@@ -39,6 +39,7 @@ class Service extends BaseModel
     {
         parent::boot();
     }
+
     // ---- Query Scopes ----
 
     /**
@@ -101,7 +102,7 @@ class Service extends BaseModel
         return $query->where('service_disabled', 1);
     }
 
-        // ---- Define Relationships ----
+    // ---- Define Relationships ----
 
     public function devices()
     {
