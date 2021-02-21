@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6321.1.2.2.5.3",
                     "sysDescr": "E7-2",
-                    "sysContact": null,
-                    "version": "3.1.50.1",
-                    "hardware": "Calix E7-2",
-                    "features": "tenge4, gpon4",
-                    "os": "exa",
-                    "type": "network",
-                    "serial": "80394580923",
-                    "icon": "calix.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6321.1.2.2.5.3",
-                    "sysDescr": "E7-2",
                     "sysContact": "<private>",
                     "version": "3.1.50.1",
                     "hardware": "Calix E7-2",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12325.1.1.2.1.1",
                     "sysDescr": "pfSense 2.3.2-RELEASE pfSense FreeBSD 10.3-RELEASE-p5 amd64",
-                    "sysContact": null,
-                    "version": "2.3.2-RELEASE",
-                    "hardware": "amd64",
-                    "features": null,
-                    "os": "pfsense",
-                    "type": "firewall",
-                    "serial": null,
-                    "icon": "pfsense.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12325.1.1.2.1.1",
-                    "sysDescr": "pfSense 2.3.2-RELEASE pfSense FreeBSD 10.3-RELEASE-p5 amd64",
                     "sysContact": "<private>",
                     "version": "2.3.2-RELEASE",
                     "hardware": "amd64",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -1638,19 +1621,6 @@
                     "storage_deleted": 0
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "3",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
-                    "storage_size": 7890923520,
-                    "storage_units": 4096,
-                    "storage_used": 865779712,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
                     "storage_mib": "ucd-dsktable",
                     "storage_index": "3",
                     "storage_type": "dsk",
@@ -1658,6 +1628,19 @@
                     "storage_size": 3567616,
                     "storage_units": 1024,
                     "storage_used": 3567616,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "3",
+                    "storage_type": "hrFSBerkeleyFFS",
+                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
+                    "storage_size": 7890923520,
+                    "storage_units": 4096,
+                    "storage_used": 865779712,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1694,19 +1677,6 @@
                     "storage_deleted": 0
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "3",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
-                    "storage_size": 7890923520,
-                    "storage_units": 4096,
-                    "storage_used": 865779712,
-                    "storage_free": 7025143808,
-                    "storage_perc": 11,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
                     "storage_mib": "ucd-dsktable",
                     "storage_index": "3",
                     "storage_type": "dsk",
@@ -1715,6 +1685,19 @@
                     "storage_units": 1024,
                     "storage_used": 385024,
                     "storage_free": 3182592,
+                    "storage_perc": 11,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "3",
+                    "storage_type": "hrFSBerkeleyFFS",
+                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
+                    "storage_size": 7890923520,
+                    "storage_units": 4096,
+                    "storage_used": 865779712,
+                    "storage_free": 7025143808,
                     "storage_perc": 11,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0

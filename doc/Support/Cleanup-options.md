@@ -17,7 +17,6 @@ Cleanup Options are set in ```config.php```
 $config['syslog_purge']                              = 30;
 $config['eventlog_purge']                            = 30;
 $config['authlog_purge']                             = 30;
-$config['perf_times_purge']                          = 30;
 $config['device_perf_purge']                         = 7;
 $config['rrd_purge']                                 = 90;// Not set by default
 $config['ports_purge']                               = true;// Set to false by default

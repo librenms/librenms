@@ -36,24 +36,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.33555.1.1",
-                    "sysDescr": "RAy - Microwave Link",
-                    "sysContact": null,
-                    "version": "4.1.51.0",
-                    "hardware": "RAY10EU",
-                    "features": "H1",
-                    "os": "ray",
-                    "type": "wireless",
-                    "serial": "9879015",
-                    "icon": "ray.png",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

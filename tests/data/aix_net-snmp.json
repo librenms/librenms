@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
                     "sysDescr": "AIX testhost 1 7 <private>",
-                    "sysContact": null,
-                    "version": "7.1",
-                    "hardware": null,
-                    "features": null,
-                    "os": "aix",
-                    "type": "server",
-                    "serial": "<private>",
-                    "icon": "aix.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
-                    "sysDescr": "AIX testhost 1 7 <private>",
                     "sysContact": "<private>",
                     "version": "7.1",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

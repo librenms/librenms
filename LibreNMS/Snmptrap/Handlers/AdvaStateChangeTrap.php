@@ -15,14 +15,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Takes traps for interface state changes on Adva Ethernet Devices.
  * On an interface state change serveral traps (6 observed) are sent via
  * CM-SYSTEM-MIB::cmStateChangeTrap. This handler creates log entries based
  * on the unit that sent the trap.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
  */

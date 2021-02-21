@@ -6,7 +6,7 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.31034.11.3",
                     "sysDescr": "Schleifenbauer",
-                    "sysContact": null,
+                    "sysContact": "<private>",
                     "version": "250 (180914PL1760)",
                     "hardware": "",
                     "features": null,
@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.31034.11.3",
-                    "sysDescr": "Schleifenbauer",
-                    "sysContact": "<private>",
-                    "version": "250 (180914PL1760)",
-                    "hardware": null,
-                    "features": null,
-                    "os": "schleifenbauer",
-                    "type": "power",
-                    "serial": "SVNL00655429",
-                    "icon": "schleifenbauer.svg",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

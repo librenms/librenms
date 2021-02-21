@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2544.1.12.1.1.39",
                     "sysDescr": "FSP150CC-XG116PRO",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "XG116Pro",
-                    "features": null,
-                    "os": "adva_fsp150",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "adva.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2544.1.12.1.1.39",
-                    "sysDescr": "FSP150CC-XG116PRO",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "XG116Pro",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

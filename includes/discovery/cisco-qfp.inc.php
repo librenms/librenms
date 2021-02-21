@@ -8,7 +8,7 @@
  *
  * LibreNMS module to capture Cisco QFP Statistics
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */

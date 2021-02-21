@@ -324,14 +324,32 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
-    public function setLocation($location_text)
+    /**
+     * Update the location to the correct location and update GPS if needed
+     *
+     * @param  \App\Models\Location  $location location data
+     */
+    public function setLocation(Location $location)
     {
-        $location_text = $location_text ? Rewrite::location($location_text) : null;
+        $location->location = $location->location ? Rewrite::location($location->location) : null;
 
-        $this->location_id = null;
-        if ($location_text) {
-            $location = Location::firstOrCreate(['location' => $location_text]);
+        if (! $location->location) { // disassociate if the location name is empty
+            $this->location_id = null;
+
+            return;
+        }
+
+        $coord = array_filter($location->only(['lat', 'lng']));
+        if (! $this->relationLoaded('location') || optional($this->location)->location !== $location->location) {
+            if (! $location->exists) { // don't fetch if new location persisted to the DB, just use it
+                $location = Location::firstOrCreate(['location' => $location->location], $coord);
+            }
             $this->location()->associate($location);
+        }
+
+        // save new coords if needed
+        if ($this->location) {
+            $this->location->fill($coord)->save();
         }
     }
 
@@ -456,11 +474,46 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
-                ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
-        });
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeNotInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
     }
 
     // ---- Define Relationships ----
@@ -633,6 +686,11 @@ class Device extends BaseModel
     public function sensors()
     {
         return $this->hasMany(\App\Models\Sensor::class, 'device_id');
+    }
+
+    public function serviceTemplates()
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
     }
 
     public function services()

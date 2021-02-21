@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2272.212",
                     "sysDescr": "VSP-8608 (6.2.0.2)",
-                    "sysContact": null,
-                    "version": "6.2.0.2",
-                    "hardware": "VSP-8608",
-                    "features": null,
-                    "os": "voss",
-                    "type": "network",
-                    "serial": "18ND1240D10P",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2272.212",
-                    "sysDescr": "VSP-8608 (6.2.0.2)",
                     "sysContact": "<private>",
                     "version": "6.2.0.2",
                     "hardware": "VSP-8608",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

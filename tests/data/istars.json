@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.40614",
                     "sysDescr": "iStars_SWV4.25",
-                    "sysContact": null,
-                    "version": "iStars_SWV4.25 R1.1.1",
-                    "hardware": null,
-                    "features": null,
-                    "os": "istars",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "istars.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.40614",
-                    "sysDescr": "iStars_SWV4.25",
                     "sysContact": "<private>",
                     "version": "iStars_SWV4.25 R1.1.1",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

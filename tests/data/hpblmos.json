@@ -24,24 +24,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.11.5.7.1.2",
                     "sysDescr": "HP Onboard Administrator",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "hpblmos",
-                    "type": "appliance",
-                    "serial": null,
-                    "icon": "hpe.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.11.5.7.1.2",
-                    "sysDescr": "HP Onboard Administrator",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -53,7 +35,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

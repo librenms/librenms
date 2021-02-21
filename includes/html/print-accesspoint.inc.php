@@ -12,7 +12,7 @@ if ($int_colour) {
     }
 }
 
-$text = $ap['name'] . ' ' . $ap['type'];
+$text = $ap['name'] . ' (' . $ap['type'] . ')';
 $ap['text'] = $text;
 
 echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='" . generate_ap_url($ap) . "/'\" style='cursor: pointer;'>
@@ -43,7 +43,7 @@ echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . format_
 
 echo '</td></tr>';
 
-if ($vars['tab'] == 'accesspoint') {
+if ($vars['ap'] > 0) { // We have a selected AP, let's show details
     $graph_type = 'accesspoints_numasoclients';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Associated Clients</div>";

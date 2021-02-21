@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": null,
-                    "sysContact": null,
-                    "version": "1.5",
-                    "hardware": "SmartPack2 Touch",
-                    "features": null,
-                    "os": "enexus",
-                    "type": "power",
-                    "serial": "<serial>",
-                    "icon": "eltek.png",
-                    "location": "<location>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

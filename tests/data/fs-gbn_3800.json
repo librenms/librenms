@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.13464.1.3.38.3",
                     "sysDescr": "FS Switch",
-                    "sysContact": null,
-                    "version": "S3800-24F4S V100R001B01D001P004SP3",
-                    "hardware": "S3800-24F4S Switch Product",
-                    "features": null,
-                    "os": "fs-gbn",
-                    "type": "network",
-                    "serial": "F170823DN051",
-                    "icon": "fs.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.13464.1.3.38.3",
-                    "sysDescr": "FS Switch",
                     "sysContact": "<private>",
                     "version": "S3800-24F4S V100R001B01D001P004SP3",
                     "hardware": "S3800-24F4S Switch Product",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
