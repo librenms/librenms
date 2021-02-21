@@ -28769,24 +28769,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1018",
                     "sysDescr": "Cisco IOS XR Software (Cisco ASR9K Series),  Version 5.3.4[Default]\nCopyright (c) 2017 by Cisco Systems, Inc.",
-                    "sysContact": null,
-                    "version": "5.3.4",
-                    "hardware": "ASR9K Series",
-                    "features": "Default",
-                    "os": "iosxr",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.1018",
-                    "sysDescr": "Cisco IOS XR Software (Cisco ASR9K Series),  Version 5.3.4[Default]\nCopyright (c) 2017 by Cisco Systems, Inc.",
                     "sysContact": "<private>",
                     "version": "5.3.4",
                     "hardware": "ASR9K Series",
@@ -28798,7 +28780,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ospf": {
         "poller": {

@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux SNMP-System",
-                    "sysContact": null,
-                    "version": "VERFW:01428.1400",
-                    "hardware": "G2-6KL",
-                    "features": null,
-                    "os": "orvaldi-ups",
-                    "type": "power",
-                    "serial": "11112222333344",
-                    "icon": "orvaldi.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux SNMP-System",
                     "sysContact": "<private>",
                     "version": "VERFW:01428.1400",
                     "hardware": "G2-6KL",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

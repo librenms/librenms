@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2.6.11",
                     "sysDescr": "IBM OS/400 V7R1M0",
-                    "sysContact": null,
-                    "version": "V7R1M0",
-                    "hardware": null,
-                    "features": null,
-                    "os": "ibm-i",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "ibmos.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2.6.11",
-                    "sysDescr": "IBM OS/400 V7R1M0",
                     "sysContact": "<private>",
                     "version": "V7R1M0",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

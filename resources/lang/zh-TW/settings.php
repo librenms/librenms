@@ -33,6 +33,7 @@ return [
             'route' => '路由探索模組',
             'discovery_modules' => '探索模組',
             'storage' => '儲存模組',
+            'networks' => '網路',
         ],
         'external' => [
             'binaries' => '執行檔位置',
@@ -43,8 +44,10 @@ return [
             'nfsen' => 'NfSen 整合',
             'unix-agent' => 'Unix-Agent 整合',
             'smokeping' => 'Smokeping 整合',
+            'snmptrapd' => 'SNMP Traps 整合',
         ],
         'poller' => [
+            'availability' => '裝置可用性',
             'distributed' => '分散式輪詢器',
             'graphite' => '資料存放區: Graphite',
             'influxdb' => '資料存放區: InfluxDB',
@@ -146,7 +149,7 @@ return [
                 'help' => '停止產生警報',
             ],
             'fixed-contacts' => [
-                'description' => 'Updates to contact email addresses not honored',
+                'description' => '在警告期間不接受連絡人電子郵件的修改',
                 'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
             ],
             'globals' => [
@@ -484,10 +487,42 @@ return [
                     'bing' => 'Bing Maps',
                 ],
             ],
+            'latlng' => [
+                'description' => 'Attempt to Geocode Locations',
+                'help' => 'Try to lookup latitude and longitude via geocoding API during polling',
+            ],
+        ],
+        'graphite' => [
+            'enable' => [
+                'description' => '啟用',
+                'help' => 'Exports metrics to Graphite',
+            ],
+            'host' => [
+                'description' => '伺服器',
+                'help' => 'The IP or hostname of the Graphite server to send data to',
+            ],
+            'port' => [
+                'description' => '連接埠',
+                'help' => 'The port to use to connect to the Graphite server',
+            ],
+            'prefix' => [
+                'description' => 'Prefix (Optional)',
+                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots',
+            ],
+        ],
+        'graphing' => [
+            'availability' => [
+                'description' => '期間',
+                'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)',
+            ],
+            'availability_consider_maintenance' => [
+                'description' => '定期維護不影響可用性',
+                'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
+            ],
         ],
         'graylog' => [
             'base_uri' => [
-                'description' => 'Base URI',
+                'description' => '基礎 URI',
                 'help' => 'Override the base uri in the case you have modified the Graylog default.',
             ],
             'device-page' => [
@@ -624,7 +659,7 @@ return [
         ],
         'oxidized' => [
             'default_group' => [
-                'description' => 'Set the default group returned',
+                'description' => '設定預設群組',
             ],
             'enabled' => [
                 'description' => '啟用 Oxidized 支援',
@@ -636,7 +671,7 @@ return [
                 ],
             ],
             'group_support' => [
-                'description' => 'Enable the return of groups to Oxidized',
+                'description' => '啟用將群組提供給 Oxidized',
             ],
             'reload_nodes' => [
                 'description' => '在每次新增裝置後，重新載入 Oxidized 節點清單',
@@ -657,10 +692,6 @@ return [
                 'description' => '啟用 PeeringDB 反查',
                 'help' => '起用 PeeringDB lookup (資料將於由 daily.sh 進行下載)',
             ],
-        ],
-        'perf_times_purge' => [
-            'description' => '輪詢器效能記錄項目大於 (天)',
-            'help' => 'Cleanup done by daily.sh',
         ],
         'permission' => [
             'device_group' => [
@@ -705,6 +736,16 @@ return [
         'routes_max_number' => [
             'description' => '允許探索路由的最大路由數',
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
+        ],
+        'nets' => [
+            'description' => '自動探索網路',
+            'help' => 'Networks from which devices will be discovered automatically.',
+        ],
+        'autodiscovery' => [
+            'nets-exclude' => [
+                'description' => '要忽略的網路或 IP',
+                'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
         ],
         'route_purge' => [
             'description' => '路由記錄大於 (天)',
@@ -810,6 +851,16 @@ return [
         'snmptranslate' => [
             'description' => 'snmptranslate 路徑',
         ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => '為 snmptraps 建立事件記錄',
+                'help' => 'Independently of the action that may be mapped to the trap',
+            ],
+            'eventlog_detailed' => [
+                'description' => '啟用詳細記錄',
+                'help' => 'Add all OIDs received with the trap in the eventlog',
+            ],
+        ],
         'snmpwalk' => [
             'description' => 'snmpwalk 路徑',
         ],
@@ -852,6 +903,10 @@ return [
                 'release' => 'release',
             ],
         ],
+        'uptime_warning' => [
+            'description' => '如果運作時間低於設定(秒)將裝置顯示警告',
+            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h',
+        ],
         'virsh' => [
             'description' => 'virsh 路徑',
         ],
@@ -877,7 +932,7 @@ return [
                 'help' => '對於沒有設定預設資訊看板的使用者，所要顯示的預設資訊看板',
             ],
             'dynamic_graphs' => [
-                'description' => '啟用動態群組',
+                'description' => '啟用動態圖表',
                 'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',
             ],
             'global_search_result_limit' => [

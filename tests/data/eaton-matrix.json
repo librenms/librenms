@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.935.10.2",
                     "sysDescr": "Network Management Card for UPS",
-                    "sysContact": null,
-                    "version": "1.0.0.1",
-                    "hardware": "Telecom Power",
-                    "features": null,
-                    "os": "eaton-matrix",
-                    "type": "power",
-                    "serial": "000000000",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.935.10.2",
-                    "sysDescr": "Network Management Card for UPS",
                     "sysContact": "<private>",
                     "version": "1.0.0.1",
                     "hardware": "Telecom Power",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

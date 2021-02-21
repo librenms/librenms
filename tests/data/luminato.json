@@ -6,24 +6,6 @@
                     "sysName": "luminato",
                     "sysObjectID": ".1.3.6.1.4.1.3715.17",
                     "sysDescr": "Teleste Luminato 8.2.6",
-                    "sysContact": null,
-                    "version": "8.2.6",
-                    "hardware": "Luminato",
-                    "features": null,
-                    "os": "luminato",
-                    "type": "network",
-                    "serial": "HK01421528",
-                    "icon": "teleste.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "luminato",
-                    "sysObjectID": ".1.3.6.1.4.1.3715.17",
-                    "sysDescr": "Teleste Luminato 8.2.6",
                     "sysContact": "dohlad@gecom.sk",
                     "version": "8.2.6",
                     "hardware": "Luminato",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

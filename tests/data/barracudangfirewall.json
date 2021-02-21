@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.10704.1.10",
                     "sysDescr": "Barracuda Firewall",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "<private>",
-                    "features": null,
-                    "os": "barracudangfirewall",
-                    "type": "firewall",
-                    "serial": null,
-                    "icon": "barracuda.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.10704.1.10",
-                    "sysDescr": "Barracuda Firewall",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "<private>",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

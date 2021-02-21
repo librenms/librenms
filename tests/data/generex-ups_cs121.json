@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.2.1.33",
                     "sysDescr": "CS121 v 4.26.14",
-                    "sysContact": null,
-                    "version": "CS121 v 4.26.14",
-                    "hardware": "Rittal RITTAL PMC Extension",
-                    "features": null,
-                    "os": "generex-ups",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "generex-ups.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.2.1.33",
-                    "sysDescr": "CS121 v 4.26.14",
                     "sysContact": "<private>",
                     "version": "CS121 v 4.26.14",
                     "hardware": "Rittal RITTAL PMC Extension",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

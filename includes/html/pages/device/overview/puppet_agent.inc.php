@@ -1,11 +1,11 @@
 <?php
 
-$app_id = \App\Models\Application::query()->where('device_id', $device['device_id'])->where('app_type', 'puppet-agent')->get('app_id')[0];
+$app = \App\Models\Application::query()->where('device_id', $device['device_id'])->where('app_type', 'puppet-agent')->first();
 
 // show only if Puppet Agent Application discovered
-if (count($app_id)) {
+if ($app) {
     $params = [];
-    $sql = 'SELECT `metric`, `value` FROM `application_metrics` WHERE `app_id` =' . $app_id['app_id'];
+    $sql = 'SELECT `metric`, `value` FROM `application_metrics` WHERE `app_id` =' . $app->app_id;
     $metrics = dbFetchKeyValue($sql, $params); ?><div class='row'>
           <div class='col-md-12'>
               <div class='panel panel-default panel-condensed device-overview'>
@@ -21,7 +21,7 @@ if (count($app_id)) {
     $graph_array['height'] = '100';
     $graph_array['width'] = '210';
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['id'] = $app_id['app_id'];
+    $graph_array['id'] = $app->app_id;
     $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['legend'] = 'no';
 

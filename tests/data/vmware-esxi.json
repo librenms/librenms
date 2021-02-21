@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6876.4.1",
                     "sysDescr": "VMware ESXi 7.0.0 build-15843807 VMware, Inc. x86_64",
-                    "sysContact": null,
-                    "version": "7.0.0",
-                    "hardware": "HP ProLiant DL380p Gen8",
-                    "features": "build 15843807",
-                    "os": "vmware-esxi",
-                    "type": "server",
-                    "serial": "CZ162913BZ",
-                    "icon": "vmware.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6876.4.1",
-                    "sysDescr": "VMware ESXi 7.0.0 build-15843807 VMware, Inc. x86_64",
                     "sysContact": "<private>",
                     "version": "7.0.0",
                     "hardware": "HP ProLiant DL380p Gen8",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

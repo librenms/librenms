@@ -51,13 +51,25 @@ modules:
                             oid: hwEntityOpticalTemperature
                             op: '<'
                             value: '-50'
+                        -
+                            oid: hwEntityOpticalTemperature
+                            op: '>='
+                            value: '2147483646'
                 -
                     oid: hwEntityStateTable
                     value: hwEntityTemperature
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: hwEntityTemperature
+                            op: '='
+                            value: '0'
+                        -
+                            oid: hwEntityTemperature
+                            op: '>='
+                            value: '2147483646'
         count:
             data:
                 -

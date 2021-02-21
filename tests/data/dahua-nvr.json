@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1004849.3.2.10",
                     "sysDescr": "DH-NVR4108HS-8P-4KS2",
-                    "sysContact": null,
-                    "version": "3.212.0000.1",
-                    "hardware": "DH-NVR4108HS-8P-4KS2",
-                    "features": null,
-                    "os": "dahua-nvr",
-                    "type": "appliance",
-                    "serial": "2M00D2APAZTL62J",
-                    "icon": "dahua.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1004849.3.2.10",
-                    "sysDescr": "DH-NVR4108HS-8P-4KS2",
                     "sysContact": "<private>",
                     "version": "3.212.0000.1",
                     "hardware": "DH-NVR4108HS-8P-4KS2",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

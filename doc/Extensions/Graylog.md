@@ -45,7 +45,7 @@ $config['graylog']['timezone'] = 'Europe/Bucharest';
 ```
 
 Timezone must be PHP supported timezones, available at:
-<http://php.net/manual/en/timezones.php>
+<https://php.net/manual/en/timezones.php>
 
 ## Graylog Version
 If you are running a version earlier than Graylog then please set
