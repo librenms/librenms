@@ -107,7 +107,7 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         return view(
-            'service.edit', [
+            'services.edit', [
                 'service' => $service,
                 'services' => Services::list(),
             ]
