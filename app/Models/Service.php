@@ -52,7 +52,7 @@ class Service extends BaseModel
             return $query;
         }
 
-        return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
+        //return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
     }
 
     /**
