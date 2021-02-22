@@ -40,7 +40,7 @@ class ServiceController extends Controller
         return view(
             'services.create', [
                 'service' => new Service(),
-                'services' => Service::orderBy('service_name')->get(),
+                'services_list' => Service::orderBy('service_name')->get(),
             ]
         );
     }

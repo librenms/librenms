@@ -25,8 +25,3 @@
         </div>
     </div>
 @endsection
-
-@section('javascript')
-    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
-    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
-@endsection

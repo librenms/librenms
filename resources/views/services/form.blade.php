@@ -22,7 +22,7 @@
     <label for="service_type" class="control-label col-sm-3 col-md-2">@lang('Check Type')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="service_type" name="service_type">
-            @foreach($services as $current_service)
+            @foreach($services_list as $current_service)
                 <option value="{{ $current_service }}" @if($current_service == $service->service_type) selected @endif>{{ $current_service }}</option>
             @endforeach
         </select>
