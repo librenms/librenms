@@ -88,6 +88,70 @@ class ServiceController extends Controller
     }
 
     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request    $request
+     * @param  \App\Models\Service $service
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function update(Request $request, Service $service)
+    {
+        $this->validate(
+            $request, [
+                'service_name' => [
+                    'required',
+                    'string',
+                    Rule::unique('services')->where(
+                        function ($query) use ($service) {
+                            $query->where('service_id', '!=', $service->service_id);
+                        }
+                    ),
+                ],
+                'service_devices' => 'array',
+                'service_devices.*' => 'integer',
+                'service_type' => 'string',
+                'service_param' => 'nullable|string',
+                'service_ip' => 'nullable|string',
+                'service_desc' => 'nullable|string',
+                'service_changed' => 'integer',
+                'service_disabled' => 'integer',
+                'service_ignore' => 'integer',
+            ]
+        );
+
+        $service->fill(
+            $request->only(
+                [
+                    'service_name',
+                    'service_type',
+                    'service_param',
+                    'service_ip',
+                    'service_desc',
+                    'service_changed',
+                    'service_ignore',
+                    'service_disabled',
+                ]
+            )
+        );
+
+        if ($service->isDirty()) {
+            try {
+                if ($service->save()) {
+                    Toastr::success(__('Service :name updated', ['name' => $service->service_name]));
+                } else {
+                    Toastr::error(__('Failed to save'));
+
+                    return redirect()->back()->withInput();
+                }
+            }
+        } else {
+            Toastr::info(__('No changes made'));
+        }
+
+        return redirect()->route('services.index');
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  \App\Models\Service $service
