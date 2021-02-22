@@ -82,6 +82,7 @@ class Location extends Model
 
             if (! empty($coord)) {
                 $this->fill($coord);
+
                 return true;
             }
         }
@@ -109,6 +110,7 @@ class Location extends Model
     {
         if (preg_match($this->location_regex, $this->location, $parsed)) {
             $this->fill($parsed);
+
             return true;
         }
 
@@ -121,6 +123,7 @@ class Location extends Model
             /** @var \LibreNMS\Interfaces\Geocoder $api */
             $api = app(\LibreNMS\Interfaces\Geocoder::class);
             $this->fill($api->getCoordinates($this->location));
+
             return true;
         } catch (BindingResolutionException $e) {
             // could not resolve geocoder, Laravel isn't booted. Fail silently.

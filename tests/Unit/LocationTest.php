@@ -106,7 +106,6 @@ class LocationTest extends TestCase
     public function testCanNotSetFixedCoordinates()
     {
         $device = Device::factory()->make(); /** @var Device $device */
-
         $locationOne = Location::factory()->withCoordinates()->make();
         $locationTwo = Location::factory(['location' => $locationOne->location])->withCoordinates()->make();
 
@@ -124,7 +123,6 @@ class LocationTest extends TestCase
         $this->assertEquals($locationTwo->lat, $device->location->lat);
         $this->assertEquals($locationTwo->lng, $device->location->lng);
     }
-
 
     public function testDnsLookup()
     {
@@ -172,7 +170,6 @@ class LocationTest extends TestCase
         $this->assertNull($device->location->lat);
         $this->assertNull($device->location->lng);
 
-
         Config::set('geoloc.latlng', true);
         $device->setLocation('API', true);
         $this->assertEquals('API', $device->location->location);
@@ -192,7 +189,6 @@ class LocationTest extends TestCase
         $location_fixed = Location::factory()->withCoordinates()->make();
         $location_api = Location::factory()->withCoordinates()->make();
         $location_dns = Location::factory()->withCoordinates()->make();
-
 
         Config::set('geoloc.dns', true);
         $this->mock(Dns::class, function (MockInterface $mock) use ($location_dns) {

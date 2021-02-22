@@ -103,7 +103,7 @@ class OS implements Module
     private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
-        $new_location = $device->override_sysLocation ? new Location() :$os->fetchLocation(); // fetch location data from device
+        $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
         $device->setLocation($new_location, true); // set location and lookup coordinates if needed
         optional($device->location)->save();
     }

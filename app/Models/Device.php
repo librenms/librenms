@@ -350,7 +350,6 @@ class Device extends BaseModel
                 }
                 $this->location()->associate($new_location);
             }
-
         }
 
         // set coordinates

@@ -48,6 +48,7 @@ class Dns implements Geocoder
             return $ret->answer;
         } catch (\Net_DNS2_Exception $e) {
             d_echo('::query() failed: ' . $e->getMessage());
+
             return [];
         }
     }
