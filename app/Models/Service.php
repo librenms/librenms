@@ -41,6 +41,19 @@ class Service extends BaseModel
     }
 
     // ---- Query Scopes ----
+    /**
+     * @param  Builder  $query
+     * @param  User  $user
+     * @return Builder
+     */
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
+    }
 
     /**
      * @param Builder $query
