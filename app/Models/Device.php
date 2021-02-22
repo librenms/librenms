@@ -327,29 +327,37 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  \App\Models\Location  $location location data
+     * @param  \App\Models\Location|string  $new_location  location data
+     * @param  string  $hostname
+     * @param  bool  $doLookup try to lookup the GPS coordinates
      */
-    public function setLocation(Location $location)
+    public function setLocation($new_location, $doLookup = false)
     {
-        $location->location = $location->location ? Rewrite::location($location->location) : null;
+        $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
+        $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
+        $coord = array_filter($new_location->only(['lat', 'lng']));
 
-        if (! $location->location) { // disassociate if the location name is empty
-            $this->location_id = null;
+        if (! $this->override_sysLocation) {
+            if (! $new_location->location) { // disassociate if the location name is empty
+                $this->location()->dissociate();
 
-            return;
-        }
-
-        $coord = array_filter($location->only(['lat', 'lng']));
-        if (! $this->relationLoaded('location') || optional($this->location)->location !== $location->location) {
-            if (! $location->exists) { // don't fetch if new location persisted to the DB, just use it
-                $location = Location::firstOrCreate(['location' => $location->location], $coord);
+                return;
             }
-            $this->location()->associate($location);
+
+            if (! $this->relationLoaded('location') || optional($this->location)->location !== $new_location->location) {
+                if (! $new_location->exists) { // don't fetch if new location persisted to the DB, just use it
+                    $new_location = Location::firstOrCreate(['location' => $new_location->location], $coord);
+                }
+                $this->location()->associate($new_location);
+            }
         }
 
-        // save new coords if needed
-        if ($this->location) {
-            $this->location->fill($coord)->save();
+        // set coordinates
+        if ($this->location && ! $this->location->fixed_coordinates) {
+            $this->location->fill($coord);
+            if ($doLookup && empty($coord)) { // only if requested and coordinates not passed explicitly
+                $this->location->lookupCoordinates($this->hostname);
+            }
         }
     }
 

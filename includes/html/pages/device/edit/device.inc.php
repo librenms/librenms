@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Device;
-use App\Models\Location;
 
 require_once 'includes/html/modal/device_maintenance.inc.php';
 
@@ -16,15 +15,12 @@ if ($_POST['editing']) {
         }
 
         $override_sysLocation = (int) isset($_POST['override_sysLocation']);
-        $override_sysLocation_string = isset($_POST['sysLocation']) ? $_POST['sysLocation'] : null;
+        $override_sysLocation_string = $_POST['sysLocation'] ?? null;
 
         if ($override_sysLocation) {
-            if ($override_sysLocation_string) {
-                $location = Location::firstOrCreate(['location' => $override_sysLocation_string]);
-                $device_model->location()->associate($location);
-            } else {
-                $device_model->location()->dissociate();
-            }
+            $device_model->override_sysLocation = false;  // allow override (will be set to actual value later)
+            $device_model->setLocation($override_sysLocation_string, true);
+            optional($device_model->location)->save();
         } elseif ($device_model->override_sysLocation) {
             // no longer overridden, clear location
             $device_model->location()->dissociate();

@@ -53,6 +53,7 @@ class LocationController extends Controller
         ]);
 
         $location->fill($request->only(['lat', 'lng']));
+        $location->fixed_coordinates = true;  // user has set coordinates, block automated changes
         $location->save();
 
         return response()->json(['status' => 'success']);

@@ -1632,6 +1632,13 @@
                 ]
             }
         },
+        "geoloc.dns": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": true,
+            "type": "boolean"
+        },
         "geoloc.engine": {
             "default": false,
             "group": "external",

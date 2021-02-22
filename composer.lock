@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0911a4d37f7dda7d8d6c8d1cfe3c1bbc",
+    "content-hash": "74b245e22b8cf40ae29fdc12cc2e59eb",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -2873,6 +2873,57 @@
                 "source": "https://github.com/pear/Console_Table"
             },
             "time": "2018-01-25T20:47:17+00:00"
+        },
+        {
+            "name": "pear/net_dns2",
+            "version": "v1.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikepultz/netdns2.git",
+                "reference": "d5dbae0b0c0567923d25b3ae5e2bf1e9cbcedf76"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikepultz/netdns2/zipball/d5dbae0b0c0567923d25b3ae5e2bf1e9cbcedf76",
+                "reference": "d5dbae0b0c0567923d25b3ae5e2bf1e9cbcedf76",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Net_DNS2": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Pultz",
+                    "email": "mike@mikepultz.com",
+                    "homepage": "https://mikepultz.com/",
+                    "role": "lead"
+                }
+            ],
+            "description": "Native PHP DNS Resolver and Updater Library",
+            "homepage": "https://netdns2.com/",
+            "keywords": [
+                "PEAR",
+                "dns",
+                "network"
+            ],
+            "support": {
+                "issues": "https://github.com/mikepultz/netdns2/issues",
+                "source": "https://github.com/mikepultz/netdns2"
+            },
+            "time": "2020-10-11T17:33:54+00:00"
         },
         {
             "name": "php-amqplib/php-amqplib",

@@ -673,6 +673,10 @@ return [
                 'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)',
             ],
+            'dns' => [
+                'description' => 'Use DNS Location Record',
+                'help' => 'Use LOC Record from DNS Server to get geographic coordinates for Hostname',
+            ],
             'engine' => [
                 'description' => 'Mapping Engine',
                 'options' => [
