@@ -147,6 +147,7 @@ class ServiceController extends Controller
                 return redirect()->back()->withInput()->withErrors([
                     $e->getMessage(),
                 ]);
+            }
         } else {
             Toastr::info(__('No changes made'));
         }
