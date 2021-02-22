@@ -35,7 +35,7 @@
                     </thead>
                     <tbody>
                     @foreach($services as $service)
-                        <tr id="row_{{ $service->id }}">
+                        <tr id="row_{{ $service->service_id }}">
                             <td>{{ $service->service_name }}</td>
                             <td>{{ $service->service_type }}</td>
                             <td>{{ $service->service_param }}</td>
@@ -46,10 +46,10 @@
                             <td>{{ $service->service_disabled }}</td>
                             <td>
                                 <a type="button" title="@lang('Edit Service')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
-                                    href="{{ route('services.edit', $service->id) }}">
+                                    href="{{ route('services.edit', $service->service_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                 <button type="button" class="btn btn-danger btn-sm" title="@lang('Delete Service')" aria-label="@lang('Delete')"
-                                    onclick="delete_st(this, '{{ $service->name }}', '{{ $service->id }}', '{{ route('services.destroy', $service->id) }}')">
+                                    onclick="delete_st(this, '{{ $service->service_name }}', '{{ $service->service_id }}', '{{ route('services.destroy', $service->service_id) }}')">
                                     <i class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
                         </tr>

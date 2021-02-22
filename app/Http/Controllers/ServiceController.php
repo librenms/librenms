@@ -25,7 +25,7 @@ class ServiceController extends Controller
 
         return view(
             'services.index', [
-                'services' => Service::orderBy('name')->get(),
+                'services' => Service::orderBy('service_name')->get(),
             ]
         );
     }
@@ -40,7 +40,7 @@ class ServiceController extends Controller
         return view(
             'services.create', [
                 'service' => new Service(),
-                'services' => Service::orderBy('name')->get(),
+                'services' => Service::orderBy('service_name')->get(),
             ]
         );
     }
