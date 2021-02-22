@@ -36,14 +36,14 @@
                     <tbody>
                     @foreach($services as $service)
                         <tr id="row_{{ $service->id }}">
-                            <td>{{ $service->name }}</td>
-                            <td>{{ $service->type }}</td>
-                            <td>{{ $service->param }}</td>
-                            <td>{{ $service->ip }}</td>
-                            <td>{{ $service->desc }}</td>
-                            <td>{{ $service->changed }}</td>
-                            <td>{{ $service->ignore }}</td>
-                            <td>{{ $service->disabled }}</td>
+                            <td>{{ $service->service_name }}</td>
+                            <td>{{ $service->service_type }}</td>
+                            <td>{{ $service->service_param }}</td>
+                            <td>{{ $service->service_ip }}</td>
+                            <td>{{ $service->service_desc }}</td>
+                            <td>{{ $service->service_changed }}</td>
+                            <td>{{ $service->service_ignore }}</td>
+                            <td>{{ $service->service_disabled }}</td>
                             <td>
                                 <a type="button" title="@lang('Edit Service')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                     href="{{ route('services.edit', $service->id) }}">
