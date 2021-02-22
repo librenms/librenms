@@ -41,6 +41,7 @@ class Service extends BaseModel
     }
 
     // ---- Query Scopes ----
+
     /**
      * @param  Builder  $query
      * @param  User  $user
