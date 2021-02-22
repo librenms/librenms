@@ -6,15 +6,15 @@
     </div>
 </div>
 
-<div class="form-group @if($errors->has('device_id')) has-error @endif">
-    <label for="device_id" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Device')</label>
+<div class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
+    <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Devices')</label>
     <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="device_id" name="device_id">
-            @foreach($device as $device)
-                <option value="{{ $service->device_id }}" selected>{{ $device_id->displayName() }}</option>
+        <select class="form-control" id="devices" name="devices[]" multiple>
+            @foreach($service->devices as $device)
+                <option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>
             @endforeach
         </select>
-        <span class="help-block">{{ $errors->first('device_id') }}</span>
+        <span class="help-block">{{ $errors->first('devices') }}</span>
     </div>
 </div>
 
