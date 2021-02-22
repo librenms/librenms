@@ -34,7 +34,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($services_list as $service)
+                    @foreach($services as $service)
                         <tr id="row_{{ $service->service_id }}">
                             <td>{{ $service->service_name }}</td>
                             <td>{{ $service->service_type }}</td>
