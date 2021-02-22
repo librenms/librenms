@@ -24,7 +24,9 @@
 
 namespace LibreNMS\Util;
 
-class Dns
+use LibreNMS\Interfaces\Geocoder;
+
+class Dns implements Geocoder
 {
     protected $resolver;
 
@@ -34,8 +36,8 @@ class Dns
     }
 
     /**
-     * @param $domain  Domain which has to be parsed
-     * @param $record  DNS Record which should be searched
+     * @param string $domain  Domain which has to be parsed
+     * @param string $record  DNS Record which should be searched
      * @return array   List of matching records
      */
     public function getRecord($domain, $record = 'A')
@@ -46,6 +48,19 @@ class Dns
             return $ret->answer;
         } catch (\Net_DNS2_Exception $e) {
             d_echo('::query() failed: ' . $e->getMessage());
+            return [];
         }
+    }
+
+    public function getCoordinates($hostname)
+    {
+        foreach ($this->getRecord($hostname, 'LOC') as $record) {
+            return [
+                'lat' => $record->latitude,
+                'lng' => $record->longitude,
+            ];
+        }
+
+        return [];
     }
 }

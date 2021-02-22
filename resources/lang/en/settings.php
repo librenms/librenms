@@ -673,6 +673,10 @@ return [
                 'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)',
             ],
+            'dns' => [
+                'description' => 'Use DNS Location Record',
+                'help' => 'Use LOC Record from DNS Server to get geographic coordinates for Hostname',
+            ],
             'engine' => [
                 'description' => 'Mapping Engine',
                 'options' => [
@@ -1363,10 +1367,6 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
-        ],
-        'parse_dns_location_record' => [
-            'description' => 'Use DNS Location Record',
-            'help' => 'Use LOC Record from DNS Server to get geographic coordinates for Hostname',
         ],
         'force_hostname_to_sysname' => [
             'description' => 'show SysName instead of Hostname',

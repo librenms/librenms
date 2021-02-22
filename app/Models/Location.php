@@ -26,30 +26,20 @@ namespace App\Models;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use LibreNMS\Util\Dns;
 
 class Location extends Model
 {
+    use HasFactory;
+
     public $fillable = ['location', 'lat', 'lng'];
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
-    protected $casts = ['lat' => 'float', 'lng' => 'float'];
+    protected $casts = ['lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'];
 
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
-
-    /**
-     * Set up listeners for this Model
-     */
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function (Location $location) {
-            // parse coordinates for new locations
-            $location->lookupCoordinates();
-        });
-    }
 
     // ---- Helper Functions ----
 
@@ -74,46 +64,55 @@ class Location extends Model
     }
 
     /**
-     * Try to parse coordinates then
-     * call geocoding API to resolve latitude and longitude.
+     * Try to parse coordinates
+     * then try to lookup DNS LOC records if hostname is provided
+     * then call geocoding API to resolve latitude and longitude.
+     *
+     * @param  string  $hostname
+     * @return bool
      */
-    public function lookupCoordinates()
+    public function lookupCoordinates($hostname = null)
     {
-        if (\LibreNMS\Config::get('parse_dns_location_record')) {
-            $r = new Dns();
-            $dns_record = $r->getRecord($this->hostname, 'LOC');
+        if ($this->location && $this->parseCoordinates()) {
+            return true;
+        }
 
-            if (is_array($dns_record)) {
-                $this->lat = $dns_record[0]->latitude;
-                $this->lng = $dns_record[0]->longitude;
-                $this->location = '';
-            }
-        } elseif (! $this->hasCoordinates() && $this->location) {
-            $this->parseCoordinates();
+        if ($hostname && \LibreNMS\Config::get('geoloc.dns')) {
+            $coord = app(Dns::class)->getCoordinates($hostname);
 
-            if (! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
-                $this->fetchCoordinates();
-                $this->updateTimestamps();
+            if (! empty($coord)) {
+                $this->fill($coord);
+                return true;
             }
         }
+
+        if ($this->location && ! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
+            return $this->fetchCoordinates();
+        }
+
+        return false;
     }
 
     /**
      * Remove encoded GPS for nicer display
      *
+     * @param  bool  $withCoords
      * @return string
      */
-    public function display()
+    public function display($withCoords = false)
     {
         return (trim(preg_replace($this->location_regex, '', $this->location)) ?: $this->location)
-            . ($this->coordinatesValid() ? " [$this->lat, $this->lng]" : '');
+            . ($withCoords && $this->coordinatesValid() ? " [$this->lat,$this->lng]" : '');
     }
 
     protected function parseCoordinates()
     {
         if (preg_match($this->location_regex, $this->location, $parsed)) {
             $this->fill($parsed);
+            return true;
         }
+
+        return false;
     }
 
     protected function fetchCoordinates()
@@ -122,9 +121,12 @@ class Location extends Model
             /** @var \LibreNMS\Interfaces\Geocoder $api */
             $api = app(\LibreNMS\Interfaces\Geocoder::class);
             $this->fill($api->getCoordinates($this->location));
+            return true;
         } catch (BindingResolutionException $e) {
             // could not resolve geocoder, Laravel isn't booted. Fail silently.
         }
+
+        return false;
     }
 
     // ---- Query scopes ----

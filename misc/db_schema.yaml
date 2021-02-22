@@ -843,6 +843,7 @@ locations:
     - { Field: lat, Type: 'double(10,6)', 'Null': true, Extra: '' }
     - { Field: lng, Type: 'double(10,6)', 'Null': true, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
+    - { Field: fixed_coordinates, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     locations_location_unique: { Name: locations_location_unique, Columns: [location], Unique: true, Type: BTREE }
