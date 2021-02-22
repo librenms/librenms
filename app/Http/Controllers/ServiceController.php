@@ -144,7 +144,7 @@ class ServiceController extends Controller
                     return redirect()->back()->withInput();
                 }
             }catch (\Illuminate\Database\QueryException $e) {
-                return redirect()->back()->withInput()->withErrors();
+                return redirect()->back()->withInput();
             }
         } else {
             Toastr::info(__('No changes made'));
