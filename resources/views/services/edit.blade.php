@@ -5,9 +5,9 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <form action="{{ route('services.update', $service->id) }}" method="POST" role="form"
+            <form action="{{ route('services.update', $service->service_id) }}" method="POST" role="form"
                   class="form-horizontal services-form col-md-10 col-md-offset-1 col-sm-12">
-                <legend><h2>@lang('Edit Service'): {{ $service->name }}</h2></legend>
+                <legend><h2>@lang('Edit Service'): {{ $service->service_name }}</h2></legend>
                 <div class='alert alert-info'>Service will edited for the specified Device.</div>
                 {{ method_field('PUT') }}
                 @csrf
