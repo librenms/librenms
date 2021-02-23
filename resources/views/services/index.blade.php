@@ -6,7 +6,7 @@
     <div class="col-md-12">
       <ul class="nav nav-tabs">
         <li role="presentation" @if( $current_tab == 'services' ) class="active" @endif>
-          <a href="{{ route('services.index') }}"><i class="fa fa-th-large fa-lg icon-theme" aria-hidden="true"></i> @lang('All Services')</a>
+          <a href="{{ route('services.index') }}"><i class="fa fa-cogs icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('All Services')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'error' ) class="active" @endif>
           <a href="{{ route('services.index') }}"><i class="fa fa-exclamation-circle fa-col-danger fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Errors')</a>

@@ -3,6 +3,7 @@
 @section('title', __('Services'))
 
 @section('content')
+@parent
     <div class="container-fluid">
         <x-panel id="manage-services-panel">
             <x-slot name="title">
