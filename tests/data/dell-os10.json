@@ -3875,7 +3875,32 @@
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
                 }
-            ]
+            ],
+            "bgpPeers": [
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "169.254.247.1",
+                    "bgpPeerRemoteAs": 64513,
+                    "bgpPeerState": "idle",
+                    "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
+                    "bgpPeerInUpdates": 0,
+                    "bgpPeerOutUpdates": 0,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
+                    "context_name": null,
+                    "bgpLocalAs": null,
+                    "vrfLocalAs": null
+                }
+            ],
+            "bgpPeers_cbgp": []
         },
         "poller": {
             "ports": [
@@ -7731,7 +7756,32 @@
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
                 }
-            ]
+            ],
+            "bgpPeers": [
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "169.254.247.1",
+                    "bgpPeerRemoteAs": 64513,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "halted",
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": "Reset by peer",
+                    "bgpLocalAddr": "169.254.247.2",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "DIRECT CONNECT",
+                    "bgpPeerInUpdates": 17,
+                    "bgpPeerOutUpdates": 4830,
+                    "bgpPeerInTotalMessages": 430177,
+                    "bgpPeerOutTotalMessages": 489554,
+                    "bgpPeerFsmEstablishedTime": 28063000,
+                    "bgpPeerInUpdateElapsedTime": 27997600,
+                    "context_name": null,
+                    "bgpLocalAs": null,
+                    "vrfLocalAs": null
+                }
+            ],
+            "bgpPeers_cbgp": []
         }
     },
     "processors": {
