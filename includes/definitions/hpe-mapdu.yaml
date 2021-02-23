@@ -12,15 +12,4 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.232.165.7
             - .1.3.6.1.4.1.232.165.11
-snmp_max_oid: '8'
-poller_modules:
-    wireless: false
-    ipmi: false
-    applications: false
-    services: false
-    ntp: false
-discovery_modules:
-    cisco-vrf-lite: false
-    services: false
-    ntp: false
-    wireless: false
+snmp_max_oid: 8
