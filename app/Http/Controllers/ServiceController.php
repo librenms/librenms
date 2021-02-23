@@ -146,7 +146,7 @@ class ServiceController extends Controller
 
                     return redirect()->back()->withInput();
                 }
-            }catch (Exception $e) {
+            } catch (Exception $e) {
                 return redirect()->back()->withInput()->withErrors([
                     $e->getMessage(),
                 ]);
