@@ -99,7 +99,7 @@ if (! empty($ltmPoolEntry['name'])) {
         $ltmPoolEntry[$key] = snmpwalk_array_num($device, $value, 0);
     }
     // Gather Pool Member Data if pool members found
-    $ltmPoolMemberEntry['name'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1', 0);
+    $ltmPoolMemberEntry['name'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.19', 0);
     if (! empty($ltmPoolMemberEntry['name'])) {
         foreach ($ltmPoolMemberEntryOID as $key => $value) {
             $ltmPoolMemberEntry[$key] = snmpwalk_array_num($device, $value, 0);
@@ -258,8 +258,8 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
             $result = [];
 
             // Find all Pool member names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1.') !== false) {
-                [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.1.', $oid);
+            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.19.') !== false) {
+                [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.19.', $oid);
                 $result['type'] = 'f5-ltm-poolmember';
                 $result['UID'] = (string) $index;
                 $result['label'] = $value;
