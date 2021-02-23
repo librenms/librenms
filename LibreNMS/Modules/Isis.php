@@ -53,15 +53,16 @@ class Isis implements Module
      */
     public function poll(OS $os)
     {
-        // Get device object
+        // Get device objects
+        $device_array = $os->getDeviceArray();
         $device = $os->getDevice();
         $device_id = $os->getDeviceId();
 
         // Poll all ISIS enabled circuits from the device
-        $circuits_poll = $os->getCacheTable('ISIS-MIB::isisCirc', 'ISIS-MIB');
+        $circuits_poll = snmpwalk_group($device_array, 'ISIS-MIB::isisCirc', 'ISIS-MIB');
 
         // Poll all available adjacencies
-        $adjacencies_poll = $os->getCacheTable('ISIS-MIB::isisISAdj', 'ISIS-MIB');
+        $adjacencies_poll = snmpwalk_group($device_array, 'ISIS-MIB::isisISAdj', 'ISIS-MIB');
         $adjacencies = collect();
         $isis_data = [];
 
