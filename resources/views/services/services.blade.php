@@ -50,8 +50,6 @@
                                     onclick="delete_st(this, '{{ $service->service_name }}', '{{ $service->service_id }}', '{{ route('services.destroy', $service->service_id) }}')">
                                     <i class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
-                            @if($service->service_status == '2') class="danger" @endif
-                            @if($service->service_status == '1') class="warning" @endif
                         </tr>
                     @endforeach
                     </tbody>
