@@ -21,6 +21,14 @@
     color: #e30613;
   }
 
+  .fa-col-warning {
+    color: #fbff00;
+  }
+
+  .fa-col-maintenance {
+    color: #6f00ff;
+  }
+
   .icon-theme {
     color: #bfc0c0;
   }
@@ -186,7 +194,7 @@
   }
   small {
     font-size: 80%;
-    color: #FFF;  
+    color: #FFF;
   }
   sub,
   sup {

@@ -41,6 +41,14 @@
     color: #e30613;
 }
 
+.fa-col-warning {
+    color: #fbff00;
+}
+
+.fa-col-maintenance {
+    color: #6f00ff;
+}
+
 .icon-theme {
     color: #0052cc;
 }
@@ -139,7 +147,7 @@
   -webkit-box-shadow: none;
 }
 
-.dropdown-menu li a:focus, 
+.dropdown-menu li a:focus,
 .dropdown-menu li a:hover {
     color: #fff;
     text-decoration: none;
