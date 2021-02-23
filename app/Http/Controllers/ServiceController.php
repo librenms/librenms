@@ -25,6 +25,7 @@ class ServiceController extends Controller
 
         return view(
             'services.index', [
+                'current_tab' => 'services',
                 'services' => Service::orderBy('service_name')->get(),
                 'services_list' => Services::list(),
             ]
