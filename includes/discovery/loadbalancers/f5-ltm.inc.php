@@ -82,6 +82,7 @@ $ltmPoolMemberEntryOID = [
     'ratio' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.6',
     'weight' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.7',
     'priority' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.8',
+    'nodename' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.19',
     'state' => '1.3.6.1.4.1.3375.2.2.5.6.2.1.5',
     'available' => '1.3.6.1.4.1.3375.2.2.5.6.2.1.6',
     'errorcode' => '1.3.6.1.4.1.3375.2.2.5.6.2.1.8',
@@ -99,7 +100,7 @@ if (! empty($ltmPoolEntry['name'])) {
         $ltmPoolEntry[$key] = snmpwalk_array_num($device, $value, 0);
     }
     // Gather Pool Member Data if pool members found
-    $ltmPoolMemberEntry['name'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.19', 0);
+    $ltmPoolMemberEntry['name'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1', 0);
     if (! empty($ltmPoolMemberEntry['name'])) {
         foreach ($ltmPoolMemberEntryOID as $key => $value) {
             $ltmPoolMemberEntry[$key] = snmpwalk_array_num($device, $value, 0);
@@ -258,8 +259,8 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
             $result = [];
 
             // Find all Pool member names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.19.') !== false) {
-                [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.19.', $oid);
+            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1.') !== false) {
+                [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.1.', $oid);
                 $result['type'] = 'f5-ltm-poolmember';
                 $result['UID'] = (string) $index;
                 $result['label'] = $value;
@@ -279,7 +280,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
                 $result['priority'] = $ltmPoolMemberEntry['priority']['1.3.6.1.4.1.3375.2.2.5.3.2.1.8.' . $index];
                 $result['state'] = $ltmPoolMemberEntry['state']['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.' . $index];
                 $result['available'] = $ltmPoolMemberEntry['available']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.' . $index];
-
+                $result['nodename'] = $ltmPoolMemberEntry['nodename']['1.3.6.1.4.1.3375.2.2.5.3.2.1.19.' . $index];
                 // If available and bad state
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
                 if (($result['available'] == 1) && ($result['state'] == 3)) {
