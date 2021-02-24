@@ -47,11 +47,11 @@ if (Config::get('enable_bgp')) {
                 $vrfId = 1; // According to the MIB
             }
             foreach ($peer as $address => $value) {
-                # resolve AS number by DNS_TXT record
+                // resolve AS number by DNS_TXT record
                 $astext = get_astext($value['os10bgp4V2PeerRemoteAs']);
 
-                # FIXME the `devices` table gets updated in the main bgp-peers.inc.php
-                # Setting it here avoids the code that resets it to null if not found in BGP4-MIB.
+                // FIXME - the `devices` table gets updated in the main bgp-peers.inc.php
+                // Setting it here avoids the code that resets it to null if not found in BGP4-MIB.
                 $bgpLocalAs = $value['os10bgp4V2PeerLocalAs'];
 
                 if (dbFetchCell('SELECT count(*) FROM `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) < '1') {
