@@ -28,9 +28,11 @@ abstract class PowerState
 
     const STATES = [
         'powered off' => self::OFF,
+        'poweredoff' => self::OFF,
         'shut off' => self::OFF,
 
         'powered on' => self::ON,
+        'poweredon' => self::ON,
         'running' => self::ON,
 
         'suspended' => self::SUSPENDED,
