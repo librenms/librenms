@@ -24,7 +24,7 @@ class ServiceController extends Controller
         //$this->authorize('manage', Service::class);
 
         return view(
-            'services.index', [
+            'services.services', [
                 'current_tab' => 'services',
                 'services' => Service::orderBy('service_name')->get(),
                 'services_list' => Services::list(),
