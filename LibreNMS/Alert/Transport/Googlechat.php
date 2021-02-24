@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * LibreNMS Google Chat alerting transport
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,7 +57,6 @@ class Googlechat extends Transport
 
         // Close cURL resource
 
-        
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
