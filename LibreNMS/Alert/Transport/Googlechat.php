@@ -1,6 +1,5 @@
 <?php
 /**
- * transport-telegram.inc.php
  *
  * LibreNMS Google Chat alerting transport
  *
@@ -17,27 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2021 Pablo Baldovi
  * @author     Pablo Baldovi <pbaldovi@gmail.com>
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 use Log;
-
 
 class Googlechat extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-
         $googlechat_conf['webhookurl'] = $this->config['googlechat-webhook'];
+
         return $this->contactGooglechat($obj, $googlechat_conf);
     }
-
 
     public static function contactGooglechat($obj, $data)
     {
@@ -48,12 +44,11 @@ class Googlechat extends Transport
         // Create a new cURL resource
         $ch = curl_init($data['webhookurl']);
 
-
         // Attach encoded JSON string to the POST fields
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
         // Set the content type to application/json
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
 
         // Return response instead of outputting
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -62,23 +57,22 @@ class Googlechat extends Transport
         $result = curl_exec($ch);
 
         // Close cURL resource
-        curl_close($ch);
+
+        
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-
-
-
+        Log::debug($code);
 
         if ($code != 200) {
-
             Log::error('Google Chat Transport Error');
             Log::error($result);
+
             return 'HTTP Status code ' . $code;
         }
 
         return true;
     }
-
 
     public static function configTemplate()
     {
@@ -89,11 +83,11 @@ class Googlechat extends Transport
                     'name' => 'googlechat-webhook',
                     'descr' => 'Google Chat Room Webhook',
                     'type' => 'text',
-                ]
+                ],
             ],
             'validation' => [
                 'googlechat-webhook' => 'required|string',
-            ]
+            ],
         ];
     }
 }
