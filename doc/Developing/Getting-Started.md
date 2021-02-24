@@ -44,7 +44,7 @@ won't be broken in the future. You can find out more in our [Validating Code Doc
 The default database connection for automated testing is `testing`.
 
 To override the database parameters for unit tests, configure your
-`.env` file accordingly. The defaults (from [config/database.php](../../config/database.php))
+`.env` file accordingly. The defaults (from `config/database.php`)
 are:
 
 ```dotenv
