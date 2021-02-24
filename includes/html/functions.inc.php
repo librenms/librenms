@@ -965,7 +965,7 @@ function alert_details($details)
         if ($tmp_alerts['sensor_id']) {
             $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
             if ($tmp_alerts['sensor_class'] == 'state') {
-                $details = 'State: ' . $tmp_alerts['state_descr'] . ' (value ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+                $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
             }
             $details_a = [];
 
