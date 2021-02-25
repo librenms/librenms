@@ -408,6 +408,16 @@ modules:
         state:
             data:
                 -
+                    oid: hwWlanClusterSynConfig
+                    value: hwWlanClusterSynConfigScheduleEnable
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.5.4.{{ $index }}'
+                    descr: 'Configuration Sync'
+                    group: Redundancy
+                    state_name: hwWlanClusterSynConfigScheduleEnable
+                    states:
+                        - { descr: disable, graph: 1, value: 1, generic: 3 }
+                        - { descr: enable, graph: 1, value: 2, generic: 0 }
+                -
                     oid: hwWlanClusterACListInfoTable
                     value: hwWlanClusterACStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.7.{{ $index }}'
