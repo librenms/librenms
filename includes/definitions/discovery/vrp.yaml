@@ -1,4 +1,4 @@
-mib: HUAWEI-WAN-MIB:HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
+mib: HUAWEI-WLAN-CONFIGURATION-MIB:HUAWEI-WAN-MIB:HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
 modules:
     os:
         sysDescr_regex: '/\((?<hardware>\S+) (?<version>V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/'
@@ -409,9 +409,24 @@ modules:
             data:
                 -
                     oid: hwWlanClusterACListInfoTable
+                    value: hwWlanClusterACStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.7.{{ $index }}'
+                    descr: 'Current Redundancy Status'
+                    group: Redundancy
+                    state_name: hwWlanClusterACStatus
+                    states:
+                        - { descr: down, graph: 1, value: 1, generic: 2 }
+                        - { descr: up, graph: 1, value: 2, generic: 0 }
+                        - { descr: pskmismatch, graph: 1, value: 3, generic: 2 }
+                        - { descr: vermismatch, graph: 1, value: 4, generic: 2 }
+                        - { descr: cfgmismatch, graph: 1, value: 5, generic: 2 }
+                        - { descr: devmismatch, graph: 1, value: 6, generic: 2 }
+                        - { descr: initial, graph: 1, value: 7, generic: 3 }
+                -
+                    oid: hwWlanClusterACListInfoTable
                     value: hwWlanClusterACRole
                     num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.4.{{ $index }}'
-                    descr: 'Peer Redundancy Status'
+                    descr: 'Peer Redundancy Role'
                     group: Redundancy
                     state_name: hwWlanClusterACRole
                     states:
