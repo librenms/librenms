@@ -9131,7 +9131,32 @@
                     "vrfLocalAs": null
                 }
             ],
-            "bgpPeers_cbgp": []
+            "bgpPeers_cbgp": [
+                {
+                    "bgpPeerIdentifier": "169.254.247.1",
+                    "afi": "ipv4",
+                    "safi": "unicast",
+                    "AcceptedPrefixes": 0,
+                    "DeniedPrefixes": 0,
+                    "PrefixAdminLimit": 0,
+                    "PrefixThreshold": 0,
+                    "PrefixClearThreshold": 0,
+                    "AdvertisedPrefixes": 0,
+                    "SuppressedPrefixes": 0,
+                    "WithdrawnPrefixes": 0,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
+                    "DeniedPrefixes_delta": 0,
+                    "DeniedPrefixes_prev": 0,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
+                    "SuppressedPrefixes_delta": 0,
+                    "SuppressedPrefixes_prev": 0,
+                    "WithdrawnPrefixes_delta": 0,
+                    "WithdrawnPrefixes_prev": 0,
+                    "context_name": null
+                }
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -9158,7 +9183,32 @@
                     "vrfLocalAs": null
                 }
             ],
-            "bgpPeers_cbgp": []
+            "bgpPeers_cbgp": [
+                {
+                    "bgpPeerIdentifier": "169.254.247.1",
+                    "afi": "ipv4",
+                    "safi": "unicast",
+                    "AcceptedPrefixes": 27,
+                    "DeniedPrefixes": 0,
+                    "PrefixAdminLimit": 0,
+                    "PrefixThreshold": 0,
+                    "PrefixClearThreshold": 0,
+                    "AdvertisedPrefixes": 69,
+                    "SuppressedPrefixes": 0,
+                    "WithdrawnPrefixes": 0,
+                    "AcceptedPrefixes_delta": 27,
+                    "AcceptedPrefixes_prev": 0,
+                    "DeniedPrefixes_delta": 0,
+                    "DeniedPrefixes_prev": 0,
+                    "AdvertisedPrefixes_delta": 69,
+                    "AdvertisedPrefixes_prev": 0,
+                    "SuppressedPrefixes_delta": 0,
+                    "SuppressedPrefixes_prev": 0,
+                    "WithdrawnPrefixes_delta": 0,
+                    "WithdrawnPrefixes_prev": 0,
+                    "context_name": null
+                }
+            ]
         }
     }
 }
