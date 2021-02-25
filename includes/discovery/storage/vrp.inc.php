@@ -24,22 +24,31 @@
  */
 
 if ($device['os'] === 'vrp') {
-    $vrp_tmp = snmp_get_multi_oid($device, ['hwStorageDescr.1', 'hwStorageSpaceFree.1', 'hwStorageSpace.1'], '-OUQs', 'HUAWEI-FLASH-MAN-MIB');
+    $vrp_tmp = snmpwalk_cache_oid($device, 'hwStorageEntry', null, 'HUAWEI-FLASH-MAN-MIB');
 /*
- * HUAWEI-FLASH-MAN-MIB::hwStorageType.1 = INTEGER: flash(1)
- * HUAWEI-FLASH-MAN-MIB::hwStorageSpace.1 = INTEGER: 206324 kbytes
- * HUAWEI-FLASH-MAN-MIB::hwStorageSpaceFree.1 = INTEGER: 59084 kbytes
- * HUAWEI-FLASH-MAN-MIB::hwStorageName.1 = STRING: flash:
- * HUAWEI-FLASH-MAN-MIB::hwStorageDescr.1 = STRING: System Flash
+ * array (
+ *   1 =>
+ *   array (
+ *     'hwStorageType' => 'flash',
+ *     'hwStorageSpace' => '206324',
+ *     'hwStorageSpaceFree' => '59084',
+ *     'hwStorageName' => 'flash:',
+ *     'hwStorageDescr' => 'System Flash',
+ *   ),
+ * )
  */
-    $fstype = 'dsk';
-    $descr = $vrp_tmp['hwStorageDescr.1'];
-    $units = 1024;
-    $index = 1;
-    if (is_numeric($vrp_tmp['hwStorageSpace.1']) && is_numeric($vrp_tmp['hwStorageSpaceFree.1'])) {
-        $total = $vrp_tmp['hwStorageSpace.1'];
-        $used = $total - $vrp_tmp['hwStorageSpaceFree.1'];
-        discover_storage($valid_storage, $device, $index, $fstype, 'vrp', $descr, $total, $units, $used);
+    if (is_array($vrp_tmp)) {
+        echo 'storageEntry ';
+        foreach ($vrp_tmp as $index => $storage) {
+            $fstype = 'dsk';
+            $descr = $storage['hwStorageDescr'];
+            $units = 1024;
+            if (is_numeric($storage['hwStorageSpace']) && is_numeric($storage['hwStorageSpaceFree'])) {
+                $total = $storage['hwStorageSpace'];
+                $used = $total - $storage['hwStorageSpaceFree'];
+                discover_storage($valid_storage, $device, $index, $fstype, 'vrp', $descr, $total, $units, $used);
+            }
+        }
     }
     unset($vrp_tmp);
 }
