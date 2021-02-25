@@ -969,7 +969,7 @@ function alert_details($details)
             } else {
                 // Other sensors
                 $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
-            ]
+            }
             $details_a = [];
 
             if ($tmp_alerts['sensor_limit_low']) {
