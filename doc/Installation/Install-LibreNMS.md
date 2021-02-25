@@ -21,17 +21,17 @@ Connect to the server command line and follow the instructions below.
 === "Ubuntu 20.04"
     === "NGINX"
         ```
-        apt install software-properties-common
-        add-apt-repository universe
-        apt update
+        apt install software-properties-common -y
+        add-apt-repository universe -y
+        apt update -y
         apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois unzip python3-pymysql python3-dotenv python3-redis python3-setuptools
         ```
 
     === "Apache"
         ```
-        apt install software-properties-common
-        add-apt-repository universe
-        apt update
+        apt install software-properties-common -y
+        add-apt-repository universe -y
+        apt update -y
         apt install acl curl apache2 composer fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
         ```
 
