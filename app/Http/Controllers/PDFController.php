@@ -8,6 +8,7 @@ use LibreNMS\Config;
 use Illuminate\Support\Facades\Route;
 use LibreNMS\Util\DynamicConfig;
 
+
 require '/opt/librenms/includes/init.php';
 require_once '/opt/librenms/includes/html/functions.inc.php';
 
