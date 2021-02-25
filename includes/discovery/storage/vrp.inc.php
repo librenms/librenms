@@ -42,10 +42,13 @@ if ($device['os'] === 'vrp') {
         foreach ($vrp_tmp as $index => $storage) {
             $fstype = 'dsk';
             $descr = $storage['hwStorageDescr'];
+            if (empty($descr)) {
+                $descr = $storage['hwStorageName'];
+            }
             $units = 1024;
             if (is_numeric($storage['hwStorageSpace']) && is_numeric($storage['hwStorageSpaceFree'])) {
-                $total = $storage['hwStorageSpace'];
-                $used = $total - $storage['hwStorageSpaceFree'];
+                $total = $storage['hwStorageSpace'] * $units;
+                $used = $total - $storage['hwStorageSpaceFree'] * $units;
                 discover_storage($valid_storage, $device, $index, $fstype, 'vrp', $descr, $total, $units, $used);
             }
         }
