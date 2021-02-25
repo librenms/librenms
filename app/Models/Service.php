@@ -116,6 +116,31 @@ class Service extends BaseModel
         return $query->where('service_disabled', 1);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsUnknown($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 3],
+        ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsMaintenance($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 3],
+        ]);
+    }
     // ---- Define Relationships ----
 
     public function devices()
