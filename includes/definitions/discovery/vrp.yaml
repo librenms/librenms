@@ -408,6 +408,17 @@ modules:
         state:
             data:
                 -
+                    oid: hwWlanClusterACListInfoTable
+                    value: hwWlanClusterACRole
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.4.{{ $index }}'
+                    descr: 'Peer Redundancy Status'
+                    group: Redundancy
+                    state_name: hwWlanClusterACRole
+                    states:
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 2, generic: 0 }
+                        - { descr: Backup, graph: 1, value: 3, generic: 0 }
+                -
                     oid: hwFanStatusTable
                     value: hwEntityFanState
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
