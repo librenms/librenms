@@ -281,6 +281,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
                 $result['state'] = $ltmPoolMemberEntry['state']['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.' . $index];
                 $result['available'] = $ltmPoolMemberEntry['available']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.' . $index];
                 $result['nodename'] = $ltmPoolMemberEntry['nodename']['1.3.6.1.4.1.3375.2.2.5.3.2.1.19.' . $index];
+
                 // If available and bad state
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
                 if (($result['available'] == 1) && ($result['state'] == 3)) {
