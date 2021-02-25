@@ -469,10 +469,19 @@ if ($vars['view'] == 'saps') {
             $operstate_status_color = 'danger';
         }
 
+        $outerEncapValue = (($sap['sapEncapValue'] % 65536) == 4095 ? '*' : ($sap['sapEncapValue'] % 65536));
+        $innerEncapValue = (intval($sap['sapEncapValue'] / 65536) == 4095 ? '*' : intval($sap['sapEncapValue'] / 65536));
+        $innerEncapValue = ($innerEncapValue == '0' ? '' : ".$innerEncapValue");
+        $showSapEncapValue = "$outerEncapValue$innerEncapValue";
+
+        if ($showSapEncapValue == 0 AND $showSapEncapValue != '*') {
+            $showSapEncapValue = '';
+        }
+
         echo "<tr bgcolor=$bg_colour>" . '
             <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
             <td>' . generate_port_link($port) . '</td>
-            <td>' . $sap['sapEncapValue'] . '</td>
+            <td>' . $showSapEncapValue . '</td>
             <td>' . $sap['sapType'] . '</td>
             <td>' . $sap['sapDescription'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>
