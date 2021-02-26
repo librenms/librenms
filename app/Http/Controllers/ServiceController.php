@@ -19,28 +19,175 @@ class ServiceController extends Controller
      *
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function servicesTab()
     {
-        //$this->authorize('manage', Service::class);
+        //$this->authorize('viewAny', PollerCluster::class);
 
         return view(
             'services.services', [
                 'current_tab' => 'services',
                 'services' => Service::orderBy('service_name')->get(),
-                'services_list' => Services::list(),
-                'error_list' => Service::isCritical()->get(),
-                'warning_list' => Service::isWarning()->get(),
-                'ignored_list' => Service::isIgnored()->get(),
-                'disabled_list' => Service::isDisabled()->get(),
-                'maintenance_list' => Service::isMaintenance()->get(),
-                'unknown_list' => Service::isUnknown()->get(),
-                'unknown_count' => Service::isUnknown()->get()->count(),
                 'error_count' => Service::isCritical()->get()->count(),
                 'warning_count' => Service::isWarning()->get()->count(),
                 'ignored_count' => Service::isIgnored()->get()->count(),
                 'disabled_count' => Service::isDisabled()->get()->count(),
                 'maintenance_count' => Service::isMaintenance()->get()->count(),
                 'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function errorsTab()
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.services', [
+                'current_tab' => 'errors',
+                'services' => Service::isCritical()->get(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function warningsTab()
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.services', [
+                'current_tab' => 'warnings',
+                'services' => Service::isWarning()->get(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function ignoredTab()
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.services', [
+                'current_tab' => 'ignored',
+                'services' => Service::isIgnored()->get(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function disabledTab()
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.services', [
+                'current_tab' => 'disabled',
+                'services' => Service::isDisabled()->get(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function maintenanceTab()
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.services', [
+                'current_tab' => 'maintenance',
+                'services' => Service::isMaintenance()->get(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function unknownTab()
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.services', [
+                'current_tab' => 'unknown',
+                'services' => Service::isUnknown()->get(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
+            ]
+        );
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function logTab(Request $request)
+    {
+        //$this->authorize('viewAny', PollerCluster::class);
+
+        return view(
+            'services.log', [
+                'current_tab' => 'log',
+                'logs' => Service::events()->get,
             ]
         );
     }

@@ -147,4 +147,9 @@ class Service extends BaseModel
     {
         return $this->belongsToMany(\App\Models\Device::class, 'services', 'service_id', 'device_id');
     }
+
+    public function events()
+    {
+        return $this->morphMany(Eventlog::class, 'events', 'type', 'datetime', 'message', 'device_id', 'severity');
+    }
 }

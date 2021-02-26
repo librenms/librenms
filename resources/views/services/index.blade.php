@@ -23,6 +23,12 @@
         <li role="presentation" @if( $current_tab == 'maintenance' ) class="active" @endif>
           <a href="{{ route('services.index') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
         </li>
+        <li role="presentation" @if( $current_tab == 'unknown' ) class="active" @endif>
+            <a href="{{ route('services.index') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
+        </li>
+        <li role="presentation" @if( $current_tab == 'create' ) class="active" @endif>
+            <a href="{{ route('services.index') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
+        </li>
         <li role="presentation" @if( $current_tab == 'log' ) class="active" @endif>
           <a href="{{ route('services.index') }}"><i class="fa fa-stack-overflow fa-lg icon-theme" aria-hidden="true"></i> @lang('Log')</a>
         </li>
