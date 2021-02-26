@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for config the ac in global view.
 -- Reference: 
--- Version: V1.05
+-- Version: V1.15
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.12
 		hwWlanGlobalManagement MODULE-IDENTITY
-			LAST-UPDATED "201602161615Z"		-- Feb 16, 2016 at 16:15 GMT
+			LAST-UPDATED "202001181237Z"		-- Aug 10, 2019 at 23:37 GMT  
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -30,10 +30,47 @@
 				   People's Republic of China
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
+
 				  "
-                                                                DESCRIPTION
-                                                                                    "V1.05, Add the hwWlanCurrentL3RoamStaCnt info node"
-                                                                REVISION "201602161615Z"		-- Feb 16, 2016 at 16:15 GMT
+			DESCRIPTION
+                             "V1.15 Modify the node hwWlanUpSpeedHistory."
+                        REVISION "202001181237Z"		-- Aug 10, 2019 at 23:37 GMT  	
+		                   
+                                                         DESCRIPTION
+                             "V1.14, Add the node for global trap."
+                        REVISION "201908192337Z"		-- Aug 10, 2019 at 23:37 GMT  
+			
+			DESCRIPTION
+                             "V1.13, Add the node for global trap."
+                        REVISION "201907162130Z"		-- Jun 16, 2019 at 21:30 GMT  	        
+
+			DESCRIPTION
+                             "V1.12, Add the node for global statistics."
+                        REVISION "201902181830Z"		-- Feb 18, 2019 at 18:30 GMT  	        
+			DESCRIPTION
+                             "V1.11, Add the node for global trap."
+                        REVISION "201901151950Z"		-- Jan 15, 2019 at 19:50 GMT 
+						
+                        DESCRIPTION
+                             "V1.10, Add the node for global trap."
+                        REVISION "201810311440Z"		-- October 31, 2018 at 14:40 GMT                       
+                        DESCRIPTION
+                             "V1.08, Add the node for global statistics."
+                        REVISION "201805091530Z"		-- May 9, 2018 at 15:30 GMT				  
+                        DESCRIPTION
+                             "V1.08, Add the node for global statistics."
+                        REVISION "201803121530Z"		-- March 12, 2018 at 15:30 GMT
+			
+			DESCRIPTION
+                             "V1.07, Modify the node of hwStaGlobalAccessExperience."
+                        REVISION "201705020930Z"		-- May 2, 2017 at 09:30 GMT
+
+                        DESCRIPTION
+                             "V1.06, Add the node for station DFX."
+                        REVISION "201703271415Z"		-- March 27, 2017 at 14:15 GMT
+                        DESCRIPTION
+                             "V1.05, Add the hwWlanCurrentL3RoamStaCnt info node"
+                        REVISION "201602161615Z"		-- Feb 16, 2016 at 16:15 GMT
 			DESCRIPTION 
 				"The MIB module defines the ap update operation."
 			REVISION "201508251550Z"		-- Aug 25, 2015 at 15:50 GMT
@@ -101,6 +138,14 @@
 				"This object indicates the maximum number of STAs connected to an AC."
 			::= { hwWlanGlobalPara 3 }
 
+		-- 1.3.6.1.4.1.2011.6.139.12.1.1.4
+		hwBranchGroupFileLoadFailGroupNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of branch groups that failed to load the certificate."
+			::= { hwWlanGlobalPara 4 }
 
 		-- 1.3.6.1.4.1.2011.6.139.12.1.2
 		hwWlanGlobalAcStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 2 }
@@ -195,7 +240,7 @@
 				"This object indicates the downstream rate of the system (downlink throughput)."
 			::= { hwWlanGlobalAcStatistics 9 }
 
-                                           -- 1.3.6.1.4.1.2011.6.139.12.1.2.10
+        -- 1.3.6.1.4.1.2011.6.139.12.1.2.10
 		hwWlanCurrentL3RoamStaCnt OBJECT-TYPE
 			SYNTAX Integer32
 			MAX-ACCESS read-only
@@ -204,6 +249,23 @@
 				"This object indicates the count of current L3 roam stations."
 			::= { hwWlanGlobalAcStatistics 10 }
 
+        -- 1.3.6.1.4.1.2011.6.139.12.1.2.11
+		hwWlanCurAssoc2gStaType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the numbers of 2.4G users with different rfmodes on an AC."
+			::= { hwWlanGlobalAcStatistics 11 }
+
+        -- 1.3.6.1.4.1.2011.6.139.12.1.2.12
+		hwWlanCurAssoc5gStaType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the numbers of 5G users with different rfmodes on an AC."
+			::= { hwWlanGlobalAcStatistics 12 }
 
 		-- 1.3.6.1.4.1.2011.6.139.12.1.3
 		hwWlanGlobalStaStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 3 }
@@ -373,6 +435,80 @@ Compliance standard: Throughput > x (x = 12 Mbps)."
 			::= { hwWlanGlobalStaStatistics 15 }
 
 
+					
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.16
+		hwStaGlobalWirelessPacketDelay OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the average packet delay of the stations."
+			::= { hwWlanGlobalStaStatistics 16 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.17
+		hwStaGlobalWirelessPacketDropRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the average packet drop rate of the stations."
+			::= { hwWlanGlobalStaStatistics 17 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.18
+		hwStaGlobalTotalAccessTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the average online time of the stations."
+			::= { hwWlanGlobalStaStatistics 18 }
+			
+	
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.19
+		hwStaGlobalAccessExperience OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the access experience of the stations."
+			::= { hwWlanGlobalStaStatistics 19 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.20
+		hwStaGlobalAssocRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the associate rate of station."
+			::= { hwWlanGlobalStaStatistics 20 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.21
+		hwStaGlobalAuthRateDot1x OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Dot1x authentication rate of station."
+			::= { hwWlanGlobalStaStatistics 21 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.22
+		hwStaGlobalAuthRatePortal OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Portal authentication rate of station."
+			::= { hwWlanGlobalStaStatistics 22 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.23
+		hwStaGlobalAuthRateMac OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Mac authentication rate of station."
+			::= { hwWlanGlobalStaStatistics 23 }
+			
 		-- 1.3.6.1.4.1.2011.6.139.12.1.4
 		hwWlanGlobalRfStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 4 }
 
@@ -729,7 +865,7 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates uplink effective throughput of the AC. Unit: Mbps."
+				"This object indicates uplink effective throughput of the AC. Unit: Kbps."
 			::= { hwWlanSpeedHistoryEntry 2 }
 
 
@@ -739,7 +875,7 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates downlink effective throughput of the AC.Unit: Mbps."
+				"This object indicates downlink effective throughput of the AC.Unit: Kbps."
 			::= { hwWlanSpeedHistoryEntry 3 }
 
 		
@@ -773,6 +909,8 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 				hwWlanLicenseOrigin
 					Integer32,
 				hwWlanLicenseBackupTime
+					OCTET STRING,
+				hwWlanLicenseBackType
 					OCTET STRING
 			 }
 
@@ -814,6 +952,16 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 			DESCRIPTION
 				"Description."
 			::= { hwWlanBackupLicenseEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1.5
+		hwWlanLicenseBackType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Backup license source type."
+			::= { hwWlanBackupLicenseEntry 5 }
 
 		
 		-- 1.3.6.1.4.1.2011.6.139.12.1.9
@@ -904,7 +1052,7 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 
 		-- 1.3.6.1.4.1.2011.6.139.12.2.2.1
 		hwWlanGlobalParaGroup OBJECT-GROUP
-			OBJECTS { hwWlanGlobalWorkMode, hwWlanAccessMaxApNumber, hwWlanAccessMaxStaNumber }
+			OBJECTS { hwWlanGlobalWorkMode, hwWlanAccessMaxApNumber, hwWlanAccessMaxStaNumber, hwBranchGroupFileLoadFailGroupNum }
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -925,7 +1073,9 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 		hwWlanGlobalStaStatisticsGroup OBJECT-GROUP
 			OBJECTS { hwWlanStaRateComplianceRate, hwWlanStaSnrComplianceRate, hwWlanStaResendRateComplianceRate, hwWlanStaDropRateComplianceRate, hwWlanStaComplianceRate, 
 			hwStaSnrNoncompliance2gCnt, hwStaRateNoncompliance2gCnt, hwStaResendRateNoncompliance2gCnt, hwStaDropRateNoncompliance2gCnt, hwStaThruputNoncompliance2gCnt, 
-			hwStaSnrNoncompliance5gCnt, hwStaRateNoncompliance5gCnt, hwStaResendRateNoncompliance5gCnt, hwStaDropRateNoncompliance5gCnt, hwStaThruputNoncompliance5gCnt }
+			hwStaSnrNoncompliance5gCnt, hwStaRateNoncompliance5gCnt, hwStaResendRateNoncompliance5gCnt, hwStaDropRateNoncompliance5gCnt, hwStaThruputNoncompliance5gCnt,
+			hwStaGlobalWirelessPacketDelay, hwStaGlobalWirelessPacketDropRate, hwStaGlobalTotalAccessTime, hwStaGlobalAccessExperience, hwStaGlobalAssocRate, hwStaGlobalAuthRateDot1x, 
+			hwStaGlobalAuthRatePortal, hwStaGlobalAuthRateMac}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -989,8 +1139,241 @@ Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to o
 			::= { hwWlanGlobalManagementObjectGroups 9 }
 
 		
-	
+		-- 1.3.6.1.4.1.2011.6.139.12.3
+		hwWlanGlobalTrapInfo OBJECT IDENTIFIER ::= { hwWlanGlobalManagement 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1
+		hwWlanGlobalTrap OBJECT IDENTIFIER ::= { hwWlanGlobalTrapInfo 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.1
+		hwWlanBackLicAgeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanMainAcMac, hwWlanBackupLicense, hwWlanLicenseBackType, hwWlanLicenseBackupTime }
+			STATUS current
+			DESCRIPTION 
+				"Backup license aging alarm."
+			::= { hwWlanGlobalTrap 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.2
+		hwWlanBackLicAgeRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanMainAcMac, hwWlanBackupLicense, hwWlanLicenseBackType, hwWlanLicenseBackupTime }
+			STATUS current
+			DESCRIPTION 
+				"The backup license stops aging."
+			::= { hwWlanGlobalTrap 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.3
+		hwWlanShareLicAgeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanShareLicAcMac, hwWlanShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"Shared license aging."
+			::= { hwWlanGlobalTrap 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.4
+		hwWlanShareLicAgeRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanShareLicAcMac, hwWlanShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"Shared license aging restore."
+			::= { hwWlanGlobalTrap 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.5
+		hwWlanPoolLicAgeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanPoolTotalLicNum, hwWlanPoolSelfShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"License resource pool aging."
+			::= { hwWlanGlobalTrap 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.6
+		hwWlanPoolLicAgeRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanPoolTotalLicNum, hwWlanPoolSelfShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"License resource pool aging restore."
+			::= { hwWlanGlobalTrap 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.7
+		hwWlanStaNumReachWarningTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations reaches 80% of the maximum specifications."
+			::= { hwWlanGlobalTrap 7 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.8
+		hwWlanStaNumReachWarningRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations is less than 80% of the maximum specifications."
+			::= { hwWlanGlobalTrap 8 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.9
+		hwWlanStaNumReachMaxTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations reaches the maximum specifications."
+			::= { hwWlanGlobalTrap 9 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.10
+		hwWlanStaNumReachMaxRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations is less than the maximum specifications."
+			::= { hwWlanGlobalTrap 10 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.11
+		hwWlanWapiCertificateNearlyExpiredTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType, hwWlanWapiCertFileName, hwWlanWapiCertStartTime, hwWlanWapiCertEndTime }
+			STATUS current
+			DESCRIPTION 
+				"The WAPI certificate is nearly expired."
+			::= { hwWlanGlobalTrap 11 }            
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.12            
+		hwWlanWapiCertificateNearlyExpiredTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType }
+			STATUS current
+			DESCRIPTION 
+				"The alarm of the WAPI certificate reaching expiration is cleared."
+			::= { hwWlanGlobalTrap 12 }    
+            
+ 		-- 1.3.6.1.4.1.2011.6.139.12.3.1.13
+		hwWlanWapiCertificateInvalidTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType, hwWlanWapiCertFileName, hwWlanWapiCertStartTime, hwWlanWapiCertEndTime }
+			STATUS current
+			DESCRIPTION 
+				"The WAPI certificate is invalid."
+			::= { hwWlanGlobalTrap 13 }       
+
+ 		-- 1.3.6.1.4.1.2011.6.139.12.3.1.14
+		hwWlanWapiCertificateInvalidTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType }
+			STATUS current
+			DESCRIPTION 
+				"The alarm of the WAPI certificate out of the invalidity period is cleared."
+			::= { hwWlanGlobalTrap 14 }  
+            
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2
+		hwWlanGlobalTrapObjects OBJECT IDENTIFIER ::= { hwWlanGlobalTrapInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.1
+		hwWlanShareLicAcMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The mac address of the shared AC"
+			::= { hwWlanGlobalTrapObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.2
+		hwWlanShareLicNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of shared license."
+			::= { hwWlanGlobalTrapObjects 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.3
+		hwWlanPoolTotalLicNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number in license pool."
+			::= { hwWlanGlobalTrapObjects 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.4
+		hwWlanPoolSelfShareLicNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of self shared in license pool ."
+			::= { hwWlanGlobalTrapObjects 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.5
+		hwWlanStaMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum specifications of stations."
+			::= { hwWlanGlobalTrapObjects 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.6
+		hwWlanStaCurNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of associated stations."
+			::= { hwWlanGlobalTrapObjects 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.7
+		hwWlanWapiSecurityProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of security profile."
+			::= { hwWlanGlobalTrapObjects 7 }	
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.8
+		hwWlanWapiCertType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of WAPI certificate."
+			::= { hwWlanGlobalTrapObjects 8 }	
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.9
+		hwWlanWapiCertFileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the file name of WAPI certificate."
+			::= { hwWlanGlobalTrapObjects 9 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.10
+		hwWlanWapiCertStartTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the start time of WAPI certificate validity."
+			::= { hwWlanGlobalTrapObjects 10 }     
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.11
+		hwWlanWapiCertEndTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the end time of WAPI certificate validity."
+			::= { hwWlanGlobalTrapObjects 11 }              
 	END
 --
 -- HUAWEI-WLAN-GLOBAL-MIB.mib
 --
+
+
+
+
+
+
+
+
+
+
+
+
