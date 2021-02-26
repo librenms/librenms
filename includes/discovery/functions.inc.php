@@ -963,7 +963,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     } else {
                         $skippedFromYaml = true;
                         // Cause we still don't have a num_oid
-                        d_echo("Error: We don't have a num_oid defined for " . $data_name . " in YAML file, and cannot guess it out of MIB files (" . $device['dynamic_discovery']['mib'] . ")");
+                        d_echo('Error: We don\'t have a num_oid defined for ' . $data_name . ' in YAML file, and cannot guess it out of MIB files (' . $device['dynamic_discovery']['mib'] . ')');
                     }
                 }
 
