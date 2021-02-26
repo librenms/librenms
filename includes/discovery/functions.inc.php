@@ -954,14 +954,21 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
-                    $num_oid = snmp_translate($data_name, $device['dynamic_discovery']['mib'], null, null, $device);
+                    if (Str::contains($data['oid'], '::') && ! (Str::contains($data_name, '::'))) {
+                        // We should search this mib first
+                        $exp_oid = explode('::', $data['oid']);
+                        $search_oid = $exp_oid[0] . ':' . $data_name;
+                    } else {
+                        $search_oid = $data['value'];
+                    }
+                    $num_oid = snmp_translate($search_oid, $device['dynamic_discovery']['mib'], null, null, $device);
                     if (oid_is_numeric($num_oid)) {
                         $data['num_oid'] = $num_oid . '.{{ $index }}';
-                        d_echo(' ->  Guessed num_oid for ' . $data_name . ': ' . $data['num_oid']);
+                        d_echo(' ->  Guessed num_oid for ' . $search_oid . ': ' . $data['num_oid']);
                     } else {
                         $skippedFromYaml = true;
                         // Cause we still don't have a num_oid
-                        d_echo('Error: We don\'t have a num_oid defined for ' . $data_name . ' in YAML file, and cannot guess it out of MIB files (' . $device['dynamic_discovery']['mib'] . ')');
+                        d_echo('Error: We don\'t have a num_oid defined for ' . $search_oid . ' in YAML file, and cannot guess it out of MIB files (' . $device['dynamic_discovery']['mib'] . ')');
                     }
                 }
 

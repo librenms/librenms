@@ -781,16 +781,12 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
     if (oid_is_numeric($oid)) {
-        $default_options = '-Os';
+        $default_options = ['-Os', '-Pu'];
     } else {
-        if ($mib != 'ALL' && ! Str::contains($mib, ':') && ! Str::contains($oid, '::')) {
+        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
             $oid = "$mib::$oid";
         }
-        $default_options = '-On';
-        if (Str::contains($mib, ':') && ! Str::contains($oid, '::')) {
-            // We have more than one MIB file to load, and no explicit mib in OID, so let's activate random search for OID
-            $cmd = array_merge($cmd, ['-IR']);
-        }
+        $default_options = ['-On', '-Pu'];
     }
     $options = is_null($options) ? $default_options : $options;
     $cmd = array_merge($cmd, (array) $options);
