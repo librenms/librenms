@@ -951,6 +951,22 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 d_echo("Final sensor value: $value\n");
 
                 $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
+
+                // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
+                if (empty($data['num_oid'])) {
+                    // Let's guess
+                    d_echo($device);
+                    $num_oid = snmp_translate($data_name, $device['dynamic_discovery']['mib'], null, null, $device);
+                    if (oid_is_numeric($num_oid)) {
+                        $data['num_oid'] = $num_oid . '.{{ $index }}';
+                        d_echo(' ->  Guessed num_oid for ' . $data_name . ': ' . $data['num_oid']);
+                    } else {
+                        $skippedFromYaml = true;
+                        // Cause we still don't have a num_oid
+                        d_echo("Error: We don't have a num_oid defined for " . $data_name . " in YAML file, and cannot guess it out of MIB files (" . $device['dynamic_discovery']['mib'] . ")");
+                    }
+                }
+
                 if ($skippedFromYaml === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID

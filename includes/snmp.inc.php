@@ -783,10 +783,14 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     if (oid_is_numeric($oid)) {
         $default_options = '-Os';
     } else {
-        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
+        if ($mib != 'ALL' && ! Str::contains($mib, ':') && ! Str::contains($oid, '::')) {
             $oid = "$mib::$oid";
         }
         $default_options = '-On';
+        if (Str::contains($mib, ':') && ! Str::contains($oid, '::')) {
+            // We have more than one MIB file to load, and no explicit mib in OID, so let's activate random search for OID
+            $cmd = array_merge($cmd, ['-IR']);
+        }
     }
     $options = is_null($options) ? $default_options : $options;
     $cmd = array_merge($cmd, (array) $options);
