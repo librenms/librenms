@@ -141,6 +141,7 @@ class Service extends BaseModel
             ['service_status', '=', 3],
         ]);
     }
+
     // ---- Define Relationships ----
 
     public function devices()
