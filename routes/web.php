@@ -27,8 +27,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
         Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
     });
-    Route::group(['prefix' => 'services'], function () {
-        Route::get('', 'ServiceController@pollerTab')->name('services.index');
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::get('', 'ServiceController@servicesTab')->name('services.index');
         Route::get('errors', 'ServiceController@errorsTab')->name('services.index');
         Route::get('warnings', 'ServiceController@warningsTab')->name('services.index');
         Route::get('disabled', 'ServiceController@disabledTab')->name('services.index');
