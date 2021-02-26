@@ -166,7 +166,7 @@ class Database extends BaseValidation
         if (empty($collation) !== true) {
             $validator->fail(
                 'MySQL Database collation is wrong: ' . implode(' ', $collation[0]),
-                'Check https://t.libren.ms/-zdwk for info on how to fix.'
+                'Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.'
             );
         }
 
@@ -177,7 +177,7 @@ class Database extends BaseValidation
         $collation_tables = dbFetchRows($table_collation_sql);
         if (empty($collation_tables) !== true) {
             $result = ValidationResult::fail('MySQL tables collation is wrong: ')
-                ->setFix('Check http://bit.ly/2lAG9H8 for info on how to fix.')
+                ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
                 ->setList('Tables', $collation_tables);
             $validator->result($result);
         }
@@ -188,7 +188,7 @@ class Database extends BaseValidation
         $collation_columns = dbFetchRows($column_collation_sql);
         if (empty($collation_columns) !== true) {
             $result = ValidationResult::fail('MySQL column collation is wrong: ')
-                ->setFix('Check https://t.libren.ms/-zdwk for info on how to fix.')
+                ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
                 ->setList('Columns', $collation_columns);
             $validator->result($result);
         }
