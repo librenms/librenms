@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.39145.10",
                     "sysDescr": "ICT Distribution Panel",
-                    "sysContact": null,
-                    "version": "2.08",
-                    "hardware": "ICT180S-12BRCP",
-                    "features": null,
-                    "os": "ict-pdu",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "ict.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.39145.10",
-                    "sysDescr": "ICT Distribution Panel",
                     "sysContact": "<private>",
                     "version": "2.08",
                     "hardware": "ICT180S-12BRCP",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

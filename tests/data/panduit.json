@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.19536.10.1",
                     "sysDescr": "SN:PDU Metered PN:Device Model:P42D04M",
-                    "sysContact": null,
-                    "version": "2.3.21",
-                    "hardware": "P42D04M",
-                    "features": "346-415V, 32A, 22.0kVA, 50/60Hz",
-                    "os": "panduit",
-                    "type": "power",
-                    "serial": "CN187D6053",
-                    "icon": "panduit.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.19536.10.1",
-                    "sysDescr": "SN:PDU Metered PN:Device Model:P42D04M",
                     "sysContact": "<private>",
                     "version": "2.3.21",
                     "hardware": "P42D04M",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

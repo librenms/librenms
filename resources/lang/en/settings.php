@@ -673,6 +673,10 @@ return [
                 'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)',
             ],
+            'dns' => [
+                'description' => 'Use DNS Location Record',
+                'help' => 'Use LOC Record from DNS Server to get geographic coordinates for Hostname',
+            ],
             'engine' => [
                 'description' => 'Mapping Engine',
                 'options' => [
@@ -956,10 +960,6 @@ return [
                 'description' => 'Enable PeeringDB lookup',
                 'help' => 'Enable PeeringDB lookup (data is downloaded with daily.sh)',
             ],
-        ],
-        'perf_times_purge' => [
-            'description' => 'Poller performance log entries older than (days)',
-            'help' => 'Cleanup done by daily.sh',
         ],
         'permission' => [
             'device_group' => [

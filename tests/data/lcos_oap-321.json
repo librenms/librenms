@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2356.11.8.301",
                     "sysDescr": "LANCOM OAP-321 10.12.0147 / 15.11.2017 4002024918100043",
-                    "sysContact": null,
-                    "version": "10.12.0147SU3 / 15.11.2017",
-                    "hardware": "LANCOM OAP-321",
-                    "features": null,
-                    "os": "lcos",
-                    "type": "wireless",
-                    "serial": "4002024918100043",
-                    "icon": "lancom.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2356.11.8.301",
-                    "sysDescr": "LANCOM OAP-321 10.12.0147 / 15.11.2017 4002024918100043",
                     "sysContact": "<private>",
                     "version": "10.12.0147SU3 / 15.11.2017",
                     "hardware": "LANCOM OAP-321",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

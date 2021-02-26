@@ -234,8 +234,12 @@
                                                      aria-hidden="true"></i> <span
                                 class="hidden-sm">@lang('Services')</span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg"
-                                                                   aria-hidden="true"></i> @lang('All Services')</a>
+                            <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> @lang('All Services')</a>
+                            </li>
+                            <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
+                                  <i class="fa fa-square fa-stack-2x"></i>
+                                  <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
+                                </span> @lang('Services Templates')</a>
                             </li>
                             @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>

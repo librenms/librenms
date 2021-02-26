@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1916.2.302",
                     "sysDescr": "VSP-7432CQ (8.0.5.0)",
-                    "sysContact": null,
-                    "version": "8.0.5.0",
-                    "hardware": "VSP-7432CQ",
-                    "features": null,
-                    "os": "voss",
-                    "type": "network",
-                    "serial": "1914Q-20413",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1916.2.302",
-                    "sysDescr": "VSP-7432CQ (8.0.5.0)",
                     "sysContact": "<private>",
                     "version": "8.0.5.0",
                     "hardware": "VSP-7432CQ",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

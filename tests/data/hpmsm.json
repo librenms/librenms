@@ -36,24 +36,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.8744.1.47",
-                    "sysDescr": "MSM765 - Hardware revision 2 - Serial number FFFFFFFFFF - Firmware version 6.6.0.0-22530",
-                    "sysContact": null,
-                    "version": "6.6.0.0-22530",
-                    "hardware": "MSM765",
-                    "features": null,
-                    "os": "hpmsm",
-                    "type": "wireless",
-                    "serial": "FFFFFFFFFF",
-                    "icon": "hp.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

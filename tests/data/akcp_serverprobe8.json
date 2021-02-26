@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.3854.1",
                     "sysDescr": "SensorProbe",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "AKCP sensorProbe8 v2.0",
-                    "features": null,
-                    "os": "akcp",
-                    "type": "environment",
-                    "serial": null,
-                    "icon": "akcp.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3854.1",
-                    "sysDescr": "SensorProbe",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "AKCP sensorProbe8 v2.0",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

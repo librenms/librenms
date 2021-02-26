@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.3902.1004.9806.22.1.1.1",
                     "sysDescr": "ZTE ACCESS NODE AGENT",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "ZXDSL 9806V",
-                    "features": null,
-                    "os": "zxdsl",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "zte.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3902.1004.9806.22.1.1.1",
-                    "sysDescr": "ZTE ACCESS NODE AGENT",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "ZXDSL 9806V",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

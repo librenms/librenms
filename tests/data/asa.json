@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.745",
                     "sysDescr": "Cisco Adaptive Security Appliance Version 8.2(5)",
-                    "sysContact": null,
-                    "version": "9.12(3)",
-                    "hardware": "ASA5555",
-                    "features": null,
-                    "os": "asa",
-                    "type": "firewall",
-                    "serial": "FGL1641413L",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.745",
-                    "sysDescr": "Cisco Adaptive Security Appliance Version 8.2(5)",
                     "sysContact": "<private>",
                     "version": "9.12(3)",
                     "hardware": "ASA5555",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

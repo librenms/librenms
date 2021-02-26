@@ -4,10 +4,10 @@ path: blob/master/doc/
 # Distributed Poller
 
 A normal install contains all parts of LibreNMS:
- - Poller/Discovery/etc workers
- - RRD (Time series data store) *
- - Database *
- - Webserver (Web UI/API) *
+- Poller/Discovery/etc workers
+- RRD (Time series data store) *
+- Database *
+- Webserver (Web UI/API) *
  
 \* may only be installed on one server (however, some can be clustered)
 

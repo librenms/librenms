@@ -1,0 +1,829 @@
+-- SOCOMEC UPS - PDU MIB
+-- PDU MIB for SOCOMEC UPS - Uninterruptible Power Supplies
+-- { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) socomec(4555) ups(2) pdu(30) }
+-- Date[dd/mm/yyy]	: 29/07/2010
+-- Version		: 1.00
+-- ==============================================================================================
+
+SOCOMECPDU-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress
+		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+socomec				OBJECT IDENTIFIER ::= { enterprises 4555 }
+
+ups					OBJECT IDENTIFIER ::=  { socomec 2 }
+
+pdu					OBJECT IDENTIFIER ::=  { ups 30 }
+
+dpduIdent			OBJECT IDENTIFIER ::=  { pdu 1 }
+dpduOutput			OBJECT IDENTIFIER ::=  { pdu 2 }
+dpduAlarm 			OBJECT IDENTIFIER ::=  { pdu 3 }
+dpduEnvironment		OBJECT IDENTIFIER ::=  { pdu 4 }
+dpduTraps			OBJECT IDENTIFIER ::=  { pdu 20 }
+
+
+--
+-- dpdu Ident group
+--
+   dpduIdentManufacturer OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..32))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The EnviroStation Vendor."
+       ::= { dpduIdent 1 }
+
+   dpduIdentModel OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..32))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The PDU Model designation."
+       ::= { dpduIdent 2 }
+
+   dpduIdentSerialNumber OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..16))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The PDU serial number"
+       ::= { dpduIdent 3 }
+
+   dpduIdentPDUFirmwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..16))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The PDU firmware version"
+       ::= { dpduIdent 4 }
+
+   dpduIdentAgentSoftwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..16))
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The PDU NMC software version"
+       ::= { dpduIdent 5 }
+
+   dpduIdentName OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..32))
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string identifying the PDU. This object should be
+               set by the administrator."
+       ::= { dpduIdent 6 }
+
+   dpduAttachedDevices OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..63))
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string identifying the devices attached to the
+               output(s) of the PDU. This object should be set by
+               the administrator."
+       ::= { dpduIdent 7 }
+
+--
+-- dpdu Output group
+--
+   dpduOutputFrequency OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 Hertz"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present output frequency in 1/10 Hz."
+       ::= { dpduOutput 1 }
+
+   dpduOutputVoltage1 OBJECT-TYPE
+	   SYNTAX     INTEGER
+       UNITS      "0.1 V"
+	   ACCESS     read-only
+	   STATUS     mandatory
+	   DESCRIPTION
+	           "The Output line 1 voltage of the PDU system in 1/10 V."
+	::= { dpduOutput 2 }
+
+   dpduOutputCurrent1 OBJECT-TYPE
+	   SYNTAX     INTEGER
+       UNITS      "0.1 A"
+	   ACCESS     read-only
+	   STATUS     mandatory
+	   DESCRIPTION
+	           "The Output line 1 current of the PDU system in 1/10 A."
+	::= { dpduOutput 3 }
+
+   dpduOutputVoltage2 OBJECT-TYPE
+	   SYNTAX     INTEGER
+       UNITS      "0.1 V"
+	   ACCESS     read-only
+	   STATUS     mandatory
+	   DESCRIPTION
+	           "The Output line 2 voltage of the PDU system in 1/10 V."
+	::= { dpduOutput 4 }
+
+   dpduOutputCurrent2 OBJECT-TYPE
+	   SYNTAX     INTEGER
+       UNITS      "0.1 A"
+	   ACCESS     read-only
+	   STATUS     mandatory
+	   DESCRIPTION
+	           "The Output line 2 current of the PDU system in 1/10 A."
+	::= { dpduOutput 5 }
+
+   dpduOutputVoltage3 OBJECT-TYPE
+	   SYNTAX     INTEGER
+       UNITS      "0.1 V"
+	   ACCESS     read-only
+	   STATUS     mandatory
+	   DESCRIPTION
+	           "The Output line 3 voltage of the PDU system in 1/10 V."
+	::= { dpduOutput 6 }
+
+   dpduOutputCurrent3 OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 A"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The Output line 3 current of the PDU system in 1/10 A."
+	::= { dpduOutput 7 }
+
+--
+-- dpdu Alarm group
+--
+   dpduAlarmDisconnect OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the PDU disconnect?"
+       ::= { dpduAlarm 1 }
+
+   dpduAlarmL1LoadMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L1 load major alarm"
+       ::= { dpduAlarm 2 }
+
+   dpduAlarmL1LoadMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L1 load minor alarm"
+       ::= { dpduAlarm 3 }
+
+   dpduAlarmL1OutVoltMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L1 output votage major alarm"
+       ::= { dpduAlarm 4 }
+
+   dpduAlarmL1OutVoltMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L1 output voltage minor alarm"
+       ::= { dpduAlarm 5 }
+
+   dpduAlarmL2LoadMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L2 load major alarm"
+       ::= { dpduAlarm 6 }
+
+   dpduAlarmL2LoadMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L2 load minor alarm"
+       ::= { dpduAlarm 7 }
+
+   dpduAlarmL2OutVoltMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L2 output votage major alarm"
+       ::= { dpduAlarm 8 }
+
+   dpduAlarmL2OutVoltMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L2 output voltage minor alarm"
+       ::= { dpduAlarm 9 }
+
+   dpduAlarmL3LoadMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L3 load major alarm"
+       ::= { dpduAlarm 10 }
+
+   dpduAlarmL3LoadMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L3 load minor alarm"
+       ::= { dpduAlarm 11 }
+
+   dpduAlarmL3OutVoltMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L3 output votage major alarm"
+       ::= { dpduAlarm 12 }
+
+   dpduAlarmL3OutVoltMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L3 output voltage minor alarm"
+       ::= { dpduAlarm 13 }
+
+   dpduAlarmL12LoadMajor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L1, L2 load major alarm"
+       ::= { dpduAlarm 14 }
+
+   dpduAlarmL12LoadMinor OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "L1, L2 load minor alarm"
+       ::= { dpduAlarm 15 }
+
+
+--
+-- dpdu Environment group
+--
+
+   dpduEnvTemperature OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "0.1 Degrees Centigrade"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The ambient environmental temperature."
+       ::= { dpduEnvironment 1 }
+
+   dpduEnvHumidity OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "percentage"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The environmental humidity."
+       ::= { dpduEnvironment 2 }
+
+   dpduEnvSetTemperatureWarnLimit OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Degrees Centigrade"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Alarm dpduEnvOverWarnTemperature on when the environmental
+		temperature over the value."
+       ::= { dpduEnvironment 3 }
+
+   dpduEnvSetTemperatureAlarmLimit OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "Degrees Centigrade"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Alarm dpduEnvOverAlarmTemperature on when the environmental
+		temperature over the value."
+       ::= { dpduEnvironment 4 }
+
+   dpduEnvSetHumidityWarnLimit OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "percentage"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Alarm dpduEnvOverWarnHumidity on when the environmental
+		humidity over the value."
+       ::= { dpduEnvironment 5 }
+
+   dpduEnvSetHumidityAlarmLimit OBJECT-TYPE
+       SYNTAX     INTEGER
+       UNITS      "percentage"
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "Alarm dpduEnvOverAlarmHumidity on when the environmental
+		humidity over the value."
+       ::= { dpduEnvironment 6 }
+
+   dpduEnvSetEnvRelay1 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dpduEnvironment 7 }
+
+   dpduEnvSetEnvRelay2 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dpduEnvironment 8 }
+
+   dpduEnvSetEnvRelay3 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dpduEnvironment 9 }
+
+   dpduEnvSetEnvRelay4 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  normalOpen(0),
+                  normalClose(1)
+       }
+       ACCESS     read-write
+       STATUS     mandatory
+       DESCRIPTION
+               ""
+       ::= { dpduEnvironment 10 }
+
+   dpduWarnOverEnvTemperature OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the environment over warning temperature?"
+       ::= { dpduEnvironment 11 }
+
+   dpduAlarmOverEnvTemperature OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the environment over alarm temperature?"
+       ::= { dpduEnvironment 12 }
+
+   dpduWarnmOverEnvHumidity OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the environment over warn humidity?"
+       ::= { dpduEnvironment 13 }
+
+   dpduAlarmOverEnvHumidity OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Does the environment over alarm humidity?"
+       ::= { dpduEnvironment 14 }
+
+   dpduAlarmEnvRelay1 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The alarm status of relay1."
+       ::= { dpduEnvironment 15 }
+       
+   dpduAlarmEnvRelay2 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               " The alarm status of relay2."
+       ::= { dpduEnvironment 16 }
+          
+    dpduAlarmEnvRelay3 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               " The alarm status of relay3."
+       ::= { dpduEnvironment 17 }
+
+   dpduAlarmEnvRelay4 OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  off(0),
+                  on(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               " The alarm status of relay4."
+       ::= { dpduEnvironment 18 }
+
+   dpduAlarmEnvDisconnect OBJECT-TYPE
+       SYNTAX     INTEGER{
+                  no(0),
+                  yes(1)
+       }
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               " To indicate the communication status of EnviroProbe."
+       ::= { dpduEnvironment 19 }
+
+--
+-- dpdu Trap group
+--
+
+   dpduCommunicationLost TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Communication with the PDU failed."
+       ::= 1
+
+   dpduCommunicationEstablished TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Communication with the PDU reestablished."
+       ::= 2
+
+   dpduL1LoadMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L1 load major alarm."
+       ::= 3
+
+   dpduL1LoadMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L1 load major alarm."
+       ::= 4
+
+   dpduL1LoadMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L1 load minor alarm."
+       ::= 5
+
+   dpduL1LoadMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L1 load minor alarm."
+       ::= 6
+
+   dpduL1OutVoltMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L1 output voltage major alarm."
+       ::= 7
+
+   dpduL1OutVoltMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L1 output voltage major alarm."
+       ::= 8
+
+   dpduL1OutVoltMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L1 output voltage minor alarm."
+       ::= 9
+
+   dpduL1OutVoltMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L1 output voltage minor alarm."
+       ::= 10
+
+   dpduL2LoadMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L2 load major alarm."
+       ::= 11
+
+   dpduL2LoadMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L2 load major alarm."
+       ::= 12
+
+   dpduL2LoadMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L2 load minor alarm."
+       ::= 13
+
+   dpduL2LoadMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L2 load minor alarm."
+       ::= 14
+
+   dpduL2OutVoltMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L2 output voltage major alarm."
+       ::= 15
+
+   dpduL2OutVoltMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L2 output voltage major alarm."
+       ::= 16
+
+   dpduL2OutVoltMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L2 output voltage minor alarm."
+       ::= 17
+
+   dpduL2OutVoltMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L2 output voltage minor alarm."
+       ::= 18
+
+   dpduL3LoadMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L3 load major alarm."
+       ::= 19
+
+   dpduL3LoadMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L3 load major alarm."
+       ::= 20
+
+   dpduL3LoadMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L3 load minor alarm."
+       ::= 21
+
+   dpduL3LoadMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L3 load minor alarm."
+       ::= 22
+
+   dpduL3OutVoltMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L3 output voltage major alarm."
+       ::= 23
+
+   dpduL3OutVoltMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L3 output voltage major alarm."
+       ::= 24
+
+   dpduL3OutVoltMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L3 output voltage minor alarm."
+       ::= 25
+
+   dpduL3OutVoltMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L3 output voltage minor alarm."
+       ::= 26
+
+   dpduL12LoadMajorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L1 L2 load major alarm."
+       ::= 27
+
+   dpduL12LoadMajorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L1 L2 load major alarm."
+       ::= 28
+
+   dpduL12LoadMinorAlarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"L1 L2 load minor alarm."
+       ::= 29
+
+   dpduL12LoadMinorAlarmRecover TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Recover from L1 L2 load minor alarm."
+       ::= 30
+
+   dpduEnvCommunicationLost TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Communication with the environmental sensor failed."
+       ::= 31
+
+   dpduEnvCommunicationEstablished TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"Communication with the environmental sensor reestablished."
+       ::= 32
+
+   dpduEnvOverWarnTemperature TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment over warning temperature."
+       ::= 33
+
+   dpduNoLongerEnvOverWarnTemperature TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment recovered from over warning temperature."
+       ::= 34
+
+   dpduEnvOverWarnHumidity TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment over warning humidity."
+       ::= 35
+
+   dpduNoLongerEnvOverWarnHumidity TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment recovered from over warning humidity."
+       ::= 36
+
+   dpduEnvOverAlarmTemperature TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment over alarm temperature."
+       ::= 37
+
+   dpduNoLongerEnvOverAlarmTemperature TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment recovered from over alarm temperature."
+       ::= 38
+
+   dpduEnvOverAlarmHumidity TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment over alarm humidity."
+       ::= 39
+
+   dpduNoLongerEnvOverAlarmHumidity TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment recovered from over alarm humidity."
+       ::= 40
+
+   dpduEnvRelay1Alarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay1 is not in normal state."
+       ::= 41
+
+   dpduEnvRelay1Normal TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay1 is in normal state."
+       ::= 42
+
+   dpduEnvRelay2Alarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay2 is not in normal state."
+       ::= 43
+
+   dpduEnvRelay2Normal TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay2 is in normal state."
+       ::= 44
+
+   dpduEnvRelay3Alarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay3 is not in normal state."
+       ::= 45
+
+   dpduEnvRelay3Normal TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay3 is in normal state."
+       ::= 46
+
+   dpduEnvRelay4Alarm TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay4 is not in normal state."
+       ::= 47
+
+   dpduEnvRelay4Normal TRAP-TYPE
+       ENTERPRISE dpduTraps
+       DESCRIPTION
+	"The environment relay4 is in normal state."
+       ::= 48
+
+END

@@ -7,7 +7,7 @@
  * the source code distribution for details.
 
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 ACL
  * @author     Abel Laura <abel.laura@gmail.com>
 */

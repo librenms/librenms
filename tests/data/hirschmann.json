@@ -24,24 +24,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.248.14.10.41",
                     "sysDescr": "Hirschmann Railswitch",
-                    "sysContact": null,
-                    "version": "07.1.05",
-                    "hardware": "RS30-1602OOZZSDHPHH",
-                    "features": null,
-                    "os": "hirschmann",
-                    "type": "network",
-                    "serial": "9999999999999F9999",
-                    "icon": "hirschmann.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.248.14.10.41",
-                    "sysDescr": "Hirschmann Railswitch",
                     "sysContact": "<private>",
                     "version": "07.1.05",
                     "hardware": "RS30-1602OOZZSDHPHH",
@@ -53,7 +35,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

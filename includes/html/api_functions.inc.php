@@ -19,6 +19,7 @@ use App\Models\DeviceOutage;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
+use App\Models\ServiceTemplate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -2364,6 +2365,57 @@ function missing_fields($required_fields, $data)
     return false;
 }
 
+function add_service_template_for_device_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'name' => 'required|string|unique:service_templates',
+        'device_group_id' => 'integer',
+        'type' => 'string',
+        'param' => 'nullable|string',
+        'ip' => 'nullable|string',
+        'desc' => 'nullable|string',
+        'changed' => 'integer',
+        'disabled' => 'integer',
+        'ignore' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    // Only use the rules if they are able to be parsed by the QueryBuilder
+    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+    if (empty($query)) {
+        return api_error(500, "We couldn't parse your rule");
+    }
+
+    $serviceTemplate = ServiceTemplate::make(['name' => $data['name'], 'device_group_id' => $data['device_group_id'], 'type' => $data['type'], 'param' => $data['param'], 'ip' => $data['ip'], 'desc' => $data['desc'], 'changed' => $data['changed'], 'disabled' => $data['disabled'], 'ignore' => $data['ignore']]);
+    $serviceTemplate->save();
+
+    return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
+}
+
+function get_service_templates(Illuminate\Http\Request $request)
+{
+    if ($request->user()->cannot('viewAny', ServiceTemplate::class)) {
+        return api_error(403, 'Insufficient permissions to access service templates');
+    }
+
+    $templates = ServiceTemplate::query()->orderBy('name')->get();
+
+    if ($templates->isEmpty()) {
+        return api_error(404, 'No service templates found');
+    }
+
+    return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
+}
+
 function add_service_for_host(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2380,7 +2432,9 @@ function add_service_for_host(Illuminate\Http\Request $request)
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore);
+    $service_disable = $data['disable'] ? true : false; // Default false
+    $service_name = $data['name'];
+    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }

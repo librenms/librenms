@@ -1,0 +1,222 @@
+mib: SCS-ks-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: exhaust-air-temperature.0
+                    value: exhaust-air-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.15.{{ $index }}'
+                    descr: 'Exhaust air temperature'
+                    divisor: 10
+
+                -
+                    oid: supply-air-temperature.0
+                    value: supply-air-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.16.{{ $index }}'
+                    descr: ' Supply air temperature'
+                    divisor: 10
+
+                -
+                    oid: outside-air-temperature.0
+                    value: outside-air-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.17.{{ $index }}'
+                    descr: 'Outside air temperature'
+                    divisor: 10
+
+                -
+                    oid: room-temperature.0
+                    value: room-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.18.{{ $index }}'
+                    descr: 'Room temperature'
+                    divisor: 10
+
+        humidity:
+            data:
+                -
+                    oid: room-humidity.0
+                    value: room-humidity
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.19.{{ $index }}'
+                    descr: ' Room humidity'
+                    divisor: 10
+
+        state:
+            data:
+                -
+                    oid: status-evaporator-fan.0
+                    value: status-evaporator-fan
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.1.{{ $index }}'
+                    descr: 'Evaporator Fan alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-condenser-fan.0
+                    value: status-condenser-fan
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.2.{{ $index }}'
+                    descr: 'Condenser Fan alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-compressor.0
+                    value: status-compressor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.3.{{ $index }}'
+                    descr: 'Compressor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-heater-thermal-protection.0
+                    value: status-heater-thermal-protection
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.4.{{ $index }}'
+                    descr: 'Heater thermal protection alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+
+                -
+                    oid: status-exhaust-air-sensor.0
+                    value: status-exhaust-air-sensor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.5.{{ $index }}'
+                    descr: 'Exhaust air sensor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+
+                -
+                    oid: status-supply-air-sensor.0
+                    value: status-supply-air-sensor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.6.{{ $index }}'
+                    descr: 'Supply air sensor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+
+                -
+                    oid: status-outside-sensor.0
+                    value: status-outside-sensor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.7.{{ $index }}'
+                    descr: 'Outside temperature sensor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-room-temperature-sensor.0
+                    value: status-room-temperature-sensor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.8.{{ $index }}'
+                    descr: 'Temperature room sensor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-room-humidity-sensor.0
+                    value: status-room-humidity-sensor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.9.{{ $index }}'
+                    descr: 'Humidity room sensor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-min-exhaust-air-temperature.0
+                    value: status-min-exhaust-air-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.10.{{ $index }}'
+                    descr: 'Minimum exhaust air temperature alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-max-exhaust-air-temperature.0
+                    value: status-max-exhaust-air-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.11.{{ $index }}'
+                    descr: 'Maximum exhaust air temperature alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-min-supply-air-temperature.0
+                    value: status-min-supply-air-temperature
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.12.{{ $index }}'
+                    descr: 'Minimum supply air temperature alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-water-sensor.0
+                    value: status-water-sensor
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.13.{{ $index }}'
+                    descr: 'Water sensor alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-filter-monitoring.0
+                    value: status-filter-monitoring
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.14.{{ $index }}'
+                    descr: 'Filter monitoring alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }
+
+                -
+                    oid: status-operational-status.0
+                    value: status-operational-status
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.20.{{ $index }}'
+                    descr: 'Operational status'
+                    group: Status
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 2, graph: 0, descr: Shut Down }
+                        - { value:  1, generic: 0, graph: 0, descr: Running }
+
+                -
+                    oid: status-collective-fault.0
+                    value: status-collective-fault
+                    num_oid: '.1.3.6.1.4.1.9839.1.2.21.{{ $index }}'
+                    descr: ' Collective fault alarm'
+                    group: Alarm
+                    states:
+                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                        - { value:  0, generic: 0, graph: 0, descr: OK }
+                        - { value:  1, generic: 2, graph: 0, descr: Error }

@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.35098.1.13.0",
                     "sysDescr": "Pica8, Inc. PicOS for as5812_54x",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "as5812_54x",
-                    "features": null,
-                    "os": "picos",
-                    "type": "network",
-                    "serial": "581254X1919216",
-                    "icon": "picos.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.35098.1.13.0",
-                    "sysDescr": "Pica8, Inc. PicOS for as5812_54x",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "as5812_54x",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

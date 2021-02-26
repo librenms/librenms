@@ -26,7 +26,7 @@
                     "sysDescr": "Cisco PIX",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "",
                     "features": null,
                     "os": "pixos",
                     "type": "firewall",

@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.885.3",
                     "sysDescr": "Emerson Vortex Power System",
-                    "sysContact": null,
-                    "version": "4.0.0.1",
-                    "hardware": null,
-                    "features": null,
-                    "os": "netsure",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "emerson.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.885.3",
-                    "sysDescr": "Emerson Vortex Power System",
                     "sysContact": "<private>",
                     "version": "4.0.0.1",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

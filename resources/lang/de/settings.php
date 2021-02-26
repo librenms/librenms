@@ -578,10 +578,6 @@ return [
                 'help' => 'Aktiviere PeeringDB lookup (Daten werden mit daily.sh heruntergeladen)',
             ],
         ],
-        'perf_times_purge' => [
-            'description' => 'Poller Performanz Daten älter als (Tage)',
-            'help' => 'Bereinigung wird erledigt durch daily.sh',
-        ],
         'ping' => [
             'description' => 'Pfad zu ping',
         ],

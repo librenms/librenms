@@ -6,24 +6,6 @@
                     "sysName": "n/a",
                     "sysObjectID": ".1.3.6.1.4.1.21362",
                     "sysDescr": "CPEFibre-G4G-PVN-001 : Commutateur Ethernet 4 ports 1000BASE-T / 1 port 1000BASE-X",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "CPEFibre-G4G-PVN-001",
-                    "features": null,
-                    "os": "ifotec",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "ifotec.png",
-                    "location": "N/A"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "n/a",
-                    "sysObjectID": ".1.3.6.1.4.1.21362",
-                    "sysDescr": "CPEFibre-G4G-PVN-001 : Commutateur Ethernet 4 ports 1000BASE-T / 1 port 1000BASE-X",
                     "sysContact": "contact@ifotec.com",
                     "version": null,
                     "hardware": "CPEFibre-G4G-PVN-001",
@@ -35,7 +17,8 @@
                     "location": "N/A"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
