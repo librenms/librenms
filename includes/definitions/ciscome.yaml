@@ -1,5 +1,5 @@
-os: CiscoME
-text: 'Cisco'
+os: ciscome
+text: 'Cisco ME'
 ifname: true
 type: network
 icon: cisco
@@ -19,14 +19,12 @@ poller_modules:
     ospf: false
     ucd-diskio: false
     ucd-mib: false
-    cisco-cbqos: true
     cisco-cef: true
     cisco-mac-accounting: true
     stp: true
 discovery_modules:
     cisco-cef: true
     cisco-mac-accounting: true
-    cisco-cbqos: true
     wireless: false
     mpls: false
     services: false
@@ -38,3 +36,4 @@ discovery_modules:
     cisco-vrf-lite: false
     ntp: false
     ucd-diskio: false
+    
