@@ -77,11 +77,6 @@ class Isis implements Module
             unset($circuits_poll['16']);
         }
 
-        // Cleanup old records from the DB
-        IsisAdjacency::query()
-        ->where(['device_id' => $device_id])
-        ->whereNotIn('ifIndex', array_keys($circuits_poll))->delete();
-
         // Loop through all configured adjacencies on the device
         foreach ($circuits_poll as $circuit => $circuit_data) {
             if (is_numeric($circuit)) {
