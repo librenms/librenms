@@ -56,7 +56,7 @@ class NoLegacyFunctions extends TestCase
         'recordDbStatistic',
     ];
 
-    public function testNoLegacyFunctionsAdded()
+    public function testNoLegacyDbFacileFunctionsAdded()
     {
         $diff = `git diff -w origin/master HEAD | grep -E "^\+"`;
 
