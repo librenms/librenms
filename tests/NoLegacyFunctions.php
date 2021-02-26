@@ -59,6 +59,7 @@ class NoLegacyFunctions extends TestCase
     public function testNoLegacyFunctionsAdded()
     {
         $diff = `git diff -w origin/master HEAD | grep -E "^\+"`;
+        dd($diff);
 
         $regex = '/' . implode('|', array_map(function ($f) {
                 return $f . '\s*\(';

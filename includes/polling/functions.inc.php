@@ -52,7 +52,7 @@ function poll_sensor($device, $class)
     $misc_sensors = [];
     $all_sensors = [];
 
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', [$class, $device['device_id']]) as $sensor) {
+    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?S', [$class, $device['device_id']]) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             // Agent sensors are polled in the unix-agent
         } elseif ($sensor['poller_type'] == 'ipmi') {
@@ -87,7 +87,7 @@ function poll_sensor($device, $class)
                 }
             } elseif ($class == 'state') {
                 if (! is_numeric($sensor_value)) {
-                    $state_value = dbFetchCell(
+                    $state_values = dbFetchCell(
                         'SELECT `state_value`
                         FROM `state_translations` LEFT JOIN `sensors_to_state_indexes`
                         ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id`
@@ -209,7 +209,7 @@ function record_sensor_data($device, $all_sensors)
         }
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
-                dbFetchRows(
+                $unneeded = dbFetchRows(
                     'SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)',
                     [$sensor['sensor_id'], $sensor_value, $prev_sensor_value]
                 ),
