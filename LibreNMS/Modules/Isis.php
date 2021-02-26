@@ -80,7 +80,7 @@ class Isis implements Module
         // Cleanup old records from the DB
         IsisAdjacency::query()
         ->where(['device_id' => $device_id])
-        ->whereNotIn('ifIndex', array_keys($circuit))->delete();
+        ->whereNotIn('ifIndex', array_keys($circuits_poll))->delete();
 
         // Loop through all configured adjacencies on the device
         foreach ($circuits_poll as $circuit => $circuit_data) {
