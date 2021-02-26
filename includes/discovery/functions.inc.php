@@ -954,8 +954,6 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
-                    // Let's guess
-                    d_echo($device);
                     $num_oid = snmp_translate($data_name, $device['dynamic_discovery']['mib'], null, null, $device);
                     if (oid_is_numeric($num_oid)) {
                         $data['num_oid'] = $num_oid . '.{{ $index }}';
