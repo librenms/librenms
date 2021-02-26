@@ -41,6 +41,7 @@ class YamlDiscovery
     public static function discover(OS $os, $class, $yaml_data)
     {
         $pre_cache = $os->preCache();
+        $device = $os->getDeviceArray();
         $items = [];
 
         // convert to class name for static call below
@@ -78,6 +79,17 @@ class YamlDiscovery
 
                     if (! isset($data['value'])) {
                         $data['value'] = $data['oid'];
+                    }
+
+                    if (! isset($data['num_oid'])) {
+                        try {
+                            $num_oid = static::oidToNumeric($data['value'], $device, $device['dynamic_discovery']['mib'], $device['mib_dir']);
+                            $data['num_oid'] = $num_oid . '.{{ $index }}';
+                            d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
+                        } catch (\Exception $e) {
+                            d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '.');
+                            continue;
+                        }
                     }
 
                     foreach ($data as $name => $value) {
