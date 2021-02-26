@@ -59,14 +59,13 @@ class NoLegacyFunctions extends TestCase
     public function testNoLegacyFunctionsAdded()
     {
         $diff = `git diff -w origin/master HEAD | grep -E "^\+"`;
-        dd($diff);
 
         $regex = '/' . implode('|', array_map(function ($f) {
-                return $f . '\s*\(';
-            }, $this->dbFacile)) . '/';
+            return preg_quote($f) . '\s*(?=\()'; // try to make sure it is a function call
+        }, $this->dbFacile)) . '/';
 
         $invalid_functions = [];
-        $file = 'unknown';
+
         if (preg_match($regex, $diff)) { // fast check to save time
             // split into files and
             foreach (explode('+++ ', $diff) as $section) {
@@ -74,33 +73,32 @@ class NoLegacyFunctions extends TestCase
                     continue;
                 }
 
-                $file = substr($section, 0, strpos($section, PHP_EOL));
+                $file = Str::after(substr($section, 0, strpos($section, PHP_EOL)), 'b/');
                 unset($matches);
                 preg_match_all($regex, $section, $matches);
                 if (! empty($matches[0])) {
-                    dd($section, $file, $matches);
-                }
-            }
-
-            dd($invalid_functions);
-
-            foreach ($this->dbFacile as $function) {
-                if (Str::contains($diff, $function . '(')) {
-                    $invalid_functions[$function] = substr_count($regex,);
+                    $invalid_functions[$file] = array_count_values($matches[0]);
                 }
             }
         }
 
-        if (! empty($invalid_functions)) {
-            $functions = implode(',', $invalid_functions);
-            $this->fail(<<<MESSAGE
-\e[41;97;1mYour code changes contain use of deprecated dbFacile function(s): $functions\e[0m
+        $found = implode(PHP_EOL, array_map(function ($file) use ($invalid_functions) {
+            return "\e[1m$file\e[0m: " . implode(', ', array_map(function ($function) use ($file, $invalid_functions) {
+                return "$function ({$invalid_functions[$file][$function]})";
+            }, array_keys($invalid_functions[$file])));
+        }, array_keys($invalid_functions)));
+
+        $this->assertEmpty($invalid_functions, <<<MESSAGE
+\e[41;97;1mYour code changes use deprecated dbFacile function(s)\e[0m
+
+$found
+
 You must use Laravel Eloquent or Fluent to access the database.
+
+See documentation:
 https://laravel.com/docs/eloquent
 https://laravel.com/docs/queries
 MESSAGE
-            );
-
-        }
+        );
     }
 }
