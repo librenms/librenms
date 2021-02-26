@@ -117,7 +117,7 @@ if ($device['os'] == 'saf-cfm') {
         }
     }
 }
-if ($device['os'] == 'ios' or $device['os'] == 'iosxe' ) {
+if ($device['os'] == 'ios' or $device['os'] == 'iosxe') {
     $tables = [
         ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.1.', 'oid' => 'c3gImsi',  'state_name' => 'c3gImsi',  'mib' => 'CISCO-WAN-3G-MIB', 'descr' => 'IMSI',  'entPhysicalIndex' => '9999'],
         ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.2.', 'oid' => 'c3gImei',  'state_name' => 'c3gImei',  'mib' => 'CISCO-WAN-3G-MIB', 'descr' => 'IMEI',  'entPhysicalIndex' => '9999'],
