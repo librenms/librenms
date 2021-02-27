@@ -94,6 +94,8 @@ class EventlogController extends TableController
                     return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
                 }
             }
+        } elseif ($eventlog->type == 'stp') {
+            return Url::deviceLink($eventlog->device, $eventlog->type, ['tab' => 'stp']);
         } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
             if (is_numeric($eventlog->reference)) {
                 $sensor = $eventlog->related;
