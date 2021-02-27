@@ -24,13 +24,13 @@
           <a href="{{ route('services.maintenance') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'unknown' ) class="active" @endif>
-            <a href="{{ route('services.unknown') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
-        </li>
-        <li role="presentation" @if( $current_tab == 'create' ) class="active" @endif>
-            <a href="{{ route('services.create') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
+            <a href="{{ route('services.unknown') }}"><i class="fa fa-question-circle icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Unknown')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'log' ) class="active" @endif>
-          <a href="{{ route('services.log') }}"><i class="fa fa-stack-overflow fa-lg icon-theme" aria-hidden="true"></i> @lang('Log')</a>
+          <a href="{{ route('services.log') }}"><i class="fa fa-stack-overflow fa-lg icon-theme" aria-hidden="true"></i> @lang('Logs')</a>
+        </li>
+        <li role="presentation" @if( $current_tab == 'create' ) class="active" @endif>
+            <a href="{{ route('services.create') }}"><i class="fa fa-plus icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Create')</a>
         </li>
       </ul>
       <br />
