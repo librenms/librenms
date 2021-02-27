@@ -35,11 +35,11 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('store', 'ServiceController@store')->name('store');
         Route::get('show', 'ServiceController@show')->name('show');
         Route::get('show', 'ServiceController@destroy')->name('destroy');
-        Route::get('errors', 'ServiceController@errorsTab')->name('index');
-        Route::get('warnings', 'ServiceController@warningsTab')->name('index');
-        Route::get('disabled', 'ServiceController@disabledTab')->name('index');
-        Route::get('ignored', 'ServiceController@ignoredTab')->name('index');
-        Route::get('maintenance', 'ServiceController@maintenanceTab')->name('index');
+        Route::get('errors', 'ServiceController@errorsTab')->name('errors');
+        Route::get('warnings', 'ServiceController@warningsTab')->name('warnings');
+        Route::get('disabled', 'ServiceController@disabledTab')->name('disabled');
+        Route::get('ignored', 'ServiceController@ignoredTab')->name('ignored');
+        Route::get('maintenance', 'ServiceController@maintenanceTab')->name('maintenance');
         Route::get('log', 'ServiceController@logTab')->name('log');
         Route::resource('templates', 'ServiceTemplateController');
         Route::post('templates/applyAll', 'ServiceTemplateController@applyAll')->name('templates.applyAll');
