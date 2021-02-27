@@ -8,10 +8,10 @@
         <li role="presentation" @if( $current_tab == 'services' ) class="active" @endif>
           <a href="{{ route('services.index') }}"><i class="fa fa-cogs icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('All Services')</a>
         </li>
-        <li role="presentation" @if( $current_tab == 'error' ) class="active" @endif>
+        <li role="presentation" @if( $current_tab == 'errors' ) class="active" @endif>
           <a href="{{ route('services.error') }}"><i class="fa fa-exclamation-circle fa-col-danger fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Errors')</a>
         </li>
-        <li role="presentation" @if( $current_tab == 'warning' ) class="active" @endif>
+        <li role="presentation" @if( $current_tab == 'warnings' ) class="active" @endif>
           <a href="{{ route('services.warning') }}"><i class="fa fa-exclamation-triangle fa-col-warning fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Warnings')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'ignored' ) class="active" @endif>
