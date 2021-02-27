@@ -34,13 +34,6 @@
             </tr>
             </thead>
             <tbody>
-            @if( $current_tab == 'error' ) $services=$error_list @endif
-            @if( $current_tab == 'warning' ) $services=$warning_list @endif
-            @if( $current_tab == 'ignored' ) $services=$ignored_list @endif
-            @if( $current_tab == 'disabled' ) $services=$disabled_list @endif
-            @if( $current_tab == 'maintenance' ) $services=$maintenance_list @endif
-            @if( $current_tab == 'unknown' ) $services=$unknown_list @endif
-            @if( $current_tab == 'error' ) $services=$error_list @endif
             @foreach($services as $service)
                 <tr id="row_{{ $service->service_id }}">
                     <td>{{ $service->service_name }}</td>
