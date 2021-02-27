@@ -1,6 +1,8 @@
-@extends('layouts.librenmsv1')
+@extends('services.index')
 
 @section('title', __('Edit Service'))
+
+@parent
 
 @section('content')
     <div class="container">

@@ -8,7 +8,7 @@
 
 <x-panel id="manage-log-panel">
     <x-slot name="title">
-        <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> @lang('Service Logs')
+        <i class="fa fa-stackoverflow fa-fw fa-lg" aria-hidden="true"></i> @lang('Service Logs')
     </x-slot>
 
     <div class="table-responsive">
