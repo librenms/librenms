@@ -29,6 +29,11 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
     Route::prefix('services')->name('services.')->group(function () {
         Route::get('', 'ServiceController@servicesTab')->name('services.index');
+        Route::get('create', 'ServiceController@create')->name('services.create');
+        Route::get('edit', 'ServiceController@edit')->name('services.edit');
+        Route::get('update', 'ServiceController@update')->name('services.update');
+        Route::get('store', 'ServiceController@store')->name('services.store');
+        Route::get('show', 'ServiceController@show')->name('services.show');
         Route::get('errors', 'ServiceController@errorsTab')->name('services.index');
         Route::get('warnings', 'ServiceController@warningsTab')->name('services.index');
         Route::get('disabled', 'ServiceController@disabledTab')->name('services.index');
