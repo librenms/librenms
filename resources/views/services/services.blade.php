@@ -10,13 +10,6 @@
     <x-slot name="title">
         <i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> @lang('Services')
     </x-slot>
-    <div class="row" style="padding-bottom: 16px;">
-        <div class="col-md-12">
-            <a type="button" class="btn btn-primary" href="{{ route('services.create') }}">
-                <i class="fa fa-plus"></i> @lang('New Service')
-            </a>
-        </div>
-    </div>
     <div class="table-responsive">
         <table id="manage-services-table" class="table table-condensed table-hover">
             <thead>

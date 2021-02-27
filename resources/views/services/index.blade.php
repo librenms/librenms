@@ -30,7 +30,7 @@
           <a href="{{ route('services.log') }}"><i class="fa fa-stack-overflow fa-lg icon-theme" aria-hidden="true"></i> @lang('Logs')</a>
         </li>
         <li role="presentation" class="btn btn-primary">
-            <a href="{{ route('services.create') }}"><i class="fa fa-plus icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Create')</a>
+            <a href="{{ route('services.create') }}"><i class="fa fa-plus-square fa-col-info fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Add Service')</a>
         </li>
       </ul>
       <br />
