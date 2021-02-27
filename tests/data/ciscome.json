@@ -1013,7 +1013,7 @@
                     "ifDuplex": "fullDuplex",
                     "ifMtu": 10240,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "Switch-Uplink",
+                    "ifAlias": "SW-Uplink",
                     "ifPhysAddress": "b83861688b29",
                     "ifHardType": null,
                     "ifLastChange": 550,
