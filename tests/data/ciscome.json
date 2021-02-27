@@ -779,7 +779,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "VLAN    5",
-                    "ifName": "Customer",
+                    "ifName": "Customer[34343]",
                     "portName": null,
                     "ifIndex": 200000005,
                     "ifSpeed": null,
