@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('update', 'ServiceController@update')->name('update');
         Route::get('store', 'ServiceController@store')->name('store');
         Route::get('show', 'ServiceController@show')->name('show');
+        Route::get('show', 'ServiceController@destroy')->name('destroy');
         Route::get('errors', 'ServiceController@errorsTab')->name('index');
         Route::get('warnings', 'ServiceController@warningsTab')->name('index');
         Route::get('disabled', 'ServiceController@disabledTab')->name('index');
