@@ -34,11 +34,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('update', 'ServiceController@update')->name('update');
         Route::get('store', 'ServiceController@store')->name('store');
         Route::get('show', 'ServiceController@show')->name('show');
-        Route::get('show', 'ServiceController@destroy')->name('destroy');
+        Route::get('destroy', 'ServiceController@destroy')->name('destroy');
         Route::get('errors', 'ServiceController@errorsTab')->name('errors');
         Route::get('warnings', 'ServiceController@warningsTab')->name('warnings');
         Route::get('disabled', 'ServiceController@disabledTab')->name('disabled');
         Route::get('ignored', 'ServiceController@ignoredTab')->name('ignored');
+        Route::get('unknown', 'ServiceController@unknownTab')->name('unknown');
         Route::get('maintenance', 'ServiceController@maintenanceTab')->name('maintenance');
         Route::get('log', 'ServiceController@logTab')->name('log');
         Route::resource('templates', 'ServiceTemplateController');
