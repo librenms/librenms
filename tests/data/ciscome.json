@@ -779,7 +779,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "VLAN    5",
-                    "ifName": "Customer[34343]",
+                    "ifName": "Customer",
                     "portName": null,
                     "ifIndex": 200000005,
                     "ifSpeed": null,
@@ -1098,10 +1098,10 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "customer",
-                    "port_descr_descr": "34343",
+                    "port_descr_type": null,
+                    "port_descr_descr": null,
                     "port_descr_circuit": null,
-                    "port_descr_speed": "34343",
+                    "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Port  2",
                     "ifName": "GigabitEthernet 1/2",
@@ -1740,10 +1740,10 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "customer",
-                    "port_descr_descr": "34343",
+                    "port_descr_type": null,
+                    "port_descr_descr": null,
                     "port_descr_circuit": null,
-                    "port_descr_speed": "34343",
+                    "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "VLAN    5",
                     "ifName": "Customer",
