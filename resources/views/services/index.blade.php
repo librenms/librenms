@@ -12,7 +12,7 @@
           <a href="{{ route('services.errors') }}"><i class="fa fa-exclamation-circle fa-col-danger fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Errors')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'warnings' ) class="active" @endif>
-          <a href="{{ route('services.warning') }}"><i class="fa fa-exclamation-triangle fa-col-warning fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Warnings')</a>
+          <a href="{{ route('services.warnings') }}"><i class="fa fa-exclamation-triangle fa-col-warning fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Warnings')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'ignored' ) class="active" @endif>
           <a href="{{ route('services.ignored') }}"><i class="fa fa-eye-slash fa-col-info fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Ignored')</a>
