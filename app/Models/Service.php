@@ -142,6 +142,17 @@ class Service extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeHasEventLogs($query)
+    {
+        return $query->where([
+            ['type', '=', 'service'],
+        ]);
+    }
+
     // ---- Define Relationships ----
 
     public function devices()
