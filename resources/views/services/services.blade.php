@@ -8,7 +8,7 @@
 
 <x-panel id="manage-services-panel" title="{{ __('Services') }}">
     <x-slot name="title">
-        <i class="fa fa-cogs fa-fw fa-lg"></i>
+        <i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> @lang('Services')
     </x-slot>
     <div class="row" style="padding-bottom: 16px;">
         <div class="col-md-12">
