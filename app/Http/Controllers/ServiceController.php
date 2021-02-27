@@ -187,7 +187,7 @@ class ServiceController extends Controller
         return view(
             'services.log', [
                 'current_tab' => 'log',
-                'logs' => Service::hasEventLogs()->get,
+                'logs' => \App\Models\Eventlog::get()->where('type', 'service'),
             ]
         );
     }
