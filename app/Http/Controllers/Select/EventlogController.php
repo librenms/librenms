@@ -68,6 +68,6 @@ class EventlogController extends SelectController
             $query->where('device_id', $device_id);
         }
 
-        return $query;
+        return $query->orderBy('type');
     }
 }
