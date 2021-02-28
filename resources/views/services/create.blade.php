@@ -5,17 +5,16 @@
 @section('content')
 
 @parent
-<x-panel id="manage-log-panel">
+
+<x-panel id="manage-create-panel">
     <x-slot name="title">
-        <i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> @lang('Add Service')
+        <i class="fa fa-plus-square fa-col-info fa-fw fa-lg" aria-hidden="true"></i> @lang('Add Service')
     </x-slot>
     <div class="container">
         <div class="row">
             <form action="{{ route('services.store') }}" method="POST" role="form"
                   class="form-horizontal services-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
-                <legend><h2>@lang('Create Service')</h2></legend>
                 <div class='alert alert-info'>Service will created for the specified Device.</div>
-                @csrf
                 <div class='well well-lg'>
                     @include('services.form')
                     <div class="form-group">
