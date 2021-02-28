@@ -340,6 +340,7 @@ class ServiceController extends Controller
     {
         return view(
             'services.edit', [
+                'current_tab' => 'services',
                 'service' => $service,
                 'services_list' => Services::list(),
             ]

@@ -30,11 +30,11 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::prefix('services')->name('services.')->group(function () {
         Route::get('', 'ServiceController@servicesTab')->name('index');
         Route::get('create', 'ServiceController@create')->name('create');
-        Route::get('edit', 'ServiceController@edit')->name('edit');
-        Route::get('update', 'ServiceController@update')->name('update');
-        Route::get('store', 'ServiceController@store')->name('store');
-        Route::get('show', 'ServiceController@show')->name('show');
-        Route::get('destroy', 'ServiceController@destroy')->name('destroy');
+        Route::get('{service}/edit', 'ServiceController@edit')->name('edit');
+        Route::put('{service}', 'ServiceController@update')->name('update');
+        Route::post('', 'ServiceController@store')->name('store');
+        Route::get('{service}', 'ServiceController@show')->name('show');
+        Route::delete('{service}', 'ServiceController@destroy')->name('destroy');
         Route::get('errors', 'ServiceController@errorsTab')->name('errors');
         Route::get('warnings', 'ServiceController@warningsTab')->name('warnings');
         Route::get('disabled', 'ServiceController@disabledTab')->name('disabled');
