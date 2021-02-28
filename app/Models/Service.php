@@ -153,5 +153,4 @@ class Service extends BaseModel
     {
         return $this->hasMany(\App\Models\Eventlog::class, 'type', 'service');
     }
-
 }
