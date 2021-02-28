@@ -9,7 +9,7 @@
           <a href="{{ route('services.index') }}"><i class="fa fa-cogs icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('All Services')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'errors' ) class="active" @endif>
-          <a href="{{ route('services.errors') }}"><i class="fa fa-exclamation-circle fa-col-danger fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Errors')</a>
+          <a href="{{ route('services.errors') }}"><i class="fa fa-exclamation-circle fa-col-danger fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Errors:error_count', ['error_count' => $error_count])</a>
         </li>
         <li role="presentation" @if( $current_tab == 'warnings' ) class="active" @endif>
           <a href="{{ route('services.warnings') }}"><i class="fa fa-exclamation-triangle fa-col-warning fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Warnings')</a>
@@ -24,7 +24,7 @@
           <a href="{{ route('services.maintenance') }}"><i class="fa fa-calendar fa-col-maintenance fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Maintenance')</a>
         </li>
         <li role="presentation" @if( $current_tab == 'unknown' ) class="active" @endif>
-            <a href="{{ route('services.unknown') }}"><i class="fa fa-question-circle icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Unknown')</a>
+            <a href="{{ route('services.unknown') }}"><i class="fa fa-question-circle icon-theme fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> @lang('Unknown:unknown_count', ['unknown_count' => $unknown_count])</a>
         </li>
         <li role="presentation" @if( $current_tab == 'log' ) class="active" @endif>
           <a href="{{ route('services.log') }}"><i class="fa fa-stack-overflow fa-lg icon-theme" aria-hidden="true"></i> @lang('Logs')</a>
