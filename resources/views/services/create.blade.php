@@ -1,10 +1,14 @@
 @extends('services.index')
 
-@section('title', __('Create Service'))
-
-@parent
+@section('title', __('Add Service'))
 
 @section('content')
+
+@parent
+<x-panel id="manage-log-panel">
+    <x-slot name="title">
+        <i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> @lang('Add Service')
+    </x-slot>
     <div class="container">
         <div class="row">
             <form action="{{ route('services.store') }}" method="POST" role="form"
@@ -25,4 +29,5 @@
             </form>
         </div>
     </div>
+</x-panel>
 @endsection

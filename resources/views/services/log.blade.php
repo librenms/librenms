@@ -10,7 +10,6 @@
     <x-slot name="title">
         <i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> @lang('Service Logs')
     </x-slot>
-
     <div class="table-responsive">
         <table id="log" class="table table-hover table-condensed table-striped" style="display: none;">
             <thead>

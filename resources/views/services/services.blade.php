@@ -6,7 +6,7 @@
 
 @parent
 
-<x-panel id="manage-services-panel" title="{{ __('Services') }}">
+<x-panel id="manage-services-panel">
     <x-slot name="title">
         <i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> @lang('Services')
     </x-slot>
