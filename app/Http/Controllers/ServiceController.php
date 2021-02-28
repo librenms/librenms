@@ -188,6 +188,12 @@ class ServiceController extends Controller
             'services.log', [
                 'current_tab' => 'log',
                 'logs' => \App\Models\Eventlog::get()->where('type', 'service'),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
             ]
         );
     }
@@ -205,6 +211,12 @@ class ServiceController extends Controller
                 'service' => new Service(),
                 'services' => Service::orderBy('service_name')->get(),
                 'services_list' => Services::list(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
             ]
         );
     }
@@ -343,6 +355,12 @@ class ServiceController extends Controller
                 'current_tab' => 'services',
                 'service' => $service,
                 'services_list' => Services::list(),
+                'error_count' => Service::isCritical()->get()->count(),
+                'warning_count' => Service::isWarning()->get()->count(),
+                'ignored_count' => Service::isIgnored()->get()->count(),
+                'disabled_count' => Service::isDisabled()->get()->count(),
+                'maintenance_count' => Service::isMaintenance()->get()->count(),
+                'unknown_count' => Service::isUnknown()->get()->count(),
             ]
             //
         );
