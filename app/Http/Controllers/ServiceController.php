@@ -180,7 +180,7 @@ class ServiceController extends Controller
      *
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function logTab(Request $request)
+    public function logTab()
     {
         //$this->authorize('viewAny', PollerCluster::class);
 
