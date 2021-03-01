@@ -153,7 +153,7 @@ class YamlDiscovery
             $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
         } catch (\Exception $e) {
             //negative cache
-            d_echo("Cache Negative value for " . $data['value']);
+            d_echo('Cache Negative value for ' . $data['value']);
             $num_oid_cache_negative[$md5] = true;
             throw $e;
         }
