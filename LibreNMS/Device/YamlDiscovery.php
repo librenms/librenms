@@ -85,16 +85,7 @@ class YamlDiscovery
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
                         try {
-                            d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
-                            $search_mib = $device['dynamic_discovery']['mib'];
-                            if (Str::contains($data['oid'], '::') && ! (Str::contains($data['value'], '::'))) {
-                                // We should search this mib first
-                                $exp_oid = explode('::', $data['oid']);
-                                $search_mib = $exp_oid[0] . ':' . $search_mib;
-                            }
-                            $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
-                            $data['num_oid'] = $num_oid . '.{{ $index }}';
-                            d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
+                            $num_oid = computeNumericalOID($device, $data);
                         } catch (\Exception $e) {
                             d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                             continue;
@@ -127,6 +118,25 @@ class YamlDiscovery
         }
 
         return $items;
+    }
+
+    /**
+     * @param Device $device Device we are working on
+     * @param array $data Array derived from YAML
+     * @return mixed|string|string[]|null
+     */
+    public static function computeNumericalOID($device, $data)
+    {
+        d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
+        $search_mib = $device['dynamic_discovery']['mib'];
+        if (Str::contains($data['oid'], '::') && ! (Str::contains($data['value'], '::'))) {
+            // We should search this mib first
+            $exp_oid = explode('::', $data['oid']);
+            $search_mib = $exp_oid[0] . ':' . $search_mib;
+        }
+        $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
+        d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
+        return $num_oid . '.{{ $index }}';
     }
 
     /**
