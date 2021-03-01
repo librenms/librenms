@@ -127,6 +127,15 @@ class YamlDiscovery
      */
     public static function computeNumericalOID($device, $data)
     {
+        static $num_oid_cache;
+        // Compute md5 of the query
+        $md5 = md5($data['value'] . $data['oid'] . $device['dynamic_discovery']['mib']);
+
+        if (isset($num_oid_cache[$md5])) {
+            //return the cached value if applicable
+            return $num_oid_cache[$md5];
+        }
+
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
         $search_mib = $device['dynamic_discovery']['mib'];
         if (Str::contains($data['oid'], '::') && ! (Str::contains($data['value'], '::'))) {
@@ -136,7 +145,9 @@ class YamlDiscovery
         }
         $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
         d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
-        return $num_oid . '.{{ $index }}';
+        //store the cached value and return
+        $num_oid_cache[$md5] = $num_oid . '.{{ $index }}';
+        return $num_oid_cache[$md5];
     }
 
     /**
