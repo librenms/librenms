@@ -16,7 +16,7 @@ make sure it is modified in a consistent manner.
 > testing. For OS discovery, we can mock snmpsim, but for other tests
 > you will need it installed and functioning.  We run snmpsim during
 > our integration tests, but not by default when running
-> `./lnms dev:check`.  You can install snmpsim with the
+> `lnms dev:check`.  You can install snmpsim with the
 > command `pip3 install snmpsim`.
 
 ## Capturing test data
@@ -58,23 +58,26 @@ After you have the data you need in the snmprec file, you can just use save-test
 directory. This will read composer.json and install any dependencies required.
 
 After you have saved your test data, you should run
-`./lnms dev:check` verify they pass.
+`lnms dev:check` verify they pass.
 
 To run the full suite of tests enable database and snmpsim reliant
-tests: `./lnms dev:check unit --db --snmpsim`
+tests: `lnms dev:check unit --db --snmpsim`
 
 ### Specific OS
 
-`./lnms dev:check unit -o osname`
+`lnms dev:check unit -o osname`
 
 ### Specific Module
 
-`./lnms dev:check unit -m modulename`
+`lnms dev:check unit -m modulename`
 
 ## Using snmpsim for testing
 
 You can run snmpsim to access test data by running
-`./scripts/collect-snmp-data.php --snmpsim`
+
+```bash
+lnms dev:simulate
+```
 
 You may then run snmp queries against it using the os (and variant) as
 the community and 127.1.6.1:1161 as the host.
@@ -143,7 +146,7 @@ must use a variant to store your test data (-v).
 1. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42`
 1. Run `./scripts/save-test-data.php -o example-os` to update the dumped database data.
 1. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
-1. Run `./lnms dev:check unit --db --snmpsim`
+1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
 ### Additional module support or test data
@@ -153,5 +156,5 @@ must use a variant to store your test data (-v).
    more data to the snmprec file
 1. Review data. If you modified the snmprec (don't modify json
    manually) run `./scripts/save-test-data.php -o example-os -m <module>`
-1. Run `./lnms dev:check unit --db --snmpsim`
+1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
