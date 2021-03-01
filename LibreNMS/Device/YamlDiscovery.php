@@ -85,7 +85,7 @@ class YamlDiscovery
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
                         try {
-                            $num_oid = static::computeNumericalOID($device, $data);
+                            $data['num_oid'] = static::computeNumericalOID($device, $data);
                         } catch (\Exception $e) {
                             d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                             continue;
@@ -144,9 +144,10 @@ class YamlDiscovery
             $search_mib = $exp_oid[0] . ':' . $search_mib;
         }
         $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
-        d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
+        d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
         //store the cached value and return
         $num_oid_cache[$md5] = $num_oid . '.{{ $index }}';
+
         return $num_oid_cache[$md5];
     }
 
