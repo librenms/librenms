@@ -143,9 +143,10 @@ class YamlDiscovery
 
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
         $search_mib = $device['dynamic_discovery']['mib'];
-        if (Str::contains($data['oid'], '::') && ! (Str::contains($data['value'], '::'))) {
-            // We should search this mib first
-            $search_mib = Str::before($data['oid']) . ':' . $search_mib;
+        $mib_prefix_data_oid = Str::before($data['oid'], '::');
+        if (! empty($mib_prefix_data_oid) &&  empty(Str::before($data['value'], '::'))) {
+            // We should search vlaue in this mib first
+            $search_mib = $mib_prefix_data_oid . ':' . $search_mib;
         }
 
         try {
