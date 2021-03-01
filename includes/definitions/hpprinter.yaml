@@ -1,0 +1,15 @@
+os: hpprinter
+group: printer
+text: 'HP Printer'
+type: printer
+icon: hp
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    -
+        sysObjectID:
+            - .2.3800717196.825506650.976236848.841756725.808464432.809054256.808464485
+discovery_modules:
+    toner: true
+poller_modules:
+    toner: true
