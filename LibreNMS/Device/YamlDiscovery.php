@@ -128,14 +128,16 @@ class YamlDiscovery
     public static function computeNumericalOID($device, $data)
     {
         static $num_oid_cache;
+        static $num_oid_cache_negative;
         // Compute md5 of the query
         $md5 = md5($data['value'] . $data['oid'] . $device['dynamic_discovery']['mib']);
 
+        if ($num_oid_cache_negative[$md5]) {
+            throw new InvalidOidException("Unable to translate oid $oid");
+        }
+
         if (isset($num_oid_cache[$md5])) {
             //return the cached value if applicable
-            if (is_null($num_oid_cache[$md5])) {
-                throw new InvalidOidException("Unable to translate oid $oid");
-            }
             return $num_oid_cache[$md5];
         }
 
@@ -151,7 +153,8 @@ class YamlDiscovery
             $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
         } catch (\Exception $e) {
             //negative cache
-            $num_oid_cache[$md5] = null;
+            d_echo("Cache Negative value for " . $data['value']);
+            $num_oid_cache_negative[$md5] = true;
             throw $e;
         }
 
