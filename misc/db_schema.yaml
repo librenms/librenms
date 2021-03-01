@@ -1748,7 +1748,7 @@ services:
     - { Field: service_type, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: service_desc, Type: text, 'Null': true, Extra: '' }
     - { Field: service_param, Type: text, 'Null': true, Extra: '' }
-    - { Field: service_ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: service_ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0'  }
     - { Field: service_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_changed, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: service_message, Type: text, 'Null': true, Extra: '' }
@@ -1771,7 +1771,7 @@ service_templates:
     - { Field: desc, Type: text, 'Null': true, Extra: '' }
     - { Field: param, Type: text, 'Null': true, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: changed, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+    - { Field: changed, Type: 'timestamp', 'Null': false, , Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
@@ -1782,22 +1782,22 @@ service_templates_device:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_template_id, device_id], Unique: true, Type: BTREE }
-    service_templates_device_device_id_index: { Name: service_templates_device_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     service_templates_device_service_template_id_index: { Name: service_templates_device_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
+    service_templates_device_device_id_index: { Name: service_templates_device_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
   Constraints:
-    service_templates_device_device_id_foreign: { name: service_templates_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
     service_templates_device_service_template_id_foreign: { name: service_templates_device_service_template_id_foreign, foreign_key: service_template_id, table: service_templates, key: id, extra: 'ON DELETE CASCADE' }
+    service_templates_device_device_id_foreign: { name: service_templates_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 service_templates_device_group:
   Columns:
     - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_template_id, device_group_id], Unique: true, Type: BTREE }
-    service_templates_device_group_device_group_id_index: { Name: service_templates_device_group_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
     service_templates_device_group_service_template_id_index: { Name: service_templates_device_group_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
+    service_templates_device_group_device_group_id_index: { Name: service_templates_device_group_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
   Constraints:
-    service_templates_device_group_device_group_id_foreign: { name: service_templates_device_group_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
     service_templates_device_group_service_template_id_foreign: { name: service_templates_device_group_service_template_id_foreign, foreign_key: service_template_id, table: service_templates, key: id, extra: 'ON DELETE CASCADE' }
+    service_templates_device_group_device_group_id_foreign: { name: service_templates_device_group_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
 session:
   Columns:
     - { Field: session_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
