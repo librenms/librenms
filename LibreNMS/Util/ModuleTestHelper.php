@@ -252,15 +252,11 @@ class ModuleTestHelper
             $decoded = json_decode(file_get_contents($file), true);
 
             if (json_last_error()) {
-                throw new \Exception("Unable to decode file $file");
-            }
-
-            $data_modules = array_keys($decoded);
-
-            if (json_last_error()) {
                 echo "Invalid json data: $base_name\n";
                 exit(1);
             }
+
+            $data_modules = array_keys($decoded);
 
             if (empty($modules)) {
                 $valid_modules = $data_modules;
