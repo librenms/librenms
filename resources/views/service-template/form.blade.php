@@ -253,9 +253,10 @@
         }
     });
     $('.service-template-form').submit(function (eventObj) {
-        if ($('#dtype').val() === 'static') {
+        if ($('#dtype').val() === 'static' & $('#dgtype').val() === 'static'){
             return true;
-        } else {
+        }
+        if ($('#dtype').val() === 'dynamic') {
             $('<input type="hidden" name="drules" />')
                 .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
                 .appendTo(this);
@@ -263,9 +264,7 @@
                 return false;
             }
         }
-        if ($('#dgtype').val() === 'static') {
-            return true;
-        } else {
+        if ($('#dgtype').val() === 'dynamic') {
             $('<input type="hidden" name="dgrules" />')
                 .attr('value', JSON.stringify(builder2.queryBuilder('getRules')))
                 .appendTo(this);
