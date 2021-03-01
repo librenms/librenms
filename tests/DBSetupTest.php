@@ -75,9 +75,9 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckDBCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')"));
         if (isset($collation[0])) {
-            $error = implode(' ', (array) $collation[0]);
+            $error = implode(' ', $collation[0]);
         } else {
             $error = '';
         }
@@ -86,20 +86,20 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckTableCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );"));
         $error = '';
-        foreach ($collation as $data) {
-            $error .= implode(' ', (array) $data) . PHP_EOL;
+        foreach ($collation as $id => $data) {
+            $error .= implode(' ', $data) . PHP_EOL;
         }
         $this->assertEmpty($collation, 'Wrong Table Collation or Character set: ' . $error);
     }
 
     public function testCheckColumnCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );"));
         $error = '';
-        foreach ($collation as $data) {
-            $error .= implode(' ', (array) $data) . PHP_EOL;
+        foreach ($collation as $id => $data) {
+            $error .= implode(' ', $data) . PHP_EOL;
         }
         $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
     }
