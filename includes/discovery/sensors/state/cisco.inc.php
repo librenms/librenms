@@ -192,6 +192,7 @@ foreach ($tables as $tablevalue) {
         create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
+            $state_group = null;
             if ($tablevalue['state_name'] == 'ciscoEnvMonTemperatureState' && (empty($temp[$index][$tablevalue['descr']]))) {
                 d_echo('Invalid sensor, skipping..');
             } else {
@@ -211,9 +212,10 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
-                    $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' - ' . $tablevalue['descr'];
+                    $descr = $tablevalue['descr'];
+                    $state_group = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
                 }
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);
