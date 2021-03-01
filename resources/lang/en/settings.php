@@ -1227,6 +1227,10 @@ return [
                 'description' => 'Port',
                 'help' => 'Set the tcp/udp port to be used for SNMP',
             ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'SNMP Timeout in seconds',
+            ],
             'v3' => [
                 'description' => 'SNMP v3 Authentication (priority)',
                 'help' => 'Set up v3 authentication variables and order them as you want them to be tried',

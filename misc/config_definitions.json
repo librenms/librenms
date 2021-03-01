@@ -4992,6 +4992,13 @@
             "type": "integer",
             "default": 161
         },
+        "snmp.timeout": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 1,
+            "type": "integer",
+            "default": 1
+        },
         "snmp.transports": {
             "group": "poller",
             "section": "snmp",
