@@ -342,7 +342,7 @@ main () {
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
-            post-pull)
+            post-pull|no-db-cleanup)
                 # re-check dependencies after pull with the new code
                 check_dependencies
 
@@ -366,7 +366,9 @@ main () {
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
                 status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
-                status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                if [ "$arg" != "no-db-cleanup" ] ; then
+                    status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                fi
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
             ;;
