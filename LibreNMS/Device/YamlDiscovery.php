@@ -133,6 +133,9 @@ class YamlDiscovery
 
         if (isset($num_oid_cache[$md5])) {
             //return the cached value if applicable
+            if (is_null($num_oid_cache[$md5])) {
+                throw new InvalidOidException("Unable to translate oid $oid");
+            }
             return $num_oid_cache[$md5];
         }
 
@@ -143,7 +146,15 @@ class YamlDiscovery
             $exp_oid = explode('::', $data['oid']);
             $search_mib = $exp_oid[0] . ':' . $search_mib;
         }
-        $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
+
+        try {
+            $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
+        } catch (\Exception $e) {
+            //negative cache
+            $num_oid_cache[$md5] = null;
+            throw $e;
+        }
+
         d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
         //store the cached value and return
         $num_oid_cache[$md5] = $num_oid . '.{{ $index }}';
