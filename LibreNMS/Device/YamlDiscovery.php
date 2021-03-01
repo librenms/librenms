@@ -123,7 +123,7 @@ class YamlDiscovery
     /**
      * @param Device $device Device we are working on
      * @param array $data Array derived from YAML
-     * @return mixed|string|string[]|null
+     * @return string
      */
     public static function computeNumericalOID($device, $data)
     {
