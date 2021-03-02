@@ -10,7 +10,7 @@
                     "version": "ME1200 OS Software Build 15.6-7.SN1",
                     "hardware": "ME-1200-Fixed Module",
                     "features": null,
-                    "os": "ciscome",
+                    "os": "ciscome1200",
                     "type": "network",
                     "serial": "RTC1818005K",
                     "icon": "cisco.svg",
