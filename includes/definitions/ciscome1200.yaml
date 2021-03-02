@@ -1,5 +1,5 @@
-os: ciscome
-text: 'Cisco ME'
+os: ciscome1200
+text: 'Cisco ME1200'
 ifname: true
 type: network
 icon: cisco
