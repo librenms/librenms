@@ -86,7 +86,7 @@ class Isis implements Module
                 if ($circuit_data['isisCircPassiveCircuit'] != '1') {
                     //var_dump($adjacencies_poll[$circuit]['isisISAdjState']);
                     // Adjancy is UP
-                    if (!empty($adjacencies_poll[$circuit]) && end($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
+                    if (! empty($adjacencies_poll[$circuit]) && end($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
                         $isis_data['isisISAdjState'] = end($adjacencies_poll[$circuit]['isisISAdjState']);
                         $isis_data['isisISAdjNeighSysID'] = end($adjacencies_poll[$circuit]['isisISAdjNeighSysID']);
                         $isis_data['isisISAdjNeighSysType'] = end($adjacencies_poll[$circuit]['isisISAdjNeighSysType']);
