@@ -986,6 +986,7 @@ mpls_saps:
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: sapEncapValue, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: sapDisplayEncapValue, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: sapRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': true, Extra: '' }
     - { Field: sapType, Type: 'enum(''unknown'',''epipe'',''tls'',''vprn'',''ies'',''mirror'',''apipe'',''fpipe'',''ipipe'',''cpipe'',''intTls'',''evpnIsaTls'')', 'Null': true, Extra: '' }
     - { Field: sapDescription, Type: varchar(80), 'Null': true, Extra: '' }
