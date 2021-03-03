@@ -1231,6 +1231,10 @@ return [
                 'description' => 'Timeout',
                 'help' => 'SNMP Timeout in seconds',
             ],
+            'retries' => [
+                'description' => 'Retries',
+                'help' => 'how many times to retry the query',
+            ],
             'v3' => [
                 'description' => 'SNMP v3 Authentication (priority)',
                 'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
