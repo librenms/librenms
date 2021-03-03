@@ -915,6 +915,42 @@ function get_port_graphs(Illuminate\Http\Request $request)
     return api_success($ports, 'ports');
 }
 
+function get_sap_graphs(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $ifName = $request->route('sapInfo');
+    $vars = array();
+    $vars['device'] = $hostname;
+    $vars['width'] = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+    if (!empty($_GET['from'])) {
+        $vars['from'] = $_GET['from'];
+    }
+    if (!empty($_GET['to'])) {
+        $vars['to'] = $_GET['to'];
+    }
+    if ($_GET['ifDescr'] == true) {
+        $port = 'ifDescr';
+    } else {
+        $port = 'ifName';
+    }
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $vars['type']='device_sap';
+    $vars['tab']='routing';
+    $vars['proto']='mpls';
+    $vars['view']='saps';
+    $trafficInfo = explode (":", $ifName);
+    if (!empty($trafficInfo[1])) {
+        $sapInfo = dbFetchRows('SELECT svc_oid, sapPortId, sapEncapValue FROM mpls_saps WHERE device_id = ? AND ifName = ? AND sapDisplayEncapValue = ?', [$device_id, $trafficInfo[0], $trafficInfo[1]]);
+    } else {
+        $sapInfo = dbFetchRows('SELECT svc_oid, sapPortId, sapEncapValue FROM mpls_saps WHERE device_id = ? AND ifName = ? AND sapDisplayEncapValue = ?', [$device_id, $trafficInfo[0], ""]);
+    }
+    $vars['traffic_id'] = (string)$sapInfo[0]['svc_oid'] . '.' . (string)$sapInfo[0]['sapPortId'] . '.' . $sapInfo[0]['sapEncapValue'];
+
+    return api_get_graph($vars);
+    //return api_success_noresult(200, $vars);
+}
+
 function get_device_ip_addresses(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
