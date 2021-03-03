@@ -1644,7 +1644,7 @@ function nfsen_live_dir($hostname)
  */
 function get_sapTitle($device_id, $traffic_id)
 {
-    $sapTrafficInfo = explode (".", $traffic_id);
+    $sapTrafficInfo = explode('.', $traffic_id);
     $sapSvcOid = $sapTrafficInfo[0];
     $sapPortId = $sapTrafficInfo[1];
     $sapEncapValue = $sapTrafficInfo[2];
