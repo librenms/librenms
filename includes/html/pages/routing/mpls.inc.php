@@ -480,7 +480,7 @@ if ($vars['view'] == 'saps') {
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
             <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
             <td>' . generate_port_link($port) . '</td>
-            <td>' . $sap['sapEncapValue'] . '</td>
+            <td>' . $sap['sapDisplayEncapValue'] . '</td>
             <td>' . $sap['sapType'] . '</td>
             <td>' . $sap['sapDescription'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>

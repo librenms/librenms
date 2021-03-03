@@ -36,7 +36,9 @@ if (is_file('includes/html/graphs/' . $type . '/auth.inc.php')) {
 if (! $auth) {
     require 'includes/html/error-no-perm.inc.php';
 } else {
-    if (Config::has("graph_types.$type.$subtype.descr")) {
+    if ($type == 'device' && $subtype == 'sap') {
+        $title .= ' :: ' . get_sapTitle($vars['device'], $vars['traffic_id']);
+    } elseif (Config::has("graph_types.$type.$subtype.descr")) {
         $title .= ' :: ' . Config::get("graph_types.$type.$subtype.descr");
     } elseif ($type == 'device' && $subtype == 'collectd') {
         $title .= ' :: ' . nicecase($subtype) . ' :: ' . $vars['c_plugin'];
