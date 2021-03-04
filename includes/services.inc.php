@@ -150,7 +150,7 @@ function poll_service($service)
         foreach ($perf as $k => $v) {
             $DS[$k] = $v['uom'];
         }
-        d_echo('Service DS: ' . _json_encode($DS) . "\n");
+        d_echo('Service DS: ' . json_encode($DS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
         if (($service['service_ds'] == '{}') || ($service['service_ds'] == '')) {
             $update['service_ds'] = json_encode($DS);
         }
