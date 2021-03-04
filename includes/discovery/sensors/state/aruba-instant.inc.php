@@ -48,18 +48,17 @@ if (! empty($oids)) {
 
     foreach ($oids as $ap_index => $ap_entry) {
         $ap_state_index = implode('.', array_map('hexdec', explode(':', $ap_index)));
-        $combined_oid = implode('.', [$ai_mib . '::' . 'aiAPStatus', $ap_state_index]);
-        $ap_state_oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+        $ap_state_oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.11.' . $ap_state_index;
         $ap_descr = $ap_entry['aiAPName'] . ' (' . $ap_entry['aiAPSerialNum'] . ')';
-        discover_sensor($valid['sensor'], 'state', $device, $ap_state_oid, $ap_state_index, $ap_state_name, $ap_entry['aiAPSerialNum'], '1', '1', null, null, null, null, $ap_descr, 'snmp', null, null, null, 'Cluster APs');
+
+        discover_sensor($valid['sensor'], 'state', $device, $ap_state_oid, $ap_state_index, $ap_state_name, $ap_descr, '1', '1', null, null, null, null, $ap_entry['aiAPStatus'], 'snmp', null, null, null, 'Cluster APs');
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $ap_state_name, $ap_state_index);
 
         foreach ($ap_entry['aiRadioStatus'] as $radio_index => $radio_status) {
             $radio_state_index = implode('.', [$ap_state_index, $radio_index]);
-            $combined_oid = implode('.', [$ai_mib . '::' . 'aiRadioStatus', $radio_state_index]);
-            $radio_state_oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+            $radio_state_oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.20.' . $radio_state_index;
 
             discover_sensor($valid['sensor'], 'state', $device, $radio_state_oid, $radio_state_index, $radio_state_name, $ap_descr . ' Radio ' . $radio_index, '1', '1', null, null, null, null, $radio_status, 'snmp', null, null, null, 'Cluster Radios');
 

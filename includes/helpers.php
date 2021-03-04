@@ -105,3 +105,25 @@ if (! function_exists('array_pairs')) {
         return $pairs;
     }
 }
+
+/**
+ * Cast string to int or float.
+ * Returns 0 if string is not numeric
+ *
+ * @param string $number
+ * @return float|int
+ */
+function cast_number($number)
+{
+    if (! is_numeric($number)) {
+        if (! preg_match('/-?\d+(\.\d+)?/', $number, $matches)) {
+            return 0;
+        }
+        $number = $matches[0];
+    }
+
+    $float = (float) $number;
+    $int = (int) $number;
+
+    return $float == $int ? $int : $float;
+}

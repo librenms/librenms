@@ -1,6 +1,8 @@
 <?php
 
-foreach ($pre_cache['aos6_temp_oids'] as $index => $entry) {
+$aos6_temp_oids = snmpwalk_cache_multi_oid($device, 'chasChassisEntry', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+
+foreach ($aos6_temp_oids as $index => $entry) {
     if (is_numeric($entry['chasHardwareBoardTemp']) && $entry['chasHardwareBoardTemp'] != 0) {
         $oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.3.1.4.' . $index;
         $value = $entry['chasHardwareBoardTemp'];

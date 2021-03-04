@@ -61,7 +61,7 @@ class Number
             $value = $value * -1;
         }
 
-        return (number_format(round($value, $round), $sf, '.', '') + 0) . " $ext$suffix";
+        return cast_number(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
     }
 
     public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B')
@@ -81,6 +81,6 @@ class Number
             $value = $value * -1;
         }
 
-        return (number_format(round($value, $round), $sf, '.', '') + 0) . " $ext$suffix";
+        return cast_number(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
     }
 }
