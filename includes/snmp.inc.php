@@ -169,7 +169,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-t', $timeout);
     }
 
-    $retries = prep_snmp_setting($device, 'retries')
+    $retries = prep_snmp_setting($device, 'retries');
     if ($retries && $retries !== 5) {
         array_push($cmd, '-r', $retries);
     }
