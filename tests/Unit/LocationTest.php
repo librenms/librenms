@@ -60,6 +60,7 @@ class LocationTest extends TestCase
 
     public function testCanSetEncodedLocation()
     {
+        Config::set('geoloc.dns', false);
         $device = Device::factory()->make(); /** @var Device $device */
 
         // valid coords
@@ -92,6 +93,7 @@ class LocationTest extends TestCase
 
     public function testCanHandleGivenCoordinates()
     {
+        Config::set('geoloc.dns', false);
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->withCoordinates()->make();
 
