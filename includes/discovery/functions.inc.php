@@ -981,10 +981,6 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                         }
                     }
 
-                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
-                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
-                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
-
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
@@ -994,6 +990,10 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
                     }
+
+                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
+                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
+                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     //user_func must be applied after divisor/multiplier
                     if (isset($user_function) && is_callable($user_function)) {
@@ -1035,7 +1035,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
             }
         }
         discovery_process($valid, $device, $sensor_class, $pre_cache);
-        d_echo($valid['sensor'][$sensor_class]);
+        d_echo($valid['sensor'][$sensor_class] ?? []);
         check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";
     }
