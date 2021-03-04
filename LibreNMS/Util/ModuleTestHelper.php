@@ -32,10 +32,6 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use Symfony\Component\Yaml\Yaml;
-use function json_encode;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
 
 class ModuleTestHelper
 {
