@@ -45,4 +45,4 @@ if (is_numeric($service_id) && $service_id > 0) {
     }
 }
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
