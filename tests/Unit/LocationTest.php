@@ -138,6 +138,7 @@ class LocationTest extends TestCase
 
     public function testCanSetDnsCoordinate()
     {
+        Config::set('geoloc.dns', true);
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->withCoordinates()->make();
 
