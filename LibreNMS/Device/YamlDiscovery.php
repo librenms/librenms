@@ -122,11 +122,11 @@ class YamlDiscovery
     }
 
     /**
-     * @param Device $device Device we are working on
+     * @param array $device Device we are working on
      * @param array $data Array derived from YAML
      * @return string
      */
-    public static function computeNumericalOID(Device $device, $data)
+    public static function computeNumericalOID($device, $data)
     {
         static $num_oid_cache;
         static $num_oid_cache_negative;
