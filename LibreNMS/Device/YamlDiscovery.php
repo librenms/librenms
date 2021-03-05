@@ -24,12 +24,12 @@
 
 namespace LibreNMS\Device;
 
+use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
-use App\Models\Device;
 
 class YamlDiscovery
 {
@@ -126,7 +126,7 @@ class YamlDiscovery
      * @param array $data Array derived from YAML
      * @return string
      */
-    public static function computeNumericalOID($device, $data)
+    public static function computeNumericalOID(Device $device, $data)
     {
         static $num_oid_cache;
         static $num_oid_cache_negative;
