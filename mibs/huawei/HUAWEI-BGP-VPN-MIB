@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-BGP-VPN-MIB , this Mib module for management 
 --              of BGP/VPN protocol.
 -- Reference: This MIB was extracted from RFC 4271 
--- Version: V2.22
+-- Version: V2.28
 -- History:
 --    <wangchong >, <2008-12-28>, <publish>
 --    <xiaoyaqun>, <2009-09-14>, <publish>
@@ -33,7 +33,7 @@
     
 -- Jan 19, 2015 at 15:02 GMT
         hwBgpMIB MODULE-IDENTITY 
-            LAST-UPDATED "201805241100Z"        -- May 24, 2018 at 1100 GMT
+            LAST-UPDATED "202007221200Z"        -- Apr 13, 2020 at 1200 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -49,6 +49,30 @@
                 "The Mib module for management of BGP/VPN. Huawei Technologies co.,Ltd. 
                 Supplementary information may be available at: 
                 http://www.huawei.com"
+		
+           REVISION "202007221200Z"
+           DESCRIPTION 
+           "Modify description of MIB nodes, include:hwOsNodeTable."
+		
+           REVISION "202004131200Z"
+           DESCRIPTION 
+           "Modify description of MIB nodes, include: hwBgpPeerAddrFamilyPerRouteThresholdExceed, hwBgpPeerAddrFamilyPerRouteThresholdExceedClear, hwBgpPeerAddrFamilyPerRouteExceed, hwBgpPeerAddrFamilyPerRouteExceedClear, hwBgpRouteType."
+ 
+           REVISION "201912251200Z"
+           DESCRIPTION 
+           "Modify one MIB table for description, include: 'hwBgpProcessName'."
+
+           REVISION "201912231200Z"
+           DESCRIPTION 
+           "Modify description of MIB nodes, include: hwBgpPeerAddrFamilyRouteThresholdExceed, hwBgpPeerAddrFamilyRouteThresholdExceedClear, hwBgpPeerAddrFamilyRouteExceed, hwBgpPeerAddrFamilyRouteExceedClear."
+
+          REVISION "201912201610Z"
+           DESCRIPTION 
+           "Modify one MIB table for description, include: 'hwBgpVrfAddressFamily','hwBgpRouteMaxNum','hwBgpRouteThreshold'."
+
+           REVISION "201903151025Z"
+           DESCRIPTION 
+           "Modify one MIB table for description, include: 'hwBgpLabelLimitTable','hwVpnRouteLabelNumReachThresold','hwVpnRouteLabelNumReachMaximum'."
 
            REVISION "201805241100Z"
            DESCRIPTION 
@@ -1193,13 +1217,13 @@
             STATUS        current
             DESCRIPTION
                 "The index of bgp route limit, including:
-                 1.ipv4(1): total ipv4 routes number.
-                 2.ipv6(2): total ipv6 routes number.
-                 3.ipv4vrf(3): ipv4 vrf routes number.
-                 4.ipv6vrf(4): ipv6 vrf routes number.
-                 5.ipv4public(5): ipv4 public routes number.
-                 6.ipv6public(6): ipv6 public routes number.
-                 7.l2ad(7): l2ad routes number."
+                 1. ipv4(1): total ipv4 routes number.
+                 2. ipv6(2): total ipv6 routes number.
+                 3. ipv4vrf(3): ipv4 vrf routes number.
+                 4. ipv6vrf(4): ipv6 vrf routes number.
+                 5. ipv4public(5): ipv4 public routes number.
+                 6. ipv6public(6): ipv6 public routes number.
+                 7. l2ad(7): l2ad routes number."
             ::= { hwBgpRouteLimitTable 1 }
 
         -- 1.3.6.1.4.1.2011.5.25.177.1.2.1.2
@@ -1228,7 +1252,15 @@
             DESCRIPTION
                 "The threshold number of bgp routes."
             ::= { hwBgpRouteLimitTable 4 }
-        
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.1.5
+        hwBgpRouteType   OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "Route type."
+            ::= { hwBgpRouteLimitTable 5 }
 
         -- 1.3.6.1.4.1.2011.5.25.177.1.2.2    
         hwBgpVrfRouteTable OBJECT-TYPE
@@ -1374,6 +1406,45 @@
             DESCRIPTION
                 "Address family."
             ::= { hwEvpnRouteEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.4
+        hwBgpLabelLimitTable OBJECT IDENTIFIER ::= { hwBgpRoute 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.4.1
+        hwBgpAddrFamilyAfi  OBJECT-TYPE
+            SYNTAX        HWBgpAfi
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The address family of BGP."
+            ::= { hwBgpLabelLimitTable 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.4.2
+        hwBgpAddrFamilySafi OBJECT-TYPE
+            SYNTAX        HWBgpSafi
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The sub-address family of BGP."
+            ::= { hwBgpLabelLimitTable 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.4.3
+        hwBgpLabelMaxValue OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The maximum number of BGP labels."
+            ::= { hwBgpLabelLimitTable 3 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.4.4
+        hwBgpLabelLimitThreshold OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The threshold number of BGP labels."
+            ::= { hwBgpLabelLimitTable 4 }
 
         -- 1.3.6.1.4.1.2011.5.25.177.1.3
         hwBgpTraps OBJECT IDENTIFIER ::= { hwBgpObjects 3 }
@@ -1579,6 +1650,102 @@
                 "The number of routes fell below the clear alarm threshold."
             ::= { hwBgpTraps 24 }
 
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.25
+        hwVpnRouteLabelNumReachThresold NOTIFICATION-TYPE
+            OBJECTS { hwBgpAddrFamilyAfi, hwBgpAddrFamilySafi, hwBgpLabelMaxValue, hwBgpLabelLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "The number of VPN route labels reached the alarm threshould."
+            ::= { hwBgpTraps 25 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.26
+        hwVpnRouteLabelNumReachThresoldClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpAddrFamilyAfi, hwBgpAddrFamilySafi, hwBgpLabelMaxValue, hwBgpLabelLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "The number of VPN route labels fell below the clear alarm threshold."
+            ::= { hwBgpTraps 26 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.27
+        hwVpnRouteLabelNumReachMaximum NOTIFICATION-TYPE
+            OBJECTS { hwBgpAddrFamilyAfi, hwBgpAddrFamilySafi, hwBgpLabelMaxValue }
+            STATUS current
+            DESCRIPTION 
+                "The number of VPN route labels reached the maximum value."
+            ::= { hwBgpTraps 27 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.28
+        hwVpnRouteLabelNumReachMaximumClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpAddrFamilyAfi, hwBgpAddrFamilySafi, hwBgpLabelMaxValue }
+            STATUS current
+            DESCRIPTION 
+                "The number of VPN route labels fell below the maximum value."
+            ::= { hwBgpTraps 28 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.29
+        hwBgpPeerAddrFamilyRouteThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteMaxNum, hwBgpRouteThreshold, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION
+                "The number of routes received from peers in a BGP address family reached the alarm threshold."
+            ::= { hwBgpTraps 29 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.30
+        hwBgpPeerAddrFamilyRouteThresholdExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteMaxNum, hwBgpRouteThreshold, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION 
+                "The number of routes received from peers in a BGP address family fell below the alarm threshold."
+            ::= { hwBgpTraps 30 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.31
+        hwBgpPeerAddrFamilyRouteExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteMaxNum, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION 
+                "The number of routes received from peers in a BGP address family reached the maximum value."
+            ::= { hwBgpTraps 31 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.32
+        hwBgpPeerAddrFamilyRouteExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteMaxNum, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION 
+                "The number of routes received from peers in a BGP address family fell below the maximum value."
+            ::= { hwBgpTraps 32 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.33
+        hwBgpPeerAddrFamilyPerRouteThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteType, hwBgpRouteMaxNum, hwBgpRouteThreshold, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION
+                "The number of specified routes received from peers in a BGP address family reached the alarm threshold."
+            ::= { hwBgpTraps 33 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.34
+        hwBgpPeerAddrFamilyPerRouteThresholdExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteType, hwBgpRouteMaxNum, hwBgpRouteThreshold, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION 
+                "The number of specified routes received from peers in a BGP address family fell below the alarm threshold."
+            ::= { hwBgpTraps 34 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.35
+        hwBgpPeerAddrFamilyPerRouteExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteType, hwBgpRouteMaxNum, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION 
+                "The number of specified routes received from peers in a BGP address family reached the maximum value."
+            ::= { hwBgpTraps 35 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.36
+        hwBgpPeerAddrFamilyPerRouteExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpVrfAddressFamily, hwBgpRouteType, hwBgpRouteMaxNum, hwBgpProcessName }
+            STATUS current
+            DESCRIPTION 
+                "The number of specified routes received from peers in a BGP address family fell below the maximum value."
+            ::= { hwBgpTraps 36 }
+
         -- 1.3.6.1.4.1.2011.5.25.177.1.4
         hwBgpScalars OBJECT IDENTIFIER ::= { hwBgpObjects 4 }
         
@@ -1662,6 +1829,43 @@
             DESCRIPTION
                 "The total number of Update packets sent to all the remote BGP peers."
             ::= { hwBgpScalars 9 }           
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.5
+        hwBgpProcess OBJECT IDENTIFIER ::= { hwBgpObjects 5 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.5.1    
+        hwBgpProcessCommTable OBJECT-TYPE
+            SYNTAX     SEQUENCE OF HwBgpProcessCommEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                "BGP process table."
+            ::= { hwBgpProcess 1 }  
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.5.1.1
+        hwBgpProcessCommEntry OBJECT-TYPE
+            SYNTAX     HwBgpProcessCommEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                "BGP process entry."
+            INDEX { hwBgpProcessName }
+            ::= { hwBgpProcessCommTable 1 }
+
+        HwBgpProcessCommEntry ::=
+            SEQUENCE { 
+                hwBgpProcessName
+                    OCTET STRING
+            }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.5.1.1.1
+        hwBgpProcessName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Name of a BGP instance."
+            ::= { hwBgpProcessCommEntry 1 }
 
         -- 1.3.6.1.4.1.2011.5.25.177.2
         hwBgpVpnObjects OBJECT IDENTIFIER ::= { hwBgpMIB 2 }
@@ -2216,7 +2420,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Table contains some statistic information entries orgnized by os-node."
+                "Table contains some statistic information entries organized by os-node."
             ::= { hwPeerDistributeObjects 2 }
 
         hwOsNodeEntry OBJECT-TYPE
@@ -2267,7 +2471,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Table contains some information entries orgnized by distribute-instance."
+                "Table contains some information entries organized by distribute-instance."
             ::= { hwPeerDistributeObjects 3 }
 
         hwDistributeEntry OBJECT-TYPE
