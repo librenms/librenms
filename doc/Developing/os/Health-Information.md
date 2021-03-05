@@ -140,12 +140,12 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
-> `skip_values` can also compare items within the OID table against
-> values. The index of the sensor is used to retrieve the value
-> from the OID, unless a target index is appended to the OID.
-> Comparisons behave on a logical OR basis when chained, so only
-> one of them needs to be matched for that particular sensor
-> to be skipped during discovery. An example of this is below:
+`skip_values` can also compare items within the OID table against
+values. The index of the sensor is used to retrieve the value
+from the OID, unless a target index is appended to the OID.
+Comparisons behave on a logical OR basis when chained, so only
+one of them needs to be matched for that particular sensor
+to be skipped during discovery. An example of this is below:
 
 ```yaml
                     skip_values:
@@ -159,13 +159,13 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: 1
 ```
 
-> ``` op ``` can be any of the following operators :
->
+``` op ``` can be any of the following operators :
+
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
 > not_ends, not_contains, not_regex, not_in_array, exists
->
-> Example:
+
+Example:
 
 ```yaml
                     skip_values:
@@ -181,6 +181,29 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       oid: sensorOptionalOID
                       op: 'exists'
                       value: false
+```
+
+```yaml
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        -
+                            oid: hwEntityOpticalTemperature
+                            op: '<'
+                            value: '-50'
+                        -
+                            oid: hwEntityOpticalTemperature
+                            op: '>='
+                            value: '2147483646'
 ```
 
 If you aren't able to use yaml to perform the sensor discovery, you

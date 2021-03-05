@@ -24,7 +24,6 @@
 
 namespace LibreNMS\Device;
 
-use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidOidException;
