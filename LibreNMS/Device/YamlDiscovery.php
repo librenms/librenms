@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use App\Models\Device;
 
 class YamlDiscovery
 {
@@ -130,15 +131,15 @@ class YamlDiscovery
         static $num_oid_cache;
         static $num_oid_cache_negative;
         // Compute md5 of the query
-        $md5 = md5($data['value'] . $data['oid'] . $device['dynamic_discovery']['mib']);
+        $key = $data['value'] . $data['oid'] . $device['dynamic_discovery']['mib'];
 
-        if ($num_oid_cache_negative[$md5]) {
-            throw new InvalidOidException("Unable to translate oid $oid");
+        if ($num_oid_cache_negative[$key]) {
+            throw new InvalidOidException('Unable to translate oid ' . $data['value']);
         }
 
-        if (isset($num_oid_cache[$md5])) {
+        if (isset($num_oid_cache[$key])) {
             //return the cached value if applicable
-            return $num_oid_cache[$md5];
+            return $num_oid_cache[$key];
         }
 
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
@@ -154,15 +155,15 @@ class YamlDiscovery
         } catch (\Exception $e) {
             //negative cache
             d_echo('Cache Negative value for ' . $data['value']);
-            $num_oid_cache_negative[$md5] = true;
+            $num_oid_cache_negative[$key] = true;
             throw $e;
         }
 
         d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
         //store the cached value and return
-        $num_oid_cache[$md5] = $num_oid . '.{{ $index }}';
+        $num_oid_cache[$key] = $num_oid . '.{{ $index }}';
 
-        return $num_oid_cache[$md5];
+        return $num_oid_cache[$key];
     }
 
     /**
