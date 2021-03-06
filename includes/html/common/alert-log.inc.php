@@ -37,6 +37,10 @@ $alert_severities = [
     'Warning' => 5,
 ];
 
+if (Auth::user()->hasGlobalAdmin()) {
+    $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
+}
+
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -83,6 +87,7 @@ $common_output[] = '
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
             <th data-column-id="severity">Severity</th>
+            ' . $admin_verbose_details . '
         </tr>
         </thead>
     </table>
@@ -171,12 +176,24 @@ $common_output[] = '<div class="form-group"> \
             $(target).collapse(\'toggle\');
             $(this).toggleClass(\'fa-plus fa-minus\');
         });
+        grid.find(".command-alert-details").on("click", function(e) {
+            e.preventDefault();
+            var alert_log_id = $(this).data(\'alert_log_id\');
+            $(\'#alert_log_id\').val(alert_log_id);
+            $("#alert_details_modal").modal(\'show\');
+        });
         grid.find(".incident").each(function () {
             $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
             $(this).parent().parent().on("mouseenter", function () {
                 $(this).find(".incident-toggle").fadeIn(200);
+                if ($(this).find(".alert-status").hasClass(\'label-danger\')){
+                    $(this).find(".command-alert-details").fadeIn(200);
+                }
             }).on("mouseleave", function () {
                 $(this).find(".incident-toggle").fadeOut(200);
+                if ($(this).find(".alert-status").hasClass(\'label-danger\')){
+                    $(this).find(".command-alert-details").fadeOut(200);
+                }
             }).on("click", "td:not(.incident-toggle-td)", function () {
                 var target = $(this).parent().find(".incident-toggle").data("target");
                 if ($(this).parent().find(".incident-toggle").hasClass(\'fa-plus\')) {
