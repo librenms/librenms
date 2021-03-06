@@ -98,7 +98,7 @@ class ServiceTemplate extends BaseModel
     public function updateDevices()
     {
         if ($this->dtype == 'dynamic') {
-            $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
+            $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->drules)->toQuery()
                 ->distinct()->pluck('devices.device_id'));
         }
     }
@@ -109,7 +109,7 @@ class ServiceTemplate extends BaseModel
     public function updateGroups()
     {
         if ($this->dgtype == 'dynamic') {
-            $this->groups()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
+            $this->groups()->sync(QueryBuilderFluentParser::fromJSON($this->dgrules)->toQuery()
                 ->distinct()->pluck('device_groups.id'));
         }
     }
