@@ -72,19 +72,19 @@ class ServiceTemplate extends BaseModel
         });
 
         static::saving(function (ServiceTemplate $template) {
-            if ($template->isDirty('drules')) {
+            if ($template->dtype == 'dynamic' and $template->isDirty('drules')) {
                 $template->drules = $template->getDeviceParser()->generateJoins()->toArray();
             }
-            if ($template->isDirty('dgrules')) {
+            if ($template->dgtype == 'dynamic' and $template->isDirty('dgrules')) {
                 $template->dgrules = $template->getDeviceGroupParser()->generateJoins()->toArray();
             }
         });
 
         static::saved(function (ServiceTemplate $template) {
-            if ($template->isDirty('drules')) {
+            if ($template->dtype == 'dynamic' and $template->isDirty('drules')) {
                 $template->updateDevices();
             }
-            if ($template->isDirty('dgrules')) {
+            if ($template->dgtype == 'dynamic' and $template->isDirty('dgrules')) {
                 $template->updateGroups();
             }
         });
