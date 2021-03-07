@@ -1051,7 +1051,7 @@ function port_fill_missing(&$port, $device)
  * returns if a port should be filtered out, like a disabled oder ignored port
  *
  * @param array $port
- * @return boolean
+ * @return bool
  */
 function port_filter($port)
 {
