@@ -901,7 +901,7 @@ function ignore_storage($os, $descr)
  */
 function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_class] && ! can_skip_sensor($device, $sensor_class, '')) {
+    if (! empty($device['dynamic_discovery']['modules']['sensors'][$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = [];
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];

@@ -114,8 +114,8 @@ class OSModulesTest extends DBTestCase
         $debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'];
-            $actual = $results[$module]['discovery'];
+            $expected = $expected_data[$module]['discovery'] ?? [];
+            $actual = $results[$module]['discovery'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,

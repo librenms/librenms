@@ -839,7 +839,9 @@ class ModuleTestHelper
     private function collectComponents($device_id)
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, 'label');
+        $components = Arr::sort($components, function ($item) {
+            return $item['type'] . $item['label'];
+        });
 
         return array_values($components);
     }
