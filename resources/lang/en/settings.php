@@ -63,6 +63,7 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
+            'interface_types' => 'Interface Type by RFC 7224',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -971,6 +972,977 @@ return [
         'ping' => [
             'description' => 'Path to ping',
         ],
+        'interface_types' => [
+            'a12MppSwitch' => [
+                'description' => 'a12MppSwitch',
+                'help' => 'Avalon Parallel Processor.',
+            ],
+            'aal2' => [
+                'description' => 'aal2',
+                'help' => 'ATM adaptation layer 2.',
+            ],
+            'aal5' => [
+                'description' => 'aal5',
+                'help' => 'AAL5 over ATM.',
+            ],
+            'actelisMetaLOOP' => [
+                'description' => 'actelisMetaLOOP',
+                'help' => 'Acteleis proprietary MetaLOOP High Speed Link.',
+            ],
+            'adsl2plus' => [
+                'description' => 'adsl2plus',
+                'help' => 'Asymmetric Digital Subscriber Loop Version 2 - Version 2 Plus and all variants.',
+            ],
+            'adsl' => [
+                'description' => 'adsl',
+                'help' => 'Asymmetric Digital Subscriber Loop.',
+            ],
+            'aflane8023' => [
+                'description' => 'aflane8023',
+                'help' => 'ATM Emulated LAN for 802.3.',
+            ],
+            'aflane8025' => [
+                'description' => 'aflane8025',
+                'help' => 'ATM Emulated LAN for 802.5.',
+            ],
+            'aluELP' => [
+                'description' => 'aluELP',
+                'help' => 'Alcatel-Lucent Ethernet Link Protection.',
+            ],
+            'aluEpon' => [
+                'description' => 'aluEpon',
+                'help' => 'Ethernet Passive Optical Networks (E-PON).',
+            ],
+            'aluEponLogicalLink' => [
+                'description' => 'aluEponLogicalLink',
+                'help' => 'The emulation of a point-to-point link over the EPON layer.',
+            ],
+            'aluEponOnu' => [
+                'description' => 'aluEponOnu',
+                'help' => 'EPON Optical Network Unit.',
+            ],
+            'aluEponPhysicalUni' => [
+                'description' => 'aluEponPhysicalUni',
+                'help' => 'EPON physical User to Network interface.',
+            ],
+            'aluGponOnu' => [
+                'description' => 'aluGponOnu',
+                'help' => 'GPON Optical Network Unit.',
+            ],
+            'aluGponPhysicalUni' => [
+                'description' => 'aluGponPhysicalUni',
+                'help' => 'GPON physical User to Network interface.',
+            ],
+            'arap' => [
+                'description' => 'arap',
+                'help' => 'Appletalk Remote Access Protocol.',
+            ],
+            'arcnet' => [
+                'description' => 'arcnet',
+                'help' => 'ARCnet.',
+            ],
+            'arcnetPlus' => [
+                'description' => 'arcnetPlus',
+                'help' => 'ARCnet Plus.',
+            ],
+            'async' => [
+                'description' => 'async',
+                'help' => 'Asynchronous Protocol.',
+            ],
+            'atmbond' => [
+                'description' => 'atmbond',
+                'help' => 'atmbond.',
+            ],
+            'atm' => [
+                'description' => 'atm',
+                'help' => 'ATM cells.',
+            ],
+            'atmDxi' => [
+                'description' => 'atmDxi',
+                'help' => 'ATM DXI.',
+            ],
+            'atmFuni' => [
+                'description' => 'atmFuni',
+                'help' => 'ATM FUNI.',
+            ],
+            'atmIma' => [
+                'description' => 'atmIma',
+                'help' => 'ATM IMA.',
+            ],
+            'atmLogical' => [
+                'description' => 'atmLogical',
+                'help' => 'ATM Logical Port.',
+            ],
+            'atmRadio' => [
+                'description' => 'atmRadio',
+                'help' => 'ATM over radio links.',
+            ],
+            'atmSubInterface' => [
+                'description' => 'atmSubInterface',
+                'help' => 'ATM Sub Interface.',
+            ],
+            'atmVciEndPt' => [
+                'description' => 'atmVciEndPt',
+                'help' => 'ATM VCI End Point.',
+            ],
+            'atmVirtual' => [
+                'description' => 'atmVirtual',
+                'help' => 'ATM Virtual Interface.',
+            ],
+            'aviciOpticalEther' => [
+                'description' => 'aviciOpticalEther',
+                'help' => 'Avici Optical Ethernet Aggregate.',
+            ],
+            'bgppolicyaccounting' => [
+                'description' => 'bgppolicyaccounting',
+                'help' => 'BGP Policy Accounting.',
+            ],
+            'bits' => [
+                'description' => 'bits',
+                'help' => 'bitsport.',
+            ],
+            'bridge' => [
+                'description' => 'bridge',
+                'help' => 'Transparent bridge interface.',
+            ],
+            'bsc' => [
+                'description' => 'bsc',
+                'help' => 'Bisynchronous Protocol.',
+            ],
+            'cableDownstreamRfPort' => [
+                'description' => 'cableDownstreamRfPort',
+                'help' => 'CATV downstream RF Port.',
+            ],
+            'capwapDot11Bss' => [
+                'description' => 'capwapDot11Bss',
+                'help' => 'WLAN BSS Interface.',
+            ],
+            'capwapDot11Profile' => [
+                'description' => 'capwapDot11Profile',
+                'help' => 'WLAN Profile Interface.',
+            ],
+            'capwapWtpVirtualRadio' => [
+                'description' => 'capwapWtpVirtualRadio',
+                'help' => 'WTP Virtual Radio Interface.',
+            ],
+            'cblVectaStar' => [
+                'description' => 'cblVectaStar',
+                'help' => 'Cambridge Broadband Networks Limited VectaStar.',
+            ],
+            'cctEmul' => [
+                'description' => 'cctEmul',
+                'help' => 'ATM Emulated circuit.',
+            ],
+            'ces' => [
+                'description' => 'ces',
+                'help' => 'Circuit Emulation Service.',
+            ],
+            'channel' => [
+                'description' => 'channel',
+                'help' => 'Channel.',
+            ],
+            'ciscoISLvlan' => [
+                'description' => 'ciscoISLvlan',
+                'help' => 'Layer 2 Virtual LAN using Cisco ISL.',
+            ],
+            'cnr' => [
+                'description' => 'cnr',
+                'help' => 'Combat Net Radio.',
+            ],
+            'coffee' => [
+                'description' => 'coffee',
+                'help' => 'Coffee pot.',
+            ],
+            'compositeLink' => [
+                'description' => 'compositeLink',
+                'help' => 'Avici Composite Link Interface.',
+            ],
+            'dcn' => [
+                'description' => 'dcn',
+                'help' => 'Data Communications Network.',
+            ],
+            'digitalPowerline' => [
+                'description' => 'digitalPowerline',
+                'help' => 'IP over Power Lines.',
+            ],
+            'digitalWrapperOverheadChannel' => [
+                'description' => 'digitalWrapperOverheadChannel',
+                'help' => 'Digital Wrapper.',
+            ],
+            'dlsw' => [
+                'description' => 'dlsw',
+                'help' => 'Data Link Switching.',
+            ],
+            'docsCableDownstream' => [
+                'description' => 'docsCableDownstream',
+                'help' => 'CATV Downstream interface.',
+            ],
+            'docsCableMaclayer' => [
+                'description' => 'docsCableMaclayer',
+                'help' => 'CATV Mac Layer.',
+            ],
+            'docsCableMCmtsDownstream' => [
+                'description' => 'docsCableMCmtsDownstream',
+                'help' => 'CATV Modular CMTS Downstream Interface.',
+            ],
+            'docsCableUpstreamChannel' => [
+                'description' => 'docsCableUpstreamChannel',
+                'help' => 'CATV Upstream Channel.',
+            ],
+            'docsCableUpstream' => [
+                'description' => 'docsCableUpstream',
+                'help' => 'CATV Upstream interface.',
+            ],
+            'docsCableUpstreamRfPort' => [
+                'description' => 'docsCableUpstreamRfPort',
+                'help' => 'DOCSIS CATV Upstream RF Port.',
+            ],
+            'ds0Bundle' => [
+                'description' => 'ds0Bundle',
+                'help' => 'Group of ds0s on the same ds1.',
+            ],
+            'ds0' => [
+                'description' => 'ds0',
+                'help' => 'Digital Signal Level 0.',
+            ],
+            'ds1FDL' => [
+                'description' => 'ds1FDL',
+                'help' => 'Facility Data Link (4Kbps) on a DS1.',
+            ],
+            'ds3' => [
+                'description' => 'ds3',
+                'help' => 'DS3-MIB.',
+            ],
+            'dtm' => [
+                'description' => 'dtm',
+                'help' => 'Dynamic synchronous Transfer Mode.',
+            ],
+            'dvbAsiIn' => [
+                'description' => 'dvbAsiIn',
+                'help' => 'DVB-ASI Input.',
+            ],
+            'dvbAsiOut' => [
+                'description' => 'dvbAsiOut',
+                'help' => 'DVB-ASI Output.',
+            ],
+            'dvbRccDownstream' => [
+                'description' => 'dvbRccDownstream',
+                'help' => 'DVB-RCC Downstream Channel.',
+            ],
+            'dvbRccMacLayer' => [
+                'description' => 'dvbRccMacLayer',
+                'help' => 'DVB-RCC MAC Layer.',
+            ],
+            'dvbRccUpstream' => [
+                'description' => 'dvbRccUpstream',
+                'help' => 'DVB-RCC Upstream Channel.',
+            ],
+            'dvbRcsMacLayer' => [
+                'description' => 'dvbRcsMacLayer',
+                'help' => 'DVB-RCS MAC Layer.',
+            ],
+            'dvbRcsTdma' => [
+                'description' => 'dvbRcsTdma',
+                'help' => 'DVB-RCS TDMA.',
+            ],
+            'dvbTdm' => [
+                'description' => 'dvbTdm',
+                'help' => 'DVB Satellite TDM.',
+            ],
+            'econet' => [
+                'description' => 'econet',
+                'help' => 'Acorn Econet.',
+            ],
+            'eon' => [
+                'description' => 'eon',
+                'help' => 'CLNP over IP.',
+            ],
+            'eplrs' => [
+                'description' => 'eplrs',
+                'help' => 'Ext Pos Loc Report Sys.',
+            ],
+            'escon' => [
+                'description' => 'escon',
+                'help' => 'IBM Enterprise Systems Connection.',
+            ],
+            'ethernet3Mbit' => [
+                'description' => 'ethernet3Mbit',
+                'help' => 'ethernet3Mbit ',
+            ],
+            'fast' => [
+                'description' => 'fast',
+                'help' => 'Fast channel.',
+            ],
+            'fcipLink' => [
+                'description' => 'fcipLink',
+                'help' => 'FCIP Link.',
+            ],
+            'fibreChannel' => [
+                'description' => 'fibreChannel',
+                'help' => 'Fibre Channel.',
+            ],
+            'frameRelay' => [
+                'description' => 'frameRelay',
+                'help' => 'DTE only.',
+            ],
+            'frameRelayMPI' => [
+                'description' => 'frameRelayMPI',
+                'help' => 'Multiproto Interconnect over FR.',
+            ],
+            'frameRelayService' => [
+                'description' => 'frameRelayService',
+                'help' => 'FRNETSERV-MIB.',
+            ],
+            'frDlciEndPt' => [
+                'description' => 'frDlciEndPt',
+                'help' => 'Frame Relay DLCI End Point.',
+            ],
+            'frf16MfrBundle' => [
+                'description' => 'frf16MfrBundle',
+                'help' => 'FRF.16 Multilink Frame Relay.',
+            ],
+            'frForward' => [
+                'description' => 'frForward',
+                'help' => 'Frame Forward Interface.',
+            ],
+            'g703at2mb' => [
+                'description' => 'g703at2mb',
+                'help' => 'Obsolete; see DS1-MIB.',
+            ],
+            'g703at64k' => [
+                'description' => 'g703at64k',
+                'help' => 'CCITT G703 at 64Kbps.',
+            ],
+            'g9981' => [
+                'description' => 'g9981',
+                'help' => 'G.998.1 bonded interface.',
+            ],
+            'g9982' => [
+                'description' => 'g9982',
+                'help' => 'G.998.2 bonded interface.',
+            ],
+            'g9983' => [
+                'description' => 'g9983',
+                'help' => 'G.998.3 bonded interface.',
+            ],
+            'gfp' => [
+                'description' => 'gfp',
+                'help' => 'Generic Framing Procedure (GFP).',
+            ],
+            'gpon' => [
+                'description' => 'gpon',
+                'help' => 'Gigabit-capable passive optical networks (G-PON) as per ITU-T G.948.',
+            ],
+            'gr303IDT' => [
+                'description' => 'gr303IDT',
+                'help' => 'Integrated Digital Terminal.',
+            ],
+            'gr303RDT' => [
+                'description' => 'gr303RDT',
+                'help' => 'Remote Digital Terminal.',
+            ],
+            'gtp' => [
+                'description' => 'gtp',
+                'help' => 'GTP (GPRS Tunneling Protocol).',
+            ],
+            'h323Gatekeeper' => [
+                'description' => 'h323Gatekeeper',
+                'help' => 'H323 Gatekeeper.',
+            ],
+            'h323Proxy' => [
+                'description' => 'h323Proxy',
+                'help' => 'H323 Voice and Video Proxy.',
+            ],
+            'hdlc' => [
+                'description' => 'hdlc',
+                'help' => 'HDLC.',
+            ],
+            'hdsl2' => [
+                'description' => 'hdsl2',
+                'help' => 'High Bit-Rate DSL - 2nd generation.',
+            ],
+            'hiperlan2' => [
+                'description' => 'hiperlan2',
+                'help' => 'HIPERLAN Type 2 Radio Interface.',
+            ],
+            'hippi' => [
+                'description' => 'hippi',
+                'help' => 'hippi ',
+            ],
+            'hippiInterface' => [
+                'description' => 'hippiInterface',
+                'help' => 'HIPPI interfaces.',
+            ],
+            'homepna' => [
+                'description' => 'homepna',
+                'help' => 'HomePNA ITU-T G.989.',
+            ],
+            'hostPad' => [
+                'description' => 'hostPad',
+                'help' => 'CCITT-ITU X.29 PAD Protocol.',
+            ],
+            'hssi' => [
+                'description' => 'hssi',
+                'help' => 'hssi ',
+            ],
+            'ibm370parChan' => [
+                'description' => 'ibm370parChan',
+                'help' => 'IBM System 360/370 OEMI Channel.',
+            ],
+            'idsl' => [
+                'description' => 'idsl',
+                'help' => 'Digital Subscriber Loop over ISDN.',
+            ],
+            'ieee1394' => [
+                'description' => 'ieee1394',
+                'help' => 'IEEE1394 High Performance Serial Bus.',
+            ],
+            'ieee80211' => [
+                'description' => 'ieee80211',
+                'help' => 'Radio spread spectrum.',
+            ],
+            'ieee80212' => [
+                'description' => 'ieee80212',
+                'help' => '100BaseVG.',
+            ],
+            'ieee802154' => [
+                'description' => 'ieee802154',
+                'help' => 'IEEE 802.15.4 WPAN interface.',
+            ],
+            'ieee80216WMAN' => [
+                'description' => 'ieee80216WMAN',
+                'help' => 'IEEE 802.16 WMAN interface.',
+            ],
+            'ieee8023adLag' => [
+                'description' => 'ieee8023adLag',
+                'help' => 'IEEE 802.3ad Link Aggregate.',
+            ],
+            'if-gsn' => [
+                'description' => 'if-gsn',
+                'help' => 'HIPPI-6400.',
+            ],
+            'ifPwType' => [
+                'description' => 'ifPwType',
+                'help' => 'Pseudowire interface type.',
+            ],
+            'ifVfiType' => [
+                'description' => 'ifVfiType',
+                'help' => 'VPLS Forwarding Instance Interface Type.',
+            ],
+            'ilan' => [
+                'description' => 'ilan',
+                'help' => 'Internal LAN on a bridge per IEEE 802.1ap.',
+            ],
+            'imt' => [
+                'description' => 'imt',
+                'help' => 'Inter-Machine Trunks.',
+            ],
+            'infiniband' => [
+                'description' => 'infiniband',
+                'help' => 'Infiniband.',
+            ],
+            'interleave' => [
+                'description' => 'interleave',
+                'help' => 'Interleave channel.',
+            ],
+            'ip' => [
+                'description' => 'ip',
+                'help' => 'IP (for APPN HPR in IP networks).',
+            ],
+            'ipForward' => [
+                'description' => 'ipForward',
+                'help' => 'IP Forwarding Interface.',
+            ],
+            'ipOverAtm' => [
+                'description' => 'ipOverAtm',
+                'help' => 'IBM ipOverAtm.',
+            ],
+            'ipOverCdlc' => [
+                'description' => 'ipOverCdlc',
+                'help' => 'IBM ipOverCdlc.',
+            ],
+            'ipOverClaw' => [
+                'description' => 'ipOverClaw',
+                'help' => 'IBM Common Link Access to Workstn.',
+            ],
+            'ipSwitch' => [
+                'description' => 'ipSwitch',
+                'help' => 'IP Switching Objects.',
+            ],
+            'isdn' => [
+                'description' => 'isdn',
+                'help' => 'ISDN and X.25.',
+            ],
+            'isdns' => [
+                'description' => 'isdns',
+                'help' => 'ISDN S/T interface.',
+            ],
+            'isdnu' => [
+                'description' => 'isdnu',
+                'help' => 'ISDN U interface.',
+            ],
+            'iso88022llc' => [
+                'description' => 'iso88022llc',
+                'help' => 'iso88022llc ',
+            ],
+            'iso88025CRFPInt' => [
+                'description' => 'iso88025CRFPInt',
+                'help' => 'ISO 802.5 CRFP.',
+            ],
+            'iso88025Dtr' => [
+                'description' => 'iso88025Dtr',
+                'help' => 'ISO 802.5r DTR.',
+            ],
+            'iso88025Fiber' => [
+                'description' => 'iso88025Fiber',
+                'help' => 'ISO 802.5j Fiber Token Ring.',
+            ],
+            'isup' => [
+                'description' => 'isup',
+                'help' => 'ISUP.',
+            ],
+            'l2vlan' => [
+                'description' => 'l2vlan',
+                'help' => 'Layer 2 Virtual LAN using 802.1Q.',
+            ],
+            'l3ipvlan' => [
+                'description' => 'l3ipvlan',
+                'help' => 'Layer 3 Virtual LAN using IP.',
+            ],
+            'l3ipxvlan' => [
+                'description' => 'l3ipxvlan',
+                'help' => 'Layer 3 Virtual LAN using IPX.',
+            ],
+            'lapd' => [
+                'description' => 'lapd',
+                'help' => 'Link Access Protocol D.',
+            ],
+            'lapf' => [
+                'description' => 'lapf',
+                'help' => 'LAP F.',
+            ],
+            'linegroup' => [
+                'description' => 'linegroup',
+                'help' => 'Interface common to multiple lines.',
+            ],
+            'lmp' => [
+                'description' => 'lmp',
+                'help' => 'Link Management Protocol.',
+            ],
+            'localTalk' => [
+                'description' => 'localTalk',
+                'help' => 'localTalk ',
+            ],
+            'macSecControlledIF' => [
+                'description' => 'macSecControlledIF',
+                'help' => 'MACSecControlled.',
+            ],
+            'macSecUncontrolledIF' => [
+                'description' => 'macSecUncontrolledIF',
+                'help' => 'MACSecUncontrolled.',
+            ],
+            'mediaMailOverIp' => [
+                'description' => 'mediaMailOverIp',
+                'help' => 'Multimedia Mail over IP.',
+            ],
+            'mfSigLink' => [
+                'description' => 'mfSigLink',
+                'help' => 'Multi-frequency signaling link.',
+            ],
+            'mocaVersion1' => [
+                'description' => 'mocaVersion1',
+                'help' => 'MultiMedia over Coax Alliance (MoCA) Interface as documented in information provided privately to IANA.',
+            ],
+            'modem' => [
+                'description' => 'modem',
+                'help' => 'Generic modem.',
+            ],
+            'mpc' => [
+                'description' => 'mpc',
+                'help' => 'IBM multi-protocol channel support.',
+            ],
+            'mpegTransport' => [
+                'description' => 'mpegTransport',
+                'help' => 'MPEG transport interface.',
+            ],
+            'mpls' => [
+                'description' => 'mpls',
+                'help' => 'MPLS.',
+            ],
+            'mplsTunnel' => [
+                'description' => 'mplsTunnel',
+                'help' => 'MPLS Tunnel Virtual Interface.',
+            ],
+            'msdsl' => [
+                'description' => 'msdsl',
+                'help' => 'Multi-rate Symmetric DSL.',
+            ],
+            'mvl' => [
+                'description' => 'mvl',
+                'help' => 'Multiple Virtual Lines DSL.',
+            ],
+            'myrinet' => [
+                'description' => 'myrinet',
+                'help' => 'Myricom Myrinet.',
+            ],
+            'nfas' => [
+                'description' => 'nfas',
+                'help' => 'Non-Facility Associated Signaling.',
+            ],
+            'nsip' => [
+                'description' => 'nsip',
+                'help' => 'XNS over IP.',
+            ],
+            'opticalChannel' => [
+                'description' => 'opticalChannel',
+                'help' => 'Optical Channel.',
+            ],
+            'opticalChannelGroup' => [
+                'description' => 'opticalChannelGroup',
+                'help' => 'Optical Channel Group.',
+            ],
+            'opticalTransport' => [
+                'description' => 'opticalTransport',
+                'help' => 'Optical Transport.',
+            ],
+            'otnOdu' => [
+                'description' => 'otnOdu',
+                'help' => 'OTN Optical Data Unit.',
+            ],
+            'otnOtu' => [
+                'description' => 'otnOtu',
+                'help' => 'OTN Optical channel Transport Unit.',
+            ],
+            'para' => [
+                'description' => 'para',
+                'help' => 'Parallel-port.',
+            ],
+            'pdnEtherLoop1' => [
+                'description' => 'pdnEtherLoop1',
+                'help' => 'Paradyne EtherLoop 1.',
+            ],
+            'pdnEtherLoop2' => [
+                'description' => 'pdnEtherLoop2',
+                'help' => 'Paradyne EtherLoop 2.',
+            ],
+            'pip' => [
+                'description' => 'pip',
+                'help' => 'Provider Instance Port on a bridge per IEEE 802.1ah PBB.',
+            ],
+            'plc' => [
+                'description' => 'plc',
+                'help' => 'Power Line Communications.',
+            ],
+            'pon155' => [
+                'description' => 'pon155',
+                'help' => 'FSAN 155Mb Symetrical PON interface.',
+            ],
+            'pon622' => [
+                'description' => 'pon622',
+                'help' => 'FSAN 622Mb Symetrical PON interface.',
+            ],
+            'pos' => [
+                'description' => 'pos',
+                'help' => 'Packet over SONET/SDH Interface.',
+            ],
+            'ppp' => [
+                'description' => 'ppp',
+                'help' => 'ppp ',
+            ],
+            'pppMultilinkBundle' => [
+                'description' => 'pppMultilinkBundle',
+                'help' => 'PPP Multilink Bundle.',
+            ],
+            'propAtm' => [
+                'description' => 'propAtm',
+                'help' => 'Proprietary ATM.',
+            ],
+            'propCnls' => [
+                'description' => 'propCnls',
+                'help' => 'Proprietary Connectionless Protocol.',
+            ],
+            'propDocsWirelessDownstream' => [
+                'description' => 'propDocsWirelessDownstream',
+                'help' => 'Cisco proprietary Downstream.',
+            ],
+            'propDocsWirelessMaclayer' => [
+                'description' => 'propDocsWirelessMaclayer',
+                'help' => 'Cisco proprietary Maclayer.',
+            ],
+            'propDocsWirelessUpstream' => [
+                'description' => 'propDocsWirelessUpstream',
+                'help' => 'Cisco proprietary Upstream.',
+            ],
+            'propMultiplexor' => [
+                'description' => 'propMultiplexor',
+                'help' => 'Proprietary multiplexing.',
+            ],
+            'propPointToPointSerial' => [
+                'description' => 'propPointToPointSerial',
+                'help' => 'Proprietary serial.',
+            ],
+            'propVirtual' => [
+                'description' => 'propVirtual',
+                'help' => 'Proprietary virtual/internal.',
+            ],
+            'propWirelessP2P' => [
+                'description' => 'propWirelessP2P',
+                'help' => 'Prop. P2P wireless interface.',
+            ],
+            'q2931' => [
+                'description' => 'q2931',
+                'help' => 'Q.2931.',
+            ],
+            'qam' => [
+                'description' => 'qam',
+                'help' => 'RF Qam Interface.',
+            ],
+            'qllc' => [
+                'description' => 'qllc',
+                'help' => 'SNA QLLC.',
+            ],
+            'radioMAC' => [
+                'description' => 'radioMAC',
+                'help' => 'MAC layer over radio links.',
+            ],
+            'radsl' => [
+                'description' => 'radsl',
+                'help' => 'Rate-Adapt. Digital Subscriber Loop.',
+            ],
+            'reachDSL' => [
+                'description' => 'reachDSL',
+                'help' => 'Long Reach DSL.',
+            ],
+            'rpr' => [
+                'description' => 'rpr',
+                'help' => 'Resilient Packet Ring Interface Type.',
+            ],
+            'rs232' => [
+                'description' => 'rs232',
+                'help' => 'rs232 ',
+            ],
+            'rsrb' => [
+                'description' => 'rsrb',
+                'help' => 'Remote Source Route Bridging.',
+            ],
+            'sdsl' => [
+                'description' => 'sdsl',
+                'help' => 'Symmetric Digital Subscriber Loop.',
+            ],
+            'shdsl' => [
+                'description' => 'shdsl',
+                'help' => 'Multirate HDSL2.',
+            ],
+            'sip' => [
+                'description' => 'sip',
+                'help' => 'SMDS, coffee.',
+            ],
+            'sipSig' => [
+                'description' => 'sipSig',
+                'help' => 'SIP Signaling.',
+            ],
+            'sipTg' => [
+                'description' => 'sipTg',
+                'help' => 'SIP Trunk Group.',
+            ],
+            'slip' => [
+                'description' => 'slip',
+                'help' => 'Generic SLIP.',
+            ],
+            'smdsDxi' => [
+                'description' => 'smdsDxi',
+                'help' => 'smdsDxi ',
+            ],
+            'smdsIcip' => [
+                'description' => 'smdsIcip',
+                'help' => 'SMDS InterCarrier Interface.',
+            ],
+            'softwareLoopback' => [
+                'description' => 'softwareLoopback',
+                'help' => 'softwareLoopback ',
+            ],
+            'sonet' => [
+                'description' => 'sonet',
+                'help' => 'SONET or SDH.',
+            ],
+            'sonetOverheadChannel' => [
+                'description' => 'sonetOverheadChannel',
+                'help' => 'SONET Overhead Channel.',
+            ],
+            'sonetPath' => [
+                'description' => 'sonetPath',
+                'help' => 'sonetPath ',
+            ],
+            'sonetVT' => [
+                'description' => 'sonetVT',
+                'help' => 'sonetVT ',
+            ],
+            'srp' => [
+                'description' => 'srp',
+                'help' => 'Spatial Reuse Protocol.',
+            ],
+            'ss7SigLink' => [
+                'description' => 'ss7SigLink',
+                'help' => 'SS7 Signaling Link.',
+            ],
+            'stackToStack' => [
+                'description' => 'stackToStack',
+                'help' => 'IBM stackToStack.',
+            ],
+            'tdlc' => [
+                'description' => 'tdlc',
+                'help' => 'IBM twinaxial data link control.',
+            ],
+            'teLink' => [
+                'description' => 'teLink',
+                'help' => 'TE Link.',
+            ],
+            'termPad' => [
+                'description' => 'termPad',
+                'help' => 'CCITT-ITU X.3 PAD Facility.',
+            ],
+            'tr008' => [
+                'description' => 'tr008',
+                'help' => 'TR008.',
+            ],
+            'transpHdlc' => [
+                'description' => 'transpHdlc',
+                'help' => 'Transp HDLC.',
+            ],
+            'tunnel' => [
+                'description' => 'tunnel',
+                'help' => 'Encapsulation interface.',
+            ],
+            'ultra' => [
+                'description' => 'ultra',
+                'help' => 'Ultra Technologies.',
+            ],
+            'usb' => [
+                'description' => 'usb',
+                'help' => 'USB Interface.',
+            ],
+            'v11' => [
+                'description' => 'v11',
+                'help' => 'CCITT V.11/X.21.',
+            ],
+            'v35' => [
+                'description' => 'v35',
+                'help' => 'v35 ',
+            ],
+            'v36' => [
+                'description' => 'v36',
+                'help' => 'CCITT V.36.',
+            ],
+            'v37' => [
+                'description' => 'v37',
+                'help' => 'V.37.',
+            ],
+            'vdsl2' => [
+                'description' => 'vdsl2',
+                'help' => 'Very high speed digital subscriber line Version 2 (as per ITU-T Recommendation G.993.2).',
+            ],
+            'vdsl' => [
+                'description' => 'vdsl',
+                'help' => 'Very H-Speed Digital Subscrib. Loop.',
+            ],
+            'virtualIpAddress' => [
+                'description' => 'virtualIpAddress',
+                'help' => 'IBM VIPA.',
+            ],
+            'virtualTg' => [
+                'description' => 'virtualTg',
+                'help' => 'Virtual Trunk Group.',
+            ],
+            'vmwareNicTeam' => [
+                'description' => 'vmwareNicTeam',
+                'help' => 'VMware NIC Team.',
+            ],
+            'vmwareVirtualNic' => [
+                'description' => 'vmwareVirtualNic',
+                'help' => 'VMware Virtual Network Interface.',
+            ],
+            'voiceDID' => [
+                'description' => 'voiceDID',
+                'help' => 'Voice Direct Inward Dialing.',
+            ],
+            'voiceEBS' => [
+                'description' => 'voiceEBS',
+                'help' => 'Voice P-phone EBS physical interface.',
+            ],
+            'voiceEM' => [
+                'description' => 'voiceEM',
+                'help' => 'Voice recEive and transMit.',
+            ],
+            'voiceEMFGD' => [
+                'description' => 'voiceEMFGD',
+                'help' => 'Voice E&amp;M Feature Group D.',
+            ],
+            'voiceEncap' => [
+                'description' => 'voiceEncap',
+                'help' => 'Voice encapsulation.',
+            ],
+            'voiceFGDEANA' => [
+                'description' => 'voiceFGDEANA',
+                'help' => 'Voice FGD Exchange Access North American.',
+            ],
+            'voiceFGDOS' => [
+                'description' => 'voiceFGDOS',
+                'help' => 'Voice FGD Operator Services.',
+            ],
+            'voiceFXO' => [
+                'description' => 'voiceFXO',
+                'help' => 'Voice Foreign Exchange Office.',
+            ],
+            'voiceFXS' => [
+                'description' => 'voiceFXS',
+                'help' => 'Voice Foreign Exchange Station.',
+            ],
+            'voiceOverAtm' => [
+                'description' => 'voiceOverAtm',
+                'help' => 'Voice over ATM.',
+            ],
+            'voiceOverCable' => [
+                'description' => 'voiceOverCable',
+                'help' => 'Voice Over Cable Interface.',
+            ],
+            'voiceOverFrameRelay' => [
+                'description' => 'voiceOverFrameRelay',
+                'help' => 'Voice Over Frame Relay.',
+            ],
+            'voiceOverIp' => [
+                'description' => 'voiceOverIp',
+                'help' => 'Voice over IP encapsulation.',
+            ],
+            'wwanPP2' => [
+                'description' => 'wwanPP2',
+                'help' => '3GPP2 WWAN.',
+            ],
+            'wwanPP' => [
+                'description' => 'wwanPP',
+                'help' => '3GPP WWAN.',
+            ],
+            'x213' => [
+                'description' => 'x213',
+                'help' => 'CCITT-ITU X213.',
+            ],
+            'x25huntGroup' => [
+                'description' => 'x25huntGroup',
+                'help' => 'X25 Hunt Group.',
+            ],
+            'x25mlp' => [
+                'description' => 'x25mlp',
+                'help' => 'Multi-Link Protocol.',
+            ],
+            'x25ple' => [
+                'description' => 'x25ple',
+                'help' => 'x25ple ',
+            ],
+            'x86Laps' => [
+                'description' => 'x86Laps',
+                'help' => 'LAPS based on ITU-T X.86/Y.1323.',
+            ],
+        ],
+
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',

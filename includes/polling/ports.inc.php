@@ -219,7 +219,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $polled_ports = array_filter($ports, function ($port) use ($ports) {
             $ports[$port['ifIndex']]['skipped'] = true;
 
-            return ! ($port['deleted'] || $port['disabled']);
+            return ! ($port['deleted'] || $port['disabled'] || port_filter($port));
         });
 
         // only try to guess if we should walk base oids if selected_ports is set only globally

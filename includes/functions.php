@@ -1046,6 +1046,29 @@ function port_fill_missing(&$port, $device)
     }
 }
 
+
+/**
+ * returns if a port should be filtered out, like a disabled oder ignored port
+ *
+ * @param array $port
+ * @return boolean
+ */
+function port_filter($port)
+{
+    // return value
+    // true: do filter port
+    // false: do not filter port
+
+    $ret = true;
+
+    if ($port['ifType']) {
+        // only poll wanted interface types
+        $ret = Config::get('interface_types.' . $port['ifType']) ?: true;
+    }
+
+    return ! $ret;
+}
+
 function scan_new_plugins()
 {
     $installed = 0; // Track how many plugins we install.
