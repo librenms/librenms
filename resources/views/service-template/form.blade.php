@@ -253,9 +253,6 @@
         }
     });
     $('.service-template-form').submit(function (eventObj) {
-        if ($('#dtype').val() === 'static' and $('#dgtype').val() === 'static'){
-            return true;
-        }
         if ($('#dtype').val() === 'dynamic') {
             $('<input type="hidden" name="drules" />')
                 .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
