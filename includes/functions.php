@@ -1046,7 +1046,6 @@ function port_fill_missing(&$port, $device)
     }
 }
 
-
 /**
  * returns if a port should be filtered out, like a disabled oder ignored port
  *
