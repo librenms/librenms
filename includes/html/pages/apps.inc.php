@@ -58,6 +58,9 @@ $graphs['powerdns-recursor'] = [
     'cache_performance',
     'outqueries',
 ];
+$graphs['powermon'] = [
+    'consumption',
+];
 $graphs['pureftpd'] = [
     'bitrate',
     'connections',
