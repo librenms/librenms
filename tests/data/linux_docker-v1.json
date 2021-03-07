@@ -26,32 +26,152 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "LibreOffice-Online_cpu_usage",
-                    "value": 2,
+                    "metric": "foobar_dashboard_1_cpu_usage",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
-                    "metric": "LibreOffice-Online_mem_limit",
-                    "value": 8349416423,
+                    "metric": "foobar_dashboard_1_mem_limit",
+                    "value": 15.36,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
-                    "metric": "LibreOffice-Online_mem_perc",
-                    "value": 527,
+                    "metric": "foobar_dashboard_1_mem_perc",
+                    "value": 4,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
-                    "metric": "LibreOffice-Online_mem_used",
-                    "value": 439877632,
+                    "metric": "foobar_dashboard_1_mem_used",
+                    "value": 6.93,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
-                    "metric": "LibreOffice-Online_pids",
-                    "value": 11,
+                    "metric": "foobar_dashboard_1_pids",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_laravel.test_1_cpu_usage",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_laravel.test_1_mem_limit",
+                    "value": 15.36,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_laravel.test_1_mem_perc",
+                    "value": 17,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_laravel.test_1_mem_used",
+                    "value": 26.67,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_laravel.test_1_pids",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_meilisearch_1_cpu_usage",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_meilisearch_1_mem_limit",
+                    "value": 15.36,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_meilisearch_1_mem_perc",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_meilisearch_1_mem_used",
+                    "value": 10.86,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_meilisearch_1_pids",
+                    "value": 15,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_mysql_1_cpu_usage",
+                    "value": 33,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_mysql_1_mem_limit",
+                    "value": 15.36,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_mysql_1_mem_perc",
+                    "value": 90,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_mysql_1_mem_used",
+                    "value": 141.3,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_mysql_1_pids",
+                    "value": 38,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_redis_1_cpu_usage",
+                    "value": 23,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_redis_1_mem_limit",
+                    "value": 15.36,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_redis_1_mem_perc",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_redis_1_mem_used",
+                    "value": 5.06,
+                    "value_prev": null,
+                    "app_type": "docker"
+                },
+                {
+                    "metric": "foobar_redis_1_pids",
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "docker"
                 }
