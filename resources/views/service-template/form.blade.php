@@ -253,7 +253,7 @@
         }
     });
     $('.service-template-form').submit(function (eventObj) {
-        if ($('#dtype').val() === 'static' & $('#dgtype').val() === 'static'){
+        if ($('#dtype').val() === 'static' and $('#dgtype').val() === 'static'){
             return true;
         }
         if ($('#dtype').val() === 'dynamic') {
