@@ -357,6 +357,13 @@ $graphs['voip-monitor'] = [
     'memoryusage',
     'openfiles',
 ];
+$graphs['docker'] = [
+    'cpu_usage',
+    'pids',
+    'mem_limit',
+    'mem_used',
+    'mem_perc',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
