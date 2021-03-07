@@ -963,7 +963,13 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['sensor_id']) {
-            $details = 'Current Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
+            if ($tmp_alerts['sensor_class'] == 'state') {
+                // Give more details for a state (textual form)
+                $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            } else {
+                // Other sensors
+                $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
+            }
             $details_a = [];
 
             if ($tmp_alerts['sensor_limit_low']) {

@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for capwap configuration.
 -- Reference: 
--- Version: V1.04
+-- Version: V1.08
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.9
 		hwWlanCapwap MODULE-IDENTITY
-			LAST-UPDATED "201610121406Z"		-- Oct 12, 2016 at 14:06 GMT
+			LAST-UPDATED "201904230912Z"		-- Apr 23, 2019 at 09:12 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -31,8 +31,20 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				  "
-			DESCRIPTION 
+		    DESCRIPTION 
+				"Modify the enumerated values and property of the node hwWlanCapwapIpv6Enable at the WMPV1R19C00 of WMP version." 
+		    REVISION "201904230912Z"		-- Apr 23, 2019 at 09:12 GMT
+		    DESCRIPTION 
+				"Add the description of the ipv4Address and ipv6Address." 
+		    REVISION "201812281652Z"		-- Dec 28, 2018 at 16:52 GMT
+		    DESCRIPTION 
 				"The MIB module defines the ap capwap operation." 
+		    REVISION "201812212132Z"		-- Dec 21, 2018 at 21:23 GMT
+			DESCRIPTION 
+				"Add capwap ipv4 address and ipv6 address."
+		    REVISION "201702061708Z"		-- Feb 06, 2017 at 17:08 GMT
+			DESCRIPTION 
+				"Add capwap data-link dtls switch."
 		    REVISION "201610121406Z"		-- Oct 12, 2016 at 14:06 GMT
 			DESCRIPTION 
 				"Add capwap message-integrity psk switch."
@@ -96,8 +108,18 @@
 			DESCRIPTION 
 				"If hwWlanCapwapSourceInterfaceMethod is set to ipaddress(4), this object is used to identify the IP address of the source port."
 			::= { hwWlanCapwapSourceInterface 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.1.4
+		hwWlanCapwapSourceIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"If hwWlanCapwapSourceInterfaceMethod is set to ipaddress(6), this object is used to identify the IP address of the source port."
+			::= { hwWlanCapwapSourceInterface 4 }
+		
 
-		--1.3.6.1.4.1.2011.6.139.9.2
+		-- 1.3.6.1.4.1.2011.6.139.9.2
 		hwWlanCapwapSysPara OBJECT IDENTIFIER ::= { hwWlanCapwap 2 }
 
 		 --1.3.6.1.4.1.2011.6.139.9.2.1
@@ -139,13 +161,17 @@
 		hwWlanCapwapIpv6Enable OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				disable(1) ,
-				enable(2)
+				ipv4(1) ,
+				ipv6(2) ,
+				doubleStack(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+				"Work mode of capwap source. It can be set 
+				 ipv4(1): capwap source just can be configed to ipv4 source.
+				 ipv6(2): capwap source just can be configed to ipv6 source.
+				 doubleStack(3): capwap source can be configed to ipv4 and ipv6 source at the same time."
 			::= { hwWlanCapwapSysPara 4 }
 
 		 --1.3.6.1.4.1.2011.6.139.9.2.5
@@ -279,8 +305,33 @@
 			STATUS current
 			DESCRIPTION 
 				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
-			::= { hwWlanCapwapSysPara 17 }
-
+			::= { hwWlanCapwapSysPara 17 }  
+			
+		 --1.3.6.1.4.1.2011.6.139.9.2.18
+		hwWlanCapwapDtlsDataSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the global DTLS function of data-link. The default value is 1: disable."
+			::= { hwWlanCapwapSysPara 18 }
+        
+         --1.3.6.1.4.1.2011.6.139.9.2.19
+		hwWlanCapwapInterControllerDtlsDataSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the inter-controller DTLS function of data-link. The default value is 1: disable."
+			::= { hwWlanCapwapSysPara 19 }
 
               --  1.3.6.1.4.1.2011.6.139.9.3
 		hwWlanCapwapSource OBJECT IDENTIFIER ::= { hwWlanCapwap 3 }
@@ -312,8 +363,12 @@
 					INTEGER,
 				hwWlanCapwapSourceValue
 					Integer32,
-                hwWlanCapwapSourceRowStatus
-					RowStatus
+				hwWlanCapwapSourceRowStatus
+					RowStatus,
+				hwWlanCapwapSourceIPv4
+					IpAddress,
+				hwWlanCapwapSourceIPv6
+					OCTET STRING
 			 }
 
 		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.1
@@ -331,14 +386,18 @@
 			SYNTAX INTEGER
 				{
 				vlanif(2),
-				loopback(3)
+				loopback(3),
+				ipv4Address(4),
+				ipv6Address(5)
 				}
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"operation method of capwap source interface.It can be set 
+				"Operation method of capwap source interface.It can be set 
 				 vlanif(2): use vlanif interface
-				 loopback(3): use loopback interface."
+				 loopback(3): use loopback interface
+				 ipv4Address(4): use ipv4 adddress
+				 ipv6Address(5): use ipv6 address."
 			::= { hwWlanCapwapSourceEntry 2 }
 
 		
@@ -362,6 +421,25 @@
 		                 destroy(6): delete the relationship."
 
 			::= { hwWlanCapwapSourceEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.5
+		hwWlanCapwapSourceIPv4 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the value of capwap source ipv4 address."
+			::= { hwWlanCapwapSourceEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.6
+		hwWlanCapwapSourceIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the value of capwap source ipv6 address."
+			::= { hwWlanCapwapSourceEntry 6 }
+		
 		-- 1.3.6.1.4.1.2011.6.139.9.4
 		hwWlanCapwapConformance OBJECT IDENTIFIER ::= { hwWlanCapwap 4 }
 
@@ -394,7 +472,8 @@
 			OBJECTS { hwWlanCapwapDtlsSwitch, hwWlanCapwapDtlsPsk, hwWlanCapwapDtlsDefaultPskSwitch, hwWlanCapwapIpv6Enable, hwWlanCapwapInterControllerDtlsEncrpyt, 
 			hwWlanCapwapInterControllerDtlsPsk, hwCapwapEchoInterval, hwCapwapEchoTimes, hwWlanCapwapControlPriorityLocal, hwWlanCapwapControlPriorityRemote,
 			hwWlanCapwapSensitiveInfoPsk, hwWlanCapwapInterControllerSensitiveInfoPsk, hwWlanCapwapMessageIntegrityPsk, hwWlanCapwapInterControllerMessageIntegrityPsk,
-			hwWlanCapwapMessageIntegrityPskMandatoryMatchSwitch, hwWlanCapwapMsgCheckSwitch, hwWlanCapwapInterControllerMsgCheckSwitch }
+			hwWlanCapwapMessageIntegrityPskMandatoryMatchSwitch, hwWlanCapwapMsgCheckSwitch, hwWlanCapwapInterControllerMsgCheckSwitch,
+			hwWlanCapwapDtlsDataSwitch, hwWlanCapwapInterControllerDtlsDataSwitch }
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -412,3 +491,17 @@
 --
 -- HUAWEI-WLAN-CAPWAP-MIB.mib
 --
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1632,6 +1632,13 @@
                 ]
             }
         },
+        "geoloc.dns": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": true,
+            "type": "boolean"
+        },
         "geoloc.engine": {
             "default": false,
             "group": "external",
@@ -4977,6 +4984,20 @@
             "order": 4,
             "type": "integer",
             "default": 0
+        },
+        "snmp.timeout": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 1
+        },
+        "snmp.retries": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 6,
+            "type": "integer",
+            "default": 5
         },
         "snmp.port": {
             "group": "poller",

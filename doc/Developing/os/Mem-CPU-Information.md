@@ -115,7 +115,7 @@ Available yaml data keys:
 Key | Default | Description
 ----- | --- | -----
 oid | required | The string based oid to fetch data, could be a table or a single value
-num_oid | required | the numerical oid to fetch data from when polling, usually should be appended by {{ $index }}
+num_oid | optional | The numerical oid to fetch data from when polling, usually should be appended by {{ $index }}. Computed by discovery process if not provided.
 value | optional | Oid to retrieve data from, primarily used for tables
 precision | 1 | The multiplier to multiply the data by. If this is negative, the data will be multiplied then subtracted from 100.
 descr | Processor | Description of this processor, may be an oid or plain string.  Helpful values {{ $index }} and {{$count}}

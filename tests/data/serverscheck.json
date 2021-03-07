@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "os": "serverscheck",
-                    "type": "network",
+                    "type": "environment",
                     "serial": null,
                     "icon": "serverscheck.svg",
                     "location": "<private>"

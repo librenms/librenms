@@ -43,6 +43,20 @@ return [
             'snmpsim' => 'Use snmpsim for unit tests',
         ],
     ],
+    'dev:simulate' => [
+        'description' => 'Simulate devices using test data',
+        'arguments' => [
+            'file' => 'The file name (only base name) of the snmprec file to update or add to LibreNMS. If file not specified, no device will be added or updated.',
+        ],
+        'options' => [
+            'multiple' => 'Use community name for hostname instead of snmpsim',
+            'remove' => 'Remove the device after stopping',
+        ],
+        'added' => 'Device :hostname (:id) added',
+        'exit' => 'Ctrl-C to stop',
+        'removed' => 'Device :id removed',
+        'updated' => 'Device :hostname (:id) updated',
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',

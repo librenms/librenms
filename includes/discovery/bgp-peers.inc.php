@@ -18,7 +18,9 @@ if (Config::get('enable_bgp')) {
         $vrfs_lite_cisco = [['context_name'=>'']];
     }
 
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+    if (empty($bgpLocalAs)) {
+        $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+    }
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];

@@ -14,6 +14,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
+        } elseif ($device['os'] === 'dell-os10') {
+            $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
         } elseif ($device['os'] === 'timos') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
         } elseif ($device['os'] === 'aos7') {
@@ -251,6 +253,24 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                             ];
+                        } elseif ($device['os'] == 'dell-os10') {
+                            $peer_identifier = '1.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
+                            $mib = 'DELLEMC-OS10-BGP4V2-MIB';
+                            $oid_map = [
+                                'os10bgp4V2PeerState' => 'bgpPeerState',
+                                'os10bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'os10bgp4V2PeerInUpdates' => 'bgpPeerInUpdates',
+                                'os10bgp4V2PeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'os10bgp4V2PeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'os10bgp4V2PeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'os10bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'os10bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'os10bgp4V2PeerLocalAddr' => 'bgpLocalAddr',
+                                'os10bgp4V2PeerDescription' => 'bgpPeerDescr',
+                                'os10bgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
+                                'os10bgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
+                                'os10bgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
+                            ];
                         } elseif ($device['os'] === 'aos7') {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
                             $mib = 'BGP4-MIB';
@@ -401,7 +421,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
                 foreach ($peer_afis as $peer_afi) {
@@ -529,6 +549,25 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
                         $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
+                    }
+
+                    if ($device['os'] == 'dell-os10') {
+                        $safis['unicast'] = 1;
+                        $safis['multicast'] = 2;
+                        $afis['ipv4'] = 1;
+                        $afis['ipv6'] = 2;
+                        if (preg_match('/:/', $peer['bgpPeerIdentifier'])) {
+                            $tmp_peer = str_replace(':', '', $peer['bgpPeerIdentifier']);
+                            $tmp_peer = preg_replace('/([\w\d]{2})/', '\1:', $tmp_peer);
+                            $tmp_peer = rtrim($tmp_peer, ':');
+                        } else {
+                            $tmp_peer = $peer['bgpPeerIdentifier'];
+                        }
+                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
+                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixOutPrefixes', $out_prefixes, 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
+
+                        $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['os10bgp4V2PrefixInPrefixesAccepted'];
+                        $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['os10bgp4V2PrefixOutPrefixes'];
                     }
 
                     if ($device['os'] === 'aos7') {

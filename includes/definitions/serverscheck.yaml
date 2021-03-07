@@ -1,6 +1,7 @@
 os: serverscheck
 text: ServersCheck
-type: network
+type: environment
+nobulk: true
 discovery:
     -
         sysObjectID:
