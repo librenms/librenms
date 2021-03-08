@@ -80,7 +80,7 @@ class DevSimulate extends LnmsCommand
 
     private function addDevice($community)
     {
-        $hostname = $this->option('new') ? $community : 'snmpsim';
+        $hostname = $this->option('multiple') ? $community : 'snmpsim';
         $device = Device::firstOrNew(['hostname' => $hostname]);
         $action = $device->exists ? 'updated' : 'added';
 
