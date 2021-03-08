@@ -116,7 +116,8 @@ if (! function_exists('array_pairs')) {
 function cast_number($number)
 {
     if (! is_numeric($number)) {
-        if (! preg_match('/-?\d+(\.\d+)?/', $number, $matches)) {
+        // match pre-PHP8 behavior
+        if (! preg_match('/^-?\d+(\.\d+)?/', $number, $matches)) {
             return 0;
         }
         $number = $matches[0];
