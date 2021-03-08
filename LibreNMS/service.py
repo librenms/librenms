@@ -373,11 +373,8 @@ class Service:
                     self.restart()
 
                 if self.reap_flag:
-                    self.reap_psutil()
-
-                    # Re-arm the signal handler
-                    signal(SIGCHLD, self.reap)
                     self.reap_flag = False
+                    self.reap_psutil()
 
                 master_lock = self._acquire_master()
                 if master_lock:
@@ -547,11 +544,6 @@ class Service:
         :param signalnum: UNIX signal number
         :param flag: Flags accompanying signal
         """
-        handler = signal(SIGCHLD, SIG_DFL)
-        if handler == SIG_DFL:
-            # signal is already being handled, bail out as this handler is not reentrant - the kernel will re-raise the signal later
-            return
-
         self.reap_flag = True
 
     def reload(self, signalnum=None, flag=None):
