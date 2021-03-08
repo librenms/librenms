@@ -41,6 +41,7 @@ jobs:
             name: Unit
             skip-style-check: 1
             skip-web-check: 1
+            database: mysql:5.7
           -
             php-version: 7.3
             name: Unit
