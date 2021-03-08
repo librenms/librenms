@@ -66,7 +66,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->mempool_perc = $percent;
 
         if (! $this->mempool_total) {
-            if (! $percent && $percent !== 0) {
+            if (! $percent && $percent !== 0.0) {
                 // could not calculate total, can't calculate other values
                 return $this;
             }
