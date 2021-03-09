@@ -1,10 +1,11 @@
 <?php
-d_echo("Entering Firebrick IPSec Tunnels");
+
+d_echo('Entering Firebrick IPSec Tunnels');
 
 if ($device['os_group'] == 'firebrick') {
     $ipsec_array = snmpwalk_cache_oid($device, 'fbIPsecConnectionEntry', [], 'FIREBRICK-IPSEC-MIB');
 
-    $tunnels = array();
+    $tunnels = [];
 
     $tunnels_db = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?', [$device['device_id']]);
     foreach ($tunnels_db as $tunnel) {
@@ -16,19 +17,19 @@ if ($device['os_group'] == 'firebrick') {
     }
 
     $tunnel_states = [
-        0 => "badconfig",
-        1 => "disabled",
-        2 => "waiting",
-        3 => "ondemand",
-        4 => "lingering",
-        5 => "reconnect-wait",
-        6 => "down",
-        7 => "initiating-eap",
-        8 => "initiating-auth",
-        9 => "initial",
-        10 => "closing",
-        11 => "childless",
-        12 => "active",
+        0 => 'badconfig',
+        1 => 'disabled',
+        2 => 'waiting',
+        3 => 'ondemand',
+        4 => 'lingering',
+        5 => 'reconnect-wait',
+        6 => 'down',
+        7 => 'initiating-eap',
+        8 => 'initiating-auth',
+        9 => 'initial',
+        10 => 'closing',
+        11 => 'childless',
+        12 => 'active',
     ];
     $valid_tunnels = [];
     $db_oids = [
@@ -52,9 +53,9 @@ if ($device['os_group'] == 'firebrick') {
             $valid_tunnels[] = $tunnel_id;
         } else {
             foreach ($db_oids as $db_oid => $db_value) {
-                if($db_value == "tunnel_status"){
+                if ($db_value == 'tunnel_status') {
                     $db_update[$db_value] = $tunnel_states[$tunnel[$db_oid]];
-                }else{
+                } else {
                     $db_update[$db_value] = $tunnel[$db_oid];
                 }
             }
@@ -80,4 +81,3 @@ if ($device['os_group'] == 'firebrick') {
         );
     }
 }
-

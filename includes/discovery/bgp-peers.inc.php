@@ -12,11 +12,11 @@ if (Config::get('enable_bgp')) {
         include Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
     }
     if ($device['os'] == 'firebrick') {
-        $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
+        $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
         foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
+            $oid = explode('.', $key);
             $protocol = $oid[0];
-            $address = str_replace($oid[0].".", '', $key);
+            $address = str_replace($oid[0] . '.', '', $key);
             if (strlen($address) > 15) {
                 $address = IP::fromHexString($address)->compressed();
             }
@@ -78,7 +78,7 @@ if (Config::get('enable_bgp')) {
         }
     }
 
-    if($device["os"] != "firebrick"){
+    if ($device['os'] != 'firebrick') {
         unset($bgpPeers);
     }
 
@@ -88,16 +88,16 @@ if (Config::get('enable_bgp')) {
         $vrfs_lite_cisco = [['context_name'=>'']];
     }
 
-    if($device["os"] != "firebrick"){
+    if ($device['os'] != 'firebrick') {
         if (empty($bgpLocalAs)) {
             $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
         }
-    }else{
+    } else {
         // TODO: Fix me to use the local AS as published
-        $bgpLocalAs = $bgpPeers[0][array_keys($bgpPeers[0])[0]]["fbBgpPeerRemoteAS"];
+        $bgpLocalAs = $bgpPeers[0][array_keys($bgpPeers[0])[0]]['fbBgpPeerRemoteAS'];
     }
 
-    if($device["os"] != "firebrick"){
+    if ($device['os'] != 'firebrick') {
         unset($bgpPeers);
     }
 
