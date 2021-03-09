@@ -89,7 +89,9 @@ if (Config::get('enable_bgp')) {
     }
 
     if($device["os"] != "firebrick"){
-        $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+        if (empty($bgpLocalAs)) {
+            $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+        }
     }else{
         // TODO: Fix me to use the local AS as published
         $bgpLocalAs = $bgpPeers[0][array_keys($bgpPeers[0])[0]]["fbBgpPeerRemoteAS"];
@@ -155,6 +157,8 @@ if (Config::get('enable_bgp')) {
                         }
                     } elseif ($device['os_group'] === 'arista') {
                         $af_data = snmpwalk_cache_oid($device, 'aristaBgp4V2PrefixInPrefixes', $af_data, 'ARISTA-BGP4V2-MIB');
+                    } elseif ($device['os'] === 'aos7') {
+                        $af_data = snmpwalk_cache_oid($device, 'alaBgpPeerRcvdPrefixes', $af_data, 'ALCATEL-IND1-BGP-MIB');
                     }
                 }
 

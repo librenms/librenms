@@ -1682,7 +1682,7 @@ function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_i
     ];
 
     $type_instances = ['incoming', 'active', 'deferred'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1717,7 +1717,7 @@ function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_in
     ];
 
     $type_instances = ['incoming', 'active', 'deferred'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1757,7 +1757,7 @@ function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances
     ];
 
     $type_instances = ['idle', 'wait', 'nice', 'user', 'system', 'softirq', 'interrupt', 'steal'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1795,7 +1795,7 @@ function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instan
     ];
 
     $type_instances = ['free', 'cached', 'buffered', 'used'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1832,7 +1832,7 @@ function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_in
     ];
 
     $type_instances = ['total', 'running', 'onhold', 'uninterruptable'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1869,7 +1869,7 @@ function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_ins
     ];
 
     $type_instances = ['anon', 'rss', 'vml', 'vm'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1898,7 +1898,7 @@ function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_
     $opts['number_format'] = '%5.2lf';
     $opts['rrd_opts'] = ['-v', 'Errors/s'];
 
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1927,7 +1927,7 @@ function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $typ
     $opts['rrd_opts'] = ['COMMENT:Issues/s               Cur    Ave     Min    Max\l'];
     $opts['number_format'] = '%5.2lf';
 
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1956,7 +1956,7 @@ function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = ['-v', 'Ops/s'];
 
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -1994,7 +1994,7 @@ function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_inst
     ];
 
     $type_instances = ['paging', 'blocked', 'zombies', 'stopped', 'running', 'sleeping'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -2030,7 +2030,7 @@ function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instance
     ];
 
     $type_instances = ['free', 'cached', 'used'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -2074,7 +2074,7 @@ function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $
     ];
 
     $type_instances = [/* 'open',*/ 'waiting', 'starting', 'reading', 'sending', 'keepalive', 'dnslookup', 'logging', 'closing', 'finishing', 'idle_cleanup'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
@@ -2119,7 +2119,7 @@ function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $ty
     ];
 
     $type_instances = ['ESTABLISHED', 'SYN_SENT', 'SYN_RECV', 'FIN_WAIT1', 'FIN_WAIT2', 'TIME_WAIT', 'CLOSE', 'CLOSE_WAIT', 'LAST_ACK', 'CLOSING', 'LISTEN'];
-    while ([$k, $inst] = each($type_instances)) {
+    foreach ($type_instances as $k => $inst) {
         $file = '';
         foreach (Config::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {

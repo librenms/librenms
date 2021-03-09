@@ -951,6 +951,27 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 d_echo("Final sensor value: $value\n");
 
                 $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
+
+                // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
+                if (empty($data['num_oid'])) {
+                    try {
+                        d_echo('Info: Trying to find a numerical OID for ' . $data_name . '.');
+                        $search_mib = $device['dynamic_discovery']['mib'];
+                        if (Str::contains($data['oid'], '::') && ! (Str::contains($data_name, '::'))) {
+                            // We should search this mib first
+                            $exp_oid = explode('::', $data['oid']);
+                            $search_mib = $exp_oid[0] . ':' . $search_mib;
+                        }
+                        $num_oid = YamlDiscovery::oidToNumeric($data_name, $device, $search_mib, $device['mib_dir']);
+                        $data['num_oid'] = $num_oid . '.{{ $index }}';
+                        d_echo('Info: We found numerical oid for ' . $data_name . ': ' . $data['num_oid']);
+                    } catch (\Exception $e) {
+                        d_echo('Error: We cannot find a numerical OID for ' . $data_name . '. Skipping this one...');
+                        $skippedFromYaml = true;
+                        // Cause we still don't have a num_oid
+                    }
+                }
+
                 if ($skippedFromYaml === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID
@@ -981,10 +1002,6 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                         }
                     }
 
-                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
-                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
-                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
-
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
@@ -994,6 +1011,10 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
                     }
+
+                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
+                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
+                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     //user_func must be applied after divisor/multiplier
                     if (isset($user_function) && is_callable($user_function)) {
@@ -1035,7 +1056,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
             }
         }
         discovery_process($valid, $device, $sensor_class, $pre_cache);
-        d_echo($valid['sensor'][$sensor_class]);
+        d_echo($valid['sensor'][$sensor_class] ?? []);
         check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";
     }
@@ -1046,6 +1067,7 @@ function build_bgp_peers($device, $data, $peer2)
     d_echo("Peers : $data\n");
     $remove = [
         'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
+        'ALCATEL-IND1-BGP-MIB::alaBgpPeerAS.',
         'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
         'BGP4-MIB::bgpPeerRemoteAs.',
         'HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs.',
@@ -1116,6 +1138,10 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
             $safi = array_shift($afisafi_tmp);
             $peertype = array_shift($afisafi_tmp);
             $bgp_ip = implode('.', $afisafi_tmp);
+        } elseif ($device['os'] == 'aos7') {
+            $afi = 'ipv4';
+            $safi = 'unicast';
+            $bgp_ip = $k;
         } else {
             $safi = array_pop($afisafi_tmp);
             $afi = array_pop($afisafi_tmp);

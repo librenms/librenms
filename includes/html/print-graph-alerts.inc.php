@@ -12,7 +12,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -71,7 +71,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
         }
     }
 
-    $graph_data = _json_encode($data);
+    $graph_data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     ?>
     var groups = new vis.DataSet();
 <?php

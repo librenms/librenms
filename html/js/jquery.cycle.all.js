@@ -1078,7 +1078,7 @@ $.fn.cycle.defaults = {
  * Version:	 2.73
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
+ * https://www.gnu.org/licenses/gpl.html
  */
 (function($) {
 "use strict";

@@ -30,22 +30,26 @@ jobs:
             name: Unit
             skip-style-check: 1
             skip-web-check: 1
+            database: mariadb:10.5
           -
             php-version: 7.4
             name: Style and Web
             skip-unit-check: 1
+            database: mysql:5.7
           -
             php-version: 7.3
             name: Unit
             skip-style-check: 1
             skip-web-check: 1
+            database: mysql:5.7
           -
             php-version: 7.3
             name: Style and Web
             skip-unit-check: 1
+            database: mysql:8.0
     services:
-      mysql:
-        image: mysql:5.7
+      database:
+        image: ${{ matrix.database }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: librenms_phpunit_78hunjuybybh
@@ -53,11 +57,6 @@ jobs:
           MYSQL_PASSWORD: librenms
         ports:
           - 3306
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
     steps:
       -
         name: Checkout
@@ -69,20 +68,14 @@ jobs:
          run: |
            FILES=$(git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g')
            echo $FILES
-           
+
            echo 'FILES<<EOF' >> $GITHUB_ENV
            echo $FILES >> $GITHUB_ENV
-           echo 'EOF' >> $GITHUB_ENV  
+           echo 'EOF' >> $GITHUB_ENV
       -
          name: Set $PATH
          run: |
            echo "/home/runner/.local/bin/" >> $GITHUB_PATH
-      -
-        name: set MySQL collate
-        env:
-          PORT: ${{ job.services.mysql.ports[3306] }}
-        run: | 
-          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -99,17 +92,17 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
+            ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
       -
         name: Cache pip
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
       -
         name: Install packages
         run: |
@@ -118,8 +111,8 @@ jobs:
       -
         name: Pip install
         run: |
-          pip3 install --upgrade pip
-          pip3 install --user snmpsim pylint python-memcached mysqlclient --upgrade
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade --user snmpsim pylint python-memcached mysqlclient
       -
         name: Composer validate
         run: |
@@ -133,13 +126,13 @@ jobs:
           APP_ENV=testing
           DB_DRIVER=mysql
           DB_HOST=127.0.0.1
-          DB_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_PORT=${{ job.services.database.ports[3306] }}
           DB_DATABASE=librenms_phpunit_78hunjuybybh
           DB_USERNAME=librenms
           DB_PASSWORD=librenms
           DB_TEST_DRIVER=mysql
           DB_TEST_HOST=127.0.0.1
-          DB_TEST_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_TEST_PORT=${{ job.services.database.ports[3306] }}
           DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
           DB_TEST_USERNAME=librenms
           DB_TEST_PASSWORD=librenms
@@ -147,12 +140,31 @@ jobs:
       -
         name: Composer install
         run: |
-          composer install --prefer-dist --no-interaction --no-progress --no-suggest
+          composer install --prefer-dist --no-interaction --no-progress
       -
         name: Artisan dusk:update
         if: matrix.skip-web-check != '1'
         run: |
           php artisan dusk:update --detect
+      -
+        name: Ensure MySQL is up
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysqladmin -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms ping --wait=5
+      -
+        name: Set MySQL authentication plugin
+        if: matrix.database == 'mysql:8.0'
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" --user=root -e "ALTER USER 'librenms'@'%' IDENTIFIED WITH mysql_native_password BY 'librenms'"
+      -
+        name: Set MySQL collate
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'

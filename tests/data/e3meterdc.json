@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.21695.1401",
                     "sysDescr": "E3METER Data Concentrator",
-                    "sysContact": null,
-                    "version": "6.1.1 (2019-04-18)",
-                    "hardware": null,
-                    "features": null,
-                    "os": "e3meterdc",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "riedo.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.21695.1401",
-                    "sysDescr": "E3METER Data Concentrator",
                     "sysContact": "<private>",
                     "version": "6.1.1 (2019-04-18)",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

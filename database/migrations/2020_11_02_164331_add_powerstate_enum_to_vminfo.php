@@ -21,7 +21,7 @@ class AddPowerstateEnumToVminfo extends Migration
                     continue;
                 }
 
-                $vm->vmwVmState = PowerState::STATES[strtolower($vm->vmwVmState)];
+                $vm->vmwVmState = PowerState::STATES[strtolower($vm->vmwVmState)] ?? PowerState::UNKNOWN;
                 $vm->update();
             }
         });

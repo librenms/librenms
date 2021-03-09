@@ -28,9 +28,7 @@
                                             "string"
                                         ]
                                     },
-                                    "oid": {
-                                        "type": "string"
-                                    },
+                                    "oid": {"$ref": "#/definitions/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
@@ -80,21 +78,13 @@
                 "os": {
                     "type": "object",
                     "properties": {
-                        "version": {
-                            "type": ["string", "array"]
-                        },
-                        "hardware": {
-                            "type": ["string", "array"]
-                        },
-                        "features": {
-                            "type": ["string", "array"]
-                        },
-                        "serial": {
-                            "type": ["string", "array"]
-                        },
-                        "location": {
-                            "type": ["string", "array"]
-                        },
+                        "version": {"$ref": "#/definitions/oids"},
+                        "hardware": {"$ref": "#/definitions/oids"},
+                        "features": {"$ref": "#/definitions/oids"},
+                        "serial": {"$ref": "#/definitions/oids"},
+                        "lat": {"$ref": "#/definitions/oid"},
+                        "location": {"$ref": "#/definitions/oids"},
+                        "long": {"$ref": "#/definitions/oid"},
                         "sysDescr_regex": {
                             "type": ["string", "array"]
                         },
@@ -142,9 +132,7 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "oid": {
-                                        "type": "string"
-                                    },
+                                    "oid": {"$ref": "#/definitions/oid"},
                                     "num_oid": {
                                         "type": "string"
                                     },
@@ -160,9 +148,7 @@
                                     "precision": {
                                         "type": "integer"
                                     },
-                                    "value": {
-                                        "type": "string"
-                                    },
+                                    "value": {"$ref": "#/definitions/oid"},
                                     "type": {
                                         "type": "string"
                                     },
@@ -184,7 +170,6 @@
                                 },
                                 "additionalProperties": false,
                                 "required": [
-                                    "num_oid",
                                     "oid"
                                 ]
                             }
@@ -206,9 +191,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
+                                            "oid": {"$ref": "#/definitions/oid"},
                                             "value": {
                                                 "type": "string"
                                             },
@@ -295,7 +278,6 @@
                                         "additionalProperties": false,
                                         "required": [
                                             "descr",
-                                            "num_oid",
                                             "oid",
                                             "states"
                                         ]
@@ -318,12 +300,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            },
+                                            "oid": {"$ref": "#/definitions/oids"},
                                             "snmp_flags": {
                                                 "type": [
                                                     "string",
@@ -370,15 +347,19 @@
         "modules"
     ],
     "definitions": {
+        "oid": {
+            "type": "string"
+        },
+        "oids": {
+            "type": ["string", "array"],
+            "items": {
+                "type": "string"
+            }
+        },
         "pre-cache": {
             "type": "object",
             "properties": {
-                "oids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
+                "oids": {"$ref": "#/definitions/oids"},
                 "snmp_flags": {
                     "type": [
                         "string",
@@ -463,7 +444,6 @@
                         "additionalProperties": false,
                         "required": [
                             "descr",
-                            "num_oid",
                             "oid"
                         ]
                     }

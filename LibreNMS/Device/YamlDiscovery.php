@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -41,6 +41,7 @@ class YamlDiscovery
     public static function discover(OS $os, $class, $yaml_data)
     {
         $pre_cache = $os->preCache();
+        $device = $os->getDeviceArray();
         $items = [];
 
         // convert to class name for static call below
@@ -78,6 +79,24 @@ class YamlDiscovery
 
                     if (! isset($data['value'])) {
                         $data['value'] = $data['oid'];
+                    }
+
+                    if (! isset($data['num_oid'])) {
+                        try {
+                            d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
+                            $search_mib = $device['dynamic_discovery']['mib'];
+                            if (Str::contains($data['oid'], '::') && ! (Str::contains($data['value'], '::'))) {
+                                // We should search this mib first
+                                $exp_oid = explode('::', $data['oid']);
+                                $search_mib = $exp_oid[0] . ':' . $search_mib;
+                            }
+                            $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
+                            $data['num_oid'] = $num_oid . '.{{ $index }}';
+                            d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
+                        } catch (\Exception $e) {
+                            d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
+                            continue;
+                        }
                     }
 
                     foreach ($data as $name => $value) {
@@ -167,10 +186,6 @@ class YamlDiscovery
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
     {
-        //create the sub-index values in order to try to match them with precache
-        foreach (explode('.', $index) as $pos => $sindex) {
-            $subindex[$pos] = $sindex;
-        }
         if (isset($discovery_data[$name])) {
             $name = $discovery_data[$name];
         }
@@ -183,6 +198,15 @@ class YamlDiscovery
             return $pre_cache[$index][$name];
         }
 
+        //create the sub-index values in order to try to match them with precache
+        $sub_indexes = explode('.', $index);
+        // parse sub_index options name with trailing colon and index
+        $sub_index = 0;
+        if (preg_match('/^(.+):(\d+)$/', $name, $matches)) {
+            $name = $matches[1];
+            $sub_index = $matches[2];
+        }
+
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
@@ -191,8 +215,8 @@ class YamlDiscovery
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
                     return current($pre_cache[$name]);
-                } elseif (isset($pre_cache[$name][$subindex[0]][$name])) {
-                    return $pre_cache[$name][$subindex[0]][$name];
+                } elseif (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
+                    return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
                 }
             } else {
                 return $pre_cache[$name];

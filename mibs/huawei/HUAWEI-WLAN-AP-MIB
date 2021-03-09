@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:   The mib is used to manage AP on AC, include AP device notify, AP type,  AP objects etc.
 -- Reference: 
--- Version: V1.31
+-- Version: V1.73
 -- ============================================================================
 -- Module definition
 
@@ -16,11 +16,11 @@
 			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
 			MODULE-IDENTITY, NOTIFICATION-TYPE
 				FROM SNMPv2-SMI
-			MacAddress, RowStatus, DateAndTime
+               			MacAddress, RowStatus, DateAndTime
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.13
 		hwWlanAp MODULE-IDENTITY
-			LAST-UPDATED"201611220909Z"		-- Nov 22, 2016 at 09:09 GMT 
+			LAST-UPDATED"202008101934Z"		-- August 10, 2020 at 19:34 GMT	   
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -29,8 +29,145 @@
 				   Shenzhen 518129
 				   People's Republic of China
 				   Website: http://www.huawei.com
-				   Email: support@huawei.com
-				  "
+				   Email: support@huawei.com"
+			DESCRIPTION 
+				"V1.73, update the value of hwApPowerInsufficientTrap, hwApPowerInsufficientResumeTrap, hwWlanAPPoeWorkmode, hwWlanAPPoeWorkmode, hwWlanIDIndexedAPPoeWorkmode, hwWlanIDIndexedAPPoeExpectedWorkmode"
+            REVISION "202008101934Z"		-- August 10, 2020 at 19:34 GMT
+			
+			DESCRIPTION 
+				"V1.72, add hwApLoopbackDetectTrap, hwApLoopbackDetectRestoreTrap, update the value of hwWlanApWiredPortState "
+            REVISION "202008061934Z"		-- July 27, 2020 at 10:32 GMT
+			
+			DESCRIPTION 
+				"V1.71, add hwApOpticalVoltageTooHighTrap hwApOpticalVoltageTooHighRestoreTrap hwApOpticalVoltageTooLowTrap hwApOpticalVoltageTooLowRestoreTrap hwApOpticalCurrentTooHighTrap hwApOpticalCurrentTooHighRestoreTrap hwApOpticalCurrentTooLowTrap hwApOpticalCurrentTooLowRestoreTrap"
+            REVISION "202007271032Z"		-- July 27, 2020 at 10:32 GMT
+			
+			DESCRIPTION 
+				"V1.70, update the type of hwWlanIDIndexedApRtuStatus "
+            REVISION "202007031444Z"		-- July 3, 2020 at 14:44 GMT
+				   
+			DESCRIPTION 
+				"V1.69, update the type of hwWlanIDIndexedApRtuStatus "
+            REVISION "202006281109Z"		-- Jun 28, 2020 at 11:09 GMT		   
+			
+			DESCRIPTION 
+				"V1.68, add hwApExistNeedReconnectTrap, hwApExistNeedReconnectResumeTrap, hwWlanIDIndexedApRadioMode, hwWlanIDIndexedApRtuStatus"
+            REVISION "202005182006Z"		-- May 18, 2020 at 20:06 GMT
+			DESCRIPTION 
+				"V1.67, update the type of hwWlanApTypeRadioType"
+            REVISION "202003301856Z"		-- Mar 30, 2020 at 18:56 GMT	   
+		    DESCRIPTION 
+				"V1.66, update the type of hwWlanApTypeRadioType"
+            REVISION "202003191730Z"		-- Mar 19, 2020 at 17:30 GMT
+			DESCRIPTION 
+				"V1.65, update the type of hwWlanApTypeAutoCreateMethod"
+            REVISION "202001211440Z"		-- Jay 21, 2020 at 14:40 GMT
+			DESCRIPTION 
+				"V1.64, add hwWlanIDIndexedApZoneName,hwWlanIDIndexedApDataLinkState"
+            REVISION "202001152221Z"		-- Jay 15, 2020 at 22:21 GMT
+			DESCRIPTION 
+				"V1.63, rename hwWlanApTypeRowStatus and  hwWlanApTypeUndefinedRowStatus"
+            REVISION "201910281355Z"		-- Oct 26, 2019 at 14:54 GMT
+			DESCRIPTION 
+				"V1.62, add hwAPFanRemoveTrap,hwAPFanInsertTrap,hwAPPowerRemoveTrap,hwAPPowerInsertTrap,hwAPPowerFailTrap,hwAPPowerFailResumeTrap,hwAPPowerInvalidTrap,hwAPPowerInvalidResumeTrap"
+            REVISION "201910261454Z"		-- Oct 26, 2019 at 14:54 GMT
+	   
+			DESCRIPTION 
+				"V1.61, add hwWlanApEnvironmentTemperature,hwWlanApCpuTemperature,hwWlanApNpTemperature"
+            REVISION "201910260954Z"		-- Oct 26, 2019 at 09:54 GMT
+			DESCRIPTION 
+				"V1.60, add hwWlanApDataLinkState"
+            REVISION "201908162000Z"		-- August 16, 2019 at 20:00 GMT
+			DESCRIPTION 
+				"V1.59, add hwWlanUnauthedAPIPv6Address,hwWlanApIotCardType,hwAPIotCardConnectServerTrap,hwAPIotCardDisconnectServerTrap,hwAPIotCardTypeMatchTrap,hwAPIotCardTypeMismatchTrap"
+            REVISION "201907191851Z"		-- July 19, 2019 at 18:51 GMT	   
+			DESCRIPTION 
+				"V1.58, add hwWlanApTypeUndefined,hwWlanApTypeAttributesAbnormalCheck"
+            REVISION "201907091500Z"		-- July 09, 2019 at 15:00 GMT
+			DESCRIPTION 
+				"V1.57, del hwWlanApWiredPortMacSecurityState"
+            REVISION "201906051100Z"		-- June 05, 2019 at 11:00 GMT				   
+			DESCRIPTION 
+				"V1.56, add hwWlanApWiredPortDot1xAuthState, hwWlanApWiredPortMacSecurityState"
+            REVISION "201906041100Z"		-- June 04, 2019 at 11:00 GMT				   
+			DESCRIPTION 
+				"V1.55, add hwAPIPConflictTrap,hwApNumReachMaxTrap,hwApNumReachMaxResumeTrap,hwApNumReachWarningTrap,hwApNumReachWarningResumeTrap"
+            REVISION "201905061100Z"		-- May 06, 2019 at 11:00 GMT
+
+			DESCRIPTION 
+				"V1.54, modify the description of hwWlanIDIndexedApReferenceRSSI."
+            REVISION "201904161100Z"		-- April 16, 2019 at 11:00 GMT
+			
+			DESCRIPTION 
+				"V1.53, add hwWlanIDIndexedApMajorString, hwWlanIDIndexedApMajorHex, hwWlanIDIndexedApMajorDecimal, hwWlanIDIndexedApMinorString, hwWlanIDIndexedApMinorHex, hwWlanIDIndexedApMinorDecimal and hwWlanIDIndexedApReferenceRSSI."
+            REVISION "201903180900Z"		-- Mar 18, 2019 at 09:00 GMT
+			
+			DESCRIPTION 
+				"V1.52, add the trap of hwApPowerLimitedTrap and hwApPowerLimitedResumeTrap, add hwWlanAPPowerSupplyState and hwWlanIDIndexedAPPowerSupplyState."
+            REVISION "201903141200Z"		-- Mar 14, 2019 at 12:00 GMT
+				   
+			DESCRIPTION 
+				"V1.51, modify the type of hwWlanApWiredPortLldpRemLocalApId."
+                                                          REVISION "201901242034Z"		-- Jan 24, 2019 at 20:34 GMT
+                                                          DESCRIPTION 
+				"V1.50, modify the description of hwApDiskOverloadTrap and hwApDiskOverloadRestoreTrap."
+			REVISION "201812272200Z"		-- Dec 27, 2018 at 22:00 GMT	 
+			DESCRIPTION 
+				"V1.49, modify the range of hwApDiskOverloadTrap and hwApDiskOverloadRestoreTrap."
+			REVISION "201812201430Z"		-- Dec 20, 2018 at 14:30 GMT	   
+			DESCRIPTION 
+				"V1.48, modify hwApSoftGreDownTrap and hwApSoftGreDownTrapRestore."
+                                                          REVISION "201811061625Z"		-- Nov 09, 2018 at 16:25 GMT
+
+                                                          DESCRIPTION 
+				"V1.46, add AP version not recommended trap node."
+                                                          REVISION "201810241625Z"		-- Oct 24, 2018 at 16:25 GMT
+			DESCRIPTION 
+				"V1.45, modify the range of hwWlanApElectronicLabel and hwWlanIDIndexedApElectronicLabel."
+			REVISION "201810221720Z"		-- Oct 22, 2018 at 17:20 GMT
+			DESCRIPTION 
+				"V1.45, modify the range of hwWlanApElectronicLabel and hwWlanIDIndexedApElectronicLabel."
+			REVISION "201810091927Z"		-- Oct 09, 2018 at 19:27 GMT				   
+			DESCRIPTION 
+				"V1.44, add hwWlanApWiredPortTrunkID and hwWlanApWiredPortTrunkActiveFlag."
+			REVISION "201809251700Z"		-- Sep 25, 2018 at 17:00 GMT
+			DESCRIPTION 
+				"V1.43, add hwApSoftGreDownTrap and hwApSoftGreDownTrapRestore."
+			REVISION "201809121700Z"		-- Sep 12, 2018 at 17:00 GMT
+			DESCRIPTION 
+				"V1.42, modify the value of hwWlanRadioType."
+			REVISION "201807101243Z"		-- July 10, 2018 at 12:00 GM
+			DESCRIPTION 
+				"V1.41, modify the value of hwApTypeMismatchTrap."
+			REVISION "201805172200Z"		-- May 17, 2018 at 22:00 GMT   
+			DESCRIPTION 
+				"V1.40, modify the value of hwWlanIDIndexedApEntry and  hwWlanApEntry."
+			REVISION "201805082321Z"		-- May 8, 2018 at 23:21 GMT            				  				  
+		    DESCRIPTION 
+				"V1.39, modify the value of hwWlanApRunState and  hwWlanIDIndexedApRunState."
+			REVISION "201803051552Z"		-- Mar 5, 2018 at 15:52 GMT            
+		    DESCRIPTION 
+				"V1.38, add hwWlanIDIndexedApDomainName."
+			REVISION "201802012052Z"		-- Feb 01, 2018 at 20:52 GMT 
+			DESCRIPTION 
+				"V1.37, add hwApPowerInsufficientResumeTrap,hwApPowerInsufficientTrap,hwApPowerWorkMode,hwApExpectPowerWorkMode    ."
+			REVISION "201712262052Z"		-- Dec 26, 2017 at 20:52 GMT 
+                                                     DESCRIPTION 
+				"V1.36, add hwWlanIDIndexedApSiteCode."
+			REVISION "201712181100Z"		-- Dec 18, 2017 at 11:00 GMT 
+
+                                                         DESCRIPTION 
+				"V1.35, add hwWlanCableSnrNormalTrap, hwWlanCableSnrAbnormalTrap, hwWlanCableSnrDetectNotSupportTrap and hwWlanApTypeExternalAntenna node."
+			REVISION "201712071230Z"		-- Dec 07, 2017 at 12:30 GMT 
+			DESCRIPTION 
+				"V1.34, add hwWlanApTotalOnlineTime, hwWlanApDiscoverTime,hwWlanAPPoeWorkmode,hwWlanAPPoeExpectedWorkmode,hwWlanIDIndexedApChannelLoadMode, hwWlanIDIndexedAPPoeWorkmode,hwWlanIDIndexedAPPoeExpectedWorkmode,hwWlanIDIndexedApTotalOnlineTime,hwWlanIDIndexedApDiscoverTime node."
+			REVISION "201710092130Z"		-- Nov 09, 2017 at 21:30 GMT 				  
+			DESCRIPTION 
+				"V1.33, add xge."
+			REVISION "201708172130Z"		-- Aug 17, 2017 at 21:30 GMT 
+			DESCRIPTION 
+				"V1.32, add UUID, AP offline and online fail nodes and BLE trap node."
+			REVISION "201703271452Z"		-- Mar 27, 2017 at 14:52 GMT 
 			DESCRIPTION 
 				"V1.31, add hwApConfigInconsistWithActualTrap trap node."
 			REVISION "201611220909Z"		-- Nov 22, 2016 at 09:09 GMT 
@@ -273,7 +410,7 @@
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.17
 		hwApTemperatureTooLowTrap NOTIFICATION-TYPE
-			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId }
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId, hwWlanApTemperatureType }
 			STATUS current
 			DESCRIPTION 
 				"This object indicates that the temperature is too low."
@@ -281,7 +418,7 @@
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.18
 		hwApTemperatureTooLowRestoreTrap NOTIFICATION-TYPE
-			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId }
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId, hwWlanApTemperatureType }
 			STATUS current
 			DESCRIPTION 
 				"This object indicates that the temperature restores to the normal range."
@@ -289,7 +426,7 @@
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.19
 		hwApTemperatureTooHighTrap NOTIFICATION-TYPE
-			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId }
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId, hwWlanApTemperatureType }
 			STATUS current
 			DESCRIPTION 
 				"This object indicates that the temperature is too high."
@@ -297,7 +434,7 @@
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.20
 		hwApTemperatureTooHighRestoreTrap NOTIFICATION-TYPE
-			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId }
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApNotifyOrRestoreTemperature, hwWlanApId, hwWlanApTemperatureType }
 			STATUS current
 			DESCRIPTION 
 				"This object indicates that the temperature restores to the normal range."
@@ -540,7 +677,7 @@
 			OBJECTS { hwWlanApMac,hwWlanApName, hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates the alarm when an MP goes online through an Ethernet interface."
 			::= { hwWlanApTrap 49 }
 
 		
@@ -549,7 +686,7 @@
 			OBJECTS { hwWlanApMac,hwWlanApName, hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates the alarm when an MP that went online through an Ethernet interface goes online through an air interface."
 			::= { hwWlanApTrap 50 }
 
 		
@@ -558,7 +695,7 @@
 			OBJECTS { hwWlanApMac,hwWlanApName, hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates the alarm when an MPP changes to an MP and goes online through an air interface."
 			::= { hwWlanApTrap 51 }
 
 		
@@ -567,7 +704,7 @@
 			OBJECTS { hwWlanApMac,hwWlanApName, hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates the alarm when an MPP that went online through an air interface goes online through an Ethernet interface."
 			::= { hwWlanApTrap 52 }
                 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.53
@@ -576,7 +713,7 @@
 				hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates an alarm for high transmit power of the AP's optical module."
 			::= { hwWlanApTrap 53 }
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.54
@@ -585,7 +722,7 @@
 				hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates a clear alarm for transmit power recovery of the AP's optical module."
 			::= { hwWlanApTrap 54 }
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.55
@@ -594,7 +731,7 @@
 				hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates an alarm for low transmit power of the AP's optical module."
 			::= { hwWlanApTrap 55 }
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.56
@@ -603,7 +740,7 @@
 				hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates a clear alarm for transmit power recovery of the AP's optical module."
 			::= { hwWlanApTrap 56 }
 
 		--1.3.6.1.4.1.2011.6.139.13.1.1.57
@@ -766,7 +903,7 @@
 
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.1.74
-                                   hwApVapStaFullTrap NOTIFICATION-TYPE
+                hwApVapStaFullTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApRadioID, hwWlanApWlanID, hwWlanStaAuthFailCause, 
 				hwWlanApPermitStaNum, hwWlanApId }
 			STATUS current
@@ -774,7 +911,7 @@
 				"This object indicates that new STAs cannot associate with an VAP."
 			::= { hwWlanApTrap 74 }
 
-                                   -- 1.3.6.1.4.1.2011.6.139.13.1.1.75
+                -- 1.3.6.1.4.1.2011.6.139.13.1.1.75
 		hwVapStaFullRecoverTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApRadioID, hwWlanApWlanID, hwWlanStaAuthFailCause, 
 				hwWlanApPermitStaNum, hwWlanApId }
@@ -783,12 +920,12 @@
 				"This object indicates that new STAs can associate with an VAP."
 			::= { hwWlanApTrap 75 }
 
-                                   -- 1.3.6.1.4.1.2011.6.139.13.1.1.76
+                -- 1.3.6.1.4.1.2011.6.139.13.1.1.76
 		hwWlanBLELowPowerTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanBLEMacAddr }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that the battery power of a BLE device is lower than the specified low power alarm threshold."
 			::= { hwWlanApTrap 76 }
 
 		
@@ -797,7 +934,7 @@
 			OBJECTS { hwWlanBLEMacAddr }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that the low power alarm of a BLE device has been cleared."
 			::= { hwWlanApTrap 77 }
 
 		
@@ -806,7 +943,7 @@
 			OBJECTS { hwWlanBLEMacAddr }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that a BLE device gets offline."
 			::= { hwWlanApTrap 78 }
 
 		
@@ -815,7 +952,7 @@
 			OBJECTS { hwWlanBLEMacAddr }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that an offline alarm of a BLE device has been cleared."
 			::= { hwWlanApTrap 79 }
 
 		
@@ -824,7 +961,7 @@
 			OBJECTS { hwWlanApMac,hwWlanApName,hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that an AP's built-in Bluetooth module is faulty."
 			::= { hwWlanApTrap 80 }
 
 		
@@ -833,23 +970,23 @@
 			OBJECTS { hwWlanApMac,hwWlanApName,hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that the fault on an AP's built-in Bluetooth module fault alarm is cleared."
 			::= { hwWlanApTrap 81 }
 
 		-- 1.3.6.1.4.1.2011.6.139.13.1.1.82
 		hwAPIoTCardInsertTrap NOTIFICATION-TYPE
-			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIotCardId, hwWlanApId }
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIotCardId, hwWlanApId, hwWlanApIotCardType }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that an IoT card is inserted."
 			::= { hwWlanApTrap 82 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.1.83
 		hwAPIoTCardRemoveTrap NOTIFICATION-TYPE
-			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIotCardId, hwWlanApId }
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIotCardId, hwWlanApId, hwWlanApIotCardType }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that an IoT card is removed."
 			::= { hwWlanApTrap 83 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.1.84
@@ -858,7 +995,7 @@
 				 }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that the server module on an AP for receiving data from the IoT card fails to start."
 			::= { hwWlanApTrap 84 }
 
 		-- 1.3.6.1.4.1.2011.6.139.13.1.1.85
@@ -867,7 +1004,7 @@
 				 }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that the server used by the IoT card is successfully recovered."
 			::= { hwWlanApTrap 85 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.1.86
@@ -876,7 +1013,7 @@
 				hwExpectVersion, hwWlanApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates the mismatch alarm for the sub-firmware version on the AP."
 			::= { hwWlanApTrap 86 }
 			
 		--  1.3.6.1.4.1.2011.6.139.13.1.1.87
@@ -896,8 +1033,390 @@
 			DESCRIPTION 
 				"This alarm is generated when a the AP config is inconsistent with the actual attribute."
 			::= { hwWlanApTrap 88 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.89
+		hwWlanBLEDetachedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanBLEMacAddr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates an alarm showing that a Bluetooth tag is detached."
+			::= { hwWlanApTrap 89 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.90
+		hwWlanBLEDetachedRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanBLEMacAddr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates an alarm showing that a Bluetooth tag is re-attached."
+			::= { hwWlanApTrap 90 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.91
+		hwWlanCableSnrNormalTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwApEntityPhysicalName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP's current network cable quality is good."
+			::= { hwWlanApTrap 91 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.92
+		hwWlanCableSnrAbnormalTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwApEntityPhysicalName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP's current network cable quality is poor, causing packet loss risks."
+			::= { hwWlanApTrap 92 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.93
+		hwWlanCableSnrDetectNotSupportTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwApEntityPhysicalName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP's port is Down, resulting in a failure to detect the network cable quality."
+			::= { hwWlanApTrap 93 }
 			
-        -- 1.3.6.1.4.1.2011.6.139.13.1.2
+		hwApPowerInsufficientTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwApPowerWorkMode, hwApExpectPowerWorkMode, hwWlanApId, hwWlanApPowerInsufficientImpact }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP power supply is insufficient."
+			::= { hwWlanApTrap 94 }
+			
+		hwApPowerInsufficientResumeTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwApPowerWorkMode, hwApExpectPowerWorkMode, hwWlanApId, hwWlanApPowerInsufficientImpact }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP power supply insufficient resume."
+			::= { hwWlanApTrap 95 }
+			
+		hwPortVlanSecureMacTrap NOTIFICATION-TYPE
+				OBJECTS { hwWlanApMac, hwWlanApName, hwWlanIllegalMac, hwApVlanId, hwWlanApIfName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP's port receive illegal MAC."
+			::= { hwWlanApTrap 96 }
+		
+		hwApMcBcPktNumExceedTrap NOTIFICATION-TYPE
+				OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP broadcast and multicast packets over threshold."
+			::= { hwWlanApTrap 97 }
+			
+		hwApMcBcPktNumExceedRestoreTrap NOTIFICATION-TYPE
+				OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP broadcast and multicast packets over threshold restore."
+			::= { hwWlanApTrap 98 }
+
+		--1.3.6.1.4.1.2011.6.139.13.1.1.99
+		hwApTypeMismatchTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApActualType, hwWlanApConfigType, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the AP version and the AC version do not match."
+			::= { hwWlanApTrap 99 }
+        
+                --1.3.6.1.4.1.2011.6.139.13.1.1.100
+		hwApSoftGreDownTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApIpv6Address, hwWlanApName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the softgre tunnel down."
+			::= { hwWlanApTrap 100 }
+		
+        hwApSoftGreDownTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApIpv6Address, hwWlanApName, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the softgre tunnel up."
+			::= { hwWlanApTrap 101 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.102
+		hwApVersionNotRecommendedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApActualType }
+			STATUS current
+			DESCRIPTION 
+				"The AP version is not recommended for the current AC."
+			::= { hwWlanApTrap 102 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.103
+		hwApVersionNotRecommendedTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanApActualType }
+			STATUS current
+			DESCRIPTION 
+				"AP-version-not-recommended alarm restore"
+			::= { hwWlanApTrap 103 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.104
+		hwApDiskOverloadTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwAPDiskThresholdWarning, hwAPDiskThresholdCurrent, hwWlanApId
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The Disk usage of an AP exceeds the upper threshold."
+			::= { hwWlanApTrap 104 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.105
+		hwApDiskOverloadRestoreTrap  NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwAPDiskThresholdWarning, hwAPDiskThresholdCurrent, hwWlanApId
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The Disk usage of an AP restores to the allowed range."
+			::= { hwWlanApTrap 105 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.106            
+		hwApPowerLimitedTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwApPowerWorkMode, hwApExpectPowerWorkMode, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP works in Limited mode due to insufficient power supply."
+			::= { hwWlanApTrap 106 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.107            
+		hwApPowerLimitedResumeTrap NOTIFICATION-TYPE
+		        OBJECTS { hwWlanApMac, hwWlanApName, hwApPowerWorkMode, hwApExpectPowerWorkMode, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP resumes from the Limited mode."
+			::= { hwWlanApTrap 107 }            
+            
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.108
+		hwAPIPConflictTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwAPConflictIPAddress }
+			STATUS current
+			DESCRIPTION 
+				"The IP address of the AP conflicts with that of the gateway or another AP."
+			::= { hwWlanApTrap 108 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.109
+		hwApNumReachMaxTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the number of online APs reaches the maximum specifications."
+			::= { hwWlanApTrap 109 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.110
+		hwApNumReachMaxResumeTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the number of online APs is less than the maximum specifications."
+			::= { hwWlanApTrap 110 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.111
+		hwApNumReachWarningTrap NOTIFICATION-TYPE
+			OBJECTS { hwAPMaxNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of online APs reaches 80% of the maximum specifications."
+			::= { hwWlanApTrap 111 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.112
+		hwApNumReachWarningResumeTrap NOTIFICATION-TYPE
+			OBJECTS { hwAPMaxNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of online APs is less than 80% of the maximum specifications."
+			::= { hwWlanApTrap 112 }
+		
+				-- 1.3.6.1.4.1.2011.6.139.13.1.1.113
+		hwAPIotCardConnectServerTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwWlanApIotCardId, hwWlanApIotCardType }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when an IOT card of the AP is connected to the server."
+			::= { hwWlanApTrap 113 }
+		
+				-- 1.3.6.1.4.1.2011.6.139.13.1.1.114
+		hwAPIotCardDisconnectServerTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwWlanApIotCardId, hwWlanApIotCardType }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when an IOT card of the AP is disconnected from the server."
+			::= { hwWlanApTrap 114 }
+		
+				-- 1.3.6.1.4.1.2011.6.139.13.1.1.115
+		hwAPIotCardTypeMatchTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwWlanApIotCardId, hwWlanApIotCardType }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when an IOT card of the AP is match with configuration."
+			::= { hwWlanApTrap 115 }
+		
+				-- 1.3.6.1.4.1.2011.6.139.13.1.1.116
+		hwAPIotCardTypeMismatchTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwWlanApIotCardId, hwWlanApIotCardType }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when an IOT card of the AP is mismatch with configuration."
+			::= { hwWlanApTrap 116 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.117
+		hwAPFanRemoveTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApFanIndex }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the fan of the AP is removed."
+			::= { hwWlanApTrap 117 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.118
+		hwAPFanInsertTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApFanIndex }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the fan of the AP is inserted."
+			::= { hwWlanApTrap 118 }
+	
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.119
+		hwAPPowerRemoveTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApPowerId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the power of the AP is removed."
+			::= { hwWlanApTrap 119 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.120
+		hwAPPowerInsertTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApPowerId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the power of the AP is inserted."
+			::= { hwWlanApTrap 120 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.121
+		hwAPPowerFailTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApPowerId, hwApPowerFaultId, hwApPowerFaultReason }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the power of the AP is faulty."
+			::= { hwWlanApTrap 121 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.122
+		hwAPPowerFailResumeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApPowerId, hwApPowerFaultId, hwApPowerFaultReason }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the power of the AP resume from failure."
+			::= { hwWlanApTrap 122 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.123
+		hwAPPowerInvalidTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApPowerId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP power is invalid for some reason."
+			::= { hwWlanApTrap 123 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.124
+		hwAPPowerInvalidResumeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApId, hwApPowerId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when the AP power resume from invalid situation."
+			::= { hwWlanApTrap 124 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.125
+		hwApExistNeedReconnectTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when some APs need to be reconnected."
+			::= { hwWlanApTrap 125 }
+		-- 1.3.6.1.4.1.2011.6.139.13.1.1.126
+		hwApExistNeedReconnectResumeTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when no AP needs to be reconnected."
+			::= { hwWlanApTrap 126 }
+		--1.3.6.1.4.1.2011.6.139.13.1.1.127
+		hwApOpticalVoltageTooHighTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalVoltage, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Voltage of an AP's optical module is too High."
+			::= { hwWlanApTrap 127 }
+
+		--1.3.6.1.4.1.2011.6.139.13.1.1.128
+		hwApOpticalVoltageTooHighRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalVoltage, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Voltage of an AP's optical module restores to the normal range."
+			::= { hwWlanApTrap 128 }
+		--1.3.6.1.4.1.2011.6.139.13.1.1.129
+		hwApOpticalVoltageTooLowTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalVoltage, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Voltage of an AP's optical module is too low."
+			::= { hwWlanApTrap 129 }
+
+		--1.3.6.1.4.1.2011.6.139.13.1.1.130
+		hwApOpticalVoltageTooLowRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalVoltage, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Voltage of an AP's optical module restores to the normal range."
+			::= { hwWlanApTrap 130 }
+		--1.3.6.1.4.1.2011.6.139.13.1.1.131
+		hwApOpticalCurrentTooHighTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalCurrent, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Current of an AP's optical module is too high."
+			::= { hwWlanApTrap 131 }
+
+		--1.3.6.1.4.1.2011.6.139.13.1.1.132
+		hwApOpticalCurrentTooHighRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalCurrent, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Current of an AP's optical module restores to the normal range."
+			::= { hwWlanApTrap 132 }
+		--1.3.6.1.4.1.2011.6.139.13.1.1.133
+		hwApOpticalCurrentTooLowTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalCurrent, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that Current of an AP's optical module is too low."
+			::= { hwWlanApTrap 133 }
+
+		--1.3.6.1.4.1.2011.6.139.13.1.1.134
+		hwApOpticalCurrentTooLowRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwWlanApOpticalCurrent, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Current of an AP's optical module restores to the normal range."
+			::= { hwWlanApTrap 134 }
+			
+		--1.3.6.1.4.1.2011.6.139.13.1.1.135
+		hwApLoopbackDetectTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the wired port detected a loop and blocked itself."
+			::= { hwWlanApTrap 135 }
+		
+		--1.3.6.1.4.1.2011.6.139.13.1.1.136
+		hwApLoopbackDetectRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApIfIndex, hwApEntityPhysicalName, 
+				hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the blocked port has recovered."
+			::= { hwWlanApTrap 136 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2
 		hwWlanApTrapObjects OBJECT IDENTIFIER ::= { hwWlanApTrapInfo 2 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.1
@@ -906,7 +1425,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP type."
 			::= { hwWlanApTrapObjects 1 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.2
@@ -915,7 +1434,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP CPU usage."
 			::= { hwWlanApTrapObjects 2 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.3
@@ -924,7 +1443,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP memory usage."
 			::= { hwWlanApTrapObjects 3 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.4
@@ -933,7 +1452,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The number of STAs allowed to associate with an AP."
 			::= { hwWlanApTrapObjects 4 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.5
@@ -942,7 +1461,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The cause of the STA authentication failure."
 			::= { hwWlanApTrapObjects 5 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.6
@@ -951,7 +1470,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The active/standby switchover type."
 			::= { hwWlanApTrapObjects 6 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.7
@@ -960,7 +1479,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Receive power of an AP's optical module."
 			::= { hwWlanApTrapObjects 7 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.8
@@ -969,7 +1488,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The temperature of an AP's optical module."
 			::= { hwWlanApTrapObjects 8 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.9
@@ -978,7 +1497,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Country code."
 			::= { hwWlanApTrapObjects 9 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.10
@@ -1032,7 +1551,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Radio ID used to report alarms."
 			::= { hwWlanApTrapObjects 15 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.16
@@ -1041,7 +1560,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP temperature."
 			::= { hwWlanApTrapObjects 16 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.17
@@ -1050,7 +1569,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Occurrence time."
 			::= { hwWlanApTrapObjects 17 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.18
@@ -1059,7 +1578,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP restart alarm name."
 			::= { hwWlanApTrapObjects 18 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.19
@@ -1068,7 +1587,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The number of AP failures."
 			::= { hwWlanApTrapObjects 19 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.20
@@ -1077,7 +1596,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"This object indicates that unauthorized AP alarms exist."
 			::= { hwWlanApTrapObjects 20 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.21
@@ -1104,7 +1623,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"WLAN ID used to report alarms."
 			::= { hwWlanApTrapObjects 23 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.24
@@ -1113,7 +1632,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"License information of APs."
 			::= { hwWlanApTrapObjects 24 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.25
@@ -1122,7 +1641,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"CRC port type."
 			::= { hwWlanApTrapObjects 25 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.26
@@ -1131,7 +1650,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"CRC port number."
 			::= { hwWlanApTrapObjects 26 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.27
@@ -1140,7 +1659,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The number of packets discarded due to ARP attacks."
 			::= { hwWlanApTrapObjects 27 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.28
@@ -1158,7 +1677,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP interface index."
 			::= { hwWlanApTrapObjects 29 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.30
@@ -1167,7 +1686,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP fault description."
 			::= { hwWlanApTrapObjects 30 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.31
@@ -1176,7 +1695,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"AP software version."
 			::= { hwWlanApTrapObjects 31 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.32
@@ -1185,7 +1704,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Remote capture result."
 			::= { hwWlanApTrapObjects 32 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.33
@@ -1194,7 +1713,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Radio ID."
 			::= { hwWlanApTrapObjects 33 }
 			
 		 --1.3.6.1.4.1.2011.6.139.13.1.2.34	
@@ -1203,7 +1722,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The high AP CPU usage."
 			::= { hwWlanApTrapObjects 34 }
 			
                  --1.3.6.1.4.1.2011.6.139.13.1.2.35
@@ -1212,10 +1731,10 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"Transmit power of the AP's optical module."
 			::= { hwWlanApTrapObjects 35 }
 			
-	-- 1.3.6.1.4.1.2011.6.139.13.1.2.36
+	        -- 1.3.6.1.4.1.2011.6.139.13.1.2.36
 		hwWlanSlotNum OBJECT-TYPE
 			SYNTAX OCTET STRING
 			MAX-ACCESS read-only
@@ -1317,7 +1836,7 @@
 
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.46
-                                   hwWlanApWlanID OBJECT-TYPE
+                hwWlanApWlanID OBJECT-TYPE
 			SYNTAX MacAddress
 			MAX-ACCESS read-only
 			STATUS current
@@ -1325,13 +1844,13 @@
 				"This object identifies the Wlan Id of the Vap that has the max number of stations."
 			::= { hwWlanApTrapObjects 46 }
 
-                                   -- 1.3.6.1.4.1.2011.6.139.13.1.2.47
+                -- 1.3.6.1.4.1.2011.6.139.13.1.2.47
 		hwWlanBLEMacAddr OBJECT-TYPE
 			SYNTAX MacAddress
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"MAC address of a BLE device."
 			::= { hwWlanApTrapObjects 47 }
 
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.48
@@ -1340,7 +1859,7 @@
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"UDP port number."
 			::= { hwWlanApTrapObjects 48 }
 
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.49
@@ -1349,7 +1868,7 @@
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"AP's sub-firmware name."
 			::= { hwWlanApTrapObjects 49 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.50
@@ -1358,7 +1877,7 @@
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"AP's sub-firmware number."
 			::= { hwWlanApTrapObjects 50 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.51
@@ -1367,7 +1886,7 @@
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Actual version of the AP's sub-firmware."
 			::= { hwWlanApTrapObjects 51 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.52
@@ -1376,7 +1895,7 @@
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Expected version of the AP's sub-firmware."
 			::= { hwWlanApTrapObjects 52 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.53
@@ -1385,7 +1904,7 @@
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Number of the slot on an AP where an IoT card is installed."
 			::= { hwWlanApTrapObjects 53 }
 			
 		-- 1.3.6.1.4.1.2011.6.139.13.1.2.54
@@ -1432,7 +1951,169 @@
 			DESCRIPTION
 				"This object identifies the reason of inconsistent config."
 			::= { hwWlanApTrapObjects 58 }
-								
+			
+		hwApPowerWorkMode OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..10))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the current power work mode of AP."
+			::= { hwWlanApTrapObjects 59 }
+			
+		hwApExpectPowerWorkMode OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..10))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the expect power work mode of AP."
+			::= { hwWlanApTrapObjects 60 }
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.61
+		hwWlanIllegalMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the illegal mac."
+			::= { hwWlanApTrapObjects 61 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.62
+		hwApVlanId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the vlan id."
+			::= { hwWlanApTrapObjects 62 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.63
+		hwWlanApIfName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the IfName."
+			::= { hwWlanApTrapObjects 63 }
+
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.64
+		hwWlanApConfigType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the type of ap config."
+			::= { hwWlanApTrapObjects 64 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.65
+		hwAPDiskThresholdWarning OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The Disk usage threshold of an AP."
+			::= { hwWlanApTrapObjects 65 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.66
+		hwAPDiskThresholdCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The current Disk usage of an AP."
+			::= { hwWlanApTrapObjects 66 }
+			       
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.67
+		hwAPConflictIPAddress OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The IP address of the ap conflicts with that of the gateway or another AP."
+			::= { hwWlanApTrapObjects 67 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.68
+		hwAPMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximum specifications of APs."
+			::= { hwWlanApTrapObjects 68 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.69
+		hwWlanApIotCardType OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card type."
+			::= { hwWlanApTrapObjects 69 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.70
+		hwApPowerId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the power ID of the AP."
+			::= { hwWlanApTrapObjects 70 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.71
+		hwApPowerFaultId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP power fault ID."
+			::= { hwWlanApTrapObjects 71 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.72		
+		hwApPowerFaultReason OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..256))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP power fault reason."
+			::= { hwWlanApTrapObjects 72 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.73
+		hwWlanApTemperatureType OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP temperature type."
+			::= { hwWlanApTrapObjects 73 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.74
+		hwWlanApOpticalVoltage OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Voltage of an AP's optical module."
+			::= { hwWlanApTrapObjects 74 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.75
+		hwWlanApOpticalCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Current of an AP's optical module."
+			::= { hwWlanApTrapObjects 75 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.1.2.76
+		hwWlanApPowerInsufficientImpact OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the impact of AP power insufficient."
+			::= { hwWlanApTrapObjects 76 }
+			
 		--1.3.6.1.4.1.2011.6.139.13.2
 		hwWlanApTypeObjects OBJECT IDENTIFIER ::= { hwWlanAp 2 }
 
@@ -1469,13 +2150,23 @@
 				hwWlanApTypeMaxStaNum
 					Integer32,
 				hwWlanApTypeReset
-					Integer32 
+					Integer32,
+				hwWlanApTypeExternalAntenna
+					INTEGER,
+				hwWlanApTypeID
+					Integer32,
+				hwWlanApTypeOperate
+					INTEGER,
+				hwWlanApTypeConfigurationMethod
+					OCTET STRING,
+				hwWlanApTypeAutoCreateMethod
+					INTEGER
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.2.1.1.1
 		hwWlanApType OBJECT-TYPE
 			SYNTAX OCTET STRING
-			MAX-ACCESS accessible-for-notify
+			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION 
 				"This object indicates the AP type name. It is the index of the table."
@@ -1525,8 +2216,70 @@
 			DESCRIPTION 
 				"This object indicates that APs are restarted based on the AP type."
 			::= { hwWlanApTypeEntry 6 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.1.1.7
+		hwWlanApTypeExternalAntenna OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				notSupport(1),
+				support(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attribute of support external antenna on an AP of a certain type."
+			::= { hwWlanApTypeEntry 7 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.1.1.8
+		hwWlanApTypeID OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"AP type ID."
+			::= { hwWlanApTypeEntry 8 }
 
-		--1.3.6.1.4.1.2011.6.139.13.2.2
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.1.1.9
+		hwWlanApTypeOperate OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				add(1),
+				delete(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the row status."
+			::= { hwWlanApTypeEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.1.1.10
+		hwWlanApTypeConfigurationMethod OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"AP type configuration method."
+			::= { hwWlanApTypeEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.1.1.11
+		hwWlanApTypeAutoCreateMethod OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				createbyid(1),
+				createbytype(2),
+				createall(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Automatic AP type generation method."
+			::= { hwWlanApTypeEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.2
 		hwWlanApTypeRadioTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApTypeRadioEntry 
 			MAX-ACCESS not-accessible
@@ -1580,8 +2333,11 @@
 				wlan80211an(5) ,
 				wlan80211bgn(6),
 				wlan80211abgn(7),
-                                wlan80211ac(8),
-                                wlan80211anac(9)
+                wlan80211ac(8),
+		        wlan80211anac(9),
+		        wlan80211bgnax(10),
+		        wlan80211anacax(11),
+		        wlan80211ax(12)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -1614,7 +2370,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the maximum number of VAPs that a radio supports."
 			::= { hwWlanApTypeRadioEntry 5 }
 		--1.3.6.1.4.1.2011.6.139.13.2.3
 		hwWlanApTypeWiredPortTable OBJECT-TYPE
@@ -1667,7 +2423,8 @@
 				epon(4),
 				adsl2plus(5),
 				ethTrunk(6),
-				multige(7)
+				multige(7),
+				xge(8)			
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -1684,6 +2441,172 @@
 				"This object indicates the name of a wired interface on APs of a certain type, for example, ethernet 0, ethernet 1, gigabit-ethernet 0, and eth-trunk 0."
 			::= { hwWlanApTypeWiredPortEntry 3 }
 
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4
+		hwWlanApTypeUndefinedTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApTypeUndefinedEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to operate the undefined AP type record reported by an AP."
+			::= { hwWlanApTypeObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4.1
+		hwWlanApTypeUndefinedEntry OBJECT-TYPE
+			SYNTAX HwWlanApTypeUndefinedEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table is hwWlanApTypeUndefined."
+			INDEX { hwWlanApTypeUndefined }
+			::= { hwWlanApTypeUndefinedTable 1 }
+
+		
+		HwWlanApTypeUndefinedEntry ::=
+			SEQUENCE { 
+				hwWlanApTypeUndefined
+					OCTET STRING,
+				hwWlanApTypeIDUndefined
+					Integer32,
+				hwWlanApTypeUndefinedReportApMac
+					MacAddress,
+				hwWlanApTypeUndefinedReportTime
+					OCTET STRING,
+				hwWlanApTypeUndefinedOperate
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4.1.1
+		hwWlanApTypeUndefined OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Name of an undefined AP type."
+			::= { hwWlanApTypeUndefinedEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4.1.2
+		hwWlanApTypeIDUndefined OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ID of an undefined AP type."
+			::= { hwWlanApTypeUndefinedEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4.1.3
+		hwWlanApTypeUndefinedReportApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"MAC address of the AP that reports an undefined AP type."
+			::= { hwWlanApTypeUndefinedEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4.1.4
+		hwWlanApTypeUndefinedReportTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Time when an undefined AP type is reported."
+			::= { hwWlanApTypeUndefinedEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.4.1.5
+		hwWlanApTypeUndefinedOperate OBJECT-TYPE
+			SYNTAX INTEGER { delete(1) }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the row status.."
+			::= { hwWlanApTypeUndefinedEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.5
+		hwWlanApTypeAttributesAbnormalCheckTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApTypeAttributesAbnormalCheckEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to query exceptions in verifying type attributes reported by an AP."
+			::= { hwWlanApTypeObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.5.1
+		hwWlanApTypeAttributesAbnormalCheckEntry OBJECT-TYPE
+			SYNTAX HwWlanApTypeAttributesAbnormalCheckEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table is hwWlanApTypeAttributesAbnormalCheck."
+			INDEX { hwWlanApTypeAttributesAbnormalCheck }
+			::= { hwWlanApTypeAttributesAbnormalCheckTable 1 }
+
+		
+		HwWlanApTypeAttributesAbnormalCheckEntry ::=
+			SEQUENCE { 
+				hwWlanApTypeAttributesAbnormalCheck
+					OCTET STRING,
+				hwWlanApTypeIDAttributesAbnormalCheck
+					Integer32,
+				hwWlanApTypeAttributesAbnormalCheckResult
+					INTEGER,
+				hwWlanApTypeAttributesAbnormalCheckReason
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.2.5.1.1
+		hwWlanApTypeAttributesAbnormalCheck OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of an AP type whose attributes fail to be verified."
+			::= { hwWlanApTypeAttributesAbnormalCheckEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.5.1.2
+		hwWlanApTypeIDAttributesAbnormalCheck OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ID of an AP type whose attributes fail to be verified."
+			::= { hwWlanApTypeAttributesAbnormalCheckEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.5.1.3
+		hwWlanApTypeAttributesAbnormalCheckResult OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				risk(1),
+				fail(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Abnormal check result of reporting AP type attributes."
+			::= { hwWlanApTypeAttributesAbnormalCheckEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.2.5.1.4
+		hwWlanApTypeAttributesAbnormalCheckReason OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				rangeconflict(1),
+				lostattributes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Reason for the abnormal check result of reporting AP type attributes."
+			::= { hwWlanApTypeAttributesAbnormalCheckEntry 4 }
+
+		
 		--1.3.6.1.4.1.2011.6.139.13.3
 		hwWlanApObjects OBJECT IDENTIFIER ::= { hwWlanAp 3 }
 
@@ -1838,7 +2761,9 @@
 				hwWlanUnauthedApIpAddress
 					IpAddress,
 				hwWlanUnauthedApRecordTime
-					DateAndTime 
+					DateAndTime,
+				hwWlanUnauthedAPIPv6Address
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.2.1.1
@@ -1894,6 +2819,15 @@
 			DESCRIPTION 
 				"This object indicates the time when a rogue AP is recorded."
 			::= { hwWlanUnauthedApRecordEntry 6 }
+			
+		--1.3.6.1.4.1.2011.6.139.13.3.2.1.7
+		hwWlanUnauthedAPIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IPv6 address of a rogue AP."
+			::= { hwWlanUnauthedApRecordEntry 7 }
 
 		--1.3.6.1.4.1.2011.6.139.13.3.3
 		hwWlanApTable OBJECT-TYPE
@@ -2062,7 +2996,29 @@
 				hwWlanAPLongitude
 					OCTET STRING,
 				hwWlanAPLatitude
-					OCTET STRING
+					OCTET STRING,
+				hwWlanApTotalOnlineTime
+					Unsigned32,
+				hwWlanApDiscoverTime
+					Unsigned32,
+				hwWlanAPPoeWorkmode
+					INTEGER,
+				hwWlanAPPoeExpectedWorkmode
+					INTEGER,
+				hwWlanAPStaOnlineFailStatistics
+					OCTET STRING,
+				hwWlanAPStaOfflineStatistics
+					OCTET STRING,
+				hwWlanAPPowerSupplyState
+					INTEGER,
+				hwWlanApDataLinkState
+					INTEGER,
+				hwWlanApEnvironmentTemperature
+					Integer32,
+				hwWlanApCpuTemperature
+					Integer32,
+				hwWlanApNpTemperature
+					Integer32					
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.3.1.1
@@ -2077,7 +3033,7 @@
 		 --1.3.6.1.4.1.2011.6.139.13.3.3.1.2
 		hwWlanApSn OBJECT-TYPE
 			SYNTAX OCTET STRING
-			MAX-ACCESS read-only
+			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
 				"This object indicates the sequence number (SN) of an AP."
@@ -2127,7 +3083,8 @@
 				standby(11) ,
 				verMismatch(12),
 				nameConflicted(13),
-				invalid(14)
+				invalid(14),
+				countryCodeMismatch(15)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -2402,7 +3359,7 @@
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.3.1.36
 		hwWlanApElectronicLabel OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (0..1025))
+			SYNTAX OCTET STRING (SIZE (0..3073))
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
@@ -2761,7 +3718,131 @@
 			DESCRIPTION 
 				"This object indicates the latitude of an AP."
 			::= { hwWlanApEntry 73 }
+		 --1.3.6.1.4.1.2011.6.139.13.3.3.1.74
+		hwWlanApTotalOnlineTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates total online duration of an AP."
+			::= { hwWlanApEntry 74 }
+			
+		 --1.3.6.1.4.1.2011.6.139.13.3.3.1.75
+		hwWlanApDiscoverTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates discover duration of an AP."
+			::= { hwWlanApEntry 75 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.76
+		hwWlanAPPoeWorkmode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				af(1),
+				at(2),
+				bt(3),
+				invalid(4),
+				bt60(5),
+				bt90(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the work mode of POE."
+			::= { hwWlanApEntry 76 }
 		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.77
+		hwWlanAPPoeExpectedWorkmode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				af(1),
+				at(2),
+				bt(3),
+				invalid(4),
+				bt60(5),
+				bt90(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the expected work mode of POE."
+			::= { hwWlanApEntry 77 }
+		
+		hwWlanAPStaOnlineFailStatistics OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..1500))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Statistics of station online fail."
+			::= { hwWlanApEntry 78 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.79
+		hwWlanAPStaOfflineStatistics OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..1500))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Statistics of station offline fail."
+			::= { hwWlanApEntry 79 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.80
+		hwWlanAPPowerSupplyState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				full(1),
+				disabled(2),
+				limited(3),
+                invalid(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP power supply state. In Limited state, some functions are limited. In Disabled state, all radios are off, and some WLAN functions are unavailable."
+			::= { hwWlanApEntry 80 }			
+
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.81
+		hwWlanApDataLinkState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				down(1),
+				run(2),
+				noneed(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the state of an AP data link."
+			::= { hwWlanApEntry 81 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.82
+		hwWlanApEnvironmentTemperature OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ambient temperature."
+			::= { hwWlanApEntry 82 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.83
+		hwWlanApCpuTemperature OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the CPU temperature."
+			::= { hwWlanApEntry 83 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.3.1.84
+		hwWlanApNpTemperature OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the NP chip temperature."
+			::= { hwWlanApEntry 84 }
+	
 		-- 1.3.6.1.4.1.2011.6.139.13.3.4
 		hwWlanApWiredPortTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApWiredPortEntry 
@@ -2803,7 +3884,13 @@
 				hwWlanApWiredPortApId
 					Unsigned32,
 				hwWlanApWiredPortApName
-					OCTET STRING
+					OCTET STRING,
+				hwWlanApWiredPortTrunkID
+					Unsigned32,
+				hwWlanApWiredPortTrunkActiveFlag
+					INTEGER,
+				hwWlanApWiredPortDot1xAuthState
+					INTEGER
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.4.1.1
@@ -2825,7 +3912,8 @@
 				epon(4) ,
 				adsl2plus(5) ,
 				trunk(6),
-				multige(7)
+				multige(7),
+				xge(8)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -2848,6 +3936,9 @@
 				{
 				down(1) ,
 				up(2) ,
+				adminshutdown(3) ,
+				stpshutdown(4) ,
+				block(5) ,
 				unknown(-1)
 				}
 			MAX-ACCESS read-only
@@ -2928,7 +4019,46 @@
 				"This object indicates the AP name."
 			::= { hwWlanApWiredPortEntry 10 }
 
-		--1.3.6.1.4.1.2011.6.139.13.3.5
+		-- 1.3.6.1.4.1.2011.6.139.13.3.4.1.11
+		hwWlanApWiredPortTrunkID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the port trunk ID."
+			::= { hwWlanApWiredPortEntry 11 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.4.1.12
+		hwWlanApWiredPortTrunkActiveFlag OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2),
+				invalid(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the port trunk active flag."
+			::= { hwWlanApWiredPortEntry 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.4.1.13
+		hwWlanApWiredPortDot1xAuthState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				init(1),
+				authenticating(2),
+				success(3),
+				fail(4),
+				invalid(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the dot1x auth state."
+			::= { hwWlanApWiredPortEntry 13 }
+					
+		-- 1.3.6.1.4.1.2011.6.139.13.3.5
 		hwWlanApWiredPortStatTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApWiredPortStatEntry 
 			MAX-ACCESS not-accessible
@@ -3151,7 +4281,7 @@
 				hwWlanApWiredPortLldpRemSysCapEnabled
 					Integer32,
 				hwWlanApWiredPortLldpRemLocalApId
-					Unsigned32
+					Integer32
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.6.1.1
@@ -3255,11 +4385,11 @@
 
 		-- 1.3.6.1.4.1.2011.6.139.13.3.6.1.12
 		hwWlanApWiredPortLldpRemLocalApId OBJECT-TYPE
-			SYNTAX Unsigned32
+			SYNTAX Integer32
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the AP ID."
 			::= { hwWlanApWiredPortLldpEntry 12 }
 
 		
@@ -3371,7 +4501,9 @@
 				hwWlanApOnlineFailReason
 					OCTET STRING,
 				hwWlanApOnlineFailRowStatus
-					RowStatus 
+					RowStatus,
+				hwWlanApOnlineFailInfo
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.8.1.1
@@ -3409,8 +4541,17 @@
 			DESCRIPTION 
 				"This object indicates that online failure records of STAs are deleted based on MAC addresses."
 			::= { hwWlanApOnlineFailEntry 4 }
-
-		--1.3.6.1.4.1.2011.6.139.13.3.9
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.8.1.5
+		hwWlanApOnlineFailInfo OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates information about the last three online failures of an AP, including the failure time and reasons."
+			::= { hwWlanApOnlineFailEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.9
 		hwWlanApOfflineTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApOfflineEntry 
 			MAX-ACCESS not-accessible
@@ -3439,7 +4580,9 @@
 				hwWlanApOfflineReason
 					OCTET STRING,
 				hwWlanApOfflineRowStatus
-					RowStatus 
+					RowStatus,
+				hwWlanApOfflineInfo
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.13.3.9.1.1
@@ -3477,8 +4620,17 @@
 			DESCRIPTION 
 				"This object clears AP offline records."
 			::= { hwWlanApOfflineEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.9.1.5
+		hwWlanApOfflineInfo OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApOfflineEntry 5 }
 
-		 --1.3.6.1.4.1.2011.6.139.13.3.10
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10
 		hwWlanIDIndexedApTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanIDIndexedApEntry 
 			MAX-ACCESS not-accessible
@@ -3642,7 +4794,63 @@
 				hwWlanIDIndexedAPLongitude
 					OCTET STRING,
 				hwWlanIDIndexedAPLatitude
-					OCTET STRING
+					OCTET STRING,
+				hwWlanIDIndexedAPUUIDString
+					OCTET STRING,
+				hwWlanIDIndexedAPUUIDHex
+					OCTET STRING,
+				hwWlanIDIndexedApChannelLoadMode
+				        INTEGER,
+				hwWlanIDIndexedAPPoeWorkmode
+					INTEGER,
+				hwWlanIDIndexedAPPoeExpectedWorkmode
+					INTEGER,
+				hwWlanIDIndexedApTotalOnlineTime
+					Unsigned32,
+				hwWlanIDIndexedApDiscoverTime
+					Unsigned32,
+				hwWlanIDIndexedApSiteCode
+					OCTET STRING,
+				hwWlanIDIndexedApDomainName
+					OCTET STRING,				
+				hwWlanIDIndexedApBranchGroup
+					OCTET STRING,
+				hwWlanIDIndexedApNatIpAddress
+					IpAddress,
+				hwWlanIDIndexedApStaOnlineFailStatistics
+					OCTET STRING,
+				hwWlanIDIndexedApStaOfflineStatistics
+					OCTET STRING,
+				hwWlanIDIndexedAPPowerSupplyState
+					INTEGER,
+				hwWlanIDIndexedApMajorString
+					OCTET STRING,
+				hwWlanIDIndexedApMajorHex
+					OCTET STRING,
+				hwWlanIDIndexedApMajorDecimal
+					Integer32,
+				hwWlanIDIndexedApMinorString
+					OCTET STRING,
+				hwWlanIDIndexedApMinorHex
+					OCTET STRING,
+				hwWlanIDIndexedApMinorDecimal
+					Integer32,
+				hwWlanIDIndexedApReferenceRSSI
+					Integer32,
+				hwWlanIDIndexedApEnvironmentTemperature
+					Integer32,
+				hwWlanIDIndexedApCpuTemperature
+					Integer32,
+				hwWlanIDIndexedApNpTemperature
+					Integer32,
+				hwWlanIDIndexedApZoneName
+					OCTET STRING,
+				hwWlanIDIndexedApDataLinkState
+					INTEGER,
+				hwWlanIDIndexedApRtuStatus
+					INTEGER,
+				hwWlanIDIndexedApRadioMode
+					INTEGER
 			 }
 		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.1
 		hwWlanIDIndexedApId OBJECT-TYPE
@@ -3715,7 +4923,8 @@
 				standby(11) ,
 				verMismatch(12),
 				nameConflicted(13),
-				invalid(14)
+				invalid(14),
+				countryCodeMismatch(15)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -3960,7 +5169,7 @@
 			::= { hwWlanIDIndexedApEntry 36 }
 		 --1.3.6.1.4.1.2011.6.139.13.3.10.1.37
 		hwWlanIDIndexedApElectronicLabel OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (0..1025))
+			SYNTAX OCTET STRING (SIZE (0..3073))
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
@@ -4272,10 +5481,423 @@
 			DESCRIPTION 
 				"This object indicates the latitude of an AP."
 			::= { hwWlanIDIndexedApEntry 73 }
-		--1.3.6.1.4.1.2011.6.139.13.4
-		hwWlanAPConformance OBJECT IDENTIFIER ::= { hwWlanAp 4 }
+		 --1.3.6.1.4.1.2011.6.139.13.3.10.1.74
+		hwWlanIDIndexedAPUUIDString OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the UUID string value of an AP."
+			::= { hwWlanIDIndexedApEntry 74 }
+		 --1.3.6.1.4.1.2011.6.139.13.3.10.1.75
+		hwWlanIDIndexedAPUUIDHex OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the UUID Hex value of an AP."
+			::= { hwWlanIDIndexedApEntry 75 }
+			
+		--1.3.6.1.4.1.2011.6.139.13.3.10.1.76
+		hwWlanIDIndexedApChannelLoadMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				indoor(1),
+				outdoor(2),
+				outToindoor(3)
+				}		
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates channel lode mode. The default value is outdoor."
+			::= { hwWlanIDIndexedApEntry 76 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.77
+		hwWlanIDIndexedAPPoeWorkmode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				af(1),
+				at(2),
+				bt(3),
+				invalid(4),
+				bt60(5),
+				bt90(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the work mode of POE."
+			::= { hwWlanIDIndexedApEntry 77 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.78
+		hwWlanIDIndexedAPPoeExpectedWorkmode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				af(1),
+				at(2),
+				bt(3),
+				invalid(4),
+				bt60(5),
+				bt90(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the expected work mode of POE."
+			::= { hwWlanIDIndexedApEntry 78 }
+			
+		 -- 1.3.6.1.4.1.2011.6.139.13.3.10.1.79
+		hwWlanIDIndexedApTotalOnlineTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates total online duration of an AP."
+			::= { hwWlanIDIndexedApEntry 79 }
+			
+		 -- 1.3.6.1.4.1.2011.6.139.13.3.10.1.80
+		hwWlanIDIndexedApDiscoverTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates discover duration of an AP."
+			::= { hwWlanIDIndexedApEntry 80 }	
 
-		--1.3.6.1.4.1.2011.6.139.13.4.1
+		 --1.3.6.1.4.1.2011.6.139.13.3.10.1.81
+		hwWlanIDIndexedApSiteCode OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..14))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Site code of an AP."
+			::= { hwWlanIDIndexedApEntry 81 }
+
+		 --1.3.6.1.4.1.2011.6.139.13.3.10.1.82
+		hwWlanIDIndexedApDomainName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..255))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Domain name of an AP."
+			::= { hwWlanIDIndexedApEntry 82 }
+	
+                 --1.3.6.1.4.1.2011.6.139.13.3.10.1.83
+		hwWlanIDIndexedApBranchGroup OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the branch group name of an AP."
+			::= { hwWlanIDIndexedApEntry 83 }			
+	
+		 --1.3.6.1.4.1.2011.6.139.13.3.10.1.84
+		hwWlanIDIndexedApNatIpAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Nat IP address of an AP."
+			::= { hwWlanIDIndexedApEntry 84 }
+			
+		hwWlanIDIndexedApStaOnlineFailStatistics OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..1500))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Statistics of station online fail."
+			::= { hwWlanIDIndexedApEntry 85 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.86
+		hwWlanIDIndexedApStaOfflineStatistics OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..1500))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Statistics of station offline fail."
+			::= { hwWlanIDIndexedApEntry 86 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.87
+		hwWlanIDIndexedAPPowerSupplyState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				full(1),
+				disabled(2),
+				limited(3),
+				invalid(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP power supply state. In Limited state, some functions are limited. In Disabled state, all radios are off, and some WLAN functions are unavailable."
+			::= { hwWlanIDIndexedApEntry 87 }	
+    
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.88
+		hwWlanIDIndexedApMajorString OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..2))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the string type value of Major field in the BLE broadcast frame of an AP."
+			::= { hwWlanIDIndexedApEntry 88 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.89
+		hwWlanIDIndexedApMajorHex OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..4))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the hex type value of Major field in the BLE broadcast frame of an AP."
+			::= { hwWlanIDIndexedApEntry 89 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.90
+		hwWlanIDIndexedApMajorDecimal OBJECT-TYPE
+			SYNTAX Integer32 (-1 | 0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the decimal type value of Major field in the BLE broadcast frame of an AP. The default value is -1."
+			::= { hwWlanIDIndexedApEntry 90 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.91
+		hwWlanIDIndexedApMinorString OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..2))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the string type value of Minor field in the BLE broadcast frame of an AP."
+			::= { hwWlanIDIndexedApEntry 91 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.92
+		hwWlanIDIndexedApMinorHex OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..4))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the hex type value of Minor field in the BLE broadcast frame of an AP."
+			::= { hwWlanIDIndexedApEntry 92 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.93
+		hwWlanIDIndexedApMinorDecimal OBJECT-TYPE
+			SYNTAX Integer32 (-1 | 0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the decimal type value of Minor field in the BLE broadcast frame of an AP. The default value is -1."
+			::= { hwWlanIDIndexedApEntry 93 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.94
+		hwWlanIDIndexedApReferenceRSSI OBJECT-TYPE
+			SYNTAX Integer32 (-97..-50 | 0)
+			UNITS "dbm"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI value of an AP. The default value is 0."
+			::= { hwWlanIDIndexedApEntry 94 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.95
+		hwWlanIDIndexedApEnvironmentTemperature OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ambient temperature."
+			::= { hwWlanIDIndexedApEntry 95 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.96
+		hwWlanIDIndexedApCpuTemperature OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the CPU temperature."
+			::= { hwWlanIDIndexedApEntry 96 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.97
+		hwWlanIDIndexedApNpTemperature OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the NP chip temperature."
+			::= { hwWlanIDIndexedApEntry 97 }
+	
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.98
+		hwWlanIDIndexedApZoneName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..35))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP zone name."
+			::= { hwWlanIDIndexedApEntry 98 }
+	
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.99
+		hwWlanIDIndexedApDataLinkState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				down(1),
+				run(2),
+				noneed(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the state of an AP data link."
+			::= { hwWlanIDIndexedApEntry 99 }	
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.100
+		hwWlanIDIndexedApRtuStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				downloading(1),
+				active(2),
+				notActive(3),
+				invalidLicense(4),
+				flashMemoryNotEnough(5),
+				notSupport(6),
+				noLicenseOnAP(7),
+				noLicenseOnAC(8),
+				invalidStatus(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP RTU status."
+			::= { hwWlanIDIndexedApEntry 100 }
+		-- 1.3.6.1.4.1.2011.6.139.13.3.10.1.101
+		hwWlanIDIndexedApRadioMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				twoRadioStandard(1),
+				twoRadio5gEnhanced(2),
+				twoRadio2gEnhanced(3),
+				threeRadio(4),
+				twoRadioIndependentScan(5),
+				notSupport(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the actual radio switch-mode of AP."
+			::= { hwWlanIDIndexedApEntry 101 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.3.11
+		hwWlanApOnlineFailReasonTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApOnlineFailReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to get AP online fail reason counts."
+			::= { hwWlanApObjects 11 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.11.1
+		hwWlanApOnlineFailReasonEntry OBJECT-TYPE
+			SYNTAX HwWlanApOnlineFailReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to get AP online fail reason counts."
+			INDEX { hwWlanApOnlineFailReasonIndex }
+			::= { hwWlanApOnlineFailReasonTable 1 }
+		
+		HwWlanApOnlineFailReasonEntry ::=
+			SEQUENCE { 
+				hwWlanApOnlineFailReasonIndex
+					Integer32,
+				hwWlanApOnlineFailReasonDesc
+					OCTET STRING,
+				hwWlanApOnlineFailReasonCount
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.3.11.1.1
+		hwWlanApOnlineFailReasonIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP online fail reason index."
+			::= { hwWlanApOnlineFailReasonEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.11.1.2
+		hwWlanApOnlineFailReasonDesc OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP online fail reason description."
+			::= { hwWlanApOnlineFailReasonEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.11.1.3
+		hwWlanApOnlineFailReasonCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the the AP online fail reason counts."
+			::= { hwWlanApOnlineFailReasonEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.12
+		hwWlanApOfflineReasonTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApOfflineReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to get AP offline reason counts."
+			::= { hwWlanApObjects 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.12.1
+		hwWlanApOfflineReasonEntry OBJECT-TYPE
+			SYNTAX HwWlanApOfflineReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to get AP offline reason counts."
+			INDEX { hwWlanApOfflineReasonIndex }
+			::= { hwWlanApOfflineReasonTable 1 }
+		
+		HwWlanApOfflineReasonEntry ::=
+			SEQUENCE { 
+				hwWlanApOfflineReasonIndex
+					Integer32,
+				hwWlanApOfflineReasonDesc
+					OCTET STRING,
+				hwWlanApOfflineReasonCount
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.13.3.12.1.1
+		hwWlanApOfflineReasonIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP offline reason index."
+			::= { hwWlanApOfflineReasonEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.12.1.2
+		hwWlanApOfflineReasonDesc OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP offline reason description."
+			::= { hwWlanApOfflineReasonEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.3.12.1.3
+		hwWlanApOfflineReasonCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP offline reason counts."
+			::= { hwWlanApOfflineReasonEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.4
+		hwWlanAPConformance OBJECT IDENTIFIER ::= { hwWlanAp 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.13.4.1
 		hwWlanAPCompliances OBJECT IDENTIFIER ::= { hwWlanAPConformance 1 }
 
 		--1.3.6.1.4.1.2011.6.139.13.4.1.1
@@ -4305,7 +5927,7 @@
 			hwApOpticalTxPowerTooHighTrap, hwApOpticalTxPowerTooHighRestoreTrap, hwApOpticalTxPowerTooLowTrap, hwApOpticalTxPowerTooLowRestoreTrap, hwApOnLineNumExceedCardSpecTrap, hwApFanInvalidTrap, hwApFanInvalidRestoreTrap,
 			hwApStorageDevRemoveTrap, hwApStorageDevInsertTrap, hwApPoePowerOffTrap, hwApPoePowerOnTrap, hwApPoePdConnectedTrap, hwApPoePdDisconnectedTrap, hwApPoePdClassOvercurrentTrap,
 			hwApPoePdPriorityDifferentTrap, hwApPoePowerOverUtilizationThresholdTrap, hwApPoePowerOverUtilizationThresholdRestoreTrap, hwApSTPAutoShutdownTrap, hwApSTPAutoShutdownRestoreTrap, hwApOpticalInvalidTrap, hwApOpticalInvalidRestoreTrap,
-			hwWlanBLELowPowerTrap, hwWlanBLELowPowerRestoreTrap, hwWlanBLEOfflineTrap, hwWlanBLEOfflineRestoreTrap, hwWlanBLEFaultyTrap, hwWlanBLEFaultyRestoreTrap }
+			hwWlanBLELowPowerTrap, hwWlanBLELowPowerRestoreTrap, hwWlanBLEOfflineTrap, hwWlanBLEOfflineRestoreTrap, hwWlanBLEFaultyTrap, hwWlanBLEFaultyRestoreTrap,hwWlanBLEDetachedTrap,hwWlanBLEDetachedRestoreTrap,hwApTypeMismatchTrap}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -4343,7 +5965,7 @@
 			OBJECTS { hwWlanApPingApMac, hwWlanApPingAddress, hwWlanApPingCount, hwWlanApPingPacketSize, hwWlanApPingWaitTime, 
 				hwWlanApPingTimeOut, hwWlanApPingResultSuccessCount, hwWlanApPingResultFailureCount, hwWlanApPingResultAveResponseTime, hwWlanApPingResultMinResponseTime, 
 				hwWlanApPingResultMaxResponseTime, hwWlanApPingResultFlag, hwWlanUnauthedApType, hwWlanUnauthedApMacAddress, hwWlanUnauthedApSn, 
-				hwWlanUnauthedApIpAddress, hwWlanUnauthedApRecordTime, hwWlanApMac, hwWlanApSn, hwWlanApTypeInfo, 
+				hwWlanUnauthedApIpAddress, hwWlanUnauthedApRecordTime, hwWlanUnauthedAPIPv6Address, hwWlanApMac, hwWlanApSn, hwWlanApTypeInfo, 
 				hwWlanApName, hwWlanApGroup, hwWlanApRunState, hwWlanApSoftwareVersion, hwWlanApHardwareVersion, 
 				hwWlanApCpuType, hwWlanApCpufrequency, hwWlanApMemoryType, hwWlanApDomain, hwWlanApIpAddress, 
 				hwWlanApIpNetMask, hwWlanApGatewayIp, hwWlanApMemorySize, hwWlanApFlashSize, hwWlanApRunTime, 
@@ -4364,7 +5986,8 @@
 				hwWlanApWiredPortLldpRemChassisId, hwWlanApWiredPortLldpRemPortIdSubtype, hwWlanApWiredPortLldpRemPortId, hwWlanApWiredPortLldpRemPortDesc, hwWlanApWiredPortLldpRemSysName, 
 				hwWlanApWiredPortLldpRemSysDesc, hwWlanApWiredPortLldpRemSysCapSupported, hwWlanApWiredPortLldpRemSysCapEnabled, hwWlanApWiredPortLldpRemManAddrIfSubtype, hwWlanApWiredPortLldpRemManAddrIfId, 
 				hwWlanApWiredPortLldpRemManAddrOID, hwWlanApOnlineFailTime, hwWlanApOnlineFailReason, hwWlanApOnlineFailRowStatus, hwWlanApOfflineTime, 
-				hwWlanApOfflineReason, hwWlanApOfflineRowStatus }
+				hwWlanApOfflineReason, hwWlanApOfflineRowStatus,hwWlanApOnlineFailInfo,hwWlanApOfflineInfo,hwWlanIDIndexedAPUUIDString,hwWlanIDIndexedAPUUIDHex,hwWlanApOnlineFailReasonDesc,
+                                                                                     hwWlanApOnlineFailReasonCount	,hwWlanApOfflineReasonDesc,hwWlanApOfflineReasonCount}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -4375,3 +5998,36 @@
 --
 -- HUAWEI-WLAN-AP-MIB.mib
 --
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

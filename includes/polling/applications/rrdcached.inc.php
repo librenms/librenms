@@ -17,9 +17,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,6 +40,13 @@ if ($agent_data['app'][$name]) {
     $sock = fsockopen($device['hostname'], 42217, $errno, $errstr, 5);
 
     if (! $sock) {
+        d_echo("\nNo Socket to rrdcached server " . $device['hostname'] . ":42217 try to get rrdcached from SNMP\n");
+        $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.114.114.100.99.97.99.104.101.100';
+        $result = snmp_get($device, $oid, '-Oqv');
+        $data = trim($result, '"');
+        $data = str_replace("<<<rrdcached>>>\n", '', $data);
+    }
+    if (strlen($data) < 100) {
         $socket = \LibreNMS\Config::get('rrdcached');
         if (substr($socket, 0, 6) == 'unix:/') {
             $socket_file = substr($socket, 5);
@@ -47,6 +54,7 @@ if ($agent_data['app'][$name]) {
                 $sock = fsockopen('unix://' . $socket_file);
             }
         }
+        d_echo("\nNo SnmpData " . $device['hostname'] . ' fallback to local rrdcached unix://' . $socket_file . "\n");
     }
     if ($sock) {
         fwrite($sock, "STATS\n");
@@ -61,7 +69,7 @@ if ($agent_data['app'][$name]) {
             $count++;
         }
         fclose($sock);
-    } else {
+    } elseif (strlen($data) < 100) {
         d_echo("ERROR: $errno - $errstr\n");
     }
 }

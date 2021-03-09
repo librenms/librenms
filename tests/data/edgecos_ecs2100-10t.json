@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.259.10.1.43.101",
                     "sysDescr": "ECS2100-10T",
-                    "sysContact": null,
-                    "version": "R01 1.2.2.24",
-                    "hardware": "ECS2100-10T",
-                    "features": null,
-                    "os": "edgecos",
-                    "type": "network",
-                    "serial": "EC1813001458",
-                    "icon": "edge-core.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.259.10.1.43.101",
-                    "sysDescr": "ECS2100-10T",
                     "sysContact": "<private>",
                     "version": "R01 1.2.2.24",
                     "hardware": "ECS2100-10T",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

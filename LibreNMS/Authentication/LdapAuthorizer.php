@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
+use ErrorException;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
@@ -80,6 +81,12 @@ class LdapAuthorizer extends AuthorizerBase
         } catch (AuthenticationException $e) {
             if ($throw_exception) {
                 throw $e;
+            } else {
+                echo $e->getMessage() . PHP_EOL;
+            }
+        } catch (ErrorException $e) {
+            if ($throw_exception) {
+                throw new AuthenticationException('Could not verify user', false, 0, $e);
             } else {
                 echo $e->getMessage() . PHP_EOL;
             }

@@ -1,5 +1,8 @@
 mib: UBNT-AirMAX-MIB
 modules:
+    os:
+        lat: UBNT-AirMAX-MIB::ubntGpsLat.0
+        long: UBNT-AirMAX-MIB::ubntGpsLon.0
     processors:
         data:
             -

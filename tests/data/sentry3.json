@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.1718.3",
-                    "sysDescr": "Sentry Switched CDU",
-                    "sysContact": null,
-                    "version": "7.1a",
-                    "hardware": "CW-24V2C458C1",
-                    "features": null,
-                    "os": "sentry3",
-                    "type": "power",
-                    "serial": "ADLH0001862",
-                    "icon": "servertech.png",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

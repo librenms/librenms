@@ -65,4 +65,4 @@ $output = [
     'rows'     => $response,
     'total'    => count($COMPONENTS[$device_id]),
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

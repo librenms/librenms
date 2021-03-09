@@ -138,7 +138,7 @@ class ServiceConfig:
         self.redis_sentinel_service = os.getenv('REDIS_SENTINEL_SERVICE',
                                                 config.get('redis_sentinel_service',
                                                            ServiceConfig.redis_sentinel_service))
-        self.redis_timeout = os.getenv('REDIS_TIMEOUT', self.alerting.frequency if self.alerting.frequency != 0 else self.redis_timeout)
+        self.redis_timeout = int(os.getenv('REDIS_TIMEOUT', self.alerting.frequency if self.alerting.frequency != 0 else self.redis_timeout))
 
         self.db_host = os.getenv('DB_HOST', config.get('db_host', ServiceConfig.db_host))
         self.db_name = os.getenv('DB_DATABASE', config.get('db_name', ServiceConfig.db_name))

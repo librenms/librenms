@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Notification Poller
@@ -20,7 +20,7 @@
  * @author    Daniel Preussker
  * @author    Tony Murray <murraytony@gmail.com>
  * @license   GPL
- * @link      http://librenms.org
+ * @link      https://www.librenms.org
  */
 
 /**
@@ -82,7 +82,7 @@ function parse_rss($feed)
             'title'=>$item['title'],
             'body'=>$item['description'],
             'checksum'=>hash('sha512', $item['title'] . $item['description']),
-            'datetime'=>strftime('%F', strtotime($item['pubDate'])),
+            'datetime'=>strftime('%F', strtotime($item['pubDate']) ?: time()),
         ];
     }
 
@@ -105,7 +105,7 @@ function parse_atom($feed)
             'title'=>$item['title'],
             'body'=>$item['content'],
             'checksum'=>hash('sha512', $item['title'] . $item['content']),
-            'datetime'=>strftime('%F', strtotime($item['updated'])),
+            'datetime'=>strftime('%F', strtotime($item['updated']) ?: time()),
         ];
     }
 

@@ -96,7 +96,7 @@ chmod +x /usr/bin/composer
 
 ## Set timezone
 
-See <http://php.net/manual/en/timezones.php> for a list of supported
+See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 
@@ -487,7 +487,7 @@ This feature grants you the opportunity to use tab for completion on lnms comman
 for normal linux commands.
 
 ```
-ln -s /opt/librenms/lnms /usr/local/bin/lnms
+ln -s /opt/librenms/lnms /usr/bin/lnms
 cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 ```
 

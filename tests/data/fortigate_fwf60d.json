@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.626",
                     "sysDescr": "",
-                    "sysContact": null,
-                    "version": "v5.6.5,build1600,180620 (GA)",
-                    "hardware": "FWF_60D",
-                    "features": null,
-                    "os": "fortigate",
-                    "type": "firewall",
-                    "serial": "<private>",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12356.101.1.626",
-                    "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v5.6.5,build1600,180620 (GA)",
                     "hardware": "FWF_60D",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

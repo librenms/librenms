@@ -365,24 +365,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8691.7.86",
                     "sysDescr": "EDS-P510A-8PoE-2GTXSFP-T",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "moxa-etherdevice",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "moxa.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8691.7.86",
-                    "sysDescr": "EDS-P510A-8PoE-2GTXSFP-T",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -394,7 +376,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

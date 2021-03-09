@@ -88,7 +88,7 @@ systemctl restart mysql
 ## Configure and Start PHP-FPM
 
 Ensure date.timezone is set in php.ini to your preferred time zone.
-See <http://php.net/manual/en/timezones.php> for a list of supported
+See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 Please remember to set the system timezone as well.

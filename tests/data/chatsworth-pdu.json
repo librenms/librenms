@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".0.10.43.6.1.4.1",
                     "sysDescr": "Epicenter SNMP",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "chatsworth-pdu",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "chatsworth.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".0.10.43.6.1.4.1",
-                    "sysDescr": "Epicenter SNMP",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

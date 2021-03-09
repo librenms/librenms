@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.266.1.3.22",
                     "sysDescr": "DualSwitch 1000 BM+ I af Desk 2SFP SECURE/SNMP/TELNET/WEB/V3.59",
-                    "sysContact": null,
-                    "version": "SECURE/SNMP/TELNET/WEB/V3.59",
-                    "hardware": "DualSwitch 1000 BM+ I af Desk 2SFP",
-                    "features": null,
-                    "os": "nexans",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "nexans.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.266.1.3.22",
-                    "sysDescr": "DualSwitch 1000 BM+ I af Desk 2SFP SECURE/SNMP/TELNET/WEB/V3.59",
                     "sysContact": "<private>",
                     "version": "SECURE/SNMP/TELNET/WEB/V3.59",
                     "hardware": "DualSwitch 1000 BM+ I af Desk 2SFP",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

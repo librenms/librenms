@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2606.4",
                     "sysDescr": "Rittal CMC-TC/LCP-InlineEC SN 07627 HW V3.20 - SW V6.50.00",
-                    "sysContact": null,
-                    "version": "6.50.00",
-                    "hardware": "3.20",
-                    "features": null,
-                    "os": "rittal-cmc",
-                    "type": "environment",
-                    "serial": "07627",
-                    "icon": "rittal.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2606.4",
-                    "sysDescr": "Rittal CMC-TC/LCP-InlineEC SN 07627 HW V3.20 - SW V6.50.00",
                     "sysContact": "<private>",
                     "version": "6.50.00",
                     "hardware": "3.20",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

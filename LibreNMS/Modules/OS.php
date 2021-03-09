@@ -15,17 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Modules;
 
-use LibreNMS\Config;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use App\Models\Location;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\Url;
@@ -35,18 +34,18 @@ class OS implements Module
     public function discover(\LibreNMS\OS $os)
     {
         $this->updateLocation($os);
-        if ($os instanceof OSDiscovery) {
-            // null out values in case they aren't filled.
-            $os->getDevice()->fill([
-                'hardware' => null,
-                'version' => null,
-                'features' => null,
-                'serial' => null,
-                'icon' => null,
-            ]);
+        $this->sysContact($os);
 
-            $os->discoverOS($os->getDevice());
-        }
+        // null out values in case they aren't filled.
+        $os->getDevice()->fill([
+            'hardware' => null,
+            'version' => null,
+            'features' => null,
+            'serial' => null,
+            'icon' => null,
+        ]);
+
+        $os->discoverOS($os->getDevice());
         $this->handleChanges($os);
     }
 
@@ -73,8 +72,9 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
-            if (! empty($location)) {
+            if (! empty($location)) { // legacy support, remove when no longer needed
                 $deviceModel->setLocation($location);
+                optional($deviceModel->location)->save();
             }
         }
 
@@ -92,7 +92,7 @@ class OS implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans('device.attributes.location') . ": $device->location\n";
+        echo trans('device.attributes.location') . ': ' . optional($device->location)->display() . PHP_EOL;
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
@@ -100,17 +100,21 @@ class OS implements Module
         $device->save();
     }
 
-    private function updateLocation(\LibreNMS\OS $os, $altLocation = null)
+    private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
-        if ($device->override_sysLocation == 0) {
-            $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
-        }
+        $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
+        $device->setLocation($new_location, true); // set location and lookup coordinates if needed
+        optional($device->location)->save();
+    }
 
-        // make sure the location has coordinates
-        if (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
-            $device->location->lookupCoordinates();
-            $device->location->save();
+    private function sysContact(\LibreNMS\OS $os)
+    {
+        $device = $os->getDevice();
+        $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
+        $device->sysContact = str_replace(['', '"', '\n', 'not set'], null, $device->sysContact);
+        if (empty($device->sysContact)) {
+            $device->sysContact = null;
         }
     }
 }
