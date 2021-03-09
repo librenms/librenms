@@ -2,26 +2,30 @@
 
 $monitoringMib = snmpwalk_cache_multi_oid($device, 'fbMonitoringMib', [], 'FIREBRICK-MONITORING', 'firebrick');
 $params_map = [
-    'Fan Controller' => ['description' => 'Fan Controller',
-                 'crit_low' => 10,
-                 'warn_low' => 20,
-                 'warn_high' => 50,
-                 'crit_high' => 70, ],
-    'CPU' => ['description' => 'CPU',
-                 'crit_low' => 10,
-                 'warn_low' => 20,
-                 'warn_high' => 60,
-                 'crit_high' => 80, ],
-    'RTC' => ['description' => 'Real-time Clock',
-                 'crit_low' => 10,
-                 'warn_low' => 20,
-                 'warn_high' => 50,
-                 'crit_high' => 70, ],
-    'PCB' => ['description' => 'Internal Ambient',
-                 'crit_low' => 10,
-                 'warn_low' => 20,
-                 'warn_high' => 50,
-                 'crit_high' => 70, ],
+    'Fan Controller' => [
+        'description' => 'Fan Controller',
+        'crit_low' => 10,
+        'warn_low' => 20,
+        'warn_high' => 50,
+        'crit_high' => 70, ],
+    'CPU' => [
+        'description' => 'CPU',
+        'crit_low' => 10,
+        'warn_low' => 20,
+        'warn_high' => 60,
+        'crit_high' => 80, ],
+    'RTC' => [
+        'description' => 'Real-time Clock',
+        'crit_low' => 10,
+        'warn_low' => 20,
+        'warn_high' => 50,
+        'crit_high' => 70, ],
+    'PCB' => [
+        'description' => 'Internal Ambient',
+        'crit_low' => 10,
+        'warn_low' => 20,
+        'warn_high' => 50,
+        'crit_high' => 70, ],
 ];
 
 foreach ($monitoringMib as $idx => $mibEntry) {

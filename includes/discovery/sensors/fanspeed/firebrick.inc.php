@@ -2,16 +2,18 @@
 
 $monitoringMib = snmpwalk_cache_multi_oid($device, 'fbMonitoringMib', [], 'FIREBRICK-MONITORING', 'firebrick');
 $params_map = [
-    'Fan1' => ['description' => 'Fan 1',
-                 'crit_low' => 1000,
-                 'warn_low' => 2000,
-                 'warn_high' => 6000,
-                 'crit_high' => 8000, ],
-    'Fan2' => ['description' => 'Fan 2',
-                 'crit_low' => 1000,
-                 'warn_low' => 2000,
-                 'warn_high' => 6000,
-                 'crit_high' => 8000, ],
+    'Fan1' => [
+        'description' => 'Fan 1',
+        'crit_low' => 1000,
+        'warn_low' => 2000,
+        'warn_high' => 6000,
+        'crit_high' => 8000, ],
+    'Fan2' => [
+        'description' => 'Fan 2',
+        'crit_low' => 1000,
+        'warn_low' => 2000,
+        'warn_high' => 6000,
+        'crit_high' => 8000, ],
 ];
 
 foreach ($monitoringMib as $idx => $mibEntry) {
