@@ -186,10 +186,6 @@ class YamlDiscovery
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
     {
-        //create the sub-index values in order to try to match them with precache
-        foreach (explode('.', $index) as $pos => $sindex) {
-            $subindex[$pos] = $sindex;
-        }
         if (isset($discovery_data[$name])) {
             $name = $discovery_data[$name];
         }
@@ -202,6 +198,15 @@ class YamlDiscovery
             return $pre_cache[$index][$name];
         }
 
+        //create the sub-index values in order to try to match them with precache
+        $sub_indexes = explode('.', $index);
+        // parse sub_index options name with trailing colon and index
+        $sub_index = 0;
+        if (preg_match('/^(.+):(\d+)$/', $name, $matches)) {
+            $name = $matches[1];
+            $sub_index = $matches[2];
+        }
+
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
@@ -210,8 +215,8 @@ class YamlDiscovery
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
                     return current($pre_cache[$name]);
-                } elseif (isset($pre_cache[$name][$subindex[0]][$name])) {
-                    return $pre_cache[$name][$subindex[0]][$name];
+                } elseif (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
+                    return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
                 }
             } else {
                 return $pre_cache[$name];
