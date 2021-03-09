@@ -4388,6 +4388,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.firebrick-ipsec-tunnels": {
+            "order": 30,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.nac": {
             "order": 280,
             "group": "poller",
