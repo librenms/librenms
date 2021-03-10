@@ -264,6 +264,8 @@ class YamlDiscovery
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
+                                } elseif (Str::contains($oid, '::')) {
+                                    $snmp_flag = ['-OteQUS'];
                                 } else {
                                     $snmp_flag = ['-OteQUs'];
                                 }
