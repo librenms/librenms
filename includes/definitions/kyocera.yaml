@@ -10,6 +10,6 @@ discovery:
         sysDescr_regex:
             - '/^KYOCERA/'
 discovery_modules:
-    toner: true
+    printer: true
 poller_modules:
-    toner: true
+    printer: true

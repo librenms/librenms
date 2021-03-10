@@ -35,7 +35,7 @@ use App\Models\Port;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
-use App\Models\Toner;
+use App\Models\Printer;
 use App\Models\Vrf;
 use Cache;
 
@@ -98,7 +98,7 @@ class ObjectCache
                 ];
             }
 
-            if (Toner::hasAccess(auth()->user())->exists()) {
+            if (Printer::hasAccess(auth()->user())->exists()) {
                 $sensor_menu[3] = [
                     [
                         'class' => 'toner',

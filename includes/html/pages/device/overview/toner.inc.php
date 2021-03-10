@@ -4,7 +4,7 @@ use LibreNMS\Util\StringHelpers;
 
 $graph_type = 'toner_usage';
 
-$supplies = \App\Models\Toner::query()->where('device_id', $device['device_id'])->get()->groupBy('toner_type');
+$supplies = \App\Models\Printer::query()->where('device_id', $device['device_id'])->get()->groupBy('toner_type');
 
 foreach ($supplies as $type => $supply) {
     if (! empty($supply)) {
@@ -13,7 +13,7 @@ foreach ($supplies as $type => $supply) {
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
               <div class="panel-heading">';
-        echo '<a href="device/device=' . $device['device_id'] . '/tab=toner/">';
+        echo '<a href="device/device=' . $device['device_id'] . '/tab=printer/">';
         $title = StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type);
         echo '<i class="fa fa-print fa-lg icon-theme" aria-hidden="true"></i> <strong>' . $title . '</strong></a>';
         echo '</div>

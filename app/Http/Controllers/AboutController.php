@@ -44,7 +44,7 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Storage;
 use App\Models\Syslog;
-use App\Models\Toner;
+use App\Models\Printer;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
@@ -98,7 +98,7 @@ class AboutController extends Controller
             'stat_services'   => Service::count(),
             'stat_storage'    => Storage::count(),
             'stat_syslog'     => Syslog::count(),
-            'stat_toner'      => Toner::count(),
+            'stat_toner'      => Printer::count(),
             'stat_vlans'      => Vlan::count(),
             'stat_vrf'        => Vrf::count(),
             'stat_wireless'   => WirelessSensor::count(),
