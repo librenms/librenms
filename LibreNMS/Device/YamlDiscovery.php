@@ -158,7 +158,7 @@ class YamlDiscovery
                 $replace[] = $subindex;
             }
 
-            $value = str_replace($search, $replace, $def[$name]);
+            $value = str_replace($search, $replace, $def[$name] ?? '');
 
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
@@ -295,7 +295,7 @@ class YamlDiscovery
      */
     public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
     {
-        $skip_values = array_replace((array) $group_options['skip_values'], (array) $yaml_item_data['skip_values']);
+        $skip_values = array_replace((array) ($group_options['skip_values'] ?? []), (array) ($yaml_item_data['skip_values'] ?? []));
 
         foreach ($skip_values as $skip_value) {
             if (is_array($skip_value) && $pre_cache) {
@@ -315,14 +315,14 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_lt = array_replace((array) $group_options['skip_value_lt'], (array) $yaml_item_data['skip_value_lt']);
+        $skip_value_lt = array_replace((array) ($group_options['skip_value_lt'] ?? []), (array) ($yaml_item_data['skip_value_lt'] ?? []));
         foreach ($skip_value_lt as $skip_value) {
             if ($value < $skip_value) {
                 return true;
             }
         }
 
-        $skip_value_gt = array_replace((array) $group_options['skip_value_gt'], (array) $yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array) ($group_options['skip_value_gt'] ?? []), (array) ($yaml_item_data['skip_value_gt'] ?? []));
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;

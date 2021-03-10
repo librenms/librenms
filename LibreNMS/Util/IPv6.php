@@ -96,6 +96,7 @@ class IPv6 extends IP
         if (is_null($cidr)) {
             $cidr = $this->cidr;
         }
+        $cidr = (int) $cidr;
 
         $net_bytes = unpack('n*', inet_pton($this->ip));
 

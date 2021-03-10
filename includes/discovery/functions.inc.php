@@ -949,8 +949,6 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     $value = false;
                 }
 
-                d_echo("Final sensor value: $value\n");
-
                 $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
 
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
@@ -974,6 +972,8 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 }
 
                 if ($skippedFromYaml === false && is_numeric($value)) {
+                    d_echo("Sensor fetched value: $value\n");
+
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID
                     // strlen($index) as first number, and each letter converted to a number, separated by dots
@@ -985,12 +985,12 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     // process the group
                     $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
 
-                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
-                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
+                    $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
+                    $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
-                        if (is_numeric($data[$limit])) {
+                        if (isset($data[$limit]) && is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
                             $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
