@@ -36,12 +36,12 @@ use Symfony\Component\Yaml\Yaml;
 
 class Database extends BaseValidation
 {
-    const MYSQL_MIN_VERSION = '5.7';
-    const MYSQL_MIN_VERSION_DATE = 'April, 2021';
+    const MYSQL_MIN_VERSION = '5.7.7';
+    const MYSQL_MIN_VERSION_DATE = 'March, 2021';
     const MYSQL_RECOMMENDED_VERSION = '8.0';
 
-    const MARIADB_MIN_VERSION = '10.2';
-    const MARIADB_MIN_VERSION_DATE = 'April, 2021';
+    const MARIADB_MIN_VERSION = '10.2.2';
+    const MARIADB_MIN_VERSION_DATE = 'March, 2021';
     const MARIADB_RECOMMENDED_VERSION = '10.5';
 
     public function validate(Validator $validator)
