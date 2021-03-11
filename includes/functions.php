@@ -1678,8 +1678,6 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-
-
 /**
  * Intialize global stat arrays
  */

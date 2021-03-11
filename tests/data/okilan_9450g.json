@@ -413,125 +413,125 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Toner Cartridge OKI DATA C",
-                    "toner_capacity": 100,
-                    "toner_current": 59,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "printer_index": 1,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "printer_descr": "Black Toner Cartridge OKI DATA CORP",
+                    "printer_capacity": 100,
+                    "printer_current": 59,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_index": 10,
-                    "toner_type": "fuser",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
-                    "toner_descr": "Fuser Unit OKI DATA CORP",
-                    "toner_capacity": 100000,
-                    "toner_current": 99,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
+                    "printer_index": 10,
+                    "printer_type": "fuser",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
+                    "printer_descr": "Fuser Unit OKI DATA CORP",
+                    "printer_capacity": 100000,
+                    "printer_current": 99,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Cyan Toner Cartridge OKI DATA CO",
-                    "toner_capacity": 100,
-                    "toner_current": 69,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "printer_index": 2,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "printer_descr": "Cyan Toner Cartridge OKI DATA CORP",
+                    "printer_capacity": 100,
+                    "printer_current": 69,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Magenta Toner Cartridge OKI DATA",
-                    "toner_capacity": 100,
-                    "toner_current": 69,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "printer_index": 3,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "printer_descr": "Magenta Toner Cartridge OKI DATA CORP",
+                    "printer_capacity": 100,
+                    "printer_current": 69,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Yellow Toner Cartridge OKI DATA ",
-                    "toner_capacity": 100,
-                    "toner_current": 69,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "printer_index": 4,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "printer_descr": "Yellow Toner Cartridge OKI DATA CORP",
+                    "printer_capacity": 100,
+                    "printer_current": 69,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "toner_index": 5,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
-                    "toner_descr": "Black Image Drum Unit OKI DATA C",
-                    "toner_capacity": 30000,
-                    "toner_current": 95,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                    "printer_index": 5,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "printer_descr": "Black Image Drum Unit OKI DATA CORP",
+                    "printer_capacity": 30000,
+                    "printer_current": 95,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
                 },
                 {
-                    "toner_index": 6,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
-                    "toner_descr": "Cyan Image Drum Unit OKI DATA CO",
-                    "toner_capacity": 30000,
-                    "toner_current": 96,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                    "printer_index": 6,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "printer_descr": "Cyan Image Drum Unit OKI DATA CORP",
+                    "printer_capacity": 30000,
+                    "printer_current": 96,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
                 },
                 {
-                    "toner_index": 7,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
-                    "toner_descr": "Magenta Image Drum Unit OKI DATA",
-                    "toner_capacity": 30000,
-                    "toner_current": 96,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                    "printer_index": 7,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "printer_descr": "Magenta Image Drum Unit OKI DATA CORP",
+                    "printer_capacity": 30000,
+                    "printer_current": 96,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
                 },
                 {
-                    "toner_index": 8,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
-                    "toner_descr": "Yellow Image Drum Unit OKI DATA ",
-                    "toner_capacity": 30000,
-                    "toner_current": 96,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                    "printer_index": 8,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "printer_descr": "Yellow Image Drum Unit OKI DATA CORP",
+                    "printer_capacity": 30000,
+                    "printer_current": 96,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
                 },
                 {
-                    "toner_index": 9,
-                    "toner_type": "transferUnit",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
-                    "toner_descr": "Belt Unit OKI DATA CORP",
-                    "toner_capacity": 80000,
-                    "toner_current": 98,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                    "printer_index": 9,
+                    "printer_type": "transferUnit",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
+                    "printer_descr": "Belt Unit OKI DATA CORP",
+                    "printer_capacity": 80000,
+                    "printer_current": 98,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
                 },
                 {
-                    "toner_index": 1,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
-                    "toner_descr": "TRAY1",
-                    "toner_capacity": 300,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                    "printer_index": 1,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "printer_descr": "TRAY1",
+                    "printer_capacity": 300,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "toner_descr": "MPTRAY",
-                    "toner_capacity": 100,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "printer_index": 2,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "printer_descr": "MPTRAY",
+                    "printer_capacity": 100,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
-                    "toner_descr": "TRAY2",
-                    "toner_capacity": 530,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
+                    "printer_index": 3,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
+                    "printer_descr": "TRAY2",
+                    "printer_capacity": 530,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
                 }
             ]
         },

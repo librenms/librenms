@@ -20,13 +20,13 @@
 
 namespace LibreNMS\Modules;
 
+use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
-use Illuminate\Support\Collection;
-use App\Observers\ModuleModelObserver;
 use Log;
 
 class Printer implements Module
@@ -47,7 +47,7 @@ class Printer implements Module
             ->concat($this->discoveryLevels($device))
             ->concat($this->discoveryPapers($device));
 
-        ModuleModelObserver::observe(\App\Models\Printer::class);
+        ModuleModelObserver::observe(\App\Models\PrinterSupply::class);
         $this->syncModels($os->getDevice(), 'printerSupplies', $data);
     }
 
@@ -63,35 +63,35 @@ class Printer implements Module
         $device = $os->getDeviceArray();
         $toner_data = $os->getDevice()->printerSupplies()->get();
 
-        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('toner_oid')->toArray());
+        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('printer_oid')->toArray());
 
         foreach ($toner_data as $toner) {
-            echo 'Checking toner ' . $toner['toner_descr'] . '... ';
+            echo 'Checking toner ' . $toner['printer_descr'] . '... ';
 
-            $raw_toner = $toner_snmp[$toner['toner_oid']];
-            $tonerperc = self::get_toner_levels($device, $raw_toner, $toner['toner_capacity']);
+            $raw_toner = $toner_snmp[$toner['printer_oid']];
+            $tonerperc = self::get_toner_levels($device, $raw_toner, $toner['printer_capacity']);
             echo $tonerperc . " %\n";
 
             $tags = [
                 'rrd_def'     => RrdDefinition::make()->addDataset('toner', 'GAUGE', 0, 20000),
-                'rrd_name'    => ['toner', $toner['toner_index']],
-                'rrd_oldname' => ['toner', $toner['toner_descr']],
-                'index'       => $toner['toner_index'],
+                'rrd_name'    => ['toner', $toner['printer_index']],
+                'rrd_oldname' => ['toner', $toner['printer_descr']],
+                'index'       => $toner['printer_index'],
             ];
             data_update($device, 'toner', $tags, $tonerperc);
 
             // Log empty supplies (but only once)
-            if ($tonerperc == 0 && $toner['toner_current'] > 0) {
-                Log::event('Toner ' . $toner['toner_descr'] . ' is empty', $device, 'toner', 5, $toner['toner_id']);
+            if ($tonerperc == 0 && $toner['printer_current'] > 0) {
+                Log::event('Toner ' . $toner['printer_descr'] . ' is empty', $device, 'toner', 5, $toner['id']);
             }
 
             // Log toner swap
-            if ($tonerperc > $toner['toner_current']) {
-                Log::event('Toner ' . $toner['toner_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['toner_id']);
+            if ($tonerperc > $toner['printer_current']) {
+                Log::event('Toner ' . $toner['printer_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['id']);
             }
 
-            $toner->toner_current = $tonerperc;
-            $toner->toner_capacity = $toner['toner_capacity'];
+            $toner->printer_current = $tonerperc;
+            $toner->printer_capacity = $toner['printer_capacity'];
             $toner->save();
         }
     }
@@ -133,18 +133,18 @@ class Printer implements Module
                     }
                     $new_descr .= $line;
                 }
-                $descr = $new_descr;
+                $descr = trim($new_descr);
             }
 
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
             $raw_toner = $data['prtMarkerSuppliesLevel'];
-            $toner_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
+            $printer_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
             $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
             // Ricoh - TONERCurLevel
             if (empty($raw_toner)) {
-                $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
-                $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
+                $printer_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
+                $raw_toner = snmp_get($device, $printer_oid, '-Oqv');
             }
 
             // Ricoh - TONERNameLocal
@@ -162,16 +162,15 @@ class Printer implements Module
             $current = self::get_toner_levels($device, $raw_toner, $capacity);
 
             if (is_numeric($current)) {
-
                 $levels->push(new \App\Models\Printer([
                     'device_id' => $device['device_id'],
-                    'toner_oid' => $toner_oid,
-                    'toner_capacity_oid' => $capacity_oid,
-                    'toner_index' => $last_index,
-                    'toner_type' => $data['prtMarkerSuppliesType'] ?: 'markerSupply',
-                    'toner_descr' => $descr,
-                    'toner_capacity' => $capacity,
-                    'toner_current' => $current
+                    'printer_oid' => $printer_oid,
+                    'printer_capacity_oid' => $capacity_oid,
+                    'printer_index' => $last_index,
+                    'printer_type' => $data['prtMarkerSuppliesType'] ?: 'markerSupply',
+                    'printer_descr' => $descr,
+                    'printer_capacity' => $capacity,
+                    'printer_current' => $current,
                 ]));
             }
         }
@@ -209,20 +208,20 @@ class Printer implements Module
 
             $papers->push(new \App\Models\Printer([
                 'device_id' => $device['device_id'],
-                'toner_oid' => ".1.3.6.1.2.1.43.8.2.1.10.$index",
-                'toner_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
-                'toner_index' => $last_index,
-                'toner_type' => 'input',
-                'toner_descr' => $data['prtInputName'],
-                'toner_capacity' => $capacity,
-                'toner_current' => $current
+                'printer_oid' => ".1.3.6.1.2.1.43.8.2.1.10.$index",
+                'printer_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
+                'printer_index' => $last_index,
+                'printer_type' => 'input',
+                'printer_descr' => $data['prtInputName'],
+                'printer_capacity' => $capacity,
+                'printer_current' => $current,
             ]));
         }
 
         return $papers;
     }
 
-     /**
+    /**
      * @param array $device
      * @param int|string $raw_value The value returned from snmp
      * @param int $capacity the normalized capacity

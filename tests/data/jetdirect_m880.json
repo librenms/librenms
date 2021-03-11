@@ -627,179 +627,179 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "tonerCartridge",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Cartridge827A HP CF300A",
-                    "toner_capacity": 100,
-                    "toner_current": 92,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "printer_index": 1,
+                    "printer_type": "tonerCartridge",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "printer_descr": "Black Cartridge827A HP CF300A",
+                    "printer_capacity": 100,
+                    "printer_current": 92,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_index": 10,
-                    "toner_type": "fuser",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
-                    "toner_descr": "Fuser Kit HP 110V-C1N54A, 220V-C",
-                    "toner_capacity": 100,
-                    "toner_current": 84,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
+                    "printer_index": 10,
+                    "printer_type": "fuser",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
+                    "printer_descr": "Fuser Kit HP 110V-C1N54A, 220V-C1N58A",
+                    "printer_capacity": 100,
+                    "printer_current": 84,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
                 },
                 {
-                    "toner_index": 11,
-                    "toner_type": "other",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
-                    "toner_descr": "Document FeederKit HP C1P70A",
-                    "toner_capacity": 100,
-                    "toner_current": 99,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
+                    "printer_index": 11,
+                    "printer_type": "other",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
+                    "printer_descr": "Document FeederKit HP C1P70A",
+                    "printer_capacity": 100,
+                    "printer_current": 99,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
                 },
                 {
-                    "toner_index": 12,
-                    "toner_type": "other",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
-                    "toner_descr": "Clean Rollers HP None",
-                    "toner_capacity": 100,
-                    "toner_current": 97,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
+                    "printer_index": 12,
+                    "printer_type": "other",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
+                    "printer_descr": "Clean Rollers HP None",
+                    "printer_capacity": 100,
+                    "printer_current": 97,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
                 },
                 {
-                    "toner_index": 13,
-                    "toner_type": "staples",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.13",
-                    "toner_descr": "Stapler 1 HP C8091A",
-                    "toner_capacity": 100,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.13"
+                    "printer_index": 13,
+                    "printer_type": "staples",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.13",
+                    "printer_descr": "Stapler 1 HP C8091A",
+                    "printer_capacity": 100,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.13"
                 },
                 {
-                    "toner_index": 14,
-                    "toner_type": "staples",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.14",
-                    "toner_descr": "Stapler 2 HP CC383A",
-                    "toner_capacity": 100,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.14"
+                    "printer_index": 14,
+                    "printer_type": "staples",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.14",
+                    "printer_descr": "Stapler 2 HP CC383A",
+                    "printer_capacity": 100,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.14"
                 },
                 {
-                    "toner_index": 15,
-                    "toner_type": "staples",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.15",
-                    "toner_descr": "Stapler 3 HP CC383A",
-                    "toner_capacity": 100,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.15"
+                    "printer_index": 15,
+                    "printer_type": "staples",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.15",
+                    "printer_descr": "Stapler 3 HP CC383A",
+                    "printer_capacity": 100,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.15"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "tonerCartridge",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Cyan Cartridge 827A HP CF301A",
-                    "toner_capacity": 100,
-                    "toner_current": 16,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "printer_index": 2,
+                    "printer_type": "tonerCartridge",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "printer_descr": "Cyan Cartridge 827A HP CF301A",
+                    "printer_capacity": 100,
+                    "printer_current": 16,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "tonerCartridge",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Magenta Cartridge 827A HP CF303A",
-                    "toner_capacity": 100,
-                    "toner_current": 100,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "printer_index": 3,
+                    "printer_type": "tonerCartridge",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "printer_descr": "Magenta Cartridge 827A HP CF303A",
+                    "printer_capacity": 100,
+                    "printer_current": 100,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "tonerCartridge",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Yellow Cartridge 827A HP CF302A",
-                    "toner_capacity": 100,
-                    "toner_current": 70,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "printer_index": 4,
+                    "printer_type": "tonerCartridge",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "printer_descr": "Yellow Cartridge 827A HP CF302A",
+                    "printer_capacity": 100,
+                    "printer_current": 70,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "toner_index": 5,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
-                    "toner_descr": "Black Drum 828AHP CF358A",
-                    "toner_capacity": 100,
-                    "toner_current": 53,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                    "printer_index": 5,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "printer_descr": "Black Drum 828AHP CF358A",
+                    "printer_capacity": 100,
+                    "printer_current": 53,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
                 },
                 {
-                    "toner_index": 6,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
-                    "toner_descr": "Cyan Drum 828A HP CF359A",
-                    "toner_capacity": 100,
-                    "toner_current": 58,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                    "printer_index": 6,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "printer_descr": "Cyan Drum 828A HP CF359A",
+                    "printer_capacity": 100,
+                    "printer_current": 58,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
                 },
                 {
-                    "toner_index": 7,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
-                    "toner_descr": "Magenta Drum 828A HP CF365A",
-                    "toner_capacity": 100,
-                    "toner_current": 58,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                    "printer_index": 7,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "printer_descr": "Magenta Drum 828A HP CF365A",
+                    "printer_capacity": 100,
+                    "printer_current": 58,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
                 },
                 {
-                    "toner_index": 8,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
-                    "toner_descr": "Yellow Drum 828A HP CF364A",
-                    "toner_capacity": 100,
-                    "toner_current": 58,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                    "printer_index": 8,
+                    "printer_type": "opc",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "printer_descr": "Yellow Drum 828A HP CF364A",
+                    "printer_capacity": 100,
+                    "printer_current": 58,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
                 },
                 {
-                    "toner_index": 9,
-                    "toner_type": "transferUnit",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
-                    "toner_descr": "Transfer Kit HPD7H14A",
-                    "toner_capacity": 100,
-                    "toner_current": 89,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                    "printer_index": 9,
+                    "printer_type": "transferUnit",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
+                    "printer_descr": "Transfer Kit HPD7H14A",
+                    "printer_capacity": 100,
+                    "printer_current": 89,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
                 },
                 {
-                    "toner_index": 1,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
-                    "toner_descr": "Tray 1",
-                    "toner_capacity": 100,
-                    "toner_current": 0,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                    "printer_index": 1,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "printer_descr": "Tray 1",
+                    "printer_capacity": 100,
+                    "printer_current": 0,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "toner_descr": "Tray 2",
-                    "toner_capacity": 500,
-                    "toner_current": 40,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "printer_index": 2,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "printer_descr": "Tray 2",
+                    "printer_capacity": 500,
+                    "printer_current": 40,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
-                    "toner_descr": "Tray 3",
-                    "toner_capacity": 1500,
-                    "toner_current": 20,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
+                    "printer_index": 3,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
+                    "printer_descr": "Tray 3",
+                    "printer_capacity": 1500,
+                    "printer_current": 20,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
                 },
                 {
-                    "toner_index": 5,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.5",
-                    "toner_descr": "Tray 4",
-                    "toner_capacity": 2000,
-                    "toner_current": 20,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.5"
+                    "printer_index": 5,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.5",
+                    "printer_descr": "Tray 4",
+                    "printer_capacity": 2000,
+                    "printer_current": 20,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.5"
                 }
             ]
         },

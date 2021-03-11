@@ -1082,53 +1082,53 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Cartridge HP CF400X",
-                    "toner_capacity": 100,
-                    "toner_current": 63,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "printer_index": 1,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "printer_descr": "Black Cartridge HP CF400X",
+                    "printer_capacity": 100,
+                    "printer_current": 63,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Cyan Cartridge HP CF401X",
-                    "toner_capacity": 100,
-                    "toner_current": 63,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "printer_index": 2,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "printer_descr": "Cyan Cartridge HP CF401X",
+                    "printer_capacity": 100,
+                    "printer_current": 63,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Magenta Cartridge HP CF403X",
-                    "toner_capacity": 100,
-                    "toner_current": 88,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "printer_index": 3,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "printer_descr": "Magenta Cartridge HP CF403X",
+                    "printer_capacity": 100,
+                    "printer_current": 88,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Yellow Cartridge HP CF402X",
-                    "toner_capacity": 100,
-                    "toner_current": 36,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "printer_index": 4,
+                    "printer_type": "toner",
+                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "printer_descr": "Yellow Cartridge HP CF402X",
+                    "printer_capacity": 100,
+                    "printer_current": 36,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "toner_descr": "Tray 2",
-                    "toner_capacity": 150,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "printer_index": 2,
+                    "printer_type": "input",
+                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "printer_descr": "Tray 2",
+                    "printer_capacity": 150,
+                    "printer_current": 50,
+                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 }
             ]
         },
