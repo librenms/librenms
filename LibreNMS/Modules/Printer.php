@@ -20,6 +20,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\PrinterSupply;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -47,7 +48,7 @@ class Printer implements Module
             ->concat($this->discoveryLevels($device))
             ->concat($this->discoveryPapers($device));
 
-        ModuleModelObserver::observe(\App\Models\PrinterSupply::class);
+        ModuleModelObserver::observe(PrinterSupply::class);
         $this->syncModels($os->getDevice(), 'printerSupplies', $data);
     }
 
@@ -162,7 +163,7 @@ class Printer implements Module
             $current = self::get_toner_levels($device, $raw_toner, $capacity);
 
             if (is_numeric($current)) {
-                $levels->push(new \App\Models\Printer([
+                $levels->push(new PrinterSupply([
                     'device_id' => $device['device_id'],
                     'printer_oid' => $printer_oid,
                     'printer_capacity_oid' => $capacity_oid,
@@ -206,7 +207,7 @@ class Printer implements Module
                 $current = $current / $capacity * 100;
             }
 
-            $papers->push(new \App\Models\Printer([
+            $papers->push(new PrinterSupply([
                 'device_id' => $device['device_id'],
                 'printer_oid' => ".1.3.6.1.2.1.43.8.2.1.10.$index",
                 'printer_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
