@@ -655,6 +655,10 @@ definitions (includes/definitions/_specific_os_.yaml) can contain
 bad_if\* arrays, but should only be modified via pull-request as 
 manipulation of the definition files will block updating. 
 
+The default filtering mode is to blacklist based on ifDescr. 
+Whitelisting interfaces is also possible. 
+See [Whitelisting intefaces](../Support/Configuration.md#whitelisting-interfaces) later in this section for more information.
+
 Examples:
 
 **Add entries to default arrays**
@@ -704,6 +708,45 @@ $config['os']['ios']['good_if'][] = 'FastEthernet';
 as well which would stop that port from being ignored. I.e If bad_if
 and good_if both contained FastEthernet then ports with this value in
 the ifDescr will be valid.
+
+# Whitelisting interfaces
+By default interfaces are blacklisted. By setting a whitelist you will only 
+allow the interfaces defined. All other intefaces will be ignored. The 
+definition is via a list of strings called good_if_regexp. Whitelisting can 
+only be performed on a per OS basis, and the if_filter_mode setting must be 
+set to 'whitelist'.
+
+Examples;
+
+```php
+
+$config['os']['junos']['if_filter_mode'] = 'whitelist';
+$config['os']['junos']['good_if_regexp'][] = '/^fxp$/';
+$config['os']['junos']['good_if_regexp'][] = '/^ae[0-9]+/';
+$config['os']['junos']['good_if_regexp'][] = '/^ge-/';
+$config['os']['junos']['good_if_regexp'][] = '/^xe-/';
+
+$config['os']['linux']['if_filter_mode'] = 'whitelist';
+$config['os']['linux']['good_if_regexp'][] = '/^ens[0-9]+/';
+```
+The `junos` example here will only match on fxp,ae,ge,xe interfaces. 
+All the other types (which can be many) will be ignored.
+
+The `linux` example will only match ens (typically debian) ethernet interfaces. 
+But will ignore the loopback, or any other interface on the system.
+
+The only limitation is whats in the ifDescr field and your comfort with 
+regular expressions.
+
+More complex example;
+```php
+$config['os']['junos']['if_filter_mode'] = 'whitelist';
+$config['os']['junos']['good_if_regexp'][] = '/^fxp[0-9]+$/';
+$config['os']['junos']['good_if_regexp'][] = '/^(gx)e-[0-9]+/[0-9]+/[0-9]+$/'
+$config['os']['junos']['good_if_regexp'][] = '/^ae[0-9]+$/'
+```
+This is similar to the `junos` example above but will only match major 
+(physical) interfaces and not their respective sub interfaces.
 
 # Interfaces to be rewritten
 
@@ -824,7 +867,6 @@ These options rely on daily.sh running from cron as per the installation instruc
 $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
-$config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 7;
 $config['alert_log_purge']                                = 365;
 $config['port_fdb_purge']                                 = 10;

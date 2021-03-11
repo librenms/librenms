@@ -931,7 +931,7 @@ function include_dir($dir, $regex = '')
 
 /**
  * Check if port is valid to poll.
- * Settings: empty_ifdescr, good_if, good_if_regexp, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
+ * Settings: empty_ifdescr, good_if, good_if_regexp in conjection with if_filter_mode = whitelist, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
  * @param array $port
  * @param array $device
@@ -962,15 +962,23 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'];
 
+    // Interface filtering will default to blacklist unless specified as whitelist on a per os basis.
+    $if_filter_mode = Config::getOsSetting($device['os'], 'if_filter_mode', 'blacklist');
+
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
     }
 
-	//Loop through the good_if_regexp interfaces and allow as a whitelist. This should be coupled with bad_if_regexp wildcard match on all interfaces. 
-    foreach (Config::getCombined($device['os'], 'good_if_regexp') as $gir) {
-        if (preg_match($gir . 'i', $ifDescr)) {
-            return true;
+    // If if_filter_mode is set to whitelist, loop through good_if_regexp and allow based on ifDescr.
+    if ($if_filter_mode == 'whitelist') {
+        foreach (Config::getCombined($device['os'], 'good_if_regexp') as $gir) {
+            if (preg_match($gir . 'i', $ifDescr)) {
+                d_echo("Allowed by whitelist on ifDescr: $ifDescr (matched: $gir)\n");
+
+                return true;
+            }
         }
+        d_echo("Ignored by whitelist, ifDescr: $ifDescr (no match in whitelist)\n");
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
@@ -1112,128 +1120,6 @@ function validate_device_id($id)
     }
 
     return $return;
-}
-
-// The original source of this code is from Stackoverflow (www.stackoverflow.com).
-// http://stackoverflow.com/questions/6054033/pretty-printing-json-with-php
-// Answer provided by stewe (http://stackoverflow.com/users/3202187/ulk200
-if (! defined('JSON_UNESCAPED_SLASHES')) {
-    define('JSON_UNESCAPED_SLASHES', 64);
-}
-if (! defined('JSON_PRETTY_PRINT')) {
-    define('JSON_PRETTY_PRINT', 128);
-}
-if (! defined('JSON_UNESCAPED_UNICODE')) {
-    define('JSON_UNESCAPED_UNICODE', 256);
-}
-
-function _json_encode($data, $options = 448)
-{
-    if (version_compare(PHP_VERSION, '5.4', '>=')) {
-        return json_encode($data, $options);
-    } else {
-        return _json_format(json_encode($data), $options);
-    }
-}
-
-function _json_format($json, $options = 448)
-{
-    $prettyPrint = (bool) ($options & JSON_PRETTY_PRINT);
-    $unescapeUnicode = (bool) ($options & JSON_UNESCAPED_UNICODE);
-    $unescapeSlashes = (bool) ($options & JSON_UNESCAPED_SLASHES);
-
-    if (! $prettyPrint && ! $unescapeUnicode && ! $unescapeSlashes) {
-        return $json;
-    }
-
-    $result = '';
-    $pos = 0;
-    $strLen = strlen($json);
-    $indentStr = ' ';
-    $newLine = "\n";
-    $outOfQuotes = true;
-    $buffer = '';
-    $noescape = true;
-
-    for ($i = 0; $i < $strLen; $i++) {
-        // Grab the next character in the string
-        $char = substr($json, $i, 1);
-
-        // Are we inside a quoted string?
-        if ('"' === $char && $noescape) {
-            $outOfQuotes = ! $outOfQuotes;
-        }
-
-        if (! $outOfQuotes) {
-            $buffer .= $char;
-            $noescape = '\\' === $char ? ! $noescape : true;
-            continue;
-        } elseif ('' !== $buffer) {
-            if ($unescapeSlashes) {
-                $buffer = str_replace('\\/', '/', $buffer);
-            }
-
-            if ($unescapeUnicode && function_exists('mb_convert_encoding')) {
-                // http://stackoverflow.com/questions/2934563/how-to-decode-unicode-escape-sequences-like-u00ed-to-proper-utf-8-encoded-cha
-                $buffer = preg_replace_callback(
-                    '/\\\\u([0-9a-f]{4})/i',
-                    function ($match) {
-                        return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-                    },
-                    $buffer
-                );
-            }
-
-            $result .= $buffer . $char;
-            $buffer = '';
-            continue;
-        } elseif (false !== strpos(" \t\r\n", $char)) {
-            continue;
-        }
-
-        if (':' === $char) {
-            // Add a space after the : character
-            $char .= ' ';
-        } elseif (('}' === $char || ']' === $char)) {
-            $pos--;
-            $prevChar = substr($json, $i - 1, 1);
-
-            if ('{' !== $prevChar && '[' !== $prevChar) {
-                // If this character is the end of an element,
-                // output a new line and indent the next line
-                $result .= $newLine;
-                for ($j = 0; $j < $pos; $j++) {
-                    $result .= $indentStr;
-                }
-            } else {
-                // Collapse empty {} and []
-                $result = rtrim($result) . "\n\n" . $indentStr;
-            }
-        }
-
-        $result .= $char;
-
-        // If the last character was the beginning of an element,
-        // output a new line and indent the next line
-        if (',' === $char || '{' === $char || '[' === $char) {
-            $result .= $newLine;
-
-            if ('{' === $char || '[' === $char) {
-                $pos++;
-            }
-
-            for ($j = 0; $j < $pos; $j++) {
-                $result .= $indentStr;
-            }
-        }
-    }
-    // If buffer not empty after formating we have an unclosed quote
-    if (strlen($buffer) > 0) {
-        //json is incorrectly formatted
-        $result = false;
-    }
-
-    return $result;
 }
 
 function convert_delay($delay)
@@ -1762,7 +1648,7 @@ function getCIMCentPhysical($location, &$entphysical, &$index)
     } // end if - Level 1
 } // end function
 
-/* idea from http://php.net/manual/en/function.hex2bin.php comments */
+/* idea from https://php.net/manual/en/function.hex2bin.php comments */
 function hex2bin_compat($str)
 {
     if (strlen($str) % 2 !== 0) {
@@ -2241,7 +2127,7 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['attribs']['snmp_max_oid'] > 0) {
+    if (! empty($device['attribs']['snmp_max_oid'])) {
         return $device['attribs']['snmp_max_oid'];
     }
 

@@ -66,9 +66,12 @@ bad_iftype: # ifType (substring)
     - sonet
 good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive)
     - virtual
-bad_ifoperstatus # IfOperStatus (substring, case insensitive)
+good_if_regexp: # ifDescr (regex, case insensitive). 
+	- "/ens[0-9]+/"
+bad_ifoperstatus: # IfOperStatus (substring, case insensitive)
     - notPresent
 ```
+For Whitelisting on Interface ifDescr see [Whitelisting intefaces](../../Support/Configuration.md#whitelisting-interfaces).
 
 ### Controlling interface labels
 
