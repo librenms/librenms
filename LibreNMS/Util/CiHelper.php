@@ -96,6 +96,11 @@ class CiHelper
         $this->unitEnv['SNMPSIM'] = 1;
     }
 
+    public function setModuleGroupDepth(int $depth)
+    {
+        $this->unitEnv['OS_MODULES_GROUP'] = $depth;
+    }
+
     public function setModules(array $modules)
     {
         $this->unitEnv['TEST_MODULES'] = implode(',', $modules);

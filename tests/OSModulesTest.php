@@ -38,10 +38,13 @@ class OSModulesTest extends DBTestCase
 
     private $discoveryModules;
     private $pollerModules;
+    private $groupDepth;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->groupDepth = (int) getenv('OS_MODULES_GROUP');
 
         // backup modules
         $this->discoveryModules = Config::get('discovery_modules');
@@ -114,13 +117,12 @@ class OSModulesTest extends DBTestCase
         $debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'];
-            $actual = $results[$module]['discovery'];
+            $expected = $this->groupTestData($expected_data[$module]['discovery'] ?? []);
+            $actual = $this->groupTestData($results[$module]['discovery'] ?? []);
             $this->assertEquals(
                 $expected,
                 $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
                 . $helper->getDiscoveryOutput($debug ? null : $module)
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
@@ -131,22 +133,43 @@ class OSModulesTest extends DBTestCase
             }
 
             if ($expected_data[$module]['poller'] == 'matches discovery') {
-                $expected = $expected_data[$module]['discovery'];
+                $expected = $this->groupTestData($expected_data[$module]['discovery']);
             } else {
-                $expected = $expected_data[$module]['poller'];
+                $expected = $this->groupTestData($expected_data[$module]['poller'] ?? []);
             }
-            $actual = $results[$module]['poller'];
+            $actual = $this->groupTestData($results[$module]['poller'] ?? []);
             $this->assertEquals(
                 $expected,
                 $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
                 . $helper->getPollerOutput($debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }
 
         DeviceCache::flush(); // clear cached devices
+    }
+
+    private function groupTestData($data)
+    {
+        if ($this->groupDepth == 0) {
+            return $data;
+        }
+
+        $groups = [
+            'sensors' => ['sensor_class', 'sensor_type', 'sensor_index'],
+            'state_indexes' => ['state_name', 'state_value'],
+            'wireless_sensors' => ['sensor_class', 'sensor_type', 'sensor_index'],
+        ];
+
+        foreach ($groups as $table => $fields) {
+            if (isset($data[$table])) {
+                $fields = array_slice($fields, 0, $this->groupDepth); // only as deep as specified by the user
+                $data[$table] = collect($data[$table])->groupBy($fields)->toArray();
+            }
+        }
+
+        return $data;
     }
 
     public function dumpedDataProvider()

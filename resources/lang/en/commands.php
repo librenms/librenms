@@ -37,6 +37,7 @@ return [
             'db' => 'Run unit tests that require a database connection',
             'fail-fast' => 'Stop checks when any failure is encountered',
             'full' => 'Run full checks ignoring changed file filtering',
+            'group-depth' => 'Max depth to group module diff depth by. Default: 0 (no grouping)',
             'module' => 'Specific Module to run tests on. Implies unit, --db, --snmpsim',
             'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
             'quiet' => 'Hide output unless there is an error',

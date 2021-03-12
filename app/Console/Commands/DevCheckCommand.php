@@ -43,6 +43,7 @@ class DevCheckCommand extends LnmsCommand
         parent::__construct();
         $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, dusk]']), 'all');
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
+        $this->addOption('group-depth', 'g', InputOption::VALUE_REQUIRED);
         $this->addOption('module', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('fail-fast', 'f', InputOption::VALUE_NONE);
         $this->addOption('quiet', 'q', InputOption::VALUE_NONE);
@@ -81,6 +82,7 @@ class DevCheckCommand extends LnmsCommand
             exit(1);
         }
 
+        $this->helper->setModuleGroupDepth((int) $this->option('group-depth'));
         $this->helper->setFlags(Arr::only($this->options(), ['quiet', 'commands', 'fail-fast', 'full']));
 
         $this->helper->enable('style', $check == 'all' || $check === 'style');
