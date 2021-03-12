@@ -204,9 +204,9 @@ class YamlDiscovery
         $sub_indexes = explode('.', $index);
         // parse sub_index options name with trailing colon and index
         $sub_index = 0;
-        if (preg_match('/^(.+):(\d+)$/', $name, $matches)) {
-            $name = $matches[1];
-            $sub_index = $matches[2];
+        $sub_index_end = null;
+        if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
+            [,$name, $sub_index, $sub_index_end] = $matches;
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -215,10 +215,20 @@ class YamlDiscovery
                     return $pre_cache[$name][$index][$name];
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
-                } elseif (count($pre_cache[$name]) === 1) {
+                } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
+
                     return current($pre_cache[$name]);
-                } elseif (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
-                    return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
+                } elseif (isset($sub_indexes[$sub_index])) {
+                    if ($sub_index_end) {
+                        $multi_sub_index = implode('.', array_slice($sub_indexes, $sub_index, $sub_index_end));
+                        if (isset($pre_cache[$name][$multi_sub_index][$name])) {
+                            return $pre_cache[$name][$multi_sub_index][$name];
+                        }
+                    }
+
+                    if (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
+                        return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
+                    }
                 }
             } else {
                 return $pre_cache[$name];
@@ -272,7 +282,7 @@ class YamlDiscovery
                                 $snmp_flag[] = '-Ih';
 
                                 $mib = $device['dynamic_discovery']['mib'];
-                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $mib, null, $snmp_flag);
+                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
                             }
                         }
                     }

@@ -1045,7 +1045,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
         echo ucfirst($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
-        if (is_file($dir . $device['os_group'] . '.inc.php')) {
+        if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
         }
         if (is_file($dir . $device['os'] . '.inc.php')) {
