@@ -234,6 +234,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     private static function processData($data, $precision)
     {
+        if (is_array($data)) {
+            throw new \RuntimeException('Got array, expected a value: ' . var_export($data, true));
+        }
+
         preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches);
         $value = $matches[1];
 
