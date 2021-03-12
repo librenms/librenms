@@ -20,7 +20,7 @@
 </div>
 
 <div id="dynamic-st-d-form" class="form-group @if($errors->has('drules')) has-error @endif">
-    <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
+    <label for="drules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
         <span class="help-block">{{ $errors->first('drules') }}</span>
