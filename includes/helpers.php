@@ -115,16 +115,5 @@ if (! function_exists('array_pairs')) {
  */
 function cast_number($number)
 {
-    if (! is_numeric($number)) {
-        // match pre-PHP8 behavior
-        if (! preg_match('/^-?\d+(\.\d+)?/', $number, $matches)) {
-            return 0;
-        }
-        $number = $matches[0];
-    }
-
-    $float = (float) $number;
-    $int = (int) $number;
-
-    return $float == $int ? $int : $float;
+    return \LibreNMS\Util\Number::cast($number);
 }
