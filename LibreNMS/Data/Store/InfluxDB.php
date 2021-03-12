@@ -30,6 +30,7 @@ use InfluxDB\Driver\UDP;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use Log;
+use Mockery\Mock;
 
 class InfluxDB extends BaseDatastore
 {
@@ -121,7 +122,7 @@ class InfluxDB extends BaseDatastore
 
             $this->connection->writePoints($points);
             $this->recordStatistic($stat->end());
-        } catch (\Exception $e) {
+        } catch (\InfluxDB\Exception $e) {
             Log::error('InfluxDB exception: ' . $e->getMessage());
             Log::debug($e->getTraceAsString());
         }
