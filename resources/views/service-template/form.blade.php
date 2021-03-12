@@ -20,7 +20,7 @@
 </div>
 
 <div id="dynamic-st-d-form" class="form-group @if($errors->has('drules')) has-error @endif">
-    <label for="drules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
+    <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
         <span class="help-block">{{ $errors->first('drules') }}</span>
@@ -254,20 +254,21 @@
     });
     $('.service-template-form').submit(function (eventObj) {
         if ($('#dtype').val() === 'dynamic') {
-            $('<input type="hidden" name="drules" />')
-                .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
-                .appendTo(this);
             if (!builder.queryBuilder('validate')) {
                 return false;
             }
+            $('<input type="hidden" name="drules" />')
+                .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
+                .appendTo(this);
+
         }
         if ($('#dgtype').val() === 'dynamic') {
-            $('<input type="hidden" name="dgrules" />')
-                .attr('value', JSON.stringify(builder2.queryBuilder('getRules')))
-                .appendTo(this);
             if (!builder2.queryBuilder('validate')) {
                 return false;
             }
+            $('<input type="hidden" name="dgrules" />')
+                .attr('value', JSON.stringify(builder2.queryBuilder('getRules')))
+                .appendTo(this);
         }
         return true;
     });

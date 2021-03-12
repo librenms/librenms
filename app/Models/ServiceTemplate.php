@@ -72,19 +72,19 @@ class ServiceTemplate extends BaseModel
         });
 
         static::saving(function (ServiceTemplate $template) {
-            if ($template->dtype == 'dynamic' and $template->isDirty('drules')) {
+            if ($template->dtype === 'dynamic' and $template->isDirty('drules')) {
                 $template->drules = $template->getDeviceParser()->generateJoins()->toArray();
             }
-            if ($template->dgtype == 'dynamic' and $template->isDirty('dgrules')) {
+            if ($template->dgtype === 'dynamic' and $template->isDirty('dgrules')) {
                 $template->dgrules = $template->getDeviceGroupParser()->generateJoins()->toArray();
             }
         });
 
         static::saved(function (ServiceTemplate $template) {
-            if ($template->dtype == 'dynamic' and $template->isDirty('drules')) {
+            if ($template->dtype === 'dynamic' and $template->isDirty('drules')) {
                 $template->updateDevices();
             }
-            if ($template->dgtype == 'dynamic' and $template->isDirty('dgrules')) {
+            if ($template->dgtype === 'dynamic' and $template->isDirty('dgrules')) {
                 $template->updateGroups();
             }
         });
@@ -97,7 +97,7 @@ class ServiceTemplate extends BaseModel
      */
     public function updateDevices()
     {
-        if ($this->dtype == 'dynamic') {
+        if ($this->dtype === 'dynamic') {
             $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->drules)->toQuery()
                 ->distinct()->pluck('devices.device_id'));
         }
@@ -108,7 +108,7 @@ class ServiceTemplate extends BaseModel
      */
     public function updateGroups()
     {
-        if ($this->dgtype == 'dynamic') {
+        if ($this->dgtype === 'dynamic') {
             $this->groups()->sync(QueryBuilderFluentParser::fromJSON($this->dgrules)->toQuery()
                 ->distinct()->pluck('device_groups.id'));
         }
@@ -139,7 +139,7 @@ class ServiceTemplate extends BaseModel
             ->get()
             ->filter(function ($template) use ($device) {
                 /** @var ServiceTemplate $template */
-                if ($template->dtype == 'dynamic') {
+                if ($template->dtype === 'dynamic') {
                     try {
                         return $template->getDeviceParser()
                             ->toQuery()
@@ -186,7 +186,7 @@ class ServiceTemplate extends BaseModel
             ->get()
             ->filter(function ($template) use ($deviceGroup) {
                 /** @var ServiceTemplate $template */
-                if ($template->dgtype == 'dynamic') {
+                if ($template->dgtype === 'dynamic') {
                     try {
                         return $template->getDeviceGroupParser()
                             ->toQuery()
