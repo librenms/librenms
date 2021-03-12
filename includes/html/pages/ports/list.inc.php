@@ -54,10 +54,10 @@ if ($vars['errors']) {
                     Packets Out
                 </th>
                 <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
-                    data-css-class="red"<?php echo $error_sort ?>>Errors In
+                    data-css-class="red"<?php echo $error_sort ?>>Delta Errors In
                 </th>
                 <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
-                    data-css-class="red">Errors Out
+                    data-css-class="red">Delta Errors Out
                 </th>
                 <th data-column-id="ifType">Media</th>
                 <th data-column-id="ifAlias">Description</th>
