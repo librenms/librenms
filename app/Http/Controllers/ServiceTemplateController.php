@@ -90,8 +90,6 @@ class ServiceTemplateController extends Controller
                     'type',
                     'dtype',
                     'dgtype',
-                    'drules',
-                    'dgrules',
                     'param',
                     'ip',
                     'desc',
