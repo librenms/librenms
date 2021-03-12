@@ -30,7 +30,6 @@ use InfluxDB\Driver\UDP;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use Log;
-use Mockery\Mock;
 
 class InfluxDB extends BaseDatastore
 {
@@ -168,7 +167,7 @@ class InfluxDB extends BaseDatastore
             // If it is an Integer
             if (ctype_digit($data)) {
                 return floatval($data);
-            // Else it is a float
+                // Else it is a float
             } else {
                 return floatval($data);
             }
