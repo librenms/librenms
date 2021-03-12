@@ -216,7 +216,6 @@ class YamlDiscovery
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
-
                     return current($pre_cache[$name]);
                 } elseif (isset($sub_indexes[$sub_index])) {
                     if ($sub_index_end) {

@@ -3,7 +3,6 @@
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\Number;
 
 $name = 'docker';
 $app_id = $app['app_id'];
