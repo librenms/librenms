@@ -88,8 +88,8 @@ echo "</td><td width=120 onclick=\"location.href='" . generate_port_url($port) .
 if ($port['ifOperStatus'] == 'up') {
     $port['in_rate'] = ($port['ifInOctets_rate'] * 8);
     $port['out_rate'] = ($port['ifOutOctets_rate'] * 8);
-    $in_perc = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    $out_perc = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $in_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $out_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
     echo "<i class='fa fa-long-arrow-left fa-lg' style='color:green' aria-hidden='true'></i> <span style='color: " . percent_colour($in_perc) . "'>" . formatRates($port['in_rate']) . "<br />
         <i class='fa fa-long-arrow-right fa-lg' style='color:blue' aria-hidden='true'></i> <span style='color: " . percent_colour($out_perc) . "'>" . formatRates($port['out_rate']) . "<br />
         <i class='fa fa-long-arrow-left fa-lg' style='color:purple' aria-hidden='true'></i> " . format_bi($port['ifInUcastPkts_rate']) . "pps</span><br />
@@ -184,6 +184,7 @@ echo '<td width=375 valign=top class="interface-desc">';
 
 $neighborsCount = 0;
 $nbLinks = 0;
+$int_links = [];
 if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', [$if_id]) as $link) {
         $int_links[$link['port_id']] = $link['port_id'];

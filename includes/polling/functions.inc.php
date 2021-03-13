@@ -159,7 +159,7 @@ function record_sensor_data($device, $all_sensors)
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
         $unit = $supported_sensors[$class];
-        $sensor_value = is_string($sensor['new_value']) ? floatval($sensor['new_value']) : $sensor['new_value'];
+        $sensor_value = cast_number($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {

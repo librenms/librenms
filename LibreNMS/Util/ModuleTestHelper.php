@@ -249,12 +249,14 @@ class ModuleTestHelper
             [$os, $variant] = self::extractVariant($file);
 
             // calculate valid modules
-            $data_modules = array_keys(json_decode(file_get_contents($file), true));
+            $decoded = json_decode(file_get_contents($file), true);
 
             if (json_last_error()) {
                 echo "Invalid json data: $base_name\n";
                 exit(1);
             }
+
+            $data_modules = array_keys($decoded);
 
             if (empty($modules)) {
                 $valid_modules = $data_modules;
@@ -837,7 +839,9 @@ class ModuleTestHelper
     private function collectComponents($device_id)
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, 'label');
+        $components = Arr::sort($components, function ($item) {
+            return $item['type'] . $item['label'];
+        });
 
         return array_values($components);
     }

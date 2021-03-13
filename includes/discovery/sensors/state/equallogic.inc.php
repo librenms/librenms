@@ -54,7 +54,7 @@ if (! empty($oids)) {
             [$oid,$current] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
             $num_index = $split_oid[(count($split_oid) - 1)];
-            $index = (int) $num_index + 0;
+            $index = (int) cast_number($num_index);
             $low_limit = 0.5;
             $high_limit = 2.5;
             discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $current, 'snmp', $index);
@@ -98,7 +98,7 @@ if (! empty($oids1)) {
             [$oid,$descr] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
             $num_index = $split_oid[(count($split_oid) - 1)];
-            $index = (int) $num_index + 0;
+            $index = (int) cast_number($num_index);
             $member_id = $split_oid[(count($split_oid) - 2)];
             $num_index = $member_id . '.' . $num_index;
             $oid = $base_oid . $num_index;

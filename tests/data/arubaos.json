@@ -20798,7 +20798,7 @@
                     "processor_index": "0",
                     "processor_type": "arubaos",
                     "processor_usage": 3,
-                    "processor_descr": "Network Processor CPU0",
+                    "processor_descr": "Supervisor Card CPU",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
