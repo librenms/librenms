@@ -63,8 +63,9 @@ echo generate_port_link(
     $port['graph_type']
 );
 
+// ADSL can be difficult to comprehend, see doc/Developing/ADSL-things.md
 echo '</td><td width=135>';
-echo '' . formatRates($port['adslAturChanCurrTxRate']) . '/' . formatRates($port['adslAtucChanCurrTxRate']);
+echo formatRates($port['adslAturChanCurrTxRate']) . '/' . formatRates($port['adslAtucChanCurrTxRate']);
 echo '<br />';
 $port['graph_type'] = 'port_adsl_speed';
 echo generate_port_link(
@@ -74,7 +75,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . formatRates($port['adslAturCurrAttainableRate']) . '/' . formatRates($port['adslAtucCurrAttainableRate']);
+echo formatRates($port['adslAturCurrAttainableRate']) . '/' . formatRates($port['adslAtucCurrAttainableRate']);
 echo '<br />';
 $port['graph_type'] = 'port_adsl_attainable';
 echo generate_port_link(
@@ -84,7 +85,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . $port['adslAturCurrAtn'] . 'dB/' . $port['adslAtucCurrAtn'] . 'dB';
+echo $port['adslAturCurrAtn'] . 'dB/' . $port['adslAtucCurrAtn'] . 'dB';
 echo '<br />';
 $port['graph_type'] = 'port_adsl_attenuation';
 echo generate_port_link(
@@ -94,7 +95,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . $port['adslAturCurrSnrMgn'] . 'dB/' . $port['adslAtucCurrSnrMgn'] . 'dB';
+echo $port['adslAturCurrSnrMgn'] . 'dB/' . $port['adslAtucCurrSnrMgn'] . 'dB';
 echo '<br />';
 $port['graph_type'] = 'port_adsl_snr';
 echo generate_port_link(
@@ -104,7 +105,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . $port['adslAturCurrOutputPwr'] . 'dBm/' . $port['adslAtucCurrOutputPwr'] . 'dBm';
+echo $port['adslAturCurrOutputPwr'] . 'dBm/' . $port['adslAtucCurrOutputPwr'] . 'dBm';
 echo '<br />';
 $port['graph_type'] = 'port_adsl_power';
 echo generate_port_link(

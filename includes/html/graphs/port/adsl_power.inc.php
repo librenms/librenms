@@ -1,14 +1,15 @@
 <?php
+// ADSL can be difficult to comprehend, see doc/Developing/ADSL-things.md
 
 $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'adsl');
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = 'Central';
-$rrd_list[0]['ds'] = 'AturCurrOutputPwr';
+$rrd_list[0]['ds'] = 'AtucCurrOutputPwr';
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = 'CPE';
-$rrd_list[1]['ds'] = 'AtucCurrOutputPwr';
+$rrd_list[1]['ds'] = 'AturCurrOutputPwr';
 
 $unit_text = 'dBm';
 
