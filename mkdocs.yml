@@ -178,6 +178,7 @@ nav:
           - Settings: Developing/os/Settings.md
           - Sensor State Support: Developing/Sensor-State-Support.md
       - SNMP Traps: Developing/SNMP-Traps.md
+      - ADSL things: Developing/ADSL-things.md
       - Dynamic Config: Developing/Dynamic-Config.md
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
       - Creating Release: Developing/Creating-Release.md
