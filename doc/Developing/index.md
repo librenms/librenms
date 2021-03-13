@@ -29,6 +29,7 @@ incompatible code. To be safe do not view Observium code at all.  See
   style that should be adhered to. You can [validate that your code
   adheres to these guidelines](Validating-Code.md) before submitting.
 - Check [Style Guidelines](Style-Guidelines.md) for Web UI guidelines and conventions.
+- Working with [ADSL](ADSL-things.md) MIB in LibreNMS.
 
 # How to Contribute
 
