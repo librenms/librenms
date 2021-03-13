@@ -122,8 +122,11 @@ class Printer implements Module
         foreach ($oids as $index => $data) {
             $last_index = substr($index, strrpos($index, '.') + 1);
 
-            $raw_toner = $data['prtMarkerSuppliesLevel'];
             $descr = $data['prtMarkerSuppliesDescription'];
+            $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
+            $raw_toner = $data['prtMarkerSuppliesLevel'];
+            $printer_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
+            $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
             // work around weird HP bug where descriptions are on two lines and the second line is hex
             if (Str::contains($descr, "\n")) {
@@ -136,11 +139,6 @@ class Printer implements Module
                 }
                 $descr = trim($new_descr);
             }
-
-            $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
-            $raw_toner = $data['prtMarkerSuppliesLevel'];
-            $printer_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
-            $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
             // Ricoh - TONERCurLevel
             if (empty($raw_toner)) {
