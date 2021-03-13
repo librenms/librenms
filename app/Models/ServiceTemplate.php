@@ -39,8 +39,6 @@ class ServiceTemplate extends BaseModel
         'type',
         'dtype',
         'dgtype',
-        'drules',
-        'dgrules',
         'desc',
         'param',
         'ignore',
