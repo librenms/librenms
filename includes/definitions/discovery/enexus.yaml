@@ -172,11 +172,6 @@ modules:
                         - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
-                    skip_values:
-                        -
-                            oid: batteryBankTable
-                            op: '='
-                            value: false
                 -
                     oid: batteryBankTable
                     value: batteryBankStatus
@@ -310,11 +305,6 @@ modules:
                     low_warn_limit: batteryVoltageMinorLowLevel
                     warn_limit: batteryVoltageMinorHighLevel
                     high_limit: batteryVoltageMajorHighLevel
-                    skip_values:
-                        -
-                            oid: batteryBankTable
-                            op: '='
-                            value: false
         current:
             data:
                 -
@@ -347,11 +337,6 @@ modules:
                     low_warn_limit: batteryCurrentsMinorLowLevel
                     warn_limit: batteryCurrentsMinorHighLevel
                     high_limit: batteryCurrentsMajorHighLevel
-                    skip_values:
-                        -
-                            oid: batteryBankTable
-                            op: '='
-                            value: false
                 -
                     oid: batteryBankCurrentTable
                     value: batteryCurrentValue
@@ -364,11 +349,6 @@ modules:
                     low_warn_limit: batteryCurrentMinorLowLevel
                     warn_limit: batteryCurrentMinorHighLevel
                     high_limit: batteryCurrentMajorHighLevel
-                    skip_values:
-                        -
-                            oid: batteryBankTable
-                            op: '='
-                            value: false
         temperature:
             data:
                 -
@@ -380,11 +360,6 @@ modules:
                     low_warn_limit: batteryTemperaturesMinorLowLevel
                     warn_limit: batteryTemperaturesMinorHighLevel
                     high_limit: batteryTemperaturesMajorHighLevel
-                    skip_values:
-                        -
-                            oid: batteryBankTable
-                            op: '='
-                            value: false
                 -
                     oid: batteryBankTemperatureTable
                     value: batteryTemperatureValue
@@ -408,8 +383,3 @@ modules:
                     descr: batteryTimeLeftDescription
                     low_warn_limit: batteryTimeLeftMinorAlarmLevel
                     low_limit: batteryTimeLeftMajorAlarmLevel
-                    skip_values:
-                        -
-                            oid: batteryBankTable
-                            op: '='
-                            value: false

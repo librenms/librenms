@@ -95,7 +95,7 @@ $component = new LibreNMS\Component();
 $options = [];         // Re-init array in case it has been declared previously.
 $options['filter']['type'] = ['=', 'Cisco-CBQOS'];
 $components = $component->getComponents($device['device_id'], $options);
-$components = $components[$device['device_id']];        // We only care about our device id.
+$components = $components[$device['device_id']] ?? [];        // We only care about our device id.
 if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }

@@ -17,8 +17,8 @@ modules:
     processors:
         data:
             -
-                oid: HealthModuleEntry
-                num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.{{ $index }}'
+                oid: healthModuleCpu1MinAvg
+                num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.0'  # force to CMM oid
                 index: 0
     sensors:
         pre-cache:

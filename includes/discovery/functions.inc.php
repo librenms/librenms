@@ -205,6 +205,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit = set_null($warn_limit);
     $high_limit = set_null($high_limit);
+    $current = cast_number($current);
 
     if (! is_numeric($divisor)) {
         $divisor = 1;
@@ -561,7 +562,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', [$index, $device['device_id'], $mib]);
-        if ($storage === false || ! count($storage)) {
+        if (empty($storage)) {
             if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
                 $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
             } else {
@@ -900,7 +901,7 @@ function ignore_storage($os, $descr)
  */
 function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_class] && ! can_skip_sensor($device, $sensor_class, '')) {
+    if (! empty($device['dynamic_discovery']['modules']['sensors'][$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = [];
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];
@@ -948,8 +949,6 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     $value = false;
                 }
 
-                d_echo("Final sensor value: $value\n");
-
                 $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
 
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
@@ -973,6 +972,8 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 }
 
                 if ($skippedFromYaml === false && is_numeric($value)) {
+                    d_echo("Sensor fetched value: $value\n");
+
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID
                     // strlen($index) as first number, and each letter converted to a number, separated by dots
@@ -984,12 +985,12 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     // process the group
                     $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
 
-                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
-                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
+                    $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
+                    $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
-                        if (is_numeric($data[$limit])) {
+                        if (isset($data[$limit]) && is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
                             $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
@@ -1044,7 +1045,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
         echo ucfirst($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
-        if (is_file($dir . $device['os_group'] . '.inc.php')) {
+        if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
         }
         if (is_file($dir . $device['os'] . '.inc.php')) {

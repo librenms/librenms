@@ -188,6 +188,12 @@ function preg_match_any($subject, $regexes)
  */
 function compare_var($a, $b, $comparison = '=')
 {
+    // handle PHP8 change to implicit casting
+    if (is_numeric($a) || is_numeric($b)) {
+        $a = cast_number($a);
+        $b = is_array($b) ? $b : cast_number($b);
+    }
+
     switch ($comparison) {
         case '=':
             return $a == $b;

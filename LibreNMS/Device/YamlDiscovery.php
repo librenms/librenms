@@ -77,10 +77,12 @@ class YamlDiscovery
                     $count++;
                     $current_data = [];
 
+                    // fall back to the fetched oid if value is not specified.  Useful for non-tabular data.
                     if (! isset($data['value'])) {
                         $data['value'] = $data['oid'];
                     }
 
+                    // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
                         try {
                             d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
@@ -100,7 +102,7 @@ class YamlDiscovery
                     }
 
                     foreach ($data as $name => $value) {
-                        if ($name == '$oid' || $name == 'skip_values') {
+                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags'])) {
                             $current_data[$name] = $value;
                         } elseif (Str::contains($value, '{{')) {
                             // replace embedded values
@@ -156,7 +158,7 @@ class YamlDiscovery
                 $replace[] = $subindex;
             }
 
-            $value = str_replace($search, $replace, $def[$name]);
+            $value = str_replace($search, $replace, $def[$name] ?? '');
 
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
@@ -202,9 +204,9 @@ class YamlDiscovery
         $sub_indexes = explode('.', $index);
         // parse sub_index options name with trailing colon and index
         $sub_index = 0;
-        if (preg_match('/^(.+):(\d+)$/', $name, $matches)) {
-            $name = $matches[1];
-            $sub_index = $matches[2];
+        $sub_index_end = null;
+        if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
+            [,$name, $sub_index, $sub_index_end] = $matches;
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -213,10 +215,19 @@ class YamlDiscovery
                     return $pre_cache[$name][$index][$name];
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
-                } elseif (count($pre_cache[$name]) === 1) {
+                } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
                     return current($pre_cache[$name]);
-                } elseif (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
-                    return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
+                } elseif (isset($sub_indexes[$sub_index])) {
+                    if ($sub_index_end) {
+                        $multi_sub_index = implode('.', array_slice($sub_indexes, $sub_index, $sub_index_end));
+                        if (isset($pre_cache[$name][$multi_sub_index][$name])) {
+                            return $pre_cache[$name][$multi_sub_index][$name];
+                        }
+                    }
+
+                    if (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
+                        return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
+                    }
                 }
             } else {
                 return $pre_cache[$name];
@@ -262,13 +273,15 @@ class YamlDiscovery
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
+                                } elseif (Str::contains($oid, '::')) {
+                                    $snmp_flag = ['-OteQUS'];
                                 } else {
                                     $snmp_flag = ['-OteQUs'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
                                 $mib = $device['dynamic_discovery']['mib'];
-                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $mib, null, $snmp_flag);
+                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
                             }
                         }
                     }
@@ -291,7 +304,7 @@ class YamlDiscovery
      */
     public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
     {
-        $skip_values = array_replace((array) $group_options['skip_values'], (array) $yaml_item_data['skip_values']);
+        $skip_values = array_replace((array) ($group_options['skip_values'] ?? []), (array) ($yaml_item_data['skip_values'] ?? []));
 
         foreach ($skip_values as $skip_value) {
             if (is_array($skip_value) && $pre_cache) {
@@ -311,14 +324,14 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_lt = array_replace((array) $group_options['skip_value_lt'], (array) $yaml_item_data['skip_value_lt']);
+        $skip_value_lt = array_replace((array) ($group_options['skip_value_lt'] ?? []), (array) ($yaml_item_data['skip_value_lt'] ?? []));
         foreach ($skip_value_lt as $skip_value) {
             if ($value < $skip_value) {
                 return true;
             }
         }
 
-        $skip_value_gt = array_replace((array) $group_options['skip_value_gt'], (array) $yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array) ($group_options['skip_value_gt'] ?? []), (array) ($yaml_item_data['skip_value_gt'] ?? []));
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;
