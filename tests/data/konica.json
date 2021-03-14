@@ -553,7 +553,7 @@
             ]
         }
     },
-    "printer": {
+    "printer-supplies": {
         "discovery": {
             "printer_supplies": [
                 {

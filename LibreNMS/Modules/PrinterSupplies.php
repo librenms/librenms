@@ -1,6 +1,6 @@
 <?php
 /**
- * Printer.php
+ * PrinterSupplies.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use Log;
 
-class Printer implements Module
+class PrinterSupplies implements Module
 {
     use SyncsModels;
 

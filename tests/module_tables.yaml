@@ -117,7 +117,7 @@ storage:
     storage:
         excluded_fields: [device_id, storage_id]
         order_by: storage_index, storage_type
-printer:
+printer-supplies:
     printer_supplies:
         excluded_fields: [device_id, id]
         order_by: printer_oid, printer_index

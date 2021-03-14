@@ -10,6 +10,6 @@ discovery:
         sysDescr:
             - 'OKI OkiLAN'
 discovery_modules:
-    printer: true
+    printer-supplies:   true
 poller_modules:
-    printer: true
+    printer-supplies:   true

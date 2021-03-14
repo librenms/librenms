@@ -10,6 +10,6 @@ discovery:
         sysDescr:
             - 'EPSON Built-in'
 discovery_modules:
-    printer: true
+    printer-supplies:   true
 poller_modules:
-    printer: true
+    printer-supplies:   true

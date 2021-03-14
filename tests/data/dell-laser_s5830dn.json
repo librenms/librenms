@@ -672,7 +672,7 @@
         },
         "poller": "matches discovery"
     },
-    "printer": {
+    "printer-supplies": {
         "discovery": {
             "printer_supplies": [
                 {

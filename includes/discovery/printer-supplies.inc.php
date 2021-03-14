@@ -5,4 +5,4 @@ use LibreNMS\OS;
 if (! $os instanceof OS) {
     $os = OS::make($device);
 }
-(new \LibreNMS\Modules\Printer())->discover($os);
+(new \LibreNMS\Modules\PrinterSupplies())->discover($os);
