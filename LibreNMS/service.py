@@ -9,11 +9,6 @@ import threading
 import sys
 import time
 
-try:
-    import psutil
-except ImportError:
-    pass
-
 from datetime import timedelta
 from datetime import datetime
 from logging import debug, info, warning, error, critical, exception
@@ -501,11 +496,7 @@ class Service:
 
         info('Restarting service... ')
 
-        if 'psutil' not in sys.modules:
-            warning("psutil is not available, polling gap possible")
-            self._stop_managers_and_wait()
-        else:
-            self._stop_managers()
+        self._stop_managers()
         self._release_master()
 
         python = sys.executable
