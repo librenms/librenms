@@ -5,14 +5,6 @@ import sys
 import threading
 import time
 
-import LibreNMS
-from LibreNMS.config import DBConfig
-
-try:
-    import psutil
-except ImportError:
-    pass
-
 from datetime import timedelta
 from datetime import datetime
 from platform import python_version
@@ -716,11 +708,7 @@ class Service:
 
         logger.info("Restarting service... ")
 
-        if "psutil" not in sys.modules:
-            logger.warning("psutil is not available, polling gap possible")
-            self._stop_managers_and_wait()
-        else:
-            self._stop_managers()
+        self._stop_managers()
         self._release_master()
 
         python = sys.executable
