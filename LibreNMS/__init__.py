@@ -203,7 +203,7 @@ def call_script(script, args=()):
     logger.debug("Running {}".format(cmd))
     # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
     return command_runner(
-        cmd, preexec_fn=os.setsid, close_fds=True, timeout=DEFAULT_SCRIPT_TIMEOUT
+        cmd, preexec_fn=os.setsid, close_fds=True, start_new_session=True, timeout=DEFAULT_SCRIPT_TIMEOUT
     )
 
 
