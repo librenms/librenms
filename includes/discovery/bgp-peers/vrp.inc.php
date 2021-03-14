@@ -176,7 +176,7 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeersCache);
         unset($bgpPeers);
         if ($vrp_bgp_peer_count > 0) {
-            return; //Finish BGP discovery here, cause we collected data
+            return; //Finish BGP discovery here, cause we already collected data with Huawei MIBs
         }
     }
     // If not, we continue with standard BGP4 MIB
