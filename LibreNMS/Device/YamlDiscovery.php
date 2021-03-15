@@ -24,12 +24,12 @@
 
 namespace LibreNMS\Device;
 
+use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
-use Cache;
 
 class YamlDiscovery
 {
@@ -386,10 +386,14 @@ class YamlDiscovery
                 }
             }
         }
+
+        //Store the value
+        Cache::put($key, $numeric_oid, $cache_time);
+
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");
         }
-        Cache::put($key, $numeric_oid, $cache_time);
+
         return $numeric_oid;
     }
 
