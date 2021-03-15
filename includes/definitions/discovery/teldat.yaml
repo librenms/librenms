@@ -23,7 +23,7 @@ modules:
                 total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalcache
                 free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreecache
                 descr: 'Cache Memory'
-                class: cache
+                class: cached
                 index: 2
     processors:
         data:
