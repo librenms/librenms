@@ -9,8 +9,8 @@ modules:
     mempools:
         data:
             -
+                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotal
                 free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreenoncache
-                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalnoncache
     processors:
         data:
             -
