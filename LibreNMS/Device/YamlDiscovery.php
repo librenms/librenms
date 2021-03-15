@@ -130,19 +130,6 @@ class YamlDiscovery
      */
     public static function computeNumericalOID($device, $data)
     {
-        // Create the keys
-        $keyPositive = 'YamlDiscovery:computedNumericalOID:' . $data['value'] . $data['oid'] . $device['dynamic_discovery']['mib'];
-        $keyNegative = 'YamlDiscovery:noNumericalOID:' . $data['value'] . $data['oid'] . $device['dynamic_discovery']['mib'];
-        
-        if (Cache::has($keyNegative)) {
-            throw new InvalidOidException('Unable to translate oid ' . $data['value']);
-        }
-
-        if (Cache::has($keyPositive)) {
-            //return the cached value if applicable
-            return Cache::get($keyPositive);
-        }
-
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
         $search_mib = $device['dynamic_discovery']['mib'];
         $mib_prefix_data_oid = Str::before($data['oid'], '::');
@@ -154,16 +141,11 @@ class YamlDiscovery
         try {
             $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
         } catch (\Exception $e) {
-            //negative cache
-            Cache::put($keyNegative, true, $cache_time);
             throw $e;
         }
 
         d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
-        //store the cached value and return
-        $result = $num_oid . '.{{ $index }}';
-        Cache::put($keyPositive, $result, $cache_time);
-        return $result;
+        return $num_oid . '.{{ $index }}';
     }
 
     /**
@@ -393,17 +375,21 @@ class YamlDiscovery
         if (self::oidIsNumeric($oid)) {
             return $oid;
         }
-
-        foreach (explode(':', $mib) as $mib_name) {
-            if ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
-                break;
+        $key = 'YamlDiscovery:oidToNumeric:' . $mibdir . '/' . $mib . '/' .  $oid;
+        if (Cache::has($key)) {
+            $numeric_oid = Cache::get($key);
+        } else {
+            foreach (explode(':', $mib) as $mib_name) {
+                $numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device);
+                if ($numeric_oid) {
+                    break;
+                }
             }
         }
-
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");
         }
-
+        Cache::put($key, $numeric_oid, $cache_time);
         return $numeric_oid;
     }
 
