@@ -417,121 +417,121 @@
         "discovery": {
             "printer_supplies": [
                 {
-                    "printer_index": 1,
-                    "printer_type": "toner",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "printer_descr": "Black Toner Cartridge OKI DATA CORP",
-                    "printer_capacity": 100,
-                    "printer_current": 59,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Toner Cartridge OKI DATA CORP",
+                    "supply_capacity": 100,
+                    "supply_current": 59,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "printer_index": 10,
-                    "printer_type": "fuser",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
-                    "printer_descr": "Fuser Unit OKI DATA CORP",
-                    "printer_capacity": 100000,
-                    "printer_current": 99,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
+                    "supply_index": 10,
+                    "supply_type": "fuser",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
+                    "supply_descr": "Fuser Unit OKI DATA CORP",
+                    "supply_capacity": 100000,
+                    "supply_current": 99,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "toner",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "printer_descr": "Cyan Toner Cartridge OKI DATA CORP",
-                    "printer_capacity": 100,
-                    "printer_current": 69,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Toner Cartridge OKI DATA CORP",
+                    "supply_capacity": 100,
+                    "supply_current": 69,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "toner",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "printer_descr": "Magenta Toner Cartridge OKI DATA CORP",
-                    "printer_capacity": 100,
-                    "printer_current": 69,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Toner Cartridge OKI DATA CORP",
+                    "supply_capacity": 100,
+                    "supply_current": 69,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "printer_index": 4,
-                    "printer_type": "toner",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "printer_descr": "Yellow Toner Cartridge OKI DATA CORP",
-                    "printer_capacity": 100,
-                    "printer_current": 69,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Yellow Toner Cartridge OKI DATA CORP",
+                    "supply_capacity": 100,
+                    "supply_current": 69,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "printer_index": 5,
-                    "printer_type": "opc",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
-                    "printer_descr": "Black Image Drum Unit OKI DATA CORP",
-                    "printer_capacity": 30000,
-                    "printer_current": 95,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                    "supply_index": 5,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "supply_descr": "Black Image Drum Unit OKI DATA CORP",
+                    "supply_capacity": 30000,
+                    "supply_current": 95,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
                 },
                 {
-                    "printer_index": 6,
-                    "printer_type": "opc",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
-                    "printer_descr": "Cyan Image Drum Unit OKI DATA CORP",
-                    "printer_capacity": 30000,
-                    "printer_current": 96,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                    "supply_index": 6,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "supply_descr": "Cyan Image Drum Unit OKI DATA CORP",
+                    "supply_capacity": 30000,
+                    "supply_current": 96,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
                 },
                 {
-                    "printer_index": 7,
-                    "printer_type": "opc",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
-                    "printer_descr": "Magenta Image Drum Unit OKI DATA CORP",
-                    "printer_capacity": 30000,
-                    "printer_current": 96,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                    "supply_index": 7,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "supply_descr": "Magenta Image Drum Unit OKI DATA CORP",
+                    "supply_capacity": 30000,
+                    "supply_current": 96,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
                 },
                 {
-                    "printer_index": 8,
-                    "printer_type": "opc",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
-                    "printer_descr": "Yellow Image Drum Unit OKI DATA CORP",
-                    "printer_capacity": 30000,
-                    "printer_current": 96,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                    "supply_index": 8,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "supply_descr": "Yellow Image Drum Unit OKI DATA CORP",
+                    "supply_capacity": 30000,
+                    "supply_current": 96,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
                 },
                 {
-                    "printer_index": 9,
-                    "printer_type": "transferUnit",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
-                    "printer_descr": "Belt Unit OKI DATA CORP",
-                    "printer_capacity": 80000,
-                    "printer_current": 98,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                    "supply_index": 9,
+                    "supply_type": "transferUnit",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
+                    "supply_descr": "Belt Unit OKI DATA CORP",
+                    "supply_capacity": 80000,
+                    "supply_current": 98,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
                 },
                 {
-                    "printer_index": 1,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
-                    "printer_descr": "TRAY1",
-                    "printer_capacity": 300,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                    "supply_index": 1,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "supply_descr": "TRAY1",
+                    "supply_capacity": 300,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "printer_descr": "MPTRAY",
-                    "printer_capacity": 100,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "supply_index": 2,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "supply_descr": "MPTRAY",
+                    "supply_capacity": 100,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
-                    "printer_descr": "TRAY2",
-                    "printer_capacity": 530,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
+                    "supply_index": 3,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
+                    "supply_descr": "TRAY2",
+                    "supply_capacity": 530,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
                 }
             ]
         },

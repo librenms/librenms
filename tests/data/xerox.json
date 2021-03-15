@@ -24,112 +24,112 @@
         "discovery": {
             "printer_supplies": [
                 {
-                    "printer_index": 1,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "printer_descr": "Black Toner",
-                    "printer_capacity": 5300,
-                    "printer_current": 20,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Toner",
+                    "supply_capacity": 5300,
+                    "supply_current": 20,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "printer_index": 10,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
-                    "printer_descr": "Waste Toner Container",
-                    "printer_capacity": 100,
-                    "printer_current": 5,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
+                    "supply_index": 10,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
+                    "supply_descr": "Waste Toner Container",
+                    "supply_capacity": 100,
+                    "supply_current": 5,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
                 },
                 {
-                    "printer_index": 11,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
-                    "printer_descr": "Transfer Belt Cleaner",
-                    "printer_capacity": 100,
-                    "printer_current": 65,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
+                    "supply_index": 11,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
+                    "supply_descr": "Transfer Belt Cleaner",
+                    "supply_capacity": 100,
+                    "supply_current": 65,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
                 },
                 {
-                    "printer_index": 12,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
-                    "printer_descr": "Second Bias Transfer Roll",
-                    "printer_capacity": 100,
-                    "printer_current": 86,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
+                    "supply_index": 12,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
+                    "supply_descr": "Second Bias Transfer Roll",
+                    "supply_capacity": 100,
+                    "supply_current": 86,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "printer_descr": "Cyan Toner",
-                    "printer_capacity": 3000,
-                    "printer_current": 66,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Toner",
+                    "supply_capacity": 3000,
+                    "supply_current": 66,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "printer_descr": "Magenta Toner",
-                    "printer_capacity": 3000,
-                    "printer_current": 72,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Toner",
+                    "supply_capacity": 3000,
+                    "supply_current": 72,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "printer_index": 4,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "printer_descr": "Yellow Toner",
-                    "printer_capacity": 3050,
-                    "printer_current": 60,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Yellow Toner",
+                    "supply_capacity": 3050,
+                    "supply_current": 60,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "printer_index": 5,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
-                    "printer_descr": "Drum Cartridge (R1)",
-                    "printer_capacity": 100,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                    "supply_index": 5,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "supply_descr": "Drum Cartridge (R1)",
+                    "supply_capacity": 100,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
                 },
                 {
-                    "printer_index": 6,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
-                    "printer_descr": "Drum Cartridge (R2)",
-                    "printer_capacity": 100,
-                    "printer_current": 92,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                    "supply_index": 6,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "supply_descr": "Drum Cartridge (R2)",
+                    "supply_capacity": 100,
+                    "supply_current": 92,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
                 },
                 {
-                    "printer_index": 7,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
-                    "printer_descr": "Drum Cartridge (R3)",
-                    "printer_capacity": 100,
-                    "printer_current": 93,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                    "supply_index": 7,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "supply_descr": "Drum Cartridge (R3)",
+                    "supply_capacity": 100,
+                    "supply_current": 93,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
                 },
                 {
-                    "printer_index": 8,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
-                    "printer_descr": "Drum Cartridge (R4)",
-                    "printer_capacity": 100,
-                    "printer_current": 93,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                    "supply_index": 8,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "supply_descr": "Drum Cartridge (R4)",
+                    "supply_capacity": 100,
+                    "supply_current": 93,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
                 },
                 {
-                    "printer_index": 9,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
-                    "printer_descr": "Fuser",
-                    "printer_capacity": 100,
-                    "printer_current": 90,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                    "supply_index": 9,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
+                    "supply_descr": "Fuser",
+                    "supply_capacity": 100,
+                    "supply_current": 90,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
                 }
             ]
         },

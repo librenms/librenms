@@ -2069,15 +2069,15 @@ wireless_sensors:
     wireless_sensors_device_id_foreign: { name: wireless_sensors_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 printer_supplies:
   Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: supply_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: printer_index, Type: int, 'Null': false, Extra: '' }
-    - { Field: printer_type, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: printer_oid, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: printer_descr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
-    - { Field: printer_capacity, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: printer_current, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: printer_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: supply_index, Type: int, 'Null': false, Extra: '' }
+    - { Field: supply_type, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: supply_oid, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: supply_descr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: supply_capacity, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_current, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

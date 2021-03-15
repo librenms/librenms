@@ -7,19 +7,19 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                                 Cur    Max\\n'";
 
-$colour = toner2colour($toner['printer_descr'], 100 - $toner['printer_current']);
+$colour = toner2colour($toner['supply_descr'], 100 - $toner['supply_current']);
 if ($colour['left'] == null) {
     $colour['left'] = 'CC0000';
 }
 
-$descr = safedescr(substr(str_pad($toner['printer_descr'], 26), 0, 26));
+$descr = safedescr(substr(str_pad($toner['supply_descr'], 26), 0, 26));
 
-$background = get_percentage_colours((100 - $toner['printer_current']));
+$background = get_percentage_colours((100 - $toner['supply_current']));
 
-$rrd_options .= ' DEF:toner' . $toner['id'] . '=' . $rrd_filename . ':toner:AVERAGE ';
+$rrd_options .= ' DEF:toner' . $toner['supply_id'] . '=' . $rrd_filename . ':toner:AVERAGE ';
 
-$rrd_options .= ' LINE1:toner' . $toner['id'] . '#' . $colour['left'] . ":'" . $descr . "' ";
+$rrd_options .= ' LINE1:toner' . $toner['supply_id'] . '#' . $colour['left'] . ":'" . $descr . "' ";
 
-$rrd_options .= ' AREA:toner' . $toner['id'] . '#' . $background['right'] . ':';
-$rrd_options .= ' GPRINT:toner' . $toner['id'] . ":LAST:'%5.0lf%%'";
-$rrd_options .= ' GPRINT:toner' . $toner['id'] . ':MAX:%5.0lf%%\l';
+$rrd_options .= ' AREA:toner' . $toner['supply_id'] . '#' . $background['right'] . ':';
+$rrd_options .= ' GPRINT:toner' . $toner['supply_id'] . ":LAST:'%5.0lf%%'";
+$rrd_options .= ' GPRINT:toner' . $toner['supply_id'] . ':MAX:%5.0lf%%\l';

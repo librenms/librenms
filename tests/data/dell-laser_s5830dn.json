@@ -676,76 +676,76 @@
         "discovery": {
             "printer_supplies": [
                 {
-                    "printer_index": 1,
-                    "printer_type": "toner",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "printer_descr": "Black Toner",
-                    "printer_capacity": 45000,
-                    "printer_current": 49,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Toner",
+                    "supply_capacity": 45000,
+                    "supply_current": 49,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "opc",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "printer_descr": "Imaging Unit",
-                    "printer_capacity": 100000,
-                    "printer_current": 72,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Imaging Unit",
+                    "supply_capacity": 100000,
+                    "supply_current": 72,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "other",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "printer_descr": "Maintenance Kit",
-                    "printer_capacity": 200000,
-                    "printer_current": 83,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "other",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Maintenance Kit",
+                    "supply_capacity": 200000,
+                    "supply_current": 83,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "printer_index": 4,
-                    "printer_type": "other",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "printer_descr": "Roller Kit",
-                    "printer_capacity": 300000,
-                    "printer_current": 89,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "other",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Roller Kit",
+                    "supply_capacity": 300000,
+                    "supply_current": 89,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "printer_index": 1,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
-                    "printer_descr": "Tray 1",
-                    "printer_capacity": 550,
-                    "printer_current": 100,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                    "supply_index": 1,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "supply_descr": "Tray 1",
+                    "supply_capacity": 550,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "printer_descr": "Manual Envelope",
-                    "printer_capacity": 1,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "supply_index": 2,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "supply_descr": "Manual Envelope",
+                    "supply_capacity": 1,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
-                    "printer_descr": "Manual Paper",
-                    "printer_capacity": 1,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
+                    "supply_index": 3,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
+                    "supply_descr": "Manual Paper",
+                    "supply_capacity": 1,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
                 },
                 {
-                    "printer_index": 4,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.4",
-                    "printer_descr": "MP Tray",
-                    "printer_capacity": 100,
-                    "printer_current": 0,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.4"
+                    "supply_index": 4,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.4",
+                    "supply_descr": "MP Tray",
+                    "supply_capacity": 100,
+                    "supply_current": 0,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.4"
                 }
             ]
         },

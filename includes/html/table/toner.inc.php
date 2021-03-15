@@ -23,7 +23,7 @@ $param = [];
 $sql = 'SELECT * FROM `printer_supplies` AS S, `devices` AS D WHERE S.device_id = D.device_id';
 
 if (! empty($searchPhrase)) {
-    $sql .= ' AND (`D`.`hostname` LIKE ? OR `printer_descr` LIKE ?)';
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `supply_descr` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
 }
@@ -37,10 +37,10 @@ if (empty($count)) {
 }
 
 if (empty($sort)) {
-    $sort = '`D`.`hostname`, `printer_descr`';
+    $sort = '`D`.`hostname`, `supply_descr`';
 } else {
     // toner_used is an alias for toner_perc
-    $sort = str_replace('toner_used', 'printer_current', $sort);
+    $sort = str_replace('toner_used', 'supply_current', $sort);
 }
 
 $sql .= " ORDER BY $sort";
@@ -56,11 +56,11 @@ if ($rowCount != -1) {
 
 foreach (dbFetchRows($sql, $param) as $toner) {
     if (device_permitted($toner['device_id'])) {
-        $perc = $toner['printer_current'];
-        $type = $toner['printer_type'];
+        $perc = $toner['supply_current'];
+        $type = $toner['supply_type'];
 
         $graph_array['type'] = $graph_type;
-        $graph_array['id'] = $toner['id'];
+        $graph_array['id'] = $toner['supply_id'];
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['height'] = '20';
@@ -75,18 +75,18 @@ foreach (dbFetchRows($sql, $param) as $toner) {
 
         $response[] = [
             'hostname' => generate_device_link($toner),
-            'printer_descr' => $toner['printer_descr'],
+            'supply_descr' => $toner['supply_descr'],
             'graph' => $mini_graph,
             'toner_used' => $bar_link,
-            'printer_type' => StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type),
-            'printer_current' => $perc . '%',
+            'supply_type' => StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type),
+            'supply_current' => $perc . '%',
         ];
 
         if ($vars['view'] == 'graphs') {
             $graph_array['height'] = '100';
             $graph_array['width'] = '216';
             $graph_array['to'] = \LibreNMS\Config::get('time.now');
-            $graph_array['id'] = $toner['id'];
+            $graph_array['id'] = $toner['supply_id'];
             $graph_array['type'] = $graph_type;
             $return_data = true;
             include 'includes/html/print-graphrow.inc.php';

@@ -444,58 +444,58 @@
         "discovery": {
             "printer_supplies": [
                 {
-                    "printer_index": 1,
-                    "printer_type": "toner",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "printer_descr": "Black Toner",
-                    "printer_capacity": 100,
-                    "printer_current": 8,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Toner",
+                    "supply_capacity": 100,
+                    "supply_current": 8,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "opc",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "printer_descr": "Drum",
-                    "printer_capacity": 100,
-                    "printer_current": 99,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Drum",
+                    "supply_capacity": 100,
+                    "supply_current": 99,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "fuser",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "printer_descr": "Fuser",
-                    "printer_capacity": 100,
-                    "printer_current": 58,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "fuser",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Fuser",
+                    "supply_capacity": 100,
+                    "supply_current": 58,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "printer_index": 4,
-                    "printer_type": "transferUnit",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "printer_descr": "Transfer Roller",
-                    "printer_capacity": 100,
-                    "printer_current": 58,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "transferUnit",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Transfer Roller",
+                    "supply_capacity": 100,
+                    "supply_current": 58,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "printer_index": 1,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
-                    "printer_descr": "1st Cassette",
-                    "printer_capacity": 500,
-                    "printer_current": 50,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                    "supply_index": 1,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "supply_descr": "1st Cassette",
+                    "supply_capacity": 500,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "input",
-                    "printer_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "printer_descr": "Bypass",
-                    "printer_capacity": 100,
-                    "printer_current": 0,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "supply_index": 2,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "supply_descr": "Bypass",
+                    "supply_capacity": 100,
+                    "supply_current": 0,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 }
             ]
         },

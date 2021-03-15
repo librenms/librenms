@@ -24,40 +24,40 @@
         "discovery": {
             "printer_supplies": [
                 {
-                    "printer_index": 1,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "printer_descr": "Black Cartridge HP CF410A",
-                    "printer_capacity": 100,
-                    "printer_current": 54,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Cartridge HP CF410A",
+                    "supply_capacity": 100,
+                    "supply_current": 54,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "printer_index": 2,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "printer_descr": "Cyan Cartridge HP CF411A",
-                    "printer_capacity": 100,
-                    "printer_current": 44,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Cartridge HP CF411A",
+                    "supply_capacity": 100,
+                    "supply_current": 44,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "printer_index": 3,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "printer_descr": "Magenta Cartridge HP CF413A This description is longer than 32",
-                    "printer_capacity": 100,
-                    "printer_current": 76,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Cartridge HP CF413A This description is longer than 32",
+                    "supply_capacity": 100,
+                    "supply_current": 76,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "printer_index": 4,
-                    "printer_type": "markerSupply",
-                    "printer_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "printer_descr": "Yellow Cartridge HP CF412A",
-                    "printer_capacity": 100,
-                    "printer_current": 71,
-                    "printer_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Yellow Cartridge HP CF412A",
+                    "supply_capacity": 100,
+                    "supply_current": 71,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 }
             ]
         },

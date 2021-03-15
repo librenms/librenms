@@ -64,35 +64,35 @@ class PrinterSupplies implements Module
         $device = $os->getDeviceArray();
         $toner_data = $os->getDevice()->printerSupplies;
 
-        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('printer_oid')->toArray());
+        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
 
         foreach ($toner_data as $toner) {
-            echo 'Checking toner ' . $toner['printer_descr'] . '... ';
+            echo 'Checking toner ' . $toner['supply_descr'] . '... ';
 
-            $raw_toner = $toner_snmp[$toner['printer_oid']];
-            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['printer_capacity']);
+            $raw_toner = $toner_snmp[$toner['supply_oid']];
+            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity']);
             echo $tonerperc . " %\n";
 
             $tags = [
                 'rrd_def'     => RrdDefinition::make()->addDataset('toner', 'GAUGE', 0, 20000),
-                'rrd_name'    => ['toner', $toner['printer_index']],
-                'rrd_oldname' => ['toner', $toner['printer_descr']],
-                'index'       => $toner['printer_index'],
+                'rrd_name'    => ['toner', $toner['supply_index']],
+                'rrd_oldname' => ['toner', $toner['supply_descr']],
+                'index'       => $toner['supply_index'],
             ];
             data_update($device, 'toner', $tags, $tonerperc);
 
             // Log empty supplies (but only once)
-            if ($tonerperc == 0 && $toner['printer_current'] > 0) {
-                Log::event('Toner ' . $toner['printer_descr'] . ' is empty', $device, 'toner', 5, $toner['id']);
+            if ($tonerperc == 0 && $toner['supply_current'] > 0) {
+                Log::event('Toner ' . $toner['supply_descr'] . ' is empty', $device, 'toner', 5, $toner['supply_id']);
             }
 
             // Log toner swap
-            if ($tonerperc > $toner['printer_current']) {
-                Log::event('Toner ' . $toner['printer_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['id']);
+            if ($tonerperc > $toner['supply_current']) {
+                Log::event('Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['supply_id']);
             }
 
-            $toner->printer_current = $tonerperc;
-            $toner->printer_capacity = $toner['printer_capacity'];
+            $toner->supply_current = $tonerperc;
+            $toner->supply_capacity = $toner['supply_capacity'];
             $toner->save();
         }
     }
@@ -125,7 +125,7 @@ class PrinterSupplies implements Module
             $descr = $data['prtMarkerSuppliesDescription'];
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
             $raw_toner = $data['prtMarkerSuppliesLevel'];
-            $printer_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
+            $supply_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
             $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
             // work around weird HP bug where descriptions are on two lines and the second line is hex
@@ -142,8 +142,8 @@ class PrinterSupplies implements Module
 
             // Ricoh - TONERCurLevel
             if (empty($raw_toner)) {
-                $printer_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
-                $raw_toner = snmp_get($device, $printer_oid, '-Oqv');
+                $supply_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
+                $raw_toner = snmp_get($device, $supply_oid, '-Oqv');
             }
 
             // Ricoh - TONERNameLocal
@@ -163,13 +163,13 @@ class PrinterSupplies implements Module
             if (is_numeric($current)) {
                 $levels->push(new PrinterSupply([
                     'device_id' => $device['device_id'],
-                    'printer_oid' => $printer_oid,
-                    'printer_capacity_oid' => $capacity_oid,
-                    'printer_index' => $last_index,
-                    'printer_type' => $data['prtMarkerSuppliesType'] ?: 'markerSupply',
-                    'printer_descr' => $descr,
-                    'printer_capacity' => $capacity,
-                    'printer_current' => $current,
+                    'supply_oid' => $supply_oid,
+                    'supply_capacity_oid' => $capacity_oid,
+                    'supply_index' => $last_index,
+                    'supply_type' => $data['prtMarkerSuppliesType'] ?: 'markerSupply',
+                    'supply_descr' => $descr,
+                    'supply_capacity' => $capacity,
+                    'supply_current' => $current,
                 ]));
             }
         }
@@ -207,13 +207,13 @@ class PrinterSupplies implements Module
 
             $papers->push(new PrinterSupply([
                 'device_id' => $device['device_id'],
-                'printer_oid' => ".1.3.6.1.2.1.43.8.2.1.10.$index",
-                'printer_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
-                'printer_index' => $last_index,
-                'printer_type' => 'input',
-                'printer_descr' => $data['prtInputName'],
-                'printer_capacity' => $capacity,
-                'printer_current' => $current,
+                'supply_oid' => ".1.3.6.1.2.1.43.8.2.1.10.$index",
+                'supply_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
+                'supply_index' => $last_index,
+                'supply_type' => 'input',
+                'supply_descr' => $data['prtInputName'],
+                'supply_capacity' => $capacity,
+                'supply_current' => $current,
             ]));
         }
 

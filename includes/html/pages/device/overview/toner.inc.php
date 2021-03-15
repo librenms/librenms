@@ -4,7 +4,7 @@ use LibreNMS\Util\StringHelpers;
 
 $graph_type = 'toner_usage';
 
-$supplies = \App\Models\PrinterSupply::query()->where('device_id', $device['device_id'])->get()->groupBy('printer_type');
+$supplies = \App\Models\PrinterSupply::query()->where('device_id', $device['device_id'])->get()->groupBy('supply_type');
 
 foreach ($supplies as $type => $supply) {
     if (! empty($supply)) {
@@ -20,18 +20,18 @@ foreach ($supplies as $type => $supply) {
         <table class="table table-hover table-condensed table-striped">';
 
         foreach ($supply as $toner) {
-            $percent = round($toner['printer_current'], 0);
+            $percent = round($toner['supply_current'], 0);
             $total = formatStorage($toner['toner_size']);
             $free = formatStorage($toner['toner_free']);
             $used = formatStorage($toner['toner_used']);
 
-            $background = toner2colour($toner['printer_descr'], $percent);
+            $background = toner2colour($toner['supply_descr'], $percent);
 
             $graph_array = [
                 'height' => 100,
                 'width' => 210,
                 'to' => \LibreNMS\Config::get('time.now'),
-                'id' => $toner['id'],
+                'id' => $toner['supply_id'],
                 'type' => $graph_type,
                 'from' => \LibreNMS\Config::get('time.day'),
                 'legend' => 'no',
@@ -42,7 +42,7 @@ foreach ($supplies as $type => $supply) {
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
             $link = generate_url($link_array);
 
-            $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - ' . $toner['printer_descr']);
+            $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - ' . $toner['supply_descr']);
 
             $graph_array['width'] = 80;
             $graph_array['height'] = 20;
@@ -51,7 +51,7 @@ foreach ($supplies as $type => $supply) {
             $minigraph = generate_lazy_graph_tag($graph_array);
 
             echo '<tr>
-            <td class="col-md-4">' . overlib_link($link, $toner['printer_descr'], $overlib_content) . '</td>
+            <td class="col-md-4">' . overlib_link($link, $toner['supply_descr'], $overlib_content) . '</td>
             <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
             <td class="col-md-4">' . overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
            </a></td>

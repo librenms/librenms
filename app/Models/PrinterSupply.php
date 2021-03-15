@@ -5,21 +5,21 @@ namespace App\Models;
 class PrinterSupply extends DeviceRelatedModel
 {
     protected $table = 'printer_supplies';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'supply_id';
     public $timestamps = false;
     protected $fillable = [
         'device_id',
-        'printer_oid',
-        'printer_capacity_oid',
-        'printer_index',
-        'printer_type',
-        'printer_descr',
-        'printer_capacity',
-        'printer_current',
+        'supply_oid',
+        'supply_capacity_oid',
+        'supply_index',
+        'supply_type',
+        'supply_descr',
+        'supply_capacity',
+        'supply_current',
     ];
 
     public function getCompositeKey()
     {
-        return "$this->printer_type-$this->printer_index";
+        return "$this->supply_type-$this->supply_index";
     }
 }
