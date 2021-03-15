@@ -29,9 +29,12 @@ use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use Cache;
 
 class YamlDiscovery
 {
+    private static $cache_time = 1800; // 30 minutes, Used for oid translation cache
+
     /**
      * @param OS $os
      * @param DiscoveryItem|string $class
@@ -127,25 +130,24 @@ class YamlDiscovery
      */
     public static function computeNumericalOID($device, $data)
     {
-        static $num_oid_cache;
-        static $num_oid_cache_negative;
-        // Compute md5 of the query
-        $key = $data['value'] . $data['oid'] . $device['dynamic_discovery']['mib'];
-
-        if ($num_oid_cache_negative[$key]) {
+        // Create the keys
+        $keyPositive = 'YamlDiscovery:computedNumericalOID:' . $data['value'] . $data['oid'] . $device['dynamic_discovery']['mib'];
+        $keyNegative = 'YamlDiscovery:noNumericalOID:' . $data['value'] . $data['oid'] . $device['dynamic_discovery']['mib'];
+        
+        if (Cache::has($keyNegative)) {
             throw new InvalidOidException('Unable to translate oid ' . $data['value']);
         }
 
-        if (isset($num_oid_cache[$key])) {
+        if (Cache::has($keyPositive)) {
             //return the cached value if applicable
-            return $num_oid_cache[$key];
+            return Cache::get($keyPositive);
         }
 
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
         $search_mib = $device['dynamic_discovery']['mib'];
         $mib_prefix_data_oid = Str::before($data['oid'], '::');
         if (! empty($mib_prefix_data_oid) && empty(Str::before($data['value'], '::'))) {
-            // We should search vlaue in this mib first
+            // We should search value in this mib first
             $search_mib = $mib_prefix_data_oid . ':' . $search_mib;
         }
 
@@ -153,16 +155,15 @@ class YamlDiscovery
             $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
         } catch (\Exception $e) {
             //negative cache
-            d_echo('Cache Negative value for ' . $data['value']);
-            $num_oid_cache_negative[$key] = true;
+            Cache::put($keyNegative, true, $cache_time);
             throw $e;
         }
 
         d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
         //store the cached value and return
-        $num_oid_cache[$key] = $num_oid . '.{{ $index }}';
-
-        return $num_oid_cache[$key];
+        $result = $num_oid . '.{{ $index }}';
+        Cache::put($keyPositive, $result, $cache_time);
+        return $result;
     }
 
     /**
