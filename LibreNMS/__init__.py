@@ -1,4 +1,5 @@
 import os
+import signal
 import subprocess
 import threading
 import timeit
@@ -18,6 +19,12 @@ def normalize_wait(seconds):
     return ceil(seconds - (time() % seconds))
 
 
+def reset_signals():
+    #https://bugs.python.org/issue38435
+    #https://bugs.python.org/issue32985
+    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+
+
 def call_script(script, args=()):
     """
     Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
@@ -35,8 +42,8 @@ def call_script(script, args=()):
     base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     debug("Running {}".format(cmd))
-    # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
-    return subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, start_new_session=True, close_fds=True)
+    # preexec_fn=reset_signals ensures we don't receive signals from children (close_fds=True is default, but may become false in a future release)
+    return subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, preexec_fn=reset_signals, start_new_session=True, close_fds=True)
 
 
 class DB:
