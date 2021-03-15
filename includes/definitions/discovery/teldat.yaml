@@ -8,11 +8,11 @@ modules:
         version: TELDAT-MIB::telAdminStatusSystemAppVersion.0
     mempools:
         data:
-            -
-                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotal
-                class: system
-                descr: 'Total System Memory'
-                index: 0
+            #- 
+            #    total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotal
+            #    class: system
+            #    descr: 'Total System Memory'
+            #    index: 0
             -
                 total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalnoncache
                 free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreenoncache
