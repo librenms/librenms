@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "teldat",
                     "type": "network",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "teldat.png",
                     "location": "<private>"
                 }
