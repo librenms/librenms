@@ -67,15 +67,16 @@ trait YamlOSDiscovery
 
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
-                // extract via regex if requested
-                if (isset($os_yaml["{$field}_regex"])) {
-                    $this->parseRegex($os_yaml["{$field}_regex"], $value);
-                    $value = $device->$field;
+                $device->$field = $value;
+
+                if (isset($os_yaml["{$field}_template"])) {
+                    $device->$field = $this->parseTemplate($os_yaml["{$field}_template"], $data);
                 }
 
-                $device->$field = isset($os_yaml["{$field}_template"])
-                    ? $this->parseTemplate($os_yaml["{$field}_template"], $data)
-                    : $value;
+                // extract via regex if requested
+                if (isset($os_yaml["{$field}_regex"])) {
+                    $this->parseRegex($os_yaml["{$field}_regex"], $device->$field);
+                }
             }
         }
     }
