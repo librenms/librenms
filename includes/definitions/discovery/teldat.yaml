@@ -10,7 +10,21 @@ modules:
         data:
             -
                 total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotal
+                class: system
+                descr: 'Total System Memory'
+                index: 0
+            -
+                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalnoncache
                 free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreenoncache
+                class: shared
+                descr: 'NonCache Memory'
+                index: 1
+            -
+                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalcache
+                free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreecache
+                descr: 'Cache Memory'
+                class: cache
+                index: 2
     processors:
         data:
             -
