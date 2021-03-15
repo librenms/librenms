@@ -145,6 +145,7 @@ class YamlDiscovery
         }
 
         d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
+
         return $num_oid . '.{{ $index }}';
     }
 
@@ -375,7 +376,7 @@ class YamlDiscovery
         if (self::oidIsNumeric($oid)) {
             return $oid;
         }
-        $key = 'YamlDiscovery:oidToNumeric:' . $mibdir . '/' . $mib . '/' .  $oid;
+        $key = 'YamlDiscovery:oidToNumeric:' . $mibdir . '/' . $mib . '/' . $oid;
         if (Cache::has($key)) {
             $numeric_oid = Cache::get($key);
         } else {
