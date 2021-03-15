@@ -62,7 +62,7 @@ class PrinterSupplies implements Module
     public function poll(OS $os)
     {
         $device = $os->getDeviceArray();
-        $toner_data = $os->getDevice()->printerSupplies()->get();
+        $toner_data = $os->getDevice()->printerSupplies;
 
         $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('printer_oid')->toArray());
 
@@ -70,7 +70,7 @@ class PrinterSupplies implements Module
             echo 'Checking toner ' . $toner['printer_descr'] . '... ';
 
             $raw_toner = $toner_snmp[$toner['printer_oid']];
-            $tonerperc = self::get_toner_levels($device, $raw_toner, $toner['printer_capacity']);
+            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['printer_capacity']);
             echo $tonerperc . " %\n";
 
             $tags = [
@@ -157,8 +157,8 @@ class PrinterSupplies implements Module
                 $descr = explode(', PN', $descr)[0];
             }
 
-            $capacity = self::get_toner_capacity($raw_capacity);
-            $current = self::get_toner_levels($device, $raw_toner, $capacity);
+            $capacity = self::getTonerCapacity($raw_capacity);
+            $current = self::getTonerLevel($device, $raw_toner, $capacity);
 
             if (is_numeric($current)) {
                 $levels->push(new PrinterSupply([
@@ -226,7 +226,7 @@ class PrinterSupplies implements Module
      * @param int $capacity the normalized capacity
      * @return int the toner level as a percentage
      */
-    private static function get_toner_levels($device, $raw_value, $capacity)
+    private static function getTonerLevel($device, $raw_value, $capacity)
     {
         // -3 means some toner is left
         if ($raw_value == '-3') {
@@ -270,7 +270,7 @@ class PrinterSupplies implements Module
      * @param int $raw_capacity The value return from snmp
      * @return int normalized capacity value
      */
-    private static function get_toner_capacity($raw_capacity)
+    private static function getTonerCapacity($raw_capacity)
     {
         // unknown or unrestricted capacity, assume 100
         if (empty($raw_capacity) || $raw_capacity < 0) {
