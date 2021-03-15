@@ -191,7 +191,7 @@ foreach (dbFetchRows($query, $param) as $port) {
         'ifInUcastPkts_rate' => $port['ifInUcastPkts_rate'],
         'ifOutUcastPkts_rate' => $port['ifOutUcastPkts_rate'],
         'ifInErrors' => formatErrors($port['ifInErrors_delta'] / $port['poll_period']),
-        'ifOutErrors' => formatErrors($port['ifOutErrors_delta'] / $port['poll_period']), 
+        'ifOutErrors' => formatErrors($port['ifOutErrors_delta'] / $port['poll_period']),
         'ifType' => humanmedia($port['ifType']),
         'ifAlias' => $port['ifAlias'],
         'actions' => $actions,
