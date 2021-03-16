@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -54,7 +54,7 @@ if (getenv('DBTEST')) {
 
     // create testing table if needed
     $db_config = \config('database.connections.testing');
-    $connection = new PDO("mysql:host={$db_config['host']}", $db_config['username'], $db_config['password']);
+    $connection = new PDO("mysql:host={$db_config['host']};port={$db_config['port']}", $db_config['username'], $db_config['password']);
     $result = $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     if ($connection->errorCode() == '42000') {
         echo implode(' ', $connection->errorInfo()) . PHP_EOL;

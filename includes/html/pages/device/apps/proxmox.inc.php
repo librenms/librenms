@@ -13,7 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * See http://www.gnu.org/licenses/gpl.txt for the full license
+ * See https://www.gnu.org/licenses/gpl.txt for the full license
  */
 
 include 'includes/html/application/proxmox.inc.php';

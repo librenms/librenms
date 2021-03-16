@@ -20,7 +20,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         'status'  => 'error',
         'message' => 'Need to be admin',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -51,4 +51,4 @@ $response = [
     'status'        => $status,
     'message'       => $message,
 ];
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

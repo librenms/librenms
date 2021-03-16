@@ -90,7 +90,8 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             throw new AuthenticationException();
         }
 
-        $group_dn = $result[0]['dn'];
+        // special character handling
+        $group_dn = addcslashes($result[0]['dn'], '()');
 
         $search = ldap_search(
             $connection,
@@ -118,10 +119,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
-            return 1;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)
@@ -226,7 +227,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
         if ($bind_result) {
-            return;
+            return $bind_result;
         }
 
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));

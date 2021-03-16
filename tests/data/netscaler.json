@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.5951.1",
                     "sysDescr": "NetScaler NS11.1: Build 51.26.nc, Date: Jan 31 2017, 00:12:01",
-                    "sysContact": null,
-                    "version": "NS12.0",
-                    "hardware": "NSMPX-8000-10G 4*CPU+6*E1K+2*IX+1*E1K+4*CVM 1620",
-                    "features": "Build 57.19.nc",
-                    "os": "netscaler",
-                    "type": "loadbalancer",
-                    "serial": "7FK7FCV4FH",
-                    "icon": "citrix.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.5951.1",
-                    "sysDescr": "NetScaler NS11.1: Build 51.26.nc, Date: Jan 31 2017, 00:12:01",
                     "sysContact": "<private>",
                     "version": "NS12.0",
                     "hardware": "NSMPX-8000-10G 4*CPU+6*E1K+2*IX+1*E1K+4*CVM 1620",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

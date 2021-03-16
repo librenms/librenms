@@ -5,6 +5,7 @@
 @section('content')
 
 @if($node_count)
+&nbsp;<big><b>{{ $group_name }}</b></big>
 <div class="pull-right">
 <input type="checkbox" class="custom-control-input" id="showparentdevicepath" onChange="highlightNode()" @if($showparentdevicepath) checked @endif>
 <label class="custom-control-label" for="showparentdevicepath">@lang('Highlight Dependencies to Root Device')</label>

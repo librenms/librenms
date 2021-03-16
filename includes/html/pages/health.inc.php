@@ -10,7 +10,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -49,6 +49,7 @@ $type_text = [
     'state' => 'State',
     'count' => 'Count',
     'signal' => 'Signal',
+    'tv_signal' => 'TV signal',
     'snr' => 'SNR',
     'pressure' => 'Pressure',
     'cooling' => 'Cooling',

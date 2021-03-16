@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <librenms+n@laf.io>
  */
@@ -60,7 +60,7 @@ class DBSetupTest extends DBTestCase
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');
-        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..']));
+        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..', '.gitkeep']));
         $migrated = DB::connection($this->connection)->table('migrations')->pluck('migration')->toArray();
         sort($files);
         sort($migrated);

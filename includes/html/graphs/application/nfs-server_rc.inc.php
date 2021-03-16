@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage nfs-server
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     SvennD <svennd@svennd.be>
 */

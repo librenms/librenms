@@ -324,14 +324,40 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
-    public function setLocation($location_text)
+    /**
+     * Update the location to the correct location and update GPS if needed
+     *
+     * @param  \App\Models\Location|string  $new_location  location data
+     * @param  string  $hostname
+     * @param  bool  $doLookup try to lookup the GPS coordinates
+     */
+    public function setLocation($new_location, $doLookup = false)
     {
-        $location_text = $location_text ? Rewrite::location($location_text) : null;
+        $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
+        $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
+        $coord = array_filter($new_location->only(['lat', 'lng']));
 
-        $this->location_id = null;
-        if ($location_text) {
-            $location = Location::firstOrCreate(['location' => $location_text]);
-            $this->location()->associate($location);
+        if (! $this->override_sysLocation) {
+            if (! $new_location->location) { // disassociate if the location name is empty
+                $this->location()->dissociate();
+
+                return;
+            }
+
+            if (! $this->relationLoaded('location') || optional($this->location)->location !== $new_location->location) {
+                if (! $new_location->exists) { // don't fetch if new location persisted to the DB, just use it
+                    $new_location = Location::firstOrCreate(['location' => $new_location->location], $coord);
+                }
+                $this->location()->associate($new_location);
+            }
+        }
+
+        // set coordinates
+        if ($this->location && ! $this->location->fixed_coordinates) {
+            $this->location->fill($coord);
+            if ($doLookup && empty($coord)) { // only if requested and coordinates not passed explicitly
+                $this->location->lookupCoordinates($this->hostname);
+            }
         }
     }
 
@@ -456,11 +482,46 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
-                ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
-        });
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeNotInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
     }
 
     // ---- Define Relationships ----
@@ -633,6 +694,11 @@ class Device extends BaseModel
     public function sensors()
     {
         return $this->hasMany(\App\Models\Sensor::class, 'device_id');
+    }
+
+    public function serviceTemplates()
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
     }
 
     public function services()

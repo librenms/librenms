@@ -397,7 +397,7 @@ STATE;
 
 function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
-    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $right_text, $left_text, null, null, [
+    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
         'left' => $left_background,
         'left_text' => $left_colour,
         'right' => $right_background,
@@ -571,6 +571,11 @@ function generate_bill_url($bill, $vars = [])
     return generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id']], $vars);
 }//end generate_bill_url()
 
+function generate_sap_url($sap, $vars = [])
+{
+    return \LibreNMS\Util\Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
+}//end generate_sap_url()
+
 function generate_port_image($args)
 {
     if (! $args['bg']) {
@@ -590,6 +595,62 @@ function generate_port_thumbnail($port)
 
     return generate_port_image($port);
 }//end generate_port_thumbnail()
+
+/**
+ * Create image to output text instead of a graph.
+ *
+ * @param string $text
+ * @param int[] $color
+ */
+function graph_error($text, $color = [128, 0, 0])
+{
+    global $vars, $debug;
+
+    if (! $debug) {
+        set_image_type();
+    }
+
+    $width = $vars['width'] ?? 150;
+    $height = $vars['height'] ?? 60;
+
+    if (Config::get('webui.graph_type') === 'svg') {
+        $rgb = implode(', ', $color);
+        $font_size = 20;
+        $svg_x = 100;
+        $svg_y = min($font_size, $width ? (($height / $width) * $svg_x) : 1);
+        echo "<svg viewBox=\"0 0 $svg_x $svg_y\" xmlns=\"http://www.w3.org/2000/svg\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" style=\"font-family: sans-serif; fill: rgb($rgb);\">$text</text></svg>";
+    } else {
+        $img = imagecreate($width, $height);
+        imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
+
+        $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
+        $font = $width < 200 ? 3 : 5;
+        imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
+
+        // Output the image
+        imagepng($img);
+        imagedestroy($img);
+    }
+}
+
+/**
+ * Output message to user in image format.
+ *
+ * @param string $text string to display
+ */
+function graph_text_and_exit($text)
+{
+    global $vars;
+
+    if ($vars['showcommand'] == 'yes') {
+        echo $text;
+
+        return;
+    }
+
+    graph_error($text, [13, 21, 210]);
+    exit;
+}
 
 function print_port_thumbnail($args)
 {
@@ -743,7 +804,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
 function generate_ap_url($ap, $vars = [])
 {
-    return generate_url(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']], $vars);
+    return generate_url(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
 
 // Find all the files in the given directory that match the pattern
@@ -902,7 +963,13 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['sensor_id']) {
-            $details = 'Current Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
+            if ($tmp_alerts['sensor_class'] == 'state') {
+                // Give more details for a state (textual form)
+                $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            } else {
+                // Other sensors
+                $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
+            }
             $details_a = [];
 
             if ($tmp_alerts['sensor_limit_low']) {

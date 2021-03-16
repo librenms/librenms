@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Alerts Cronjob
  * @author f0o <f0o@devilcode.org>
@@ -38,7 +38,7 @@ if (set_debug(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-$alerts_lock = Cache::lock('alerts');
+$alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {
     $alerts = new RunAlerts();
     if (! defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {

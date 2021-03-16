@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 namespace LibreNMS\Enum;
@@ -28,9 +28,11 @@ abstract class PowerState
 
     const STATES = [
         'powered off' => self::OFF,
+        'poweredoff' => self::OFF,
         'shut off' => self::OFF,
 
         'powered on' => self::ON,
+        'poweredon' => self::ON,
         'running' => self::ON,
 
         'suspended' => self::SUSPENDED,

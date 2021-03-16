@@ -4,10 +4,11 @@ path: blob/master/doc/
 # Distributed Poller
 
 A normal install contains all parts of LibreNMS:
- - Poller/Discovery/etc workers
- - RRD (Time series data store) *
- - Database *
- - Webserver (Web UI/API) *
+
+- Poller/Discovery/etc workers
+- RRD (Time series data store) *
+- Database *
+- Webserver (Web UI/API) *
  
 \* may only be installed on one server (however, some can be clustered)
 
@@ -24,6 +25,7 @@ RRDcached.
 It is also a requirement that at least one locking service is in place
 to which all pollers can connect. There are currently three locking 
 mechanisms available
+
 - memcached
 - redis (preferred)
 - sql locks (default)
@@ -174,9 +176,16 @@ need to have the same `APP_KEY` value set in the `.env` file.
 
 ### Discovery
 
-It's not necessary to run discovery services on all pollers. In fact,
-you should only run one discovery process per poller group. Designate
-a single poller to run discovery (or a separate server if required).
+Depending on your setup will depend on how you configure your discovery processes.
+
+**Cron based polling**
+
+It's not necessary to run discovery services on all pollers. In fact, you should 
+only run one discovery process per poller group.
+Designate a single poller to run discovery (or a separate server if required).
+
+**Dispatcher service**
+When using the dispatcher service, discovery can run on all nodes.
 
 ### Configuration
 

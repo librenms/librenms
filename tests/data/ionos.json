@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1038.20",
                     "sysDescr": "SAGEM ADR2500 eXtra",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ionos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "sagemcom.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1038.20",
-                    "sysDescr": "SAGEM ADR2500 eXtra",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

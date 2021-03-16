@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.26928.1",
                     "sysDescr": "AP650X, HiveOS 10.0r7a build-232353",
-                    "sysContact": null,
-                    "version": "10.0r7a build-232353",
-                    "hardware": "AP650X",
-                    "features": null,
-                    "os": "hiveos-wireless",
-                    "type": "wireless",
-                    "serial": "16501810030163",
-                    "icon": "aerohive.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.26928.1",
-                    "sysDescr": "AP650X, HiveOS 10.0r7a build-232353",
                     "sysContact": "<private>",
                     "version": "10.0r7a build-232353",
                     "hardware": "AP650X",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

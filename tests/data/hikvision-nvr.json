@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.50001",
                     "sysDescr": "Hikvision company products",
-                    "sysContact": null,
-                    "version": "200",
-                    "hardware": "NVR",
-                    "features": null,
-                    "os": "hikvision-nvr",
-                    "type": "network",
-                    "serial": "0820160719AARR624053979WCVU",
-                    "icon": "hikvision.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.50001",
-                    "sysDescr": "Hikvision company products",
                     "sysContact": "<private>",
                     "version": "200",
                     "hardware": "NVR",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

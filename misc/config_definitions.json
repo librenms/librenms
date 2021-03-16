@@ -947,6 +947,10 @@
             "default": false,
             "type": "boolean"
         },
+        "discover_services_templates": {
+            "default": false,
+            "type": "boolean"
+        },
         "discovery_by_ip": {
             "default": false,
             "type": "boolean"
@@ -1627,6 +1631,13 @@
                     "bing"
                 ]
             }
+        },
+        "geoloc.dns": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": true,
+            "type": "boolean"
         },
         "geoloc.engine": {
             "default": false,
@@ -3923,7 +3934,7 @@
             "type": "executable"
         },
         "notifications.LibreNMS": {
-            "default": "http://www.librenms.org/notifications.rss",
+            "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
         },
         "notifications.local": {
@@ -4123,13 +4134,6 @@
             "validate": {
                 "value": "integer|between:0,100"
             }
-        },
-        "perf_times_purge": {
-            "default": 30,
-            "group": "system",
-            "section": "cleanup",
-            "order": 6,
-            "type": "integer"
         },
         "permission.device_group.allow_dynamic": {
             "default": false,
@@ -4498,7 +4502,7 @@
             "type": "boolean"
         },
         "project_home": {
-            "default": "http://www.librenms.org/",
+            "default": "https://www.librenms.org/",
             "type": "text"
         },
         "project_id": {
@@ -4980,6 +4984,20 @@
             "order": 4,
             "type": "integer",
             "default": 0
+        },
+        "snmp.timeout": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 1
+        },
+        "snmp.retries": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 6,
+            "type": "integer",
+            "default": 5
         },
         "snmp.port": {
             "group": "poller",

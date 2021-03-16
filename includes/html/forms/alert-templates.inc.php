@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Alert Templates
@@ -85,4 +85,4 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
 
 $response = ['status' => $status, 'message' => $message, 'newid' => $template_newid];
 
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

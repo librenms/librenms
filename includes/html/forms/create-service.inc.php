@@ -24,10 +24,12 @@ $param = $vars['param'];
 $ignore = isset($vars['ignore']) ? 1 : 0;
 $disabled = isset($vars['disabled']) ? 1 : 0;
 $device_id = $vars['device_id'];
+$template_id = $vars['template_id'];
+$name = $vars['name'];
 
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
-    $update = ['service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled];
+    $update = ['service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
     if (is_numeric(edit_service($update, $service_id))) {
         $status = ['status' =>0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $type . '</i>'];
     } else {
@@ -35,7 +37,7 @@ if (is_numeric($service_id) && $service_id > 0) {
     }
 } else {
     // Need to add.
-    $service_id = add_service($device_id, $type, $desc, $ip, $param, $ignore, $disabled);
+    $service_id = add_service($device_id, $type, $desc, $ip, $param, $ignore, $disabled, 0, $name);
     if ($service_id == false) {
         $status = ['status' =>1, 'message' => 'ERROR: Failed to add Service: <i>' . $type . '</i>'];
     } else {
@@ -43,4 +45,4 @@ if (is_numeric($service_id) && $service_id > 0) {
     }
 }
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

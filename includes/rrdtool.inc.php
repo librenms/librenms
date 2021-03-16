@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -66,12 +66,7 @@ function rrdtool_escape($string, $length = null)
         // preserve original $length for str_pad()
 
         // determine correct strlen() for substr_count()
-        $string_length = strlen($string);
-        $substr_count_length = $length;
-
-        if ($length > $string_length) {
-            $substr_count_length = $string_length; // If $length is greater than the haystack length, then substr_count() will produce a warning; fix warnings.
-        }
+        $substr_count_length = $length <= 0 ? null : min(strlen($string), $length);
 
         $extra = substr_count($string, ':', 0, $substr_count_length);
         $result = substr(str_pad($result, $length), 0, ($length + $extra));

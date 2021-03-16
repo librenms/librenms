@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -94,6 +94,8 @@ class EventlogController extends TableController
                     return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
                 }
             }
+        } elseif ($eventlog->type == 'stp') {
+            return Url::deviceLink($eventlog->device, $eventlog->type, ['tab' => 'stp']);
         } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
             if (is_numeric($eventlog->reference)) {
                 $sensor = $eventlog->related;

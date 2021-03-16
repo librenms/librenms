@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.113.100.101",
                     "sysDescr": "FortiAuthenticator",
-                    "sysContact": null,
-                    "version": "v6.0.3-build0058",
-                    "hardware": "FACVM",
-                    "features": null,
-                    "os": "fortiauthenticator",
-                    "type": "firewall",
-                    "serial": "FAC-VM0A12345678",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12356.113.100.101",
-                    "sysDescr": "FortiAuthenticator",
                     "sysContact": "<private>",
                     "version": "v6.0.3-build0058",
                     "hardware": "FACVM",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

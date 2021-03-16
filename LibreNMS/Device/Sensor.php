@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -364,7 +364,7 @@ class Sensor implements DiscoveryModule, PollerModule
         array_walk($snmp_data, function (&$oid) {
             preg_match('/-?\d+(\.\d+)?(e-?\d+)?/i', $oid, $matches);
             if (isset($matches[0])) {
-                $oid = $matches[0] + 0;
+                $oid = cast_number($matches[0]);
             } else {
                 $oid = trim('"', $oid); // allow string only values
             }

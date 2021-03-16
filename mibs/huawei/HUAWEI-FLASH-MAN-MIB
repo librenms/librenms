@@ -1,16 +1,16 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: flash mangement mib
 -- Reference:   huawei enterprise mib
--- Version:     V2.04
+-- Version:     V2.05
 -- History:
 --             initial version 2002-12-20
 -- =================================================================
 
     HUAWEI-FLASH-MAN-MIB DEFINITIONS ::= BEGIN
  
-        IMPORTS
+            IMPORTS
             huaweiUtility            
                 FROM HUAWEI-MIB            
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
@@ -19,12 +19,14 @@
             OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
                 FROM SNMPv2-SMI            
             DisplayString, TimeStamp, TruthValue, RowStatus, TEXTUAL-CONVENTION            
-                FROM SNMPv2-TC;
+                FROM SNMPv2-TC
+            entPhysicalName			
+				FROM ENTITY-MIB;
     
     
 --  1.3.6.1.4.1.2011.6.9
         hwFlash MODULE-IDENTITY 
-            LAST-UPDATED "201502100001Z"        -- Feb 10, 2015 at 00:00 GMT
+            LAST-UPDATED "201909260001Z"        -- Sep 26, 2019 at 00:00 GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -35,6 +37,10 @@
                      Website: http://www.huawei.com
                      Email: support@huawei.com
                    "
+		DESCRIPTION 
+                "Add trap node hwFlhStorageFullTrap "
+        REVISION "201909260001Z"
+				
 		DESCRIPTION 
                 "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
                 and flash card operations. There are no constraints on this MIB.
@@ -1631,7 +1637,49 @@
             DESCRIPTION 
                 "Description."
             ::= { huaweiFlashMIBGroups 8 }
-    
+			
+--  1.3.6.1.4.1.2011.6.9.3
+        hwFlashTraps  OBJECT IDENTIFIER ::= { hwFlash 3 }
+		
+--  1.3.6.1.4.1.2011.6.9.3.1
+        hwFlhTrapObjects OBJECT IDENTIFIER ::= { hwFlashTraps 1 }
+		
+--  1.3.6.1.4.1.2011.6.9.3.1.1
+		hwFlhPhysicalIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The index of physical."
+			::= { hwFlhTrapObjects 1 }
+			
+--  1.3.6.1.4.1.2011.6.9.3.1.2
+        hwFlhStorageUsageRatio OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The Usage Ratio of FLASH."
+			::= { hwFlhTrapObjects 2 }
+
+--  1.3.6.1.4.1.2011.6.9.3.1.3
+        hwFlhStorageUsageThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The Threshold of FLASH Usage."
+			::= { hwFlhTrapObjects 3 }
+			
+--  1.3.6.1.4.1.2011.6.9.3.2
+        hwFlhStorageFullTrap NOTIFICATION-TYPE
+			OBJECTS { hwFlhPhysicalIndex, entPhysicalName, hwFlhStorageUsageRatio, hwFlhStorageUsageThreshold}
+			STATUS current
+			DESCRIPTION 
+				"The flash memory usage has exceeded the upper threshold 85%. The system will clear the recycle bin and delete unused software packages, patch files, and log files."
+			::= { hwFlashTraps 2 }
+			
+			
     END
 
 --

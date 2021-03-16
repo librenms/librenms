@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.10520.2.1.3",
                     "sysDescr": "NE843A",
-                    "sysContact": null,
-                    "version": "3.3.24",
-                    "hardware": "NE843_M1",
-                    "features": null,
-                    "os": "gepulsar",
-                    "type": "power",
-                    "serial": "16KZ46035608",
-                    "icon": "ge.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.10520.2.1.3",
-                    "sysDescr": "NE843A",
                     "sysContact": "<private>",
                     "version": "3.3.24",
                     "hardware": "NE843_M1",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

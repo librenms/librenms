@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -114,8 +114,8 @@ class OSModulesTest extends DBTestCase
         $debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'];
-            $actual = $results[$module]['discovery'];
+            $expected = $expected_data[$module]['discovery'] ?? [];
+            $actual = $results[$module]['discovery'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,
@@ -133,9 +133,9 @@ class OSModulesTest extends DBTestCase
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
-                $expected = $expected_data[$module]['poller'];
+                $expected = $expected_data[$module]['poller'] ?? [];
             }
-            $actual = $results[$module]['poller'];
+            $actual = $results[$module]['poller'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,

@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ################################################################################
 
 #######################################
@@ -201,14 +201,14 @@ check_dependencies() {
 #   Exit-Code: 0: if equal 1: if 1 > 2  2: if 1 < 2
 #######################################
 version_compare () {
-    local IFS i ver1 ver2 parts1 parts2
+    local i ver1 ver2 parts1 parts2
 
     if [[ "$1" == "$2" ]]; then
         return 0
     fi
-    IFS=.
-    ver1=("$1")
-    ver2=("$2")
+
+    IFS=. read -ra ver1 <<< "$1"
+    IFS=. read -ra ver2 <<< "$2"
 
     parts2=${#ver2[@]}
     [[ -n $3 ]] && parts2=$3
@@ -379,7 +379,6 @@ main () {
                                "syslog"
                                "eventlog"
                                "authlog"
-                               "perf_times"
                                "callback"
                                "device_perf"
                                "purgeusers"

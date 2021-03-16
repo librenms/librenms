@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.3052.10.3.2",
                     "sysDescr": "SiteBoss 550 2.11.280 STD",
-                    "sysContact": null,
-                    "version": "2.11.280 STD",
-                    "hardware": "SiteBoss 550",
-                    "features": null,
-                    "os": "siteboss550",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "siteboss.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3052.10.3.2",
-                    "sysDescr": "SiteBoss 550 2.11.280 STD",
                     "sysContact": "<private>",
                     "version": "2.11.280 STD",
                     "hardware": "SiteBoss 550",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

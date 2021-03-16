@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.18334.1.1.1.2.1.117.2.2",
                     "sysDescr": "KONICA MINOLTA bizhub C3110",
-                    "sysContact": null,
-                    "version": "1.80",
-                    "hardware": "Develop ineo+ 280",
-                    "features": null,
-                    "os": "konica",
-                    "type": "printer",
-                    "serial": "A79K021008739",
-                    "icon": "konica.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.18334.1.1.1.2.1.117.2.2",
-                    "sysDescr": "KONICA MINOLTA bizhub C3110",
                     "sysContact": "<private>",
                     "version": "1.80",
                     "hardware": "Develop ineo+ 280",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

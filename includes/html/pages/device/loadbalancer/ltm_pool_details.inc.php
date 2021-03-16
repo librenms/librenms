@@ -96,7 +96,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                                         $error = '';
                                     } ?>
                                     <tr <?php echo $error; ?>>
-                                        <td><?php echo $comp['label']; ?></td>
+                                        <td><?php echo $comp['nodename']; ?></td>
                                         <td><?php echo $string; ?></td>
                                         <td><?php echo $status; ?></td>
                                     </tr>

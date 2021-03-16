@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.2494",
                     "sysDescr": "Cisco IOS Software [Everest], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.6.7, RELEASE SOFTWARE (fc2)",
-                    "sysContact": null,
-                    "version": "CAT9K_IOSXE 16.6.7",
-                    "hardware": "C9300-48P",
-                    "features": "Everest",
-                    "os": "iosxe",
-                    "type": "network",
-                    "serial": "FCW2204L050",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.2494",
-                    "sysDescr": "Cisco IOS Software [Everest], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.6.7, RELEASE SOFTWARE (fc2)",
                     "sysContact": "<private>",
                     "version": "CAT9K_IOSXE 16.6.7",
                     "hardware": "C9300-48P",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

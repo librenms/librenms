@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux Nas 3.2.40 #25426 Wed Jul 8 03:15:48 CST 2020 armv7l",
-                    "sysContact": null,
-                    "version": "6.2-25426",
-                    "hardware": "DS214se",
-                    "features": null,
-                    "os": "dsm",
-                    "type": "storage",
-                    "serial": "139M8N0094",
-                    "icon": "synology.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux Nas 3.2.40 #25426 Wed Jul 8 03:15:48 CST 2020 armv7l",
                     "sysContact": "<private>",
                     "version": "6.2-25426",
                     "hardware": "DS214se",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

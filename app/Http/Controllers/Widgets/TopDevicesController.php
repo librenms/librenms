@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,6 +38,7 @@ use Illuminate\View\View;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Validate;
 
 class TopDevicesController extends WidgetController
 {
@@ -66,6 +67,9 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
         $sort = $settings['sort_order'];
+
+        // We use raw() function below, validate input and default to sane value.
+        $sort = Validate::ascDesc($sort, 'ASC');
 
         switch ($settings['top_query']) {
             case 'traffic':
