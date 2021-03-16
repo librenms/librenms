@@ -42,7 +42,7 @@ class Ukfastpss extends Transport
             'author' => [
                 'id' => $author,
             ],
-            'secure' => ($secure == "on"),
+            'secure' => ($secure == 'on'),
             'subject' => $obj['title'],
             'details' => $obj['msg'],
             'priority' => $priority,
