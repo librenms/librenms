@@ -28,6 +28,11 @@ class Ukfastpss extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        return $this->contactUkfastpss($obj, $opts);
+    }
+
+    public function contactUkfastpss($obj, $opts)
+    {
         $apiKey = $this->config['api-key'];
         $author = $this->config['author'];
         $secure = $this->config['secure'];
