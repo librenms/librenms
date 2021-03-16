@@ -389,7 +389,7 @@ class YamlDiscovery
         }
 
         //Store the value
-        Cache::put($key, $numeric_oid, $this->cache_time);
+        Cache::put($key, $numeric_oid, $cache_time);
 
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");
