@@ -40,12 +40,12 @@ class Ukfastpss extends Transport
 
         $body = [
             'author' => [
-                'id' => $author
+                'id' => $author,
             ],
             'secure' => ($secure == "on"),
             'subject' => $obj['title'],
             'details' => $obj['msg'],
-            'priority' => $priority
+            'priority' => $priority,
         ];
 
         $request_opts = [];
@@ -61,16 +61,10 @@ class Ukfastpss extends Transport
         $request_opts['headers'] = $request_headers;
         $request_opts['body'] = json_encode($body);
 
-        $res = $client->request('POST', "https://api.ukfast.io/pss/v1/requests", $request_opts);
+        $res = $client->request('POST', 'https://api.ukfast.io/pss/v1/requests', $request_opts);
 
         $code = $res->getStatusCode();
         if ($code != 200) {
-            var_dump("UKFast PSS API returned Error");
-            var_dump('Params:');
-            var_dump('Response headers:');
-            var_dump($res->getHeaders());
-            var_dump('Return: ' . $res->getReasonPhrase());
-
             return 'HTTP Status code ' . $code;
         }
 
