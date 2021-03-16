@@ -44,16 +44,16 @@ class Ukfastpss extends Transport
         ];
 
         $request_opts = [];
-        $request_heads = [];
+        $request_headers = [];
 
 
-        $request_heads['Authorization'] = $apiKey;
-        $request_heads['Content-Type'] = 'application/json';
-        $request_heads['Accept'] = 'application/json';
+        $request_headers['Authorization'] = $apiKey;
+        $request_headers['Content-Type'] = 'application/json';
+        $request_headers['Accept'] = 'application/json';
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = get_guzzle_proxy();
-        $request_opts['headers'] = $request_heads;
+        $request_opts['headers'] = $request_headers;
         $request_opts['body'] = json_encode($body);
 
         $res = $client->request('POST', "https://api.ukfast.io/pss/v1/requests", $request_opts);
