@@ -51,7 +51,6 @@ class Ukfastpss extends Transport
         $request_opts = [];
         $request_headers = [];
 
-
         $request_headers['Authorization'] = $apiKey;
         $request_headers['Content-Type'] = 'application/json';
         $request_headers['Accept'] = 'application/json';
