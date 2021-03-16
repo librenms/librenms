@@ -23,6 +23,9 @@
  * @author     Chris Malton (@cjsoftuk)
  */
 
+use LibreNMS\Config;
+use LibreNMS\Util\IP;
+
 $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
 foreach ($bgpPeersCache as $key => $value) {
     $oid = explode('.', $key);

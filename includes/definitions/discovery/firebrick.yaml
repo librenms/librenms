@@ -1,4 +1,4 @@
-mib: FIREBRICK-CPU-MIB
+mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING
 modules:
     processors:
         data:
@@ -9,3 +9,21 @@ modules:
                 precision: 0.01
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>.*)\).*$/m'
+    sensors:
+        fanspeed:
+            options:
+                skip_values:
+                    -
+                      oid: fbMonReadingType
+                      op: '!='
+                      value: 'Fan speed (RPM)'
+            data:
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    descr: 'fbMonReadingName'
+                    index: 'fbMonReadingValue.{{ $index }}'
+                    low_limit: 1000
+                    low_warn_limit: 2000
+                    warn_limit: 6000
+                    high_limit: 8000
