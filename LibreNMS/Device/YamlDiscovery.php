@@ -134,7 +134,7 @@ class YamlDiscovery
         $search_mib = $device['dynamic_discovery']['mib'];
         $mib_prefix_data_oid = Str::before($data['oid'], '::');
         if (! empty($mib_prefix_data_oid) && empty(Str::before($data['value'], '::'))) {
-            // We should search value in this mib first
+            // We should search value in this mib first, as it is explicitely specified
             $search_mib = $mib_prefix_data_oid . ':' . $search_mib;
         }
 
