@@ -489,7 +489,7 @@ function formatRates($value, $round = '2', $sf = '3')
 
 function formatErrors($value, $round = '2', $sf = '3')
 {
-    $value = format_si($value, $round, $sf) . 'Eps';
+    $value = format_si($value, $round, $sf) . 'EPS';
 
     return $value;
 }
