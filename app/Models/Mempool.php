@@ -66,7 +66,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->mempool_perc = $percent;
 
         if (! $this->mempool_total) {
-            if (! $percent && $percent !== '0') {
+            if (! $percent && $percent !== 0.0) {
                 // could not calculate total, can't calculate other values
                 return $this;
             }
@@ -176,6 +176,12 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
     private function normalizePercent($percent)
     {
+        if ($percent === null) {
+            return null;
+        }
+
+        $percent = floatval($percent);
+
         while ($percent > 100) {
             $percent = $percent / 10;
         }

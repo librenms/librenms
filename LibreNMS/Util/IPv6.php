@@ -93,9 +93,7 @@ class IPv6 extends IP
      */
     public function getNetworkAddress($cidr = null)
     {
-        if (is_null($cidr)) {
-            $cidr = $this->cidr;
-        }
+        $cidr = (int) ($cidr ?? $this->cidr);
 
         $net_bytes = unpack('n*', inet_pton($this->ip));
 

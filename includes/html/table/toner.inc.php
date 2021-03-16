@@ -29,7 +29,7 @@ if (! empty($searchPhrase)) {
 }
 
 $count_sql = 'SELECT COUNT(*) FROM `toner`';
-$param[] = Auth::id();
+// FIXME not restricted to device access
 
 $count = dbFetchCell($count_sql, $param);
 if (empty($count)) {

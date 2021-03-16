@@ -33,7 +33,7 @@ if (Config::get('enable_bgp')) {
             $oid = explode('.', $key);
             $vrfInstance = array_shift($oid);       // os10bgp4V2PeerInstance
             $remoteAddressType = array_shift($oid); // os10bgp4V2PeerRemoteAddrType
-            $address = IP::fromSnmpString(implode($oid, ' '))->compressed(); // os10bgp4V2PeerRemoteAddr
+            $address = IP::fromSnmpString(implode(' ', $oid))->compressed(); // os10bgp4V2PeerRemoteAddr
             $bgpPeers[$vrfInstance][$address] = $value;
         }
         unset($bgpPeersCache);
@@ -90,7 +90,7 @@ if (Config::get('enable_bgp')) {
             $remoteAddressType = array_shift($oid); // os10bgp4V2PeerRemoteAddrType
             $safi = array_pop($oid);                // os10bgp4V2PrefixGaugesSafi
             $afi = array_pop($oid);                 // os10bgp4V2PrefixGaugesAfi
-            $address = IP::fromSnmpString(implode($oid, ' '))->compressed(); // os10bgp4V2PeerRemoteAddr
+            $address = IP::fromSnmpString(implode(' ', $oid))->compressed(); // os10bgp4V2PeerRemoteAddr
             // add to `bgpPeers_cbgp` table
             add_cbgp_peer($device, ['ip' => $address], $afi, $safi);
         }

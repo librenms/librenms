@@ -73,7 +73,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
         }
 
         // convert to integer
-        $lindex = $lindex + 0;
+        $lindex = cast_number($lindex);
 
         $port_stats[$lindex]['ifName'] = $descr;
         $port_stats[$lindex]['ifDescr'] = $descr;

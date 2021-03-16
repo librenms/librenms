@@ -364,7 +364,7 @@ class Sensor implements DiscoveryModule, PollerModule
         array_walk($snmp_data, function (&$oid) {
             preg_match('/-?\d+(\.\d+)?(e-?\d+)?/i', $oid, $matches);
             if (isset($matches[0])) {
-                $oid = $matches[0] + 0;
+                $oid = cast_number($matches[0]);
             } else {
                 $oid = trim('"', $oid); // allow string only values
             }
