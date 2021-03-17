@@ -17,7 +17,9 @@ class ServiceTemplatesCleanup extends Migration
             $table->renameColumn('type', 'check');
             $table->renameColumn('dtype', 'type');
             $table->renameColumn('drules', 'rules');
-            $table->dropColumn(['dgtype', 'dgrules']);
+            if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+                $table->dropColumn(['dgtype', 'dgrules']);
+            }
         });
     }
 
@@ -32,8 +34,11 @@ class ServiceTemplatesCleanup extends Migration
             $table->renameColumn('check', 'type');
             $table->renameColumn('type', 'dtype');
             $table->renameColumn('rules', 'drules');
-            $table->string('dgtype', 16)->default('static');
-            $table->text('dgrules')->nullable();
+
+            if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+                $table->string('dgtype', 16)->default('static');
+                $table->text('dgrules')->nullable();
+            }
         });
     }
 }
