@@ -31,7 +31,6 @@ foreach ($_POST as $key => $val) {
         }
 
         Port::find($port_id)->groups()->sync($port_group_ids);
-
     } elseif (strncmp($key, 'oldign_', 7) == 0) {
         // Interface identifier passed as part of the field name
 
