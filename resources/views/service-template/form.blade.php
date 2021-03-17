@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div id="dynamic-st-d-form" class="form-group @if($errors->has('rules')) has-error @endif">
+<div id="dynamic-st-d-form" class="form-group @if($errors->has('rules')) has-error @endif" style="display: none">
     <label for="rules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<div id="static-st-d-form" class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
+<div id="static-st-d-form" class="form-group @if($errors->has('devices')) has-error @endif">
     <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Devices')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="devices" name="devices[]" multiple>
@@ -126,6 +126,7 @@
         document.getElementById("dynamic-st-d-form").style.display = (type === 'dynamic' ? 'block' : 'none');
         document.getElementById("static-st-d-form").style.display = (type === 'dynamic' ? 'none' : 'block');
     }
+    change_st_dtype(document.getElementById('type'));
 
     init_select2('#devices', 'device', {multiple: true});
     init_select2('#groups', 'device-group', {multiple: true});
@@ -175,65 +176,22 @@
             }
         }
     });
-    var builder2 = $('#builder2').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
-        $("[name$='_filter']").each(function () {
-            $(this).select2({
-                dropdownAutoWidth: true,
-                width: 'auto'
-            });
-        });
-    }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
-        if (rule.operator === 'regexp') {
-            e.value += ' \'' + rule.value + '\'';
-        }
-    }).queryBuilder({
-        plugins: [
-            'bt-tooltip-errors'
-            // 'not-group'
-        ],
 
-        filters: {!! $filters !!},
-        operators: [
-            'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
-            {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
-            {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
-        ],
-        lang: {
-            operators: {
-                regexp: 'regex',
-                not_regex: 'not regex'
-            }
-        },
-        sqlOperators: {
-            regexp: {op: 'REGEXP'},
-            not_regexp: {op: 'NOT REGEXP'}
-        },
-        sqlRuleOperator: {
-            'REGEXP': function (v) {
-                return {val: v, op: 'regexp'};
-            },
-            'NOT REGEXP': function (v) {
-                return {val: v, op: 'not_regexp'};
-            }
-        }
-    });
     $('.service-template-form').submit(function (eventObj) {
         if ($('#type').val() === 'dynamic') {
             $('<input type="hidden" name="rules" />')
                 .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
                 .appendTo(this);
+            console.log('parsed');
+            console.log(this);
             if (!builder.queryBuilder('validate')) {
+                eventObj.preventDefault();
                 return false;
             }
         }
         return true;
     });
-</script>
-<script>
+
     var rules = {!! json_encode(old('rules') ? json_decode(old('rules')) : $template->rules) !!};
     if (rules) {
         builder.queryBuilder('setRules', rules);
