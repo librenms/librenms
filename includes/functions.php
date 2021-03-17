@@ -1055,7 +1055,7 @@ function port_fill_missing(&$port, $device)
 function port_filter($port)
 {
     // return value
-    // true: do filter port
+    // true:  do filter port
     // false: do not filter port
 
     $ret = true;
