@@ -31,8 +31,8 @@ class ServiceTemplatesCleanup extends Migration
     public function down()
     {
         Schema::table('service_templates', function (Blueprint $table) {
-            $table->renameColumn('check', 'type');
             $table->renameColumn('type', 'dtype');
+            $table->renameColumn('check', 'type');
             $table->renameColumn('rules', 'drules');
 
             if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
