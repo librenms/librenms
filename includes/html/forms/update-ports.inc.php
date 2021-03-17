@@ -26,7 +26,7 @@ foreach ($_POST as $key => $val) {
     if (strncmp($key, 'port_group_', 11) == 0) {
         $port_group_ids = $val;
 
-        if(($idx = array_search('0', $port_group_ids)) !== false) {
+        if (($idx = array_search('0', $port_group_ids)) !== false) {
             unset($port_group_ids[$idx]);
         }
 
