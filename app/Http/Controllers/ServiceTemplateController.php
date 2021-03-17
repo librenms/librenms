@@ -302,7 +302,7 @@ class ServiceTemplateController extends Controller
     public function applyAll()
     {
         foreach (ServiceTemplate::all() as $template) {
-            ServiceTemplateController::apply($template);
+            $this->apply($template);
         }
         $msg = __('All Service Templates have been applied');
 
