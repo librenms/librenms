@@ -13,7 +13,7 @@ class ServiceTemplatesCleanup extends Migration
      */
     public function up()
     {
-        Schema::create('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('type', 'check');
             $table->renameColumn('dtype', 'type');
             $table->renameColumn('drules', 'rules');
@@ -28,7 +28,7 @@ class ServiceTemplatesCleanup extends Migration
      */
     public function down()
     {
-        Schema::create('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('check', 'type');
             $table->renameColumn('type', 'dtype');
             $table->renameColumn('rules', 'drules');
