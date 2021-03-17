@@ -2,6 +2,8 @@
 
 header('Content-type: application/json');
 
+use App\Models\Port;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
         'status'  => 'error',
@@ -19,17 +21,18 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-    $port_id = intval(substr($key, 7));
-    $port_group_ids = $_POST['port_group_' . $port_id];
+    $port_id = intval(end(explode('_', $key)));
 
-    dbDelete('port_group_port', '`port_id` = ?', [$port_id]);
-    if (! empty($port_group_ids)) {
-        foreach ($port_group_ids as $port_group_id) {
-            dbInsert(['port_group_id' => $port_group_id, 'port_id' => $port_id], 'port_group_port');
+    if (strncmp($key, 'port_group_', 11) == 0) {
+        $port_group_ids = $val;
+
+        if(($idx = array_search('0', $port_group_ids)) !== false) {
+            unset($port_group_ids[$idx]);
         }
-    }
 
-    if (strncmp($key, 'oldign_', 7) == 0) {
+        Port::find($port_id)->groups()->sync($port_group_ids);
+
+    } elseif (strncmp($key, 'oldign_', 7) == 0) {
         // Interface identifier passed as part of the field name
 
         $oldign = intval($val) ? 1 : 0;
