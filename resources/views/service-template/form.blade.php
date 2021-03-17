@@ -6,24 +6,24 @@
     </div>
 </div>
 
-<div class="form-group @if($errors->has('dtype')) has-error @endif">
-    <label for="dtype" class="control-label col-sm-3 col-md-2">@lang('Device Type')</label>
+<div class="form-group @if($errors->has('type')) has-error @endif">
+    <label for="type" class="control-label col-sm-3 col-md-2">@lang('Device Type')</label>
     <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="dtype" name="dtype" onchange="change_st_dtype(this)">
+        <select class="form-control" id="type" name="type" onchange="change_st_dtype(this)">
             <option value="static"
-                    @if(old('dtype', $template->dtype) == 'static') selected @endif>@lang('Static')</option>
+                    @if(old('type', $template->type) == 'static') selected @endif>@lang('Static')</option>
             <option value="dynamic"
-                    @if(old('dtype', $template->dtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
+                    @if(old('type', $template->type) == 'dynamic') selected @endif>@lang('Dynamic')</option>
         </select>
-        <span class="help-block">{{ $errors->first('dtype') }}</span>
+        <span class="help-block">{{ $errors->first('type') }}</span>
     </div>
 </div>
 
-<div id="dynamic-st-d-form" class="form-group @if($errors->has('drules')) has-error @endif">
-    <label for="drules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
+<div id="dynamic-st-d-form" class="form-group @if($errors->has('rules')) has-error @endif">
+    <label for="rules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
-        <span class="help-block">{{ $errors->first('drules') }}</span>
+        <span class="help-block">{{ $errors->first('rules') }}</span>
     </div>
 </div>
 
@@ -39,28 +39,7 @@
     </div>
 </div>
 
-<div class="form-group @if($errors->has('dgtype')) has-error @endif">
-    <label for="dgtype" class="control-label col-sm-3 col-md-2">@lang('Device Group Type')</label>
-    <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="dgtype" name="dgtype" onchange="change_st_dgtype(this)">
-            <option value="static"
-                    @if(old('dgtype', $template->dgtype) == 'static') selected @endif>@lang('Static')</option>
-            <option value="dynamic"
-                    @if(old('dgtype', $template->dgtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
-        </select>
-        <span class="help-block">{{ $errors->first('dgtype') }}</span>
-    </div>
-</div>
-
-<div id="dynamic-st-dg-form" class="form-group @if($errors->has('dgrules')) has-error @endif">
-    <label for="dgrules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Group Rules')</label>
-    <div class="col-sm-9 col-md-10">
-        <div id="builder2"></div>
-        <span class="help-block">{{ $errors->first('dgrules') }}</span>
-    </div>
-</div>
-
-<div id="static-st-dg-form" class="form-group @if($errors->has('groups')) has-error @endif" style="display: none">
+<div id="static-st-dg-form" class="form-group @if($errors->has('groups')) has-error @endif">
     <label for="groups" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Groups')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="groups" name="groups[]" multiple>
@@ -72,15 +51,15 @@
     </div>
 </div>
 
-<div class="form-group @if($errors->has('type')) has-error @endif">
-    <label for="type" class="control-label col-sm-3 col-md-2">@lang('Check Type')</label>
+<div class="form-group @if($errors->has('check')) has-error @endif">
+    <label for="check" class="control-label col-sm-3 col-md-2">@lang('Check Type')</label>
     <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="type" name="type">
+        <select class="form-control" id="check" name="check">
             @foreach($services as $current_service)
-                <option value="{{ $current_service }}" @if($current_service == $template->type) selected @endif>{{ $current_service }}</option>
+                <option value="{{ $current_service }}" @if($current_service == $template->check) selected @endif>{{ $current_service }}</option>
             @endforeach
         </select>
-        <span class="help-block">{{ $errors->first('type') }}</span>
+        <span class="help-block">{{ $errors->first('check') }}</span>
     </div>
 </div>
 
@@ -143,20 +122,10 @@
         $('#disabled').val(value);
     });
     function change_st_dtype(select) {
-        var dtype = select.options[select.selectedIndex].value;
-        document.getElementById("dynamic-st-d-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
-        document.getElementById("static-st-d-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
+        var type = select.options[select.selectedIndex].value;
+        document.getElementById("dynamic-st-d-form").style.display = (type === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-st-d-form").style.display = (type === 'dynamic' ? 'none' : 'block');
     }
-
-    change_st_dtype(document.getElementById('dtype'));
-
-    function change_st_dgtype(select) {
-        var dgtype = select.options[select.selectedIndex].value;
-        document.getElementById("dynamic-st-dg-form").style.display = (dgtype === 'dynamic' ? 'block' : 'none');
-        document.getElementById("static-st-dg-form").style.display = (dgtype === 'dynamic' ? 'none' : 'block');
-    }
-
-    change_st_dgtype(document.getElementById('dgtype'));
 
     init_select2('#devices', 'device', {multiple: true});
     init_select2('#groups', 'device-group', {multiple: true});
@@ -253,19 +222,11 @@
         }
     });
     $('.service-template-form').submit(function (eventObj) {
-        if ($('#dtype').val() === 'dynamic') {
-            $('<input type="hidden" name="drules" />')
+        if ($('#type').val() === 'dynamic') {
+            $('<input type="hidden" name="rules" />')
                 .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
                 .appendTo(this);
             if (!builder.queryBuilder('validate')) {
-                return false;
-            }
-        }
-        if ($('#dgtype').val() === 'dynamic') {
-            $('<input type="hidden" name="dgrules" />')
-                .attr('value', JSON.stringify(builder2.queryBuilder('getRules')))
-                .appendTo(this);
-            if (!builder2.queryBuilder('validate')) {
                 return false;
             }
         }
@@ -273,12 +234,8 @@
     });
 </script>
 <script>
-    var drules = {!! json_encode(old('drules') ? json_decode(old('drules')) : $template->drules) !!};
-    if (drules) {
-        builder.queryBuilder('setRules', drules);
-    }
-    var dgrules = {!! json_encode(old('dgrules') ? json_decode(old('dgrules')) : $template->dgrules) !!};
-    if (dgrules) {
-        builder2.queryBuilder('setRules', dgrules);
+    var rules = {!! json_encode(old('rules') ? json_decode(old('rules')) : $template->rules) !!};
+    if (rules) {
+        builder.queryBuilder('setRules', rules);
     }
 </script>
