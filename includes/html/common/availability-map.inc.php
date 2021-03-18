@@ -293,7 +293,7 @@ if (defined('SHOW_SETTINGS')) {
                     if ($directpage == 'yes') {
                         $deviceIcon = getIconTag($service);
                         $temp_output[] = '
-                        <a href="' . generate_url(['page' => 'device', 'tab' => 'services', 'device' => $service['device_id']]) . '" title="' . $service_system_name . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
+                        <a href="' . generate_url(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . $service_system_name . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
                             <div class="service-availability ' . $serviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                                 <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service['service_type'] . '</span>
                                 <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
@@ -308,12 +308,12 @@ if (defined('SHOW_SETTINGS')) {
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
-                        <a href="' . generate_url(['page' => 'device', 'tab' => 'services', 'device' => $service['device_id']]) . '" title="' . shorthost($service_system_name) . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
+                        <a href="' . generate_url(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . shorthost($service_system_name) . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $serviceText . '</span>
                         </a>';
                     }
                 } else {
-                    $temp_output[] = "<a href='" . generate_url(['page' => 'device', 'tab' => 'services', 'device' => $service['device_id']]) . "' title='${service_system_name} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                    $temp_output[] = "<a href='" . generate_url(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . "' title='${service_system_name} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
                 }
             }
         } else {
