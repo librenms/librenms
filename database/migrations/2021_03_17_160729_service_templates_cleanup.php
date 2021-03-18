@@ -15,12 +15,21 @@ class ServiceTemplatesCleanup extends Migration
     {
         Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('type', 'check');
-            $table->renameColumn('dtype', 'type');
-            $table->renameColumn('drules', 'rules');
-            if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-                $table->dropColumn(['dgtype', 'dgrules']);
-            }
         });
+        Schema::table('service_templates', function (Blueprint $table) {
+            $table->renameColumn('dtype', 'type');
+
+        });
+        Schema::table('service_templates', function (Blueprint $table) {
+            $table->renameColumn('drules', 'rules');
+
+        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('service_templates', function (Blueprint $table) {
+
+                $table->dropColumn(['dgtype', 'dgrules']);
+            });
+        }
     }
 
     /**
@@ -32,13 +41,18 @@ class ServiceTemplatesCleanup extends Migration
     {
         Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('type', 'dtype');
+        });
+        Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('check', 'type');
+        });
+        Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('rules', 'drules');
-
-            if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('service_templates', function (Blueprint $table) {
                 $table->string('dgtype', 16)->default('static');
                 $table->text('dgrules')->nullable();
-            }
-        });
+            });
+        }
     }
 }
