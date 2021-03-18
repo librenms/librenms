@@ -418,10 +418,10 @@ class Vrp extends OS implements
 
         foreach ($staTable as $ssid => $sta) {
             //Convert string to num_oid
-            $numSsid = strlen($ssid) . '.' . implode(".", unpack("c*", $ssid));
+            $numSsid = strlen($ssid) . '.' . implode('.', unpack('c*', $ssid));
             $oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute total
             foreach ($sta as $staFreq => $count) {
-                $oid =  $oidMap[$staFreq] . $numSsid;
+                $oid = $oidMap[$staFreq] . $numSsid;
                 $oid_array[] = $oid;
                 $sensors[] = new WirelessSensor(
                     'clients',
@@ -451,6 +451,7 @@ class Vrp extends OS implements
                 'sum'
             );
         }
+
         return $sensors;
     }
 }
