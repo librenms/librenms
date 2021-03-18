@@ -18,15 +18,12 @@ class ServiceTemplatesCleanup extends Migration
         });
         Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('dtype', 'type');
-
         });
         Schema::table('service_templates', function (Blueprint $table) {
             $table->renameColumn('drules', 'rules');
-
         });
         if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('service_templates', function (Blueprint $table) {
-
                 $table->dropColumn(['dgtype', 'dgrules']);
             });
         }
