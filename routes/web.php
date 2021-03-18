@@ -17,6 +17,14 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
+// PDF Stuff
+	Route::group(['prefix' => 'pdf'], function () {
+		Route::get('generate/{view}', 'PDFController@generate');
+		Route::get('preview/{view}',  'PDFController@preview');
+		Route::get('alerts{params}', 'PDFController@Getalerts')->where('params','.*');
+		Route::post('Alerts/', 'PDFController@Alerts');
+	});
+	
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
     Route::group(['prefix' => 'poller'], function () {

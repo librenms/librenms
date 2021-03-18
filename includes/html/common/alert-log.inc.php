@@ -37,10 +37,6 @@ $alert_severities = [
     'Warning' => 5,
 ];
 
-if (Auth::user()->hasGlobalAdmin()) {
-    $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
-}
-
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -87,7 +83,6 @@ $common_output[] = '
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
             <th data-column-id="severity">Severity</th>
-            ' . $admin_verbose_details . '
         </tr>
         </thead>
     </table>
@@ -167,7 +162,8 @@ $common_output[] = '<div class="form-group"> \
         max = high - low;
         search = $(\'.search-field\').val();
 
-        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . $_POST['device_id'] . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-heartbeat fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to pdf</a>");
+//		$(".pdf-export").html("<a href=\'pdf/alerts?report=alert-log&device_id=' . $_POST['device_id'] . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-heartbeat fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to pdf</a>");
+		$(".pdf-export").html("<button type=\"button\" class=\"pdf-export-button btn btn-default btn-sm\" ><i class=\"fa fa-heartbeat fa-lg icon-theme\"></i> Export to pdf</button>");
 
         grid.find(".incident-toggle").each(function () {
             $(this).parent().addClass(\'incident-toggle-td\');
@@ -176,24 +172,12 @@ $common_output[] = '<div class="form-group"> \
             $(target).collapse(\'toggle\');
             $(this).toggleClass(\'fa-plus fa-minus\');
         });
-        grid.find(".command-alert-details").on("click", function(e) {
-            e.preventDefault();
-            var alert_log_id = $(this).data(\'alert_log_id\');
-            $(\'#alert_log_id\').val(alert_log_id);
-            $("#alert_details_modal").modal(\'show\');
-        });
         grid.find(".incident").each(function () {
             $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
             $(this).parent().parent().on("mouseenter", function () {
                 $(this).find(".incident-toggle").fadeIn(200);
-                if ($(this).find(".alert-status").hasClass(\'label-danger\')){
-                    $(this).find(".command-alert-details").fadeIn(200);
-                }
             }).on("mouseleave", function () {
                 $(this).find(".incident-toggle").fadeOut(200);
-                if ($(this).find(".alert-status").hasClass(\'label-danger\')){
-                    $(this).find(".command-alert-details").fadeOut(200);
-                }
             }).on("click", "td:not(.incident-toggle-td)", function () {
                 var target = $(this).parent().find(".incident-toggle").data("target");
                 if ($(this).parent().find(".incident-toggle").hasClass(\'fa-plus\')) {
@@ -222,5 +206,47 @@ $common_output[] = '<div class="form-group"> \
     }).on(\'select2:select\', function (e) {
         $(\'#hostname\').val(e.params.data.text);
     });
+
+	$(\'.pdf-export\').on(\'click\', \'.pdf-export-button\', function() {
+		var results = $("div.infos").text().split(" ");
+		low = results[1] - 1;
+		high = results[3];
+		max = high - low;
+		fileName = "AlertReport.pdf";
+		search = $(\'.search-field\').val();
+		data={ 
+				device_id: \'' . htmlspecialchars($_POST['device_id']) . '\',
+				string: search,
+				results: max,
+				start: low,
+				report: \'alert-log\'
+			};
+		url = \'/pdf/Alerts\';
+
+		fetch(url, {
+			body: JSON.stringify(data),
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json; charset=utf-8",
+				\'X-CSRF-TOKEN\': $(\'meta[name="csrf-token"]\').attr(\'content\')
+			},
+		})
+		.then(response => response.blob())
+		.then(response => {
+			const blob = new Blob([response], {type: "application/pdf"});
+			const downloadUrl = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = downloadUrl;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(blob);
+		})
+		.catch(function(err) {
+			console.log(\'Fetch Error :-S\', err);
+		});	
+		
+	});
+
 </script>
 ';
