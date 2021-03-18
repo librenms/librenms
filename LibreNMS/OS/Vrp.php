@@ -406,8 +406,8 @@ class Vrp extends OS implements
         $sensors = [];
 
         //Clients (STA) for 2.4Ghz and 5Ghz
-        $sta5gTable = snmpwalk_group($this->getDeviceArray(),'hwWlanSsid5gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
-        $sta2gTable = snmpwalk_group($this->getDeviceArray(),'hwWlanSsid2gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+        $sta5gTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanSsid5gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+        $sta2gTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanSsid2gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
         $staTable = array_merge_recursive($sta5gTable, $sta2gTable);
 
         //Map OIDs and description
