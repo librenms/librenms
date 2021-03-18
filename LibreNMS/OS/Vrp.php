@@ -410,6 +410,9 @@ class Vrp extends OS implements
         $sta2gTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanSsid2gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
         $staTable = array_merge_recursive($sta5gTable, $sta2gTable);
 
+        $staTable = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanSsid2gStaCnt', [], 'HUAWEI-WLAN-VAP-MIB', null, '-OQUs');
+        $staTable = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanSsid5gStaCnt', $staTable, 'HUAWEI-WLAN-VAP-MIB', null, '-OQUs');
+
         //Map OIDs and description
         $oidMap['hwWlanSsid5gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.3.';
         $oidMap['hwWlanSsid2gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.2.';
