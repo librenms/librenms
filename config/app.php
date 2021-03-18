@@ -187,10 +187,10 @@ return [
          */
         App\Providers\SnmptrapProvider::class,
 
-		/*
-		 * DomPDF
-		 */
-		Barryvdh\DomPDF\ServiceProvider::class,
+        /*
+         * DomPDF
+         */
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -251,11 +251,11 @@ return [
         'Permissions' => \App\Facades\Permissions::class,
         'DeviceCache' => \App\Facades\DeviceCache::class,
         'Rrd' => App\Facades\Rrd::class,
-		
-		/*
-		 * DomPDF
-		 */
-		'PDF' => Barryvdh\DomPDF\Facade::class,
+
+        /*
+         * DomPDF
+         */
+        'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

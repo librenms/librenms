@@ -21,7 +21,7 @@
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
- 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,13 +29,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class AlertLog extends Model
 {
-	use HasFactory;
+    use HasFactory;
 
-	public $timestamps = false;
-	protected $table = 'alert_log';
-	
-	public function scopeDeviceID($query, $device_id)
-	{
-		return $query->where('device_id', $device_id);
-	}
+    public $timestamps = false;
+    protected $table = 'alert_log';
+
+    public function scopeDeviceID($query, $device_id)
+    {
+        return $query->where('device_id', $device_id);
+    }
 }
