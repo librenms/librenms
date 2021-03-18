@@ -404,30 +404,53 @@ class Vrp extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = [];
-        $total_oids = [];
 
-        $vapInfoTable = $this->getCacheTable('hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3);
+        //Clients (STA) for 2.4Ghz and 5Ghz
+        $sta5gTable = $this->getCacheTable('hwWlanSsid5gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+        $sta2gTable = $this->getCacheTable('hwWlanSsid2gStaCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+        $staTable = array_merge_recursive($sta5gTable, $sta2gTable);
 
-        foreach ($vapInfoTable as $a_index => $ap) {
-            //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
-            $a_index_oid = implode('.', array_map('hexdec', explode(':', $a_index)));
-            foreach ($ap as $r_index => $radio) {
-                foreach ($radio as $s_index => $ssid) {
-                    $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index;
-                    $total_oids[] = $oid;
-                    $sensors[] = new WirelessSensor(
-                        'clients',
-                        $this->getDeviceId(),
-                        $oid,
-                        'vrp',
-                        $a_index_oid . '.' . $r_index . '.' . $s_index,
-                        'Radio:' . $r_index . ' SSID:' . $ssid['hwWlanVapProfileName'],
-                        $ssid['hwWlanVapStaOnlineCnt']
-                    );
-                }
+        //Map OIDs and description
+        $oidMap['hwWlanSsid5gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.3.';
+        $oidMap['hwWlanSsid2gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.2.';
+        $descrMap['hwWlanSsid5gStaCnt'] = '5 Ghz';
+        $descrMap['hwWlanSsid2gStaCnt'] = '2.4 Ghz';
+
+        foreach ($staTable as $ssid => $sta) {
+            //Convert string to num_oid
+            $numSsid = strlen($ssid) . '.' . implode(".", unpack("c*", $ssid));
+            $oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute total
+            foreach ($sta as $staFreq => $count) {
+                $oid =  $oidMap[$staFreq] . $numSsid;
+                $oid_array[] = $oid;
+                $sensors[] = new WirelessSensor(
+                    'clients',
+                    $this->getDeviceId(),
+                    $oid,
+                    'vrp',
+                    $staFreq . '-' . $ssid,
+                    $ssid . ' (' . $descrMap[$staFreq] . ')',
+                    $count,
+                    1,
+                    1,
+                    'sum'
+                );
             }
-        }
 
+            // And we add a sensor with all frequencies for each SSID
+            $sensors[] = new WirelessSensor(
+                'clients',
+                $this->getDeviceId(),
+                $oid_array,
+                'vrp',
+                'total-' . $ssid,
+                $ssid,
+                0,
+                1,
+                1,
+                'sum'
+            );
+        }
         return $sensors;
     }
 }
