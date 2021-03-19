@@ -17,11 +17,11 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
     if (! $agent) {
         echo 'Connection to UNIX agent failed on port ' . $agent_port . '.';
-    } else {    
+    } else {
         // Set stream timeout (for timeouts during agent  fetch
         stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
         $agentinfo = stream_get_meta_data($agent);
-        
+
         // fetch data while not eof and not timed-out
         while ((! feof($agent)) && (! $agentinfo['timed_out'])) {
             $agent_raw .= fgets($agent, 128);
