@@ -1763,11 +1763,9 @@ service_templates:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: ip, Type: text, 'Null': true, Extra: '' }
-    - { Field: type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: dtype, Type: varchar(16), 'Null': false, Extra: '', Default: static }
-    - { Field: dgtype, Type: varchar(16), 'Null': false, Extra: '', Default: static }
-    - { Field: drules, Type: text, 'Null': true, Extra: '' }
-    - { Field: dgrules, Type: text, 'Null': true, Extra: '' }
+    - { Field: check, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: type, Type: varchar(16), 'Null': false, Extra: '', Default: static }
+    - { Field: rules, Type: text, 'Null': true, Extra: '' }
     - { Field: desc, Type: text, 'Null': true, Extra: '' }
     - { Field: param, Type: text, 'Null': true, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
