@@ -36,8 +36,8 @@ if (is_array($ipmi_rows)) {
             $desc = trim($desc, ' ');
             $ipmi_unit_type = Config::get("ipmi_unit.$type");
 
-	    // SDR records can include hexadecimal values, identified by an h
-	    // suffix (like "93h" for 0x93). Convert them to decimal.
+            // SDR records can include hexadecimal values, identified by an h
+            // suffix (like "93h" for 0x93). Convert them to decimal.
             if (preg_match('/^[0-9A-Fa-f]+h$/', $value)) {
                 $value = hexdec(substr($value, 0, -1));
             }
