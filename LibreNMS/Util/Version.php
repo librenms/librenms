@@ -30,7 +30,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    const VERSION = '21.2.0';
+    const VERSION = '21.3.0';
 
     protected $is_git_install = false;
 
