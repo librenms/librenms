@@ -1759,10 +1759,10 @@ function printChangedStats($update_only = false)
     global $snmp_stats_last, $db_stats_last;
     $output = sprintf(
         '>> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]',
-        array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
-        array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
-        array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
-        array_sum($db_stats['time']) - array_sum($db_stats_last['time'])
+        array_sum($snmp_stats['ops'] ?? []) - array_sum($snmp_stats_last['ops'] ?? []),
+        array_sum($snmp_stats['time'] ?? []) - array_sum($snmp_stats_last['time'] ?? []),
+        array_sum($db_stats['ops'] ?? []) - array_sum($db_stats_last['ops'] ?? []),
+        array_sum($db_stats['time'] ?? []) - array_sum($db_stats_last['time'] ?? [])
     );
 
     foreach (app('Datastore')->getStats() as $datastore => $stats) {
