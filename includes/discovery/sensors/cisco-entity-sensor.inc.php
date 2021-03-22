@@ -203,15 +203,15 @@ if ($device['os_group'] == 'cisco') {
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
                         // convert Watts to dbm
-                        $user_func = 'mw_to_dbm';
-						$type = 'dbm';
-						$limit_low = 10 * log10($limit_low * 1000);
+						$user_func = 'mw_to_dbm';
+                        $type = 'dbm';
+                        $limit_low = 10 * log10($limit_low * 1000);
                         $warn_limit_low = 10 * log10($warn_limit_low * 1000);
                         $warn_limit = 10 * log10($warn_limit * 1000);
                         $limit = 10 * log10($limit * 1000);
-						$current = round(10 * log10($current * 1000), 3);
-						$multiplier = 1000;
-                        echo("\n TEST 6".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, $user_func");
+                        $current = round(10 * log10($current * 1000), 3);
+                        $multiplier = 1000;
+                        //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, $user_func");
                         discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], $user_func);
                     }
                 }
