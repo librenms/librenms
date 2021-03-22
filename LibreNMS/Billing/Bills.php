@@ -25,12 +25,7 @@
 namespace LibreNMS\Billing;
 
 use App\Models\Billing;
-use App\Models\User;
-use DateTime;
-use DateTimeZone;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Common\Functions;
-use LibreNMS\Config;
 
 class Bills
 {
@@ -97,14 +92,14 @@ class Bills
         if (isset($params['current'])) {
             $limit_low = (($params['current'] * $params['rowCount']) - ($params['rowCount']));
             $limit_high = $params['rowCount'];
-        
-			if (isset($params['rowCount'])) {
-				if ($params['rowCount'] != -1) {
-					$query = $query->offset($limit_low)
-						->limit($limit_high);
-				}
-			}
-		}
+
+            if (isset($params['rowCount'])) {
+                if ($params['rowCount'] != -1) {
+                    $query = $query->offset($limit_low)
+                        ->limit($limit_high);
+                }
+            }
+        }
         $query2 = clone $query;
         $total = count(
                 json_decode(
