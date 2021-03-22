@@ -219,7 +219,7 @@ $common_output[] = '<div class="form-group"> \
 				string: search,
 				results: max,
 				start: low,
-				report: \'alert-log\'
+				report: \'alertlog\'
 			};
 		url = \'/pdf/Alerts\';
 

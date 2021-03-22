@@ -12,7 +12,7 @@ use PDF;
 
 class PDFController extends Controller
 {
-    public function preview(DynamicConfig $config, $path, Request $request)
+    public function preview($path)
     {
         $clean_path = \LibreNMS\Util\Clean::fileName($path);
         $view = 'pdf.' . $clean_path;
@@ -66,9 +66,9 @@ class PDFController extends Controller
         }
     }
 
-    public function generate(DynamicConfig $config, $path)
+    public function generate($path)
     {
-        $clean_path = \LibreNMS\Util\Clean::fileName($path);
+        $clean_path = strval( \LibreNMS\Util\Clean::fileName($path) );
         $view = 'pdf.' . $clean_path;
 
         $header_logo = \LibreNMS\Config::get('dompdf.header_logo');
@@ -121,12 +121,13 @@ class PDFController extends Controller
 
     public function Alerts(Request $request)
     {
-        $device_id = $request->input('device_id');
-        $string = $request->input('string');
-        $results = $request->input('results');
-        $start = $request->input('start');
-        $report = $request->input('report');
-        $rule_id = $request->input('rule_id');
+        $device_id   = $request->input('device_id');
+        $string      = $request->input('string');
+        $results     = $request->input('results');
+        $start       = $request->input('start');
+        $report      = $request->input('report');
+        $rule_id     = $request->input('rule_id');
+        $sort        = $request->input('sort');
 
         if (isset($results) && is_numeric($results)) {
             $numresults = $results;
@@ -171,11 +172,6 @@ class PDFController extends Controller
         // probably a better solution to this but it works.....
         $json = json_decode($query->toJson());
 
-        $params = [
-            'rule_id' 		=> $rule_id,
-            'device_id' 	=> $device_id,
-            'show_links'	=> false,
-        ];
         $className = 'LibreNMS\\Alert\\AlertLogs';
         $AlertLog = new $className;
 
@@ -200,20 +196,20 @@ class PDFController extends Controller
             'owner'			=> \LibreNMS\Config::get('pdf.doc_owner'),
             'level'			=> \LibreNMS\Config::get('pdf.doc_level'),
         ];
-
-        $returnHTML = view('pdf.alertlog')->with($data)->render();
-        $pdf = PDF::loadView('pdf.alertlog', $data)->setPaper('a4', 'landscape');
+        $view_pdf = 'pdf.' .$report ;
+        $pdf = PDF::loadView($view_pdf, $data)->setPaper('a4', 'landscape');
 
         return $pdf->stream();
     }
 
     public function Getalerts(Request $request)
     {
-        $device_id = $request->input('device_id');
-        $string = $request->input('string');
-        $results = $request->input('results');
-        $start = $request->input('start');
-        $report = $request->input('report');
+        $device_id   = $request->input('device_id');
+        $string      = $request->input('string');
+        $results     = $request->input('results');
+        $start       = $request->input('start');
+        $report      = $request->input('report');
+        $sort        = $request->input('sort');
 
         if (isset($results) && is_numeric($results)) {
             $numresults = $results;
@@ -257,7 +253,6 @@ class PDFController extends Controller
 
         // probably a better solution to this but it works.....
         $json = json_decode($query->toJson());
-        $show_links = false;
 
         $className = 'LibreNMS\\Alert\\AlertLogs';
         $AlertLog = new $className;
@@ -283,8 +278,8 @@ class PDFController extends Controller
             'owner'			=> \LibreNMS\Config::get('pdf.doc_owner'),
             'level'			=> \LibreNMS\Config::get('pdf.doc_level'),
         ];
-        $returnHTML = view('pdf.alertlog')->with($data)->render();
-        $pdf = PDF::loadView('pdf.alertlog', $data)->setPaper('a4', 'landscape');
+        $view_pdf = 'pdf.' .$report ;
+        $pdf = PDF::loadView($view_pdf, $data)->setPaper('a4', 'landscape');
 
         return $pdf->stream();
     }
