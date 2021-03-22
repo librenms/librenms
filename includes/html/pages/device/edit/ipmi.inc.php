@@ -3,7 +3,7 @@
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
         $ipmi_hostname = mres($_POST['ipmi_hostname']);
-        $ipmi_port = mres($_POST['ipmi_port']);
+        $ipmi_port = (int) $_POST['ipmi_port'];
         $ipmi_username = mres($_POST['ipmi_username']);
         $ipmi_password = mres($_POST['ipmi_password']);
 
