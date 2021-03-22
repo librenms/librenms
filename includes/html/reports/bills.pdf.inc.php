@@ -93,4 +93,4 @@
             'background'	=> $background,
         ];
     }
-$json = _json_encode($response);
+$json = json_encode($response);
