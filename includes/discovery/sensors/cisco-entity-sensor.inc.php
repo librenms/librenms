@@ -203,7 +203,7 @@ if ($device['os_group'] == 'cisco') {
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
                         // convert Watts to dbm
-						$user_func = 'mw_to_dbm';
+                        $user_func = 'mw_to_dbm';
                         $type = 'dbm';
                         $limit_low = 10 * log10($limit_low * 1000);
                         $warn_limit_low = 10 * log10($warn_limit_low * 1000);
