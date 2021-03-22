@@ -195,7 +195,7 @@ class PDFController extends Controller
             'owner'			=> \LibreNMS\Config::get('pdf.doc_owner'),
             'level'			=> \LibreNMS\Config::get('pdf.doc_level'),
         ];
-        $view_pdf = 'pdf.' . $report ;
+        $view_pdf = 'pdf.' . $report;
         $pdf = PDF::loadView($view_pdf, $data)->setPaper('a4', 'landscape');
 
         return $pdf->stream();
@@ -277,7 +277,7 @@ class PDFController extends Controller
             'owner'			=> \LibreNMS\Config::get('pdf.doc_owner'),
             'level'			=> \LibreNMS\Config::get('pdf.doc_level'),
         ];
-        $view_pdf = 'pdf.' . $report ;
+        $view_pdf = 'pdf.' . $report;
         $pdf = PDF::loadView($view_pdf, $data)->setPaper('a4', 'landscape');
 
         return $pdf->stream();
