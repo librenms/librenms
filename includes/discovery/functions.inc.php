@@ -302,7 +302,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'H';
-            log_event('Sensor High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -311,7 +311,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'L';
-            log_event('Sensor Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
@@ -320,7 +320,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WH';
-            log_event('Sensor Warn High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Warn High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -329,7 +329,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WL';
-            log_event('Sensor Warn Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Warn Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($oid == $sensor_entry['sensor_oid'] &&
@@ -356,7 +356,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             ];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             echo 'U';
-            log_event('Sensor Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr, $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr, $device, 'sensor', 3, $sensor_entry['sensor_id']);
             d_echo("( $updated updated )\n");
         }
     }//end if
@@ -461,7 +461,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
                     dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', [$entry['sensor_id']]);
                 }
                 dbDelete('sensors', '`sensor_id` =  ?', [$entry['sensor_id']]);
-                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', 3, $sensor_id);
+                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', 3, $entry['sensor_id']);
             }
 
             unset($oid);
@@ -569,7 +569,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                 $perc_warn = Config::get('storage_perc_warn', 60);
             }
 
-            $insert = dbInsert(
+            dbInsert(
                 [
                     'device_id' => $device['device_id'],
                     'storage_descr' => $descr,
