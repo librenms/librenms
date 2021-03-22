@@ -225,4 +225,3 @@ if ($device['os_group'] == 'cisco') {
         $entity_array
     );
 }//end if
-
