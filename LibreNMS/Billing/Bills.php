@@ -25,7 +25,7 @@
 namespace LibreNMS\Billing;
 
 use App\Models\Billing;
-use Auth;
+use App\Models\User;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
@@ -90,21 +90,21 @@ class Bills
             }
         }
 
-        if (! isset($sort) || empty($sort)) {
+        if (! isset($params['sort']) || empty($params['sort'])) {
             $query = $query->orderBy('B.bill_name');
         }
 
         if (isset($params['current'])) {
             $limit_low = (($params['current'] * $params['rowCount']) - ($params['rowCount']));
             $limit_high = $params['rowCount'];
-        }
-
-        if (isset($params['rowCount'])) {
-            if ($params['rowCount'] != -1) {
-                $query = $query->offset($limit_low)
-                    ->limit($limit_high);
-            }
-        }
+        
+			if (isset($params['rowCount'])) {
+				if ($params['rowCount'] != -1) {
+					$query = $query->offset($limit_low)
+						->limit($limit_high);
+				}
+			}
+		}
         $query2 = clone $query;
         $total = count(
                 json_decode(
@@ -119,112 +119,6 @@ class Bills
 
         return $output;
     }
-
-    /// ----------------------------------------------------------------------------------------------------------------------------
-    // So this is where im at the limit of my knowledge - I know this is not the way to do this
-    // help would be very much appreciated to "do the the right way"
-    // Basically cheating and coping functions from other files.
-    /// ----------------------------------------------------------------------------------------------------------------------------
-
-    private function zeropad($num, $length = 2)
-    {
-        return str_pad($num, $length, '0', STR_PAD_LEFT);
-    }
-
-    private function getDates($dayofmonth, $months = 0)
-    {
-        $dayofmonth = $this->zeropad($dayofmonth);
-        $year = date('Y');
-        $month = date('m');
-
-        if (date('d') > $dayofmonth) {
-            // Billing day is past, so it is next month
-            $date_end = date_create($year . '-' . $month . '-' . $dayofmonth);
-            $date_start = date_create($year . '-' . $month . '-' . $dayofmonth);
-            date_add($date_end, date_interval_create_from_date_string('1 month'));
-        } else {
-            // Billing day will happen this month, therefore started last month
-            $date_end = date_create($year . '-' . $month . '-' . $dayofmonth);
-            $date_start = date_create($year . '-' . $month . '-' . $dayofmonth);
-            date_sub($date_start, date_interval_create_from_date_string('1 month'));
-        }
-
-        if ($months > 0) {
-            date_sub($date_start, date_interval_create_from_date_string($months . ' month'));
-            date_sub($date_end, date_interval_create_from_date_string($months . ' month'));
-        }
-
-        // date_sub($date_start, date_interval_create_from_date_string('1 month'));
-        date_sub($date_end, date_interval_create_from_date_string('1 day'));
-
-        $date_from = date_format($date_start, 'Ymd') . '000000';
-        $date_to = date_format($date_end, 'Ymd') . '235959';
-
-        date_sub($date_start, date_interval_create_from_date_string('1 month'));
-        date_sub($date_end, date_interval_create_from_date_string('1 month'));
-
-        $last_from = date_format($date_start, 'Ymd') . '000000';
-        $last_to = date_format($date_end, 'Ymd') . '235959';
-
-        $return = [];
-        $return['0'] = $date_from;
-        $return['1'] = $date_to;
-        $return['2'] = $last_from;
-        $return['3'] = $last_to;
-
-        return $return;
-    }
-
-    private function getPredictedUsage($bill_day, $cur_used)
-    {
-        $tmp = $this->getDates($bill_day, 0);
-        $start = new DateTime($tmp[0], new DateTimeZone(date_default_timezone_get()));
-        $end = new DateTime($tmp[1], new DateTimeZone(date_default_timezone_get()));
-        $now = new DateTime(date('Y-m-d'), new DateTimeZone(date_default_timezone_get()));
-        $total = $end->diff($start)->format('%a');
-        $since = $now->diff($start)->format('%a');
-
-        return $cur_used / $since * $total;
-    }
-
-    private function format_si($value, $round = 2, $sf = 3)
-    {
-        return \LibreNMS\Util\Number::formatSi($value, $round, $sf, '');
-    }
-
-    private function format_bytes_billing($value)
-    {
-        return $this->format_number($value, Config::get('billing.base')) . 'B';
-    }
-
-    //end format_bytes_billing()
-
-    private function format_number($value, $base = 1000, $round = 2, $sf = 3)
-    {
-        return \LibreNMS\Util\Number::formatBase($value, $base, $round, $sf, '');
-    }
-
-    private function generate_url($vars, $new_vars = [])
-    {
-        return \LibreNMS\Util\Url::generate($vars, $new_vars);
-    }
-
-    private function get_percentage_colours($percentage, $component_perc_warn = null)
-    {
-        return \LibreNMS\Util\Colors::percentage($percentage, $component_perc_warn);
-    }
-
-    private function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
-    {
-        return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
-            'left' => $left_background,
-            'left_text' => $left_colour,
-            'right' => $right_background,
-            'right_text' => $right_colour,
-        ]);
-    }
-
-    /// ----------------------------------------------------------------------------------------------------------------------------
 
     public function expand_bill_list($json, $params)
     {
