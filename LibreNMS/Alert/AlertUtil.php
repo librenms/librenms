@@ -221,7 +221,7 @@ class AlertUtil
      */
     public static function runMacros($rule, $x = 1)
     {
-        $macros = Config::get('alert.macros.rule', []) .
+        $macros = Config::get('alert.macros.rule', []);
         krsort($macros);
         foreach ($macros as $macro => $value) {
             if (! strstr($macro, ' ')) {

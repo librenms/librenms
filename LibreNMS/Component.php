@@ -220,7 +220,7 @@ class Component
         \App\Models\Component::whereIn('id', array_keys($updated))
             ->with('prefs')
             ->get()
-            ->each(function (\App\Models\Component $component) use ($updated) {
+            ->each(function (\App\Models\Component $component) use ($device_id, $updated) {
                 $update = $updated[$component->id];
                 unset($update['type']);  // can't change type
 
@@ -256,7 +256,7 @@ class Component
                         $invalid->forget($existing->id);
                         $existing->fill(['value' => $value]);
                         if ($existing->isDirty()) {
-                            Log::event("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component_id);
+                            Log::event("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component->id);
                             $existing->save();
                         }
                     } else {
