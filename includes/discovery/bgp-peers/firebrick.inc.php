@@ -45,7 +45,7 @@ foreach ($bgpPeers as $vrfOid => $vrf) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
     }
     foreach ($vrf as $address => $value) {
-        $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
+        $astext = get_astext($value['fbBgpPeerRemoteAS']);
         if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]) < '1') {
             $peers = [
                 'device_id' => $device['device_id'],
