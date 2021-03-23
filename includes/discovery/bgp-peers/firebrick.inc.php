@@ -44,9 +44,19 @@ foreach ($bgpPeersCache as $key => $value) {
 unset($bgpPeersCache);
 
 foreach ($bgpPeers as $vrfId => $vrf) {
-    $checkVrf = ' AND vrf_id = ? ';
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
+    }else{
+        $checkVrf = ' AND vrf_id = ? ';
+        $vrfs = [
+            'vrf_oid' => "firebrick." . $vrfId,
+            'vrf_name' => $vrfId,
+            'device_id' => $device['device_id'],
+        ];
+
+        if (!dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrfs["vrf_oid"]])) {
+            dbInsert($vrfs, 'vrfs');
+        }
     }
     foreach ($vrf as $address => $value) {
         $astext = get_astext($value['fbBgpPeerRemoteAS']);
@@ -58,8 +68,8 @@ foreach ($bgpPeers as $vrfId => $vrf) {
                 'bgpPeerRemoteAs' => $value['fbBgpPeerRemoteAS'],
                 'bgpPeerState' => 'idle',
                 'bgpPeerAdminStatus' => 'stop',
-                'bgpLocalAddr' => '0.0.0.0',
-                'bgpPeerRemoteAddr' => '0.0.0.0',
+                'bgpLocalAddr' => $value['fbBgpPeerLocalAddress'],
+                'bgpPeerRemoteAddr' => $value['fbBgpPeerAddress'],
                 'bgpPeerInUpdates' => 0,
                 'bgpPeerOutUpdates' => 0,
                 'bgpPeerInTotalMessages' => 0,
@@ -81,15 +91,18 @@ foreach ($bgpPeers as $vrfId => $vrf) {
     }
 }
 // clean up peers
-$peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier`, `vrf_oid` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
+$peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
     $vrfId = $value['vrf_id'];
-    $vrfOid = $value['vrf_oid'];
+    if($vrfId === NULL) $vrfId = 0;
     $address = $value['bgpPeerIdentifier'];
 
-    if (empty($bgpPeers[$vrfOid][$address])) {
-        $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-
+    if (empty($bgpPeers[$vrfId][$address])) {
+        if($vrfId === null){
+            $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id IS NULL', [$device['device_id'], $address]);
+        }else{
+            $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+        }
         echo str_repeat('-', $deleted);
         echo PHP_EOL;
     }
