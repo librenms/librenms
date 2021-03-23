@@ -237,7 +237,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             }
 
                             // Some older Firebrick software versions don't have this field
-                            if(isset($value['fbBgpLocalAddr'])){
+                            if (isset($value['fbBgpLocalAddr'])) {
                                 $peer_data['bgpLocalAddr'] = IP::fromHexString($value['fbBgpLocalAddr'])->uncompressed();
                             }
 

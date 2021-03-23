@@ -35,7 +35,7 @@ foreach ($bgpPeersCache as $key => $value) {
         $address = IP::fromHexString($address)->compressed();
     }
 
-    if(isset($value["fbBgpPeerTableId"]){
+    if(isset($value["fbBgpPeerTableId"])){
         $bgpPeers[$value["fbBgpPeerTableId"]][$address] = $value;
     }else{
         $bgpPeers[0][$address] = $value;
@@ -43,8 +43,7 @@ foreach ($bgpPeersCache as $key => $value) {
 }
 unset($bgpPeersCache);
 
-foreach ($bgpPeers as $vrfOid => $vrf) {
-    $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfOid]);
+foreach ($bgpPeers as $vrfId => $vrf) {
     $checkVrf = ' AND vrf_id = ? ';
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
