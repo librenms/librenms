@@ -8,7 +8,7 @@ modules:
                 type: firebrick-cpu
                 precision: 0.01
     os:
-        sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>.*)\).*$/m'
+        sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)\).*$/m'
     sensors:
         fanspeed:
             options:

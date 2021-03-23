@@ -225,8 +225,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
-                    // ToDo, It seems that bgpPeer(In|Out)Updates, bgpPeerInUpdateElapsedTime and  bgpLocalAddr are actually not available over SNMP
                     } elseif ($device['os'] == 'firebrick') {
+                        // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
                         $bgpPeer = null;
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', $key);
@@ -235,6 +235,12 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             if (strlen($address) > 15) {
                                 $address = IP::fromHexString($address)->compressed();
                             }
+
+                            // Some older Firebrick software versions don't have this field
+                            if(isset($value['fbBgpLocalAddr'])){
+                                $peer_data['bgpLocalAddr'] = IP::fromHexString($value['fbBgpLocalAddr'])->uncompressed();
+                            }
+
                             if ($address == $peer_ip) {
                                 switch ($value['fbBgpPeerState']) {
                                     case 0:

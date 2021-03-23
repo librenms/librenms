@@ -34,7 +34,12 @@ foreach ($bgpPeersCache as $key => $value) {
     if (strlen($address) > 15) {
         $address = IP::fromHexString($address)->compressed();
     }
-    $bgpPeers[0][$address] = $value;
+
+    if(isset($value["fbBgpPeerTableId"]){
+        $bgpPeers[$value["fbBgpPeerTableId"]][$address] = $value;
+    }else{
+        $bgpPeers[0][$address] = $value;
+    }
 }
 unset($bgpPeersCache);
 

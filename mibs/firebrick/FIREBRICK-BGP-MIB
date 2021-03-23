@@ -170,4 +170,12 @@ fbBgpPeerLocalAS OBJECT-TYPE
         "The local AS number for the BGP Peer"
     ::= { fbBgpPeerEntry 12 }
 
+fbBgpPeerTableId OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The routing table number for this BGP Peer."
+    ::= { fbBgpPeerEntry 13 }
+
 END
