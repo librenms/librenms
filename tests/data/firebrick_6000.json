@@ -2556,7 +2556,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
                     "bgpPeerIdentifier": "10.2.3.4",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -2578,7 +2578,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
                     "bgpPeerIdentifier": "10.2.3.5",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -2600,7 +2600,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
                     "bgpPeerIdentifier": "fd01:8b0:0:fb::1",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -2627,7 +2627,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
                     "bgpPeerIdentifier": "10.2.3.4",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "opensent",
@@ -2649,7 +2649,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
                     "bgpPeerIdentifier": "10.2.3.5",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "established",
@@ -2671,7 +2671,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
                     "bgpPeerIdentifier": "fd01:8b0:0:fb::1",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "established",
