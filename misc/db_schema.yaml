@@ -2079,5 +2079,5 @@ printer_supplies:
     - { Field: supply_current, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: supply_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [supply_id], Unique: true, Type: BTREE }
     toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
