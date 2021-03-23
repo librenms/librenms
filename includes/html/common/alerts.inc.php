@@ -276,7 +276,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
-    if (isset($sort) && sort != '') {
+    if (isset($sort) && $sort != '') {
         $common_output[] = "sort: '$sort',\n";
     }
 
