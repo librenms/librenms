@@ -181,7 +181,7 @@ class RoutesTablesController extends TableController
             try {
                 $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
                 $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
             }
         }
@@ -189,7 +189,7 @@ class RoutesTablesController extends TableController
             try {
                 $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
                 $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
             }
         }

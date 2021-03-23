@@ -35,6 +35,13 @@ if (is_array($ipmi_rows)) {
             [$desc, $value, $type, $status] = explode(',', $row);
             $desc = trim($desc, ' ');
             $ipmi_unit_type = Config::get("ipmi_unit.$type");
+
+            // SDR records can include hexadecimal values, identified by an h
+            // suffix (like "93h" for 0x93). Convert them to decimal.
+            if (preg_match('/^([0-9A-Fa-f]+)h$/', $value, $matches)) {
+                $value = hexdec($matches[1]);
+            }
+
             $ipmi_sensor[$desc][$ipmi_unit_type]['value'] = $value;
             $ipmi_sensor[$desc][$ipmi_unit_type]['unit'] = $type;
         }

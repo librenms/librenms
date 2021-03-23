@@ -367,6 +367,11 @@ $graphs['docker'] = [
     'mem_used',
     'mem_perc',
 ];
+$graphs['chronyd'] = [
+    'time',
+    'frequency',
+    'root',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
