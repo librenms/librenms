@@ -144,5 +144,30 @@ fbBgpPeerExported OBJECT-TYPE
         "The number of prefixes exported to the BGP Peer"
     ::= { fbBgpPeerEntry 9 }
 
+fbBgpPeerLocalAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The address type of fbBgpPeerLocalAddress."
+    ::= { fbBgpPeerEntry 10 }
+
+fbBgpPeerLocalAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The local internet address used for this peer.  The type of the
+         address is determined by the value of the fbBgpPeerAddressType
+         object."
+    ::= { fbBgpPeerEntry 11 }
+
+fbBgpPeerLocalAS OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The local AS number for the BGP Peer"
+    ::= { fbBgpPeerEntry 12 }
 
 END
