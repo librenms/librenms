@@ -7,7 +7,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.24693.1.2900",
                     "sysDescr": "FB2901 FB2900 Hamman+ (V1.55.126 2021-03-10T14:00:34)",
                     "sysContact": "<private>",
-                    "version": "V1.55.126 2021-03-10T14:00:34",
+                    "version": "V1.55.126",
                     "hardware": "FB2901",
                     "features": null,
                     "os": "firebrick",
