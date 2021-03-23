@@ -177,6 +177,16 @@ install run `cp /opt/librenms/misc/librenms.service
 /etc/systemd/system/librenms.service && systemctl enable --now
 librenms.service`
 
+## systemd-watchdog
+
+A systemd unit file can be found in `misc/librenms-watchdog.service`. To
+install run `cp /opt/librenms/misc/librenms-watchdog.service
+/etc/systemd/system/librenms.service && systemctl enable --now
+librenms.service`
+
+This requires: python3-systemd (or python-systemd on older systems)
+or https://pypi.org/project/systemd-python/
+
 ## OS-Specific Instructions
 
 ### RHEL/CentOS

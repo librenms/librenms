@@ -773,6 +773,19 @@ located at: [https://www.twilio.com/docs/api?filter-product=sms](https://www.twi
 | Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
 | Twilio SMS Number | 8888778660 |
 
+## UKFast PSS
+
+UKFast PSS tickets can be raised from alerts using the UKFastPSS transport. This required an [API key](https://my.ukfast.co.uk/applications) with PSS `write` permissions
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Key | ABCDefgfg12 |
+| Author | 5423 |
+| Priority | Critical |
+| Secure | true |
+
 ## VictorOps
 
 VictorOps provide a webHook url to make integration extremely
