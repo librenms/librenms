@@ -14544,8 +14544,7 @@
                     "ifIndices": "73,74,76"
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "sensors": {
         "discovery": {
