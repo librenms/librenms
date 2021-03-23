@@ -357,6 +357,7 @@ class Rrd extends BaseDatastore
     {
         global $vdebug;
         $stat = Measurement::start($this->coalesceStatisticType($command));
+        $output = null;
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
