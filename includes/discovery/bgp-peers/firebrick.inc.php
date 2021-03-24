@@ -46,15 +46,15 @@ unset($bgpPeersCache);
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
-    }else{
+    } else {
         $checkVrf = ' AND vrf_id = ? ';
         $vrfs = [
-            'vrf_oid' => "firebrick." . $vrfId,
+            'vrf_oid' => 'firebrick.' . $vrfId,
             'vrf_name' => $vrfId,
             'device_id' => $device['device_id'],
         ];
 
-        if (!dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrfs["vrf_oid"]])) {
+        if (! dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrfs['vrf_oid']])) {
             dbInsert($vrfs, 'vrfs');
         }
     }
@@ -94,13 +94,15 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
     $vrfId = $value['vrf_id'];
-    if($vrfId === NULL) $vrfId = 0;
+    if ($vrfId === null) {
+        $vrfId = 0;
+    }
     $address = $value['bgpPeerIdentifier'];
 
     if (empty($bgpPeers[$vrfId][$address])) {
-        if($vrfId === null){
+        if ($vrfId === null) {
             $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id IS NULL', [$device['device_id'], $address]);
-        }else{
+        } else {
             $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
         }
         echo str_repeat('-', $deleted);
