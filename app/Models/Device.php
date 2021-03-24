@@ -328,10 +328,9 @@ class Device extends BaseModel
      * Update the location to the correct location and update GPS if needed
      *
      * @param  \App\Models\Location|string  $new_location  location data
-     * @param  string  $hostname
      * @param  bool  $doLookup try to lookup the GPS coordinates
      */
-    public function setLocation($new_location, $doLookup = false)
+    public function setLocation($new_location, bool $doLookup = false)
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;

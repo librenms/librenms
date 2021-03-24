@@ -34,7 +34,7 @@ class AlertRule extends BaseModel
     // ---- Query scopes ----
 
     /**
-     * @param Builder $query
+     * @param Builder<AlertRule> $query
      * @return Builder
      */
     public function scopeEnabled($query)
@@ -45,7 +45,7 @@ class AlertRule extends BaseModel
     /**
      * Scope for only alert rules that are currently in alarm
      *
-     * @param Builder $query
+     * @param Builder<AlertRule> $query
      * @return Builder
      */
     public function scopeIsActive($query)
@@ -59,7 +59,7 @@ class AlertRule extends BaseModel
      * Scope to filter rules for devices permitted to user
      * (do not use for admin and global read-only users)
      *
-     * @param $query
+     * @param Builder<AlertRule> $query
      * @param User $user
      * @return mixed
      */

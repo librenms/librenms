@@ -164,6 +164,9 @@ class RoutesTablesController extends TableController
         return $query;
     }
 
+    /**
+     * @param Route $route_entry
+     */
     public function formatItem($route_entry)
     {
         $item = $route_entry->toArray();

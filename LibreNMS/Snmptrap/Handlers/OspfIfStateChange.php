@@ -79,6 +79,9 @@ class OspfIfStateChange implements SnmptrapHandler
             case 'loopback':
                 $severity = 4;
                 break;
+            default:
+                $severity = 0;
+                break;
         }
 
         Log::event("OSPF interface $port->ifName is $ospfPort->ospfIfState", $device->device_id, 'trap', $severity);
