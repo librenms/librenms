@@ -413,7 +413,7 @@ class Vrp extends OS implements
         $oidMap['hwWlanSsid2gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.2.';
         $descrMap['hwWlanSsid5gStaCnt'] = '5 Ghz';
         $descrMap['hwWlanSsid2gStaCnt'] = '2.4 Ghz';
-        $ssid_total_oid_array=[]; // keep all OIDs so we can compute the total of all STA
+        $ssid_total_oid_array = []; // keep all OIDs so we can compute the total of all STA
 
         foreach ($staTable as $ssid => $sta) {
             //Convert string to num_oid
@@ -427,7 +427,7 @@ class Vrp extends OS implements
                     'clients',
                     $this->getDeviceId(),
                     $oid,
-                    'vrp',
+                    'vrpi-clients',
                     $staFreq . '-' . $ssid,
                     'SSID: ' . $ssid . ' (' . $descrMap[$staFreq] . ')',
                     $count,
@@ -442,7 +442,7 @@ class Vrp extends OS implements
                 'clients',
                 $this->getDeviceId(),
                 $ssid_oid_array,
-                'vrp',
+                'vrp-clients',
                 'total-' . $ssid,
                 'SSID: ' . $ssid,
                 0,
@@ -452,12 +452,12 @@ class Vrp extends OS implements
             );
         }
         if (count($ssid_total_oid_array) > 0) {
-                // We have at least 1 SSID, so we can count the total of STA
-                $sensors[] = new WirelessSensor(
+            // We have at least 1 SSID, so we can count the total of STA
+            $sensors[] = new WirelessSensor(
                 'clients',
                     $this->getDeviceId(),
                 $ssid_total_oid_array,
-                'vrp',
+                'vrp-clients',
                 'total-all-ssids',
                 'Total Clients',
                 0,
