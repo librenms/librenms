@@ -52,12 +52,13 @@ class DeviceController extends TableController
             'disable_notify' => 'nullable|in:0,1',
             'group' => 'nullable|int',
             'poller_group' => 'nullable|int',
+            'device_id' => 'nullable|int',
         ];
     }
 
     protected function filterFields($request)
     {
-        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location'];
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location', 'device_id' => 'device_id'];
     }
 
     protected function searchFields($request)
@@ -75,6 +76,7 @@ class DeviceController extends TableController
             'os' => 'os',
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
+            'device_id' => 'device_id',
         ];
     }
 
@@ -148,6 +150,7 @@ class DeviceController extends TableController
             'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
             'location' => $this->getLocation($device),
             'actions' => $this->getActions($device),
+            'device_id' => $device->device_id,
         ];
     }
 

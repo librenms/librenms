@@ -3,6 +3,7 @@
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
         $ipmi_hostname = mres($_POST['ipmi_hostname']);
+        $ipmi_port = (int) $_POST['ipmi_port'];
         $ipmi_username = mres($_POST['ipmi_username']);
         $ipmi_password = mres($_POST['ipmi_password']);
 
@@ -10,6 +11,12 @@ if ($_POST['editing']) {
             set_dev_attrib($device, 'ipmi_hostname', $ipmi_hostname);
         } else {
             del_dev_attrib($device, 'ipmi_hostname');
+        }
+
+        if ($ipmi_port != '') {
+            set_dev_attrib($device, 'ipmi_port', $ipmi_port);
+        } else {
+            set_dev_attrib($device, 'ipmi_port', '623'); // Default port
         }
 
         if ($ipmi_username != '') {
@@ -48,6 +55,12 @@ if ($updated && $update_message) {
     <label for="ipmi_hostname" class="col-sm-2 control-label">IPMI/BMC Hostname</label>
     <div class="col-sm-6">
       <input id="ipmi_hostname" name="ipmi_hostname" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_hostname'); ?>" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ipmi_port" class="col-sm-2 control-label">IPMI/BMC Port</label>
+    <div class="col-sm-6">
+      <input id="ipmi_port" name="ipmi_port" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_port'); ?>" placeholder="623" />
     </div>
   </div>
   <div class="form-group">
