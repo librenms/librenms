@@ -1,12 +1,5 @@
 mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING
 modules:
-    processors:
-        data:
-            -
-                oid: fbCpuUsageTable.0
-                num_oid: '.1.3.6.1.4.1.24693.100.2.1.1.2.0.{{ $index }}'
-                type: firebrick-cpu
-                precision: 0.01
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)/m'
     sensors:
