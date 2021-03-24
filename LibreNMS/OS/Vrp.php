@@ -405,14 +405,18 @@ class Vrp extends OS implements
     {
         $sensors = [];
 
-        $staTable = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanSsid2gStaCnt', [], 'HUAWEI-WLAN-VAP-MIB', null, '-OQUs');
-        $staTable = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanSsid5gStaCnt', $staTable, 'HUAWEI-WLAN-VAP-MIB', null, '-OQUs');
+        $staTable = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanSsid2gStaCnt', [], 'HUAWEI-WLAN-VAP-MIB');
+        $staTable = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanSsid5gStaCnt', $staTable, 'HUAWEI-WLAN-VAP-MIB');
 
         //Map OIDs and description
-        $oidMap['hwWlanSsid5gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.3.';
-        $oidMap['hwWlanSsid2gStaCnt'] = '.1.3.6.1.4.1.2011.6.139.17.1.2.1.2.';
-        $descrMap['hwWlanSsid5gStaCnt'] = '5 Ghz';
-        $descrMap['hwWlanSsid2gStaCnt'] = '2.4 Ghz';
+        $oidMap = [
+            'hwWlanSsid5gStaCnt' => '.1.3.6.1.4.1.2011.6.139.17.1.2.1.3.',
+            'hwWlanSsid2gStaCnt' => '.1.3.6.1.4.1.2011.6.139.17.1.2.1.2.',
+        ];
+        $descrMap = [
+            'hwWlanSsid5gStaCnt' => '5 GHz',
+            'hwWlanSsid2gStaCnt' => '2.4 GHz',
+        ];
         $ssid_total_oid_array = []; // keep all OIDs so we can compute the total of all STA
 
         foreach ($staTable as $ssid => $sta) {
