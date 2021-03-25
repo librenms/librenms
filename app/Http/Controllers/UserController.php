@@ -202,7 +202,7 @@ class UserController extends Controller
 
     /**
      * @param User $user
-     * @param $dashboard
+     * @param mixed $dashboard
      * @return bool
      */
     protected function updateDashboard(User $user, $dashboard)

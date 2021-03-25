@@ -138,9 +138,8 @@ class LegacyUserProvider implements UserProvider
             }
             \Toastr::error($auth_message);
 
-            if (empty($username)) {
-                $username = Session::get('username', $credentials['username']);
-            }
+            $username = $username ?? Session::get('username', $credentials['username']);
+
             DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
         } finally {
             error_reporting(-1);
