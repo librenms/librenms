@@ -347,7 +347,7 @@ bill_port_counters:
 cache:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: value, Type: text, 'Null': false, Extra: '' }
+    - { Field: value, Type: mediumtext, 'Null': false, Extra: '' }
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
