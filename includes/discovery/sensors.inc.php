@@ -55,6 +55,7 @@ $run_sensors = [
     'humidity',
     'load',
     'loss',
+    'rttjitter',
     'power',
     'power_consumed',
     'power_factor',

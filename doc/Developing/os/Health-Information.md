@@ -26,6 +26,7 @@ the values we expect to see the data in:
 | humidity                        | %                           |
 | load                            | %                           |
 | loss                            | %                           |
+| rttjitter                       | ms                          |
 | power                           | W                           |
 | power_consumed                  | kWh                         |
 | power_factor                    | ratio                       |
