@@ -18,7 +18,7 @@ if (count($components) > 0) {
     <?php
     foreach ($components as $component => $array) {
         if ($array['disabled'] == 1) {
-            break;
+            continue;
         } elseif ($array['status'] == 2) {
             $class = 'danger';
             $message = 'Alert';
