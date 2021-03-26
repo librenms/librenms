@@ -26,6 +26,8 @@ namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\Validate;
 
 class CommonFunctionsTest extends TestCase
 {
@@ -71,7 +73,7 @@ class CommonFunctionsTest extends TestCase
     public function testRrdDescriptions()
     {
         $data = 'Toner, S/N:CR_UM-16021314488.';
-        $this->assertEquals('Toner, S/N CR_UM-16021314488.', Rrd::safeDescr($data));
+        $this->assertEquals('Toner, S/N CR_UM-16021314488.', \LibreNMS\Data\Store\Rrd::safeDescr($data));
     }
 
     public function testSetNull()
