@@ -71,7 +71,8 @@ foreach (get_graph_subtypes($type) as $avail_type) {
     } else {
         $is_selected = '';
     }
-    $headeroptions .= '<option value="' . \LibreNMS\Util\Url::generate($vars, [
+    $headeroptions .= '<option value="' .
+        \LibreNMS\Util\Url::generate($vars, [
             'format' => 'graph_' . $avail_type,
             'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
             'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now'),

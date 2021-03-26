@@ -817,7 +817,8 @@ function alert_details($details)
         }
 
         if (in_array('app_id', array_keys($tmp_alerts))) {
-            $fault_detail .= "<a href='" . \LibreNMS\Util\Url::generate([
+            $fault_detail .= "<a href='" .
+                \LibreNMS\Util\Url::generate([
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'apps',
