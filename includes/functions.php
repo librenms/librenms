@@ -700,7 +700,6 @@ function isDomainResolves($domain)
     return ! empty($records);
 }
 
-
 function match_network($nets, $ip, $first = false)
 {
     $return = false;

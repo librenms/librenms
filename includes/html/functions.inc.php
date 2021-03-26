@@ -125,6 +125,7 @@ function generate_overlib_content($graph_array, $text)
 function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
     $deviceModel = DeviceCache::get((int) $device['device_id']);
+
     return \LibreNMS\Util\Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
 
