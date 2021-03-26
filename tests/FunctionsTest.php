@@ -25,6 +25,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Rewrite;
 
 class FunctionsTest extends TestCase
 {

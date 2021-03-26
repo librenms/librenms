@@ -25,6 +25,7 @@ use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
+use Permissions;
 
 class IRCBot
 {
