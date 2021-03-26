@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux vsx123 2.6.18-92cpx86_64 #1 SMP Tue Sep 8 20:04:48 IDT 2020 x86_64",
+                    "sysContact": "<private>",
+                    "version": "R80.30",
+                    "hardware": "Check Point 23900",
+                    "features": null,
+                    "os": "gaia",
+                    "type": "firewall",
+                    "serial": "LR123456789",
+                    "icon": "checkpoint.png",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
