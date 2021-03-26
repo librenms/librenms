@@ -32,7 +32,7 @@ jobs:
             database: mariadb:10.5
           -
             php-version: 8.0
-            name: Style and Web
+            name: Web
             skip-unit-check: 1
             database: mysql:5.7
           -
@@ -44,10 +44,10 @@ jobs:
             php-version: 7.3
             name: Unit
             skip-web-check: 1
-            database: mysql:5.7
+            database: mysql:8.0
           -
             php-version: 7.3
-            name: Style and Web
+            name: Web
             skip-unit-check: 1
             database: mysql:8.0
     services:
