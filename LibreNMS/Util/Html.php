@@ -147,15 +147,15 @@ class Html
         $right_color = $colors['right'] ?? $default['right'];
 
         $output = '<div style="width:' . $width . 'px; height:' . $height . 'px; position: relative;">
-        <div class="progress" style="min-width: 2em; background-color:#' . $right_color . '; height:' . $height . 'px;margin-bottom:-' . $height . 'px;">';
+        <div class="progress" style="background-color:#' . $right_color . '; height:' . $height . 'px;margin-bottom:-' . $height . 'px;">';
 
         if ($shadow !== null) {
             $shadow = min($shadow, 100);
             $middle_color = $colors['middle'] ?? $default['middle'];
-            $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $shadow . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $shadow . '%; background-color: #' . $middle_color . ';">';
+            $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $shadow . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $shadow . '%; background-color: #' . $middle_color . ';">';
         }
 
-        $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $percent . '%; background-color: #' . $left_color . ';">
+        $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $percent . '%; background-color: #' . $left_color . ';">
         </div></div>
         <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#' . $left_text_color . ';">' . $left_text . '</b>
         <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#' . $right_text_color . ';">' . $right_text . '</b>
