@@ -128,25 +128,25 @@ function print_help()
 $options = getopt('b:s:h:i:f:np:t:q:');
 
 if (! empty($options['s'])) {
-    $host_glob = str_replace('*', '%', mres($options['s']));
+    $host_glob = str_replace('*', '%', $options['s']);
     $nameType = 'sysName';
 }
 if (! empty($options['h'])) {
-    $host_glob = str_replace('*', '%', mres($options['h']));
+    $host_glob = str_replace('*', '%', $options['h']);
     $nameType = 'hostname';
 }
 if (array_key_exists('n', $options)) {
     $create_bill = true;
 }
 if (! empty($options['t'])) {
-    $bill_type = mres($options['t']);
+    $bill_type = $options['t'];
 }
 if (! empty($options['q'])) {
-    $bill_cdr = mres($options['q']);
+    $bill_cdr = $options['q'];
 }
 
-$bill_name = str_replace('*', '%', mres($options['b']));
-$intf_glob = str_replace('*', '%', mres($options['i']));
+$bill_name = str_replace('*', '%', $options['b']);
+$intf_glob = str_replace('*', '%', $options['i']);
 
 // Exit if no bill
 if (empty($bill_name)) {

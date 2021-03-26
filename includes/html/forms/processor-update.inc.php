@@ -26,9 +26,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $status = 'error';
 $message = 'Error updating processor information';
 
-$device_id = mres($_POST['device_id']);
-$processor_id = mres($_POST['processor_id']);
-$data = mres($_POST['data']);
+$device_id = $_POST['device_id'];
+$processor_id = $_POST['processor_id'];
+$data = $_POST['data'];
 
 if (! is_numeric($device_id)) {
     $message = 'Missing device id';

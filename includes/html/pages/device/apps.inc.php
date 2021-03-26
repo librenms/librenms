@@ -14,7 +14,7 @@ $link_array = [
 
 $app_list = [];
 foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ?', [$device['device_id']]) as $app) {
-    $app['app_display'] = nicecase($app['app_type']);
+    $app['app_display'] = \LibreNMS\Util\StringHelpers::niceCase($app['app_type']);
     $app_list[] = $app;
 }
 
@@ -68,8 +68,8 @@ if ($vars['instance']) {
 
 $app = dbFetchRow('SELECT * FROM `applications` WHERE `device_id` = ? AND `app_type` = ?' . $where, $where_array);
 
-if (is_file('includes/html/pages/device/apps/' . mres($vars['app']) . '.inc.php')) {
-    include 'includes/html/pages/device/apps/' . mres($vars['app']) . '.inc.php';
+if (is_file('includes/html/pages/device/apps/' . $vars['app'] . '.inc.php')) {
+    include 'includes/html/pages/device/apps/' . $vars['app'] . '.inc.php';
 }
 
 $pagetitle[] = 'Apps';

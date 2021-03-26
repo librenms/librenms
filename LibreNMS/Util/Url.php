@@ -172,7 +172,7 @@ class Url
     }
 
     /**
-     * @param Sensor $sensor
+     * @param \App\Models\Sensor $sensor
      * @param string $text
      * @param string $type
      * @param bool $overlib

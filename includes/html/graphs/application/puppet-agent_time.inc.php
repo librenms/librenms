@@ -9,7 +9,7 @@ $unit_text = 'Runtime/sec';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'time']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'time']);
 $array = [
     'catalog_application',
     'config_retrieval',
@@ -21,7 +21,7 @@ $array = [
     'transaction_evaluation',
     'total',
 ];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

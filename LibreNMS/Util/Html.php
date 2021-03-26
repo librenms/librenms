@@ -123,7 +123,7 @@ class Html
             unset($link_array['height'], $link_array['width']);
             $link = Url::generate($link_array);
 
-            $full_link = Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom), null);
+            $full_link = Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom));
             $graph_data[] = $full_link;
 
             if ($print) {

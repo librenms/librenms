@@ -26,9 +26,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $status = 'error';
 $message = 'Error updating mempool information';
 
-$device_id = mres($_POST['device_id']);
-$mempool_id = mres($_POST['mempool_id']);
-$data = mres($_POST['data']);
+$device_id = $_POST['device_id'];
+$mempool_id = $_POST['mempool_id'];
+$data = $_POST['data'];
 
 if (! is_numeric($device_id)) {
     $message = 'Missing device id';

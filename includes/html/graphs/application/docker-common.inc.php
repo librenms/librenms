@@ -21,9 +21,9 @@ if (isset($vars['container'])) {
 $int = 0;
 while (isset($containers[$int])) {
     $container_name = $containers[$int];
-    $rrd_filename = rrd_name($device['hostname'], ['app', $name, $app_id, $container_name]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id, $container_name]);
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr'    => $container_name,

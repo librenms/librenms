@@ -381,7 +381,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Update rrd data ---
-            $peer_rrd_name = safename('bgp-' . $peer['bgpPeerIdentifier']);
+            $peer_rrd_name = \LibreNMS\Data\Store\Rrd::safeName('bgp-' . $peer['bgpPeerIdentifier']);
             $peer_rrd_def = RrdDefinition::make()
                 ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
                 ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
@@ -650,7 +650,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         );
                     }
 
-                    $cbgp_rrd_name = safename('cbgp-' . $peer['bgpPeerIdentifier'] . ".$afi.$safi");
+                    $cbgp_rrd_name = \LibreNMS\Data\Store\Rrd::safeName('cbgp-' . $peer['bgpPeerIdentifier'] . ".$afi.$safi");
                     $cbgp_rrd_def = RrdDefinition::make()
                         ->addDataset('AcceptedPrefixes', 'GAUGE', null, 100000000000)
                         ->addDataset('DeniedPrefixes', 'GAUGE', null, 100000000000)

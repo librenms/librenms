@@ -115,7 +115,7 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'dell.arrayDiskState') {
                     $descr = str_replace('"', '', snmp_get($device, 'arrayDiskEnclosureConnectionEnclosureName.' . $index . '', '-Ovqn', $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
                 } else {
-                    $descr = clean($temp[$index][$tablevalue[3]]); // Use clean as virtualDiskDeviceName is user defined
+                    $descr = strip_tags($temp[$index][$tablevalue[3]]); // Use clean as virtualDiskDeviceName is user defined
                 }
                 //Discover Sensors
                 discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);

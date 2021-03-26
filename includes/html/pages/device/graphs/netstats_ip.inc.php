@@ -1,6 +1,6 @@
 <?php
 
-if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'netstats-ip'))) {
+if (Rrd::checkRrdExists(Rrd::name($device['hostname'], 'netstats-ip'))) {
     $graph_title = 'IP Statistics';
     $graph_type = 'device_ip';
 

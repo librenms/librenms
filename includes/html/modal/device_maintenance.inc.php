@@ -87,7 +87,7 @@ foreach ($hour_steps as $hour) {
 <script>
     $("#maintenance-submit").click(function() {
         var device_id = $(this).data("device_id");
-        var title = '<?=display($device['hostname']); ?>';
+        var title = '<?=\LibreNMS\Util\Clean::html($device['hostname'], []); ?>';
         var notes = $('#notes').val();
         var recurring = 0;
         var start = '<?=date('Y-m-d H:i:00'); ?>';

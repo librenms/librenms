@@ -10,8 +10,8 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-frameUtilization');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-frameUtilization');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'%                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:downlinkutilization=' . $rrdfilename . ':downlinkutilization:AVERAGE ';
     $rrd_options .= ' DEF:uplinkutilization=' . $rrdfilename . ':uplinkutilization:AVERAGE ';

@@ -52,10 +52,10 @@ $rrd_options .= " COMMENT:'                            Min   Max    Cur      \\n
 foreach ($mempools as $index => $mempool) {
     $color = $colors[$index % 8];
 
-    $descr = rrdtool_escape($mempool->mempool_descr, 22);
-    $rrd_filename = rrd_name($device['hostname'], ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index]);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($mempool->mempool_descr, 22);
+    $rrd_filename = Rrd::name($device['hostname'], ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index]);
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_options .= " DEF:mempoolfree$index=$rrd_filename:free:AVERAGE ";
         $rrd_options .= " DEF:mempoolused$index=$rrd_filename:used:AVERAGE ";
         $rrd_options .= " CDEF:mempooltotal$index=mempoolused$index,mempoolfree$index,+ ";
@@ -107,7 +107,7 @@ if (! empty($free_indexes)) {
         if ($available === null) {
             $rrd_options .= " CDEF:mempoolavailablebytes=mempoolfree{$free_indexes[0]}";
         } else {
-            $available_filename = rrd_name($device['hostname'], ['mempool', $available->mempool_type, $available->mempool_class, $available->mempool_index]);
+            $available_filename = Rrd::name($device['hostname'], ['mempool', $available->mempool_type, $available->mempool_class, $available->mempool_index]);
             $rrd_options .= " DEF:mempoolavailablebytes=$available_filename:free:AVERAGE";
         }
 

@@ -21,21 +21,21 @@ echo '<div class="row">
 $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
 
 if (! empty($_POST['hostname'])) {
-    $hostname = clean($_POST['hostname']);
-    if (! is_valid_hostname($hostname) && ! IP::isValid($hostname)) {
+    $hostname = strip_tags($_POST['hostname']);
+    if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
     if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
-            $port = clean($_POST['port']);
+            $port = strip_tags($_POST['port']);
         } else {
             $port = Config::get('snmp.port');
         }
 
         if ($_POST['transport']) {
-            $transport = clean($_POST['transport']);
+            $transport = strip_tags($_POST['transport']);
         } else {
             $transport = 'udp';
         }
@@ -45,25 +45,25 @@ if (! empty($_POST['hostname'])) {
             $snmpver = 'v2c';
             $additional = [
                 'snmp_disable' => 1,
-                'os'           => $_POST['os'] ? mres($_POST['os_id']) : 'ping',
-                'hardware'     => mres($_POST['hardware']),
-                'sysName'      => mres($_POST['sysName']),
+                'os'           => $_POST['os'] ? $_POST['os_id'] : 'ping',
+                'hardware'     => $_POST['hardware'],
+                'sysName'      => $_POST['sysName'],
             ];
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
-                Config::set('snmp.community', [clean($_POST['community'], false)]);
+                Config::set('snmp.community', [$_POST['community']]);
             }
 
-            $snmpver = clean($_POST['snmpver']);
+            $snmpver = strip_tags($_POST['snmpver']);
             print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', Config::get('snmp.community')) . " port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = [
-                'authlevel'  => clean($_POST['authlevel']),
-                'authname'   => clean($_POST['authname'], false),
-                'authpass'   => clean($_POST['authpass'], false),
-                'authalgo'   => clean($_POST['authalgo']),
-                'cryptopass' => clean($_POST['cryptopass'], false),
-                'cryptoalgo' => clean($_POST['cryptoalgo'], false),
+                'authlevel'  => strip_tags($_POST['authlevel']),
+                'authname'   => $_POST['authname'],
+                'authpass'   => $_POST['authpass'],
+                'authalgo'   => strip_tags($_POST['authalgo']),
+                'cryptopass' => $_POST['cryptopass'],
+                'cryptoalgo' => $_POST['cryptoalgo'],
             ];
 
             $v3_config = Config::get('snmp.v3');
@@ -76,13 +76,13 @@ if (! empty($_POST['hostname'])) {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
 
-        $poller_group = clean($_POST['poller_group']);
+        $poller_group = strip_tags($_POST['poller_group']);
         $force_add = ($_POST['force_add'] == 'on');
 
-        $port_assoc_mode = clean($_POST['port_assoc_mode']);
+        $port_assoc_mode = strip_tags($_POST['port_assoc_mode']);
         try {
             $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
-            $link = generate_device_url(['device_id' => $device_id]);
+            $link = \LibreNMS\Util\Url::deviceUrl($device_id);
             print_message("Device added <a href='$link'>$hostname ($device_id)</a>");
         } catch (HostUnreachableException $e) {
             print_error($e->getMessage());

@@ -1,6 +1,6 @@
 <?php
 
-$file = rrd_name($device['hostname'], 'screenos_sessions');
+$file = Rrd::name($device['hostname'], 'screenos_sessions');
 
 $rrd_list[0]['filename'] = $file;
 $rrd_list[0]['descr'] = 'Maxiumum';

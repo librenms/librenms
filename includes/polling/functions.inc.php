@@ -283,7 +283,7 @@ function poll_device($device, $force_module = false)
     $poll_update_array = [];
     $update_array = [];
 
-    $host_rrd = rrd_name($device['hostname'], '', '');
+    $host_rrd = Rrd::name($device['hostname'], '', '');
     if (Config::get('norrd') !== true && ! is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
@@ -341,7 +341,7 @@ function poll_device($device, $force_module = false)
                 $os->enableGraph('poller_perf');
 
                 // remove old rrd
-                $oldrrd = rrd_name($device['hostname'], ['poller', $module, 'perf']);
+                $oldrrd = Rrd::name($device['hostname'], ['poller', $module, 'perf']);
                 if (is_file($oldrrd)) {
                     unlink($oldrrd);
                 }
@@ -570,13 +570,6 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         echo PHP_EOL;
     }
-}
-
-function convert_to_celsius($value)
-{
-    $value = ($value - 32) / 1.8;
-
-    return sprintf('%.02f', $value);
 }
 
 /**
