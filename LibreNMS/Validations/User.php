@@ -83,7 +83,7 @@ class User extends BaseValidation
                 "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/",
             ];
 
-            if (!Config::get('installed_from_package')) {
+            if (! Config::get('installed_from_package')) {
                 $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
                 if (! empty($find_result)) {
                     // Ignore files created by the webserver
