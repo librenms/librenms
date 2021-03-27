@@ -54,6 +54,7 @@ class Lcos extends OS implements
      */
     private function strToDecOid($index)
     {
+        $dec_index = [];
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
             $dec_index[] = ord($index[$i]);
         }
