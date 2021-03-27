@@ -107,7 +107,9 @@ class DBSetupTest extends DBTestCase
     public function testSqlMode()
     {
         $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode'));
-        [$version, $vendor] = explode('-', $result->version, 2);
+        preg_match('/([0-9.]+)(?:-(\w+))/', $result->version, $matches);
+        $version = $matches[1];
+        $vendor = $matches[2];
         $mode = $result->mode;
 
         // NO_AUTO_CREATE_USER is removed in mysql 8
