@@ -3,6 +3,7 @@
 use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Time;
 
@@ -88,14 +89,14 @@ if ($device['sysContact']) {
         <div class="col-sm-4">Contact</div>';
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '
-        <div class="col-sm-8">' . display(htmlspecialchars(get_dev_attrib($device, 'override_sysContact_string'))) . '</div>
+        <div class="col-sm-8">' . Clean::html(get_dev_attrib($device, 'override_sysContact_string')) . '</div>
       </div>
       <div class="row">
         <div class="col-sm-4">SNMP Contact</div>';
     }
 
     echo '
-        <div class="col-sm-8">' . display(htmlspecialchars($device['sysContact'])) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
       </div>';
 }
 
