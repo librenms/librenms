@@ -762,7 +762,7 @@ class Device extends BaseModel
 
     public function printerSupplies()
     {
-        return $this->hasMany(Toner::class, 'device_id');
+        return $this->hasMany(PrinterSupply::class, 'device_id');
     }
 
     public function pseudowires()

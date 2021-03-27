@@ -1916,20 +1916,6 @@ tnmsneinfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     tnmsneinfo_device_id_index: { Name: tnmsneinfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     tnmsneinfo_neid_index: { Name: tnmsneinfo_neid_index, Columns: [neID], Unique: false, Type: BTREE }
-toner:
-  Columns:
-    - { Field: toner_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: toner_index, Type: int, 'Null': false, Extra: '' }
-    - { Field: toner_type, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: toner_oid, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: toner_descr, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
-    - { Field: toner_capacity, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: toner_current, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: toner_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [toner_id], Unique: true, Type: BTREE }
-    toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 transport_group_transport:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2081,3 +2067,17 @@ wireless_sensors:
     wireless_sensors_sensor_type_index: { Name: wireless_sensors_sensor_type_index, Columns: [sensor_type], Unique: false, Type: BTREE }
   Constraints:
     wireless_sensors_device_id_foreign: { name: wireless_sensors_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+printer_supplies:
+  Columns:
+    - { Field: supply_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_index, Type: int, 'Null': false, Extra: '' }
+    - { Field: supply_type, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: supply_oid, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: supply_descr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: supply_capacity, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_current, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [supply_id], Unique: true, Type: BTREE }
+    toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
