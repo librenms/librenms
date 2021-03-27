@@ -20,6 +20,10 @@ jobs:
       - name: Lint Code Base
         uses: github/super-linter@v3
         env:
+          VALIDATE_BASH: true
+          VALIDATE_BASH_EXEC: true
+          VALIDATE_PHP_BUILTIN: true
+          VALIDATE_PYTHON_PYLINT: true
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
