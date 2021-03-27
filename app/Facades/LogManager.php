@@ -24,7 +24,7 @@
 
 namespace App\Facades;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\Alert;
 
 class LogManager extends \Illuminate\Log\LogManager
