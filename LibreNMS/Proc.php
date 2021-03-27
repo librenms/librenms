@@ -176,8 +176,12 @@ class Proc
     public function close($command = null)
     {
         if (isset($command)) {
-            if (is_resource($this->_pipes[0])) {
-                $this->sendInput($this->checkAddEOL($command));
+            try {
+                if (is_resource($this->_pipes[0])) {
+                    $this->sendInput($this->checkAddEOL($command));
+                }
+            } catch (\ErrorException $e) {
+                // might have closed already
             }
         }
 
