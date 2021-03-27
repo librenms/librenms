@@ -28,6 +28,8 @@ use App\Models\Eventlog;
 
 class EventlogController extends SelectController
 {
+    protected $default_sort = ['type' => 'asc'];
+
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
      *
@@ -39,6 +41,18 @@ class EventlogController extends SelectController
             'field' => 'required|in:type',
             'device' => 'nullable|int',
         ];
+    }
+
+    /**
+     * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function sortFields($request)
+    {
+        return ['type'];
     }
 
     /**

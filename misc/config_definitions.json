@@ -4985,6 +4985,20 @@
             "type": "integer",
             "default": 0
         },
+        "snmp.timeout": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 1
+        },
+        "snmp.retries": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 6,
+            "type": "integer",
+            "default": 5
+        },
         "snmp.port": {
             "group": "poller",
             "section": "snmp",

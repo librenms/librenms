@@ -170,7 +170,6 @@
                                 },
                                 "additionalProperties": false,
                                 "required": [
-                                    "num_oid",
                                     "oid"
                                 ]
                             }
@@ -279,7 +278,6 @@
                                         "additionalProperties": false,
                                         "required": [
                                             "descr",
-                                            "num_oid",
                                             "oid",
                                             "states"
                                         ]
@@ -446,7 +444,6 @@
                         "additionalProperties": false,
                         "required": [
                             "descr",
-                            "num_oid",
                             "oid"
                         ]
                     }

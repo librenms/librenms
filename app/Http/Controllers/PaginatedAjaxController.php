@@ -126,7 +126,6 @@ abstract class PaginatedAjaxController extends Controller
     {
         if ($search) {
             $query->where(function ($query) use ($fields, $search) {
-                /** @var Builder $query */
                 foreach ($fields as $field) {
                     $query->orWhere($field, 'like', '%' . $search . '%');
                 }

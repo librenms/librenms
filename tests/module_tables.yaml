@@ -75,6 +75,12 @@ ports:
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+cisco-pw:
+    pseudowires:
+        excluded_fields: [pseudowire_id, device_id, port_id, peer_device_id]
+        joins:
+            - { left: excluded_fields.port_id, right: ports.port_id, select: [ ifIndex ] }
+        order_by: cpwVcID, ifIndex
 route:
     route:
         excluded_fields: [port_id, device_id, route_id, created_at, updated_at]

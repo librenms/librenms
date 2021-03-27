@@ -26,6 +26,7 @@ namespace LibreNMS\Validations;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use DB;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
@@ -35,12 +36,21 @@ use Symfony\Component\Yaml\Yaml;
 
 class Database extends BaseValidation
 {
+    const MYSQL_MIN_VERSION = '5.7.7';
+    const MYSQL_MIN_VERSION_DATE = 'March, 2021';
+    const MYSQL_RECOMMENDED_VERSION = '8.0';
+
+    const MARIADB_MIN_VERSION = '10.2.2';
+    const MARIADB_MIN_VERSION_DATE = 'March, 2021';
+    const MARIADB_RECOMMENDED_VERSION = '10.5';
+
     public function validate(Validator $validator)
     {
         if (! dbIsConnected()) {
             return;
         }
 
+        $this->checkVersion($validator);
         $this->checkMode($validator);
         $this->checkTime($validator);
         $this->checkMysqlEngine($validator);
@@ -75,6 +85,30 @@ class Database extends BaseValidation
 
         $this->checkCollation($validator);
         $this->checkSchema($validator);
+    }
+
+    private function checkVersion(Validator $validator)
+    {
+        $version = DB::selectOne('SELECT VERSION() as version')->version;
+        $version = explode('-', $version);
+
+        if (isset($version[1]) && $version[1] == 'MariaDB') {
+            if (version_compare($version[0], self::MARIADB_MIN_VERSION, '<=')) {
+                $validator->fail(
+                    'MariaDB version ' . self::MARIADB_MIN_VERSION . ' is the minimum supported version as of ' .
+                    self::MARIADB_MIN_VERSION_DATE . '. We recommend you update MariaDB to a supported version ' .
+                    self::MARIADB_RECOMMENDED_VERSION . ' suggested). Failure to update MariaDB will eventually cause issues.'
+                );
+            }
+        } else {
+            if (version_compare($version[0], self::MYSQL_MIN_VERSION, '<=')) {
+                $validator->fail(
+                    'MySQL version ' . self::MYSQL_MIN_VERSION . ' is the minimum supported version as of ' .
+                    self::MYSQL_MIN_VERSION_DATE . '. We recommend you update MySQL to a supported version (' .
+                    self::MYSQL_RECOMMENDED_VERSION . ' suggested). Failure to update MySQL will eventually cause issues.'
+                );
+            }
+        }
     }
 
     private function checkTime(Validator $validator)

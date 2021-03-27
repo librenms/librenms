@@ -35,7 +35,7 @@ class Notification extends Model
      * @param bool $enabled
      * @return bool
      */
-    public function markRead($enabled = true)
+    public function markRead(bool $enabled = true): bool
     {
         return $this->setAttrib('read', $enabled);
     }
@@ -46,17 +46,17 @@ class Notification extends Model
      * @var bool
      * @return bool
      */
-    public function markSticky($enabled = true)
+    public function markSticky(bool $enabled = true): bool
     {
         return $this->setAttrib('sticky', $enabled);
     }
 
     /**
-     * @param $name
-     * @param $enabled
+     * @param string $name
+     * @param bool $enabled
      * @return bool
      */
-    private function setAttrib($name, $enabled)
+    private function setAttrib($name, bool $enabled): bool
     {
         if ($enabled === true) {
             $read = new NotificationAttrib;
@@ -74,7 +74,8 @@ class Notification extends Model
     // ---- Query Scopes ----
 
     /**
-     * @param Builder $query
+     * @param Builder<Notification> $query
+     * @param User $user
      * @return mixed
      */
     public function scopeIsUnread(Builder $query, User $user)
@@ -90,7 +91,7 @@ class Notification extends Model
     /**
      * Get all sticky notifications
      *
-     * @param Builder $query
+     * @param Builder<Notification> $query
      */
     public function scopeIsSticky(Builder $query)
     {
@@ -99,7 +100,7 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder $query
+     * @param Builder<Notification> $query
      * @param User $user
      * @return mixed
      */
@@ -113,7 +114,7 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder $query
+     * @param Builder<Notification> $query
      * @return $this
      */
     public function scopeLimit(Builder $query)
@@ -122,7 +123,7 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder $query
+     * @param Builder<Notification> $query
      * @return Builder|static
      */
     public function scopeSource(Builder $query)

@@ -199,10 +199,9 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * @param $user
      * @return mixed
      */
-    private function loadSettings($user)
+    private function loadSettings(User $user)
     {
         if (Session::has('twofactoradd')) {
             return Session::get('twofactoradd');

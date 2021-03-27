@@ -9,7 +9,7 @@
                     "sysContact": "<private>",
                     "version": "2.55",
                     "hardware": "RH2288H V3",
-                    "features": null,
+                    "features": "BIOS 1.08",
                     "os": "ibmc",
                     "type": "appliance",
                     "serial": "SerialNumber",

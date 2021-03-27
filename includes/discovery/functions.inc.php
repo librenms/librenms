@@ -205,6 +205,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit = set_null($warn_limit);
     $high_limit = set_null($high_limit);
+    $current = cast_number($current);
 
     if (! is_numeric($divisor)) {
         $divisor = 1;
@@ -301,7 +302,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'H';
-            log_event('Sensor High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -310,7 +311,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'L';
-            log_event('Sensor Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
@@ -319,7 +320,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WH';
-            log_event('Sensor Warn High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Warn High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -328,7 +329,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WL';
-            log_event('Sensor Warn Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Warn Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
         if ($oid == $sensor_entry['sensor_oid'] &&
@@ -355,7 +356,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             ];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             echo 'U';
-            log_event('Sensor Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr, $device, 'sensor', 3, $sensor_id);
+            log_event('Sensor Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr, $device, 'sensor', 3, $sensor_entry['sensor_id']);
             d_echo("( $updated updated )\n");
         }
     }//end if
@@ -460,7 +461,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
                     dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', [$entry['sensor_id']]);
                 }
                 dbDelete('sensors', '`sensor_id` =  ?', [$entry['sensor_id']]);
-                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', 3, $sensor_id);
+                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', 3, $entry['sensor_id']);
             }
 
             unset($oid);
@@ -561,14 +562,14 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', [$index, $device['device_id'], $mib]);
-        if ($storage === false || ! count($storage)) {
+        if (empty($storage)) {
             if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
                 $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
             } else {
                 $perc_warn = Config::get('storage_perc_warn', 60);
             }
 
-            $insert = dbInsert(
+            dbInsert(
                 [
                     'device_id' => $device['device_id'],
                     'storage_descr' => $descr,
@@ -900,7 +901,7 @@ function ignore_storage($os, $descr)
  */
 function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_class] && ! can_skip_sensor($device, $sensor_class, '')) {
+    if (! empty($device['dynamic_discovery']['modules']['sensors'][$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = [];
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];
@@ -948,10 +949,31 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     $value = false;
                 }
 
-                d_echo("Final sensor value: $value\n");
-
                 $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
+
+                // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
+                if (empty($data['num_oid'])) {
+                    try {
+                        d_echo('Info: Trying to find a numerical OID for ' . $data_name . '.');
+                        $search_mib = $device['dynamic_discovery']['mib'];
+                        if (Str::contains($data['oid'], '::') && ! (Str::contains($data_name, '::'))) {
+                            // We should search this mib first
+                            $exp_oid = explode('::', $data['oid']);
+                            $search_mib = $exp_oid[0] . ':' . $search_mib;
+                        }
+                        $num_oid = YamlDiscovery::oidToNumeric($data_name, $device, $search_mib, $device['mib_dir']);
+                        $data['num_oid'] = $num_oid . '.{{ $index }}';
+                        d_echo('Info: We found numerical oid for ' . $data_name . ': ' . $data['num_oid']);
+                    } catch (\Exception $e) {
+                        d_echo('Error: We cannot find a numerical OID for ' . $data_name . '. Skipping this one...');
+                        $skippedFromYaml = true;
+                        // Cause we still don't have a num_oid
+                    }
+                }
+
                 if ($skippedFromYaml === false && is_numeric($value)) {
+                    d_echo("Sensor fetched value: $value\n");
+
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID
                     // strlen($index) as first number, and each letter converted to a number, separated by dots
@@ -963,12 +985,12 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     // process the group
                     $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
 
-                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
-                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
+                    $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
+                    $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
-                        if (is_numeric($data[$limit])) {
+                        if (isset($data[$limit]) && is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
                             $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
@@ -981,10 +1003,6 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                         }
                     }
 
-                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
-                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
-                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
-
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
@@ -994,6 +1012,10 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
                     }
+
+                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
+                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
+                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     //user_func must be applied after divisor/multiplier
                     if (isset($user_function) && is_callable($user_function)) {
@@ -1023,7 +1045,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
         echo ucfirst($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
-        if (is_file($dir . $device['os_group'] . '.inc.php')) {
+        if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
         }
         if (is_file($dir . $device['os'] . '.inc.php')) {
@@ -1035,7 +1057,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
             }
         }
         discovery_process($valid, $device, $sensor_class, $pre_cache);
-        d_echo($valid['sensor'][$sensor_class]);
+        d_echo($valid['sensor'][$sensor_class] ?? []);
         check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";
     }

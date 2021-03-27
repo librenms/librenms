@@ -41,7 +41,8 @@ unset(
     $descr
 );
 
-foreach ($pre_cache['aos6_fan_oids'] as $index => $data) {
+$aos6_fan_oids = snmpwalk_cache_multi_oid($device, 'alaChasEntPhysFanTable', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+foreach ($aos6_fan_oids as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.' . $index;
         $state_name = 'alaChasEntPhysFanStatus';
@@ -63,13 +64,15 @@ foreach ($pre_cache['aos6_fan_oids'] as $index => $data) {
     }
 }
 unset(
+    $aos6_fan_oids,
     $index,
     $data,
     $descr
 );
 
+$aos6_stack_oids = snmpwalk_cache_multi_oid($device, 'alaStackMgrChassisTable', [], 'ALCATEL-IND1-STACK-MANAGER-MIB', 'aos6', '-OQUse');
 if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
-    foreach ($pre_cache['aos6_stack_oids'] as $stackindexa => $stack_data_a) {
+    foreach ($aos6_stack_oids as $stackindexa => $stack_data_a) {
         if (is_array($stack_data_a)) {
             $oid_stackport_a = '.1.3.6.1.4.1.6486.800.1.2.1.24.1.1.1.1.4.' . $stackindexa;
             $current_stacka = $stack_data_a['alaStackMgrLocalLinkStateA'];
@@ -87,7 +90,7 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
 }
 
 if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
-    foreach ($pre_cache['aos6_stack_oids'] as $stackindexb => $stack_data_b) {
+    foreach ($aos6_stack_oids as $stackindexb => $stack_data_b) {
         if (is_array($stack_data_b)) {
             $oid_stackport_b = '.1.3.6.1.4.1.6486.800.1.2.1.24.1.1.1.1.7.' . $stackindexb;
             $current_stackb = $stack_data_b['alaStackMgrLocalLinkStateB'];
@@ -104,11 +107,14 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
     }
 }
 
-foreach ($pre_cache['aos6_sync_oids'] as $index => $data) {
+unset($aos6_stack_oids);
+
+$aos6_certify_oids = snmpwalk_cache_multi_oid($device, 'chasControlCertifyStatus', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+foreach ($aos6_certify_oids as $index => $data) {
     if (is_array($data)) {
-        $sync_chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.5.65';
+        $sync_chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.5.' . $index;
         $sync_state = 'chasControlCertifyStatus';
-        $sync_value = 'chasControlCertifyStatus.1';
+        $sync_value = $data['chasControlCertifyStatus'];
         $descr_sync = 'Certify/Restore Status';
         $sync_chas_states = [
             ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'Unknown'],
@@ -122,6 +128,7 @@ foreach ($pre_cache['aos6_sync_oids'] as $index => $data) {
 }
 
 unset(
+    $aos6_certify_oids,
     $sync_chas_oid,
     $sync_state,
     $sync_value,
@@ -131,11 +138,12 @@ unset(
     $index
 );
 
-foreach ($pre_cache['aos6_sync_oids'] as $index => $data) {
+$aos6_sync_oids = snmpwalk_cache_multi_oid($device, 'chasControlSynchronizationStatus', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+foreach ($aos6_sync_oids as $index => $data) {
     if (is_array($data)) {
-        $sync_chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.6.65';
+        $sync_chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.6.' . $index;
         $sync_state = 'chasControlSynchronizationStatus';
-        $sync_value = 'chasControlSynchronizationStatus.1';
+        $sync_value = $data['chasControlSynchronizationStatus'];
         $descr_sync = 'Flash Between CMMs';
         $sync_chas_states = [
             ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'Unknown'],
@@ -149,8 +157,11 @@ foreach ($pre_cache['aos6_sync_oids'] as $index => $data) {
     }
 }
 
+unset($aos6_sync_oids);
+
 $type = 'alclnkaggAggNbrAttachedPorts';
-foreach ($pre_cache['aos6_lag_oids'] as $index => $entry) {
+$aos6_lag_oids = snmpwalk_cache_multi_oid($device, 'alclnkaggAggEntry', [], 'ALCATEL-IND1-LAG-MIB', 'aos6', '-OQUse');
+foreach ($aos6_lag_oids as $index => $entry) {
     $oid_size = $entry['alclnkaggAggSize'];
     $oid_mem = $entry['alclnkaggAggNbrAttachedPorts'];
     $lag_state = '.1.3.6.1.4.1.6486.800.1.2.1.13.1.1.1.1.1.19.' . $index;
@@ -175,3 +186,5 @@ foreach ($pre_cache['aos6_lag_oids'] as $index => $entry) {
         create_sensor_to_state_index($device, $type, $index);
     }
 }
+
+unset($aos6_lag_oids);

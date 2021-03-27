@@ -67,12 +67,10 @@ class RipeApi extends BaseApi
     }
 
     /**
-     * @param $uri
-     * @param $options
      * @return array|mixed
      * @throws ApiException
      */
-    private function makeApiCall($uri, $options)
+    private function makeApiCall(string $uri, array $options)
     {
         try {
             $response = $this->getClient()->get($uri, $options);

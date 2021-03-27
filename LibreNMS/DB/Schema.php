@@ -144,6 +144,7 @@ class Schema
     public function getAllRelationshipPaths($base = 'devices')
     {
         $update_cache = true;
+        $cache = [];
         $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
         $db_version = Version::get()->database();
 

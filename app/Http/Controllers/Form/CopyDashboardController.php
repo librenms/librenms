@@ -53,7 +53,7 @@ class CopyDashboardController extends Controller
             $success = $dashboard_copy->save();
         }
 
-        if ($success) {
+        if ($success && isset($dashboard_copy)) {
             $widgets = UserWidget::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->get();
 
             foreach ($widgets as $widget) {

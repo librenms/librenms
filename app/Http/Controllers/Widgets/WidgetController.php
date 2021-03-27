@@ -61,6 +61,7 @@ abstract class WidgetController extends Controller
     public function __invoke(Request $request)
     {
         $this->show_settings = (bool) $request->get('settings');
+        $settings = $this->getSettings();
 
         if ($this->show_settings) {
             $view = $this->getSettingsView($request);

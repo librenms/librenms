@@ -188,6 +188,12 @@ function preg_match_any($subject, $regexes)
  */
 function compare_var($a, $b, $comparison = '=')
 {
+    // handle PHP8 change to implicit casting
+    if (is_numeric($a) || is_numeric($b)) {
+        $a = cast_number($a);
+        $b = is_array($b) ? $b : cast_number($b);
+    }
+
     switch ($comparison) {
         case '=':
             return $a == $b;
@@ -1107,128 +1113,6 @@ function validate_device_id($id)
     return $return;
 }
 
-// The original source of this code is from Stackoverflow (www.stackoverflow.com).
-// http://stackoverflow.com/questions/6054033/pretty-printing-json-with-php
-// Answer provided by stewe (http://stackoverflow.com/users/3202187/ulk200
-if (! defined('JSON_UNESCAPED_SLASHES')) {
-    define('JSON_UNESCAPED_SLASHES', 64);
-}
-if (! defined('JSON_PRETTY_PRINT')) {
-    define('JSON_PRETTY_PRINT', 128);
-}
-if (! defined('JSON_UNESCAPED_UNICODE')) {
-    define('JSON_UNESCAPED_UNICODE', 256);
-}
-
-function _json_encode($data, $options = 448)
-{
-    if (version_compare(PHP_VERSION, '5.4', '>=')) {
-        return json_encode($data, $options);
-    } else {
-        return _json_format(json_encode($data), $options);
-    }
-}
-
-function _json_format($json, $options = 448)
-{
-    $prettyPrint = (bool) ($options & JSON_PRETTY_PRINT);
-    $unescapeUnicode = (bool) ($options & JSON_UNESCAPED_UNICODE);
-    $unescapeSlashes = (bool) ($options & JSON_UNESCAPED_SLASHES);
-
-    if (! $prettyPrint && ! $unescapeUnicode && ! $unescapeSlashes) {
-        return $json;
-    }
-
-    $result = '';
-    $pos = 0;
-    $strLen = strlen($json);
-    $indentStr = ' ';
-    $newLine = "\n";
-    $outOfQuotes = true;
-    $buffer = '';
-    $noescape = true;
-
-    for ($i = 0; $i < $strLen; $i++) {
-        // Grab the next character in the string
-        $char = substr($json, $i, 1);
-
-        // Are we inside a quoted string?
-        if ('"' === $char && $noescape) {
-            $outOfQuotes = ! $outOfQuotes;
-        }
-
-        if (! $outOfQuotes) {
-            $buffer .= $char;
-            $noescape = '\\' === $char ? ! $noescape : true;
-            continue;
-        } elseif ('' !== $buffer) {
-            if ($unescapeSlashes) {
-                $buffer = str_replace('\\/', '/', $buffer);
-            }
-
-            if ($unescapeUnicode && function_exists('mb_convert_encoding')) {
-                // http://stackoverflow.com/questions/2934563/how-to-decode-unicode-escape-sequences-like-u00ed-to-proper-utf-8-encoded-cha
-                $buffer = preg_replace_callback(
-                    '/\\\\u([0-9a-f]{4})/i',
-                    function ($match) {
-                        return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-                    },
-                    $buffer
-                );
-            }
-
-            $result .= $buffer . $char;
-            $buffer = '';
-            continue;
-        } elseif (false !== strpos(" \t\r\n", $char)) {
-            continue;
-        }
-
-        if (':' === $char) {
-            // Add a space after the : character
-            $char .= ' ';
-        } elseif (('}' === $char || ']' === $char)) {
-            $pos--;
-            $prevChar = substr($json, $i - 1, 1);
-
-            if ('{' !== $prevChar && '[' !== $prevChar) {
-                // If this character is the end of an element,
-                // output a new line and indent the next line
-                $result .= $newLine;
-                for ($j = 0; $j < $pos; $j++) {
-                    $result .= $indentStr;
-                }
-            } else {
-                // Collapse empty {} and []
-                $result = rtrim($result) . "\n\n" . $indentStr;
-            }
-        }
-
-        $result .= $char;
-
-        // If the last character was the beginning of an element,
-        // output a new line and indent the next line
-        if (',' === $char || '{' === $char || '[' === $char) {
-            $result .= $newLine;
-
-            if ('{' === $char || '[' === $char) {
-                $pos++;
-            }
-
-            for ($j = 0; $j < $pos; $j++) {
-                $result .= $indentStr;
-            }
-        }
-    }
-    // If buffer not empty after formating we have an unclosed quote
-    if (strlen($buffer) > 0) {
-        //json is incorrectly formatted
-        $result = false;
-    }
-
-    return $result;
-}
-
 function convert_delay($delay)
 {
     $delay = preg_replace('/\s/', '', $delay);
@@ -1875,10 +1759,10 @@ function printChangedStats($update_only = false)
     global $snmp_stats_last, $db_stats_last;
     $output = sprintf(
         '>> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]',
-        array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
-        array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
-        array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
-        array_sum($db_stats['time']) - array_sum($db_stats_last['time'])
+        array_sum($snmp_stats['ops'] ?? []) - array_sum($snmp_stats_last['ops'] ?? []),
+        array_sum($snmp_stats['time'] ?? []) - array_sum($snmp_stats_last['time'] ?? []),
+        array_sum($db_stats['ops'] ?? []) - array_sum($db_stats_last['ops'] ?? []),
+        array_sum($db_stats['time'] ?? []) - array_sum($db_stats_last['time'] ?? [])
     );
 
     foreach (app('Datastore')->getStats() as $datastore => $stats) {
