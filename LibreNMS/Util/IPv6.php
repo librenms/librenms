@@ -30,7 +30,7 @@ class IPv6 extends IP
 {
     /**
      * IPv6 constructor.
-     * @param $ipv6
+     * @param string $ipv6
      * @throws InvalidIpException
      */
     public function __construct($ipv6)

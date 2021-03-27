@@ -130,8 +130,8 @@ class Laravel
     /**
      * Add prefix and strip .php to make the url helper work in non-laravel php scripts
      *
-     * @param $request
-     * @param $auth
+     * @param \Illuminate\Http\Request $request
+     * @param bool $auth
      */
     private static function rewriteDummyHeaders($request, $auth)
     {

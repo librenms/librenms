@@ -66,7 +66,7 @@ class Template
     /**
      * Parse Blade body
      *
-     * @param $data
+     * @param array $data
      * @return string
      */
     public function bladeBody($data)
@@ -82,7 +82,7 @@ class Template
     /**
      * Parse Blade title
      *
-     * @param $data
+     * @param array $data
      * @return string
      */
     public function bladeTitle($data)
