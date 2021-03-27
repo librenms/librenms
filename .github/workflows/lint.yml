@@ -21,7 +21,6 @@ jobs:
         uses: github/super-linter@v3
         env:
           VALIDATE_BASH: true
-          VALIDATE_BASH_EXEC: false
           VALIDATE_PHP_BUILTIN: true
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_ALL_CODEBASE: false
