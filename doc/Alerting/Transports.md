@@ -62,9 +62,12 @@ of alerts of similar content for an array of hosts, whereas
 Alertmanager can group them by alert meta, ideally producing one
 single notice in case an issue occurs.
 
-It is possible to configure as much label values as required in
-Alertmanager Options section. Every label and it's value should be
+It is possible to configure as many label values as required in
+Alertmanager Options section. Every label and its value should be
 entered as a new line.
+
+Multiple Alertmanager URLs (comma separated) are supported. Each
+URL will be tried and the search will stop at the first success.
 
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
@@ -72,7 +75,7 @@ entered as a new line.
 
 | Config | Example |
 | ------ | ------- |
-| Alertmanager URL      | http://alertmanager.example.com |
+| Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
 | Alertmanager Options: | source=librenms <br/> customlabel=value |
 
 ## API
