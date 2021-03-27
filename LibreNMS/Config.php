@@ -432,6 +432,8 @@ class Config
         self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
         self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
+        self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
+        self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();

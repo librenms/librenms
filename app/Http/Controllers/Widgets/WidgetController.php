@@ -61,7 +61,6 @@ abstract class WidgetController extends Controller
     public function __invoke(Request $request)
     {
         $this->show_settings = (bool) $request->get('settings');
-        $settings = $this->getSettings();
 
         if ($this->show_settings) {
             $view = $this->getSettingsView($request);
@@ -87,13 +86,13 @@ abstract class WidgetController extends Controller
             $view = $this->getView($request);
         }
 
-        if (! empty($settings['title'])) {
-            $title = $settings['title'];
+        if (! empty($this->settings['title'])) {
+            $title = $this->settings['title'];
         } else {
             $title = __(method_exists($this, 'title') ? app()->call([$this, 'title']) : $this->title);
         }
 
-        return $this->formatResponse($view, $title, $settings);
+        return $this->formatResponse($view, $title, $this->settings);
     }
 
     /**

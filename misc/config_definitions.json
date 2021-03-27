@@ -1165,7 +1165,7 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.toner": {
+        "discovery_modules.printer-supplies": {
             "order": 320,
             "group": "discovery",
             "section": "discovery_modules",
@@ -4255,7 +4255,7 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.toner": {
+        "poller_modules.printer-supplies": {
             "order": 390,
             "group": "poller",
             "section": "poller_modules",

@@ -10,6 +10,6 @@ discovery:
         sysDescr:
             - 'NRG Network Printer'
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

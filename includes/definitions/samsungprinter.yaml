@@ -11,6 +11,6 @@ discovery:
             - 'Samsung S'
             - 'Samsung ML'
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true
