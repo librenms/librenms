@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -141,14 +142,8 @@ class Panos extends \LibreNMS\OS implements OSPolling
 
     protected function memValid($storage)
     {
-        if ($storage['hrStorageType'] == 'hrStorageOther') {
-            foreach ($this->validNetBufferMemory as $netBufferMemory) {
-                if (strpos($storage['hrStorageDescr'], $netBufferMemory) !== false) {
-                    return true;
-                }
-            }
-        }
-
-        return parent::memValid($storage);
+        return $storage['hrStorageType'] == 'hrStorageOther'
+            && Str::contains($storage['hrStorageDescr'], $this->validNetBufferMemory)
+            || parent::memValid($storage);
     }
 }
