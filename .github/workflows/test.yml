@@ -28,29 +28,26 @@ jobs:
           -
             php-version: 8.0
             name: Unit
-            skip-style-check: 1
             skip-web-check: 1
             database: mariadb:10.5
           -
             php-version: 8.0
-            name: Style and Web
+            name: Web
             skip-unit-check: 1
             database: mysql:5.7
           -
             php-version: 7.4
             name: Unit
-            skip-style-check: 1
             skip-web-check: 1
             database: mysql:5.7
           -
             php-version: 7.3
             name: Unit
-            skip-style-check: 1
             skip-web-check: 1
-            database: mysql:5.7
+            database: mysql:8.0
           -
             php-version: 7.3
-            name: Style and Web
+            name: Web
             skip-unit-check: 1
             database: mysql:8.0
     services:
@@ -187,7 +184,6 @@ jobs:
         run: |
           php lnms dev:check ci
         env:
-          SKIP_STYLE_CHECK: ${{ matrix.skip-style-check }}
           SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
           SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
       -

@@ -106,10 +106,18 @@ class DBSetupTest extends DBTestCase
 
     public function testSqlMode()
     {
-        $this->assertEquals(
-            'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',
-            DB::connection($this->connection)->select(DB::raw('SELECT @@sql_mode AS mode'))[0]->mode
-        );
+        $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode'));
+        preg_match('/([0-9.]+)(?:-(\w+))?/', $result->version, $matches);
+        $version = $matches[1] ?? null;
+        $vendor = $matches[2] ?? null;
+        $mode = $result->mode;
+
+        // NO_AUTO_CREATE_USER is removed in mysql 8
+        $expected = ($vendor !== 'MariaDB' && version_compare($version, '8.0.0') >= 0)
+            ? 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+            : 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+
+        $this->assertEquals($expected, $mode);
     }
 
     public function testValidateSchema()
