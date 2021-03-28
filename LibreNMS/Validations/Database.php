@@ -161,34 +161,34 @@ class Database extends BaseValidation
         $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
             FROM information_schema.SCHEMATA S
             WHERE schema_name = '$db_name' AND
-            ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')";
+            ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')";
         $collation = dbFetchRows($db_collation_sql);
         if (empty($collation) !== true) {
             $validator->fail(
                 'MySQL Database collation is wrong: ' . implode(' ', $collation[0]),
-                'Check https://t.libren.ms/-zdwk for info on how to fix.'
+                'Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.'
             );
         }
 
         $table_collation_sql = "SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME
             FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C
             WHERE C.collation_name = T.table_collation AND T.table_schema = '$db_name' AND
-             ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );";
+             ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );";
         $collation_tables = dbFetchRows($table_collation_sql);
         if (empty($collation_tables) !== true) {
             $result = ValidationResult::fail('MySQL tables collation is wrong: ')
-                ->setFix('Check http://bit.ly/2lAG9H8 for info on how to fix.')
+                ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
                 ->setList('Tables', $collation_tables);
             $validator->result($result);
         }
 
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
             FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$db_name' AND
-            ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );";
+            ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );";
         $collation_columns = dbFetchRows($column_collation_sql);
         if (empty($collation_columns) !== true) {
             $result = ValidationResult::fail('MySQL column collation is wrong: ')
-                ->setFix('Check https://t.libren.ms/-zdwk for info on how to fix.')
+                ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
                 ->setList('Columns', $collation_columns);
             $validator->result($result);
         }
