@@ -1,9 +1,9 @@
 #!/bin/sh
 
-LIBRENMS_DIR=`dirname "$(readlink -f "$0/..")"`
-cd $LIBRENMS_DIR
+LIBRENMS_DIR=$(dirname "$(readlink -f "$0/..")")
+cd "$LIBRENMS_DIR" || exit
 
 case $1 in
     ''|*[!0-9]*) echo "You must specify a PR number to apply a patch" ;;
-    *) curl -s https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/${1}.diff | git apply --exclude=*.png -v ${2} ;;
+    *) curl -s https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/"${1}".diff | git apply --exclude=*.png -v ;;
 esac
