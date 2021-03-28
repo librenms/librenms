@@ -40,7 +40,7 @@ if (is_array($hrstorage_array)) {
         if (Str::startsWith($device['os'], 'vmware') && $descr == 'Real Memory') {
             $old_rrdfile = ['storage', 'hrstorage', $descr];
             $new_rrdfile = ['mempool', 'hrstorage', $storage['hrStorageIndex']];
-            rrd_file_rename($device, $old_rrdfile, $new_rrdfile);
+            \Rrd::renameFile($device, $old_rrdfile, $new_rrdfile);
             continue;
         }
 

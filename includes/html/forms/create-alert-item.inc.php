@@ -22,12 +22,12 @@ $rule = implode(' ', $_POST['rules']);
 $rule = rtrim($rule, '&|');
 $query = AlertDB::genSQL($rule);
 $alert_id = $_POST['alert_id'];
-$count = mres($_POST['count']);
-$delay = mres($_POST['delay']);
-$interval = mres($_POST['interval']);
-$mute = mres($_POST['mute']);
-$invert = mres($_POST['invert']);
-$name = mres($_POST['name']);
+$count = $_POST['count'];
+$delay = $_POST['delay'];
+$interval = $_POST['interval'];
+$mute = $_POST['mute'];
+$invert = $_POST['invert'];
+$name = $_POST['name'];
 if ($_POST['proc'] != '') {
     $proc = $_POST['proc'];
 } else {
@@ -65,7 +65,7 @@ if (empty($rule)) {
     ];
     $extra_json = json_encode($extra);
     if (is_numeric($alert_id) && $alert_id > 0) {
-        if (dbUpdate(['rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'name' => $name, 'proc' => $proc, 'query' => $query], 'alert_rules', 'id=?', [$alert_id]) >= 0) {
+        if (dbUpdate(['rule' => $rule, 'severity' => $_POST['severity'], 'extra' => $extra_json, 'name' => $name, 'proc' => $proc, 'query' => $query], 'alert_rules', 'id=?', [$alert_id]) >= 0) {
             $update_message = "Edited Rule: <i>$name: $rule</i>";
         } else {
             $update_message = 'ERROR: Failed to edit Rule: <i>' . $rule . '</i>';
@@ -74,7 +74,7 @@ if (empty($rule)) {
         if (is_array($_POST['maps'])) {
             $device_id = ':' . $device_id;
         }
-        if (dbInsert(['device_id' => $device_id, 'rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'disabled' => 0, 'name' => $name, 'proc' => $proc, 'query' => $query], 'alert_rules')) {
+        if (dbInsert(['device_id' => $device_id, 'rule' => $rule, 'severity' => $_POST['severity'], 'extra' => $extra_json, 'disabled' => 0, 'name' => $name, 'proc' => $proc, 'query' => $query], 'alert_rules')) {
             $update_message = "Added Rule: <i>$name: $rule</i>";
             if (is_array($_POST['maps'])) {
                 foreach ($_POST['maps'] as $target) {

@@ -20,7 +20,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
-function discover_new_device($hostname, $device = '', $method = '', $interface = '')
+function discover_new_device($hostname, $device = [], $method = '', $interface = '')
 {
     d_echo("discovering $hostname\n");
 
@@ -32,7 +32,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
             return false;
         }
-    } elseif (is_valid_hostname($hostname)) {
+    } elseif (\LibreNMS\Util\Validate::hostname($hostname)) {
         if ($mydomain = Config::get('mydomain')) {
             $full_host = rtrim($hostname, '.') . '.' . $mydomain;
             if (isDomainResolves($full_host)) {
@@ -1268,7 +1268,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
     $where = [];
     $params = [];
 
-    if ($name && is_valid_hostname($name)) {
+    if ($name && \LibreNMS\Util\Validate::hostname($name)) {
         $where[] = '`hostname`=?';
         $params[] = $name;
 

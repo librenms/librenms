@@ -40,7 +40,7 @@ foreach (dbFetchRows($sql, $param) as $asn) {
     $response[] = [
         'bgpLocalAs'    => $asn['bgpLocalAs'],
         'asname' => $astext,
-        'action' => "<a class='btn btn-sm btn-primary' href='" . generate_url(['page' => 'peering', 'section' => 'ix-list', 'bgpLocalAs' => $asn['bgpLocalAs']]) . "' role='button'>Show connected IXes</a>",
+        'action' => "<a class='btn btn-sm btn-primary' href='" . \LibreNMS\Util\Url::generate(['page' => 'peering', 'section' => 'ix-list', 'bgpLocalAs' => $asn['bgpLocalAs']]) . "' role='button'>Show connected IXes</a>",
     ];
 }
 

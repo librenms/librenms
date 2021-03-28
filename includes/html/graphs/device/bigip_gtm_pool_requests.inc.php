@@ -25,8 +25,8 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
-    $rrd_filename = rrd_name($device['hostname'], ['f5-gtm-pool', $label, $hash]);
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    $rrd_filename = Rrd::name($device['hostname'], ['f5-gtm-pool', $label, $hash]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
         require 'includes/html/graphs/common.inc.php';
         $ds = 'resolved';
 

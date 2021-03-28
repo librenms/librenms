@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'ciscowlc');
+$rrd_filename = Rrd::name($device['hostname'], 'ciscowlc');
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = 'Clients';

@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $colours = 'mixed';
 $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Seconds PPM';
-$rrd_filename = rrd_name($device['hostname'], ['app', 'chronyd', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app['app_id']]);
 $array = [
     'frequency'             => ['descr' => 'Error rate'],
     'residual_frequency'    => ['descr' => 'Ref clk offset'],
@@ -14,7 +14,7 @@ $array = [
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

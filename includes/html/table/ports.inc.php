@@ -160,12 +160,12 @@ foreach (dbFetchRows($query, $param) as $port) {
 
     if ($vars['deleted'] !== 'yes') {
         $actions .= '<div class="col-xs-1"><a href="';
-        $actions .= generate_device_url($device, ['tab' => 'alerts']);
+        $actions .= \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], ['tab' => 'alerts']);
         $actions .= '" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>';
 
         if (Auth::user()->hasGlobalAdmin()) {
             $actions .= '<div class="col-xs-1"><a href="';
-            $actions .= generate_device_url($device, ['tab' => 'edit', 'section' => 'ports']);
+            $actions .= \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], ['tab' => 'edit', 'section' => 'ports']);
             $actions .= '" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>';
         }
     }
@@ -192,7 +192,7 @@ foreach (dbFetchRows($query, $param) as $port) {
         'ifOutUcastPkts_rate' => $port['ifOutUcastPkts_rate'],
         'ifInErrors' => $port['ifInErrors'],
         'ifOutErrors' => $port['ifOutErrors'],
-        'ifType' => humanmedia($port['ifType']),
+        'ifType' => \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']),
         'ifAlias' => $port['ifAlias'],
         'actions' => $actions,
     ];

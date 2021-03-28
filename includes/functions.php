@@ -98,11 +98,6 @@ function array_sort_by_column($array, $on, $order = SORT_ASC)
     return $new_array;
 }
 
-function mac_clean_to_readable($mac)
-{
-    return \LibreNMS\Util\Rewrite::readableMac($mac);
-}
-
 function only_alphanumeric($string)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
@@ -308,7 +303,7 @@ function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
 
-    if (! is_dir(get_rrd_dir($new)) && rename(get_rrd_dir($host), get_rrd_dir($new)) === true) {
+    if (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
@@ -322,8 +317,6 @@ function renamehost($id, $new, $source = 'console')
 
 function device_discovery_trigger($id)
 {
-    global $debug;
-
     if (isCli() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
@@ -391,7 +384,7 @@ function delete_device($id)
         }
     }
 
-    $ex = shell_exec("bash -c '( [ ! -d " . trim(get_rrd_dir($host)) . ' ] || rm -vrf ' . trim(get_rrd_dir($host)) . " 2>&1 ) && echo -n OK'");
+    $ex = shell_exec("bash -c '( [ ! -d " . trim(Rrd::dirFromHost($host)) . ' ] || rm -vrf ' . trim(Rrd::dirFromHost($host)) . " 2>&1 ) && echo -n OK'");
     $tmp = explode("\n", $ex);
     if ($tmp[sizeof($tmp) - 1] != 'OK') {
         $ret .= "Could not remove files:\n$ex\n";
@@ -541,11 +534,6 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
 
     return $device;
 }//end deviceArray()
-
-function formatUptime($diff, $format = 'long')
-{
-    return Time::formatInterval($diff, $format);
-}
 
 function isSNMPable($device)
 {
@@ -710,11 +698,6 @@ function isDomainResolves($domain)
     $records = dns_get_record($domain);  // returns array or false
 
     return ! empty($records);
-}
-
-function hoststatus($id)
-{
-    return dbFetchCell('SELECT `status` FROM `devices` WHERE `device_id` = ?', [$id]);
 }
 
 function match_network($nets, $ip, $first = false)
@@ -1176,9 +1159,8 @@ function get_guzzle_proxy()
 
     $tmp = rtrim($proxy, '/');
     $proxy = str_replace(['http://', 'https://'], '', $tmp);
-    if (! empty($proxy)) {
-        return 'tcp://' . $proxy;
-    }
+
+    return empty($proxy) ? '' : ('tcp://' . $proxy);
 }
 
 /**
@@ -1210,27 +1192,6 @@ function target_to_id($target)
     }
 
     return $target;
-}
-
-function id_to_target($id)
-{
-    if ($id[0] == 'g') {
-        $id = 'g:' . dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [substr($id, 1)]);
-    } else {
-        $id = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
-    }
-
-    return $id;
-}
-
-function first_oid_match($device, $list)
-{
-    foreach ($list as $item) {
-        $tmp = trim(snmp_get($device, $item, '-Ovq'), '" ');
-        if (! empty($tmp)) {
-            return $tmp;
-        }
-    }
 }
 
 function fix_integer_value($value)
@@ -2143,22 +2104,6 @@ function lock_and_purge_query($table, $sql, $msg)
     }
 
     return -1;
-}
-
-/**
- * Convert space separated hex OID content to character
- *
- * @param string $hex_string
- * @return string $chr_string
- */
-function hexbin($hex_string)
-{
-    $chr_string = '';
-    foreach (explode(' ', $hex_string) as $a) {
-        $chr_string .= chr(hexdec($a));
-    }
-
-    return $chr_string;
 }
 
 /**

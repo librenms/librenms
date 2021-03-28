@@ -29,6 +29,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Proc;
+use LibreNMS\Util\Rewrite;
 use Log;
 
 class Rrd extends BaseDatastore
@@ -526,6 +527,36 @@ class Rrd extends BaseDatastore
     public static function safeDescr($descr)
     {
         return (string) preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
+    }
+
+    /**
+     * Escapes strings and sets them to a fixed length for use with RRDtool
+     *
+     * @param string $descr the string to escape
+     * @param int $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
+     * @return string
+     */
+    public static function fixedSafeDescr($descr, $length)
+    {
+        $result = Rewrite::shortenIfType($descr);
+        $result = str_replace("'", '', $result);            // remove quotes
+
+        if (is_numeric($length)) {
+            // preserve original $length for str_pad()
+
+            // determine correct strlen() for substr_count()
+            $substr_count_length = $length <= 0 ? null : min(strlen($descr), $length);
+
+            $extra = substr_count($descr, ':', 0, $substr_count_length);
+            $result = substr(str_pad($result, $length), 0, ($length + $extra));
+            if ($extra > 0) {
+                $result = substr($result, 0, (-1 * $extra));
+            }
+        }
+
+        $result = str_replace(':', '\:', $result);          // escape colons
+
+        return $result . ' ';
     }
 
     /**

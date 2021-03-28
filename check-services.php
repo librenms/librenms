@@ -31,14 +31,18 @@ echo "Starting service polling run:\n\n";
 $polled_services = 0;
 
 $where = '';
+$params = [];
 if ($options['h']) {
     if (is_numeric($options['h'])) {
-        $where = 'AND `S`.`device_id` = ' . $options['h'];
+        $where = 'AND `S`.`device_id` = ?';
+        $params[] = (int) $options['h'];
     } else {
         if (preg_match('/\*/', $options['h'])) {
-            $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
+            $where = "AND `hostname` LIKE '?'";
+            $params[] = str_replace('*', '%', $options['h']);
         } else {
-            $where = "AND `hostname` = '" . mres($options['h']) . "'";
+            $where = "AND `hostname` = '?'";
+            $params[] = $options['h'];
         }
     }
 }
@@ -48,7 +52,7 @@ $sql = 'SELECT D.*,S.*,attrib_value  FROM `devices` AS D'
        . ' LEFT JOIN `devices_attribs` as A ON D.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"'
        . ' ORDER by D.device_id DESC;';
 
-foreach (dbFetchRows($sql) as $service) {
+foreach (dbFetchRows($sql, $params) as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
     if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||
@@ -61,7 +65,7 @@ foreach (dbFetchRows($sql) as $service) {
             d_echo("\nService check - " . $service['service_id'] . "\nSkipping service check because device "
                 . $service['hostname'] . " is down due to icmp.\n");
             Log::event(
-                "Service check - {$service['service_desc']} ({$service['service_id']}) - 
+                "Service check - {$service['service_desc']} ({$service['service_id']}) -
                 Skipping service check because device {$service['hostname']} is down due to icmp",
                 $service['device_id'],
                 'service',

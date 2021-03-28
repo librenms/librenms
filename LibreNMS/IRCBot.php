@@ -23,6 +23,9 @@ namespace LibreNMS;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
+use Permissions;
 
 class IRCBot
 {
@@ -631,7 +634,7 @@ class IRCBot
                     $this->log("HostAuth on irc matching $host to " . $this->getUserHost($this->data));
                 }
                 if (preg_match("/$host/", $this->getUserHost($this->data))) {
-                    $user_id = LegacyAuth::get()->getUserid(mres($nms_user));
+                    $user_id = LegacyAuth::get()->getUserid($nms_user);
                     $user = LegacyAuth::get()->getUser($user_id);
                     $this->user['name'] = $user['username'];
                     $this->user['id'] = $user_id;
@@ -682,7 +685,7 @@ class IRCBot
                 return $this->respond('Nope.');
             }
         } else {
-            $user_id = LegacyAuth::get()->getUserid(mres($params[0]));
+            $user_id = LegacyAuth::get()->getUserid($params[0]);
             $user = LegacyAuth::get()->getUser($user_id);
             if ($user['email'] && $user['username'] == $params[0]) {
                 $token = hash('gost', openssl_random_pseudo_bytes(1024));
@@ -871,7 +874,7 @@ class IRCBot
             return $this->respond('Error: Permission denied.');
         }
 
-        $status = $device['status'] ? 'Up ' . formatUptime($device['uptime']) : 'Down';
+        $status = $device['status'] ? 'Up ' . Time::formatInterval($device['uptime']) : 'Down';
         $status .= $device['ignore'] ? '*Ignored*' : '';
         $status .= $device['disabled'] ? '*Disabled*' : '';
 
@@ -895,12 +898,12 @@ class IRCBot
             return $this->respond('Error: Permission denied.');
         }
 
-        $bps_in = formatRates($port['ifInOctets_rate'] * 8);
-        $bps_out = formatRates($port['ifOutOctets_rate'] * 8);
-        $pps_in = format_bi($port['ifInUcastPkts_rate']);
-        $pps_out = format_bi($port['ifOutUcastPkts_rate']);
+        $bps_in = Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps');
+        $bps_out = Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
+        $pps_in = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, 'pps');
+        $pps_out = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, 'pps');
 
-        return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . 'pps > PPS > ' . $pps_out . 'pps');
+        return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . ' > PPS > ' . $pps_out);
     }
 
     //end _port()

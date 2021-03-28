@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'waas_cwotfostatsactiveoptconn');
+$rrd_filename = Rrd::name($device['hostname'], 'waas_cwotfostatsactiveoptconn');
 
 require 'includes/html/graphs/common.inc.php';
 

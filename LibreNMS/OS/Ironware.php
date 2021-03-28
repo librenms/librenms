@@ -625,6 +625,6 @@ class Ironware extends Foundry
             'snICX725048HPOERouter' => 'FastIron ICX 7250 48-port PoE+ Router',
         ];
 
-        $this->getDevice()->hardware = array_str_replace($rewrite_ironware_hardware, $this->getDevice()->hardware);
+        $this->getDevice()->hardware = str_replace(array_keys($rewrite_ironware_hardware), array_values($rewrite_ironware_hardware), $this->getDevice()->hardware);
     }
 }

@@ -105,7 +105,7 @@ class GitHub
     /**
      * Get the release information for a specific tag
      *
-     * @param $tag
+     * @param string $tag
      * @return mixed
      */
     public function getRelease($tag)
@@ -127,7 +127,7 @@ class GitHub
     /**
      * Get all closed pull requests up to a certain date
      *
-     * @param $date
+     * @param string $date
      * @param string $after
      */
     public function getPullRequests($date, $after = null)
@@ -307,7 +307,7 @@ GRAPHQL;
 
     /**
      * Create a markdown list of users and link their github profile
-     * @param $users
+     * @param array $users
      * @return string
      */
     private function formatUserList($users)

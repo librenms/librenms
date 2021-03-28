@@ -8,7 +8,7 @@ if ($sla['owner']) {
     $name .= ' (Owner: ' . $sla['owner'] . ')';
 }
 
-$rrd_filename = rrd_name($device['hostname'], ['sla', $sla['sla_nr']]);
+$rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr']]);
 
 $rrd_options .= ' -l 0 ';
 

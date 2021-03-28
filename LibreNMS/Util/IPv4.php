@@ -30,7 +30,7 @@ class IPv4 extends IP
 {
     /**
      * IPv4 constructor.
-     * @param $ipv4
+     * @param string $ipv4
      * @throws InvalidIpException
      */
     public function __construct($ipv4)

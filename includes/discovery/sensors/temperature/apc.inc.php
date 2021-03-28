@@ -173,7 +173,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     if (is_numeric($value)) {
         $user_func = null;
         if ($pre_cache['memSensorsStatusSysTempUnits'] === 'fahrenheit') {
-            $user_func = 'convert_to_celsius';
+            $user_func = 'fahrenheit_to_celsius';
         }
         discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, 'memSensorsTemperature.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value, 'snmp', null, null, $user_func);
     }
