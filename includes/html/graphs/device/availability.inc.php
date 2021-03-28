@@ -4,7 +4,7 @@ $scale_min = '0';
 $scale_max = '100';
 $float_precision = '3';
 
-$rrd_filename = rrd_name($device['hostname'], ['availability', $vars['duration']]);
+$rrd_filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
 
 $ds = 'availability';
 

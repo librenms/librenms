@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'sgos_server_connections');
+$rrd_filename = Rrd::name($device['hostname'], 'sgos_server_connections');
 
 require 'includes/html/graphs/common.inc.php';
 

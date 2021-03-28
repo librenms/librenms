@@ -11,6 +11,8 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -52,20 +54,9 @@ function data_uri($file, $mime)
     return 'data:' . $mime . ';base64,' . $base64;
 }//end data_uri()
 
-/**
- * Convert string to nice case, mostly used for applications
- *
- * @param $item
- * @return mixed|string
- */
-function nicecase($item)
-{
-    return \LibreNMS\Util\StringHelpers::niceCase($item);
-}
-
 function toner2colour($descr, $percent)
 {
-    $colour = get_percentage_colours(100 - $percent);
+    $colour = \LibreNMS\Util\Colors::percentage(100 - $percent, null);
 
     if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
@@ -110,13 +101,8 @@ function linkify($text)
 
 function generate_link($text, $vars, $new_vars = [])
 {
-    return '<a href="' . generate_url($vars, $new_vars) . '">' . $text . '</a>';
+    return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
-
-function generate_url($vars, $new_vars = [])
-{
-    return \LibreNMS\Util\Url::generate($vars, $new_vars);
-}
 
 function escape_quotes($text)
 {
@@ -128,7 +114,7 @@ function generate_overlib_content($graph_array, $text)
     $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = Config::get("time.$period");
-        $overlib_content .= escape_quotes(generate_graph_tag($graph_array));
+        $overlib_content .= escape_quotes(\LibreNMS\Util\Url::graphTag($graph_array));
     }
 
     $overlib_content .= '</div>';
@@ -136,98 +122,11 @@ function generate_overlib_content($graph_array, $text)
     return $overlib_content;
 }//end generate_overlib_content()
 
-function get_percentage_colours($percentage, $component_perc_warn = null)
-{
-    return \LibreNMS\Util\Colors::percentage($percentage, $component_perc_warn);
-}//end get_percentage_colours()
-
-function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
-{
-    return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="graph.php?' . implode($sep, ['device=' . $device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"]) . '">';
-}//end generate_minigraph_image()
-
-function generate_device_url($device, $vars = [])
-{
-    return \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], $vars);
-}
-
 function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
-    if (! $start) {
-        $start = Config::get('time.day');
-    }
+    $deviceModel = DeviceCache::get((int) $device['device_id']);
 
-    if (! $end) {
-        $end = Config::get('time.now');
-    }
-
-    $class = devclass($device);
-
-    $text = format_hostname($device, $text);
-
-    $graphs = \LibreNMS\Util\Graph::getOverviewGraphsForDevice(DeviceCache::get($device['device_id']));
-
-    $url = generate_device_url($device, $vars);
-
-    // beginning of overlib box contains large hostname followed by hardware & OS details
-    $contents = '<div><span class="list-large">' . $device['hostname'] . '</span>';
-    if ($device['hardware']) {
-        $contents .= ' - ' . $device['hardware'];
-    }
-
-    if ($device['os']) {
-        $contents .= ' - ' . Config::getOsSetting($device['os'], 'text');
-    }
-
-    if ($device['version']) {
-        $contents .= ' ' . mres($device['version']);
-    }
-
-    if ($device['features']) {
-        $contents .= ' (' . mres($device['features']) . ')';
-    }
-
-    if (isset($device['location'])) {
-        $contents .= ' - ' . htmlentities($device['location']);
-    }
-
-    $contents .= '</div>';
-
-    foreach ($graphs as $entry) {
-        $graph = $entry['graph'];
-        $graphhead = $entry['text'];
-        $contents .= '<div class="overlib-box">';
-        $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
-        $contents .= generate_minigraph_image($device, $start, $end, $graph);
-        $contents .= generate_minigraph_image($device, Config::get('time.week'), $end, $graph);
-        $contents .= '</div>';
-    }
-
-    if ($escape_text) {
-        $text = htmlentities($text);
-    }
-
-    if ($overlib == 0) {
-        $link = $contents;
-    } else {
-        $link = overlib_link($url, $text, escape_quotes($contents), $class);
-    }
-
-    if (device_permitted($device['device_id'])) {
-        return $link;
-    } else {
-        return $device['hostname'];
-    }
-}//end generate_device_link()
-
-function overlib_link($url, $text, $contents, $class = null)
-{
-    return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
-}
-
-function print_graph_popup($graph_array)
-{
-    echo \LibreNMS\Util\Url::graphPopup($graph_array);
+    return \LibreNMS\Util\Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
 
 function bill_permitted($bill_id)
@@ -274,11 +173,6 @@ function device_permitted($device_id)
     return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
-function print_graph_tag($args)
-{
-    echo generate_graph_tag($args);
-}//end print_graph_tag()
-
 function alert_layout($severity)
 {
     switch ($severity) {
@@ -306,16 +200,6 @@ function alert_layout($severity)
     return ['icon' => $icon,
         'icon_color' => $color,
         'background_color' => $background, ];
-}
-
-function generate_graph_tag($args)
-{
-    return \LibreNMS\Util\Url::graphTag($args);
-}
-
-function generate_lazy_graph_tag($args)
-{
-    return \LibreNMS\Util\Url::lazyGraphTag($args);
 }
 
 function generate_dynamic_graph_tag($args)
@@ -452,7 +336,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array = [];
 
     if (! $text) {
-        $text = fixifName($port['label']);
+        $text = Rewrite::normalizeIfName($port['label']);
     }
 
     if ($type) {
@@ -469,9 +353,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>' . $port['hostname'] . ' - ' . fixifName(addslashes(display($port['label']))) . '</div>';
+    $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
     if ($port['ifAlias']) {
-        $content .= addslashes(display($port['ifAlias'])) . '<br />';
+        $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
     }
 
     $content .= "<div style=\'width: 850px\'>";
@@ -482,14 +366,14 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array['to'] = Config::get('time.now');
     $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $port['port_id'];
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
     if ($single_graph == 0) {
         $graph_array['from'] = Config::get('time.week');
-        $content .= generate_graph_tag($graph_array);
+        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
         $graph_array['from'] = Config::get('time.month');
-        $content .= generate_graph_tag($graph_array);
+        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
         $graph_array['from'] = Config::get('time.year');
-        $content .= generate_graph_tag($graph_array);
+        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
     }
 
     $content .= '</div>';
@@ -499,9 +383,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     if ($overlib == 0) {
         return $content;
     } elseif (port_permitted($port['port_id'], $port['device_id'])) {
-        return overlib_link($url, $text, $content, $class);
+        return \LibreNMS\Util\Url::overlibLink($url, $text, $content, $class);
     } else {
-        return fixifName($text);
+        return Rewrite::normalizeIfName($text);
     }
 }//end generate_port_link()
 
@@ -533,43 +417,28 @@ function generate_sensor_link($args, $text = null, $type = null)
         'from' => Config::get('time.day'),
         'id' => $args['sensor_id'],
     ];
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.week');
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.month');
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.year');
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
 
     $content .= '</div>';
 
-    $url = generate_sensor_url($args);
+    $url = \LibreNMS\Util\Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
 
-    return overlib_link($url, $text, $content, null);
+    return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()
-
-function generate_sensor_url($sensor, $vars = [])
-{
-    return generate_url(['page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')], $vars);
-}//end generate_sensor_url()
 
 function generate_port_url($port, $vars = [])
 {
-    return generate_url(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
+    return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
-
-function generate_peer_url($peer, $vars = [])
-{
-    return generate_url(['page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'], $vars);
-}//end generate_peer_url()
-
-function generate_bill_url($bill, $vars = [])
-{
-    return generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id']], $vars);
-}//end generate_bill_url()
 
 function generate_sap_url($sap, $vars = [])
 {
@@ -584,17 +453,6 @@ function generate_port_image($args)
 
     return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
 }//end generate_port_image()
-
-function generate_port_thumbnail($port)
-{
-    $port['graph_type'] = 'port_bits';
-    $port['from'] = Config::get('time.day');
-    $port['to'] = Config::get('time.now');
-    $port['width'] = 150;
-    $port['height'] = 21;
-
-    return generate_port_image($port);
-}//end generate_port_thumbnail()
 
 /**
  * Create image to output text instead of a graph.
@@ -673,29 +531,6 @@ function print_optionbar_end()
         ';
 }//end print_optionbar_end()
 
-function overlibprint($text)
-{
-    return "onmouseover=\"return overlib('" . $text . "');\" onmouseout=\"return nd();\"";
-}//end overlibprint()
-
-function humanmedia($media)
-{
-    global $rewrite_iftype;
-    array_preg_replace($rewrite_iftype, $media);
-
-    return $media;
-}//end humanmedia()
-
-function humanspeed($speed)
-{
-    $speed = formatRates($speed);
-    if ($speed == '') {
-        $speed = '-';
-    }
-
-    return $speed;
-}//end humanspeed()
-
 function devclass($device)
 {
     if (isset($device['status']) && $device['status'] == '0') {
@@ -756,7 +591,7 @@ function generate_ap_link($args, $text = null, $type = null)
 {
     $args = cleanPort($args);
     if (! $text) {
-        $text = fixIfName($args['label']);
+        $text = Rewrite::normalizeIfName($args['label']);
     }
 
     if ($type) {
@@ -771,9 +606,9 @@ function generate_ap_link($args, $text = null, $type = null)
         $args = array_merge($args, device_by_id_cache($args['device_id']));
     }
 
-    $content = '<div class=list-large>' . $args['text'] . ' - ' . fixifName($args['label']) . '</div>';
+    $content = '<div class=list-large>' . $args['text'] . ' - ' . Rewrite::normalizeIfName($args['label']) . '</div>';
     if ($args['ifAlias']) {
-        $content .= display($args['ifAlias']) . '<br />';
+        $content .= \LibreNMS\Util\Clean::html($args['ifAlias'], []) . '<br />';
     }
 
     $content .= "<div style=\'width: 850px\'>";
@@ -785,26 +620,26 @@ function generate_ap_link($args, $text = null, $type = null)
     $graph_array['to'] = Config::get('time.now');
     $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $args['accesspoint_id'];
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.week');
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.month');
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.year');
-    $content .= generate_graph_tag($graph_array);
+    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
     $content .= '</div>';
 
     $url = generate_ap_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return overlib_link($url, $text, $content, null);
+        return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
     } else {
-        return fixifName($text);
+        return Rewrite::normalizeIfName($text);
     }
 }//end generate_ap_link()
 
 function generate_ap_url($ap, $vars = [])
 {
-    return generate_url(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
+    return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
 
 // Find all the files in the given directory that match the pattern
@@ -883,39 +718,6 @@ function get_client_ip()
     return $client_ip;
 }//end get_client_ip()
 
-/**
- * @param $string
- * @param int $max
- * @return string
- */
-function shorten_text($string, $max = 30)
-{
-    return \LibreNMS\Util\StringHelpers::shortenText($string, $max);
-}
-
-function shorten_interface_type($string)
-{
-    return str_ireplace(
-        [
-            'FastEthernet',
-            'TenGigabitEthernet',
-            'GigabitEthernet',
-            'Port-Channel',
-            'Ethernet',
-            'Bundle-Ether',
-        ],
-        [
-            'Fa',
-            'Te',
-            'Gi',
-            'Po',
-            'Eth',
-            'BE',
-        ],
-        $string
-    );
-}//end shorten_interface_type()
-
 function clean_bootgrid($string)
 {
     $output = str_replace(["\r", "\n"], '', $string);
@@ -947,7 +749,7 @@ function alert_details($details)
         $fallback = true;
         $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
         if ($tmp_alerts['bill_id']) {
-            $fault_detail .= '<a href="' . generate_bill_url($tmp_alerts) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
+            $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
             $fallback = false;
         }
 
@@ -993,10 +795,12 @@ function alert_details($details)
         if ($tmp_alerts['bgpPeer_id']) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
-                generate_url(['page' => 'device',
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'routing',
-                    'proto' => 'bgp', ]) .
+                    'proto' => 'bgp',
+                ]) .
                 "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
@@ -1013,10 +817,13 @@ function alert_details($details)
         }
 
         if (in_array('app_id', array_keys($tmp_alerts))) {
-            $fault_detail .= "<a href='" . generate_url(['page' => 'device',
-                'device' => $tmp_alerts['device_id'],
-                'tab' => 'apps',
-                'app' => $tmp_alerts['app_type'], ]) . "'>";
+            $fault_detail .= "<a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'device',
+                    'device' => $tmp_alerts['device_id'],
+                    'tab' => 'apps',
+                    'app' => $tmp_alerts['app_type'],
+                ]) . "'>";
             $fault_detail .= $tmp_alerts['metric'];
             $fault_detail .= '</a>';
 
@@ -1214,7 +1021,7 @@ function eventlog_severity($eventlog_severity)
 
 function set_image_type()
 {
-    return header('Content-type: ' . get_image_type());
+    header('Content-type: ' . get_image_type());
 }
 
 function get_image_type()
@@ -1254,12 +1061,6 @@ function get_oxidized_nodes_list()
         <td></td>
         </tr>';
     }
-}
-
-// fetches disks for a system
-function get_disks($device)
-{
-    return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', [$device]);
 }
 
 /**
@@ -1329,9 +1130,9 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
     $separator = '-';
 
     if ($category) {
-        $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id, $category);
+        $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', Rrd::dirFromHost($device['hostname']), 'app', $app_name, $app_id, $category);
     } else {
-        $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id);
+        $pattern = sprintf('%s/%s-%s-%s-*.rrd', Rrd::dirFromHost($device['hostname']), 'app', $app_name, $app_id);
     }
 
     // app_name contains a separator character? consider it
@@ -1521,7 +1322,7 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
     if ($sensor['sensor_class'] == 'runtime') {
-        $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
+        $sensor['sensor_current'] = \LibreNMS\Util\Time::formatInterval($sensor['sensor_current'] * 60);
 
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
     }
@@ -1529,7 +1330,7 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
 
-    return "<span class='label $label_style'>" . trim(format_si($sensor['sensor_current']) . $unit) . '</span>';
+    return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
 }
 
 /**

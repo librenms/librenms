@@ -2,9 +2,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'ubnt-airfibre-mib-rx');
+$rrdfilename = Rrd::name($device['hostname'], 'ubnt-airfibre-mib-rx');
 
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dbm                        Now    Min     Max\\n'";
     $rrd_options .= ' DEF:rxPower0=' . $rrdfilename . ':rxPower0:AVERAGE ';
     $rrd_options .= ' DEF:rxPower1=' . $rrdfilename . ':rxPower1:AVERAGE ';

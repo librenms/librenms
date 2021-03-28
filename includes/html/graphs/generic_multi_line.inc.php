@@ -26,7 +26,7 @@ if ($nototal) {
     $unitlen += '2';
 }
 
-$rrd_options .= " COMMENT:'" . rrdtool_escape($unit_text, $descr_len) . "      Now      Min      Max     Avg\l'";
+$rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "      Now      Min      Max     Avg\l'";
 
 $i = 0;
 $iter = 0;
@@ -50,7 +50,7 @@ foreach ($rrd_list as $rrd) {
     $ds = $rrd['ds'];
     $filename = $rrd['filename'];
 
-    $descr = rrdtool_escape($rrd['descr'], $descr_len);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
 
     $id = 'ds' . $i;
 

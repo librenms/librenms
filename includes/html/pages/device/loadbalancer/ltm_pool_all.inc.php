@@ -56,7 +56,7 @@
             2: "danger"
         },
     }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-        var link = '<?php echo generate_url($vars, ['type' => 'ltm_pool', 'subtype' => 'ltm_pool_details']); ?>poolid='+row['poolid'];
+        var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_pool', 'subtype' => 'ltm_pool_details']); ?>poolid='+row['poolid'];
         window.location.href = link;
     });
 </script>

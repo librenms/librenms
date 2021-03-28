@@ -33,7 +33,7 @@ if (is_numeric($vars['device_id'])) {
 
 if ($vars['state'] >= 0) {
     $where .= ' AND `E`.`state` = ?';
-    $param[] = mres($vars['state']);
+    $param[] = $vars['state'];
 }
 
 if (isset($vars['min_severity'])) {

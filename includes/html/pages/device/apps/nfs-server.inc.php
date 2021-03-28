@@ -15,7 +15,7 @@
 
 print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>" . nicecase($app['app_type']) . '</span> &#187; ';
+echo "<span style='font-weight: bold;'>" . \LibreNMS\Util\StringHelpers::niceCase($app['app_type']) . '</span> &#187; ';
 
 $app_sections = [
     'default'  => 'NFS',
@@ -29,8 +29,8 @@ unset($sep);
 foreach ($app_sections as $app_section => $app_section_text) {
     // remove entries that have no rrd associated
     // commonly proc2 will be invisible
-    $var_rrd = rrd_name($device['hostname'], 'app-nfs-server-' . $app_section . '-' . $app['app_id']);
-    if (! rrdtool_check_rrd_exists($var_rrd)) {
+    $var_rrd = Rrd::name($device['hostname'], 'app-nfs-server-' . $app_section . '-' . $app['app_id']);
+    if (! Rrd::checkRrdExists($var_rrd)) {
         continue;
     }
 
@@ -83,7 +83,7 @@ $graphs['proc4'] = [
 
 foreach ($graphs[$vars['app_section']] as $key => $info) {
     // check if they exist
-    if (! rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'app-nfs-server-' . $info[1] . '-' . $app['app_id']))) {
+    if (! Rrd::checkRrdExists(Rrd::name($device['hostname'], 'app-nfs-server-' . $info[1] . '-' . $app['app_id']))) {
         continue;
     }
 

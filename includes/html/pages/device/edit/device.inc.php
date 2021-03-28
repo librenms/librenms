@@ -66,9 +66,9 @@ if ($_POST['editing']) {
             }
         }
 
-        $override_sysContact_bool = mres($_POST['override_sysContact']);
+        $override_sysContact_bool = $_POST['override_sysContact'];
         if (isset($_POST['sysContact'])) {
-            $override_sysContact_string = mres($_POST['sysContact']);
+            $override_sysContact_string = $_POST['sysContact'];
         }
 
         if ($override_sysContact_bool) {
@@ -121,7 +121,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo display($device['hostname']); ?> />
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo \LibreNMS\Util\Clean::html($device['hostname'], []); ?> />
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
@@ -136,7 +136,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
      <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <textarea id="descr" name="descr" class="form-control"><?php echo display($device_model->purpose); ?></textarea>
+            <textarea id="descr" name="descr" class="form-control"><?php echo \LibreNMS\Util\Clean::html($device_model->purpose, []); ?></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -185,7 +185,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
                 if (! $device_model->override_sysLocation) {
                     echo ' disabled="1"';
                 }
-                ?> value="<?php echo display($device_model->location); ?>" />
+                ?> value="<?php echo \LibreNMS\Util\Clean::html($device_model->location, []); ?>" />
         </div>
     </div>
     <div class="form-group">
@@ -375,8 +375,8 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 </script>
 <?php
 print_optionbar_start();
-[$sizeondisk, $numrrds] = foldersize(get_rrd_dir($device['hostname']));
-echo 'Size on Disk: <b>' . formatStorage($sizeondisk) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
+[$sizeondisk, $numrrds] = foldersize(Rrd::dirFromHost($device['hostname']));
+echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 3) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
 echo ' | Last polled: <b>' . $device['last_polled'] . '</b>';
 if ($device['last_discovered']) {
     echo ' | Last discovered: <b>' . $device['last_discovered'] . '</b>';

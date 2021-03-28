@@ -20,11 +20,7 @@ foreach ($supplies as $type => $supply) {
         <table class="table table-hover table-condensed table-striped">';
 
         foreach ($supply as $toner) {
-            $percent = round($toner['supply_current'], 0);
-            $total = formatStorage($toner['toner_size']);
-            $free = formatStorage($toner['toner_free']);
-            $used = formatStorage($toner['toner_used']);
-
+            $percent = round($toner['supply_current']);
             $background = toner2colour($toner['supply_descr'], $percent);
 
             $graph_array = [
@@ -40,7 +36,7 @@ foreach ($supplies as $type => $supply) {
             $link_array = $graph_array;
             $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
-            $link = generate_url($link_array);
+            $link = \LibreNMS\Util\Url::generate($link_array);
 
             $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - ' . $toner['supply_descr']);
 
@@ -48,12 +44,12 @@ foreach ($supplies as $type => $supply) {
             $graph_array['height'] = 20;
             $graph_array['bg'] = 'ffffff00';
             // the 00 at the end makes the area transparent.
-            $minigraph = generate_lazy_graph_tag($graph_array);
+            $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
             echo '<tr>
-            <td class="col-md-4">' . overlib_link($link, $toner['supply_descr'], $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $toner['supply_descr'], $overlib_content) . '</td>
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
            </a></td>
          </tr>';
         }//end foreach

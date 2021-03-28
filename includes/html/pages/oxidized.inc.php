@@ -17,7 +17,7 @@ $pagetitle[] = 'Oxidized';
         <ul class="nav nav-tabs">
             <li class="active"><a href="#list" data-toggle="tab">Node List</a></li>
             <li><a href="#search" data-toggle="tab">Config Search</a></li>
-            <li><a href="<?php echo generate_url(['page' => 'tools', 'tool' => 'oxidized-cfg-check']); ?>">Oxidized config validation</a></li>
+            <li><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'tools', 'tool' => 'oxidized-cfg-check']); ?>">Oxidized config validation</a></li>
         </ul>
     </div>
     <div class="panel with-nav-tabs panel-default">
@@ -78,7 +78,7 @@ $pagetitle[] = 'Oxidized';
                         <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div>\
                     </div></div>'
             },
-        rowCount: [50, 100, 250, -1],                
+        rowCount: [50, 100, 250, -1],
         formatters: {
             "hostname": function(column, row) {
                 if (row.id) {
@@ -89,7 +89,7 @@ $pagetitle[] = 'Oxidized';
             },
             "actions": function(column, row) {
                 if (row.id) {
-                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id + 
+                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id +
                             '" id="btn-refresh-node-devId' + row.id + '" onclick="refresh_oxidized_node(\'' + row.hostname + '\');" title="Refetch config">' +
                             '<i class="fa fa-refresh"></i></button> ' +
                             '<a href="device/device=' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
@@ -101,7 +101,7 @@ $pagetitle[] = 'Oxidized';
             }
         }
     });
-    
+
     $("[name='btn-search']").on('click', function (event) {
         event.preventDefault();
         var $this = $(this);

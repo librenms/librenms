@@ -14,7 +14,7 @@ echo "<div class='row'>
 
 if (Config::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
-    echo Config::get('overview_show_sysDescr', true) ? display($device['sysDescr']) : 'System';
+    echo Config::get('overview_show_sysDescr', true) ? Clean::html($device['sysDescr'], []) : 'System';
     echo '</strong>';
 }
 
@@ -35,7 +35,7 @@ $device['os_text'] = Config::getOsSetting($device['os'], 'text');
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
-        <div class="col-sm-8">' . display($device['sysName']) . ' </div>
+        <div class="col-sm-8">' . Clean::html($device['sysName'], []) . ' </div>
       </div>';
 
 if (! empty($device['overwrite_ip'])) {
@@ -54,33 +54,33 @@ if (! empty($device['overwrite_ip'])) {
 if ($device['purpose']) {
     echo '<div class="row">
         <div class="col-sm-4">Description</div>
-        <div class="col-sm-8">' . display($device['purpose']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['purpose'], []) . '</div>
       </div>';
 }
 
 if ($device['hardware']) {
     echo '<div class="row">
         <div class="col-sm-4">Hardware</div>
-        <div class="col-sm-8">' . display($device['hardware']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['hardware'], []) . '</div>
       </div>';
 }
 
 echo '<div class="row">
         <div class="col-sm-4 text-nowrap">Operating System</div>
-        <div class="col-sm-8">' . display($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features']) . ' </div>
+        <div class="col-sm-8">' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </div>
       </div>';
 
 if ($device['serial']) {
     echo '<div class="row">
         <div class="col-sm-4">Serial</div>
-        <div class="col-sm-8">' . display($device['serial']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['serial'], []) . '</div>
       </div>';
 }
 
 if ($device['sysObjectID']) {
     echo '<div class="row">
         <div class="col-sm-4">Object ID</div>
-        <div class="col-sm-8">' . display($device['sysObjectID']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['sysObjectID'], []) . '</div>
       </div>';
 }
 
@@ -130,7 +130,7 @@ if ($device['location_id']) {
     echo '
     <div class="row">
         <div class="col-sm-4">Location</div>
-        <div class="col-sm-8">' . display($location->display()) . '</div>
+        <div class="col-sm-8">' . Clean::html($location->display(), []) . '</div>
     </div>
     <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
         <div class="col-sm-4">Lat / Lng</div>

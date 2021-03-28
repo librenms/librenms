@@ -109,7 +109,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
-        log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
+        log_event('Autodiscovered service: type ' . $service, $device, 'service', 2);
         echo '+';
     }
     echo "$service ";

@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 use Log;
 
 class Mempools implements Module
@@ -169,10 +170,10 @@ class Mempools implements Module
             }
 
             if ($system !== null) {
-                $old = format_bi($system->mempool_free);
+                $old = Number::formatBi($system->mempool_free, 2, 3, 'iB');
                 $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
-                $new = format_bi($system->mempool_free);
-                Log::debug("Free memory adjusted by availability calculation: {$old}iB -> {$new}iB\n");
+                $new = Number::formatBi($system->mempool_free, 2, 3, 'iB');
+                Log::debug("Free memory adjusted by availability calculation: {$old} -> {$new}\n");
             }
         }
 
@@ -183,9 +184,9 @@ class Mempools implements Module
     {
         echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
-            $used = format_bi($mempool->mempool_used);
-            $total = format_bi($mempool->mempool_total);
-            echo "  {$used}iB / {$total}iB";
+            $used = Number::formatBi($mempool->mempool_used, 2, 3, 'iB');
+            $total = Number::formatBi($mempool->mempool_total, 2, 3, 'iB');
+            echo "  {$used} / {$total}";
         }
         echo PHP_EOL;
     }

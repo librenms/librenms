@@ -20,7 +20,7 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
     ];
 
     $rrd_oldname = 'etherlike-' . $port['ifIndex']; // TODO: remove oldname check?
-    $rrd_name = getPortRrdName($port_id, 'dot3');
+    $rrd_name = Rrd::portName($port_id, 'dot3');
 
     $rrd_def = new RrdDefinition();
     $fields = [];

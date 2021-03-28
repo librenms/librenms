@@ -79,7 +79,7 @@ if ($_POST['addbill'] == 'yes') {
         dbInsert(['bill_id' => $bill_id, 'port_id' => $_POST['port_id']], 'bill_ports');
     }
 
-    header('Location: ' . generate_url(['page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit']));
+    header('Location: ' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit']));
     exit();
 }
 

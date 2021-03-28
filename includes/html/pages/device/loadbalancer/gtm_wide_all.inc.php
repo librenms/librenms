@@ -107,7 +107,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo generate_url($vars, ['type' => 'gtm_wide', 'subtype' => 'gtm_wide_det']); ?>wideid='+row['wideid'];
+            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'gtm_wide', 'subtype' => 'gtm_wide_det']); ?>wideid='+row['wideid'];
             window.location.href = link;
         });
     </script>

@@ -70,7 +70,7 @@ class AlertDB
             if (strstr($opt, '%') && strstr($opt, '.')) {
                 $tmpp = explode('.', $opt, 2);
                 $tmpp[0] = str_replace('%', '', $tmpp[0]);
-                $tables[] = mres(str_replace('(', '', $tmpp[0]));
+                $tables[] = str_replace('(', '', $tmpp[0]);
                 $rule = str_replace($opt, $tmpp[0] . '.' . $tmpp[1], $rule);
             }
         }

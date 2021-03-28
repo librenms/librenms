@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'drbd', $app['app_instance']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'drbd', $app['app_instance']]);
 
 $array = [
     'lo' => 'Local I/O',
@@ -12,7 +12,7 @@ $array = [
 ];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         if (is_array($var)) {
