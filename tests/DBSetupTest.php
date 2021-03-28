@@ -107,7 +107,7 @@ class DBSetupTest extends DBTestCase
     public function testSqlMode()
     {
         $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode'));
-        preg_match('/([0-9.]+)(?:-(\w+))/', $result->version, $matches);
+        preg_match('/([0-9.]+)(?:-(\w+))?/', $result->version, $matches);
         $version = $matches[1];
         $vendor = $matches[2];
         $mode = $result->mode;
