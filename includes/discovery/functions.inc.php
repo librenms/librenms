@@ -598,29 +598,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     }//end if
 }
 
-function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity_oid = null, $capacity = null, $current = null)
-{
-    d_echo("Discover Toner: $oid, $index, $type, $descr, $capacity_oid, $capacity, $current\n");
-
-    if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_oid` =?', [$device['device_id'], $type, $index, $oid]) == '0') {
-        $inserted = dbInsert(['device_id' => $device['device_id'], 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_index' => $index, 'toner_type' => $type, 'toner_descr' => $descr, 'toner_capacity' => $capacity, 'toner_current' => $current], 'toner');
-        echo '+';
-        log_event('Toner added: type ' . $type . ' index ' . $index . ' descr ' . $descr, $device, 'toner', 3, $inserted);
-    } else {
-        $toner_entry = dbFetchRow('SELECT * FROM `toner` WHERE `device_id` = ? AND `toner_type` = ? AND `toner_index` =?', [$device['device_id'], $type, $index]);
-        if ($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'] && $capacity_oid == $toner_entry['toner_capacity_oid']) {
-            echo '.';
-        } else {
-            dbUpdate(['toner_descr' => $descr, 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_capacity' => $capacity], 'toner', 'device_id=? AND toner_type=? AND `toner_index`=?', [$device['device_id'], $type, $index]);
-            echo 'U';
-        }
-    }
-
-    $valid[$type][$oid] = 1;
-}
-
-//end discover_toner()
-
 function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex)
 {
     d_echo("Discover Inventory Item: $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex\n");
@@ -841,20 +818,6 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
     }
 
     return 10;
-}
-
-/**
- * @param int $raw_capacity The value return from snmp
- * @return int normalized capacity value
- */
-function get_toner_capacity($raw_capacity)
-{
-    // unknown or unrestricted capacity, assume 100
-    if (empty($raw_capacity) || $raw_capacity < 0) {
-        return 100;
-    }
-
-    return $raw_capacity;
 }
 
 /**

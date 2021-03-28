@@ -9,6 +9,6 @@ discovery:
     -
         sysDescr_regex: '/Brother NC-.*(h|w),/'
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

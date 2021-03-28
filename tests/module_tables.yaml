@@ -117,10 +117,10 @@ storage:
     storage:
         excluded_fields: [device_id, storage_id]
         order_by: storage_index, storage_type
-toner:
-    toner:
-        excluded_fields: [device_id, toner_id]
-        order_by: toner_oid, toner_index
+printer-supplies:
+    printer_supplies:
+        excluded_fields: [device_id, supply_id]
+        order_by: supply_oid, supply_index
 vlans:
     vlans:
         excluded_fields: [vlan_id, device_id]

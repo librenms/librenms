@@ -97,6 +97,7 @@ class Programs extends BaseValidation
 
     private function failFping($validator, $cmd, $output)
     {
+        $validator->info('fping FAILURES can be ignored if running LibreNMS in a jail without ::1. You may want to test it manually: fping ::1');
         $validator->fail(
             "$cmd could not be executed. $cmd must have CAP_NET_RAW capability (getcap) or suid. Selinux exclusions may be required.\n ($output)"
         );

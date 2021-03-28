@@ -60,24 +60,27 @@ abstract class WidgetController extends Controller
     public function __invoke(Request $request)
     {
         $this->show_settings = (bool) $request->get('settings');
-        $settings = $this->getSettings();
 
         if ($this->show_settings) {
             $view = $this->getSettingsView($request);
         } else {
-            if (! empty($settings['device_group'])) {
-                $this->title .= ' (' . DeviceGroup::find($settings['device_group'])->name . ')';
+            // This might be invoked in getSettingsView() in an extended class
+            // So don't run it before since it's cached.
+            $this->getSettings();
+
+            if (! empty($this->settings['device_group'])) {
+                $this->title .= ' (' . DeviceGroup::find($this->settings['device_group'])->name . ')';
             }
             $view = $this->getView($request);
         }
 
-        if (! empty($settings['title'])) {
-            $title = $settings['title'];
+        if (! empty($this->settings['title'])) {
+            $title = $this->settings['title'];
         } else {
             $title = __(method_exists($this, 'title') ? app()->call([$this, 'title']) : $this->title);
         }
 
-        return $this->formatResponse($view, $title, $settings);
+        return $this->formatResponse($view, $title, $this->settings);
     }
 
     /**
