@@ -1057,7 +1057,6 @@ function port_filter($port)
     // return value
     // true:  do filter port
     // false: do not filter port
-
     $ret = true;
 
     if ($port['ifType']) {
