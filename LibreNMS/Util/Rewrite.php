@@ -114,7 +114,7 @@ class Rewrite
     /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
-     * @param $mac
+     * @param string $mac
      * @return string
      */
     public static function readableMac($mac)

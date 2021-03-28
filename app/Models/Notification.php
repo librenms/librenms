@@ -115,7 +115,7 @@ class Notification extends Model
 
     /**
      * @param Builder<Notification> $query
-     * @return $this
+     * @return Builder<Notification>
      */
     public function scopeLimit(Builder $query)
     {

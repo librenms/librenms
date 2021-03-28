@@ -36,8 +36,8 @@ use LibreNMS\Alerting\QueryBuilderParser;
 class AlertDB
 {
     /**
-     * @param $rule
-     * @param $query_builder
+     * @param string $rule
+     * @param bool $query_builder
      * @return bool|string
      */
     public static function genSQL($rule, $query_builder = false)

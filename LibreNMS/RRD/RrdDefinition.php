@@ -85,7 +85,7 @@ class RrdDefinition
     /**
      * Check if the give dataset name is valid for this definition
      *
-     * @param $name
+     * @param string $name
      * @return bool
      */
     public function isValidDataset($name)
