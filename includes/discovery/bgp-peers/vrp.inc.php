@@ -161,8 +161,8 @@ if (Config::get('enable_bgp')) {
             $afi = $entry['afi'];
             $safi = $entry['safi'];
             $vrfName = $entry['context_name'];
-            if (! exist($bgpPeersCache[$vrfName]) ||
-                    ! exist($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
+            if (! isset($bgpPeersCache[$vrfName]) ||
+                    ! isset($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
                     $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['afi']] != $afi ||
                     $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['safi']] != $safi) {
                 dbDelete(
