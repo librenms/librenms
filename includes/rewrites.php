@@ -39,6 +39,9 @@ function rewrite_entity_descr($descr)
  */
 function cleanPort($interface, $device = null)
 {
+    if (! $interface) {
+        return $interface;
+    }
     $interface['ifAlias'] = \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
     $interface['ifName'] = \LibreNMS\Util\Clean::html($interface['ifName'], []);
     $interface['ifDescr'] = \LibreNMS\Util\Clean::html($interface['ifDescr'], []);
