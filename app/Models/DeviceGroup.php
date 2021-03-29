@@ -24,6 +24,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Log;
 use Permissions;
@@ -162,22 +163,22 @@ class DeviceGroup extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function devices()
+    public function devices(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Device::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
-    public function services()
+    public function services(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Service::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\User::class, 'devices_group_perms', 'device_group_id', 'user_id');
     }
 
-    public function serviceTemplates()
+    public function serviceTemplates(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device_group', 'device_group_id', 'service_template_id');
     }

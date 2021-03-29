@@ -39,11 +39,6 @@ class Route extends DeviceRelatedModel
     public $timestamps = true;
 
     // ---- Define Relationships ----
-    public function device()
-    {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
-    }
-
     public function port()
     {
         return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');

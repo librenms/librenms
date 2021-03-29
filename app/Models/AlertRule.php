@@ -25,6 +25,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
@@ -78,12 +80,12 @@ class AlertRule extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function alerts()
+    public function alerts(): HasMany
     {
         return $this->hasMany(\App\Models\Alert::class, 'rule_id');
     }
 
-    public function devices()
+    public function devices(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Device::class, 'alert_device_map', 'device_id', 'device_id');
     }
