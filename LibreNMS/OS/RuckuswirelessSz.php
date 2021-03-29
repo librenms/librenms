@@ -34,6 +34,7 @@ class RuckuswirelessSz extends OS implements
 
         $total_oids = [];
         $total = 0;
+        $index = null;
         foreach ($counts as $index => $count) {
             $oid = '.1.3.6.1.4.1.25053.1.4.2.1.1.1.2.1.12.' . $index;
             $total_oids[] = $oid;
@@ -66,6 +67,7 @@ class RuckuswirelessSz extends OS implements
     {
         $apconnected = $this->getCacheByIndex('ruckusCtrlSystemNodeNumApConnected', 'RUCKUS-CTRL-MIB', '-OQUsb');
         $dbindex = 0;
+        $apstatus = [];
         foreach ($apconnected as $index => $connect) {
             $oid = '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.19.' . $index;
             $apstatus[] = new WirelessSensor(

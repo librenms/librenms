@@ -25,13 +25,13 @@
 
 namespace App\Observers;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Log;
 use Rrd;
 
 class MempoolObserver extends ModuleModelObserver
 {
-    public function updated(Eloquent $model)
+    /** @param \App\Models\Mempool $model  */
+    public function updated($model)
     {
         parent::updated($model);
 

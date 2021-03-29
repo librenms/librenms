@@ -75,7 +75,7 @@ class GlobeController extends WidgetController
             if ($data['markers'] == 'devices') {
                 $count = $location->devices->count();
                 [$devices_down, $devices_up] = $location->devices->partition(function ($device) {
-                    return $device->disable = 0 && $device->ignore = 0 && $device->status = 0;
+                    return $device->disabled = 0 && $device->ignore = 0 && $device->status = 0;
                 });
                 $up = $devices_up->count();
                 $down_items = $devices_down->map(function ($device) {
