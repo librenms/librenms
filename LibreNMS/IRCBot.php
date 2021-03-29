@@ -722,7 +722,9 @@ class IRCBot
             $new_config = Config::load();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
-                return $this->__construct();
+                $this->__construct();
+
+                return;
             }
         } else {
             return $this->respond('Permission denied.');
@@ -847,6 +849,7 @@ class IRCBot
             $tmp = dbFetchRows('SELECT `hostname` FROM `devices` WHERE status=0');
         }
 
+        $msg = '';
         foreach ($tmp as $db) {
             if ($db['hostname']) {
                 $msg .= ', ' . $db['hostname'];
@@ -916,6 +919,7 @@ class IRCBot
             $tmp = dbFetchRows('SELECT `hostname` FROM `devices`');
         }
 
+        $msg = '';
         foreach ($tmp as $device) {
             $msg .= ', ' . $device['hostname'];
         }
@@ -932,6 +936,11 @@ class IRCBot
     {
         $params = explode(' ', $params);
         $statustype = $params[0];
+
+        $d_w = '';
+        $d_a = '';
+        $p_w = '';
+        $p_a = '';
         if ($this->user['level'] < 5) {
             $d_w = ' WHERE device_id IN (' . implode(',', $this->user['devices']) . ')';
             $d_a = ' AND   device_id IN (' . implode(',', $this->user['devices']) . ')';
