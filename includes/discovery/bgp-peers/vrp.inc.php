@@ -125,7 +125,9 @@ if (Config::get('enable_bgp')) {
                     $vrp_bgp_peer_count++;
                 }
                 if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi']]) < 1) {
-                    $device['context_name'] = $vrfName;
+                    if ($vrf_name != '') {
+                        $device['context_name'] = $vrfName;
+                    }
                     add_cbgp_peer($device, ['ip' => $value['hwBgpPeerRemoteAddr']], $value['afi'], $value['safi']);
                     unset($device['context_name']);
                 } else {
