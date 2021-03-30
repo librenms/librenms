@@ -225,7 +225,7 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [is_int($device) ? $device : $device->device_id];
+        $routeParams = [is_numeric($device) ? $device : $device->device_id];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
