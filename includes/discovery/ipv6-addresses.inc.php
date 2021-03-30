@@ -21,7 +21,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
             $oid = '';
             $sep = '';
             $adsep = '';
-            unset($ipv6_address);
+            $ipv6_address = '';
             $do = '0';
             foreach (explode(':', $ipv6addr) as $part) {
                 $n = hexdec($part);
@@ -62,10 +62,10 @@ foreach ($vrfs_lite_cisco as $vrf) {
             if ($data) {
                 $data = trim($data);
                 [$if_ipv6addr,$ipv6_prefixlen] = explode(' ', $data);
-                [$ifIndex,$ipv6addr] = explode('.', $if_ipv6addr, 2);
-                $ipv6_address = snmp2ipv6($ipv6addr);
+                $exploded = explode('.', $if_ipv6addr);
+                $ipv6_address = \LibreNMS\Util\IP::fromSnmpString(implode('.', array_slice($exploded, -16)), true);
                 $ipv6_origin = snmp_get($device, "IPV6-MIB::ipv6AddrType.$if_ipv6addr", '-Ovq', 'IPV6-MIB');
-                discover_process_ipv6($valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $device['context_name']);
+                discover_process_ipv6($valid, $exploded[0], $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $device['context_name']);
             } //end if
         } //end foreach
     } //end if
@@ -77,7 +77,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $full_address = $row['ipv6_address'] . '/' . $row['ipv6_prefixlen'];
         $port_id = $row['port_id'];
         $valid_address = $full_address . '-' . $port_id;
-        if (! $valid['ipv6'][$valid_address]) {
+        if (! isset($valid['ipv6'][$valid_address])) {
             echo '-';
             $query = dbDelete('ipv6_addresses', '`ipv6_address_id` = ?', [$row['ipv6_address_id']]);
             if (! dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?', [$row['ipv6_network_id']])) {
