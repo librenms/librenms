@@ -60,7 +60,7 @@
     <x-panel title="{{ __('Performance') }}">
         <x-slot name="heading">
             <span class="panel-title" style="line-height: 34px">@lang('Performance')</span>
-                <span class="pull-right">
+                <span style="text-align: center">
                     <form method="post" role="form" id="map" class="form-inline">
                             @csrf
                             <div class="form-group">
@@ -220,6 +220,10 @@
 
         .panel.with-nav-tabs .nav-justified {
             margin-bottom: -1px;
+        }
+        
+        .bootstrap-datetimepicker-widget.dropdown-menu {
+            inset: auto!important;
         }
     </style>
 @endpush
