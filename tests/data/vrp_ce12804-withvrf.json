@@ -24917,7 +24917,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": "test1"
                 }
             ]
         },
@@ -24929,8 +24929,8 @@
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "",
-                    "bgpPeerLastErrorCode": 2,
-                    "bgpPeerLastErrorSubCode": 2,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "192.168.189.96",
@@ -24969,7 +24969,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": "test1"
                 }
             ]
         }
