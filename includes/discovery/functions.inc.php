@@ -921,7 +921,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     } catch (\Exception $e) {
                         d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
-                        // Beause we don't have a num_oid, we have no way to add this sensor.
+                        // Because we don't have a num_oid, we have no way to add this sensor.
                     }
                 }
 
