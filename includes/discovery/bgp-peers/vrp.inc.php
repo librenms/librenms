@@ -94,7 +94,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerIdentifier' => $address,
                         'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'],
                         'bgpPeerState' => $value['hwBgpPeerState'],
-                        'bgpPeerAdminStatus' => 'stop',
+                        'bgpPeerAdminStatus' => $value['hwBgpPeerAdminStatus'],
                         'bgpLocalAddr' => '0.0.0.0',
                         'bgpPeerRemoteAddr' => $value['hwBgpPeerRemoteAddr'],
                         'bgpPeerInUpdates' => 0,

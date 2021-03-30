@@ -24876,59 +24876,7 @@
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "192.168.189.96",
-                    "bgpPeerDescr" : "PeerDesc1",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 2078608,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
-                    "bgpLocalAs": 1,
-                    "vrfLocalAs": null
-                }
-            ],
-            "bgpPeers_cbgp": [
-                {
-                    "bgpPeerIdentifier": "192.168.189.96",
-                    "afi": "ipv4",
-                    "safi": "unicast",
-                    "AcceptedPrefixes": 0,
-                    "DeniedPrefixes": 0,
-                    "PrefixAdminLimit": 0,
-                    "PrefixThreshold": 0,
-                    "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 0,
-                    "SuppressedPrefixes": 0,
-                    "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 0,
-                    "AcceptedPrefixes_prev": 0,
-                    "DeniedPrefixes_delta": 0,
-                    "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 0,
-                    "AdvertisedPrefixes_prev": 0,
-                    "SuppressedPrefixes_delta": 0,
-                    "SuppressedPrefixes_prev": 0,
-                    "WithdrawnPrefixes_delta": 0,
-                    "WithdrawnPrefixes_prev": 0,
-                    "context_name": "test1"
-                }
-            ]
-        },
-        "poller": {
-            "bgpPeers": [
-                {
-                    "astext": "",
-                    "bgpPeerIdentifier": "192.168.189.96",
-                    "bgpPeerRemoteAs": 64512,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "stop",
+                    "bgpPeerAdminStatus": "",
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
@@ -24969,7 +24917,59 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": "test1"
+                    "context_name": null
+                }
+            ]
+        },
+        "poller": {
+            "bgpPeers": [
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "192.168.189.96",
+                    "bgpPeerRemoteAs": 64512,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "",
+                    "bgpPeerLastErrorCode": 2,
+                    "bgpPeerLastErrorSubCode": 2,
+                    "bgpPeerLastErrorText": null,
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "192.168.189.96",
+                    "bgpPeerDescr": "PeerDesc1",
+                    "bgpPeerInUpdates": 0,
+                    "bgpPeerOutUpdates": 0,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 2078608,
+                    "bgpPeerInUpdateElapsedTime": 0,
+                    "context_name": null,
+                    "bgpLocalAs": 1,
+                    "vrfLocalAs": null
+                }
+            ],
+            "bgpPeers_cbgp": [
+                {
+                    "bgpPeerIdentifier": "192.168.189.96",
+                    "afi": "ipv4",
+                    "safi": "unicast",
+                    "AcceptedPrefixes": 0,
+                    "DeniedPrefixes": 0,
+                    "PrefixAdminLimit": 0,
+                    "PrefixThreshold": 0,
+                    "PrefixClearThreshold": 0,
+                    "AdvertisedPrefixes": 0,
+                    "SuppressedPrefixes": 0,
+                    "WithdrawnPrefixes": 0,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
+                    "DeniedPrefixes_delta": 0,
+                    "DeniedPrefixes_prev": 0,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
+                    "SuppressedPrefixes_delta": 0,
+                    "SuppressedPrefixes_prev": 0,
+                    "WithdrawnPrefixes_delta": 0,
+                    "WithdrawnPrefixes_prev": 0,
+                    "context_name": null
                 }
             ]
         }
