@@ -24,6 +24,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class DeviceRelatedModel extends BaseModel
 {
     // ---- Query Scopes ----
@@ -44,7 +46,7 @@ class DeviceRelatedModel extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }
