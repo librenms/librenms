@@ -65,6 +65,9 @@ class MempoolsController extends TableController
         return $query;
     }
 
+    /**
+     * @param Device|Mempool $mempool
+     */
     public function formatItem($mempool)
     {
         if ($mempool instanceof Device) {

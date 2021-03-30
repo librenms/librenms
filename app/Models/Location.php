@@ -28,6 +28,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Util\Dns;
 
 class Location extends Model
@@ -162,7 +163,7 @@ class Location extends Model
 
     // ---- Define Relationships ----
 
-    public function devices()
+    public function devices(): HasMany
     {
         return $this->hasMany(\App\Models\Device::class, 'location_id');
     }

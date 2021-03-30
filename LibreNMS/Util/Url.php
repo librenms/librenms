@@ -47,7 +47,7 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
-        if (is_null($device)) {
+        if (! $device instanceof Device || ! $device->hostname) {
             return '';
         }
 
@@ -225,7 +225,7 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [is_int($device) ? $device : $device->device_id];
+        $routeParams = [is_numeric($device) ? $device : $device->device_id];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);

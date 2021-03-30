@@ -80,6 +80,9 @@ class SyslogController extends TableController
             });
     }
 
+    /**
+     * @param Syslog $syslog
+     */
     public function formatItem($syslog)
     {
         $device = $syslog->device;

@@ -68,7 +68,9 @@ class WorldMapController extends WidgetController
                 }
 
                 // add extra data
+                /** @phpstan-ignore-next-line */
                 $device->markerIcon = 'greenMarker';
+                /** @phpstan-ignore-next-line */
                 $device->zOffset = 0;
 
                 if ($device->status == 0) {
