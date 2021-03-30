@@ -147,6 +147,9 @@ class FdbTablesController extends TableController
         return $query;
     }
 
+    /**
+     * @param PortsFdb $fdb_entry
+     */
     public function formatItem($fdb_entry)
     {
         $ip_info = $this->findIps($fdb_entry->mac_address);
