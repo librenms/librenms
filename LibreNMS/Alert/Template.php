@@ -34,7 +34,7 @@ class Template
     /**
      * Get the template details
      *
-     * @param null $obj
+     * @param array|null $obj
      * @return mixed
      */
     public function getTemplate($obj = null)

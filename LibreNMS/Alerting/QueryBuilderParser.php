@@ -285,7 +285,7 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Parse a rule
      *
-     * @param $rule
+     * @param array $rule
      * @param bool $expand Expand macros?
      * @return string
      */
@@ -323,7 +323,7 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Expand macro to sql
      *
-     * @param $subject
+     * @param string $subject
      * @param bool $tables_only Used when finding tables in query returns an array instead of sql string
      * @param int $depth_limit
      * @return string|array
