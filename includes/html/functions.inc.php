@@ -1138,16 +1138,32 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
     // app_name contains a separator character? consider it
     $offset = substr_count($app_name, $separator);
 
-    foreach (glob($pattern) as $rrd) {
+    if (Config::get('rrdcached')) {
+        $apparray = [];
+        $pattern = sprintf('%s-%s-%s', 'app', $app_name, $app_id);
+        // Build the rrdtool cmd to list rrdfiles for this device
+        $rrdcmd = sprintf('%s list /%s --daemon %s', Config::get('rrdtool', 'rrdtool'), $device['hostname'], Config::get('rrdcached'));
+        $rrd_files = shell_exec($rrdcmd);
+        // Split returned files into array
+        $rrdarray = preg_split('/\s+/', trim($rrd_files));
+        // Find only the rrd files for the app we care about and add them to apparray.
+        foreach ($rrdarray as $rrd) {
+            if (str_contains($rrd, $pattern)) {
+                 array_push($apparray, $rrd); 
+           }
+        }
+    } else {
+        $apparray = glob($pattern);
+    }
+    
+    foreach ($apparray as $rrd) {
         $filename = basename($rrd, '.rrd');
-
         $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
 
         if ($entry) {
-            array_push($entries, $entry);
+          array_push($entries, $entry);
         }
     }
-
     return $entries;
 }
 
