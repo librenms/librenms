@@ -1161,7 +1161,7 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
         $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
 
         if ($entry) {
-          array_push($entries, $entry);
+            array_push($entries, $entry);
         }
     }
     return $entries;
