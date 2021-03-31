@@ -44,7 +44,7 @@ abstract class WidgetController extends Controller
 
     /**
      * @param Request $request
-     * @return View
+     * @return View|string
      */
     abstract public function getView(Request $request);
 

@@ -110,7 +110,7 @@ class Proc
      * process is not synchronous
      * If the command isn't terminated with a newline, add one
      *
-     * @param $command
+     * @param string $command
      * @return array
      */
     public function sendCommand($command)
