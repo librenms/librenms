@@ -5,6 +5,9 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 use Permissions;
@@ -254,78 +257,78 @@ class Port extends DeviceRelatedModel
 
     // ---- Define Relationships ----
 
-    public function adsl()
+    public function adsl(): HasMany
     {
         return $this->hasMany(PortAdsl::class, 'port_id');
     }
 
-    public function events()
+    public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
-    public function fdbEntries()
+    public function fdbEntries(): HasMany
     {
         return $this->hasMany(\App\Models\PortsFdb::class, 'port_id', 'port_id');
     }
 
-    public function ipv4()
+    public function ipv4(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv4Address::class, 'port_id');
     }
 
-    public function ipv6()
+    public function ipv6(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv6Address::class, 'port_id');
     }
 
-    public function macAccounting()
+    public function macAccounting(): HasMany
     {
         return $this->hasMany(MacAccounting::class, 'port_id');
     }
 
-    public function macs()
+    public function macs(): HasMany
     {
         return $this->hasMany(Ipv4Mac::class, 'port_id');
     }
 
-    public function nac()
+    public function nac(): HasMany
     {
         return $this->hasMany(PortsNac::class, 'port_id');
     }
 
-    public function ospfNeighbors()
+    public function ospfNeighbors(): HasMany
     {
         return $this->hasMany(OspfNbr::class, 'port_id');
     }
 
-    public function ospfPorts()
+    public function ospfPorts(): HasMany
     {
         return $this->hasMany(OspfPort::class, 'port_id');
     }
 
-    public function pseudowires()
+    public function pseudowires(): HasMany
     {
         return $this->hasMany(Pseudowire::class, 'port_id');
     }
 
-    public function statistics()
+    public function statistics(): HasMany
     {
         return $this->hasMany(PortStatistic::class, 'port_id');
     }
 
-    public function stp()
+    public function stp(): HasMany
     {
         return $this->hasMany(PortStp::class, 'port_id');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         // FIXME does not include global read
         return $this->belongsToMany(\App\Models\User::class, 'ports_perms', 'port_id', 'user_id');
     }
 
-    public function vlans()
+    public function vlans(): HasMany
     {
         return $this->hasMany(PortVlan::class, 'port_id');
     }

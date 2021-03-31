@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
@@ -183,7 +186,7 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
 
-    public function apiToken()
+    public function apiToken(): HasOne
     {
         return $this->hasOne(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
@@ -196,7 +199,7 @@ class User extends Authenticatable
         });
     }
 
-    public function deviceGroups()
+    public function deviceGroups(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
@@ -211,17 +214,17 @@ class User extends Authenticatable
         }
     }
 
-    public function dashboards()
+    public function dashboards(): HasMany
     {
         return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
     }
 
-    public function preferences()
+    public function preferences(): HasMany
     {
         return $this->hasMany(\App\Models\UserPref::class, 'user_id');
     }
 
-    public function widgets()
+    public function widgets(): HasMany
     {
         return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
     }

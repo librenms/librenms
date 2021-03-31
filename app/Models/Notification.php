@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Notification extends Model
@@ -133,10 +134,7 @@ class Notification extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function attribs()
+    public function attribs(): HasMany
     {
         return $this->hasMany(\App\Models\NotificationAttrib::class, 'notifications_id', 'notifications_id');
     }

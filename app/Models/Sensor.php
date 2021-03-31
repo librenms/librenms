@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Sensor extends DeviceRelatedModel
 {
@@ -73,7 +74,7 @@ class Sensor extends DeviceRelatedModel
     }
 
     // ---- Define Relationships ----
-    public function events()
+    public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
