@@ -63,7 +63,7 @@ class Notification extends Model
             $read = new NotificationAttrib;
             $read->user_id = \Auth::user()->user_id;
             $read->key = $name;
-            $read->value = 1;
+            $read->value = '1';
             $this->attribs()->save($read);
 
             return true;

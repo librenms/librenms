@@ -29,6 +29,10 @@ use Permissions;
 
 class IRCBot
 {
+    private $config;
+
+    private $user;
+
     private $last_activity = 0;
 
     private $data = '';
@@ -77,6 +81,14 @@ class IRCBot
     private $socket = [];
 
     private $floodcount = 0;
+
+    private $max_retry = 5;
+
+    private $nickwait;
+
+    private $buff;
+
+    private $tokens;
 
     public function __construct()
     {
@@ -802,7 +814,7 @@ class IRCBot
 
         foreach ($tmp as $logline) {
             $response = $logline['datetime'] . ' ';
-            $response .= $this->_color($hostid['hostname'], null, null, 'bold') . ' ';
+            $response .= $this->_color($logline['hostname'], null, null, 'bold') . ' ';
             if ($this->config['irc_alert_utf8']) {
                 if (preg_match('/critical alert/', $logline['message'])) {
                     $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $logline['message']) . ' ';

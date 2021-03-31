@@ -82,6 +82,7 @@ class QueryBuilderParser implements \JsonSerializable
 
     protected $builder;
     protected $schema;
+    private $tables;
 
     private function __construct(array $builder)
     {
