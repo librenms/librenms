@@ -255,7 +255,7 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Parse a rule group
      *
-     * @param $rule
+     * @param array $rule
      * @param bool $expand Expand macros?
      * @param bool $wrap Wrap in parenthesis
      * @return string

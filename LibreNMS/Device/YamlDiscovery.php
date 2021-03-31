@@ -35,7 +35,7 @@ class YamlDiscovery
     /**
      * @param OS $os
      * @param DiscoveryItem|string $class
-     * @param $yaml_data
+     * @param array $yaml_data
      * @return array
      */
     public static function discover(OS $os, $class, $yaml_data)

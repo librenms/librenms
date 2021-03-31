@@ -260,9 +260,9 @@ class Rrd extends BaseDatastore
     /**
      * Generates a filename for a proxmox cluster rrd
      *
-     * @param $pmxcluster
-     * @param $vmid
-     * @param $vmport
+     * @param string $pmxcluster
+     * @param string $vmid
+     * @param string $vmport
      * @return string full path to the rrd.
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport)
@@ -562,7 +562,7 @@ class Rrd extends BaseDatastore
     /**
      * Only track update and create primarily, just put all others in an "other" bin
      *
-     * @param $type
+     * @param string $type
      * @return string
      */
     private function coalesceStatisticType($type)

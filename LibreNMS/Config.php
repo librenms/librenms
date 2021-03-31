@@ -476,8 +476,8 @@ class Config
     /**
      * Copy data from old variables to new ones.
      *
-     * @param $old
-     * @param $new
+     * @param string $old
+     * @param string $new
      */
     private static function deprecatedVariable($old, $new)
     {
@@ -493,7 +493,7 @@ class Config
     /**
      * Locate the actual path of a binary
      *
-     * @param $binary
+     * @param string $binary
      * @return mixed
      */
     public static function locateBinary($binary)
