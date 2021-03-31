@@ -26,6 +26,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\Alert;
 
 class Eventlog extends DeviceRelatedModel
@@ -54,7 +55,7 @@ class Eventlog extends DeviceRelatedModel
             'datetime' => Carbon::now(),
             'severity' => $severity,
             'message' => $text,
-            'username'  => (class_exists('\Auth') && \Auth::check()) ? \Auth::user()->username : '',
+            'username'  => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
         ]);
 
         if ($device instanceof Device) {

@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -303,7 +304,7 @@ class DeviceController extends TableController
 
         if ($server = Config::get('gateone.server')) {
             if (Config::get('gateone.use_librenms_user')) {
-                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . \Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
             } else {
                 $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
             }
