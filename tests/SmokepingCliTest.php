@@ -24,10 +24,10 @@
 
 namespace LibreNMS\Tests;
 
-use app\Console\Commands\SmokepingGenerateCommand;
+use App\Console\Commands\SmokepingGenerateCommand;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\arr;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SmokepingCliTest extends DBTestCase
