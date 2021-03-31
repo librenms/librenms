@@ -24,6 +24,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class AlertTemplateMap extends BaseModel
 {
     protected $table = 'alert_template_map';
@@ -31,7 +33,7 @@ class AlertTemplateMap extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function template()
+    public function template(): BelongsTo
     {
         return $this->belongsTo(\App\Models\AlertTemplate::class, 'alert_templates_id');
     }

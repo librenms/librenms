@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use LibreNMS\Enum\Alert;
 
 class Eventlog extends DeviceRelatedModel
@@ -65,7 +66,7 @@ class Eventlog extends DeviceRelatedModel
 
     // ---- Define Relationships ----
 
-    public function related()
+    public function related(): MorphTo
     {
         return $this->morphTo('related', 'type', 'reference');
     }
