@@ -1149,13 +1149,13 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
         // Find only the rrd files for the app we care about and add them to apparray.
         foreach ($rrdarray as $rrd) {
             if (str_contains($rrd, $pattern)) {
-                 array_push($apparray, $rrd); 
-           }
+                array_push($apparray, $rrd); 
+            }
         }
     } else {
         $apparray = glob($pattern);
     }
-    
+
     foreach ($apparray as $rrd) {
         $filename = basename($rrd, '.rrd');
         $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
@@ -1164,6 +1164,7 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
             array_push($entries, $entry);
         }
     }
+
     return $entries;
 }
 
