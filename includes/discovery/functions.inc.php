@@ -1056,6 +1056,7 @@ function build_bgp_peers($device, $data, $peer2)
             $pieces = explode('.', $peer_ip);
             if (isset($pieces[1])) {
                 $is_ipv4 = $pieces[1] == 'ipv4';
+                // both local and remote are in the index, extract them
                 $local_ip = (string) IP::fromSnmpString(implode('.', array_slice($pieces, $is_ipv4 ? -9 : -33, $is_ipv4 ? 4 : 16)), true);
                 $peer_ip = (string) IP::fromSnmpString(implode('.', array_slice($pieces, $is_ipv4 ? -4 : -16)), true);
             }
@@ -1141,7 +1142,7 @@ function add_bgp_peer($device, $peer)
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
             'bgpLocalAddr' => $peer['localip'] ?: '0.0.0.0',
-            'bgpPeerRemoteAddr' => '0.0.0.0',
+            'bgpPeerRemoteAddr' => $peer['ip'] ?: '0.0.0.0',
             'bgpPeerInUpdates' => 0,
             'bgpPeerOutUpdates' => 0,
             'bgpPeerInTotalMessages' => 0,
