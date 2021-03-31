@@ -34,6 +34,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
 
+/**
+ * @method static \Database\Factories\AlertScheduleFactory factory(...$parameters)
+ */
 class AlertSchedule extends Model
 {
     use HasFactory;

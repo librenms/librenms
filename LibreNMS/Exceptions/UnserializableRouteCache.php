@@ -43,7 +43,7 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
      * Try to convert the given Exception to this exception
      *
      * @param \Exception $exception
-     * @return static
+     * @return static|null
      */
     public static function upgrade($exception)
     {
