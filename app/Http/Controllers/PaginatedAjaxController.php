@@ -185,13 +185,13 @@ abstract class PaginatedAjaxController extends Controller
      * @param  array $rules
      * @param  array $messages
      * @param  array $customAttributes
-     * @return void
+     * @return array
      */
     public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
     {
         $full_rules = array_replace($this->baseRules(), $rules);
 
-        parent::validate($request, $full_rules, $messages, $customAttributes);
+        return parent::validate($request, $full_rules, $messages, $customAttributes);
     }
 
     /**

@@ -124,7 +124,7 @@ class Schema
     /**
      * Return all columns for the given table
      *
-     * @param $table
+     * @param string $table
      * @return array
      */
     public function getColumns($table)

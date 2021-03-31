@@ -26,6 +26,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ipv4Network extends Model
 {
@@ -36,7 +37,7 @@ class Ipv4Network extends Model
 
     // ---- Define Relationships ----
 
-    public function ipv4()
+    public function ipv4(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv4Address::class, 'ipv4_network_id');
     }

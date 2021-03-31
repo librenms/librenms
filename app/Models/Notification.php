@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class Notification extends Model
@@ -60,9 +62,9 @@ class Notification extends Model
     {
         if ($enabled === true) {
             $read = new NotificationAttrib;
-            $read->user_id = \Auth::user()->user_id;
+            $read->user_id = Auth::user()->user_id;
             $read->key = $name;
-            $read->value = 1;
+            $read->value = '1';
             $this->attribs()->save($read);
 
             return true;
@@ -133,10 +135,7 @@ class Notification extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function attribs()
+    public function attribs(): HasMany
     {
         return $this->hasMany(\App\Models\NotificationAttrib::class, 'notifications_id', 'notifications_id');
     }

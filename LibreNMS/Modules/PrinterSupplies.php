@@ -224,7 +224,7 @@ class PrinterSupplies implements Module
      * @param array $device
      * @param int|string $raw_value The value returned from snmp
      * @param int $capacity the normalized capacity
-     * @return int the toner level as a percentage
+     * @return int|float|bool the toner level as a percentage
      */
     private static function getTonerLevel($device, $raw_value, $capacity)
     {

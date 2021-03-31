@@ -24,6 +24,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+
 class AlertTemplate extends BaseModel
 {
     public $timestamps = false;
@@ -35,7 +37,7 @@ class AlertTemplate extends BaseModel
         return $this->hasMany(\App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id');
     }
 
-    public function alert_rules()
+    public function alert_rules(): HasManyThrough
     {
         return $this->hasManyThrough(\App\Models\AlertRule::class, \App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id', 'id', 'alert_rule_id')
                     ->select(['id' => 'alert_rules.id', 'name' => 'alert_rules.name'])

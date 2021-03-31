@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dashboard extends Model
 {
@@ -46,12 +48,12 @@ class Dashboard extends Model
 
     // ---- Define Relationships ----
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-    public function widgets()
+    public function widgets(): HasMany
     {
         return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
     }

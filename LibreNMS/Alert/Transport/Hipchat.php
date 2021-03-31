@@ -50,9 +50,7 @@ class Hipchat extends Transport
         if ($version == 2) {
             $url .= '/' . urlencode($option['room_id']) . '/notification?auth_token=' . urlencode($option['auth_token']);
         }
-        foreach ($obj as $key => $value) {
-            $api = str_replace('%' . $key, $method == 'get' ? urlencode($value) : $value, $api);
-        }
+
         $curl = curl_init();
 
         if (empty($obj['msg'])) {
