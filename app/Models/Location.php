@@ -31,6 +31,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Util\Dns;
 
+/**
+ * @method static \Database\Factories\LocationFactory factory(...$parameters)
+ */
 class Location extends Model
 {
     use HasFactory;

@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use Permissions;
 
+/**
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
+ */
 class User extends Authenticatable
 {
     use Notifiable, HasFactory;

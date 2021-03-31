@@ -103,7 +103,7 @@ class Eloquent
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
      * @param string $name
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Database\Connection|null
      */
     public static function DB($name = null)
     {

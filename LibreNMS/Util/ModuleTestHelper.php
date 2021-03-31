@@ -504,7 +504,7 @@ class ModuleTestHelper
      *
      * @param Snmpsim $snmpsim
      * @param bool $no_save
-     * @return array
+     * @return array|null
      * @throws FileNotFoundException
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)

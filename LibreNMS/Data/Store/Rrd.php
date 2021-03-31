@@ -485,7 +485,7 @@ class Rrd extends BaseDatastore
      *
      * @param string $graph_file
      * @param string $options
-     * @return int
+     * @return string|int
      */
     public function graph($graph_file, $options)
     {

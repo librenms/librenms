@@ -54,7 +54,7 @@ interface Authorizer
      * can_modify_passwd
      *
      * @param int $user_id
-     * @return array
+     * @return array|bool
      */
     public function getUser($user_id);
 

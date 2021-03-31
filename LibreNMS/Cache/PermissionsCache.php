@@ -247,7 +247,7 @@ class PermissionsCache
     }
 
     /**
-     * @param Demixed $device
+     * @param mixed $device
      * @return int
      */
     private function getDeviceId($device)
