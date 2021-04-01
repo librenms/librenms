@@ -118,7 +118,7 @@ class AuthSSOTest extends DBTestCase
 
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertNull($dbuser);
+        $this->assertFalse($dbuser);
     }
 
     // Excercise general auth flow with creation enabled
@@ -225,11 +225,11 @@ class AuthSSOTest extends DBTestCase
     {
         $a = LegacyAuth::reset();
 
-        $this->assertTrue($a->canUpdatePasswords() === 0);
-        $this->assertTrue($a->changePassword(null, null) === 0);
-        $this->assertTrue($a->canManageUsers() === 1);
-        $this->assertTrue($a->canUpdateUsers() === 1);
-        $this->assertTrue($a->authIsExternal() === 1);
+        $this->assertFalse($a->canUpdatePasswords());
+        $this->assertFalse($a->changePassword(null, null));
+        $this->assertTrue($a->canManageUsers());
+        $this->assertTrue($a->canUpdateUsers());
+        $this->assertTrue($a->authIsExternal());
     }
 
     /* Everything from here comprises of targeted tests to excercise single methods */

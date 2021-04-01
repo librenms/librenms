@@ -39,7 +39,6 @@ class MigrateToUtf8mb4 extends Migration
         // Get the list of all tables
         $tableNames = DB::table('information_schema.tables')
             ->where('table_schema', $databaseName)
-            ->get(['TABLE_NAME'])
             ->pluck('TABLE_NAME');
 
         // Iterate through the list and alter each table
