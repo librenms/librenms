@@ -1055,16 +1055,15 @@ function port_fill_missing(&$port, $device)
 function port_filter($port)
 {
     // return value
-    // true:  do filter port
+    // true: do filter port
     // false: do not filter port
-    $ret = true;
 
     if ($port['ifType']) {
         // only poll wanted interface types
-        $ret = Config::get('interface_types.' . $port['ifType']) ?: true;
+        return !Config::has('interface_types.' . $port['ifType']);
     }
 
-    return ! $ret;
+    return false;
 }
 
 function scan_new_plugins()
