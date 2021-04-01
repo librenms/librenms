@@ -2339,6 +2339,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.gaia_lograte": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Log Rate"
+            },
+            "type": "graph"
+        },
         "graph_types.device.gaia_connections": {
             "default": {
                 "section": "firewall",
