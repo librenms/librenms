@@ -1060,7 +1060,7 @@ function port_filter($port)
 
     if ($port['ifType']) {
         // only poll wanted interface types
-        return !Config::has('interface_types.' . $port['ifType']);
+        return ! Config::has('interface_types.' . $port['ifType']);
     }
 
     return false;
