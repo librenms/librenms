@@ -674,10 +674,19 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
 
         // merge the parts into an array, creating keys if they don't exist
         $tmp = &$array;
-        foreach ($parts as $part) {
-            $tmp = &$tmp[trim($part, '".')];
+        try {
+            foreach ($parts as $part) {
+                $tmp = &$tmp[trim($part, '".')];
+            }
+            $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
         }
-        $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
+        catch (Exception $e) {
+            // We probably have invalid data here
+            //Warning: Illegal string offset '' in /opt/librenms/includes/snmp.inc.php on line 678
+            //Cannot create references to/from string offsets
+            //{"exception":"[object] (Error(code: 0): Cannot create references to/from string offsets at /opt/librenms/includes/snmp.inc.php:678)"}
+            continue;
+        }
     }
 
     return $array;
