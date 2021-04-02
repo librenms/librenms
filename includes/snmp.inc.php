@@ -679,8 +679,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
                 $tmp = &$tmp[trim($part, '".')];
             }
             $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // We probably have invalid data here
             //Warning: Illegal string offset '' in /opt/librenms/includes/snmp.inc.php on line 678
             //Cannot create references to/from string offsets
