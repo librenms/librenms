@@ -26,7 +26,6 @@ if (is_numeric($battery_volts)) {
 }
 
 $output_volts = snmpwalk_group($device, 'upsOutputVoltage', 'UPS-MIB');
-d_echo($output_volts);
 foreach ($output_volts as $index => $data) {
     $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$index";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);

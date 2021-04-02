@@ -662,7 +662,6 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
         }
 
         [$address, $value] = explode(' =', $line, 2);
-//file_put_contents("/tmp/debug", "line: ". $line."\n", FILE_APPEND );
         preg_match_all('/([^[\]]+)/', $address, $parts);
         $parts = $parts[1];
         array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
@@ -676,12 +675,9 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
         // merge the parts into an array, creating keys if they don't exist
         $tmp = &$array;
         foreach ($parts as $part) {
-//file_put_contents("/tmp/debug", "--> ". strval($part) . "\n", FILE_APPEND );
-            $key = (trim($part, '.'));
-            $key = (trim($key, '"'));
+            // we don't want to remove dots inside quotes, only outside
+            $key = trim(trim($part, '.'), '"');
             $tmp = &$tmp[$key];
-
-//file_put_contents("/tmp/debug", "-key-> ". $key . "\n", FILE_APPEND );
         }
         $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
     }
