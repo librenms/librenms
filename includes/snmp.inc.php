@@ -662,6 +662,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
         }
 
         [$address, $value] = explode(' =', $line, 2);
+//file_put_contents("/tmp/debug", "line: ". $line."\n", FILE_APPEND );
         preg_match_all('/([^[\]]+)/', $address, $parts);
         $parts = $parts[1];
         array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
@@ -675,19 +676,12 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
         // merge the parts into an array, creating keys if they don't exist
         $tmp = &$array;
         foreach ($parts as $part) {
-            $tmp = &$tmp[trim($part, '"')];
-//            $key = strval(trim(strval((string)$part), '"'));
-//            if (empty($key)) {
-//        d_echo("ARRAY");
-//        d_echo($array);
-//        d_echo("KEY");
-//        d_echo($key);
-//        //        continue 2;
-//                //Warning: Illegal string offset '' in /opt/librenms/includes/snmp.inc.php on line 678
-//                //Cannot create references to/from string offsets
-//                //{"exception":"[object] (Error(code: 0): Cannot create references to/from string offsets at /opt/librenms/includes/snmp.inc.php:678)"}
-//            }
-//            $tmp = &$tmp[(string)$key];
+//file_put_contents("/tmp/debug", "--> ". strval($part) . "\n", FILE_APPEND );
+            $key = (trim($part, '.'));
+            $key = (trim($key, '"'));
+            $tmp = &$tmp[$key];
+
+//file_put_contents("/tmp/debug", "-key-> ". $key . "\n", FILE_APPEND );
         }
         $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
     }
