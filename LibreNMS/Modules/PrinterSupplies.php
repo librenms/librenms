@@ -25,6 +25,7 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -83,12 +84,24 @@ class PrinterSupplies implements Module
 
             // Log empty supplies (but only once)
             if ($tonerperc == 0 && $toner['supply_current'] > 0) {
-                Log::event('Toner ' . $toner['supply_descr'] . ' is empty', $device, 'toner', 5, $toner['supply_id']);
+                Log::event(
+                    'Toner ' . $toner['supply_descr'] . ' is empty',
+                    $os->getDevice(),
+                    'toner',
+                    Alert::ERROR,
+                    $toner['supply_id']
+                );
             }
 
             // Log toner swap
             if ($tonerperc > $toner['supply_current']) {
-                Log::event('Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['supply_id']);
+                Log::event(
+                    'Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)',
+                    $os->getDevice(),
+                    'toner',
+                    Alert::NOTICE,
+                    $toner['supply_id']
+                 );
             }
 
             $toner->supply_current = $tonerperc;
