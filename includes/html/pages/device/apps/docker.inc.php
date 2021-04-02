@@ -1,6 +1,8 @@
 <?php
 
-$domain_list = get_arrays_with_application($device, $app['app_id'], 'docker');
+use LibreNMS\Util\RrdTool;
+
+$domain_list = RrdTool::getRrdApplicationArrays($device, $app['app_id'], 'docker');
 
 print_optionbar_start();
 
