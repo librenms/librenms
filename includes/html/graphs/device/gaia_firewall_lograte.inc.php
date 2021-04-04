@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'gaia_fw_lograte');
+$rrd_filename = rrd_name($device['hostname'], 'gaia_firewall_lograte');
 $rrd_options .= " --vertical-label='Logs per second'";
 
 $rrd_options .= " DEF:fw_lograte=$rrd_filename:fwlograte:LAST";
