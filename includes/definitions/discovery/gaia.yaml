@@ -12,6 +12,7 @@ modules:
                         - tempertureSensorName
                         - fanSpeedSensorName
                         - voltageSensorName
+                        - fwLSConnName
         state:
             data:
                 -
@@ -77,6 +78,69 @@ modules:
                         - { value: 0, descr: Up , graph: 2, generic: 0 }
                         - { value: 1, descr: Attention, graph: 1, generic: 3 }
                         - { value: 2, descr: Down, graph: 0, generic: 1 }
+                -
+                    oid: raidVolumeState
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.6.{{ $index }}'
+                    index: 'raidVolumeState.{{ $index }}'
+                    descr: 'RAID Status'
+                    group: RAID
+                    value: raidVolumeState
+                    states:
+                        - { value: 0, descr: OPTIMAL, graph: 3, generic: 0 }
+                        - { value: 1, descr: DEGRADED, graph: 2, generic: 1 }
+                        - { value: 2, descr: FAILED, graph: 1, generic: 2}
+                        - { value: -1, descr: 'Unknown', graph: 0, generic: 3}
+                -
+                    oid: raidVolumeType
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.3.{{ $index }}'
+                    index: 'raidVolumeType.{{ $index }}'
+                    descr: 'RAID Type'
+                    group: RAID
+                    value: raidVolumeType
+                    states:
+                        - { value: 0, descr: 'RAID-0', graph: 8, generic: 0 }
+                        - { value: 1, descr: 'RAID-1E', graph: 7, generic: 0 }
+                        - { value: 2, descr: 'RAID-1', graph: 6, generic: 0 }
+                        - { value: 3, descr: 'RAID-10', graph: 5, generic: 0 }
+                        - { value: 4, descr: 'RAID-4', graph: 4, generic: 0 }
+                        - { value: 5, descr: 'RAID-5', graph: 3, generic: 0 }
+                        - { value: 6, descr: 'RAID-6', graph: 2, generic: 0 }
+                        - { value: 7, descr: 'RAID-60', graph: 1, generic: 0 }
+                        - { value: 8, descr: 'RAID-50', graph: 0, generic: 0 }
+                -
+                    oid: fwLSConnOverall
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.1.{{ $index }}'
+                    index: 'fwLSConnOverall.{{ $index }}'
+                    descr: 'Log Server Connectivity'
+                    group: Logging
+                    value: fwLSConnOverall
+                    states:
+                        - {value: 0, descr: 'Ok', graph: '2', generic: 0}
+                        - {value: 1, descr: 'Warning', graph: '1', generic: 1}
+                        - {value: 2, descr: 'Error', graph: '0', generic: 2}
+                -
+                    oid: fwLSConnState
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.3.1.3.{{ $index }}'
+                    index: 'fwLSConnState.{{ $index }}'
+                    descr: '{{ $fwLSConnName }}, Log Server Connectivity'
+                    group: Logging
+                    value: fwLSConnState
+                    states:
+                        - {value: 0, descr: 'Ok', graph: '2', generic: 0}
+                        - {value: 1, descr: 'Error', graph: '1', generic: 2}
+                        - {value: 2, descr: 'Not Active', graph: '0', generic: 2}
+                -
+                    oid: fwLocalLoggingStat
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.5.{{ $index }}'
+                    index: 'fwLocalLoggingStat.{{ $index }}'
+                    descr: 'Local Log Server Status'
+                    group: Logging
+                    value: fwLocalLoggingStat
+                    states:
+                        - {value: 0, descr: 'To log servers', graph: '3', generic: 0}
+                        - {value: 1, descr: 'Local configured', graph: '2', generic: 0}
+                        - {value: 2, descr: 'Local due to connectivity', graph: '1', generic: 2}
+                        - {value: 3, descr: 'Local due to high rate', graph: '0', generic: 2}
         temperature:
             data:
                 -
