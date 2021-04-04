@@ -39,8 +39,8 @@ class Gaia extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'gaia_lograte', $tags, $fields);
-            $this->enableGraph('gaia_lograte');
+            data_update($this->getDeviceArray(), 'gaia_logserver_lograte', $tags, $fields);
+            $this->enableGraph('gaia_logserver_lograte');
         }
 
         //#############
