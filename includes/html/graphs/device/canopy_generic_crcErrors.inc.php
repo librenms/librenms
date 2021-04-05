@@ -11,8 +11,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-crcErrors');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-crcErrors');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:crcErrors=' . $rrdfilename . ':crcErrors:AVERAGE ';
     $rrd_options .= " LINE2:crcErrors#FF0000:'CRC Errors        ' ";

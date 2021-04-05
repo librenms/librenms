@@ -11,7 +11,7 @@ if (is_numeric($vars['id'])) {
 
     if (is_array($acc)) {
         if ($auth || port_permitted($acc['port_id'])) {
-            $filename = rrd_name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
+            $filename = Rrd::name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
             d_echo($filename);
 
             if (is_file($filename)) {
@@ -22,7 +22,7 @@ if (is_numeric($vars['id'])) {
                 $device = device_by_id_cache($port['device_id']);
                 $title = generate_device_link($device);
                 $title .= ' :: Port  ' . generate_port_link($port);
-                $title .= ' :: ' . formatMac($acc['mac']);
+                $title .= ' :: ' . \LibreNMS\Util\Rewrite::readableMac($acc['mac']);
                 $auth = true;
             } else {
                 graph_error('file not found');

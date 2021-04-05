@@ -6,9 +6,9 @@ $scale_max = 1;
 
 require 'includes/html/graphs/common.inc.php';
 
-$opensips_rrd = rrd_name($device['hostname'], ['app', 'opensips', $app['app_id']]);
+$opensips_rrd = Rrd::name($device['hostname'], ['app', 'opensips', $app['app_id']]);
 
-if (rrdtool_check_rrd_exists($opensips_rrd)) {
+if (Rrd::checkRrdExists($opensips_rrd)) {
     $rrd_filename = $opensips_rrd;
 }
 

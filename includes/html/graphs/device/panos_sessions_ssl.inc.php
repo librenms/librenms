@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'panos-sessions-ssl');
+$rrd_filename = Rrd::name($device['hostname'], 'panos-sessions-ssl');
 
 $ds = 'sessions_ssl';
 

@@ -27,8 +27,8 @@ namespace App\Http\Controllers\Form;
 use App\Http\Controllers\Controller;
 use App\Models\Dashboard;
 use App\Models\UserWidget;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CopyDashboardController extends Controller
 {
@@ -53,7 +53,7 @@ class CopyDashboardController extends Controller
             $success = $dashboard_copy->save();
         }
 
-        if ($success) {
+        if ($success && isset($dashboard_copy)) {
             $widgets = UserWidget::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->get();
 
             foreach ($widgets as $widget) {

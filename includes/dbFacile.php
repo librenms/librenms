@@ -62,8 +62,8 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
                 'username' => $db_user,
                 'password' => $db_pass,
                 'unix_socket' => $db_socket,
-                'charset' => 'utf8',
-                'collation' => 'utf8_unicode_ci',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
                 'prefix' => '',
                 'strict' => true,
                 'engine' => null,
@@ -258,12 +258,12 @@ function dbDeleteOrphans($target_table, $parents)
         return false;
     }
 
-    $target_table = mres($target_table);
+    $target_table = $target_table;
     $sql = "DELETE T FROM `$target_table` T";
     $where = [];
 
     foreach ((array) $parents as $parent) {
-        $parent_parts = explode('.', mres($parent));
+        $parent_parts = explode('.', $parent);
         if (count($parent_parts) == 2) {
             [$parent_table, $parent_column] = $parent_parts;
             $target_column = $parent_column;

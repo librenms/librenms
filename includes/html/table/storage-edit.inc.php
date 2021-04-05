@@ -1,6 +1,6 @@
 <?php
 
-$device_id = mres($vars['device_id']);
+$device_id = $vars['device_id'];
 
 $sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0';
 $param[] = $device_id;
@@ -39,9 +39,9 @@ $sql = "SELECT * $sql";
 
 //$response[] = array('storage_descr' => $sql);
 foreach (dbFetchRows($sql, $param) as $drive) {
-    $perc = round($drive['storage_perc'], 0);
-    $perc_warn = round($drive['storage_perc_warn'], 0);
-    $size = formatStorage($drive['storage_size']);
+    $perc = round($drive['storage_perc']);
+    $perc_warn = round($drive['storage_perc_warn']);
+    $size = \LibreNMS\Util\Number::formatBi($drive['storage_size']);
     $response[] = [
         'storage_id' => $drive['storage_id'],
         'hostname' => generate_device_link($drive),

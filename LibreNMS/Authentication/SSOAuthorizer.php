@@ -34,10 +34,10 @@ use LibreNMS\Util\IP;
  */
 class SSOAuthorizer extends MysqlAuthorizer
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 1;
-    protected static $CAN_UPDATE_USER = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
-    protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = true;
 
     public function authenticate($credentials)
     {

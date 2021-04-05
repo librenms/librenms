@@ -30,7 +30,7 @@ $params = [];
 
 if (! empty($_REQUEST['search'])) {
     $query .= ' WHERE `location` LIKE ?';
-    $params[] = '%' . mres($_REQUEST['search']) . '%';
+    $params[] = '%' . $_REQUEST['search'] . '%';
 }
 
 $total = dbFetchCell("SELECT COUNT(*) FROM `locations` $query", $params);

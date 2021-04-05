@@ -28,10 +28,10 @@ use LibreNMS\Interfaces\Authentication\Authorizer;
 
 abstract class AuthorizerBase implements Authorizer
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 0;
-    protected static $CAN_UPDATE_USER = 0;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
-    protected static $AUTH_IS_EXTERNAL = 0;
+    protected static $HAS_AUTH_USERMANAGEMENT = false;
+    protected static $CAN_UPDATE_USER = false;
+    protected static $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = false;
 
     public function canUpdatePasswords($username = '')
     {
@@ -41,7 +41,7 @@ abstract class AuthorizerBase implements Authorizer
     public function changePassword($username, $newpassword)
     {
         //not supported by default
-        return 0;
+        return false;
     }
 
     public function canManageUsers()
@@ -52,13 +52,13 @@ abstract class AuthorizerBase implements Authorizer
     public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
     {
         //not supported by default
-        return 0;
+        return false;
     }
 
     public function deleteUser($user_id)
     {
         //not supported by default
-        return 0;
+        return false;
     }
 
     public function canUpdateUsers()
@@ -69,7 +69,7 @@ abstract class AuthorizerBase implements Authorizer
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
     {
         //not supported by default
-        return 0;
+        return false;
     }
 
     public function authIsExternal()

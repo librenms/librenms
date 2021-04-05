@@ -36,7 +36,7 @@ class Graph
 
     /**
      * Get an array of all graph subtypes for the given type
-     * @param $type
+     * @param string $type
      * @param Device $device
      * @return array
      */
@@ -73,8 +73,8 @@ class Graph
     /**
      * Check if the given graph is a mib graph
      *
-     * @param $type
-     * @param $subtype
+     * @param string $type
+     * @param string $subtype
      * @return bool
      */
     public static function isMibGraph($type, $subtype)

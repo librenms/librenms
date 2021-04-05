@@ -249,12 +249,14 @@ class ModuleTestHelper
             [$os, $variant] = self::extractVariant($file);
 
             // calculate valid modules
-            $data_modules = array_keys(json_decode(file_get_contents($file), true));
+            $decoded = json_decode(file_get_contents($file), true);
 
             if (json_last_error()) {
                 echo "Invalid json data: $base_name\n";
                 exit(1);
             }
+
+            $data_modules = array_keys($decoded);
 
             if (empty($modules)) {
                 $valid_modules = $data_modules;
@@ -502,7 +504,7 @@ class ModuleTestHelper
      *
      * @param Snmpsim $snmpsim
      * @param bool $no_save
-     * @return array
+     * @return array|null
      * @throws FileNotFoundException
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
@@ -665,7 +667,7 @@ class ModuleTestHelper
      * Mostly used for testing
      *
      * @param int $device_id The test device id
-     * @param array modules to capture data for (should be a list of modules that were actually run)
+     * @param array $modules to capture data for (should be a list of modules that were actually run)
      * @param string $key a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
@@ -837,7 +839,9 @@ class ModuleTestHelper
     private function collectComponents($device_id)
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, 'label');
+        $components = Arr::sort($components, function ($item) {
+            return $item['type'] . $item['label'];
+        });
 
         return array_values($components);
     }

@@ -432,6 +432,8 @@ class Config
         self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
         self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
+        self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
+        self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();
@@ -474,8 +476,8 @@ class Config
     /**
      * Copy data from old variables to new ones.
      *
-     * @param $old
-     * @param $new
+     * @param string $old
+     * @param string $new
      */
     private static function deprecatedVariable($old, $new)
     {
@@ -491,7 +493,7 @@ class Config
     /**
      * Locate the actual path of a binary
      *
-     * @param $binary
+     * @param string $binary
      * @return mixed
      */
     public static function locateBinary($binary)

@@ -11,8 +11,8 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     use LdapSessionCache;
     use ActiveDirectoryCommon;
 
-    protected static $AUTH_IS_EXTERNAL = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
+    protected static $AUTH_IS_EXTERNAL = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected $ldap_connection;
 
@@ -68,7 +68,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     public function userExists($username, $throw_exception = false)
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
-            return 1;
+            return true;
         }
 
         $search = ldap_search(
@@ -86,10 +86,10 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
              */
             $this->authLdapSessionCacheSet('user_exists', 1);
 
-            return 1;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)

@@ -43,6 +43,9 @@ class MuninPluginController extends SelectController
             ->select('mplug_id', 'mplug_type', 'device_id');
     }
 
+    /**
+     * @param MuninPlugin $munin_plugin
+     */
     public function formatItem($munin_plugin)
     {
         return [

@@ -25,7 +25,7 @@ $status = 'error';
 $message = 'unknown error';
 
 $dashboard_id = (int) $_REQUEST['dashboard_id'];
-$dashboard_name = display($_REQUEST['dashboard_name']);
+$dashboard_name = \LibreNMS\Util\Clean::html($_REQUEST['dashboard_name'], []);
 $access = $_REQUEST['access'];
 
 if (isset($dashboard_id) && isset($dashboard_name) && isset($access)) {

@@ -19,8 +19,8 @@
 
 use LibreNMS\Config;
 
-$filter_hostname = mres($vars['hostname']);
-$filter_range = mres($vars['range']);
+$filter_hostname = $vars['hostname'];
+$filter_range = $vars['range'];
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $query = 'message:"' . $searchPhrase . '"';
@@ -83,7 +83,7 @@ foreach ($messages['messages'] as $message) {
 
     $response[] = [
         'timestamp' => graylog_severity_label($message['message']['level']) . $displayTime,
-        'source'    => '<a href="' . generate_url(['page'=>'device', 'device'=>$message['message']['source']]) . '">' . $message['message']['source'] . '</a>',
+        'source'    => '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $message['message']['source']]) . '">' . $message['message']['source'] . '</a>',
         'message'    => $message['message']['message'],
         'facility'  => $message['message']['facility'],
         'level'     => $message['message']['level'],

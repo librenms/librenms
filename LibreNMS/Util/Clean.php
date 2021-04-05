@@ -68,7 +68,7 @@ class Clean
      * Clean a string for display in an html page.
      * For use in non-blade pages
      *
-     * @param $value
+     * @param string $value
      * @param array $purifier_config (key, value pair)
      * @return string
      */
@@ -84,7 +84,7 @@ class Clean
             $value = htmlentities($value);
         }
 
-        if (! isset($purifier)) {
+        if (! $purifier instanceof HTMLPurifier) {
             // initialize HTML Purifier here since this is the only user
             $p_config = HTMLPurifier_Config::createDefault();
             $p_config->set('Cache.SerializerPath', Config::get('temp_dir', '/tmp'));

@@ -7,11 +7,11 @@ echo '</div>';
 echo '<div class="panel-body">';
 
 foreach ($ports as $port) {
-    $speed = humanspeed($port['ifSpeed']);
-    $type = humanmedia($port['ifType']);
+    $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+    $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
 
-    $port['in_rate'] = formatRates(($port['ifInOctets_rate'] * 8));
-    $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
+    $port['in_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps');
+    $port['out_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
 
     if ($port['in_errors'] > 0 || $port['out_errors'] > 0) {
         $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
@@ -48,15 +48,15 @@ foreach ($ports as $port) {
         $link_array = $graph_array;
         $link_array['page'] = 'graphs';
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
-        $link = generate_url($link_array);
+        $link = \LibreNMS\Util\Url::generate($link_array);
         $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . ' - ' . $port['label']);
         $graph_array['title'] = 'yes';
         $graph_array['width'] = $width;
         $graph_array['height'] = 119;
-        $graph = generate_lazy_graph_tag($graph_array);
+        $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         echo "<div class='graph-all-common' style='min-width: " . $width_div . 'px;max-width:' . $width_div . "px;'>";
-        echo overlib_link($link, $graph, $overlib_content);
+        echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
         echo '</div>';
     }
 }

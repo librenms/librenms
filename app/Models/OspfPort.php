@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OspfPort extends PortRelatedModel
 {
@@ -65,7 +66,7 @@ class OspfPort extends PortRelatedModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id');
     }

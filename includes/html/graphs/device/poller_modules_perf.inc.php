@@ -21,10 +21,10 @@ require 'includes/html/graphs/common.inc.php';
 
 $count = 0;
 foreach ($modules as $module => $module_status) {
-    $rrd_filename = rrd_name($device['hostname'], ['poller-perf', $module]);
+    $rrd_filename = Rrd::name($device['hostname'], ['poller-perf', $module]);
     if ($attribs['poll_' . $module] || ($module_status && ! isset($attribs['poll_' . $module])) ||
         (\LibreNMS\Config::getOsSetting($device['os'], 'poller_modules.' . $module) && ! isset($attribs['poll_' . $module]))) {
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
+        if (Rrd::checkRrdExists($rrd_filename)) {
             $ds['ds'] = 'poller';
             $ds['descr'] = $module;
             $ds['filename'] = $rrd_filename;

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSdpBind extends Model implements Keyable
@@ -41,12 +42,12 @@ class MplsSdpBind extends Model implements Keyable
 
     // ---- Define Relationships ----
 
-    public function sdp()
+    public function sdp(): BelongsTo
     {
         return $this->belongsTo(\App\Models\MplsSdp::class, 'sdp_id');
     }
 
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(\App\Models\MplsService::class, 'svc_id');
     }

@@ -26,7 +26,7 @@ include 'powerdns-recursor.inc.php';
 $colours = 'purples';
 $unit_text = 'Entries';
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,

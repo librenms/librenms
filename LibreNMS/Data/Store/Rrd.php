@@ -29,6 +29,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Proc;
+use LibreNMS\Util\Rewrite;
 use Log;
 
 class Rrd extends BaseDatastore
@@ -259,9 +260,9 @@ class Rrd extends BaseDatastore
     /**
      * Generates a filename for a proxmox cluster rrd
      *
-     * @param $pmxcluster
-     * @param $vmid
-     * @param $vmport
+     * @param string $pmxcluster
+     * @param string $vmid
+     * @param string $vmport
      * @return string full path to the rrd.
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport)
@@ -357,6 +358,7 @@ class Rrd extends BaseDatastore
     {
         global $vdebug;
         $stat = Measurement::start($this->coalesceStatisticType($command));
+        $output = null;
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
@@ -483,7 +485,7 @@ class Rrd extends BaseDatastore
      *
      * @param string $graph_file
      * @param string $options
-     * @return int
+     * @return string|int
      */
     public function graph($graph_file, $options)
     {
@@ -528,9 +530,39 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Escapes strings and sets them to a fixed length for use with RRDtool
+     *
+     * @param string $descr the string to escape
+     * @param int $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
+     * @return string
+     */
+    public static function fixedSafeDescr($descr, $length)
+    {
+        $result = Rewrite::shortenIfType($descr);
+        $result = str_replace("'", '', $result);            // remove quotes
+
+        if (is_numeric($length)) {
+            // preserve original $length for str_pad()
+
+            // determine correct strlen() for substr_count()
+            $substr_count_length = $length <= 0 ? null : min(strlen($descr), $length);
+
+            $extra = substr_count($descr, ':', 0, $substr_count_length);
+            $result = substr(str_pad($result, $length), 0, ($length + $extra));
+            if ($extra > 0) {
+                $result = substr($result, 0, (-1 * $extra));
+            }
+        }
+
+        $result = str_replace(':', '\:', $result);          // escape colons
+
+        return $result . ' ';
+    }
+
+    /**
      * Only track update and create primarily, just put all others in an "other" bin
      *
-     * @param $type
+     * @param string $type
      * @return string
      */
     private function coalesceStatisticType($type)

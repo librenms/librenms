@@ -52,9 +52,9 @@ if (isset($options['h'])) {
             $doing = $options['h'];
         } else {
             if (preg_match('/\*/', $options['h'])) {
-                $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
+                $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
             } else {
-                $where = "AND `hostname` = '" . mres($options['h']) . "'";
+                $where = "AND `hostname` = '" . $options['h'] . "'";
             }
             $doing = $options['h'];
         }
@@ -71,7 +71,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
             WHERE `disabled` = 0
             ORDER BY `device_id` ASC
         ) temp
-        WHERE MOD(temp.rownum, ' . mres($options['i']) . ') = ' . mres($options['n']) . ';';
+        WHERE MOD(temp.rownum, ' . $options['i'] . ') = ' . $options['n'] . ';';
     $doing = $options['n'] . '/' . $options['i'];
 }
 

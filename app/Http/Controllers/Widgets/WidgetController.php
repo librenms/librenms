@@ -44,7 +44,7 @@ abstract class WidgetController extends Controller
 
     /**
      * @param Request $request
-     * @return View
+     * @return View|string
      */
     abstract public function getView(Request $request);
 
@@ -63,24 +63,24 @@ abstract class WidgetController extends Controller
 
         if ($this->show_settings) {
             $view = $this->getSettingsView($request);
-        }
+        } else {
+            // This might be invoked in getSettingsView() in an extended class
+            // So don't run it before since it's cached.
+            $this->getSettings();
 
-        $settings = $this->getSettings();
-
-        if (! $this->show_settings) {
-            if (! empty($settings['device_group'])) {
-                $this->title .= ' (' . DeviceGroup::find($settings['device_group'])->name . ')';
+            if (! empty($this->settings['device_group'])) {
+                $this->title .= ' (' . DeviceGroup::find($this->settings['device_group'])->name . ')';
             }
             $view = $this->getView($request);
         }
 
-        if (! empty($settings['title'])) {
-            $title = $settings['title'];
+        if (! empty($this->settings['title'])) {
+            $title = $this->settings['title'];
         } else {
             $title = __(method_exists($this, 'title') ? app()->call([$this, 'title']) : $this->title);
         }
 
-        return $this->formatResponse($view, $title, $settings);
+        return $this->formatResponse($view, $title, $this->settings);
     }
 
     /**

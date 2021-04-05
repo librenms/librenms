@@ -168,7 +168,7 @@
                 "mib": {
                     "type": "boolean"
                 },
-                "toner": {
+                "printer-supplies": {
                     "type": "boolean"
                 },
                 "cisco-vpdn": {
@@ -288,7 +288,7 @@
                 "arp-table": {
                     "type": "boolean"
                 },
-                "toner": {
+                "printer-supplies": {
                     "type": "boolean"
                 },
                 "ipv4-addresses": {

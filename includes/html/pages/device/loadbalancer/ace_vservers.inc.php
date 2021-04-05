@@ -17,7 +17,7 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="' . generate_url($vars, ['type' => $option]) . '">' . $text . '</a>';
+    echo '<a href="' . \LibreNMS\Util\Url::generate($vars, ['type' => $option]) . '">' . $text . '</a>';
     if ($_GET['type'] == $option) {
         echo '</span>';
     }
@@ -42,7 +42,7 @@ foreach ($graph_types as $type => $descr) {
     }
 
     echo '<a href="device/device=' . $device['device_id'] . '/tab=routing/type=loadbalancer_vservers/graphs/' . $type . '/">' . $descr . '</a>';
-    echo '<a href="' . generate_url($vars, ['type' => 'loadbalancer_ace_vservers']) . '">' . $text . '</a>';
+    echo '<a href="' . \LibreNMS\Util\Url::generate($vars, ['type' => 'loadbalancer_ace_vservers']) . '">' . $text . '</a>';
     if ($_GET['opte'] == $type) {
         echo '</span>';
     }

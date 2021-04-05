@@ -82,6 +82,9 @@ class Elasticsearch extends Transport
             case AlertState::BETTER:
                 $state = 'better';
                 break;
+            default:
+                $state = 'unknown';
+                break;
         }
 
         $data = [

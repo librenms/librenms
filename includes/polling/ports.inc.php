@@ -4,6 +4,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 $data_oids = [
     'ifName',
@@ -200,9 +201,9 @@ $ports = $ports_mapped['ports'];
 foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
     foreach (['', '-adsl', '-dot3'] as $suffix) {
         $old_rrd_name = "port-$ifIndex$suffix";
-        $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
+        $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
 
-        rrd_file_rename($device, $old_rrd_name, $new_rrd_name);
+        \Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
     }
 }
 
@@ -516,10 +517,12 @@ foreach ($port_stats as $ifIndex => $port) {
 echo "\n";
 
 // get last poll time to optimize poll_time, poll_prev and poll_period in table db
+$prev_poll_times = array_filter(array_column($ports, 'poll_time'));
+$max_poll_time_prev = empty($prev_poll_times) ? null : max($prev_poll_times);
 $device_global_ports = [
     'poll_time' => $polled,
-    'poll_prev' => max(array_column($ports, 'poll_time')),
-    'poll_period' => ($polled - $port['poll_time']),
+    'poll_prev' => $max_poll_time_prev,
+    'poll_period' => $max_poll_time_prev ? null : ($polled - $max_poll_time_prev),
 ];
 
 $globally_updated_port_ids = [];
@@ -787,13 +790,13 @@ foreach ($ports as $port) {
                 $port['stats']['ifOutBits_perc'] = round(($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100));
             }
 
-            echo 'bps(' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ')';
-            echo 'bytes(' . formatStorage($port['stats']['ifInOctets_diff']) . '/' . formatStorage($port['stats']['ifOutOctets_diff']) . ')';
-            echo 'pkts(' . format_si($port['stats']['ifInUcastPkts_rate']) . 'pps/' . format_si($port['stats']['ifOutUcastPkts_rate']) . 'pps)';
+            echo 'bps(' . Number::formatSi($port['stats']['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($port['stats']['ifOutBits_rate'], 2, 3, 'bps') . ')';
+            echo 'bytes(' . Number::formatBi($port['stats']['ifInOctets_diff']) . '/' . Number::formatBi($port['stats']['ifOutOctets_diff']) . ')';
+            echo 'pkts(' . Number::formatSi($port['stats']['ifInUcastPkts_rate'], 2, 3, 'pps') . '/' . Number::formatSi($port['stats']['ifOutUcastPkts_rate'], 2, 3, 'pps') . ')';
 
             // Update data stores
-            $rrd_name = getPortRrdName($port_id);
-            $rrdfile = rrd_name($device['hostname'], $rrd_name);
+            $rrd_name = Rrd::portName($port_id, '');
+            $rrdfile = Rrd::name($device['hostname'], $rrd_name);
             $rrd_def = RrdDefinition::make()
                 ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
                 ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000)

@@ -38,7 +38,7 @@ if (isset($options['h'])) {
             $where = "AND `device_id` = '" . $options['h'] . "'";
             $doing = $options['h'];
         } else {
-            $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
+            $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
             $doing = $options['h'];
         }
     }//end if

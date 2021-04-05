@@ -72,6 +72,7 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
 
         // missing user for existing token, create it assuming legacy auth_id
         $api_token = ApiToken::where('token_hash', $credentials['api_token'])->first();
+        /** @var \App\Models\User */
         $user = $this->retrieveByLegacyId($api_token->user_id);
 
         // update token user_id
@@ -92,6 +93,7 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
+        /** @var \App\Models\User $user */
         return ApiToken::isValid($credentials['api_token'], $user->user_id);
     }
 }

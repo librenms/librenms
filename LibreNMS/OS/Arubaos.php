@@ -160,7 +160,7 @@ class Arubaos extends OS implements
 
     protected function decodeChannel($channel)
     {
-        return $channel & 255; // mask off the channel width information
+        return cast_number($channel) & 255; // mask off the channel width information
     }
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')

@@ -153,19 +153,19 @@ $csv[] = [
 ];
 foreach ($ports as $port) {
     if (port_permitted($port['port_id'], $port['device_id'])) {
-        $speed = humanspeed($port['ifSpeed']);
-        $type = humanmedia($port['ifType']);
-        $port['in_rate'] = formatRates(($port['ifInOctets_rate'] * 8));
-        $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
+        $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+        $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
+        $port['in_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps');
+        $port['out_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
         $port = cleanPort($port, $device);
         $csv[] = [
             format_hostname($port, $port['hostname']),
-            fixIfName($port['label']),
+            \LibreNMS\Util\Rewrite::normalizeIfName($port['label']),
             $speed,
             $port['in_rate'],
             $port['out_rate'],
             $type,
-            display($port['ifAlias']),
+            \LibreNMS\Util\Clean::html($port['ifAlias'], []),
         ];
     }
 }

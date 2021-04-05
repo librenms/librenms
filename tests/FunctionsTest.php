@@ -25,12 +25,13 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Rewrite;
 
 class FunctionsTest extends TestCase
 {
     public function testMacCleanToReadable()
     {
-        $this->assertEquals('de:ad:be:ef:a0:c3', mac_clean_to_readable('deadbeefa0c3'));
+        $this->assertEquals('de:ad:be:ef:a0:c3', Rewrite::readableMac('deadbeefa0c3'));
     }
 
     public function testHex2Str()

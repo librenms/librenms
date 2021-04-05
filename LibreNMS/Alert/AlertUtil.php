@@ -35,7 +35,7 @@ class AlertUtil
     /**
      * Get the rule_id for a specific alert
      *
-     * @param $alert_id
+     * @param int $alert_id
      * @return mixed|null
      */
     private static function getRuleId($alert_id)
@@ -48,7 +48,7 @@ class AlertUtil
     /**
      * Get the transport for a given alert_id
      *
-     * @param $alert_id
+     * @param int $alert_id
      * @return array
      */
     public static function getAlertTransports($alert_id)
@@ -221,7 +221,7 @@ class AlertUtil
      */
     public static function runMacros($rule, $x = 1)
     {
-        $macros = Config::get('alert.macros.rule', []) .
+        $macros = Config::get('alert.macros.rule', []);
         krsort($macros);
         foreach ($macros as $macro => $value) {
             if (! strstr($macro, ' ')) {

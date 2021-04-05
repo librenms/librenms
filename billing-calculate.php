@@ -8,6 +8,9 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
+
+use LibreNMS\Util\Number;
+
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
@@ -50,8 +53,8 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $type = 'CDR';
                 $allowed = $bill['bill_cdr'];
                 $used = $rate_data['rate_95th'];
-                $allowed_text = format_si($allowed) . 'bps';
-                $used_text = format_si($used) . 'bps';
+                $allowed_text = Number::formatSi($allowed, 2, 3, 'bps');
+                $used_text = Number::formatSi($used, 2, 3, 'bps');
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
                 $percent = round((($rate_data['rate_95th'] / $bill['bill_cdr']) * 100), 2);
