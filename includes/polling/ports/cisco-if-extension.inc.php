@@ -21,8 +21,8 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      * Build interface RRD with filename in format of:
      * port-id<ifIndex>-cie.rrd
      */
-    $rrd_name = getPortRrdName($port_id, 'cie');
-    $rrdfile = rrd_name($device['hostname'], $rrd_name);
+    $rrd_name = Rrd::portName($port_id, 'cie');
+    $rrdfile = Rrd::name($device['hostname'], $rrd_name);
     $rrd_def = RrdDefinition::make()
         ->addDataset('InRuntsErrs', 'DERIVE', 0)
         ->addDataset('InGiantsErrs', 'DERIVE', 0)

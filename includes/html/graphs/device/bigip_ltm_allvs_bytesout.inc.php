@@ -30,8 +30,8 @@ $count = 0;
 foreach ($components as $compid => $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
-    $rrd_filename = rrd_name($device['hostname'], [$comp['type'], $label, $hash]);
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
         // Grab a colour from the array.
         if (isset($colours[$colcount])) {
             $colour = $colours[$colcount];

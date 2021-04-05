@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'sgos_average_requests');
+$rrd_filename = Rrd::name($device['hostname'], 'sgos_average_requests');
 
 require 'includes/html/graphs/common.inc.php';
 

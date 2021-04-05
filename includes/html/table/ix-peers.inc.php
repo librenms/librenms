@@ -19,9 +19,9 @@
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$asn = clean($vars['asn']);
-$ixid = clean($vars['ixid']);
-$status = clean($vars['status']);
+$asn = strip_tags($vars['asn']);
+$ixid = strip_tags($vars['ixid']);
+$status = strip_tags($vars['status']);
 
 $sql = ' FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_ipaddr4` = `bgpPeers`.`bgpPeerIdentifier` WHERE `P`.`ix_id` = ? AND `remote_ipaddr4` IS NOT NULL';
 $params = [$ixid];

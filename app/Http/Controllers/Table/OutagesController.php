@@ -70,6 +70,9 @@ class OutagesController extends TableController
             });
     }
 
+    /**
+     * @param DeviceOutage $outage
+     */
     public function formatItem($outage)
     {
         $start = $this->formatDatetime($outage->going_down);

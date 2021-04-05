@@ -25,6 +25,7 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -83,12 +84,24 @@ class PrinterSupplies implements Module
 
             // Log empty supplies (but only once)
             if ($tonerperc == 0 && $toner['supply_current'] > 0) {
-                Log::event('Toner ' . $toner['supply_descr'] . ' is empty', $device, 'toner', 5, $toner['supply_id']);
+                Log::event(
+                    'Toner ' . $toner['supply_descr'] . ' is empty',
+                    $os->getDevice(),
+                    'toner',
+                    Alert::ERROR,
+                    $toner['supply_id']
+                );
             }
 
             // Log toner swap
             if ($tonerperc > $toner['supply_current']) {
-                Log::event('Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['supply_id']);
+                Log::event(
+                    'Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)',
+                    $os->getDevice(),
+                    'toner',
+                    Alert::NOTICE,
+                    $toner['supply_id']
+                 );
             }
 
             $toner->supply_current = $tonerperc;
@@ -224,7 +237,7 @@ class PrinterSupplies implements Module
      * @param array $device
      * @param int|string $raw_value The value returned from snmp
      * @param int $capacity the normalized capacity
-     * @return int the toner level as a percentage
+     * @return int|float|bool the toner level as a percentage
      */
     private static function getTonerLevel($device, $raw_value, $capacity)
     {

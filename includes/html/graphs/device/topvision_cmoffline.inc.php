@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'topvision_cmoffline');
+$rrd_filename = Rrd::name($device['hostname'], 'topvision_cmoffline');
 
 $ds = 'cmoffline';
 

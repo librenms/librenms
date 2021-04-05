@@ -504,7 +504,7 @@ class ModuleTestHelper
      *
      * @param Snmpsim $snmpsim
      * @param bool $no_save
-     * @return array
+     * @return array|null
      * @throws FileNotFoundException
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
@@ -667,7 +667,7 @@ class ModuleTestHelper
      * Mostly used for testing
      *
      * @param int $device_id The test device id
-     * @param array modules to capture data for (should be a list of modules that were actually run)
+     * @param array $modules to capture data for (should be a list of modules that were actually run)
      * @param string $key a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */

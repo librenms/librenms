@@ -110,7 +110,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             // ToDo fix log_event()
             //
             //log_event('STP topology changed after: '.formatUptime($stp['timeSinceTopologyChange']), $device, 'stp', $stp['timeSinceTopologyChange']);
-            log_event('STP topology changed after: ' . formatUptime($stp['timeSinceTopologyChange']), $device, 'stp', 4);
+            log_event('STP topology changed after: ' . \LibreNMS\Util\Time::formatInterval($stp['timeSinceTopologyChange']), $device, 'stp', 4);
         }
         // Write to db
         dbUpdate($stp, 'stp', 'device_id = ?', [$device['device_id']]);

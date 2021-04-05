@@ -39,9 +39,9 @@ try:
     from optparse import OptionParser
 
 except ImportError as exc:
-    print('ERROR: missing one or more of the following python modules:')
-    print('threading, queue, sys, subprocess, time, os, json')
-    print('ERROR: %s' % exc)
+    print("ERROR: missing one or more of the following python modules:")
+    print("threading, queue, sys, subprocess, time, os, json")
+    print("ERROR: %s" % exc)
     sys.exit(2)
 
 
@@ -60,9 +60,9 @@ def memc_alive():
     try:
         global memc
         key = str(uuid.uuid4())
-        memc.set('poller.ping.' + key, key, 60)
-        if memc.get('poller.ping.' + key) == key:
-            memc.delete('poller.ping.' + key)
+        memc.set("poller.ping." + key, key, 60)
+        if memc.get("poller.ping." + key) == key:
+            memc.delete("poller.ping." + key)
             return True
         else:
             return False
@@ -82,7 +82,9 @@ def memc_touch(key, time):
 def get_time_tag(step):
     ts = int(time.time())
     return ts - ts % step
-#EOC0
+
+
+# EOC0
 
 """
     A seperate queue and a single worker for printing information to the screen prevents
@@ -91,6 +93,8 @@ def get_time_tag(step):
         Some people, when confronted with a problem, think,
         "I know, I'll use threads," and then two they hav erpoblesms.
 """
+
+
 def printworker():
     nodeso = 0
     while True:
@@ -102,7 +106,9 @@ def printworker():
                 memc_touch(master_tag, 10)
                 nodes = memc.get(nodes_tag)
                 if nodes is None and not memc_alive():
-                    print("WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly.")
+                    print(
+                        "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
+                    )
                     distpoll = False
                     nodes = nodeso
                 if nodes is not nodeso:
@@ -129,9 +135,15 @@ def printworker():
         per_device_duration[device_id] = elapsed_time
         polled_devices += 1
         if elapsed_time < step:
-            print("INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
+            print(
+                "INFO: worker %s finished device %s in %s seconds"
+                % (worker_id, device_id, elapsed_time)
+            )
         else:
-            print("WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
+            print(
+                "WARNING: worker %s finished device %s in %s seconds"
+                % (worker_id, device_id, elapsed_time)
+            )
         print_queue.task_done()
 
 
@@ -139,33 +151,57 @@ def printworker():
     This class will fork off single instances of the poller.php process, record
     how long it takes, and push the resulting reports to the printer queue
 """
+
+
 def poll_worker():
     while True:
         device_id = poll_queue.get()
         # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
-        if not distpoll or memc.get('poller.device.%s.%s' % (device_id, time_tag)) is None:
+        if (
+            not distpoll
+            or memc.get("poller.device.%s.%s" % (device_id, time_tag)) is None
+        ):
             if distpoll:
-                result = memc.add('poller.device.%s.%s' % (device_id, time_tag), config['distributed_poller_name'],
-                                  step)
+                result = memc.add(
+                    "poller.device.%s.%s" % (device_id, time_tag),
+                    config["distributed_poller_name"],
+                    step,
+                )
                 if not result:
-                    print("This device (%s) appears to be being polled by another poller" % (device_id))
+                    print(
+                        "This device (%s) appears to be being polled by another poller"
+                        % (device_id)
+                    )
                     poll_queue.task_done()
                     continue
                 if not memc_alive() and IsNode:
-                    print("Lost Memcached, Not polling Device %s as Node. Master will poll it." % device_id)
+                    print(
+                        "Lost Memcached, Not polling Device %s as Node. Master will poll it."
+                        % device_id
+                    )
                     poll_queue.task_done()
                     continue
             # EOC5
             try:
                 start_time = time.time()
 
-                output = "-d >> %s/poll_device_%s.log" % (log_dir, device_id) if debug else ">> /dev/null"
-                command = "/usr/bin/env php %s -h %s %s 2>&1" % (poller_path, device_id, output)
+                output = (
+                    "-d >> %s/poll_device_%s.log" % (log_dir, device_id)
+                    if debug
+                    else ">> /dev/null"
+                )
+                command = "/usr/bin/env php %s -h %s %s 2>&1" % (
+                    poller_path,
+                    device_id,
+                    output,
+                )
                 # TODO: replace with command_runner
                 subprocess.check_call(command, shell=True)
 
                 elapsed_time = int(time.time() - start_time)
-                print_queue.put([threading.current_thread().name, device_id, elapsed_time])
+                print_queue.put(
+                    [threading.current_thread().name, device_id, elapsed_time]
+                )
             except (KeyboardInterrupt, SystemExit):
                 raise
             except:
@@ -173,32 +209,33 @@ def poll_worker():
         poll_queue.task_done()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
 
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    LNMS.check_for_file(install_dir + '/.env')
+    LNMS.check_for_file(install_dir + "/.env")
     config = json.loads(LNMS.get_config_data(install_dir))
 
-    poller_path = config['install_dir'] + '/poller.php'
-    log_dir = config['log_dir']
+    poller_path = config["install_dir"] + "/poller.php"
+    log_dir = config["log_dir"]
 
-    if 'rrd' in config and 'step' in config['rrd']:
-        step = config['rrd']['step']
+    if "rrd" in config and "step" in config["rrd"]:
+        step = config["rrd"]["step"]
     else:
         step = 300
 
-
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
-    if 'distributed_poller_group' in config:
-        poller_group = str(config['distributed_poller_group'])
+    if "distributed_poller_group" in config:
+        poller_group = str(config["distributed_poller_group"])
     else:
         poller_group = False
 
-    if ('distributed_poller' in config and
-        'distributed_poller_memcached_host' in config and
-        'distributed_poller_memcached_port' in config and
-        config['distributed_poller']):
+    if (
+        "distributed_poller" in config
+        and "distributed_poller_memcached_host" in config
+        and "distributed_poller_memcached_port" in config
+        and config["distributed_poller"]
+    ):
 
         time_tag = str(get_time_tag(step))
         master_tag = "poller.master." + time_tag
@@ -208,15 +245,20 @@ if __name__ == '__main__':
             import memcache
             import uuid
 
-            memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
-                                    str(config['distributed_poller_memcached_port'])])
-            if str(memc.get(master_tag)) == config['distributed_poller_name']:
+            memc = memcache.Client(
+                [
+                    config["distributed_poller_memcached_host"]
+                    + ":"
+                    + str(config["distributed_poller_memcached_port"])
+                ]
+            )
+            if str(memc.get(master_tag)) == config["distributed_poller_name"]:
                 print("This system is already joined as the poller master.")
                 sys.exit(2)
             if memc_alive():
                 if memc.get(master_tag) is None:
                     print("Registered as Master")
-                    memc.set(master_tag, config['distributed_poller_name'], 10)
+                    memc.set(master_tag, config["distributed_poller_name"], 10)
                     memc.set(nodes_tag, 0, step)
                     IsNode = False
                 else:
@@ -252,8 +294,13 @@ if __name__ == '__main__':
     usage = "usage: %prog [options] <workers> (Default: 16 (Do not set too high)"
     description = "Spawn multiple poller.php processes in parallel."
     parser = OptionParser(usage=usage, description=description)
-    parser.add_option('-d', '--debug', action='store_true', default=False,
-                      help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+    parser.add_option(
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
+    )
     (options, args) = parser.parse_args()
 
     debug = options.debug
@@ -272,13 +319,23 @@ if __name__ == '__main__':
     """
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
     if poller_group is not False:
-        query = 'select device_id from devices where poller_group IN(' + poller_group + \
-                ') and disabled = 0 order by last_polled_timetaken desc'
+        query = (
+            "select device_id from devices where poller_group IN("
+            + poller_group
+            + ") and disabled = 0 order by last_polled_timetaken desc"
+        )
     else:
-        query = 'select device_id from devices where disabled = 0 order by last_polled_timetaken desc'
+        query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
     # EOC2
 
-    db = LNMS.db_open(config['db_socket'], config['db_host'], config['db_port'], config['db_user'], config['db_pass'], config['db_name'])
+    db = LNMS.db_open(
+        config["db_socket"],
+        config["db_host"],
+        config["db_port"],
+        config["db_user"],
+        config["db_pass"],
+        config["db_name"],
+    )
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()
@@ -298,8 +355,9 @@ if __name__ == '__main__':
     print_queue = queue.Queue()
 
     print(
-        "INFO: starting the poller at %s with %s threads, slowest devices first" % (time.strftime("%Y-%m-%d %H:%M:%S"),
-                                                                                    amount_of_workers))
+        "INFO: starting the poller at %s with %s threads, slowest devices first"
+        % (time.strftime("%Y-%m-%d %H:%M:%S"), amount_of_workers)
+    )
 
     for device_id in devices_list:
         poll_queue.put(device_id)
@@ -321,13 +379,15 @@ if __name__ == '__main__':
 
     total_time = int(time.time() - s_time)
 
-    print("INFO: poller-wrapper polled %s devices in %s seconds with %s workers" % (
-        polled_devices, total_time, amount_of_workers))
+    print(
+        "INFO: poller-wrapper polled %s devices in %s seconds with %s workers"
+        % (polled_devices, total_time, amount_of_workers)
+    )
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
     if distpoll or memc_alive():
         master = memc.get(master_tag)
-        if master == config['distributed_poller_name'] and not IsNode:
+        if master == config["distributed_poller_name"] and not IsNode:
             print("Wait for all poller-nodes to finish")
             nodes = memc.get(nodes_tag)
             while nodes is not None and nodes > 0:
@@ -339,7 +399,7 @@ if __name__ == '__main__':
             print("Clearing Locks for %s" % time_tag)
             x = minlocks
             while x <= maxlocks:
-                res = memc.delete('poller.device.%s.%s' % (x, time_tag))
+                res = memc.delete("poller.device.%s.%s" % (x, time_tag))
                 x += 1
             print("%s Locks Cleared" % x)
             print("Clearing Nodes")
@@ -352,36 +412,57 @@ if __name__ == '__main__':
 
     show_stopper = False
 
-    db = LNMS.db_open(config['db_socket'], config['db_host'], config['db_port'], config['db_user'], config['db_pass'], config['db_name'])
+    db = LNMS.db_open(
+        config["db_socket"],
+        config["db_host"],
+        config["db_port"],
+        config["db_user"],
+        config["db_pass"],
+        config["db_name"],
+    )
     cursor = db.cursor()
-    query = "update pollers set last_polled=NOW(), devices='%d', time_taken='%d' where poller_name='%s'" % (
-        polled_devices,
-        total_time,
-        config['distributed_poller_name'])
+    query = (
+        "update pollers set last_polled=NOW(), devices='%d', time_taken='%d' where poller_name='%s'"
+        % (polled_devices, total_time, config["distributed_poller_name"])
+    )
     response = cursor.execute(query)
     if response == 1:
         db.commit()
     else:
-        query = "insert into pollers set poller_name='%s', last_polled=NOW(), devices='%d', time_taken='%d'" % (
-            config['distributed_poller_name'], polled_devices, total_time)
+        query = (
+            "insert into pollers set poller_name='%s', last_polled=NOW(), devices='%d', time_taken='%d'"
+            % (config["distributed_poller_name"], polled_devices, total_time)
+        )
         cursor.execute(query)
         db.commit()
     db.close()
 
     if total_time > step:
         print(
-            "WARNING: the process took more than %s seconds to finish, you need faster hardware or more threads" % step)
-        print("INFO: in sequential style polling the elapsed time would have been: %s seconds" % real_duration)
+            "WARNING: the process took more than %s seconds to finish, you need faster hardware or more threads"
+            % step
+        )
+        print(
+            "INFO: in sequential style polling the elapsed time would have been: %s seconds"
+            % real_duration
+        )
         for device in per_device_duration:
             if per_device_duration[device] > step:
-                print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
+                print(
+                    "WARNING: device %s is taking too long: %s seconds"
+                    % (device, per_device_duration[device])
+                )
                 show_stopper = True
         if show_stopper:
             print(
-                "ERROR: Some devices are taking more than %s seconds, the script cannot recommend you what to do." % step)
+                "ERROR: Some devices are taking more than %s seconds, the script cannot recommend you what to do."
+                % step
+            )
         else:
             recommend = int(total_time / step * amount_of_workers + 1)
             print(
-                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
+                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)"
+                % recommend
+            )
 
         sys.exit(2)

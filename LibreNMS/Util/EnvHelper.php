@@ -161,7 +161,7 @@ class EnvHelper
     /**
      * quote strings with spaces
      *
-     * @param $value
+     * @param string $value
      * @return string
      */
     private static function escapeValue($value)

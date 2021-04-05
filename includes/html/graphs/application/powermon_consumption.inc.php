@@ -33,7 +33,7 @@ below under LOCAL OPTIONS
 $name = 'powermon';
 $app_id = $app['app_id'];
 
-$rrd_filename = rrd_name($device['hostname'], ['app', $name, $app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
 
 $ds_list[0]['vname'] = 'watts';
 $ds_list[0]['ds'] = 'watts-gauge';
@@ -91,7 +91,7 @@ foreach ($ds_list as $ds_item) {
     $vname = $ds_item['vname'];
     $ds = $ds_item['ds'];
     $filename = $ds_item['filename'];
-    $descr = rrdtool_escape($ds_item['descr'], $pad_to);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds_item['descr'], $pad_to);
 
     // CF to use
     $use_cf_last = ['nothing', 'nothing'];
@@ -157,7 +157,7 @@ foreach ($ds_list as $ds_item) {
         $units_text = ' kWh';
         $float_precision = 2;
         $descr = '  Total Consumed';
-        $descr = rrdtool_escape($descr, $pad_to + 2);
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $pad_to + 2);
         $rrd_options .= " COMMENT:'{$descr}'";
         $rrd_options .= ' CDEF:series_a=watts,3600000,/';
         $rrd_options .= ' VDEF:kilowatthours=series_a,TOTAL';
@@ -165,7 +165,7 @@ foreach ($ds_list as $ds_item) {
     } elseif ($vname == 'rate') {
         // Consumption Charge
         $float_precision = 2;
-        $descr = rrdtool_escape($descr, $pad_to + 7);
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $pad_to + 7);
         $rrd_options .= " COMMENT:'{$descr}{$currency_symbol}'";
         $rrd_options .= " CDEF:series_b=watts,{$vname},*,3600000,/";
         $rrd_options .= ' VDEF:total_cost=series_b,TOTAL';

@@ -433,7 +433,7 @@ class CiHelper
         $this->setFlags([
             'unit_skip' => empty($this->changed['php']) && ! array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
             'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
-            'style_skip' => empty($this->changed['php']),
+            'style_skip' => ! $this->flags['ci'] && empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);
     }

@@ -72,7 +72,9 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
+
             if (! empty($location)) { // legacy support, remove when no longer needed
+                /** @phpstan-ignore-next-line */
                 $deviceModel->setLocation($location);
                 optional($deviceModel->location)->save();
             }

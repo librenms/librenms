@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$rrd_name = getPortRrdName($port_id, 'poe');
+$rrd_name = Rrd::portName($port_id, 'poe');
 $rrd_def = RrdDefinition::make()
     ->addDataset('PortPwrAllocated', 'GAUGE', 0)
     ->addDataset('PortPwrAvailable', 'GAUGE', 0)

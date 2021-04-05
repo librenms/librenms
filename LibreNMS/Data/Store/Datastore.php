@@ -35,7 +35,7 @@ class Datastore
      * Initialize and create the Datastore(s)
      *
      * @param array $options
-     * @return DatastoreContract
+     * @return Datastore
      */
     public static function init($options = [])
     {

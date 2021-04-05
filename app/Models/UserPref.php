@@ -29,6 +29,7 @@ class UserPref extends BaseModel
     public $timestamps = false;
     public $incrementing = false;
     protected $table = 'users_prefs';
+    /** @var array */
     protected $primaryKey = ['user_id', 'pref'];
     protected $fillable = ['user_id', 'pref', 'value'];
 
@@ -91,6 +92,7 @@ class UserPref extends BaseModel
      */
     protected function setKeysForSaveQuery($query)
     {
+        /** @var array */
         $keys = $this->getKeyName();
         if (! is_array($keys)) {
             return parent::setKeysForSaveQuery($query);

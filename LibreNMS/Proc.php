@@ -110,7 +110,7 @@ class Proc
      * process is not synchronous
      * If the command isn't terminated with a newline, add one
      *
-     * @param $command
+     * @param string $command
      * @return array
      */
     public function sendCommand($command)
@@ -278,6 +278,7 @@ class Proc
 
     /**
      * If this process waits for output
+     *
      * @return bool
      */
     public function isSynchronous()
@@ -301,7 +302,7 @@ class Proc
      * Add and end of line character to a string if
      * it doesn't already end with one
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     private function checkAddEOL($string)

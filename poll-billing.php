@@ -68,7 +68,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             $port_data['last_out_measurement'] = $last_counters['out_counter'];
             $port_data['last_out_delta'] = $last_counters['out_delta'];
 
-            $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . mres($last_counters['timestamp']) . "')");
+            $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . $last_counters['timestamp'] . "')");
 
             if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['in_measurement'], $tmp_period) - delta_to_bits($port_data['last_in_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
@@ -103,7 +103,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             logfile("Nice, valid counters 'in/out_measurement', lets use them");
             // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
             $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($port_data['in_measurement']), 'out_counter' => (string) set_numeric($port_data['out_measurement']), 'in_delta' => (string) set_numeric($port_data['in_delta']), 'out_delta' => (string) set_numeric($port_data['out_delta'])];
-            if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "' AND `bill_id`='$bill_id'") == 0) {
+            if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . $port_id . "' AND `bill_id`='$bill_id'") == 0) {
                 $fields['bill_id'] = $bill_id;
                 $fields['port_id'] = $port_id;
                 dbInsert($fields, 'bill_port_counters');
@@ -125,7 +125,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $prev_in_delta = $last_data['in_delta'];
         $prev_out_delta = $last_data['out_delta'];
         $prev_timestamp = $last_data['timestamp'];
-        $period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . mres($prev_timestamp) . "')");
+        $period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . $prev_timestamp . "')");
     } else {
         $prev_delta = '0';
         $period = '0';

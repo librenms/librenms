@@ -26,7 +26,7 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '400';
 
-        $mini_graph = overlib_link($proc_url, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+        $mini_graph = \LibreNMS\Util\Url::overlibLink($proc_url, \LibreNMS\Util\Url::lazyGraphTag($graph_array), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
         echo '<td>' . $mini_graph . '</td>';
     } elseif ($hrdevice['hrDeviceType'] == 'hrDeviceNetwork') {
@@ -51,7 +51,7 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width'] = '400';
 
-            $mini_graph = overlib_link(generate_port_url($interface), generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+            $mini_graph = \LibreNMS\Util\Url::overlibLink(generate_port_url($interface), \LibreNMS\Util\Url::lazyGraphTag($graph_array), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
             echo "<td>$mini_graph</td>";
         } else {

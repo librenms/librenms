@@ -31,7 +31,7 @@ $template_id = 0;
 $template_newid = 0;
 $create = true;
 
-$name = mres($vars['name']);
+$name = $vars['name'];
 if (isset($vars['template']) && empty(view(['template' => $vars['template']], [])->__toString())) {
     $message = 'Template failed to be parsed, please check the syntax';
 } elseif (! empty($name)) {

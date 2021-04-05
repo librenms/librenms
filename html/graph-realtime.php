@@ -31,7 +31,7 @@ $ifname = $port['label']; //Interface name that will be showed on top right of g
 $hostname = shorthost($device['hostname']);
 
 if ($_GET['title']) {
-    $ifname = display($_GET['title']);
+    $ifname = \LibreNMS\Util\Clean::html($_GET['title'], []);
 }
 
 /********* Other conf *******/

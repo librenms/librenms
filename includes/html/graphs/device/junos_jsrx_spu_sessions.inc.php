@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'junos_jsrx_spu_sessions');
+$rrd_filename = Rrd::name($device['hostname'], 'junos_jsrx_spu_sessions');
 
 require 'includes/html/graphs/common.inc.php';
 

@@ -1,7 +1,7 @@
 <?php
 
 require 'includes/html/graphs/common.inc.php';
-$rrd_filename = rrd_name($device['hostname'], 'rutos_2xx_mobileDataUsage');
+$rrd_filename = Rrd::name($device['hostname'], 'rutos_2xx_mobileDataUsage');
 $scale_min = 0;
 $colours = 'mixed';
 $unit_text = 'Usage';
@@ -17,7 +17,7 @@ $data_sources = [
     'usage_received' => ['descr' => 'Received', 'colour' => '4096EE'],
 ];
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($data_sources as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

@@ -75,7 +75,7 @@ class Alerta extends Transport
             var_dump("API '$host' returned Error");
             var_dump('Params: ' . $alert_message);
             var_dump('Return: ' . $ret);
-            var_dump('Headers: ' . $headers);
+            var_dump('Headers: ', $headers);
 
             return 'HTTP Status code ' . $code;
         }

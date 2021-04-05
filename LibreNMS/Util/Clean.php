@@ -68,7 +68,7 @@ class Clean
      * Clean a string for display in an html page.
      * For use in non-blade pages
      *
-     * @param $value
+     * @param string $value
      * @param array $purifier_config (key, value pair)
      * @return string
      */

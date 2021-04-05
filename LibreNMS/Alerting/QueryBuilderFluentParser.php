@@ -34,7 +34,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     /**
      * Convert the query builder rules to a Laravel Fluent builder
      *
-     * @return Builder
+     * @return Builder|null
      */
     public function toQuery()
     {

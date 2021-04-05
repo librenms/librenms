@@ -26,9 +26,9 @@ namespace App;
 
 use App\Models\Device;
 use App\Models\Notification;
-use Auth;
 use Cache;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use Toastr;
 

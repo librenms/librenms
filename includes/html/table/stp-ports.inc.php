@@ -1,6 +1,6 @@
 <?php
 
-$device_id = mres($vars['device_id']);
+$device_id = $vars['device_id'];
 
 $param[] = $device_id;
 

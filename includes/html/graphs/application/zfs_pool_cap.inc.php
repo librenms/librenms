@@ -9,10 +9,10 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 15;
 
-$rrd_filename = rrd_name($device['hostname'], ['app', $name, $app['app_id'], $vars['pool']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['pool']]);
 
 $rrd_list = [];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => 'Capacity',

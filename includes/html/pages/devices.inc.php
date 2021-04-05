@@ -29,7 +29,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'list_' . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . generate_url($vars, ['format' => 'list_' . $option]) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['format' => 'list_' . $option]) . '">' . $text . '</a>';
     if ($vars['format'] == 'list_' . $option) {
         $listoptions .= '</span>';
     }
@@ -55,7 +55,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . generate_url($vars, ['format' => 'graph_' . $option, 'from' => '-24hour', 'to' => 'now']) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['format' => 'graph_' . $option, 'from' => '-24hour', 'to' => 'now']) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '</span>';
     }
@@ -65,32 +65,33 @@ foreach ($menu_options as $option => $text) {
 $headeroptions = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
 $type = 'device';
 foreach (get_graph_subtypes($type) as $avail_type) {
-    $display_type = nicecase($avail_type);
+    $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
     if ('graph_' . $avail_type == $vars['format']) {
         $is_selected = 'selected';
     } else {
         $is_selected = '';
     }
-    $headeroptions .= '<option value="' . generate_url($vars, [
-        'format' => 'graph_' . $avail_type,
-        'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
-        'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now'),
-    ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
+    $headeroptions .= '<option value="' .
+        \LibreNMS\Util\Url::generate($vars, [
+            'format' => 'graph_' . $avail_type,
+            'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
+            'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now'),
+        ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == 'hide') {
-    $headeroptions .= '<a href="' . generate_url($vars, ['searchbar' => '']) . '">Restore Search</a>';
+    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => '']) . '">Restore Search</a>';
 } else {
-    $headeroptions .= '<a href="' . generate_url($vars, ['searchbar' => 'hide']) . '">Remove Search</a>';
+    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => 'hide']) . '">Remove Search</a>';
 }
 
 $headeroptions .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == 'yes') {
-    $headeroptions .= '<a href="' . generate_url($vars, ['bare' => '']) . '">Restore Header</a>';
+    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['bare' => '']) . '">Restore Header</a>';
 } else {
-    $headeroptions .= '<a href="' . generate_url($vars, ['bare' => 'yes']) . '">Remove Header</a>';
+    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['bare' => 'yes']) . '">Remove Header</a>';
 }
 
 [$format, $subformat] = explode('_', $vars['format'], 2);
@@ -245,11 +246,11 @@ if ($format == 'graph') {
                 $link_array['type'] = $graph_type;
                 $link_array['device'] = $device['device_id'];
                 unset($link_array['height'], $link_array['width']);
-                $overlib_link = generate_url($link_array);
+                $overlib_link = \LibreNMS\Util\Url::generate($link_array);
 
                 echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
                 echo '<div class="panel panel-default">';
-                echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array_new), generate_graph_tag($graph_array_zoom), null);
+                echo \LibreNMS\Util\Url::overlibLink($overlib_link, \LibreNMS\Util\Url::lazyGraphTag($graph_array_new), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
                 echo "</div></div>\n\n";
             }
         }
@@ -343,21 +344,21 @@ if ($format == 'graph') {
             },
             post: function () {
                 return {
-                    format: ' <?php echo mres($vars['format']); ?>',
+                    format: ' <?php echo $vars['format']; ?>',
                     searchPhrase: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
-                    os: '<?php echo mres($vars['os']); ?>',
-                    version: '<?php echo mres($vars['version']); ?>',
-                    hardware: '<?php echo mres($vars['hardware']); ?>',
-                    features: '<?php echo mres($vars['features']); ?>',
-                    location: '<?php echo mres($vars['location']); ?>',
-                    type: '<?php echo mres($vars['type']); ?>',
-                    state: '<?php echo mres($vars['state']); ?>',
-                    disabled: '<?php echo mres($vars['disabled']); ?>',
-                    ignore: '<?php echo mres($vars['ignore']); ?>',
-                    disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
-                    group: '<?php echo mres($vars['group']); ?>',
-                    poller_group: '<?php echo mres($vars['poller_group']); ?>',
-                    device_id: '<?php echo mres($vars['device_id']); ?>',
+                    os: '<?php echo $vars['os']; ?>',
+                    version: '<?php echo $vars['version']; ?>',
+                    hardware: '<?php echo $vars['hardware']; ?>',
+                    features: '<?php echo $vars['features']; ?>',
+                    location: '<?php echo $vars['location']; ?>',
+                    type: '<?php echo $vars['type']; ?>',
+                    state: '<?php echo $vars['state']; ?>',
+                    disabled: '<?php echo $vars['disabled']; ?>',
+                    ignore: '<?php echo $vars['ignore']; ?>',
+                    disable_notify: '<?php echo $vars['disable_notify']; ?>',
+                    group: '<?php echo $vars['group']; ?>',
+                    poller_group: '<?php echo $vars['poller_group']; ?>',
+                    device_id: '<?php echo $vars['device_id']; ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
@@ -381,8 +382,8 @@ if ($format == 'graph') {
             "<div class='form-group'><select name='location' id='location' class='form-control'></select></div>" +
             "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
             "<input type='submit' class='btn btn-info' value='Search'>" +
-            "<a href='<?php echo generate_url(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
-            "<a href='<?php echo generate_url(['page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']]) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
+            "<a href='<?php echo \LibreNMS\Util\Url::generate(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
+            "<a href='<?php echo \LibreNMS\Util\Url::generate(['page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']]) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
             "</form>" +
             "</div>"
         );

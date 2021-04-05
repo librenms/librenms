@@ -98,6 +98,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
+        /** @var User $user */
         $user->setRememberToken($token);
         $timestamps = $user->timestamps;
         $user->timestamps = false;

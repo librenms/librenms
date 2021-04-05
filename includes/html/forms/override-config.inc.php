@@ -23,9 +23,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit;
 }
 
-$device['device_id'] = mres($_POST['device_id']);
-$attrib = mres($_POST['attrib']);
-$state = mres($_POST['state']);
+$device['device_id'] = $_POST['device_id'];
+$attrib = $_POST['attrib'];
+$state = $_POST['state'];
 $status = 'error';
 $message = 'Error with config';
 

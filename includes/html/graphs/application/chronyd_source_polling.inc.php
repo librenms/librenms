@@ -4,7 +4,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $colours = 'mixed';
 $nototal = (($width < 224) ? 1 : 0);
-$rrd_filename = rrd_name($device['hostname'], ['app', 'chronyd', $app['app_id'], $vars['source']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app['app_id'], $vars['source']]);
 $array = [
     'polling_rate'          => ['descr' => 'Polling rate'],
     'last_rx'               => ['descr' => 'Last RX'],
@@ -14,7 +14,7 @@ $array = [
 ];
 
 $rrd_list = [];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];
