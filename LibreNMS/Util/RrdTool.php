@@ -4,7 +4,6 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use LibreNMS\Config;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Data\Store\Rrd;
 
 
