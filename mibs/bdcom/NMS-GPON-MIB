@@ -1,0 +1,3292 @@
+NMS-GPON-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,BITS
+            FROM SNMPv2-SMI
+        
+     	Gauge,TimeTicks
+      		FROM RFC1155-SMI
+                  
+        DisplayString,ifIndex,ifDescr,PhysAddress
+			FROM RFC1213-MIB
+        nms
+            FROM NMS-SMI 
+        PhysAddress, RowStatus 
+            FROM SNMPv2-TC;
+                        
+nmsGponMIB  MODULE-IDENTITY
+        LAST-UPDATED    "201511300000Z"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+                "nmsGponProfile management group."
+        ::= { nms 10 }
+
+--nmsGponOltObj OLT任务 OID:1.3.6.1.4.1.3320.10.1
+        
+nmsGponOltObj   OBJECT IDENTIFIER ::= { nmsGponMIB 1 }  
+        
+-- 全局配置表
+
+gponOltConfigTable   OBJECT IDENTIFIER ::= { nmsGponOltObj 1 }  
+
+gponOltConfigEntry   OBJECT IDENTIFIER ::= { gponOltConfigTable 1 }  
+               
+                 
+          gponOnuAuthenticationMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			serial-number-only(1),
+              			serial-number-and-password(2),
+              			disable(3)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Authentication method:1 Serial number only, 2 Serial number and password, 3 Disabled, so all ONU/ONTs
+                       are allowed to be activated always. When this option is selected. Default value is 3."
+              ::= { gponOltConfigEntry 1 }
+                 
+          gponBroadcastGEMPort OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "GEM port for incidental broadcast traffic. Set to 0, if no dedicated GEM port is needed for broadcast
+                       traffic and broadcast traffic will be sent on unicast GEM ports."
+              ::= { gponOltConfigEntry 2 }
+                 
+          gponEncryption OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			disable(0),
+              			enable(1)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "GPON encryption switch.1-Enable  0-Disable. Default value is 0."
+              ::= { gponOltConfigEntry 3 }
+                 
+          gponKeyExchangeInterval OBJECT-TYPE
+              SYNTAX  INTEGER(1..3600)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Key exchange interval in milliseconds.1-3600. Default value is 3600."
+              ::= { gponOltConfigEntry 4 }
+                 
+
+--nmsGponOltPonPortObj PON端口任务 OID:1.3.6.1.4.1.3320.10.2
+
+--PON端口配置表
+
+nmsGponOltPonPortObj  OBJECT IDENTIFIER ::= { nmsGponMIB 2 }  
+
+             gponOltPonPortConfigTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOltPonPortConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config table."
+                 ::= { nmsGponOltPonPortObj 1 }
+
+             gponOltPonPortConfigEntry OBJECT-TYPE
+                 SYNTAX GponOltPonPortConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config ."
+                 INDEX { gponOltPonPortPortIndex }
+             ::= { gponOltPonPortConfigTable 1 }
+
+             GponOltPonPortConfigEntry ::=
+                 SEQUENCE {
+                     gponOltPonPortPortIndex
+                         INTEGER,
+                     gponOltPonPortPortAdminStatus
+                         INTEGER,
+                     gponOltPonPortOnuDiscoveryMode 
+                         INTEGER,
+                     gponOltPonPortPortActiveOnuNum
+                         INTEGER,   
+                     gponOltPonPortPortInactiveOnuNum 
+                         INTEGER,
+                     gponOltPonPortPortLlidIfIndexString
+                         OCTET STRING                      
+                 }
+                 
+                 
+          gponOltPonPortPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, PON port INDEX."
+              ::= { gponOltPonPortConfigEntry 1 }
+
+          gponOltPonPortPortAdminStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		       no-shutdown(1),
+              		       shutdown(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1-No shutdown 2-shutdown."
+              ::= { gponOltPonPortConfigEntry 2 }
+
+          gponOltPonPortOnuDiscoveryMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		       period(1),
+              		       manual(2),
+              		       disable(3)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU discovery mode: 1 Auto periodic (onuDiscoveryInterval is the period),2 Manual enabled once
+                       then disabled, 3 Disabled,  "
+              ::= { gponOltPonPortConfigEntry 3 }
+
+          gponOltPonPortPortActiveOnuNum OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU count of this pon port which is in active status ."
+              ::= { gponOltPonPortConfigEntry 4 }
+
+          gponOltPonPortPortInactiveOnuNum OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU count of this pon port which is in inactive status ."
+              ::= { gponOltPonPortConfigEntry 5 }
+
+          gponOltPonPortPortLlidIfIndexString OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "For diID of this PON port is 32, 33, 34. This string should be writed as '32,33,34'. "
+              ::= { gponOltPonPortConfigEntry 6 }
+
+
+--OLT PON端口光功率
+
+             gponOltPonPortOpticalParameterTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOltPonPortOpticalParameterEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config table."
+                 ::= { nmsGponOltPonPortObj 2 }
+
+             gponOltPonPortOpticalParameterEntry OBJECT-TYPE
+                 SYNTAX GponOltPonPortOpticalParameterEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config ."
+                 INDEX { gponOltPonPortOpticalParameterPortIndex }
+             ::= { gponOltPonPortOpticalParameterTable 1 }
+
+             GponOltPonPortOpticalParameterEntry ::=
+                 SEQUENCE {
+                     gponOltPonPortOpticalParameterPortIndex
+                         INTEGER,
+                     gponOltPonPortOpticalParameterTemperature
+                         INTEGER,
+                     gponOltPonPortOpticalParameterVoltage 
+                         INTEGER,
+                     gponOltPonPortOpticalParameterCurrent
+                         INTEGER,   
+                     gponOltPonPortOpticalParameterTxPower 
+                         INTEGER
+                 }
+                 
+                 
+          gponOltPonPortOpticalParameterPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, PON port INDEX."
+              ::= { gponOltPonPortOpticalParameterEntry 1 }
+
+          gponOltPonPortOpticalParameterTemperature OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterEntry 2 }
+
+          gponOltPonPortOpticalParameterVoltage OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterEntry 3 }
+
+          gponOltPonPortOpticalParameterCurrent OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterEntry 4 }
+
+          gponOltPonPortOpticalParameterTxPower OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterEntry 5 }
+
+--OLT PON端口接收光功率
+
+             gponOltPonPortOpticalRxPowerTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOltPonPortOpticalRxPowerEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config table."
+                 ::= { nmsGponOltPonPortObj 3 }
+
+             gponOltPonPortOpticalRxPowerEntry OBJECT-TYPE
+                 SYNTAX GponOltPonPortOpticalRxPowerEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config ."
+                 INDEX { gponOltPonPortOpticalRxPowerPortIndex }
+             ::= { gponOltPonPortOpticalRxPowerTable 1 }
+
+             GponOltPonPortOpticalRxPowerEntry ::=
+                 SEQUENCE {
+                     gponOltPonPortOpticalRxPowerPortIndex
+                         INTEGER,
+                     gponOltPonPortOpticalRxPowerLinkStatus
+                         INTEGER,
+                     gponOltPonPortOpticalRxPowerRxPower 
+                         INTEGER
+                 }
+                 
+                 
+          gponOltPonPortOpticalRxPowerPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, PON port INDEX."
+              ::= { gponOltPonPortOpticalRxPowerEntry 1 }
+
+          gponOltPonPortOpticalRxPowerLinkStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               link-up(1),
+                               link-down(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalRxPowerEntry 2 }
+
+          gponOltPonPortOpticalRxPowerRxPower OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The rx power of optical module. The unit is 0.1DBm."
+              ::= { gponOltPonPortOpticalRxPowerEntry 3 }
+
+
+--OLT PON端口光功率告警
+
+             gponOltPonPortOpticalParameterAlarmTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOltPonPortOpticalParameterAlarmEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config table."
+                 ::= { nmsGponOltPonPortObj 4 }
+
+             gponOltPonPortOpticalParameterAlarmEntry OBJECT-TYPE
+                 SYNTAX GponOltPonPortOpticalParameterAlarmEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port Config ."
+                 INDEX { gponOltPonPortPowerAlarmIndex }
+             ::= { gponOltPonPortOpticalParameterAlarmTable 1 }
+
+             GponOltPonPortOpticalParameterAlarmEntry ::=
+                 SEQUENCE {
+                     gponOltPonPortPowerAlarmIndex
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmUpLimitEnable
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmUpLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmUpLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmLowLimitEnable
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmLowLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmLowLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortTemperatureAlarmUpLimitEnable
+                         INTEGER,
+                     gponOltPonPortTemperatureAlarmUpLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortTemperatureAlarmUpLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortTemperatureAlarmLowLimitEnable
+                         INTEGER,
+                     gponOltPonPortTemperatureAlarmLowLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortTemperatureAlarmLowLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortVoltageAlarmUpLimitEnable
+                         INTEGER,
+                     gponOltPonPortTxPowerAlarmUpLimitThreshold 
+                         INTEGER,    
+                     gponOltPonPortVoltageAlarmUpLimitThreshold  
+                         INTEGER, 
+                     gponOltPonPortVoltageAlarmUpLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortVoltageAlarmLowLimitEnable
+                         INTEGER,
+                     gponOltPonPortVoltageAlarmLowLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortVoltageAlarmLowLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortCurrentAlarmUpLimitEnable
+                         INTEGER,
+                     gponOltPonPortCurrentAlarmUpLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortCurrentAlarmUpLimitClearThreshold
+                         INTEGER,
+                     gponOltPonPortCurrentAlarmLowLimitEnable
+                         INTEGER,
+                     gponOltPonPortCurrentAlarmLowLimitThreshold 
+                         INTEGER,
+                     gponOltPonPortCurrentAlarmLowLimitClearThreshold 
+                         INTEGER
+                 }
+                                 
+          gponOltPonPortPowerAlarmIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, PON port INDEX."
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 1 }
+
+          gponOltPonPortTxPowerAlarmUpLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, PON port INDEX."
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 2 }
+
+          gponOltPonPortTxPowerAlarmUpLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 3 }
+
+          gponOltPonPortTxPowerAlarmUpLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 4 }
+
+          gponOltPonPortTxPowerAlarmLowLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, PON port INDEX."
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 5 }
+
+          gponOltPonPortTxPowerAlarmLowLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 6 }
+
+          gponOltPonPortTxPowerAlarmLowLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 7 }
+
+          gponOltPonPortTemperatureAlarmUpLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 8 }
+
+          gponOltPonPortTemperatureAlarmUpLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 9 }
+
+          gponOltPonPortTemperatureAlarmUpLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 10 }
+
+          gponOltPonPortTemperatureAlarmLowLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 11 }
+
+          gponOltPonPortTemperatureAlarmLowLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 12 }
+
+          gponOltPonPortTemperatureAlarmLowLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 13 }
+
+          gponOltPonPortVoltageAlarmUpLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 14 }
+
+          gponOltPonPortVoltageAlarmUpLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 15 }
+
+          gponOltPonPortVoltageAlarmUpLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 16 }
+
+          gponOltPonPortVoltageAlarmLowLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 17 }
+
+          gponOltPonPortVoltageAlarmLowLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 18 }
+
+          gponOltPonPortVoltageAlarmLowLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 19 }
+
+          gponOltPonPortCurrentAlarmUpLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 20 }
+
+          gponOltPonPortCurrentAlarmUpLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 21 }
+
+          gponOltPonPortCurrentAlarmUpLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 22 }
+
+          gponOltPonPortCurrentAlarmLowLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 23 }
+
+          gponOltPonPortCurrentAlarmLowLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 24 }
+
+          gponOltPonPortCurrentAlarmLowLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonPortOpticalParameterAlarmEntry 25 }
+
+
+--OLT PON端口光功率告警陷阱
+--gponOltPonSfpParameterAlarmTrap  OID:1.3.6.1.4.1.3320.10.2.5
+
+ 	gponOltPonSfpParameterAlarmTrap OBJECT IDENTIFIER
+                                ::= { nmsGponOltPonPortObj 5 }
+
+          gponOltPonSfpParameterAlarmStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              above(1),
+                              below(2),
+                              normal(3)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { gponOltPonSfpParameterAlarmTrap 1 }
+
+	gponOltPonSfpParameterAlarmNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ifIndex,
+                       ifDescr,
+                       gponOltPonSfpParameterAlarmStatus,
+                       gponOltPonPortOpticalParameterTemperature,
+                       gponOltPonPortOpticalParameterVoltage,
+                       gponOltPonPortOpticalParameterCurrent,
+                       gponOltPonPortOpticalParameterTxPower
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when alarm was triggered ."
+    		::= { gponOltPonSfpParameterAlarmTrap 2 }
+             
+--PON口与ONU绑定关系表
+
+--gponOltONUBindTable  OID:1.3.6.1.4.1.3320.10.2.6
+
+             gponOltONUBindTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOltONUBindEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port and onu binding table."
+                 ::= { nmsGponOltPonPortObj 6 }
+
+             gponOltONUBindEntry OBJECT-TYPE
+                 SYNTAX GponOltONUBindEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon Olt Pon Port and onu binding entry ."
+                 INDEX { gponOltONUBindPortIndex }
+             ::= { gponOltONUBindTable 1 }
+
+             GponOltONUBindEntry ::=
+                 SEQUENCE {
+                     gponOltONUBindPortIndex
+                         INTEGER,
+                     gponOltONUBindONUId
+                         INTEGER,
+                     gponOltONUBindSN 
+                         INTEGER,
+                      gponOltONUBindPassword 
+                         INTEGER,
+                     gponOltONUBindRowStatus 
+                         RowStatus
+                      
+                 }
+                 
+                 
+          gponOltONUBindPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Pon port diID."
+              ::= { gponOltONUBindEntry 1 }
+
+          gponOltONUBindONUId OBJECT-TYPE
+              SYNTAX  INTEGER(1..128)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU ID (1-128)."
+              ::= { gponOltONUBindEntry 2 }
+
+          gponOltONUBindSN OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Serial number of ONU."
+              ::= { gponOltONUBindEntry 3 }
+
+          gponOltONUBindPassword OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Password."
+              ::= { gponOltONUBindEntry 4 }
+
+          gponOltONUBindRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "."
+              ::= { gponOltONUBindEntry 5 }
+
+
+--nmsGponONUObj ONU任务 OID:1.3.6.1.4.1.3320.10.3
+
+nmsGponONUObj   OBJECT IDENTIFIER ::= { nmsGponMIB 3 }  
+
+-- ONU基本信息表
+
+             gponOnuInfoTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOnuInfoEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "GPON onu information table."
+                 ::= { nmsGponONUObj 1 }
+
+             gponOnuInfoEntry OBJECT-TYPE
+                 SYNTAX GponOnuInfoEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon onu information table."
+                 INDEX { gponONUInfoDeviceIndex }
+             ::= { gponOnuInfoTable 1 }
+
+             GponOnuInfoEntry ::=
+                 SEQUENCE {
+                      gponONUInfoDeviceIndex
+                         INTEGER,
+                      onuVendorID
+                         OCTET STRING,
+                      onuVersion 
+                         OCTET STRING,
+                      onuSerialNum 
+                         OCTET STRING,
+                      onuTrafficManagementOption 
+                         INTEGER,
+                      onuBatteryBackup 
+                         INTEGER,
+                      onuAdminState 
+                         INTEGER,
+                      onuOperationalState 
+                         INTEGER,
+                      onuEquipmentID 
+                         OCTET STRING,
+                      onuOMCCVersion 
+                         INTEGER,
+                      onuHardwareType 
+                         INTEGER,
+                      onuHardwareRevision 
+                         INTEGER,
+                      onuSecurityCapability 
+                         INTEGER,
+                      onuSecurityMode 
+                         INTEGER,
+                      onuTotalPriorityQueueNumber 
+                         INTEGER,
+                      onuTotalTrafficSchedulerNumber 
+                         INTEGER,
+                      onuTotalGEMPortNumber 
+                         INTEGER,
+                      onuTotalPOTSUNInumber 
+                         INTEGER,
+                      onuSysUpTime 
+                         INTEGER,
+                      onuImageInstance0Version 
+                         OCTET STRING,
+                      onuImageInstance0Valid 
+                         INTEGER,
+                      onuImageInstance0Activate 
+                         INTEGER,
+                      onuImageInstance0Commit 
+                         INTEGER,
+                      onuImageInstance1Version 
+                         OCTET STRING,
+                      onuImageInstance1Valid 
+                         INTEGER,
+                      onuImageInstance1Activate 
+                         INTEGER,
+                      onuImageInstance1Commit 
+                         INTEGER,
+                      onuInfoOonuMacAddress 
+                         PhysAddress,
+                      onuFastLeaveCapability 
+                         INTEGER,
+                      onuPiggybackDbaRep 
+                         INTEGER,
+                      onuWholeOnuDbaRep 
+                         INTEGER,
+                      onuProtectionMode 
+                         INTEGER,
+                      onuDistance 
+                         INTEGER,
+                      onuSwdlState 
+                         INTEGER,
+                     onuDeActiveReason 
+                         INTEGER
+                      
+                 }
+                 
+                 
+          gponONUInfoDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Pon port diID."
+              ::= { gponOnuInfoEntry 1 }
+
+          onuVendorID OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "This attribute identifies the vendor of the ONT. It is the same as the four most significant
+                       bytes of the ONT serial number (4 bytes). "
+              ::= { gponOnuInfoEntry 2 }
+
+          onuVersion OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "This attribute identifies the version of the ONT as defined by the vendor. Then character
+                       value“0” indicates that version information is not available or applicable.(14 bytes) "
+              ::= { gponOnuInfoEntry 3 }
+
+          onuSerialNum OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The serial number is unique for each ONT. It contains the vendor id and version number in
+                       hexadecimal format. "
+              ::= { gponOnuInfoEntry 4 }
+
+          onuTrafficManagementOption OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               priority-controlled(0),
+                               rate-controlled(1),
+                               priority-and-rate-controlled(2)
+                              }
+              
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "This attribute identifies the upstream traffic management function implemented in the ONT. 
+                      There are two options: 0 Priority controlled and flexibly scheduled upstream traffic. The 
+                      traffic scheduler and priority queue mechanism are used for upstream traffic. 1 Rate controlled
+                       upstream traffic. The maximum upstream traffic of each individual connection is guaranteed .2
+                        Priority and rate controlled. The traffic scheduler and priority queue mechanism are used for 
+                        upstream traffic. The maximum upstream traffic of each individual connection is guaranteed by 
+                        shaping. "
+              ::= { gponOnuInfoEntry 5 }
+
+          onuBatteryBackup OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "his Boolean attribute specifies whether the ONT/NT supports backup battery monitoring. False
+                       disables battery alarm monitoring; True enables battery alarm monitoring. (1 byte). Default 
+                       value is false. "
+              ::= { gponOnuInfoEntry 6 }
+
+          onuAdminState OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               noshutdown-unlocks(1),
+                               shutdown-locks(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1 No shutdown/unlocks, 2 Shutdown/locks. "
+              ::= { gponOnuInfoEntry 7 }
+
+          onuOperationalState OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               enable(1),
+                               disable(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1 Enabled 2 Disable."
+              ::= { gponOnuInfoEntry 8 }
+
+          onuEquipmentID OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "This attribute may be used to identify the specific type of ONT. "
+              ::= { gponOnuInfoEntry 9 }
+
+          onuOMCCVersion OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 10 }
+
+          onuHardwareType OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 11 }
+
+          onuHardwareRevision OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 12 }
+
+          onuSecurityCapability OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 13 }
+
+          onuSecurityMode OBJECT-TYPE
+              SYNTAX  INTEGER(1..255)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "This attribute specifies the current security mode of the ONT. All secure
+                       GEM ports in an ONT must use the same security mode at any given time. The
+                       following codepoints are defined: 1 Reserved 2 AES algorithm 3..255 Reserved. "
+              ::= { gponOnuInfoEntry 14 }
+
+          onuTotalPriorityQueueNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 15 }
+
+          onuTotalTrafficSchedulerNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 16 }
+
+          onuTotalGEMPortNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 17 }
+
+          onuTotalPOTSUNInumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 18 }
+
+          onuSysUpTime OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 19 }
+
+          onuImageInstance0Version OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 20 }
+
+          onuImageInstance0Valid OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 21 }
+
+          onuImageInstance0Activate OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 22 }
+
+          onuImageInstance0Commit OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 23 }
+
+          onuImageInstance1Version OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 24 }
+
+          onuImageInstance1Valid OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 25 }
+
+          onuImageInstance1Activate OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 26 }
+
+          onuImageInstance1Commit OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               true(1),
+                               false(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 27 }
+
+          onuInfoOonuMacAddress OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 28 }
+
+          onuFastLeaveCapability OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 29 }
+
+          onuPiggybackDbaRep OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 30 }
+
+          onuWholeOnuDbaRep OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 31 }
+
+          onuProtectionMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               type-b-scheme(1),
+                               type-c-scheme(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indicates Protection scheme, (1) for Type-B scheme and (2) for Type-C scheme. "
+              ::= { gponOnuInfoEntry 32 }
+
+          onuDistance OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 33 }
+
+          onuSwdlState OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 34 }
+
+          onuDeActiveReason OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuInfoEntry 35 }
+
+--ONU 管理表
+
+--gponOnuConfigTable  OID:1.3.6.1.4.1.3320.10.3.2
+
+             gponOnuConfigTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOnuConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon  onu configuration table."
+                 ::= { nmsGponONUObj 2 }
+
+             gponOnuConfigEntry OBJECT-TYPE
+                 SYNTAX GponOnuConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon onu configuration entry ."
+                 INDEX { gponOnuConfigDeviceIndex }
+             ::= { gponOnuConfigTable 1 }
+
+             GponOnuConfigEntry ::=
+                 SEQUENCE {
+                     gponOnuConfigDeviceIndex
+                         INTEGER,
+                     gponOnuConfigActicate
+                         INTEGER,
+                     gponOnuConfigEnable 
+                         INTEGER,
+                      gponOnuConfigReboot 
+                         INTEGER,
+                      gponOnuConfigEnablePM 
+                         INTEGER,
+                      gponOnuConfigFlowProfileID 
+                         INTEGER,
+                      gponOnuConfigTcontVirPortBindingProfileID 
+                         INTEGER,
+                      gponOnuConfigOnuProfileID 
+                         INTEGER,
+                     gponOnuConfigUsMapProfileID 
+                         INTEGER
+                 }
+                 
+          gponOnuConfigDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "GPON ONU device configuration index."
+              ::= { gponOnuConfigEntry 1 }
+
+          gponOnuConfigActicate OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               acticate(1),
+                               deacticate(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1-Acticate；2-Deacticate"
+              ::= { gponOnuConfigEntry 2 }
+
+          gponOnuConfigEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               enable(1),
+                               disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1-Enable；2-Disable."
+              ::= { gponOnuConfigEntry 3 }
+
+          gponOnuConfigReboot OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               reboot(1)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "reboot(1)."
+              ::= { gponOnuConfigEntry 4 }
+
+          gponOnuConfigEnablePM OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               enable(1),
+                               disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuConfigEntry 5 }
+
+          gponOnuConfigFlowProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The profileIndex corresponding to ONU Flow Profile Table. 0 means invalid. Default value is 1."
+              ::= { gponOnuConfigEntry 6 }
+
+          gponOnuConfigTcontVirPortBindingProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "It points to the associated T-CONT and virtual port binding profile index. 0 means invalid."
+              ::= { gponOnuConfigEntry 7 }
+
+          gponOnuConfigOnuProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuConfigEntry 8 }
+
+          gponOnuConfigUsMapProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuConfigEntry 9 }
+
+
+--ONU 状态表        
+--gponOnuStatusTable  OID:1.3.6.1.4.1.3320.10.3.3
+
+             gponOnuStatusTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOnuStatusEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon  onu status table."
+                 ::= { nmsGponONUObj 3 }
+
+             gponOnuStatusEntry OBJECT-TYPE
+                 SYNTAX GponOnuStatusEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon onu status entry ."
+                 INDEX { gponOnuStatusDeviceIndex }
+             ::= { gponOnuStatusTable 1 }
+
+             GponOnuStatusEntry ::=
+                 SEQUENCE {
+                     gponOnuStatusDeviceIndex
+                         INTEGER,
+                     gponOnuStatusOnuSn 
+                         INTEGER,
+                     gponOnuStatusPonPortID 
+                         INTEGER,
+                     gponOnuStatusOnuStatus 
+                         INTEGER
+                 }
+                 
+          gponOnuStatusDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuStatusEntry 1 }
+
+          gponOnuStatusOnuSn OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuStatusEntry 2 }
+
+          gponOnuStatusPonPortID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuStatusEntry 3 }
+
+          gponOnuStatusOnuStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              authenticated(0),
+                              registered(1),
+                              deregistered(2),
+                              auto-config(3),
+                              lost(4),
+                              standby(5)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuStatusEntry 4 }
+
+--ONU PON口光功率
+
+--gponOnuOpticalPowerTable  OID:1.3.6.1.4.1.3320.10.3.4
+
+             gponOnuOpticalPowerTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOnuOpticalPowerEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon  onu pon port power table."
+                 ::= { nmsGponONUObj 4 }
+
+             gponOnuOpticalPowerEntry OBJECT-TYPE
+                 SYNTAX GponOnuOpticalPowerEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon onu pon port power entry ."
+                 INDEX { gponOnuOpticalPowerDeviceIndex }
+             ::= { gponOnuOpticalPowerTable 1 }
+
+             GponOnuOpticalPowerEntry ::=
+                 SEQUENCE {
+                     gponOnuOpticalPowerDeviceIndex
+                         INTEGER,
+                     gponOnuOpticalPowerRxPower 
+                         INTEGER,
+                     gponOnuOpticalPowerTxPower 
+                         INTEGER
+                 }
+                 
+          gponOnuOpticalPowerDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalPowerEntry 1 }
+
+          gponOnuOpticalPowerRxPower OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalPowerEntry 2 }
+
+          gponOnuOpticalPowerTxPower OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalPowerEntry 3 }
+
+
+
+
+
+
+
+
+--ONU PON口光功率告警
+--gponOnuOpticalParameterAlarmTable  OID:1.3.6.1.4.1.3320.10.3.5
+
+             gponOnuOpticalParameterAlarmTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOnuOpticalParameterAlarmEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon  onu status table."
+                 ::= { nmsGponONUObj 5 }
+
+             gponOnuOpticalParameterAlarmEntry OBJECT-TYPE
+                 SYNTAX GponOnuOpticalParameterAlarmEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "gpon onu status entry ."
+                 INDEX { gponOnuOpticalParameterAlarmDeviceIndex }
+             ::= { gponOnuOpticalParameterAlarmTable 1 }
+
+             GponOnuOpticalParameterAlarmEntry ::=
+                 SEQUENCE {
+                     gponOnuOpticalParameterAlarmDeviceIndex
+                         INTEGER,
+                     gponOnuOpticalTxPowerAlarmUpLimitEnable 
+                         INTEGER,
+                     gponOnuOpticalTxPowerAlarmUpLimitThreshold 
+                         INTEGER,
+                      gponOnuOpticalTxPowerAlarmUpLimitClearThreshold 
+                         INTEGER,
+                     gponOnuOpticalTxPowerAlarmUpLimitRowStatus 
+                         RowStatus,
+                     gponOnuOpticalTxPowerAlarmLowLimitEnable 
+                         INTEGER,
+                     gponOnuOpticalTxPowerAlarmLowLimitThreshold 
+                         INTEGER,
+                     gponOnuOpticalTxPowerAlarmLowLimitClearThreshold 
+                         INTEGER,
+                     gponOnuOpticalTxPowerAlarmLowLimitRowStatus 
+                         RowStatus,
+                     gponOnuOpticalRxPowerAlarmUpLimitEnable 
+                         INTEGER,
+                     gponOnuOpticalRxPowerAlarmUpLimitThreshold 
+                         INTEGER,
+                     gponOnuOpticalRxPowerAlarmUpLimitClearThreshold 
+                         INTEGER,
+                     gponOnuOpticalRxPowerAlarmUpLimitRowStatus 
+                         RowStatus,
+                     gponOnuOpticalRxPowerAlarmLowLimitEnable 
+                         INTEGER,
+                     gponOnuOpticalRxPowerAlarmLowLimitThreshold 
+                         INTEGER,
+                     gponOnuOpticalRxPowerAlarmLowLimitClearThreshold 
+                         INTEGER,
+                    gponOnuOpticalRxPowerAlarmLowLimitRowStatus 
+                         RowStatus
+                 }
+                 
+          gponOnuOpticalParameterAlarmDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 1 }
+
+          gponOnuOpticalTxPowerAlarmUpLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 2 }
+
+          gponOnuOpticalTxPowerAlarmUpLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 3 }
+
+          gponOnuOpticalTxPowerAlarmUpLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 4 }
+
+          gponOnuOpticalTxPowerAlarmUpLimitRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 5 }
+
+          gponOnuOpticalTxPowerAlarmLowLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 6 }
+
+          gponOnuOpticalTxPowerAlarmLowLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 7 }
+
+          gponOnuOpticalTxPowerAlarmLowLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 8 }
+
+          gponOnuOpticalTxPowerAlarmLowLimitRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 9 }
+
+          gponOnuOpticalRxPowerAlarmUpLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 10 }
+
+          gponOnuOpticalRxPowerAlarmUpLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 11 }
+
+          gponOnuOpticalRxPowerAlarmUpLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 12 }
+
+          gponOnuOpticalRxPowerAlarmUpLimitRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 13 }
+
+          gponOnuOpticalRxPowerAlarmLowLimitEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 14 }
+
+          gponOnuOpticalRxPowerAlarmLowLimitThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 15 }
+
+          gponOnuOpticalRxPowerAlarmLowLimitClearThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 16 }
+
+          gponOnuOpticalRxPowerAlarmLowLimitRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuOpticalParameterAlarmEntry 17 }
+
+--ONU PON口光功率告警陷阱
+
+	gponOnuSfpParameterAlarmTrap OBJECT IDENTIFIER
+                                ::= { nmsGponONUObj 6 }
+                                
+                                
+          gponOnuSfpParameterAlarmStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               above(1),
+                               below(2),
+                               normal(3)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuSfpParameterAlarmTrap 1 }
+
+                                
+
+
+	gponOnuSfpParameterAlarmNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ifIndex,
+                       ifDescr,
+                       onuSerialNum,
+                       gponOnuSfpParameterAlarmStatus,
+                       gponOnuOpticalPowerRxPower,
+                       gponOnuOpticalPowerTxPower
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when ONU SFP parameter alarms ."
+    		::= { gponOnuSfpParameterAlarmTrap 2 }
+
+
+-- ONU 状态变化陷阱 
+ 
+	gponOnuStatusAlarmTrap OBJECT IDENTIFIER
+                                ::= { nmsGponONUObj 7 }
+                                
+                                
+          gponOnuStatusChange OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              discovered(1),
+                              activated(2),
+                              deactivated(3),
+                              disable-conplete(4)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuStatusAlarmTrap 1 }
+
+                                
+
+
+	gponOnuStatusChangeNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ifIndex,
+                       ifDescr,
+                       onuSerialNum,
+                       gponOnuStatusChange 
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when ONU status change alarms ."
+    		::= { gponOnuStatusAlarmTrap 2 }
+ 
+-- ONU Dying Gasp陷阱
+
+	gponOnuDyingGaspAlarmTrap OBJECT IDENTIFIER
+                                ::= { nmsGponONUObj 8 }
+                                
+                                
+          gponOnuDyingGaspStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              true(1),
+                              false(2)
+    		}
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { gponOnuDyingGaspAlarmTrap 1 }
+
+                                
+
+
+	gponOnuDyingGaspNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ifIndex,
+                       ifDescr,
+                       onuSerialNum,
+                       gponOnuDyingGaspStatus 
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when ONU status change alarms ."
+    		::= { gponOnuDyingGaspAlarmTrap 2 }
+
+-- ONU批量升级
+
+             gponOnuBatchUpdateTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF GponOnuBatchUpdateEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu batch update table."
+                 ::= { nmsGponONUObj 9 }
+
+             gponOnuBatchUpdateEntry OBJECT-TYPE
+                 SYNTAX GponOnuBatchUpdateEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu batch update table entry."
+                 INDEX { gponOnuBatchUpdateLLIDs }
+             ::= { gponOnuBatchUpdateTable 1 }
+
+             GponOnuBatchUpdateEntry ::=
+                 SEQUENCE {
+                     gponOnuBatchUpdateLLIDs
+                         OCTET STRING,
+                     gponOnuBatchUpdateFileName
+                         OCTET STRING,
+                     gponOnuBatchUpdateAction
+                         INTEGER,
+                     gponOnuBatchUpdateResult
+                         INTEGER
+            }
+                 
+                 
+          gponOnuBatchUpdateLLIDs OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  write-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU LLID list, which defines the ONU to be updated."
+              ::= { gponOnuBatchUpdateEntry 1 }
+
+                 
+          gponOnuBatchUpdateFileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  write-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The file name in OLT flash, which is ONU bin file and must be existed."
+              ::= { gponOnuBatchUpdateEntry 2 }
+
+                 
+          gponOnuBatchUpdateAction OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               no-action(0),
+                               action(1)
+                             }
+              ACCESS  write-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The update operation indication. 0-no action for update 1-action for update."
+              ::= { gponOnuBatchUpdateEntry 3 }
+
+                 
+          gponOnuBatchUpdateResult OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               success(0),
+                               processing(1),
+                               other(2)
+                               }
+              ACCESS  write-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The result for update. 0-success 1-processing 2-other result values and reserved for system."
+              ::= { gponOnuBatchUpdateEntry 4 }
+
+ 
+--nmsGponUNIPortObj UNI端口任务 OID:1.3.6.1.4.1.3320.10.4
+
+nmsGponUNIPortObj   OBJECT IDENTIFIER ::= { nmsGponMIB 4 }  
+
+-- UNI端口配置表
+
+             onuUniPortConfigTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuUniPortConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu UNI port config table."
+                 ::= { nmsGponUNIPortObj 1 }
+
+             onuUniPortConfigEntry OBJECT-TYPE
+                 SYNTAX OnuUniPortConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu UNI port config table entry."
+                 INDEX { onuUniPortConfigDeviceIndex, onuUniPortConfigPortIndex }
+             ::= { onuUniPortConfigTable 1 }
+
+             OnuUniPortConfigEntry ::=
+                 SEQUENCE {
+                     onuUniPortConfigDeviceIndex
+                         INTEGER,
+                     onuUniPortConfigPortIndex
+                         INTEGER,
+                     onuUniPortConfigAdminState
+                         INTEGER,
+                     onuUniPortConfigOperationalState
+                         INTEGER,
+                     onuUniPortConfigEthernetProfileID
+                         INTEGER,
+                     onuUniPortConfigOnuVLANTranslationProfileID
+                         INTEGER,
+                     onuUniPortConfigRowStatus
+                         RowStatus
+            }
+                 
+                 
+          onuUniPortConfigDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortConfigEntry 1 }
+
+
+          onuUniPortConfigPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortConfigEntry 2 }
+
+          onuUniPortConfigAdminState OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               no-shutdown(1),
+                               shutdown(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1-No shutdown  2-Shutdown "
+              ::= { onuUniPortConfigEntry 3 }
+
+          onuUniPortConfigOperationalState OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               enable(1),
+                               disable(2)
+                             }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1-enable 2-disable"
+              ::= { onuUniPortConfigEntry 4 }
+
+          onuUniPortConfigEthernetProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "It points to the associated Ethernet UNI profile. 0 means cancel profile config. 
+                      Default value is 0."
+              ::= { onuUniPortConfigEntry 5 }
+
+          onuUniPortConfigOnuVLANTranslationProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "It stores the profileIndex of the associated ONU VLAN translation profile.0 means cancel
+                       profile config. Default value is 0. "
+              ::= { onuUniPortConfigEntry 6 }
+
+          onuUniPortConfigRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortConfigEntry 7 }
+
+-- UNI端口报文统计表
+
+             onuUniPortStatisticTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuUniPortStatisticEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu UNI port config table."
+                 ::= { nmsGponUNIPortObj 2 }
+
+             onuUniPortStatisticEntry OBJECT-TYPE
+                 SYNTAX OnuUniPortStatisticEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu UNI port config table entry."
+                 INDEX { onuUniPortStatisticDeviceIndex, onuUniPortStatisticUniPortIndex }
+             ::= { onuUniPortStatisticTable 1 }
+
+             OnuUniPortStatisticEntry ::=
+                 SEQUENCE {
+                     onuUniPortStatisticDeviceIndex
+                         INTEGER,
+                     onuUniPortStatisticUniPortIndex
+                         INTEGER,
+                     onuUniPortStatisticRxTotalFrames
+                         INTEGER,
+                     onuUniPortStatisticTxTotalFrames
+                         INTEGER,
+                     onuUniPortStatisticRxTotalBytes
+                         INTEGER,
+                     onuUniPortStatisticTxTotalBytes
+                         INTEGER,
+                     onuUniPortStatisticEncryptKeyErrors
+                         RowStatus
+            }
+                 
+                 
+          onuUniPortStatisticDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 1 }
+
+          onuUniPortStatisticUniPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 2 }
+
+
+          onuUniPortStatisticRxTotalFrames OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 3 }
+
+
+          onuUniPortStatisticTxTotalFrames OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 4 }
+
+
+          onuUniPortStatisticRxTotalBytes OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 5 }
+
+
+          onuUniPortStatisticTxTotalBytes OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 6 }
+
+
+          onuUniPortStatisticEncryptKeyErrors OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuUniPortStatisticEntry 7 }
+
+-- nmsGponVirPortObj 虚端口任务 OID:1.3.6.1.4.1.3320.10.5
+
+nmsGponVirPortObj   OBJECT IDENTIFIER ::= { nmsGponMIB 5 }  
+
+-- ONU虚端口配置表
+
+             onuVirPortConfigTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuVirPortConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VIR port config table."
+                 ::= { nmsGponVirPortObj 1 }
+
+             onuVirPortConfigEntry OBJECT-TYPE
+                 SYNTAX OnuVirPortConfigEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VIR port config table entry."
+                 INDEX { onuVirPortConfigDeviceIndex, onuVirPortConfigPortIndex }
+             ::= { onuVirPortConfigTable 1 }
+
+             OnuVirPortConfigEntry ::=
+                 SEQUENCE {
+                     onuVirPortConfigDeviceIndex
+                         INTEGER,
+                     onuVirPortConfigPortIndex
+                         INTEGER,
+                     onuVirPortConfigTCONTID
+                         INTEGER,
+                     onuVirPortConfigOltGEMPortID
+                         INTEGER,
+                     onuVirPortConfigOltAllocID
+                         INTEGER,
+                     onuVirPortConfigVirPortAdminState
+                         INTEGER,
+                     onuVirPortConfigEncryptionMode
+                         INTEGER,
+                     onuVirPortConfigDownstreamRateLimit
+                         INTEGER,
+                     onuVirPortConfigOltVLANTranslationProfileID
+                         INTEGER,
+                     onuVirPortConfigONUMacFilterProfileID
+                         INTEGER,
+                     onuVirPortConfigONUMacFilterPreassignProfileID
+                         INTEGER,
+                     onuVirPortConfigRowStatus
+                         RowStatus
+            }
+                 
+                 
+          onuVirPortConfigDeviceIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVirPortConfigEntry 1 }
+
+          onuVirPortConfigPortIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVirPortConfigEntry 2 }
+
+          onuVirPortConfigTCONTID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Static T-CONT index from ONU’s perspective. Default value is 1. "
+              ::= { onuVirPortConfigEntry 3 }
+          onuVirPortConfigOltGEMPortID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "EM port no which is assigned dynamically by OLT. "
+              ::= { onuVirPortConfigEntry 4 }
+          onuVirPortConfigOltAllocID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "lloc-ID which is assigned dynamically by OLT, a dynamic Alloc-ID is one-to-one mapped 
+                      to a static T-CONT index."
+              ::= { onuVirPortConfigEntry 5 }
+          onuVirPortConfigVirPortAdminState OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               no-shutdown-unlocks(1),
+                               shutdown-locks(2)
+                             }
+
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "This attribute locks and unlocks the functions performed by this managed entity. 1 No
+                       shutdown/unlocks, 2 Shutdown/locks. "
+              ::= { onuVirPortConfigEntry 6 }
+          onuVirPortConfigEncryptionMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               enable(1),
+                               disable(2)
+                             }
+
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The encryption mode for the GEM port. Possible values are: 1 (Enabled), 2 (Disabled). "
+              ::= { onuVirPortConfigEntry 7 }
+          onuVirPortConfigDownstreamRateLimit OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Config Virtual port downstream rate limit(unit:64kbps)."
+              ::= { onuVirPortConfigEntry 8 }
+          onuVirPortConfigOltVLANTranslationProfileID OBJECT-TYPE
+              SYNTAX  INTEGER(1..1024)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "It stores the profileIndex1 of the associated OLT VLAN translation profile. 1–1024."
+              ::= { onuVirPortConfigEntry 9 }
+          onuVirPortConfigONUMacFilterProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVirPortConfigEntry 10 }
+          onuVirPortConfigONUMacFilterPreassignProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVirPortConfigEntry 11 }
+          onuVirPortConfigRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVirPortConfigEntry 12 }
+
+
+        
+        
+        
+        
+--GPON脚本任务        
+
+nmsGponProfile   OBJECT IDENTIFIER ::= { nmsGponMIB 6 }  
+
+onuVLANProfile   OBJECT IDENTIFIER ::= { nmsGponProfile 1 }  
+
+
+             onuVLANProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuVLANProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VLAN Profile table."
+                 ::= { onuVLANProfile 1 }
+
+             onuVLANProfileEntry OBJECT-TYPE
+                 SYNTAX OnuVLANProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VLAN Profile."
+                 INDEX { onuVLANProfileIndex }
+             ::= { onuVLANProfileTable 1 }
+
+             OnuVLANProfileEntry ::=
+                 SEQUENCE {
+                     onuVLANProfileIndex
+                         INTEGER,
+                     onuVLANProfileName
+                         OCTET STRING,
+                     onuVLANProfileVlanMode
+                         INTEGER,
+                     onuVLANProfilePVID
+                         INTEGER,   
+                     onuVLANProfileTrunkVlans 
+                         BITS,
+                     onuVLANProfileRowStatus
+                         RowStatus                      
+                 }
+                 
+                 
+          onuVLANProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, ONU VLAN INDEX."
+              ::= { onuVLANProfileEntry 1 }
+                 
+          onuVLANProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Name of VLAN profile."
+              ::= { onuVLANProfileEntry 2 }
+                 
+          onuVLANProfileVlanMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               transparent(1),
+                               tag(2),
+                               translation(3),
+                               vlan-stacking(4),
+                               aggregation(5),
+                               trunk(6)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "  1 Transparent,2 Tag, 3 Translation,4 Vlan-stacking, 5 Aggregation,6 Trunk. Defualt value is 1."
+              ::= { onuVLANProfileEntry 3 }
+                 
+          onuVLANProfilePVID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4094)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The pvid of the port(1-4094). Default value is 1."
+              ::= { onuVLANProfileEntry 4 }
+                 
+          onuVLANProfileTrunkVlans OBJECT-TYPE
+              SYNTAX  BITS
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU UNI port allowed VLAN in trunk mode. There is totally 4094 bit, and each bit value means allow VLAN or not, 0 mean forbidding VLAN and 1 means allowed VLAN."
+              ::= { onuVLANProfileEntry 5 }
+                 
+          onuVLANProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVLANProfileEntry 6 }
+
+
+             onuVLANTranslationTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuVLANTranslationEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VLAN translation Profile table."
+                 ::= { onuVLANProfile 2 }
+
+             onuVLANTranslationEntry OBJECT-TYPE
+                 SYNTAX OnuVLANTranslationEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VLAN translation Profile entry."
+                 INDEX { onuVLANTranslationIndex1,onuVLANTranslationIndex2 }
+             ::= { onuVLANTranslationTable 1 }
+
+             OnuVLANTranslationEntry ::=
+                 SEQUENCE {
+                     onuVLANTranslationIndex1
+                         INTEGER,
+                     onuVLANTranslationIndex2
+                         INTEGER,
+                     onuVLANTranslationName
+                         OCTET STRING,
+                     onuVLANTranslationSrcVlan
+                         INTEGER,   
+                     onuVLANTranslationDstVlan 
+                         INTEGER,
+                     onuVLANTranslationRowStatus
+                         RowStatus                      
+                 }
+                 
+          onuVLANTranslationIndex1 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, ONU VLAN translation INDEX 1."
+              ::= { onuVLANTranslationEntry 1 }
+                 
+          onuVLANTranslationIndex2 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, ONU VLAN translation INDEX 2."
+              ::= { onuVLANTranslationEntry 2 }
+                 
+          onuVLANTranslationName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Name of VLAN translation profile."
+              ::= { onuVLANTranslationEntry 3 }
+                 
+          onuVLANTranslationSrcVlan OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU VLAN translation source VLAN id."
+              ::= { onuVLANTranslationEntry 4 }
+
+          onuVLANTranslationDstVlan OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU VLAN translation destination VLAN id."
+              ::= { onuVLANTranslationEntry 5 }
+      
+          onuVLANTranslationRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVLANTranslationEntry 6 }
+
+--ONU T-cont管理表
+
+             onuTCONTServiceProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuTCONTServiceProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VLAN translation Profile table."
+                 ::= { nmsGponProfile 2 }
+
+             onuTCONTServiceProfileEntry OBJECT-TYPE
+                 SYNTAX OnuTCONTServiceProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu VLAN translation Profile entry."
+                 INDEX { onuTcontServiceProfileIndex }
+             ::= { onuTCONTServiceProfileTable 1 }
+
+             OnuTCONTServiceProfileEntry ::=
+                 SEQUENCE {
+                     onuTcontServiceProfileIndex
+                         INTEGER,
+                     onuTcontServiceProfileName
+                         OCTET STRING,
+                     onuTcontServiceProfileUsBandwidthProID
+                         INTEGER,   
+                     onuTcontServiceProfileUsQueuingSchedulingType 
+                         INTEGER,
+                     onuTcontServiceProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuTcontServiceProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, ONU VLAN T-CONT service profile INDEX ."
+              ::= { onuTCONTServiceProfileEntry 1 }
+                 
+          onuTcontServiceProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU VLAN T-CONT service profile Name ."
+              ::= { onuTCONTServiceProfileEntry 2 }
+                 
+          onuTcontServiceProfileUsBandwidthProID OBJECT-TYPE
+              SYNTAX  INTEGER(1..256)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "It points to the associated ONU bandwidth profile for upstream. 1 – 256. Default value is 1."
+              ::= { onuTCONTServiceProfileEntry 3 }
+                 
+          onuTcontServiceProfileUsQueuingSchedulingType OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			priority-controlled(1),
+              			rate-controlled(2),
+              			priority-and-rate-controlled(3)
+                             }  
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "1 Flow-based priority-controlled, 2  Flow-based rate-controlled, 3 Flow-based priority-and-rate-controlled. Default value is 1."
+              ::= { onuTCONTServiceProfileEntry 4 }
+                 
+          onuTcontServiceProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuTCONTServiceProfileEntry 5 }
+
+--  ONU 带宽管理表
+
+             onuBandwidthProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuBandwidthProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Bandwidth Profile table."
+                 ::= { nmsGponProfile 3 }
+
+             onuBandwidthProfileEntry OBJECT-TYPE
+                 SYNTAX OnuBandwidthProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Bandwidth Profile entry."
+                 INDEX { onuBandwidthProfileIndex }
+             ::= { onuBandwidthProfileTable 1 }
+
+             OnuBandwidthProfileEntry ::=
+                 SEQUENCE {
+                     onuBandwidthProfileIndex
+                         INTEGER,
+                     onuBandwidthProfileName
+                         OCTET STRING,
+                     onuBandwidthProfileTcontType
+                         INTEGER,   
+                     onuBandwidthProfileFixedBandwidth 
+                         INTEGER,
+                     onuBandwidthProfileAssuredBandwidth  
+                         INTEGER,
+                     onuBandwidthProfileMaximumBandwidth 
+                         INTEGER,
+                     onuBandwidthProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuBandwidthProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of the table, ONU Bandwidth Profile INDEX ."
+              ::= { onuBandwidthProfileEntry 1 }
+                 
+          onuBandwidthProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "ONU Bandwidth Profile name ."
+              ::= { onuBandwidthProfileEntry 2 }
+                 
+                 
+          onuBandwidthProfileTcontType OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			type1(1),
+              			type2(2),
+              			type3(3),
+              			type4(4),
+              			type5(5)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Traffic type which is equivalent to T-CONT type: 1 T-CONT type 1,2 T-CONT type 2,3 T-CONT type 3,
+                      4 T-CONT type 4, 5 T-CONT type 5."
+              ::= { onuBandwidthProfileEntry 3 }
+                 
+          onuBandwidthProfileFixedBandwidth OBJECT-TYPE
+              SYNTAX  INTEGER(128..2500000)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Fixed bandwidth, the granularity is 64Kbps. The unit is Kbps. Range of allowed values, 128 –2500000. Default value is 128Kbps."
+              ::= { onuBandwidthProfileEntry 4 }
+                 
+          onuBandwidthProfileAssuredBandwidth OBJECT-TYPE
+              SYNTAX  INTEGER(256..2500000)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Assured bandwidth, the granularity is 64Kbps. The unit is Kbps. Range of allowed values, 0, 256 – 2500000. Not Valid for Type 1
+                       TCONT. Default value is 0."
+              ::= { onuBandwidthProfileEntry 5 }
+                 
+          onuBandwidthProfileMaximumBandwidth OBJECT-TYPE
+              SYNTAX  INTEGER(128..2500000)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Maximum bandwidth, the granularity is 64Kbps. The unit is Kbps. Range of allowed values, 128 – 2500000. Not valid for Type 1 
+                      TCONT. Default value is 1024."
+              ::= { onuBandwidthProfileEntry 6 }
+                 
+          onuBandwidthProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuBandwidthProfileEntry 7 }
+
+-- ONU T-CONT与虚端口绑定管理表
+
+             onuTcontVirportBindProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuTcontVirportBindProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Tcont Virport Bind Profile table."
+                 ::= { nmsGponProfile 4 }
+
+             onuTcontVirportBindProfileEntry OBJECT-TYPE
+                 SYNTAX OnuTcontVirportBindProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Tcont Virport Bind Profile entry."
+                 INDEX { onuTcontVirportBindProfileIndex }
+             ::= { onuTcontVirportBindProfileTable 1 }
+
+             OnuTcontVirportBindProfileEntry ::=
+                 SEQUENCE {
+                     onuTcontVirportBindProfileIndex
+                         INTEGER,
+                     onuTcontVirportBindProfileName
+                         OCTET STRING,
+                     onuTcontVirportBindProfileTcontID
+                         INTEGER,   
+                     onuTcontVirportBindProfileTcontServiceProfileID 
+                         INTEGER,
+                     onuTcontVirportBindProfileVirportIndex  
+                         INTEGER,
+                     onuTcontVirportBindProfileVirportServiceProfileID 
+                         INTEGER,
+                     onuTcontVirportBindProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuTcontVirportBindProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, ONU Tcont Virport Bind Profile INDEX ."
+              ::= { onuTcontVirportBindProfileEntry 1 }
+                 
+          onuTcontVirportBindProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "ONU Tcont Virport Bind Profile name ."
+              ::= { onuTcontVirportBindProfileEntry 2 }
+                 
+          onuTcontVirportBindProfileTcontID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "T-CONT index from ONU’s perspective. Default value is 1."
+              ::= { onuTcontVirportBindProfileEntry 3 }
+                 
+          onuTcontVirportBindProfileTcontServiceProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It points to the associated ONU T-CONT service profile. Default value is 1."
+              ::= { onuTcontVirportBindProfileEntry 4 }
+                 
+          onuTcontVirportBindProfileVirportIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Virtual port index from ONU’s perspective. Default value is 1."
+              ::= { onuTcontVirportBindProfileEntry 5 }
+                 
+          onuTcontVirportBindProfileVirportServiceProfileID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It points to the associated ONU virtual port service profile. Default value is 1."
+              ::= { onuTcontVirportBindProfileEntry 6 }
+                 
+          onuTcontVirportBindProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuTcontVirportBindProfileEntry 7 }
+
+-- ONU虚端口管理表              
+
+             onuVirtualPortServiceProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuVirtualPortServiceProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Virtual Port Service Profile table."
+                 ::= { nmsGponProfile 5 }
+
+             onuVirtualPortServiceProfileEntry OBJECT-TYPE
+                 SYNTAX OnuVirtualPortServiceProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Virtual Port Service Profile entry."
+                 INDEX { onuVirportProfileIndex }
+             ::= { onuVirtualPortServiceProfileTable 1 }
+
+             OnuVirtualPortServiceProfileEntry ::=
+                 SEQUENCE {
+                     onuVirportProfileIndex
+                         INTEGER,
+                     onuVirportProfileName
+                         OCTET STRING,
+                     onuVirportProfileUsTrafficMapType 
+                         INTEGER,
+                     onuVirportProfileTypeOfService  
+                         INTEGER,
+                     onuVirportProfileEncrypMode 
+                         INTEGER,
+                     onuVirportProfileUsBwProID
+                         INTEGER,   
+                     onuVirportProfileUsFlowPriority
+                         INTEGER,   
+                     onuVirportProfileUsFlowWeight
+                         INTEGER,   
+                     onuVirportProfileUsRateCtlSchedulerProID
+                         INTEGER,   
+                     onuVirportProfileDsBwProID
+                         INTEGER,   
+                     onuVirportProfileDsQueueSchType
+                         INTEGER,   
+                     onuVirportProfileDsFlowPriority
+                         INTEGER,   
+                     onuVirportProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuVirportProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, ONU Virtual Port Service Profile INDEX ."
+              ::= { onuVirtualPortServiceProfileEntry 1 }
+                 
+          onuVirportProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "ONU Virtual Port Service Profile Name ."
+              ::= { onuVirtualPortServiceProfileEntry 2 }
+                 
+          onuVirportProfileUsTrafficMapType OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "pstream traffic mapping type is inherited from the upstreamTrafficMappingType of its ONU/ONT."
+              ::= { onuVirtualPortServiceProfileEntry 3 }
+                 
+          onuVirportProfileTypeOfService OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              data(1),
+                              iptv(2),
+                              video-on-demand(3),
+                              voip(4),
+                              ti(5),
+                              e1(6),
+                              hpna(7),
+                              others(8)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Type of service for which this virtual port is to be used: 1 Data, 2 IPTV, 3 Video-on-demand, 4 VoIP, 
+                      5 T1, 6 E1, 7 HPNA, 8 Others. Default value is 1."
+              ::= { onuVirtualPortServiceProfileEntry 4 }
+                 
+          onuVirportProfileEncrypMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)       
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Encryption mode: 1 Enabled, 2 Disabled. Default value is 2."
+              ::= { onuVirtualPortServiceProfileEntry 5 } 	
+                 
+          onuVirportProfileUsBwProID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It points to the associated ONU bandwidth profile for upstream."
+              ::= { onuVirtualPortServiceProfileEntry 6 } 	
+                 
+          onuVirportProfileUsFlowPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It’s valid only in either flow-based priority-controlled or flow-based priority-and-rate-
+		       controlled upstream queuing and scheduling type. Valid range 0 - 7.Default value is 0. "
+              ::= { onuVirtualPortServiceProfileEntry 7 } 	
+                 
+          onuVirportProfileUsFlowWeight OBJECT-TYPE
+              SYNTAX  INTEGER(0..255)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It’s valid only in flow-based rate-controlled queuing and scheduling type. Valid range 0-255.
+                      Default value is 1. "
+              ::= { onuVirtualPortServiceProfileEntry 8 } 	
+                 
+          onuVirportProfileUsRateCtlSchedulerProID OBJECT-TYPE
+              SYNTAX  INTEGER(1..128)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It points to the associated ONU upstream rate-control scheduler profile. 1–128.
+                      Default value is 1. "
+              ::= { onuVirtualPortServiceProfileEntry 9 } 	
+                 
+          onuVirportProfileDsBwProID OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It points to the associated ONU bandwidth profile for downstream. Default value is 1."
+              ::= { onuVirtualPortServiceProfileEntry 10 } 	
+                 
+          onuVirportProfileDsQueueSchType OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              priority-controlled(0),
+                              flow-based-priority-controlled(1)       
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "0 – Priority Controlled. 1 - Flow-based priority-controlled. Default value is 1."
+              ::= { onuVirtualPortServiceProfileEntry 11 } 	 
+              
+          onuVirportProfileDsFlowPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "It’s valid only in flow-based priority-controlled downstream queuing and scheduling type. 
+                      Valid range 0 - 7. Default value is 0. "
+              ::= { onuVirtualPortServiceProfileEntry 12 } 	
+              
+          onuVirportProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuVirtualPortServiceProfileEntry 13 }
+
+-- ONU流量管理表
+                 
+             onuFlowProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuFlowProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu flow Profile table."
+                 ::= { nmsGponProfile 6 }
+
+             onuFlowProfileEntry OBJECT-TYPE
+                 SYNTAX OnuFlowProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu flow profile entry."
+                 INDEX { onuFlowProfileIndex1,onuFlowProfileIndex2 }
+             ::= { onuFlowProfileTable 1 }
+
+             OnuFlowProfileEntry ::=
+                 SEQUENCE {
+                     onuFlowProfileIndex1
+                         INTEGER,
+                     onuFlowProfileIndex2
+                         INTEGER,
+                     onuFlowProfileName 
+                         OCTET STRING,
+                     onuFlowProfileUniType  
+                         INTEGER,
+                     onuFlowProfileUniPortBitMap 
+                         INTEGER,
+                     onuFlowProfileUsMapType
+                         INTEGER,   
+                     onuFlowProfileVlanIdStart
+                         INTEGER,   
+                     onuFlowProfileVlanIdStop
+                         INTEGER,   
+                     onuFlowProfilePBITsMap
+                         INTEGER,   
+                     onuFlowProfileVirportNo
+                         INTEGER,   
+                     onuFlowProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuFlowProfileIndex1 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, ONU flow Profile INDEX 1."
+              ::= { onuFlowProfileEntry 1 }
+                 
+          onuFlowProfileIndex2 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, ONU flow Profile INDEX 2."
+              ::= { onuFlowProfileEntry 2 }
+                 
+          onuFlowProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "IONU flow Profile name."
+              ::= { onuFlowProfileEntry 3 }
+                 
+          onuFlowProfileUniType OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			ethernet-uni(1),
+              			pots-uni(2),
+              			t1(3),
+              			e1(4),
+              			hpna(5),
+              			ip-host(6)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Physical port type: 1 Ethernet UNI, 2 POTS UNI, 3 T1, 4 E1, 5 HPNA, 6 IP Host. Default value is 1."
+              ::= { onuFlowProfileEntry 4 }
+                 
+          onuFlowProfileUniPortBitMap OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "UNI Port bit map representing 1 or more UNI ports to be associated with a flow. The value 0 will 
+                      indicate the flow applies to all UNI ports of the ONU. Default value is 1."
+              ::= { onuFlowProfileEntry 5 }
+                 
+          onuFlowProfileUsMapType OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			user-port(1),
+              			vlan-id(2),
+              			pbit(3),
+              			vlan-id-pbit(4),
+              			ehter-type(5),
+              			dscp(6),
+              			user-port-pbits(7),
+              			user-port-dscp(8)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Upstream Traffic Mapping mechanism: 1 User Port, 2 VLAN ID, 3 PBIT, 4 VLAN ID + PBIT, 5 Ether Type, 
+                      6 DSCP, 7 User Port + PBITS, 8 User Port + DSCP, The valid values are 1 to 4. Values 5, 6, 7 and 8 
+                      are reserved for future use. Default value is 2."
+              ::= { onuFlowProfileEntry 6 }
+                 
+          onuFlowProfileVlanIdStart OBJECT-TYPE
+              SYNTAX  INTEGER(1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The beginning of the VLAN Id range to be mapped to the flow. 1..4095. Set this value only if the 
+                      mapping type is VLAN ID or VLAND + PBITS. Default value is 101."
+              ::= { onuFlowProfileEntry 7 }
+                 
+          onuFlowProfileVlanIdStop OBJECT-TYPE
+              SYNTAX  INTEGER(1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The end of the VLAN Id range. 1..4095. VLAN ID Stop–VLAN ID Start should be less than equal to 12 
+                      for 1 flow. Set this value only if the mapping type is VLAN ID or VLAND + PBITS. Default value is 101."
+              ::= { onuFlowProfileEntry 8 }
+                 
+          onuFlowProfilePBITsMap OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Bit map representing PBITs that have to be mapped to the flow. If the value is set to 1, it would mean 
+                      PBIT 0, if the value is set to 2, it would mean PBIT 1, if the value is set to 3, it would mean, both 
+                      PBIT 0 and 1. The value 255 would mean, PBITS 0 through 7. Set this value only if the mapping type is 
+                      PBITS  or VLAND + PBITS. efault value is 1."
+              ::= { onuFlowProfileEntry 9 }
+                 
+          onuFlowProfileVirportNo OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "ONU flow profile virtual port number."
+              ::= { onuFlowProfileEntry 10 }
+                 
+          onuFlowProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      ""
+              ::= { onuFlowProfileEntry 11 }
+
+-- ONU速率控制管理表
+
+             onuRateControlSchedulerProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuRateControlSchedulerProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu rate control scheduler profile table."
+                 ::= { nmsGponProfile 7 }
+
+             onuRateControlSchedulerProfileEntry OBJECT-TYPE
+                 SYNTAX OnuRateControlSchedulerProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu rate control scheduler profile entry."
+                 INDEX { onuRateCtlProfileIndex }
+             ::= { onuRateControlSchedulerProfileTable 1 }
+
+             OnuRateControlSchedulerProfileEntry ::=
+                 SEQUENCE {
+                     onuRateCtlProfileIndex
+                         INTEGER,
+                     onuRateCtlProfileName 
+                         OCTET STRING,
+                     onuRateCtlProfileSir  
+                         INTEGER,
+                     onuRateCtlProfilePir 
+                         INTEGER,
+                     onuRateCtlProfileScheduleWeight
+                         INTEGER,   
+                     onuRateCtlProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuRateCtlProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, ONU rate control scheduler profile INDEX 1."
+              ::= { onuRateControlSchedulerProfileEntry 1 }
+                 
+          onuRateCtlProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "ONU rate control scheduler profile name."
+              ::= { onuRateControlSchedulerProfileEntry 2 }
+                 
+          onuRateCtlProfileSir OBJECT-TYPE
+              SYNTAX  INTEGER(128..2500000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "SIR, the granularity is 64Kbps. The unit is Kbps. Range of allowed values, 128 – 2500000. Default value is 128. "
+              ::= { onuRateControlSchedulerProfileEntry 3 }
+                 
+          onuRateCtlProfilePir OBJECT-TYPE
+              SYNTAX  INTEGER(128..2500000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "SIR, the granularity is 64Kbps. The unit is Kbps. Range of allowed values, 128 – 2500000. Default value is 1024. "
+              ::= { onuRateControlSchedulerProfileEntry 4 }
+                 
+          onuRateCtlProfileScheduleWeight OBJECT-TYPE
+              SYNTAX  INTEGER(128..2500000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Scheduler weight. Valid range 0-255. Default value is 1. "
+              ::= { onuRateControlSchedulerProfileEntry 5 }
+                 
+          onuRateCtlProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { onuRateControlSchedulerProfileEntry 6 }
+                 
+-- UNI端口配置Profile表  
+
+             onuEthernetUNIConfigProfileTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF OnuEthernetUNIConfigProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Ethernet UNI configuration profile table."
+                 ::= { nmsGponProfile 8 }
+
+             onuEthernetUNIConfigProfileEntry OBJECT-TYPE
+                 SYNTAX OnuEthernetUNIConfigProfileEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "Onu Ethernet UNI configuration profile entry."
+                 INDEX { onuEthernetUNIPortProfileIndex }
+             ::= { onuEthernetUNIConfigProfileTable 1 }
+
+             OnuEthernetUNIConfigProfileEntry ::=
+                 SEQUENCE {
+                     onuEthernetUNIPortProfileIndex
+                         INTEGER,
+                     onuEthernetUNIPortProfileName 
+                         OCTET STRING,
+                     onuEthernetUNIPortAutoNegotiation  
+                         INTEGER,
+                     onuEthernetUNIPortSpeed 
+                         INTEGER,
+                     onuEthernetUNIPortDuplex
+                         INTEGER,   
+                     onuEthernetUNIPortExpectedType
+                         INTEGER,   
+                     onuEthernetUNIPortMaxFrameSize
+                         INTEGER,   
+                     onuEthernetUNIPortEthernetInterfaceWiring
+                         INTEGER,   
+                     onuEthernetUNIPortProfileRowStatus
+                         RowStatus                      
+                 }
+
+          onuEthernetUNIPortProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Index of the table, ONU Ethernet UNI configuration profile INDEX 1."
+              ::= { onuEthernetUNIConfigProfileEntry 1 }
+                 
+          onuEthernetUNIPortProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "ONU Ethernet UNI configuration profile name."
+              ::= { onuEthernetUNIConfigProfileEntry 2 }
+                 
+          onuEthernetUNIPortAutoNegotiation OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			enable(1),
+              			disable(2)
+              			}
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Auto negotiation: 1 Enabled, 2 Disabled. Default value is 1. "
+              ::= { onuEthernetUNIConfigProfileEntry 3 }
+                 
+          onuEthernetUNIPortSpeed OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			s10Mbps(1),
+              			s100Mbps(2),
+              			s1000Mbps(3)
+              			}
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Speed: 1 10Mbps, 2 100Mbps, 3 1000Mbps. Default value is 2. "
+              ::= { onuEthernetUNIConfigProfileEntry 4 }
+                 
+          onuEthernetUNIPortDuplex OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			full(1),
+              			half(2)
+              			}
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Duplex: 1 Full, 2 Half. Default value is 1. "
+              ::= { onuEthernetUNIConfigProfileEntry 5 }
+                 
+          onuEthernetUNIPortExpectedType OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "This attribute supports pre-provisioning. It is coded as follows: 1 Autosense, 2 to 254 is compatible 
+                      with other Ethernet circuit pack type Upon ME instantiation, the ONT sets this attribute to 0. Default value is 1. "
+              ::= { onuEthernetUNIConfigProfileEntry 6 }
+                 
+          onuEthernetUNIPortMaxFrameSize OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "This attribute denotes the maximum frame size allowed across this interface. Upon ME instantiation, the ONT 
+                      sets the attribute to 1518. Default value is 1522. "
+              ::= { onuEthernetUNIConfigProfileEntry 7 }
+                 
+          onuEthernetUNIPortEthernetInterfaceWiring OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			dce(1),
+              			dte(2)
+              			}
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "This attribute specifies the Ethernet interface wiring: 1 DCE (default), 2 DTE. Default value is 1. "
+              ::= { onuEthernetUNIConfigProfileEntry 8 }
+                 
+          onuEthernetUNIPortProfileRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+              ::= { onuEthernetUNIConfigProfileEntry 9 }
+                 
+
+
+
+                 
+END
+
