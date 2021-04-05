@@ -3,13 +3,19 @@ text: 'HPE Managed Power Distribution Unit'
 type: power
 icon: hpe
 group: hpe
+mib_dir: hp
 over:
     - {graph: device_power, text: Power}  
     - {graph: device_current, text: Current}
-mib_dir: hp
+snmp_max_oid: '8'
 discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.232.165.7
             - .1.3.6.1.4.1.232.165.11
-snmp_max_oid: 8
+    -        
+        sysDescr:
+            - maPDU
+            - Outlet Metered
+            - Outlet Switched
+            - P9S18A
