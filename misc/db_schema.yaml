@@ -1478,8 +1478,8 @@ port_group_port:
     port_group_port_port_group_id_index: { Name: port_group_port_port_group_id_index, Columns: [port_group_id], Unique: false, Type: BTREE }
     port_group_port_port_id_index: { Name: port_group_port_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
   Constraints:
-    port_group_port_port_group_id_foreign: { name: port_group_port_port_group_id_foreign, foreign_key: port_group_id, table: port_groups, key: id, extra: 'ON DELETE CASCADE' }
-    port_group_port_port_id_foreign: { name: port_group_port_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE CASCADE' }
+    port_group_port_port_group_id_foreign: { name: port_group_port_port_group_id_foreign, foreign_key: port_group_id, table: port_groups, key: id, extra: 'ON DELETE CASCADE ON UPDATE RESTRICT' }
+    port_group_port_port_id_foreign: { name: port_group_port_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE CASCADE ON UPDATE RESTRICT' }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
