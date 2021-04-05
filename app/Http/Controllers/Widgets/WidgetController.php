@@ -64,20 +64,22 @@ abstract class WidgetController extends Controller
 
         if ($this->show_settings) {
             $view = $this->getSettingsView($request);
+        } else {
+            // This might be invoked in getSettingsView() in an extended class
+            // So don't run it before since it's cached.
+            $this->getSettings();
         }
 
-        $settings = $this->getSettings();
-
         if (! $this->show_settings) {
-            if (! empty($settings['device_group']) || ! empty($settings['port_group'])) {
+            if (! empty($this->settings['device_group']) || ! empty($this->settings['port_group'])) {
                 $this->title .= ' (';
 
                 $title_details = [];
-                if (! empty($settings['device_group'])) {
-                    $title_details[] = DeviceGroup::find($settings['device_group'])->name;
+                if (! empty($this->settings['device_group'])) {
+                    $title_details[] = DeviceGroup::find($this->settings['device_group'])->name;
                 }
-                if (! empty($settings['port_group'])) {
-                    $title_details[] = PortGroup::find($settings['port_group'])->name;
+                if (! empty($this->settings['port_group'])) {
+                    $title_details[] = PortGroup::find($this->settings['port_group'])->name;
                 }
 
                 $this->title .= implode(' ; ', $title_details);
