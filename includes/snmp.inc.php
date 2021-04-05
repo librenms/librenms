@@ -675,7 +675,9 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
         // merge the parts into an array, creating keys if they don't exist
         $tmp = &$array;
         foreach ($parts as $part) {
-            $tmp = &$tmp[trim($part, '".')];
+            // we don't want to remove dots inside quotes, only outside
+            $key = trim(trim($part, '.'), '"');
+            $tmp = &$tmp[$key];
         }
         $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
     }
