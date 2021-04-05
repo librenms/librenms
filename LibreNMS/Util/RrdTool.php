@@ -24,9 +24,7 @@ class RrdTool
             // Split returned files into array
             $rrdfilearray = preg_split('/\s+/', trim($rrd_files));
         } else {
-            $rrdclass = new Rrd();
-            $rrddir = $rrdclass->dirFromHost($device['hostname']);
-
+            $rrddir = \Rrd::dirFromHost($device['hostname']);
             $pattern = sprintf('%s/*.rrd', $rrddir);
             $rrdfilearray = glob($pattern);
         }
