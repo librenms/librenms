@@ -191,7 +191,7 @@ foreach (dbFetchRows($query, $param) as $port) {
         'ifInUcastPkts_rate' => $port['ifInUcastPkts_rate'],
         'ifOutUcastPkts_rate' => $port['ifOutUcastPkts_rate'],
         'ifInErrors' => \LibreNMS\Util\Number::formatSi($port['ifInErrors_delta'] / $port['poll_period'], 2, 3, 'EPS'),
-        'ifOutErrors' => \LibreNMS\Util\Number::formatSi($port['ifOutErrors_delta'] / $port['poll_period'], 2, 3, 'EPS),
+        'ifOutErrors' => \LibreNMS\Util\Number::formatSi($port['ifOutErrors_delta'] / $port['poll_period'], 2, 3, 'EPS'),
         'ifType' => \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']),
         'ifAlias' => $port['ifAlias'],
         'actions' => $actions,
