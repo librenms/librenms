@@ -60,7 +60,8 @@ class DeviceRelatedModel extends BaseModel
     public function getDeviceAttribute(): ?Device
     {
         if (! $this->relationLoaded('device')) {
-            $this->setRelation('device', DeviceCache::get($this->device_id));
+            $device = DeviceCache::get($this->device_id);
+            $this->setRelation('device', $device->exists ? $device : null);
         }
 
         return $this->getRelationValue('device');
