@@ -2,8 +2,6 @@
 
 header('Content-type: application/json');
 
-use App\Models\Port;
-
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
         'status'  => 'error',
@@ -21,10 +19,9 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-    $port_id = intval(end(explode('_', $key)));
-
     if (strncmp($key, 'oldign_', 7) == 0) {
         // Interface identifier passed as part of the field name
+        $port_id = intval(substr($key, 7));
 
         $oldign = intval($val) ? 1 : 0;
         $newign = $_POST['ignore_' . $port_id] ? 1 : 0;
@@ -45,6 +42,7 @@ foreach ($_POST as $key => $val) {
         $rows_updated += $n;
     } elseif (strncmp($key, 'olddis_', 7) == 0) {
         // Interface identifier passed as part of the field name
+        $port_id = intval(substr($key, 7));
 
         $olddis = intval($val) ? 1 : 0;
         $newdis = $_POST['disabled_' . $port_id] ? 1 : 0;
