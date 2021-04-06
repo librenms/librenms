@@ -28,7 +28,7 @@ use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use DB;
 use LibreNMS\Config;
 
