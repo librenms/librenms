@@ -4,7 +4,6 @@ theme:
   name: material
   logo: img/librenms.svg
   language: en
-  palette: null
   font:
     text: 'Roboto'
     code: 'Roboto Mono'
