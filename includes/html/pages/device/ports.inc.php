@@ -126,6 +126,7 @@ if ($vars['view'] == 'minigraphs') {
 <div style='margin: 0px;'><table class='table'>
   <tr>
     <th width="350"><A href="<?php echo \LibreNMS\Util\Url::generate($vars, ['sort' => 'port']); ?>">Port</a></th>
+    <th width="100">Port Group</a></th>
     <th width="100"></th>
     <th width="120"><a href="<?php echo \LibreNMS\Util\Url::generate($vars, ['sort' => 'traffic']); ?>">Traffic</a></th>
     <th width="75">Speed</th>

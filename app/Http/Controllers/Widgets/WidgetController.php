@@ -26,6 +26,7 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
+use App\Models\PortGroup;
 use App\Models\UserWidget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -67,9 +68,22 @@ abstract class WidgetController extends Controller
             // This might be invoked in getSettingsView() in an extended class
             // So don't run it before since it's cached.
             $this->getSettings();
+        }
 
-            if (! empty($this->settings['device_group'])) {
-                $this->title .= ' (' . DeviceGroup::find($this->settings['device_group'])->name . ')';
+        if (! $this->show_settings) {
+            if (! empty($this->settings['device_group']) || ! empty($this->settings['port_group'])) {
+                $this->title .= ' (';
+
+                $title_details = [];
+                if (! empty($this->settings['device_group'])) {
+                    $title_details[] = DeviceGroup::find($this->settings['device_group'])->name;
+                }
+                if (! empty($this->settings['port_group'])) {
+                    $title_details[] = PortGroup::find($this->settings['port_group'])->name;
+                }
+
+                $this->title .= implode(' ; ', $title_details);
+                $this->title .= ')';
             }
             $view = $this->getView($request);
         }
@@ -100,6 +114,10 @@ abstract class WidgetController extends Controller
 
             if ($settingsView && isset($this->settings['device_group'])) {
                 $this->settings['device_group'] = DeviceGroup::find($this->settings['device_group']);
+            }
+
+            if ($settingsView && isset($this->settings['port_group'])) {
+                $this->settings['port_group'] = PortGroup::find($this->settings['port_group']);
             }
         }
 

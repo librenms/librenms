@@ -74,6 +74,7 @@ Output from the API currently is via two output types:
 - [Devices](Devices.md)
 - [DeviceGroups](DeviceGroups.md)
 - [Ports](Ports.md)
+- [Port_Groups](Port_Groups.md)
 - [PortGroups](PortGroups.md)
 - [Alerts](Alerts.md)
 - [Routing](Routing.md)

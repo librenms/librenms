@@ -19,6 +19,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
+    Route::resource('port-groups', 'PortGroupController');
+    Route::resource('port', 'PortController', ['only' => 'update']);
     Route::group(['prefix' => 'poller'], function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
         Route::get('log', 'PollerController@logTab')->name('poller.log');
@@ -107,6 +109,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('device', 'DeviceController');
             Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');
+            Route::get('port-group', 'PortGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
@@ -125,6 +128,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('alert-schedule', 'AlertScheduleController');
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
+            Route::post('edit-ports', 'EditPortsController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('graylog', 'GraylogController');

@@ -37,6 +37,7 @@ class TopInterfacesController extends WidgetController
         'time_interval' => 15,
         'interface_filter' => null,
         'device_group' => null,
+        'port_group' => null,
     ];
 
     /**
@@ -59,6 +60,9 @@ class TopInterfacesController extends WidgetController
                 $query->inDeviceGroup($data['device_group']);
             }, function ($query) {
                 $query->has('device');
+            })
+            ->when($data['port_group'], function ($query) use ($data) {
+                $query->inPortGroup($data['port_group']);
             })
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
