@@ -37,7 +37,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
             $colour = 'FF0084';
     }//end switch
 
-    $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 12);
+    $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 12);
     $rrd_file = get_sensor_rrd($device, $sensor);
     $rrd_options .= " DEF:sensor{$sensor['sensor_id']}=$rrd_file:sensor:AVERAGE";
     $rrd_options .= " LINE1:sensor{$sensor['sensor_id']}#$colour:'$sensor_descr_fixed'";

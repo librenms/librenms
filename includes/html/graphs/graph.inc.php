@@ -68,7 +68,7 @@ if ($error_msg) {
         echo "<pre class='rrd-pre'>";
         echo 'rrdtool ' . Rrd::buildCommand('graph', $graphfile, $rrd_options);
         echo '</pre>';
-        $return = rrdtool_graph($graphfile, $rrd_options);
+        $return = Rrd::graph($graphfile, $rrd_options);
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
         echo "<pre class='rrd-pre'>";
         echo "$return";
@@ -78,7 +78,7 @@ if ($error_msg) {
     } elseif ($no_file) {
         graph_error($width < 200 ? 'No Data' : 'No Data file');
     } elseif ($rrd_options) {
-        rrdtool_graph($graphfile, $rrd_options);
+        Rrd::graph($graphfile, $rrd_options);
         d_echo($rrd_cmd);
         if (is_file($graphfile)) {
             if (! $debug) {

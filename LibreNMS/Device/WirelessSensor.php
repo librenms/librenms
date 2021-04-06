@@ -248,7 +248,7 @@ class WirelessSensor extends Sensor
     /**
      * Convert a WiFi channel to a Frequency in MHz
      *
-     * @param $channel
+     * @param int $channel
      * @return int
      */
     public static function channelToFrequency($channel)

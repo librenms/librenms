@@ -35,7 +35,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
     $colour = Config::get("graph_colours.$colourset.$iter");
     $iter++;
 
-    $descr = rrdtool_escape($source, $descr_len);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);
 
     $filename = generate_smokeping_file($device, $filename);
     $rrd_options .= " DEF:median$i=" . $filename . ':median:AVERAGE ';

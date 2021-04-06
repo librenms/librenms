@@ -54,6 +54,9 @@ class ApplicationController extends SelectController
         return $query;
     }
 
+    /**
+     * @param Application $app
+     */
     public function formatItem($app)
     {
         return [

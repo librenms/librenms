@@ -61,7 +61,7 @@ class Number
             $value = $value * -1;
         }
 
-        return (number_format(round($value, $round), $sf, '.', '') + 0) . " $ext$suffix";
+        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
     }
 
     public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B')
@@ -81,6 +81,29 @@ class Number
             $value = $value * -1;
         }
 
-        return (number_format(round($value, $round), $sf, '.', '') + 0) . " $ext$suffix";
+        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+    }
+
+    /**
+     * Cast string to int or float.
+     * Returns 0 if string is not numeric
+     *
+     * @param string $number
+     * @return float|int
+     */
+    public static function cast($number)
+    {
+        if (! is_numeric($number)) {
+            // match pre-PHP8 behavior
+            if (! preg_match('/^-?\d+(\.\d+)?/', $number, $matches)) {
+                return 0;
+            }
+            $number = $matches[0];
+        }
+
+        $float = (float) $number;
+        $int = (int) $number;
+
+        return $float == $int ? $int : $float;
     }
 }

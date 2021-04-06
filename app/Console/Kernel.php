@@ -49,7 +49,9 @@ class Kernel extends ConsoleKernel
     {
         if (is_null($this->artisan)) {
             parent::getArtisan();
+            /** @phpstan-ignore-next-line */
             $this->artisan->setName(\LibreNMS\Config::get('project_name', 'LibreNMS'));
+            /** @phpstan-ignore-next-line */
             $this->artisan->setVersion(Version::get()->local());
         }
 

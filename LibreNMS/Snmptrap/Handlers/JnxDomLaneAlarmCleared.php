@@ -50,7 +50,7 @@ class JnxDomLaneAlarmCleared implements SnmptrapHandler
         $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         if (! $port) {
-            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
 
             return;
         }

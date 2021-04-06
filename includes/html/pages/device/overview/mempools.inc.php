@@ -76,15 +76,15 @@ if ($mempools->isNotEmpty()) {
         $graph_array['height'] = 20;
         $graph_array['bg'] = 'ffffff00';
         // the 00 at the end makes the area transparent.
-        $minigraph = generate_lazy_graph_tag($graph_array);
+        $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         $percentageBar = $available_used_all
             ? Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", "$available_used_all%", $mempool->mempool_perc_warn, $available_used_all)
             : Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", '', $mempool->mempool_perc_warn);
         echo '<tr>
-            <td class="col-md-4">' . overlib_link($link, $mempool->mempool_descr, $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, $percentageBar, $overlib_content) . '
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</td>
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '
             </a></td>
             </tr>';
     }//end foreach

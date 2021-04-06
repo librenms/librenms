@@ -33,7 +33,7 @@ if (! Auth::user()->hasGlobalRead()) {
 
 if (! empty($_REQUEST['search'])) {
     $where[] = '(`hostname` LIKE ? OR `sysName` LIKE ?)';
-    $search = '%' . mres($_REQUEST['search']) . '%';
+    $search = '%' . $_REQUEST['search'] . '%';
     $params[] = $search;
     $params[] = $search;
 }

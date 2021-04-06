@@ -23,8 +23,8 @@ if (is_numeric($vars['port_id'])) {
 }
 
 if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
-    $ip_search = '%' . mres(trim($vars['searchPhrase'])) . '%';
-    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', mres($vars['searchPhrase'])) . '%';
+    $ip_search = '%' . trim($vars['searchPhrase']) . '%';
+    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $vars['searchPhrase']) . '%';
 
     if (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
         $sql .= ' AND `ipv4_address` LIKE ?';
@@ -94,7 +94,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
         }
 
         $response[] = [
-            'mac_address'      => formatMac($entry['mac_address']),
+            'mac_address'      => \LibreNMS\Util\Rewrite::readableMac($entry['mac_address']),
             'ipv4_address'     => $entry['ipv4_address'],
             'hostname'         => generate_device_link($entry),
             'interface'        => generate_port_link($entry, makeshortif($entry['label'])) . ' ' . $error_img,

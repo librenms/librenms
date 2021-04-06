@@ -55,7 +55,7 @@ class InfluxDBStoreTest extends TestCase
         $device = ['hostname' => 'testhost'];
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
-        $fields = ['ifIn' => 234234, 'ifOut' => 53453];
+        $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
 
         $expected = [new Point($measurement, null, ['hostname' => $device['hostname']] + $tags, $fields)];
 

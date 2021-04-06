@@ -189,14 +189,14 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         echo '<tr id="row_' . $service['service_id'] . '">';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
-                        echo '<td>' . nl2br(display($service['service_name'])) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_type'])) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_ip'])) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_message'])) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
-                        echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_ignore'])) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_disabled'])) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_name'], [])) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_type'], [])) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_ip'], [])) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_message'], [])) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_desc'], [])) . '</td>';
+                        echo '<td>' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_ignore'], [])) . '</td>';
+                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_disabled'], [])) . '</td>';
 
                         if (Auth::user()->hasGlobalAdmin()) {
                             echo "<td>

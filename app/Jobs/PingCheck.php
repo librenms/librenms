@@ -223,9 +223,9 @@ class PingCheck implements ShouldQueue
      * If the device is on the current tier, record the data and remove it
      * $data should have keys: hostname, status, and conditionally rtt
      *
-     * @param $data
+     * @param array $data
      */
-    private function recordData($data)
+    private function recordData(array $data)
     {
         global $vdebug;
 
@@ -280,7 +280,7 @@ class PingCheck implements ShouldQueue
     /**
      * Done processing $hostname, remove it from our active data
      *
-     * @param $hostname
+     * @param string $hostname
      */
     private function complete($hostname)
     {
@@ -292,9 +292,9 @@ class PingCheck implements ShouldQueue
      * Defer this data processing until all parent devices are complete
      *
      *
-     * @param $data
+     * @param array $data
      */
-    private function defer($data)
+    private function defer(array $data)
     {
         $device = $this->devices->get($data['hostname']);
 

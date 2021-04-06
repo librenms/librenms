@@ -74,6 +74,9 @@ class EventlogController extends TableController
             });
     }
 
+    /**
+     * @param Eventlog $eventlog
+     */
     public function formatItem($eventlog)
     {
         return [

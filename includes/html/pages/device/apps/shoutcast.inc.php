@@ -29,7 +29,7 @@ if (isset($total) && $total === true) {
     }
 }
 
-$files = glob(rrd_name($device['hostname'], ['app', 'shoutcast', $app['app_id']], '*.rrd'));
+$files = glob(Rrd::name($device['hostname'], ['app', 'shoutcast', $app['app_id']], '*.rrd'));
 foreach ($files as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
     $hostname = end($pieces);

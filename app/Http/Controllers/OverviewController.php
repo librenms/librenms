@@ -11,8 +11,8 @@ use App\Models\Syslog;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Widget;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use Toastr;
 

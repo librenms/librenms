@@ -94,6 +94,7 @@ class HiveosWireless extends OS implements
     {
         $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
         $data = snmpwalk_group($this->getDeviceArray(), 'ahRadioChannel', 'AH-INTERFACE-MIB');
+        $sensors = [];
         foreach ($data as $index => $frequency) {
             $sensors[] = new WirelessSensor(
                 'frequency',

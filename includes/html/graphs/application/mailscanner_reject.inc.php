@@ -6,7 +6,7 @@ $scale_min = 0;
 $colours = 'mixed';
 $nototal = (($width < 550) ? 1 : 0);
 $unit_text = 'Messages/sec';
-$rrd_filename = rrd_name($device['hostname'], ['app', 'mailscannerV2', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mailscannerV2', $app['app_id']]);
 $array = [
     'msg_rejected' => ['descr' => 'Rejected'],
     'msg_relay'    => ['descr' => 'Relayed'],
@@ -16,7 +16,7 @@ $array = [
 $i = 0;
 $x = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $max_colours = count(Config::get("graph_colours.$colours"));
     foreach ($array as $ds => $var) {
         $x = (($x <= $max_colours) ? $x : 0);

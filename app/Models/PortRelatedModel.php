@@ -24,6 +24,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 abstract class PortRelatedModel extends BaseModel
 {
     // ---- Query scopes ----
@@ -35,7 +37,7 @@ abstract class PortRelatedModel extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function port()
+    public function port(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
     }

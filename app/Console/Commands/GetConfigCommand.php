@@ -47,7 +47,7 @@ class GetConfigCommand extends LnmsCommand
         if (Config::has($setting)) {
             $output = Config::get($setting);
             if (! is_string($output)) {
-                $output = var_export($output, 1);
+                $output = var_export($output, true);
             }
 
             $this->line($output);

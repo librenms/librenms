@@ -11,8 +11,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'cambium-650-gps');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'cambium-650-gps');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'\\n'";
     $rrd_options .= ' DEF:gps=' . $rrdfilename . ':gps:AVERAGE ';
     $rrd_options .= " LINE2:gps#9B30FF:'GPS Status' ";

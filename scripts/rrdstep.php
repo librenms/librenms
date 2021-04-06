@@ -59,7 +59,7 @@ $tmp_path = Config::get('temp_dir', '/tmp');
 if ($hostname === 'all') {
     $hostname = '*';
 }
-$files = glob(get_rrd_dir($hostname) . '/*.rrd');
+$files = glob(Rrd::dirFromHost($hostname) . '/*.rrd');
 
 $converted = 0;
 $skipped = 0;
@@ -99,8 +99,8 @@ foreach ($files as $file) {
     }
 
     echo "Converting $file: ";
-    $command = "$rrdtool dump $file > $random && 
-        sed -i 's/<step>\([0-9]*\)/<step>$step/' $random && 
+    $command = "$rrdtool dump $file > $random &&
+        sed -i 's/<step>\([0-9]*\)/<step>$step/' $random &&
         sed -i 's/<minimal_heartbeat>\([0-9]*\)/<minimal_heartbeat>$heartbeat/' $random &&
         $rrdtool restore -f $random $file &&
         rm -f $random";

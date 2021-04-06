@@ -65,7 +65,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param int $warn_percent
      * @param int $entPhysicalIndex
      * @param int $hrDeviceIndex
-     * @return Processor
+     * @return static
      */
     public static function discover(
         $type,
@@ -295,6 +295,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         return array_diff_key($array, array_flip($exclude));
     }
 
+    /**
+     * @param Processor $processor
+     */
     public static function onCreate($processor)
     {
         $message = "Processor Discovered: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
@@ -303,6 +306,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         parent::onCreate($processor);
     }
 
+    /**
+     * @param Processor $processor
+     */
     public static function onDelete($processor)
     {
         $message = "Processor Removed: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";

@@ -160,7 +160,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo generate_url($vars, ['type' => 'ltm_vs', 'subtype' => 'ltm_vs_det']); ?>vsid='+row['vsid']+'/poolid='+row['poolid'];
+            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_vs', 'subtype' => 'ltm_vs_det']); ?>vsid='+row['vsid']+'/poolid='+row['poolid'];
             window.location.href = link;
         });
     </script>

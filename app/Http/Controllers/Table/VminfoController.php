@@ -57,6 +57,9 @@ class VminfoController extends TableController
             });
     }
 
+    /**
+     * @param Vminfo $vm
+     */
     public function formatItem($vm)
     {
         return [

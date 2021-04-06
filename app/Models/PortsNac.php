@@ -24,6 +24,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class PortsNac extends PortRelatedModel
 {
     protected $table = 'ports_nac';
@@ -50,7 +52,7 @@ class PortsNac extends PortRelatedModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }

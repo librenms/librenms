@@ -1,0 +1,130 @@
+-- *------------------------------------------------
+-- * Firebrick CPU MIB
+-- *
+-- * June 2020, Cliff Hones
+-- *
+-- * Copyright (c) 2020 by Andrews & Arnold
+-- * 
+-- * See the Firebrick Manuals for more information
+-- *------------------------------------------------
+
+FIREBRICK-CPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    firebrickNewStyle
+	FROM FIREBRICK-MIB
+        ;
+
+fbCpuMib MODULE-IDENTITY
+    LAST-UPDATED "202006170000Z"
+    ORGANIZATION "Andrews & Arnold Limited"
+    CONTACT-INFO
+        "Andrews & Arnold
+        Unit 1&2, Enterprise Court
+        Bracknell, Berkshire, RG12 1QS
+        United Kingdom
+
+        Tel: +44 3333 400 999
+        Email: support@aa.net.uk"
+    DESCRIPTION
+        "This is a MIB Module for monitoring Firebrick CPU usage."
+    REVISION "202006170000Z"
+    DESCRIPTION "Initial version of this MIB module"
+    ::= { firebrickNewStyle 2 }
+
+fbCpuUsageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbCpuUsageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of CPU usage for this Firebrick"
+    ::= { fbCpuMib 1 }
+
+fbCpuUsageEntry OBJECT-TYPE
+    SYNTAX FbCpuUsageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the CPU usage table"
+    INDEX { fbCpuPeriod, fbCpuCore }
+    ::= { fbCpuUsageTable 1 }
+
+FbCpuUsageEntry ::= SEQUENCE {
+    fbCpuIRQ      Gauge32,
+    fbCpuAll      Gauge32,
+    fbCpuIRQPeak  Gauge32,
+    fbCpuAllPeak  Gauge32,
+    fbCpuPeriod   Integer32,
+    fbCpuCore     Integer32
+}
+
+fbCpuPeriod OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The period in minutes covered by this table entry.
+         Zero indicates that an instantaneous value is required."
+    ::= { fbCpuUsageEntry 5 }
+
+fbCpuCore OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The CPU core number covered by this table entry.
+	 The numbering starts at 1, so CPU0 (CORE) is 1 and CPU1 (NET) is 2."
+    ::= { fbCpuUsageEntry 6 }
+
+fbCpuIRQ OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The percentage of CPU time spent in interrupt processing for this period.
+	 If period is 0 the instantaneous usage in the last second is used.
+	 Units are 100ths of a percent, so 10000 indicates 100%."
+    ::= { fbCpuUsageEntry 1 }
+
+fbCpuAll OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total percentage of CPU time spent non-idle for this period.
+	 If period is 0 the instantaneous usage in the last second is used.
+	 Units are 100ths of a percent, so 10000 indicates 100%."
+    ::= { fbCpuUsageEntry 2 }
+
+fbCpuIRQPeak OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The peak percentage of CPU time in interrupt processing during this period.
+	 If period is 0 the peak usage in the current minute is used.
+	 Units are 100ths of a percent, so 10000 indicates 100%."
+    ::= { fbCpuUsageEntry 3 }
+
+fbCpuAllPeak OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The peak percentage of CPU time non-idle during this period.
+	 If period is 0 the peak usage in the current minute is used.
+	 Units are 100ths of a percent, so 10000 indicates 100%."
+    ::= { fbCpuUsageEntry 4 }
+END
