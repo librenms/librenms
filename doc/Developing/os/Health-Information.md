@@ -189,8 +189,6 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalTemperature
-                    descr: '{{ $entPhysicalName }}'
-                    index: '{{ $index }}'
                     skip_values:
                         -
                             oid: hwEntityOpticalMode
