@@ -159,7 +159,7 @@ to be skipped during discovery. An example of this is below:
                       value: 1
 ```
 
-``` op ``` can be any of the following operators :
+`op` can be any of the following operators :
 
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
