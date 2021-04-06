@@ -48,7 +48,7 @@ class Component
     public function getComponentCount($device_id = null)
     {
         $counts = \App\Models\Component::query()->when($device_id, function ($query, $device_id) {
-            $query->where('device_id', $device_id);
+            return $query->where('device_id', $device_id);
         })->selectRaw('type, count(*) as count')->groupBy('type')->pluck('count', 'type');
 
         return $counts->isEmpty() ? false : $counts->all();

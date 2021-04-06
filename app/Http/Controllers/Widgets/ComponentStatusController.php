@@ -63,7 +63,7 @@ class ComponentStatusController extends WidgetController
             ->groupBy('status')
             ->where('disabled', '!=', 0)
             ->when($data['device_group'], function ($query) use ($data) {
-                $query->inDeviceGroup($data['device_group']);
+                return $query->inDeviceGroup($data['device_group']);
             })
             ->get()->pluck('total', 'status')->toArray();
 

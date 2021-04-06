@@ -137,7 +137,7 @@ class TopDevicesController extends WidgetController
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
             ->when($settings['device_group'], function ($query) use ($settings) {
                 /** @var Builder<\App\Models\DeviceRelatedModel> $query */
-                $query->inDeviceGroup($settings['device_group']);
+                return $query->inDeviceGroup($settings['device_group']);
             });
     }
 
