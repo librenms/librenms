@@ -23,15 +23,7 @@ $rows_updated = 0;
 foreach ($_POST as $key => $val) {
     $port_id = intval(end(explode('_', $key)));
 
-    if (strncmp($key, 'port_group_', 11) == 0) {
-        $port_group_ids = $val;
-
-        if (($idx = array_search('0', $port_group_ids)) !== false) {
-            unset($port_group_ids[$idx]);
-        }
-
-        Port::find($port_id)->groups()->sync($port_group_ids);
-    } elseif (strncmp($key, 'oldign_', 7) == 0) {
+    if (strncmp($key, 'oldign_', 7) == 0) {
         // Interface identifier passed as part of the field name
 
         $oldign = intval($val) ? 1 : 0;
@@ -75,13 +67,13 @@ foreach ($_POST as $key => $val) {
 }//end foreach
 
 if ($rows_updated > 0) {
-    $message = $rows_updated . ' Device record updated.';
+    $message = $rows_updated . ' Port record(s) updated.';
     $status = 'ok';
 } elseif ($rows_updated = '-1') {
-    $message = 'Device record unchanged. No update necessary.';
+    $message = 'Port records unchanged. No update necessary.';
     $status = 'ok';
 } else {
-    $message = 'Device record update error.';
+    $message = 'Port record update error.';
 }
 
 $response = [

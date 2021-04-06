@@ -281,7 +281,7 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(\App\Models\PortsFdb::class, 'port_id', 'port_id');
     }
 
-    public function groups()
+    public function groups(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\PortGroup::class, 'port_group_port', 'port_id', 'port_group_id');
     }

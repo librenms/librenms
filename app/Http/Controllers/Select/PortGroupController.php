@@ -35,7 +35,7 @@ class PortGroupController extends SelectController
 
     protected function baseQuery($request)
     {
-        return PortGroup::hasAccess($request->user())->select('id', 'name');
+        return PortGroup::hasAccess($request->user())->select(['id', 'name']);
     }
 
     public function formatItem($port_group)

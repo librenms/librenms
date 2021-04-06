@@ -79,10 +79,12 @@ class PortGroupController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('port_groups')->where(function ($query) use ($portGroup) {
+                'max:255',
+                Rule::unique('port_groups', 'name')->where(function ($query) use ($portGroup) {
                     $query->where('id', '!=', $portGroup->id);
                 }),
             ],
+            'desc' => 'string|max:255',
         ]);
 
         $portGroup->fill($request->only(['name', 'desc']));
