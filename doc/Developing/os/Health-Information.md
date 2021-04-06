@@ -159,13 +159,13 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: 1
 ```
 
-> ``` op ``` can be any of the following operators :
->
-> =, !=, ==, !==, <=, >=, <, >,
-> starts, ends, contains, regex, in_array, not_starts,
-> not_ends, not_contains, not_regex, not_in_array, exists
->
-> Example:
+`op` can be any of the following operators :
+
+=, !=, ==, !==, <=, >=, <, >,
+starts, ends, contains, regex, in_array, not_starts,
+not_ends, not_contains, not_regex, not_in_array, exists
+
+Example:
 
 ```yaml
                     skip_values:
@@ -181,27 +181,6 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       oid: sensorOptionalOID
                       op: 'exists'
                       value: false
-```
-
-```yaml
-        temperature:
-            data:
-                -
-                    oid: hwOpticalModuleInfoTable
-                    value: hwEntityOpticalTemperature
-                    skip_values:
-                        -
-                            oid: hwEntityOpticalMode
-                            op: '='
-                            value: '1'
-                        -
-                            oid: hwEntityOpticalTemperature
-                            op: '<'
-                            value: '-50'
-                        -
-                            oid: hwEntityOpticalTemperature
-                            op: '>='
-                            value: '2147483646'
 ```
 
 If you aren't able to use yaml to perform the sensor discovery, you
