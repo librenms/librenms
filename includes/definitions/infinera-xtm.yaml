@@ -6,3 +6,27 @@ mib_dir: infinera
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.8708
+
+poller_modules:
+    hr-mib: false
+    ipSystemStats: false
+    netstats: false
+    ospf: false
+    ucd-mib: false
+    ports: false
+    stp: false
+discovery_modules:
+    ports-stack: false
+    mempools: false
+    cisco-vrf-lite: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    arp-table: false
+    bgp-peers: false
+    ucd-diskio: false
+    stp: false
+    vlans: false
+    ports: false
