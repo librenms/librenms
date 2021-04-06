@@ -183,6 +183,29 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: false
 ```
 
+```yaml
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        -
+                            oid: hwEntityOpticalTemperature
+                            op: '<'
+                            value: '-50'
+                        -
+                            oid: hwEntityOpticalTemperature
+                            op: '>='
+                            value: '2147483646'
+```
+
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
 
