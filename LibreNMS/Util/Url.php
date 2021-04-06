@@ -26,9 +26,9 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\ParameterBag;
