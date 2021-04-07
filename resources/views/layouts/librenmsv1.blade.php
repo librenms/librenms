@@ -50,8 +50,8 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-1.12.4.js') }}"></script>
-    <script src="{{ asset('js/jquery-migrate-1.4.1.js') }}"></script>
+    <script src="{{ asset('js/jquery-3.0.0.js') }}"></script>
+    <script src="{{ asset('js/jquery-migrate-3.3.2.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-switch.min.js') }}"></script>
