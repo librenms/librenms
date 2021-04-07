@@ -173,7 +173,7 @@ function process_syslog($entry, $update)
 
         unset($os);
     }//end if
-    elseif (true == Config::get("syslog_debug")) {
+    elseif (true == Config::get('syslog_debug')) {
         // For finding unknowen Hosts
         $fd = fopen('/opt/librenms/logs/Debug.log', 'a');
         fputs($fd, "Can't process host: " . $entry['host'] . "\n");
