@@ -50,6 +50,7 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
+    <script src="{{ asset('js/intersection-observer.js') }}"></script>
     <script src="{{ asset('js/loading-attribute-polyfill.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
