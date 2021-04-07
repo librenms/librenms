@@ -55,14 +55,14 @@ function process_syslog($entry, $update)
     $entry['host'] = preg_replace('/^::ffff:/', '', $entry['host']);
 
     $axlate = Config::get('syslog_xlate');
-    if(true === is_array($axlate)) {
+    if (true === is_array($axlate)) {
         foreach ($axlate as $xname => $xlate) {
-            if ( $xname == $entry['host']) {
+            if ($xname == $entry['host']) {
                 $entry['host'] = $xlate;
             }
         }
     }
-    
+
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
@@ -173,7 +173,7 @@ function process_syslog($entry, $update)
 
         unset($os);
     }//end if
-    elseif(true == Config::get("syslog_debug")) {
+    elseif (true == Config::get("syslog_debug")) {
         // For finding unknowen Hosts
         $fd = fopen('/opt/librenms/logs/Debug.log', 'a');
         fputs($fd, "Can't process host: " . $entry['host'] . "\n");
