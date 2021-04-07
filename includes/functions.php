@@ -731,24 +731,6 @@ function match_network($nets, $ip, $first = false)
     return $return;
 }
 
-// FIXME port to LibreNMS\Util\IPv6 class
-function snmp2ipv6($ipv6_snmp)
-{
-    // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
-    // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
-    $ipv6_2 = [];
-
-    for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = zeropad(dechex($ipv6[$i]));
-    }
-    for ($i = 0; $i <= 15; $i += 2) {
-        $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
-    }
-
-    return implode(':', $ipv6_2);
-}
-
 function get_astext($asn)
 {
     global $cache;

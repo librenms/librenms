@@ -1035,13 +1035,17 @@ function build_bgp_peers($device, $data, $peer2)
         'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
         'BGP4-MIB::bgpPeerRemoteAs.',
         'HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs.',
-        '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
+        'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAs.',
     ];
     $peers = trim(str_replace($remove, '', $data));
 
     $peerlist = [];
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {
+        if (empty($peer)) {
+            continue;
+        }
+
         $local_ip = null;
         if ($peer2 === true) {
             [$ver, $peer] = explode('.', $peer, 2);
@@ -1049,13 +1053,12 @@ function build_bgp_peers($device, $data, $peer2)
         [$peer_ip, $peer_as] = explode(' ', $peer);
         if ($device['os'] === 'junos') {
             $ver = '';
-            $octets = count(explode('.', $peer_ip));
-            if ($octets > 11) {
-                // ipv6
-                $peer_ip = (string) IP::parse(snmp2ipv6($peer_ip), true);
-            } else {
-                // ipv4
-                $peer_ip = implode('.', array_slice(explode('.', $peer_ip), -4));
+            $pieces = explode('.', $peer_ip);
+            if (isset($pieces[1])) {
+                $is_ipv4 = $pieces[1] == 'ipv4';
+                // both local and remote are in the index, extract them
+                $local_ip = (string) IP::fromSnmpString(implode('.', array_slice($pieces, $is_ipv4 ? -9 : -33, $is_ipv4 ? 4 : 16)), true);
+                $peer_ip = (string) IP::fromSnmpString(implode('.', array_slice($pieces, $is_ipv4 ? -4 : -16)), true);
             }
         } else {
             if (strstr($peer_ip, ':')) {
@@ -1064,7 +1067,7 @@ function build_bgp_peers($device, $data, $peer2)
                 $peer_ip = str_replace('"', '', str_replace(' ', '', $peer_ip));
             }
         }
-        if ($peer && $peer_ip != '0.0.0.0') {
+        if ($peer_ip != '0.0.0.0') {
             if ($peer_as < 0) {
                 //if ASN is negative -> overflow int32 -> original number is max(INT32) - min(INT32) + 1 + value
                 $peer_as = 4294967296 + $peer_as;
@@ -1139,7 +1142,7 @@ function add_bgp_peer($device, $peer)
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
             'bgpLocalAddr' => $peer['localip'] ?: '0.0.0.0',
-            'bgpPeerRemoteAddr' => '0.0.0.0',
+            'bgpPeerRemoteAddr' => $peer['ip'] ?: '0.0.0.0',
             'bgpPeerInUpdates' => 0,
             'bgpPeerOutUpdates' => 0,
             'bgpPeerInTotalMessages' => 0,
