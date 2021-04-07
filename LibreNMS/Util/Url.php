@@ -352,11 +352,13 @@ class Url
             $urlargs[] = $key . '=' . urlencode($arg);
         }
 
+        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+
         if (Config::get('enable_lazy_load', true)) {
-            return '<img class="lazy img-responsive" data-original="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+            return '<noscript class="loading-lazy">' . $tag . ' loading="lazy" /></noscript>';
         }
 
-        return '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return $tag . ' />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
