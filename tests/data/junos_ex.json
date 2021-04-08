@@ -29,11 +29,8 @@
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpLocalAddr": "192.168.1.4",
-                    "bgpPeerRemoteAddr": "192.168.1.4",
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -43,7 +40,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -51,11 +51,8 @@
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpLocalAddr": "192.168.1.186",
-                    "bgpPeerRemoteAddr": "192.168.1.186",
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -65,7 +62,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -73,11 +73,8 @@
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpLocalAddr": "192.168.1.226",
-                    "bgpPeerRemoteAddr": "192.168.1.226",
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -87,7 +84,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -100,11 +100,8 @@
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "192.168.1.43",
-                    "bgpPeerRemoteAddr": "192.168.1.4",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 10526,
                     "bgpPeerOutUpdates": 531,
@@ -114,7 +111,10 @@
                     "bgpPeerInUpdateElapsedTime": 21748,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -122,11 +122,8 @@
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "192.168.1.185",
-                    "bgpPeerRemoteAddr": "192.168.1.186",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 1,
@@ -136,7 +133,10 @@
                     "bgpPeerInUpdateElapsedTime": 785386,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -144,11 +144,8 @@
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "192.168.1.225",
-                    "bgpPeerRemoteAddr": "192.168.1.226",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 3,
                     "bgpPeerOutUpdates": 1,
@@ -158,7 +155,10 @@
                     "bgpPeerInUpdateElapsedTime": 774040,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": []
