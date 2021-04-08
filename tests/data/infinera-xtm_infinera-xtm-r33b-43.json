@@ -8,7 +8,7 @@
                     "sysDescr": "Infinera Corporation - Embedded Node Manager - ENM_CUAPPL_03A cuappl03a r33b 43",
                     "sysContact": "<private>",
                     "version": "r33b-43",
-                    "hardware": null,
+                    "hardware": "TM-3000/II subrack",
                     "features": null,
                     "os": "infinera-xtm",
                     "type": "network",

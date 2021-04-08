@@ -4,6 +4,7 @@ modules:
     os:
         version: LUM-SYSTEM-MIB::sysNodeVersion.0
         location: LUM-SYSTEM-MIB::sysNodeLocation.0
+        hardware: LUM-INVENTORY-MIB::invPhysDescr.100000000
 
     mempools:
         data:
