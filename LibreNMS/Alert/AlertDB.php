@@ -37,7 +37,7 @@ class AlertDB
 {
     /**
      * @param string $rule
-     * @param bool $query_builder
+     * @param mixed $query_builder
      * @return bool|string
      */
     public static function genSQL($rule, $query_builder = false)
