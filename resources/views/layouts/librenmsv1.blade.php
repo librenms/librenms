@@ -50,6 +50,8 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
+    <script src="{{ asset('js/intersection-observer.js') }}"></script>
+    <script src="{{ asset('js/loading-attribute-polyfill.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
@@ -66,10 +68,6 @@
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
     <script src="{{ asset('js/pace.min.js') }}"></script>
     <script src="{{ asset('js/qrcode.min.js') }}"></script>
-    @if(LibreNMS\Config::get('enable_lazy_load', true))
-        <script src="{{ asset('js/jquery.lazyload.min.js') }}"></script>
-        <script src="{{ asset('js/lazyload.js') }}"></script>
-    @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
         $.ajaxSetup({
