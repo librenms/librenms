@@ -36,7 +36,7 @@
 @endforeach
 
 <script type='text/javascript'>
-    loadjs('js/raphael-min.js', function() {
+    loadjs('js/raphael.min.js', function() {
         loadjs('js/justgage.js', function() {
             $('.guage-{{ $id }}').each(function() {
                 new JustGage({

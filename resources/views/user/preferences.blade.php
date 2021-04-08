@@ -202,7 +202,7 @@
                 });
             });
 
-        $('.ajax-select').change(function () {
+        $('.ajax-select').on("change", function () {
             var $this = $(this);
             var value = $this.val();
             var pref = $this.data('pref');

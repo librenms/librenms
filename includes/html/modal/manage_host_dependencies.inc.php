@@ -157,7 +157,7 @@ $('#manage-dependencies').on('show.bs.modal', function() {
     })
 });
 
-$('#manhostdep-save').click('', function(event) {
+$('#manhostdep-save').on("click", function(event) {
     event.preventDefault();
     var device_ids = [];
     var children = [];

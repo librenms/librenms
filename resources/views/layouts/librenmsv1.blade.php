@@ -60,7 +60,7 @@
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('js/typeahead.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
+{{--    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>--}}
     <script src="{{ asset('js/tagmanager.js') }}"></script>
     <script src="{{ asset('js/mktree.js') }}"></script>
     <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>

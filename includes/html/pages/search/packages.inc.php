@@ -181,12 +181,12 @@ if ((int) ($count / $results) > 0 && $count != $results) {
     function updateResults(results) {
        $('#results_amount').val(results.value);
        $('#page_number').val(1);
-       $('#result_form').submit();
+       $('#result_form').trigger( "submit" );
     }
 
     function changePage(page,e) {
         e.preventDefault();
         $('#page_number').val(page);
-        $('#result_form').submit();
+        $('#result_form').trigger( "submit" );
     }
 </script>

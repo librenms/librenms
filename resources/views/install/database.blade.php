@@ -112,7 +112,7 @@
 
 @section('scripts')
     <script>
-        $('#database-form').submit(function (event) {
+        $('#database-form').on("submit", function (event) {
             event.preventDefault();
             $('#credential-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
@@ -138,7 +138,7 @@
             });
         });
 
-        $('#migrate-btn').click(function () {
+        $('#migrate-btn').on("click", function () {
             $('#migrate-warning').show()
             $('#migrate-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
