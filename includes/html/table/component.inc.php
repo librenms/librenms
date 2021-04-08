@@ -63,6 +63,6 @@ $output = [
     'current'  => $current,
     'rowCount' => $rowCount,
     'rows'     => $response,
-    'total'    => is_countable($COMPONENTS[$device_id]) ? count($COMPONENTS[$device_id]) : 0,
+    'total'    => ! empty($COMPONENTS[$device_id]) ? count($COMPONENTS[$device_id]) : 0,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
