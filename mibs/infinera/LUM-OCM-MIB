@@ -1,0 +1,1142 @@
+LUM-OCM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    lumModules, lumOcmMIB
+        FROM LUM-REG
+    FaultStatus, MgmtNameString, SubrackNumber, SlotNumber, PortNumber,
+    LambdaFrequency, BoardOrInterfaceOperStatus, BoardOrInterfaceAdminStatus,
+    CommandString
+        FROM LUM-TC;
+
+lumOcmMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201806150000Z" -- June 15th 2018
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The optical control interface MIB.
+
+        - General
+
+        - Monitor interfaces
+
+        Note that, every time a get operation is performed and both ports are set
+        to admin status up, the switch will switch to update both ports. (unless
+        commissioning mode) The guaranteed durability of switching is 10 million times.
+        That means, if you switch (perform a get operation) more than every 50 second,
+        product lifetime of 15 years can not be guaranteed.
+
+"
+    REVISION
+        "201806150000Z" -- June 15th 2018
+    DESCRIPTION
+        " Changes made for release r31.0:
+        - Added ocmIfSpacingMode and ocmIfHighInputPower in ocmIfEntry."
+    REVISION
+        "201712150000Z" -- Dec 15th 2017
+    DESCRIPTION
+        " Changes made for release r30.0:
+        - Added ocmChannelReferenceTime and ocmChannelSaveReference action in ocmChannel."
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201601110000Z" -- Jan 11th 2016
+    DESCRIPTION
+        "Added default value notPresent for operStatus."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Added a parameter for offset adjustment which will allow for better
+        regulation in the optical control loop"
+    REVISION
+        "200801160000Z" -- January 16th 2008
+    DESCRIPTION
+        "First version."
+
+    ::= { lumModules 33 }
+
+
+-- ----------------------------------------------------
+-- Conformance area, containing groups and complicance
+-- specifications.
+-- ----------------------------------------------------
+
+lumOcmConfs OBJECT IDENTIFIER ::= { lumOcmMIB 1 }
+lumOcmGroups OBJECT IDENTIFIER ::= { lumOcmConfs 1 }
+lumOcmCompl OBJECT IDENTIFIER ::= { lumOcmConfs 2 }
+lumOcmMinimalGroups OBJECT IDENTIFIER ::= { lumOcmConfs 3 }
+lumOcmMinimalCompl OBJECT IDENTIFIER ::= { lumOcmConfs 4 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the ocm MIB
+-- ----------------------------------------------------
+
+lumOcmMIBObjects OBJECT IDENTIFIER ::= { lumOcmMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+ocmGeneral OBJECT IDENTIFIER ::= { lumOcmMIBObjects 1 }
+ocmIfList OBJECT IDENTIFIER ::= { lumOcmMIBObjects 2 }
+ocmChannelList OBJECT IDENTIFIER ::= { lumOcmMIBObjects 3 }
+lumentisOcmNotifications  OBJECT IDENTIFIER ::= { lumOcmMIBObjects 4 }
+
+-- ----------------------------------------------------
+-- Textual Conventions
+-- ----------------------------------------------------
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+ocmGeneralLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB
+        was last changed.
+
+"
+    ::= { ocmGeneral 1 }
+
+ocmGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state of the MIB was last
+        changed.
+
+"
+    ::= { ocmGeneral 2 }
+
+ocmGeneralOcmIfTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { ocmGeneral 3 }
+
+ocmGeneralOcmChannelTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { ocmGeneral 4 }
+
+-- ----------------------------------------------------
+-- Optical control interfaces
+-- ----------------------------------------------------
+
+ocmIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OcmIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface list."
+    ::= { ocmIfList 1 }
+
+ocmIfEntry OBJECT-TYPE
+    SYNTAX      OcmIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the interface list.
+
+"
+    INDEX { ocmIfIndex }
+    ::= { ocmIfTable 1 }
+
+OcmIfEntry ::=
+    SEQUENCE {
+        ocmIfIndex                      Unsigned32,
+        ocmIfName                       MgmtNameString,
+        ocmIfDescr                      DisplayString,
+        ocmIfSubrack                    SubrackNumber,
+        ocmIfSlot                       SlotNumber,
+        ocmIfRxPort                     PortNumber,
+        ocmIfInvPhysIndexOrZero         Unsigned32,
+        ocmIfAdminStatus                BoardOrInterfaceAdminStatus,
+        ocmIfOperStatus                 BoardOrInterfaceOperStatus,
+        ocmIfPowerThreshold             Integer32,
+        ocmIfPowerOffset                Integer32,
+        ocmIfMaxPowerLevel              Integer32,
+        ocmIfMinPowerLevel              Integer32,
+        ocmIfDeltaPower                 Integer32,
+        ocmIfConnectedBoardType         INTEGER,
+        ocmIfUpdateLastChangeTime       DateAndTime,
+        ocmIfConnectedSubrack           SubrackNumber,
+        ocmIfConnectedSlot              SlotNumber,
+        ocmIfConnectedPort              PortNumber,
+        ocmIfActivePort                 PortNumber,
+        ocmIfControlMode                INTEGER,
+        ocmIfReferenceTime              DisplayString,
+        ocmIfSwitchFailure              FaultStatus,
+        ocmIfDataSourceNotDefined       FaultStatus,
+        ocmIfCommissioningMode          FaultStatus,
+        ocmIfModuleFailure              FaultStatus,
+        ocmIfConfigurationCommand       CommandString,
+        ocmIfChangeConnectedPort        CommandString,
+        ocmIfSaveReference              CommandString,
+        ocmIfChangeConnectedBoardType   CommandString,
+        ocmIfChangePowerThreshold       CommandString,
+        ocmIfChangePowerOffset          CommandString,
+        ocmIfPowerOffsetAdjustment      Integer32,
+        ocmIfSpacingMode                Integer32,
+        ocmIfHighInputPower             FaultStatus }
+
+
+ocmIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { ocmIfEntry 1 }
+
+ocmIfName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for
+        example 'ocm:1:2:1', where the first number
+        indicates sub-rack, the second slot number and
+        the third is the port number.
+        Examples:
+
+        ocm:s:s:p - Optical channel module interface
+
+"
+    ::= { ocmIfEntry 2 }
+
+ocmIfDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { ocmIfEntry 3 }
+
+ocmIfSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the interface
+        is located.
+
+"
+    ::= { ocmIfEntry 4 }
+
+ocmIfSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the interface is
+        located.
+
+"
+    ::= { ocmIfEntry 5 }
+
+ocmIfRxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the RX-side of
+        the interface is located.
+
+"
+    ::= { ocmIfEntry 6 }
+
+ocmIfInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this interface.
+        Set to 0 if not known.
+
+"
+    ::= { ocmIfEntry 7 }
+
+ocmIfAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state for the interface.
+
+        down - The interface should be inactive.
+
+        service - The interface is activated but alarms
+        are suppressed. Intended for use during service
+        or re-configuration. When service is concluded
+        adminStatus should be set to 'up' again.
+
+        up - The interface should be activated when
+        it becomes available. Alarms are not suppressed.
+
+"
+    DEFVAL { up }
+    ::= { ocmIfEntry 8 }
+
+ocmIfOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The physical resources are not
+        available.
+
+        down - The interface is de-activated or the are
+        faults preventing it from going to the 'up'-state.
+
+        up - The interface is operational.
+
+"
+    DEFVAL { notPresent }
+    ::= { ocmIfEntry 9 }
+
+ocmIfPowerThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-50..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The threshold for power levels. If the measured
+        power level is below the threshold, it is regarded
+        as no signal.
+
+        For OCM8p:
+
+        Default	  -13dBm
+
+        Range	  -35 to 100dBm
+
+        For OCM2p:
+
+"
+    DEFVAL { -24 }
+    ::= { ocmIfEntry 12 }
+
+ocmIfUpdateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the last measurement was done.
+
+"
+    ::= { ocmIfEntry 13 }
+
+ocmIfConnectedSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the connected
+        interface is located. (0 is not valid)
+
+"
+    DEFVAL { 0 }
+    ::= { ocmIfEntry 14 }
+
+ocmIfConnectedSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the connected
+        interface is located. (not possible to set 0, 1,
+        19-22, oa/roadm can not be placed in those slots)
+
+"
+    DEFVAL { 0 }
+    ::= { ocmIfEntry 15 }
+
+ocmIfConnectedPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the connected port.
+        (the tx port number).
+        1 or 3 for OA,
+        5 for 1x2ROADM/100G/50G,
+        9 for 1x4ROADM/100G,ROADM1x4f,
+        17 for 1x8ROADM/50G,
+        19 for ROADM1x9f,
+        1 for OA26C,
+        5 for OARAED21HG
+        81 for MDU40.
+        and 1 to 82 for other boards.
+
+"
+    DEFVAL { 0 }
+    ::= { ocmIfEntry 16 }
+
+ocmIfActivePort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the active port.
+        Only valid when commissioning mode.
+
+"
+    DEFVAL { 1 }
+    ::= { ocmIfEntry 17 }
+
+ocmIfControlMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        normal (1),
+        commissioning (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "What mode the ocm is in.
+
+        normal - the switch toggle every hour
+        and measure both ports.
+
+        commissioning - the switch is set to one active
+        port and measurement is made continuously on this port.
+        After 15 minutes it will change back to normal mode.
+        Note that it is not possible to get updated
+        values on port that is not chosen as active during
+        commissioning mode.
+
+"
+    DEFVAL { normal }
+    ::= { ocmIfEntry 18 }
+
+ocmIfReferenceTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Time where reference values were saved.
+
+"
+    ::= { ocmIfEntry 21 }
+
+ocmIfSwitchFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Switch failure.
+
+        A: The switch is stuck and it is not possible
+        to change port. It is not sure if it the values
+        comes from the expected port.
+
+        D: The switch works as expected.
+
+"
+    ::= { ocmIfEntry 22 }
+
+ocmIfDataSourceNotDefined OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Data source not defined,
+
+        A: No connected slot, connected subrack
+        nor connected port is defined.
+
+        D: Connected slot, connected subrack and
+        connected port is ok.
+
+"
+    ::= { ocmIfEntry 23 }
+
+ocmIfCommissioningMode OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Data source not defined,
+
+        A: Commissioning mode is used
+
+        D: Normal mode
+
+"
+    ::= { ocmIfEntry 24 }
+
+ocmIfModuleFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module HW has detected a failure.
+
+        A: The module has failed
+
+        D: The module is OK again
+
+"
+    ::= { ocmIfEntry 25 }
+
+ocmIfConfigurationCommand OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select which control mode to use.
+
+        normal - the switch toggle every hour
+        and measure both ports.
+
+        commissioning - the switch is set to one
+        port while adjusting surrounding boards.
+
+
+"
+    ::= { ocmIfEntry 26 }
+
+ocmIfChangeConnectedPort OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select which monitor port that is connected
+        to this ocm port.
+
+"
+    ::= { ocmIfEntry 27 }
+
+ocmIfSaveReference OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Save current measurement as reference values
+
+"
+    ::= { ocmIfEntry 28 }
+
+ocmIfPowerOffset OBJECT-TYPE
+    SYNTAX      Integer32 (0..350)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An offset value added to all power levels to get
+        an accurate presentation of channel powers at the line
+	    port.
+
+        Generally offset values depends upon board type connected.
+        oa - 20.0
+        roadm - 17.0
+        oa26c - 20.0
+        mdu40 - 20.0
+        other - 20.0
+        oaraed21hg - 20.0
+        oaraed20lg - 20.0
+
+	    OA boards have more accurate values for power offset
+        named Monitor port insertion loss visible in the OA
+        interface.
+
+        Note however that the reference power level values
+        are not affected by a change of this offset. A new
+        reference calculation should be made after a change.
+
+"
+    ::= { ocmIfEntry 29 }
+
+ocmIfConnectedBoardType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        oa (1),
+        roadm (2),
+        oa26c (3),
+        mdu40 (4),
+        other (5),
+        oaraed21hg (6),
+        oaraed20lg (7)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "What board type that is connected to the ocm.
+        The power offset default value is changed
+        based on the chosen board type.
+        Please note that this function is not
+        applicable for mdu40lite boards.
+
+"
+    DEFVAL { oa }
+    ::= { ocmIfEntry 30 }
+
+ocmIfChangeConnectedBoardType OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select board type for the monitor port connected
+        to this ocm port.
+
+"
+    ::= { ocmIfEntry 31 }
+
+ocmIfMaxPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum received power level for this port
+        in units of 0.1 dBm.
+
+"
+    ::= { ocmIfEntry 32 }
+
+ocmIfMinPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum received power level for this port
+        in units of 0.1 dBm.
+
+"
+    ::= { ocmIfEntry 33 }
+
+ocmIfDeltaPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The difference between the maximum and the minimum
+        received power level for this port in units of 0.1 dBm.
+
+"
+    ::= { ocmIfEntry 34 }
+
+ocmIfChangePowerThreshold OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select the power threshold for this ocm port.
+
+        If the measured power level is below the threshold, it
+        is regarded as no signal.
+
+"
+    ::= { ocmIfEntry 35 }
+
+ocmIfChangePowerOffset OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select the power offset for this ocm port.
+
+        The power offset is a value added to all power levels to get
+        an accurate presentation of channel powers at the line port.
+
+"
+    ::= { ocmIfEntry 36 }
+
+ocmIfPowerOffsetAdjustment OBJECT-TYPE
+    SYNTAX      Integer32 (0..350)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An offset adjustment added to the power offset to
+        mitigate the effects of differences between actual
+        power measured at the OCM and the configured power
+        offset value.
+        This adjustment allows the optical control loop to
+        regulate with better precision.
+
+"
+    ::= { ocmIfEntry 37 }
+
+ocmIfSpacingMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        spacing50GHz  (1)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Spacing mode is configured for monitoring channel power
+        with the channel spacing of 50GHz.
+
+        spacing50GHz: interface with channels in 50 GHz intervals
+
+"
+    DEFVAL { spacing50GHz }
+    ::= { ocmIfEntry 38 }
+
+ocmIfHighInputPower OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OCM module has detected a high input power.
+
+        A: OCM module has dectected high input power (above 20dBm)
+            on particular port.
+
+        D: Optical input power is within the limit (below 20dBm).
+
+"
+    ::= { ocmIfEntry 39 }
+
+-- ----------------------------------------------------
+-- Optical control channels
+-- ----------------------------------------------------
+
+ocmChannelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OcmChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The channel list."
+
+    ::= { ocmChannelList 1 }
+
+ocmChannelEntry OBJECT-TYPE
+    SYNTAX      OcmChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the channel list.
+
+"
+    INDEX { ocmChannelIndex }
+    ::= { ocmChannelTable 1 }
+
+OcmChannelEntry ::=
+    SEQUENCE {
+        ocmChannelIndex                 Unsigned32,
+        ocmChannelName                  MgmtNameString,
+        ocmChannelFrequency             LambdaFrequency,
+        ocmChannelPowerLevel            Integer32,
+        ocmChannelUpdateLastChangeTime  DateAndTime,
+        ocmChannelOcmRefIfIndex         Unsigned32,
+        ocmChannelReferencePowerLevel   Integer32,
+        ocmChannelReferenceTime	        DisplayString,
+        ocmChannelSaveReference         CommandString}
+
+
+ocmChannelIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { ocmChannelEntry 1 }
+
+ocmChannelName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for
+        example 'ocm:1:2:1', where the first number
+        indicates sub-rack, the second slot number and
+        the third is the port number.
+        Examples:
+
+        ocm:s:s:p - Optical channel module interface
+
+"
+    ::= { ocmChannelEntry 2 }
+
+ocmChannelFrequency OBJECT-TYPE
+    SYNTAX      LambdaFrequency
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Freqency in hundreds of GHz (0.01 GHz).
+
+"
+    ::= { ocmChannelEntry 3 }
+
+ocmChannelPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The received power level in units of 0.1 dBm.
+
+"
+    ::= { ocmChannelEntry 4 }
+
+ocmChannelUpdateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time when last measurement was done.
+
+"
+    ::= { ocmChannelEntry 5 }
+
+ocmChannelOcmRefIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNMP-index of the OCM i/f object related to this
+         object.
+
+"
+    DEFVAL { 1 }
+    ::= { ocmChannelEntry 6 }
+
+ocmChannelReferencePowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The reference power level in units of 0.1 dBm.
+
+"
+    DEFVAL { 1000 }
+    ::= { ocmChannelEntry 7 }
+
+ocmChannelReferenceTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Time where reference values were saved.
+
+"
+    ::= { ocmChannelEntry 8 }
+
+ocmChannelSaveReference OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Save current measurement as reference values
+
+"
+    ::= { ocmChannelEntry 9 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+-- n/a
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+ocmGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        ocmGeneralLastChangeTime,
+        ocmGeneralStateLastChangeTime,
+        ocmGeneralOcmIfTableSize }
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumOcmGroups 1 }
+
+ocmIfGroup OBJECT-GROUP
+    OBJECTS {
+        ocmIfIndex,
+        ocmIfName,
+        ocmIfDescr,
+        ocmIfSubrack,
+        ocmIfSlot,
+        ocmIfRxPort,
+        ocmIfInvPhysIndexOrZero,
+        ocmIfAdminStatus,
+        ocmIfOperStatus,
+        ocmIfPowerThreshold,
+        ocmIfUpdateLastChangeTime,
+        ocmIfConnectedSubrack,
+        ocmIfConnectedSlot,
+        ocmIfConnectedPort,
+        ocmIfActivePort,
+        ocmIfControlMode,
+        ocmIfReferenceTime,
+        ocmIfSwitchFailure,
+        ocmIfDataSourceNotDefined,
+        ocmIfCommissioningMode,
+        ocmIfModuleFailure,
+        ocmIfConfigurationCommand,
+        ocmIfChangeConnectedPort,
+        ocmIfSaveReference,
+        ocmIfPowerOffset,
+        ocmIfConnectedBoardType,
+        ocmIfChangeConnectedBoardType,
+        ocmIfMaxPowerLevel,
+        ocmIfMinPowerLevel,
+        ocmIfDeltaPower }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ocm interface objects."
+    ::= { lumOcmGroups 2 }
+
+ocmChannelGroup OBJECT-GROUP
+    OBJECTS {
+        ocmChannelIndex,
+        ocmChannelName,
+        ocmChannelFrequency,
+        ocmChannelPowerLevel,
+        ocmChannelUpdateLastChangeTime,
+        ocmChannelOcmRefIfIndex,
+        ocmChannelReferencePowerLevel }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ocm channel objects."
+    ::= { lumOcmGroups 3 }
+
+ocmIfGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ocmIfIndex,
+        ocmIfName,
+        ocmIfDescr,
+        ocmIfSubrack,
+        ocmIfSlot,
+        ocmIfRxPort,
+        ocmIfInvPhysIndexOrZero,
+        ocmIfAdminStatus,
+        ocmIfOperStatus,
+        ocmIfPowerThreshold,
+        ocmIfUpdateLastChangeTime,
+        ocmIfConnectedSubrack,
+        ocmIfConnectedSlot,
+        ocmIfConnectedPort,
+        ocmIfActivePort,
+        ocmIfControlMode,
+        ocmIfReferenceTime,
+        ocmIfSwitchFailure,
+        ocmIfDataSourceNotDefined,
+        ocmIfCommissioningMode,
+        ocmIfModuleFailure,
+        ocmIfConfigurationCommand,
+        ocmIfChangeConnectedPort,
+        ocmIfSaveReference,
+        ocmIfPowerOffset,
+        ocmIfConnectedBoardType,
+        ocmIfChangeConnectedBoardType,
+        ocmIfMaxPowerLevel,
+        ocmIfMinPowerLevel,
+        ocmIfDeltaPower,
+        ocmIfChangePowerThreshold,
+        ocmIfChangePowerOffset }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ocm interface objects."
+    ::= { lumOcmGroups 4 }
+
+ocmIfGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ocmIfIndex,
+        ocmIfName,
+        ocmIfDescr,
+        ocmIfSubrack,
+        ocmIfSlot,
+        ocmIfRxPort,
+        ocmIfInvPhysIndexOrZero,
+        ocmIfAdminStatus,
+        ocmIfOperStatus,
+        ocmIfPowerThreshold,
+        ocmIfUpdateLastChangeTime,
+        ocmIfConnectedSubrack,
+        ocmIfConnectedSlot,
+        ocmIfConnectedPort,
+        ocmIfActivePort,
+        ocmIfControlMode,
+        ocmIfReferenceTime,
+        ocmIfSwitchFailure,
+        ocmIfDataSourceNotDefined,
+        ocmIfCommissioningMode,
+        ocmIfModuleFailure,
+        ocmIfConfigurationCommand,
+        ocmIfChangeConnectedPort,
+        ocmIfSaveReference,
+        ocmIfPowerOffset,
+        ocmIfConnectedBoardType,
+        ocmIfChangeConnectedBoardType,
+        ocmIfMaxPowerLevel,
+        ocmIfMinPowerLevel,
+        ocmIfDeltaPower,
+        ocmIfChangePowerThreshold,
+        ocmIfChangePowerOffset,
+        ocmIfPowerOffsetAdjustment }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ocm interface objects."
+    ::= { lumOcmGroups 5 }
+
+ocmChannelGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ocmChannelIndex,
+        ocmChannelName,
+        ocmChannelFrequency,
+        ocmChannelPowerLevel,
+        ocmChannelUpdateLastChangeTime,
+        ocmChannelOcmRefIfIndex,
+        ocmChannelReferencePowerLevel,
+        ocmChannelReferenceTime,
+        ocmChannelSaveReference }
+    STATUS      current
+    DESCRIPTION
+        "The ocm channel objects."
+    ::= { lumOcmGroups 6 }
+
+ocmIfGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ocmIfIndex,
+        ocmIfName,
+        ocmIfDescr,
+        ocmIfSubrack,
+        ocmIfSlot,
+        ocmIfRxPort,
+        ocmIfInvPhysIndexOrZero,
+        ocmIfAdminStatus,
+        ocmIfOperStatus,
+        ocmIfPowerThreshold,
+        ocmIfUpdateLastChangeTime,
+        ocmIfConnectedSubrack,
+        ocmIfConnectedSlot,
+        ocmIfConnectedPort,
+        ocmIfActivePort,
+        ocmIfControlMode,
+        ocmIfReferenceTime,
+        ocmIfSwitchFailure,
+        ocmIfDataSourceNotDefined,
+        ocmIfCommissioningMode,
+        ocmIfModuleFailure,
+        ocmIfConfigurationCommand,
+        ocmIfChangeConnectedPort,
+        ocmIfSaveReference,
+        ocmIfPowerOffset,
+        ocmIfConnectedBoardType,
+        ocmIfChangeConnectedBoardType,
+        ocmIfMaxPowerLevel,
+        ocmIfMinPowerLevel,
+        ocmIfDeltaPower,
+        ocmIfChangePowerThreshold,
+        ocmIfChangePowerOffset,
+        ocmIfPowerOffsetAdjustment,
+        ocmIfSpacingMode,
+        ocmIfHighInputPower }
+
+    STATUS      current
+    DESCRIPTION
+        "The ocm interface objects."
+    ::= { lumOcmGroups 7 }
+
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumOcmBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OCM MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            ocmGeneralGroup,
+            ocmIfGroup,
+            ocmChannelGroup }
+    ::= { lumOcmCompl 1 }
+
+lumOcmBasicComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OCM MIB V2 (14.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            ocmGeneralGroup,
+            ocmIfGroupV2,
+            ocmChannelGroup }
+    ::= { lumOcmCompl 2 }
+
+lumOcmBasicComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OCM MIB V2 (23.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            ocmGeneralGroup,
+            ocmIfGroupV3,
+            ocmChannelGroup }
+    ::= { lumOcmCompl 3 }
+
+lumOcmBasicComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OCM MIB V2 (30.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            ocmGeneralGroup,
+            ocmIfGroupV3,
+            ocmChannelGroupV2 }
+    ::= { lumOcmCompl 4 }
+
+lumOcmBasicComplV5 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the OCM MIB V2 (31.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            ocmGeneralGroup,
+            ocmIfGroupV4,
+            ocmChannelGroupV2 }
+    ::= { lumOcmCompl 5 }
+
+-- ----------------------------------------------------
+-- Minimal Compliance
+-- ----------------------------------------------------
+
+lumOcmMinimalComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the OCM MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            ocmGeneralGroup,
+            ocmIfGroup }
+    ::= { lumOcmMinimalCompl 1 }
+
+END
+
+
