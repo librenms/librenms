@@ -565,7 +565,7 @@
         var datas = $(data).serializeArray();
         for( var field in datas ) {
             var name = datas[field].name;
-            if (name.substring(name.length - 2, name.length) === '[]')
+            if (name.substring(name.length - 2, name.length) === '[]') {
                 name = name.slice(0, -2);
                 if (widget_settings[name]) {
                     widget_settings[name].push(datas[field].value);
