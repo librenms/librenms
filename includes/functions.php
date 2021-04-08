@@ -402,7 +402,7 @@ function delete_device($id)
  *
  * @param string $host dns name or ip address
  * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
- * @param string $port the port to connect to for snmp
+ * @param int $port the port to connect to for snmp
  * @param string $transport udp or tcp
  * @param string $poller_group the poller group this device will belong to
  * @param bool $force_add add even if the device isn't reachable
@@ -418,7 +418,7 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
+function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
 {
     // Test Database Exists
     if (host_exists($host)) {
@@ -729,6 +729,24 @@ function match_network($nets, $ip, $first = false)
     }
 
     return $return;
+}
+
+// FIXME port to LibreNMS\Util\IPv6 class
+function snmp2ipv6($ipv6_snmp)
+{
+    // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
+    // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
+    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
+    $ipv6_2 = [];
+
+    for ($i = 0; $i <= 15; $i++) {
+        $ipv6[$i] = zeropad(dechex($ipv6[$i]));
+    }
+    for ($i = 0; $i <= 15; $i += 2) {
+        $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
+    }
+
+    return implode(':', $ipv6_2);
 }
 
 function get_astext($asn)

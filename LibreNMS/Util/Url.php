@@ -26,9 +26,9 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
-use Auth;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -496,7 +496,7 @@ class Url
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
                 if (strpos($feature, ' ') !== false) {
-                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";
                     $possibilities[] = "$distro.png";

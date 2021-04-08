@@ -94,9 +94,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param mixed $tmnxEnacpVal
+     * @param mixed $tmnxEncapVal
      * @return string encapsulation
-     * see TIMETRA-TC-MIB::TmnxEncapVal
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
      */
     private function nokiaEncap($tmnxEncapVal)
     {

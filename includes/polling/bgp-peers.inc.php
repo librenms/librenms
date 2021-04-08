@@ -11,7 +11,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
     if (! empty($peers)) {
         $generic = false;
         if ($device['os'] == 'junos') {
-            $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
+            $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'dell-os10') {
@@ -69,15 +69,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             echo "\nCaching Oids...";
 
                             foreach ($peer_data_check as $hash => $index) {
-                                $exploded_ip = explode('.', $index['orig']);
-                                $tmp_peer_ip = (string) IP::fromSnmpString(implode('.', array_slice($exploded_ip, $exploded_ip[2] == '1' ? -4 : -16)));
+                                $peer_ip_snmp = ltrim($index['orig'], '.');
+                                $exploded_ip = explode('.', $peer_ip_snmp);
+                                if (count($exploded_ip) > 11) {
+                                    // ipv6
+                                    $tmp_peer_ip = (string) IP::parse(snmp2ipv6($peer_ip_snmp), true);
+                                } else {
+                                    // ipv4
+                                    $tmp_peer_ip = implode('.', array_slice($exploded_ip, -4));
+                                }
                                 $junos[$tmp_peer_ip]['hash'] = $hash;
                                 $junos[$tmp_peer_ip]['index'] = $index['jnxBgpM2PeerIndex'];
                             }
                         }
 
                         if (! isset($peer_data_tmp)) {
-                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
+                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerStatus', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.3', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerOutUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
