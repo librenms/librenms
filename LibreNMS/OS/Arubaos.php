@@ -87,7 +87,7 @@ class Arubaos extends OS implements
         $sensors = [];
 
         foreach ($data as $key => $value) {
-            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On', null);
+            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On');
             $value = intval($value);
 
             $low_warn_const = 1; // Default warning threshold = 1 down AP
