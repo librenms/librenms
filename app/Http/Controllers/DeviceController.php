@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
+use Wpb\String_Blade_Compiler\Facades\StringBlade as View;
 
 class DeviceController extends Controller
 {
@@ -165,7 +166,7 @@ class DeviceController extends Controller
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $link) {
             $device_links['custom' . ($index + 1)] = [
                 'icon' => $link['icon'] ?? 'fa-external-link',
-                'url' => view(['template' => $link['url']], ['device' => $device])->__toString(),
+                'url' => View::make(['template' => $link['url']], ['device' => $device])->__toString(),
                 'title' => $link['title'],
                 'external' => $link['external'] ?? true,
             ];
