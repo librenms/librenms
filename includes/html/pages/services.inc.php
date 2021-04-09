@@ -202,17 +202,17 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             $color = 'default';
                             $orig_colour = 'danger';
                             $orig_ico = $ico;
-                        } elseif (!$service['service_ignore'] && !$service['service_disabled']) {
+                        } elseif (! $service['service_ignore'] && ! $service['service_disabled']) {
                             $ico = 'check';
                             $color = 'success';
                             $orig_colour = $color;
                             $orig_ico = $ico;
                             $service_checked = 'checked';
-                        } elseif (!$service['service_ignore'] && $service['service_disabled']) {
+                        } elseif (! $service['service_ignore'] && $service['service_disabled']) {
                             $color = 'default';
                             $orig_colour = 'success';
                             $orig_ico = 'check';
-                        } elseif ($service['service_ignore'] && !$service['service_disabled']) {
+                        } elseif ($service['service_ignore'] && ! $service['service_disabled']) {
                             $color = 'danger';
                             $orig_colour = $color;
                             $orig_ico = $ico;
@@ -277,20 +277,12 @@ $('input[name="service_status"]').on('switchChange.bootstrapSwitch',  function(e
                         $('#service_status-'+service_id).removeClass('text-danger');
                         $('#service_status-'+service_id).removeClass('text-success');
                         $('#service_status-'+service_id).addClass('text-'+orig_colour);
-                        //$('#alert-rule-'+alert_id).attr('data-content', alert_status);
-                        //$('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is ON');
-                        //$('#rule_id_'+alert_id).removeClass('active');
-                        //$('#rule_id_'+alert_id).addClass(orig_class);
                     } else {
                         $('#service_status-'+service_id).removeClass('fa-check');
                         $('#service_status-'+service_id).addClass('fa-pause');
                         $('#service_status-'+service_id).removeClass('text-success');
                         $('#service_status-'+service_id).removeClass('text-danger');
                         $('#service_status-'+service_id).addClass('text-default');
-                        //$('#alert-rule-'+alert_id).attr('data-content', alert_name+' is OFF');
-                        //$('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is OFF');
-                        //$('#rule_id_'+alert_id).removeClass('warning');
-                        //$('#rule_id_'+alert_id).addClass('active');
                     }
                 } else {
                     $("#message").html('<div class="alert alert-info">'+msg+'</div>');
