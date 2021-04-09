@@ -45,7 +45,7 @@ if (is_numeric($service_id) && $service_id > 0) {
     if (is_numeric(edit_service($update, $service_id))) {
         $status = ['status' =>0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];
     } else {
-        $status = ['status' =>1, 'update' => var_dump($update), 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
     }
 } else {
     // Need to add.
