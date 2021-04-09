@@ -266,7 +266,7 @@ $('input[name="service_status"]').on('switchChange.bootstrapSwitch',  function(e
     $.ajax({
         type: 'POST',
             url: 'ajax_form.php',
-            data: { type: "update-service-status", service_id: service_id, state: state },
+            data: { type: "create-service", service_id: service_id, disabled: (1 - state) },
             dataType: "html",
             success: function(msg) {
                 if(msg.indexOf("ERROR:") <= -1) {
