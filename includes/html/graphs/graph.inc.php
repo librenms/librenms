@@ -51,12 +51,14 @@ if ($auth && is_customoid_graph($type, $subtype)) {
 if (! empty($error_msg)) {
     // We have an error :(
     graph_error($error_msg);
+
     return;
 }
 
 if ($auth === null) {
     // We are unauthenticated :(
     graph_error($width < 200 ? 'No Auth' : 'No Authorization');
+
     return;
 }
 
@@ -83,17 +85,20 @@ if (! empty($command_only)) {
         echo '</pre>';
     }
     echo '</div>';
+
     return;
 }
 
 // graph sent file not found flag
 if (! empty($no_file)) {
     graph_error($width < 200 ? 'No Data' : 'No Data file ' . $no_file);
+
     return;
 }
 
 if (empty($rrd_options)) {
     graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
+
     return;
 }
 
