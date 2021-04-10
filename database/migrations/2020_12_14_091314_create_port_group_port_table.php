@@ -12,7 +12,7 @@ class CreatePortGroupPortTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('port_group_port')) {
+        if (! Schema::hasTable('port_group_port')) {
             Schema::create('port_group_port', function (Blueprint $table) {
                 $table->unsignedInteger('port_group_id')->unsigned()->index();
                 $table->unsignedInteger('port_id')->unsigned()->index();
