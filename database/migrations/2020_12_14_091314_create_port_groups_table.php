@@ -17,11 +17,6 @@ class CreatePortGroupsTable extends Migration
             $table->string('name')->unique();
             $table->string('desc')->nullable();
         });
-        Schema::create('port_group_port', function (Blueprint $table) {
-            $table->unsignedInteger('port_group_id')->unsigned()->index();
-            $table->unsignedInteger('port_id')->unsigned()->index();
-            $table->primary(['port_group_id', 'port_id']);
-        });
     }
 
     /**
@@ -31,7 +26,6 @@ class CreatePortGroupsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('port_group_port');
         Schema::drop('port_groups');
     }
 }
