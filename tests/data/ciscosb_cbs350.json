@@ -8,7 +8,7 @@
                     "sysDescr": "CBS350-24P-4G 24-Port Gigabit PoE Managed Switch",
                     "sysContact": "<private>",
                     "version": "",
-                    "hardware": "",
+                    "hardware": "CBS350-24P-4G",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",
