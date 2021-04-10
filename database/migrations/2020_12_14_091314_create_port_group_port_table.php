@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreatePortGroupsTable extends Migration
+class CreatePortGroupPortTable extends Migration
 {
     /**
      * Run the migrations.
