@@ -1,0 +1,53 @@
+os: deltaorion
+group: delta
+text: 'Delta Orion Controller'
+type: environment
+icon: delta
+discovery_modules:
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    ipmi: false
+    bgp-peers: false
+    services: false
+    vlans: false
+    arp-table: false
+    mef: false
+    cisco-vrf-lite: false
+    storage: false
+    fdb-table: false
+    wireless: false
+    discovery-protocols: false
+    hr-device: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    processors: false
+    mempools: false
+    ports-stack: false
+    ports: false
+    entity-physical: false
+poller_modules:
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    ipmi: false
+    bgp-peers: false
+    services: false
+    libvirt-vminfo: false
+    vmware-vminfo: false
+    vlans: false
+    arp-table: false
+    mef: false
+    cisco-vrf-lite: false
+    storage: false
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.20246
