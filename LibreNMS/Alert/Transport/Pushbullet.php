@@ -56,9 +56,7 @@ class Pushbullet extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 201) {
-            if ($debug) {
-                var_dump($ret);
-            }
+            var_dump($ret);
 
             return 'HTTP Status code ' . $code;
         }

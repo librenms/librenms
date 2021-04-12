@@ -124,6 +124,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     public function buildTargetsConfiguration($devices)
     {
         // Take the devices array and build it into a hierarchical list
+        $smokelist = [];
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
         }
@@ -222,7 +223,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Determine if a list of targets is needed, and write one if so
      *
-     * @param array $devices A list of devices to create a a config block for
+     * @param array $smokelist A list of devices to create a a config block for
      *
      * @return array
      */

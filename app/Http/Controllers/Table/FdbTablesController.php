@@ -147,6 +147,9 @@ class FdbTablesController extends TableController
         return $query;
     }
 
+    /**
+     * @param PortsFdb $fdb_entry
+     */
     public function formatItem($fdb_entry)
     {
         $ip_info = $this->findIps($fdb_entry->mac_address);
@@ -197,10 +200,10 @@ class FdbTablesController extends TableController
 
         return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->where('port_id', $port_id);
+                return $query->where('port_id', $port_id);
             })
             ->pluck('mac_address');
     }
@@ -216,10 +219,10 @@ class FdbTablesController extends TableController
 
         return Vlan::where('vlan_vlan', $vlan)
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->whereIn('device_id', function ($query) use ($port_id) {
+                return $query->whereIn('device_id', function ($query) use ($port_id) {
                     $query->select('device_id')->from('ports')->where('port_id', $port_id);
                 });
             })
@@ -237,10 +240,10 @@ class FdbTablesController extends TableController
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->where('port_id', $port_id);
+                return $query->where('port_id', $port_id);
             })
             ->pluck('port_id');
     }

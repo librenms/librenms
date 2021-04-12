@@ -36,7 +36,7 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;

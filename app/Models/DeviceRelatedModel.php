@@ -24,6 +24,9 @@
 
 namespace App\Models;
 
+use App\Facades\DeviceCache;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class DeviceRelatedModel extends BaseModel
 {
     // ---- Query Scopes ----
@@ -44,8 +47,23 @@ class DeviceRelatedModel extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
+    }
+
+    // ---- Accessors/Mutators ----
+
+    /**
+     * Use cached device instance to load device relationships
+     */
+    public function getDeviceAttribute(): ?Device
+    {
+        if (! $this->relationLoaded('device')) {
+            $device = DeviceCache::get($this->device_id);
+            $this->setRelation('device', $device->exists ? $device : null);
+        }
+
+        return $this->getRelationValue('device');
     }
 }

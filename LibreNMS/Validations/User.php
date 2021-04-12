@@ -83,39 +83,41 @@ class User extends BaseValidation
                 "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/",
             ];
 
-            $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
-            if (! empty($find_result)) {
-                // Ignore files created by the webserver
-                $ignore_files = [
-                    "$log_dir/error_log",
-                    "$log_dir/access_log",
-                    "$dir/bootstrap/cache/",
-                    "$dir/storage/framework/cache/",
-                    "$dir/storage/framework/sessions/",
-                    "$dir/storage/framework/views/",
-                    "$dir/storage/debugbar/",
-                    "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
-                ];
+            if (! Config::get('installed_from_package')) {
+                $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
+                if (! empty($find_result)) {
+                    // Ignore files created by the webserver
+                    $ignore_files = [
+                        "$log_dir/error_log",
+                        "$log_dir/access_log",
+                        "$dir/bootstrap/cache/",
+                        "$dir/storage/framework/cache/",
+                        "$dir/storage/framework/sessions/",
+                        "$dir/storage/framework/views/",
+                        "$dir/storage/debugbar/",
+                        "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
+                    ];
 
-                $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
-                    if (Str::startsWith($file, $ignore_files)) {
-                        return false;
+                    $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
+                        if (Str::startsWith($file, $ignore_files)) {
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                    if (! empty($files)) {
+                        $result = ValidationResult::fail(
+                            "We have found some files that are owned by a different user than $lnms_username, this " .
+                            'will stop you updating automatically and / or rrd files being updated causing graphs to fail.'
+                        )
+                            ->setFix($fix)
+                            ->setList('Files', $files);
+
+                        $validator->result($result);
+
+                        return;
                     }
-
-                    return true;
-                });
-
-                if (! empty($files)) {
-                    $result = ValidationResult::fail(
-                        "We have found some files that are owned by a different user than $lnms_username, this " .
-                        'will stop you updating automatically and / or rrd files being updated causing graphs to fail.'
-                    )
-                        ->setFix($fix)
-                        ->setList('Files', $files);
-
-                    $validator->result($result);
-
-                    return;
                 }
             }
         } else {

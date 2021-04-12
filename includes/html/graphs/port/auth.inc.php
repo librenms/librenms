@@ -9,8 +9,8 @@ if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
     $graph_title = shorthost($device['hostname']) . '::' . strtolower(makeshortif($port['ifDescr']));
 
     if (($port['ifAlias'] != '') && ($port['ifAlias'] != $port['ifDescr'])) {
-        $title .= ', ' . display($port['ifAlias']);
-        $graph_title .= '::' . display($port['ifAlias']);
+        $title .= ', ' . \LibreNMS\Util\Clean::html($port['ifAlias'], []);
+        $graph_title .= '::' . \LibreNMS\Util\Clean::html($port['ifAlias'], []);
     }
 
     $auth = true;

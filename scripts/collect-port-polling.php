@@ -44,7 +44,7 @@ if (isset($options['h'])) {
         $params = $device_ids;
     } else {
         $where = 'AND `hostname` LIKE ?';
-        $params = [str_replace('*', '%', mres($options['h']))];
+        $params = [str_replace('*', '%', $options['h'])];
     }
 }
 $devices = dbFetchRows("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY `hostname` ASC", $params);

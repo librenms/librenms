@@ -90,8 +90,8 @@ echo '"' . $_POST['searchPhrase'] . '"+';
         return {
             id: "arp-search",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            searchby: '<?php echo mres($_POST['searchby']); ?>',
-            searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
+            searchby: '<?php echo $_POST['searchby']; ?>',
+            searchPhrase: '<?php echo $_POST['searchPhrase']; ?>'
         };
     },
     url: "ajax_table.php"

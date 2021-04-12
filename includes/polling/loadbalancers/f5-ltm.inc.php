@@ -44,7 +44,7 @@ foreach ($components as $k => $v) {
 $components = $keep;
 
 // Only collect SNMP data if we have enabled components
-if (count($components > 0)) {
+if (! empty($components)) {
     // Let's gather the stats..
     $f5_stats['ltmVirtualServStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6', 0);
     $f5_stats['ltmVirtualServStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8', 0);

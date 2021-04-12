@@ -40,7 +40,7 @@ class HostUnreachableException extends \Exception
 
     /**
      * Add additional reasons
-     * @param $message
+     * @param string $message
      */
     public function addReason($message)
     {

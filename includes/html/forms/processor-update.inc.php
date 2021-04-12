@@ -19,16 +19,16 @@ if (! Auth::user()->hasGlobalAdmin()) {
         'status'  => 'error',
         'message' => 'Need to be admin',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 $status = 'error';
 $message = 'Error updating processor information';
 
-$device_id = mres($_POST['device_id']);
-$processor_id = mres($_POST['processor_id']);
-$data = mres($_POST['data']);
+$device_id = $_POST['device_id'];
+$processor_id = $_POST['processor_id'];
+$data = $_POST['data'];
 
 if (! is_numeric($device_id)) {
     $message = 'Missing device id';
@@ -50,4 +50,4 @@ $response = [
     'message'       => $message,
     'extra'         => $extra,
 ];
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

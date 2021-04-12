@@ -7,7 +7,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         'status'  => 'error',
         'message' => 'Need to be admin',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -65,17 +65,17 @@ foreach ($_POST as $key => $val) {
 }//end foreach
 
 if ($rows_updated > 0) {
-    $message = $rows_updated . ' Device record updated.';
+    $message = $rows_updated . ' Port record(s) updated.';
     $status = 'ok';
 } elseif ($rows_updated = '-1') {
-    $message = 'Device record unchanged. No update necessary.';
+    $message = 'Port records unchanged. No update necessary.';
     $status = 'ok';
 } else {
-    $message = 'Device record update error.';
+    $message = 'Port record update error.';
 }
 
 $response = [
     'status'        => $status,
     'message'       => $message,
 ];
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

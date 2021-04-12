@@ -47,9 +47,9 @@ $iter = '0';
 $rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
 
 foreach ($accs as $acc) {
-    $this_rrd = rrd_name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
-    if (rrdtool_check_rrd_exists($this_rrd)) {
-        $mac = formatmac($acc['mac']);
+    $this_rrd = Rrd::name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
+    if (Rrd::checkRrdExists($this_rrd)) {
+        $mac = \LibreNMS\Util\Rewrite::readableMac($acc['mac']);
         $name = $mac;
 
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?', [$acc['mac'], $acc['port_id']]);
@@ -86,7 +86,7 @@ foreach ($accs as $acc) {
         }
 
         $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-        $descr = rrdtool_escape($name, 36);
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($name, 36);
         $rrd_options .= ' DEF:in' . $this_id . "=$this_rrd:" . $prefix . 'IN:AVERAGE ';
         $rrd_options .= ' DEF:out' . $this_id . "temp=$this_rrd:" . $prefix . 'OUT:AVERAGE ';
         $rrd_options .= ' CDEF:inB' . $this_id . '=in' . $this_id . ",$multiplier,* ";

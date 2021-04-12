@@ -24,6 +24,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class ApiToken extends BaseModel
 {
     public $timestamps = false;
@@ -91,7 +93,7 @@ class ApiToken extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }

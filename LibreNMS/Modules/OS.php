@@ -72,8 +72,11 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
-            if (! empty($location)) {
-                $deviceModel->setLocation(new Location(['location' => $location]));
+
+            if (! empty($location)) { // legacy support, remove when no longer needed
+                /** @phpstan-ignore-next-line */
+                $deviceModel->setLocation($location);
+                optional($deviceModel->location)->save();
             }
         }
 
@@ -102,14 +105,8 @@ class OS implements Module
     private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
-        if ($device->override_sysLocation) {
-            optional($device->location)->lookupCoordinates();
-        } else {
-            $new = $os->fetchLocation();  // fetch location data from device
-            $new->lookupCoordinates();
-            $device->setLocation($new);
-        }
-
+        $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
+        $device->setLocation($new_location, true); // set location and lookup coordinates if needed
         optional($device->location)->save();
     }
 
@@ -117,7 +114,7 @@ class OS implements Module
     {
         $device = $os->getDevice();
         $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
-        $device->sysContact = str_replace(['', '"', '\n', 'not set'], null, $device->sysContact);
+        $device->sysContact = str_replace(['', '"', '\n', 'not set'], '', $device->sysContact);
         if (empty($device->sysContact)) {
             $device->sysContact = null;
         }

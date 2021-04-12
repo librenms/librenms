@@ -54,8 +54,7 @@ class Telegram extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $api); //FIXME: propper debuging
+            var_dump('Telegram returned Error'); //FIXME: propper debuging
             var_dump('Return: ' . $ret); //FIXME: propper debuging
 
             return 'HTTP Status code ' . $code . ', Body ' . $ret;

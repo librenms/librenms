@@ -6,11 +6,9 @@ from pkg_resources import DistributionNotFound, VersionConflict
 args = sys.argv
 
 # verbose flag
-verbose = '-v' in args
+verbose = "-v" in args
 
-requirements = [
-    'PyMySQL'
-]
+requirements = ["PyMySQL"]
 
 try:
     pkg_resources.require(requirements)

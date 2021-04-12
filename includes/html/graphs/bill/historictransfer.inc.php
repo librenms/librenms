@@ -4,6 +4,7 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\BarPlot;
 use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
+use LibreNMS\Util\Number;
 
 if (is_numeric($vars['bill_hist_id'])) {
     $graph_data = getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
@@ -57,7 +58,7 @@ $graph->xgrid->SetColor('#e0e0e0', '#efefef');
 
 function YCallback($value)
 {
-    return format_number($value, \LibreNMS\Config::get('billing.base'), 2, 1) . 'B';
+    return Number::formatBase($value, \LibreNMS\Config::get('billing.base'), 2, 1);
 }
 
 $graph->yaxis->SetFont(FF_FONT1);

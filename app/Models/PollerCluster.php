@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
@@ -260,7 +261,7 @@ class PollerCluster extends Model
 
     // ---- Relationships ----
 
-    public function stats()
+    public function stats(): HasMany
     {
         return $this->hasMany(\App\Models\PollerClusterStat::class, 'parent_poller', 'id');
     }

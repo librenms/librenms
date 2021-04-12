@@ -20,7 +20,7 @@ $rrd_options .= ' AREA:sensor_min#ffffffff';
 // $rrd_options .= " AREA:sensor#bbd392";
 // $rrd_options .= " AREA:sensorwarm#FFCCCC";
 // $rrd_options .= " AREA:sensorcold#CCCCFF";
-$rrd_options .= " LINE1:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'], 28) . "'";
+$rrd_options .= " LINE1:sensor#cc0000:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 28) . "'";
 if (is_numeric($sensor['sensor_limit'])) {
     $rrd_options .= ' LINE1:sensorwarm#660000';
 }

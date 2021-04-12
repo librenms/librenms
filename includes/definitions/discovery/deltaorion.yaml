@@ -1,0 +1,79 @@
+mib: GLOBAL-REG:ORION-BASE-MIB
+modules:
+    os:
+        version: ORION-BASE-MIB::dcSoftwareVersion.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - dcMeasurementTable
+                        - dcMeterPanelEventTable
+        state:
+            data:
+                -
+                    oid: dcMeterPanelEventTable
+                    value: dcMeterPanelEventValue
+                    num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.10.1.1.3.{{ $index }}'
+                    descr: '{{ $dcMeterPanelEventName }}'
+                    states:
+                        - { value: 1, descr: off, graph: 1, generic: 0 }
+                        - { value: 2, descr: indeterminate, graph: 1, generic: 3 }
+                        - { value: 3, descr: on, graph: 1, generic: 2 }
+        temperature:
+            options:
+                skip_values: 
+                -
+                  oid: dcMeasurementUnit
+                  op: '!='
+                  value: 7
+                -
+                  oid: dcMeasurementValue
+                  op: 'in_array'
+                  value: [0, 2147483647]
+            data:
+                -
+                  oid: dcMeasurementTable
+                  value: dcMeasurementValue
+                  num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
+                  descr: '{{ $dcMeasurementName }}'
+                  divisor: 10
+                  low_limit: 10
+                  high_limit: 50
+        voltage:
+            options:
+                skip_values: 
+                -
+                  oid: dcMeasurementUnit
+                  op: '!='
+                  value: 3
+                - 
+                  oid: dcMeasurementValue
+                  op: 'in_array'
+                  value: [0, 2147483647]
+            data:
+                -
+                  oid: dcMeasurementTable
+                  value: dcMeasurementValue
+                  num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
+                  descr: '{{ $dcMeasurementName }}'
+                  divisor: 100
+                  low_limit: 46
+                  high_limit: 56
+        current:
+            options:
+                skip_values:
+                -
+                  oid: dcMeasurementUnit
+                  op: '!='
+                  value: 5
+                -
+                  oid: dcMeasurementValue
+                  op: 'in_array'
+                  value: [0, 2147483647]
+            data:
+                -
+                  oid: dcMeasurementTable
+                  value: dcMeasurementValue
+                  num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
+                  descr: '{{ $dcMeasurementName }}'

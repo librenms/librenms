@@ -16,6 +16,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
@@ -184,12 +185,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = formatRates($in_rate);
-        $port['out_rate'] = formatRates($out_rate);
+        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($in_rate, 2, 3, 'bps');
+        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($out_rate, 2, 3, 'bps');
         $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
         $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
-        $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
+        $port['in_pps'] = \LibreNMS\Util\Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
+        $port['out_pps'] = \LibreNMS\Util\Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -1384,6 +1385,8 @@ function list_oxidized(Illuminate\Http\Request $request)
 
         // We remap certain device OS' that have different names with Oxidized models
         $models = [
+            'airos-af-ltu' => 'airfiber',
+            'airos-af'   => 'airfiber',
             'arista_eos' => 'eos',
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
@@ -1456,15 +1459,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = format_si($bill['bill_cdr']) . 'bps';
-            $used = format_si($rate_data['rate_95th']) . 'bps';
+            $allowed = \LibreNMS\Util\Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
+            $used = \LibreNMS\Util\Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : format_si($overuse));
+            $overuse = (($overuse <= 0) ? '-' : \LibreNMS\Util\Number::formatSi($overuse, 2, 3, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used = format_bytes_billing($rate_data['total_data']);
@@ -1842,6 +1845,41 @@ function rename_device(Illuminate\Http\Request $request)
             return api_error(500, 'Device failed to be renamed');
         }
     }
+}
+
+function add_port_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'name' => 'required|string|unique:port_groups',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $portGroup = PortGroup::make(['name' => $data['name'], 'desc' => $data['desc']]);
+    $portGroup->save();
+
+    return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
+}
+
+function get_port_groups(Illuminate\Http\Request $request)
+{
+    $query = PortGroup::query();
+
+    $groups = $query->orderBy('name')->get();
+
+    if ($groups->isEmpty()) {
+        return api_error(404, 'No port groups found');
+    }
+
+    return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
 function add_device_group(Illuminate\Http\Request $request)

@@ -100,7 +100,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
             }
         }
 
-        if (empty($hardware) && ! empty($data[1000]['entPhysicalModelName'])) {
+        if ((empty($hardware) || preg_match('/Switch System/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];

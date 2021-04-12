@@ -105,3 +105,15 @@ if (! function_exists('array_pairs')) {
         return $pairs;
     }
 }
+
+/**
+ * Cast string to int or float.
+ * Returns 0 if string is not numeric
+ *
+ * @param string $number
+ * @return float|int
+ */
+function cast_number($number)
+{
+    return \LibreNMS\Util\Number::cast($number);
+}

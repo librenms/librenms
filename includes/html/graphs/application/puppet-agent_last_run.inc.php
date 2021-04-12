@@ -9,11 +9,11 @@ $unit_text = 'Minutes';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'last_run']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'last_run']);
 $array = [
     'last_run',
 ];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

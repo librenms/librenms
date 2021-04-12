@@ -85,10 +85,9 @@ class SetConfigCommand extends LnmsCommand
     /**
      * Convert the string input into the appropriate PHP native type
      *
-     * @param $value
      * @return mixed
      */
-    private function juggleType($value)
+    private function juggleType(string $value)
     {
         $json = json_decode($value, true);
 

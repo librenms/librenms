@@ -82,6 +82,7 @@ $ltmPoolMemberEntryOID = [
     'ratio' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.6',
     'weight' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.7',
     'priority' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.8',
+    'nodename' => '1.3.6.1.4.1.3375.2.2.5.3.2.1.19',
     'state' => '1.3.6.1.4.1.3375.2.2.5.6.2.1.5',
     'available' => '1.3.6.1.4.1.3375.2.2.5.6.2.1.6',
     'errorcode' => '1.3.6.1.4.1.3375.2.2.5.6.2.1.8',
@@ -279,6 +280,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
                 $result['priority'] = $ltmPoolMemberEntry['priority']['1.3.6.1.4.1.3375.2.2.5.3.2.1.8.' . $index];
                 $result['state'] = $ltmPoolMemberEntry['state']['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.' . $index];
                 $result['available'] = $ltmPoolMemberEntry['available']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.' . $index];
+                $result['nodename'] = $ltmPoolMemberEntry['nodename']['1.3.6.1.4.1.3375.2.2.5.3.2.1.19.' . $index];
 
                 // If available and bad state
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue

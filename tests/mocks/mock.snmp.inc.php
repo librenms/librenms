@@ -50,7 +50,16 @@ function cache_snmprec($file)
         } elseif ($type == '6') {
             $data = trim($data, '.');
         } elseif ($type == '4x') {
-            $data = hex2str($data);
+            // MacAddress type is stored as hex string, but we don't understand mibs
+            if (Str::startsWith($oid, [
+                '1.3.6.1.2.1.2.2.1.6', // IF-MIB::ifPhysAddress
+                '1.3.6.1.2.1.17.1.1.0', // BRIDGE-MIB::dot1dBaseBridgeAddress.0
+                '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20', // IES5206-MIB::slotModuleMacAddress
+            ])) {
+                $data = \LibreNMS\Util\Rewrite::readableMac($data);
+            } else {
+                $data = hex2str($data);
+            }
         }
 
         $snmpMockCache[$file][$oid] = [$type, $data];

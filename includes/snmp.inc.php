@@ -40,7 +40,7 @@ function prep_snmp_setting($device, $setting)
 }//end prep_snmp_setting()
 
 /**
- * @param $device
+ * @param array $device
  * @return array will contain a list of mib dirs
  */
 function get_mib_dir($device)
@@ -78,13 +78,14 @@ function get_mib_dir($device)
  * If $mibdir is empty '', return an empty string
  *
  * @param string $mibdir should be the name of the directory within \LibreNMS\Config::get('mib_dir')
- * @param array $device
+ * @param array|null $device
  * @return string The option string starting with -M
  */
-function mibdir($mibdir = null, $device = [])
+function mibdir($mibdir = null, $device = null)
 {
+    $dirs = is_array($device) ? get_mib_dir($device) : [];
+
     $base = Config::get('mib_dir');
-    $dirs = get_mib_dir($device);
     $dirs[] = "$base/$mibdir";
 
     // make sure base directory is included first
@@ -163,10 +164,14 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-m', $mib);
     }
     array_push($cmd, '-M', mibdir($mibdir, $device));
-    if ($timeout = prep_snmp_setting($device, 'timeout')) {
+
+    $timeout = prep_snmp_setting($device, 'timeout');
+    if ($timeout && $timeout !== 1) {
         array_push($cmd, '-t', $timeout);
     }
-    if ($retries = prep_snmp_setting($device, 'retries')) {
+
+    $retries = prep_snmp_setting($device, 'retries');
+    if ($retries && $retries !== 5) {
         array_push($cmd, '-r', $retries);
     }
 
@@ -671,7 +676,9 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
         // merge the parts into an array, creating keys if they don't exist
         $tmp = &$array;
         foreach ($parts as $part) {
-            $tmp = &$tmp[trim($part, '".')];
+            // we don't want to remove dots inside quotes, only outside
+            $key = trim(trim($part, '.'), '"');
+            $tmp = &$tmp[$key];
         }
         $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
     }
@@ -773,20 +780,20 @@ function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
  * @param string $mib
  * @param string $mibdir the mib directory (relative to the LibreNMS mibs directory)
  * @param array|string $options Options to pass to snmptranslate
- * @param array $device
+ * @param array|null $device
  * @return string
  */
-function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = [])
+function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
     if (oid_is_numeric($oid)) {
-        $default_options = '-Os';
+        $default_options = ['-Os', '-Pu'];
     } else {
         if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
             $oid = "$mib::$oid";
         }
-        $default_options = '-On';
+        $default_options = ['-On', '-Pu'];
     }
     $options = is_null($options) ? $default_options : $options;
     $cmd = array_merge($cmd, (array) $options);

@@ -122,7 +122,8 @@ if ($device['os_group'] == 'cisco') {
                         // Workaround for a Cisco SNMP bug
                         && $entry['entSensorPrecision'] != '1615384784'
                 ) {
-                    $divisor = $divisor . str_pad('', $entry['entSensorPrecision'], '0');
+                    // Use precision value to determine decimal point place on returned value, then apply divisor
+                    $divisor = (10 ** $entry['entSensorPrecision']) * $divisor;
                 }
 
                 $current = ($current * $multiplier / $divisor);
@@ -141,11 +142,11 @@ if ($device['os_group'] == 'cisco') {
                             continue;
                         }
                         // Critical Limit
-                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdValue'] != 0) && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdValue'] != 0) && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
@@ -200,18 +201,18 @@ if ($device['os_group'] == 'cisco') {
                     }
                     discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
-                    if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr))) {
+                    if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
                         // convert Watts to dbm
+                        $user_func = 'mw_to_dbm';
                         $type = 'dbm';
                         $limit_low = 10 * log10($limit_low * 1000);
                         $warn_limit_low = 10 * log10($warn_limit_low * 1000);
                         $warn_limit = 10 * log10($warn_limit * 1000);
                         $limit = 10 * log10($limit * 1000);
                         $current = round(10 * log10($current * 1000), 3);
-                        $multiplier = 1;
-                        $divisor = 1;
-                        //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current");
-                        discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
+                        $multiplier = 1000;
+                        //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, $user_func");
+                        discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], $user_func);
                     }
                 }
 

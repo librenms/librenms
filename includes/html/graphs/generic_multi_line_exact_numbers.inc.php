@@ -40,7 +40,7 @@ foreach ($rrd_list as $rrd) {
     $ds = $rrd['ds'];
     $filename = $rrd['filename'];
 
-    $descr = rrdtool_escape($rrd['descr'], $descr_len);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
     $id = 'ds' . $i;
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
@@ -94,7 +94,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:' . $t_defname . $i . 'max:MAX:%8.0lf%s GPRINT:' . $t_defname . $i . ":AVERAGE:'%8.0lf%s\\n'";
 
     if ($printtotal === 1) {
-        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ":%6.2lf%s'" . rrdtool_escape($total_units) . "'";
+        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ":%6.2lf%s'" . Rrd::safeDescr($total_units) . "'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";
