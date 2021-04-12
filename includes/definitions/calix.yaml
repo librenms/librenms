@@ -3,7 +3,6 @@ text: Calix Legacy
 type: network
 ifname: true
 empty_ifdescr: true
-nobulk: true
 icon: calix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
