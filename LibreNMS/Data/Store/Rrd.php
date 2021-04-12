@@ -445,7 +445,7 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Get array of all rrd files for a device, 
+     * Get array of all rrd files for a device,
      * via rrdached or localdisk.
      *
      * @param array $device device for which we get the rrd's
@@ -456,7 +456,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached) {
             $filename = sprintf('/%s', $device['hostname']);
             $rrd_files = $this->command('list', $filename, '');
-            // Output command is an array, create new array with each filename as a item in array.
+            // Command output is an array, create new array with each filename as a item in array.
             $rrdfilearray = preg_split('/\s+/', trim($rrd_files[0]));
         } else {
             $rrddir = self::dirFromHost($device['hostname']);
@@ -465,7 +465,6 @@ class Rrd extends BaseDatastore
         }
 
         return $rrdfilearray;
-        //return $rrd_files;
     }
 
     /**
@@ -489,8 +488,11 @@ class Rrd extends BaseDatastore
             $pattern = sprintf('%s-%s-%s', 'app', $app_name, $app_id);
         }
 
+        // app_name contains a separator character? consider it
+        $offset = substr_count($app_name, $separator);
+
         foreach ($rrdfilearray as $rrd) {
-            
+
             if (str_contains($rrd, $pattern)) {
                 $filename = basename($rrd, '.rrd');
                 $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
@@ -499,7 +501,7 @@ class Rrd extends BaseDatastore
                 }
             }
         }
-        //return $rrdfilearray;
+
         return $entries;
     }
 
