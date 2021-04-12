@@ -355,7 +355,7 @@ class Url
         $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
         if (Config::get('enable_lazy_load', true)) {
-            return '<noscript class="loading-lazy">' . $tag . ' loading="lazy" /></noscript>';
+            return $tag . ' loading="lazy" />';
         }
 
         return $tag . ' />';
