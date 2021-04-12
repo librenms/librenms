@@ -384,6 +384,8 @@ class Rrd extends BaseDatastore
         if ($command == 'last' && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
             $output = $this->sync_process->sendCommand($cmd);
+        } elseif ($command == 'list') {
+            $output = $this->sync_process->sendCommand($cmd);
         } elseif ($this->init()) {
             // don't care about the return of other commands, so send them to the faster async process
             $output = $this->async_process->sendCommand($cmd);
@@ -440,6 +442,65 @@ class Rrd extends BaseDatastore
         }
 
         return "$command $filename $options";
+    }
+
+    /**
+     * Get array of all rrd files for a device, 
+     * via rrdached or localdisk.
+     *
+     * @param array $device device for which we get the rrd's
+     * @return array $rrdfilearray array of rrd files for this host
+     */
+    public function getRrdFiles($device)
+    {
+        if ($this->rrdcached) {
+            $filename = sprintf('/%s', $device['hostname']);
+            $rrd_files = $this->command('list', $filename, '');
+            // Output command is an array, create new array with each filename as a item in array.
+            $rrdfilearray = preg_split('/\s+/', trim($rrd_files[0]));
+        } else {
+            $rrddir = self::dirFromHost($device['hostname']);
+            $pattern = sprintf('%s/*.rrd', $rrddir);
+            $rrdfilearray = glob($pattern);
+        }
+
+        return $rrdfilearray;
+        //return $rrd_files;
+    }
+
+    /**
+     * Get array of rrd files for specific application.
+     *
+     * @param array $device device for which we get the rrd's
+     * @param int   $app_id application id on the device
+     * @param string  $app_name name of app to be searched
+     * @param string  $category which category of graphs are searched
+     * @return array $rrdfilearray array of rrd files for this host
+     */
+    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null)
+    {
+        $entries = [];
+        $separator = '-';
+
+        $rrdfilearray = self::getRrdFiles($device);
+        if ($category) {
+            $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
+        } else {
+            $pattern = sprintf('%s-%s-%s', 'app', $app_name, $app_id);
+        }
+
+        foreach ($rrdfilearray as $rrd) {
+            
+            if (str_contains($rrd, $pattern)) {
+                $filename = basename($rrd, '.rrd');
+                $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
+                if ($entry) {
+                    array_push($entries, $entry);
+                }
+            }
+        }
+        //return $rrdfilearray;
+        return $entries;
     }
 
     /**
