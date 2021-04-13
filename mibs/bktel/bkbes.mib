@@ -1,0 +1,811 @@
+--- ****************************************************************************
+-- *
+-- * Description:   Implements definitions for the BK-Ethernet-Switch-modules
+-- *
+-- * Copyright 2007 by BKtel communications GmbH
+-- *
+-- *
+-- *     V.0.1 12.05.2006  M. Heldmann    first draft
+-- *     V.0.2 04.10.2006  M. Heldmann    NESlotWriteValue expanded due to new 2G6 platform needs
+-- *     V.1.0 11.05.2007  M. Heldmann    renamed this  module from "bkswitch" to "bkbes"
+-- *                                      added a couple of parameters
+-- *     V.1.1 11.07.2013  M. Heldmann    adjusted syntax of "CommonEntry" to remove MIB compiler warnings
+-- *     V.1.2 05.09.2014  M. Heldmann    changed CommonModuleWidth and ConfigNESlotWrite STATUS to optional
+-- ****************************************************************************
+
+BKTEL-HFC862-BES-V01-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        experimental, enterprises, TimeTicks, IpAddress, Counter
+                 FROM RFC1155-SMI
+    OBJECT-TYPE
+                 FROM RFC-1212
+        TRAP-TYPE
+                 FROM RFC-1215
+        modules, DisplayString, TruthValue, PerceivedSeverityValue, NESlotValue, ModuleWidthValue
+                 FROM   BKTEL-HFC862-BASE-MIB
+    ;
+
+    bes                 OBJECT IDENTIFIER ::= { modules 114 }
+    besCommon           OBJECT IDENTIFIER ::= { bes 1 }
+    besStates           OBJECT IDENTIFIER ::= { bes 2 }
+    besConfiguration    OBJECT IDENTIFIER ::= { bes 3 }
+    besControl          OBJECT IDENTIFIER ::= { bes 4 }
+    besMeasuringValues  OBJECT IDENTIFIER ::= { bes 5 }
+    besDisplay          OBJECT IDENTIFIER ::= { bes 6 }
+    besDisplayPorts     OBJECT IDENTIFIER ::= { bes 56 }
+
+
+--
+-- Type definitions
+--
+
+    PortType ::= INTEGER
+        {
+        typeCopper(1),
+        typeFiber(2)
+        }
+
+    PortLinkState ::= INTEGER
+        {
+        linkDown(1),
+        linkUp(2)
+        }
+
+    PortStatus ::= INTEGER
+        {
+        statusUnknown(1),
+        statusInit(2),
+        statusValid(3),
+        statusBusy(4),
+        statusEmpty(5),
+        statusInvalid(6),
+        statusLossOfSignal(7)
+        }
+
+    PortDuplexMode ::= INTEGER
+        {
+        duplexFull(1),
+        duplexHalf(2)
+        }
+
+    PortSpeed ::= INTEGER
+        {
+        speedUnknown(0),
+        speed10Mbps(10),
+        speed100Mbps(100),
+        speed1000Mbps(1000)
+        }
+
+    PortFlowControl ::= INTEGER
+        {
+        flowControlDisabled(1),
+        flowControlEnabled(2)
+        }
+
+    NESlotWriteValue ::= INTEGER (-1..99)
+
+
+-- MibCompiler defs --
+-- $idx$: besDisplayConfiguration
+-- MibCompiler defs --
+
+
+--*****************************************************************************************
+-- BES (BK Ethernet Switch)
+--*****************************************************************************************
+-- besCommon group
+
+    besCommonNumberOfModules OBJECT-TYPE
+        SYNTAX  INTEGER(0..50)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of modules in table."
+  ::= { besCommon 1 }
+
+    besCommonTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BesCommonEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "The table contains all modules of the BES-type in the NE"
+  ::= { besCommon 2 }
+
+-- table of states entry(ro/rw)
+
+    besCommonEntry OBJECT-TYPE
+        SYNTAX BesCommonEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Common-Values for a module."
+        INDEX { besNESlot }
+  ::= { besCommonTable 1 }
+
+-- the structure of the entry
+
+    BesCommonEntry ::= SEQUENCE
+    {
+        besNESlot                      NESlotValue,
+        besCommonType                  DisplayString,
+        besCommonDescr                 DisplayString,
+        besCommonFirmwareId            DisplayString,
+        besCommonModuleWidth           ModuleWidthValue
+    }
+
+    besNESlot OBJECT-TYPE
+        SYNTAX  NESlotValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "The slot number of the chassis for which this
+        entry contains management information."
+    ::= { besCommonEntry 1 }
+
+    besCommonType OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "The type of physical module. modSlotEmpty indicates
+         an empty slot.  A Value of modSlotUnknown indicates
+         that the type of module is unknown."
+    ::= { besCommonEntry 2 }
+
+    besCommonDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "A textual description of the module.
+        If not available, this Value should be
+        set to a zero length string."
+    ::= { besCommonEntry 3 }
+
+    besCommonFirmwareId OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The firmware Id of the module."
+    ::= { besCommonEntry 4 }
+
+    besCommonModuleWidth OBJECT-TYPE
+        SYNTAX ModuleWidthValue
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The width of the module in multiples of slots (1, 2, ...)"
+    ::= { besCommonEntry 5 }
+
+
+--*****************************************************************************************
+-- besMeasuringValues group
+
+-- table of measuring Values
+
+    besMeasuringValuesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BesMeasuringValuesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+   ::= { besMeasuringValues 1 }
+
+-- table of measuring Values entry
+
+    besMeasuringValuesEntry OBJECT-TYPE
+        SYNTAX BesMeasuringValuesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Common-Values for a module."
+        INDEX { besNESlot }
+  ::= { besMeasuringValuesTable 1 }
+
+--  the structure of the entry
+
+    BesMeasuringValuesEntry ::= SEQUENCE
+    {
+        besTemperatureLoLo             INTEGER,
+        besTemperatureLo               INTEGER,
+        besTemperatureValue            INTEGER,
+        besTemperatureHi               INTEGER,
+        besTemperatureHiHi             INTEGER,
+
+        besInputVoltageLoLo            INTEGER,
+        besInputVoltageLo              INTEGER,
+        besInputVoltageValue           INTEGER,
+        besInputVoltageHi              INTEGER,
+        besInputVoltageHiHi            INTEGER
+    }
+
+-- *****
+    besTemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature low alarm threshold in 0.1 celsius degrees."
+    ::= { besMeasuringValuesEntry 1 }
+
+    besTemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature low warning threshold in 0.1 celsius degrees."
+    ::= { besMeasuringValuesEntry 2 }
+
+    besTemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature in 0.1 celsius degrees."
+    ::= { besMeasuringValuesEntry 3 }
+
+    besTemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature high warning threshold in 0.1 celsius degrees."
+    ::= { besMeasuringValuesEntry 4 }
+
+    besTemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature high alarm threshold in 0.1 celsius degrees."
+    ::= { besMeasuringValuesEntry 5 }
+
+-- *****
+    besInputVoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage low alarm threshold in steps of 0.1 Volts."
+    ::= { besMeasuringValuesEntry 6 }
+
+    besInputVoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage low warning threshold in steps of 0.1 Volts."
+    ::= { besMeasuringValuesEntry 7 }
+
+    besInputVoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage in steps of 0.1 Volts.
+                     Input supply voltage nominal value, see 'besDisplayInputVoltageNominal'"
+    ::= { besMeasuringValuesEntry 8 }
+
+    besInputVoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage high warning threshold in steps of 0.1 Volts."
+    ::= { besMeasuringValuesEntry 9 }
+
+    besInputVoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage high alarm threshold in steps of 0.1 Volts."
+    ::= { besMeasuringValuesEntry 10 }
+
+
+--*****************************************************************************************
+--  besStates group
+
+-- Note: For every control OId there must be a correspondant alarm OId!
+
+    besStatesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BesStatesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { besStates 1 }
+
+-- table of states entry(ro/rw)
+
+    besStatesEntry OBJECT-TYPE
+        SYNTAX BesStatesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Alarms for a module."
+        INDEX { besNESlot }
+    ::= { besStatesTable 1 }
+
+-- the structure of the entry
+
+    BesStatesEntry ::= SEQUENCE
+    {
+        besStatesBootloader           PerceivedSeverityValue,
+        besStatesCommLoss             PerceivedSeverityValue,
+        besStatesTemperatureLow       PerceivedSeverityValue,
+        besStatesTemperatureHigh      PerceivedSeverityValue,
+        besStatesInputVoltageLow      PerceivedSeverityValue,
+        besStatesInputVoltageHigh     PerceivedSeverityValue
+    }
+
+    besStatesBootloader OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The device is running in bootloader mode
+             without a legal application software."
+    ::= { besStatesEntry 1 }
+
+    besStatesCommLoss OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The NEC has lost the connection to the device.
+             Reason may be a removed or defective device.
+             Note that this state is set by the NEC and not
+             by the device"
+    ::= { besStatesEntry 2 }
+
+    besStatesTemperatureLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature low"
+    ::= { besStatesEntry 3 }
+
+    besStatesTemperatureHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device temperature high"
+    ::= { besStatesEntry 4 }
+
+    besStatesInputVoltageLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Input supply voltage low"
+    ::= { besStatesEntry 5 }
+
+    besStatesInputVoltageHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Input supply voltage high"
+    ::= { besStatesEntry 6 }
+
+
+--*****************************************************************************************
+--  besControl group
+
+  besControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BesControlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+  ::= { besControl 1 }
+
+-- table of control entry(ro/rw)
+
+  besControlEntry OBJECT-TYPE
+    SYNTAX BesControlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Alarms for a module."
+    INDEX { besNESlot }
+  ::= { besControlTable 1 }
+
+-- the structure of the entry
+
+    BesControlEntry ::= SEQUENCE
+    {
+        besControlReset             TruthValue,
+        besControlModuleLedBlink    TruthValue
+    }
+
+    besControlReset OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Reset the module."
+    ::= { besControlEntry 1 }
+
+    besControlModuleLedBlink OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "Writing this variable to true(1) lets the device's
+        modul LED blink green for 10 seconds.
+        Writing this variable to false(2) stbes blinking at once.
+        This variable always returns false(2) on read requests"
+    ::= { besControlEntry 2 }
+
+
+--*****************************************************************************************
+-- besConfiguration group
+
+    besConfigurationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BesConfigurationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { besConfiguration 1 }
+
+-- table of configuration entry(ro/rw)
+
+    besConfigurationEntry OBJECT-TYPE
+        SYNTAX BesConfigurationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { besNESlot  }
+    ::= { besConfigurationTable 1 }
+
+-- the structure of the entry
+
+    BesConfigurationEntry ::= SEQUENCE
+    {
+        besConfigNESlotWrite                    NESlotWriteValue,
+        besConfigConfigurationIndex             INTEGER,
+        besConfigConfiguration                  DisplayString
+    }
+
+-- Common part
+
+    besConfigNESlotWrite OBJECT-TYPE
+        SYNTAX NESlotWriteValue
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION "By writing this variable a slot can be assigned
+            for devices that dont support hardware slot detection.
+            Reading '-1' means that the slot position is NOT writable."
+    ::= { besConfigurationEntry 1 }
+
+    besConfigConfigurationIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Index of the active configuration (1..besDisplayNumberOfConfigs)"
+    ::= { besConfigurationEntry 2 }
+
+    besConfigConfiguration OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of the active configuration"
+    ::= { besConfigurationEntry 3 }
+
+
+--*****************************************************************************************
+-- Display group
+
+    besDisplayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BesDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { besDisplay 1 }
+
+-- table of configuration entry(ro/rw)
+
+    besDisplayEntry OBJECT-TYPE
+        SYNTAX BesDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { besNESlot  }
+    ::= { besDisplayTable 1 }
+
+-- the structure of the entry
+
+    BesDisplayEntry ::= SEQUENCE
+    {
+        besDisplayNumberOfPorts             INTEGER,
+        besDisplayInputVoltageNominal       INTEGER,
+
+        besDisplayNumberOfConfigs           INTEGER,
+        besDisplayConfiguration1            DisplayString,
+        besDisplayConfiguration2            DisplayString,
+        besDisplayConfiguration3            DisplayString,
+        besDisplayConfiguration4            DisplayString,
+        besDisplayConfiguration5            DisplayString,
+        besDisplayConfiguration6            DisplayString,
+        besDisplayConfiguration7            DisplayString,
+        besDisplayConfiguration8            DisplayString,
+        besDisplayConfiguration9            DisplayString,
+        besDisplayConfiguration10           DisplayString,
+        besDisplayConfiguration11           DisplayString,
+        besDisplayConfiguration12           DisplayString,
+        besDisplayConfiguration13           DisplayString,
+        besDisplayConfiguration14           DisplayString,
+        besDisplayConfiguration15           DisplayString,
+        besDisplayConfiguration16           DisplayString
+
+    }
+
+    besDisplayNumberOfPorts OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of ports"
+    ::={ besDisplayEntry 1 }
+
+    besDisplayInputVoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The nominal value of input voltage in 0.1 V units."
+    ::={ besDisplayEntry 2 }
+
+    besDisplayNumberOfConfigs OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of different configurations supplied"
+    ::={ besDisplayEntry 3 }
+
+    besDisplayConfiguration1 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #1"
+    ::= { besDisplayEntry 4 }
+
+    besDisplayConfiguration2 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #2"
+    ::= { besDisplayEntry 5 }
+
+    besDisplayConfiguration3 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #3"
+    ::= { besDisplayEntry 6 }
+
+    besDisplayConfiguration4 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #4"
+    ::= { besDisplayEntry 7 }
+
+    besDisplayConfiguration5 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #5"
+    ::= { besDisplayEntry 8 }
+
+    besDisplayConfiguration6 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #6"
+    ::= { besDisplayEntry 9 }
+
+    besDisplayConfiguration7 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #7"
+    ::= { besDisplayEntry 10 }
+
+    besDisplayConfiguration8 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #8"
+    ::= { besDisplayEntry 11 }
+
+    besDisplayConfiguration9 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #9"
+    ::= { besDisplayEntry 12 }
+
+    besDisplayConfiguration10 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #10"
+    ::= { besDisplayEntry 13 }
+
+    besDisplayConfiguration11 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #11"
+    ::= { besDisplayEntry 14 }
+
+    besDisplayConfiguration12 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #12"
+    ::= { besDisplayEntry 15 }
+
+    besDisplayConfiguration13 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #13"
+    ::= { besDisplayEntry 16 }
+
+    besDisplayConfiguration14 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #14"
+    ::= { besDisplayEntry 17 }
+
+    besDisplayConfiguration15 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #15"
+    ::= { besDisplayEntry 18 }
+
+    besDisplayConfiguration16 OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Description of configuration no. #16"
+    ::= { besDisplayEntry 19 }
+
+
+--*****************************************************************************************
+-- DisplayPorts group
+
+-- MibCompiler defs --
+-- $suboids$: 56,1
+-- MibCompiler defs --
+
+    besDisplayPortsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BesDisplayPortsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { besDisplayPorts 1 }
+
+-- table of configuration entry(ro/rw)
+
+    besDisplayPortsEntry OBJECT-TYPE
+        SYNTAX BesDisplayPortsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { besNESlot, besDisplayPortsPortIndex }
+    ::= { besDisplayPortsTable 1 }
+
+-- the structure of the entry
+
+    BesDisplayPortsEntry ::= SEQUENCE
+    {
+        besDisplayPortsPortIndex            INTEGER,
+        besDisplayPortsPortName             DisplayString,
+        besDisplayPortsType                 PortType,
+        besDisplayPortsLinkState            PortLinkState,
+        besDisplayPortsStatus               PortStatus,
+        besDisplayPortsDuplexMode           PortDuplexMode,
+        besDisplayPortsSpeed                PortSpeed,
+        besDisplayPortsFlowControl          PortFlowControl,
+        besDisplayPortsFiberTxDistance      INTEGER,
+        besDisplayPortsFiberTxWavelen       INTEGER,
+        besDisplayPortsFiberRxWavelenMin    INTEGER,
+        besDisplayPortsFiberRxWavelenMax    INTEGER,
+        besDisplayPortsFiberSfpData         DisplayString
+
+    }
+
+    besDisplayPortsPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port index (1..besDisplayNumberOfPorts)"
+    ::={ besDisplayPortsEntry 1 }
+
+    besDisplayPortsPortName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port name"
+    ::={ besDisplayPortsEntry 2 }
+
+    besDisplayPortsType OBJECT-TYPE
+        SYNTAX  PortType
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port type"
+    ::={ besDisplayPortsEntry 3 }
+
+    besDisplayPortsLinkState OBJECT-TYPE
+        SYNTAX  PortLinkState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port link status"
+    ::={ besDisplayPortsEntry 4 }
+
+    besDisplayPortsStatus OBJECT-TYPE
+        SYNTAX  PortStatus
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port status"
+    ::={ besDisplayPortsEntry 5 }
+
+    besDisplayPortsDuplexMode OBJECT-TYPE
+        SYNTAX  PortDuplexMode
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port duplex mode"
+    ::={ besDisplayPortsEntry 6 }
+
+    besDisplayPortsSpeed OBJECT-TYPE
+        SYNTAX  PortSpeed
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port speed"
+    ::={ besDisplayPortsEntry 7 }
+
+    besDisplayPortsFlowControl OBJECT-TYPE
+        SYNTAX  PortFlowControl
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port speed"
+    ::={ besDisplayPortsEntry 8 }
+
+    besDisplayPortsFiberTxDistance OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port transmission distance in units of km (Fiber ports only)"
+    ::={ besDisplayPortsEntry 9 }
+
+    besDisplayPortsFiberTxWavelen OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port transmission wavelength in units of nm (Fiber ports only)"
+    ::={ besDisplayPortsEntry 10 }
+
+    besDisplayPortsFiberRxWavelenMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port minimum receive wavelength in units of nm (Fiber ports only)"
+    ::={ besDisplayPortsEntry 11 }
+
+    besDisplayPortsFiberRxWavelenMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port maximum receive wavelength in units of nm (Fiber ports only)"
+    ::={ besDisplayPortsEntry 12 }
+
+    besDisplayPortsFiberSfpData OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Port SFP data text (Fiber ports only)"
+    ::={ besDisplayPortsEntry 13 }
+
+
+
+--*****************************************************************************************
+END
+
