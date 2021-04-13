@@ -82,7 +82,9 @@ modules:
                     state_name: hwGponOntOpticalDdmRxPower
                     group: ONT RX                    
                     divisor: 100
-                    skip_value_gt: 999999                    
+                    skip_value_gt: 999999
+                    low_limit: -27.0
+                    low_warn_limit: -25.0                    
 
         current:
             data:
