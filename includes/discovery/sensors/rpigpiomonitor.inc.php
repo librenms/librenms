@@ -25,13 +25,13 @@
 $gpio_mon_data = snmpwalk_cache_oid($device, 'nsExtendOutLine."rpigpiomonitor"', [], 'NET-SNMP-EXTEND-MIB', null, '-OteQUsb');
 
 $sensor_index = 0;
-$sensors = Array();
+$sensors = [];
 
 foreach ($gpio_mon_data as $index => $entry) {
     if (Str::contains($entry['nsExtendOutLine'], ';')) {
 
         $splitted_data_array = explode(';', $entry['nsExtendOutLine']);
-        $sensor_data = Array();
+        $sensor_data = [];
         foreach ($splitted_data_array as $splitted_data_index => $splitted_data) {
             $sensor_data_parts = explode(',', $splitted_data);
 
@@ -47,8 +47,8 @@ foreach ($gpio_mon_data as $index => $entry) {
                 }
             } else {
                 if (isset($sensor_data_parts[0]) && isset($sensor_data_parts[1]) && isset($sensor_data_parts[2])) {
-                    if (!isset($sensor_data['state_data'])) {
-                        $sensor_data['state_data'] = Array();
+                    if (! isset($sensor_data['state_data'])) {
+                        $sensor_data['state_data'] = [];
                     }
 
                     $state_data['value'] = intval($sensor_data_parts[0]);
@@ -72,7 +72,6 @@ var_dump($sensors);
 
 foreach ($sensors as $sensor_id => $sensor_data) {
     if (isset($sensor_data['name']) && isset($sensor_data['type']) && isset($sensor_data['descr'])) {
-
         if (isset($sensor_data['state_data'])) {
             create_state_index($sensor_data['name'], $sensor_data['state_data']);
         }
