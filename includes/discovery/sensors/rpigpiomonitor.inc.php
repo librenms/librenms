@@ -21,7 +21,6 @@
  * @copyright 2021 Denny Friebe
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
-
 $gpio_mon_data = snmpwalk_cache_oid($device, 'nsExtendOutLine."rpigpiomonitor"', [], 'NET-SNMP-EXTEND-MIB', null, '-OteQUsb');
 
 $sensor_index = 0;
@@ -29,7 +28,6 @@ $sensors = [];
 
 foreach ($gpio_mon_data as $index => $entry) {
     if (Str::contains($entry['nsExtendOutLine'], ';')) {
-
         $splitted_data_array = explode(';', $entry['nsExtendOutLine']);
         $sensor_data = [];
         foreach ($splitted_data_array as $splitted_data_index => $splitted_data) {
