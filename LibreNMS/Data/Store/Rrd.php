@@ -381,10 +381,8 @@ class Rrd extends BaseDatastore
         }
 
         // send the command!
-        if ($command == 'last' && $this->init(false)) {
+        if (in_array($command, ['last', 'list']) && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
-            $output = $this->sync_process->sendCommand($cmd);
-        } elseif ($command == 'list') {
             $output = $this->sync_process->sendCommand($cmd);
         } elseif ($this->init()) {
             // don't care about the return of other commands, so send them to the faster async process
@@ -459,7 +457,7 @@ class Rrd extends BaseDatastore
             // Command output is an array, create new array with each filename as a item in array.
             $rrdfilearray = preg_split('/\s+/', trim($rrd_files[0]));
         } else {
-            $rrddir = self::dirFromHost($device['hostname']);
+            $rrddir = $this->dirFromHost($device['hostname']);
             $pattern = sprintf('%s/*.rrd', $rrddir);
             $rrdfilearray = glob($pattern);
         }
@@ -481,7 +479,7 @@ class Rrd extends BaseDatastore
         $entries = [];
         $separator = '-';
 
-        $rrdfilearray = self::getRrdFiles($device);
+        $rrdfilearray = $this->getRrdFiles($device);
         if ($category) {
             $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
         } else {
