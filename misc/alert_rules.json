@@ -518,5 +518,9 @@
   {
     "rule": "UNIX_TIMESTAMP() - UNIX_TIMESTAMP(devices.last_polled) > COALESCE((select config_value from config WHERE config_name=\"rrd.heartbeat\"), 300)",
     "name": "Device unpolled"
-  }    
+  },
+  {
+    "rule": "eventlog.message ~ \"Deleted\" && eventlog.datetime >= `DATE_SUB(NOW(),INTERVAL 12 Hour)`",
+    "name": "A Device sensor has been deleted"
+  }
 ]
