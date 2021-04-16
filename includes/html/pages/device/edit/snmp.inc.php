@@ -385,6 +385,7 @@ if (! $snmpv3_sha2) {
     <option value='AES' " . ($device['cryptoalgo'] === 'AES' ? 'selected' : '') . ">AES</option>
     <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-192</option>
     <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-256</option>
+    <option value='AES-256-C' " . ($device['cryptoalgo'] === 'AES-256-C' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-256 Cisco</option>
     <option value='DES'>DES</option>
     </select>
     ";

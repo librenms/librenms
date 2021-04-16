@@ -50,7 +50,7 @@ class Device extends BaseModel
     /**
      * Returns IP/Hostname where polling will be targeted to
      *
-     * @param string $device hostname which will be triggered
+     * @param string|array $device hostname which will be triggered
      *        array  $device associative array with device data
      * @return string IP/Hostname to which Device polling is targeted
      */

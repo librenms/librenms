@@ -5,6 +5,7 @@ $(function () {
 </script>
 <?php
 
+use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
@@ -73,6 +74,10 @@ if ($port_details) {
 
 echo '</span>';
 
+$port_group_name_list = Port::find($port['port_id'])->groups->pluck('name')->toArray() ?: ['Default'];
+
+echo '</td><td width=100>';
+echo implode('<br>', $port_group_name_list);
 echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
 
 if ($port_details) {

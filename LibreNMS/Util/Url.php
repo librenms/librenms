@@ -26,9 +26,9 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
-use Auth;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -352,11 +352,13 @@ class Url
             $urlargs[] = $key . '=' . urlencode($arg);
         }
 
+        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+
         if (Config::get('enable_lazy_load', true)) {
-            return '<img class="lazy img-responsive" data-original="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+            return $tag . ' loading="lazy" />';
         }
 
-        return '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return $tag . ' />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
@@ -494,7 +496,7 @@ class Url
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
                 if (strpos($feature, ' ') !== false) {
-                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";
                     $possibilities[] = "$distro.png";

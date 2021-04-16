@@ -137,7 +137,7 @@ class TopDevicesController extends WidgetController
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
             ->when($settings['device_group'], function ($query) use ($settings) {
                 /** @var Builder<\App\Models\DeviceRelatedModel> $query */
-                $query->inDeviceGroup($settings['device_group']);
+                return $query->inDeviceGroup($settings['device_group']);
             });
     }
 
@@ -211,6 +211,7 @@ class TopDevicesController extends WidgetController
         $query = $this->deviceQuery()->orderBy('uptime', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
+            /** @var Device $device */
             return $this->standardRow($device, 'device_uptime', ['tab' => 'graphs', 'group' => 'system']);
         });
 
@@ -225,6 +226,7 @@ class TopDevicesController extends WidgetController
         $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
+            /** @var Device $device */
             return $this->standardRow($device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
@@ -270,6 +272,7 @@ class TopDevicesController extends WidgetController
         $query = $this->deviceQuery()->orderBy('last_polled_timetaken', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
+            /** @var Device $device */
             return $this->standardRow($device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 

@@ -265,6 +265,7 @@ foreach (get_port_assoc_modes() as $mode) {
                 <option value="AES" selected>AES</option>
                 <option value="AES-192"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-192</option>
                 <option value="AES-256"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-256</option>
+                <option value="AES-256-C"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-256-C</option>
                 <option value="DES">DES</option>
               </select>
               <?php if (! $snmpv3_aes256) {?>

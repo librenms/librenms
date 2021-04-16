@@ -18,6 +18,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
         } elseif ($device['os'] === 'timos') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
+        } elseif ($device['os'] === 'firebrick') {
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
         } elseif ($device['os'] === 'aos7') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'alaBgpPeerAS', [], 'ALCATEL-IND1-BGP-MIB', 'aos7');
         } elseif ($device['os'] === 'vrp') {
@@ -224,7 +226,58 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
-                    // ToDo, It seems that bgpPeer(In|Out)Updates, bgpPeerInUpdateElapsedTime and  bgpLocalAddr are actually not available over SNMP
+                    } elseif ($device['os'] == 'firebrick') {
+                        // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
+                        $bgpPeer = null;
+                        foreach ($peer_data_check as $key => $value) {
+                            $oid = explode('.', $key);
+                            $protocol = $oid[0];
+                            $address = str_replace($oid[0] . '.', '', $key);
+                            if (strlen($address) > 15) {
+                                $address = IP::fromHexString($address)->compressed();
+                            }
+
+                            // Some older Firebrick software versions don't have this field
+                            if (isset($value['fbBgpPeerLocalAddress'])) {
+                                $peer_data['bgpLocalAddr'] = IP::fromHexString($value['fbBgpPeerLocalAddress'])->uncompressed();
+                            }
+
+                            if ($address == $peer_ip) {
+                                switch ($value['fbBgpPeerState']) {
+                                    case 0:
+                                        $peer_data['bgpPeerState'] = 'idle';
+                                        break;
+                                    case 1:
+                                    case 2:
+                                        $peer_data['bgpPeerState'] = 'active';
+                                        break;
+                                    case 3:
+                                        $peer_data['bgpPeerState'] = 'opensent';
+                                        break;
+                                    case 4:
+                                        $peer_data['bgpPeerState'] = 'openconfig';
+                                        break;
+                                    case 5:
+                                        $peer_data['bgpPeerState'] = 'established';
+                                        break;
+                                    case 6:
+                                        $peer_data['bgpPeerState'] = 'closed';
+                                        break;
+                                    case 7:
+                                        $peer_data['bgpPeerState'] = 'free';
+                                        break;
+                                }
+                                $peer_data['bgpPeerRemoteAddr'] = $address;
+                                $peer_data['bgpPeerRemoteAs'] = $value['fbBgpPeerRemoteAS'];
+                                $peer_data['bgpPeerAdminStatus'] = 'start';
+                                $peer_data['bgpPeerInUpdates'] = 0;
+                                $peer_data['bgpPeerOutUpdates'] = 0;
+                                $peer_data['bgpPeerInTotalMessages'] = 0;
+                                $peer_data['bgpPeerOutTotalMessages'] = 0;
+                                $peer_data['bgpPeerFsmEstablishedTime'] = 0;
+                                break;
+                            }
+                        }
                     } else {
                         $bgp_peer_ident = $peer_ip->toSnmpIndex();
                         $ip_ver = $peer_ip->getFamily();
@@ -422,7 +475,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
                 foreach ($peer_afis as $peer_afi) {
@@ -593,6 +646,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         if (isset($vrpPrefixes[$key6])) {
                             $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key6]['hwBgpPeerPrefixRcvCounter'];
                             $cbgpPeerAdvertisedPrefixes = $vrpPrefixes[$key6]['hwBgpPeerPrefixAdvCounter'];
+                        }
+                    }
+
+                    if ($devices['os'] == 'firebrick') {
+                        foreach ($peer_data_check as $key => $value) {
+                            $oid = explode('.', $key);
+                            $protocol = $oid[0];
+                            $address = str_replace($oid[0] . '.', '', $key);
+                            if (strlen($address) > 15) {
+                                $address = IP::fromHexString($address)->compressed();
+                            }
+                            if ($address == $peer['bgpPeerIdentifier']) {
+                                $cbgpPeerAcceptedPrefixes = $value['fbBgpPeerReceivedIpv4Prefixes'] + $value['fbBgpPeerReceivedIpv6Prefixes'];
+                                $cbgpPeerAdvertisedPrefixes = $value['fbBgpPeerExported'];
+                                break;
+                            }
                         }
                     }
 

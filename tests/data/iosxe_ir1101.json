@@ -460,7 +460,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.4002",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.4002",
                     "sensor_index": "4002",
                     "sensor_type": "c3gGsmSimStatus",
                     "sensor_descr": "SIM status",
@@ -1542,7 +1542,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.4002",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.4002",
                     "sensor_index": "4002",
                     "sensor_type": "c3gGsmSimStatus",
                     "sensor_descr": "SIM status",
@@ -2426,5 +2426,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.2661",
+                    "sysDescr": "Cisco IOS Software [Amsterdam], ISR Software (ARMV8EL_LINUX_IOSD-UNIVERSALK9_IOT-M), Version 17.3.1, RELEASE SOFTWARE (fc5)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2020 by Cisco Systems, Inc.\r\nCompiled Fri 07-Aug-20 19:09",
+                    "sysContact": null,
+                    "version": "ARMV8EL_LINUX_IOSD-UNIVERSALK9_IOT-M 17.3.1",
+                    "hardware": "IR1101-K9",
+                    "features": "Amsterdam",
+                    "os": "iosxe",
+                    "type": "network",
+                    "serial": "FCW2428P6Q9",
+                    "icon": "cisco.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

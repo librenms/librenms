@@ -112,7 +112,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $graph_array['bg'] = 'ffffff00';
     // the 00 at the end makes the area transparent.
     $graph_array['from'] = Config::get('time.day');
-    $sensor_minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+    $sensor_minigraph = \LibreNMS\Util\Url::graphTag($graph_array);
 
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 

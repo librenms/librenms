@@ -180,7 +180,7 @@ class YamlDiscovery
      * Helper function for dynamic discovery to search for data from pre_cached snmp data
      *
      * @param string $name The name of the field from the discovery data or just an oid
-     * @param string $index The index of the current sensor
+     * @param string|int $index The index of the current sensor
      * @param array $discovery_data The discovery data for the current sensor
      * @param array $pre_cache all pre-cached snmp data
      * @param mixed $default The default value to return if data is not found

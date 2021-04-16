@@ -114,7 +114,7 @@ class OS implements Module
     {
         $device = $os->getDevice();
         $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
-        $device->sysContact = str_replace(['', '"', '\n', 'not set'], null, $device->sysContact);
+        $device->sysContact = str_replace(['', '"', '\n', 'not set'], '', $device->sysContact);
         if (empty($device->sysContact)) {
             $device->sysContact = null;
         }

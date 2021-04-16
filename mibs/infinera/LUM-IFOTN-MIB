@@ -1,0 +1,1441 @@
+LUM-IFOTN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    lumModules, lumIfOtnMIB
+        FROM LUM-REG
+    SignalStatusWithNA, FaultStatusWithNA, MgmtNameString, Unsigned32WithNA,
+    TruthValueWithNA, CommandString
+        FROM LUM-TC;
+
+lumIfOtnMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201904030000Z" -- June 28th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The MIB module for management of otn parameters on objects.
+        Notice! The SM, TCM and PM sections are described in
+        LUM-IFSMTCMPM-MIB.txt
+
+        This module describes the otn layer in ITU-T Recommendation
+        G.709.
+
+        The references refers to the following:
+        G.709/Y.1331 (03/2003)
+        G.798 (06/2004)
+        G.806 (03/2006)
+
+        The tables contained in this MIB are:
+
+        (1) The General group contains some general attributes as time stamps
+            and tables sizes.
+
+        (2) The optical channel transport unit (otu) group contains infor-
+            mation and configuration for the Otu layer objects.
+
+        (3) The optical channel data unit (odu) group contains information
+            and configuration for the Odu layer objects.
+
+        (4) The optical channel payload unit (opu) group contains information
+            and configuration for the Opu layer objects.
+
+        (5) The tributary port (tp) group contains information
+            and configuration for the tributary port.
+
+"
+    REVISION
+        "201904030000Z" -- June 28th 2019
+        DESCRIPTION
+            "Changes made for release r33.0:
+             - Added ifOtnTpNotAvailableForUse"
+    REVISION
+        "201806290000Z" -- June 29th 2018
+    DESCRIPTION
+        "Changes made for release r31.0:
+         - Added mxp200gotn board
+         - Added ifOtnOpuConnOduIndex
+         - Added ifOtnOduType value odu2e"
+    REVISION
+        "201712150000Z" -- December 15th 2017
+    DESCRIPTION
+        "Changes made for release r30.0:
+         - Complience table corrected"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added tp100gotnii board."
+    REVISION
+        "201501230000Z" -- January 23rd 2015
+    DESCRIPTION
+        "Changes made for release r24:
+        - Added Rx CMI (generic AIS) alarm."
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added mxp100gotn board.
+        - Added LOOMFI alarm."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Changed board name from tp10gotn to tphex10gotn."
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Removed fecType completely to be compliant with R21.
+        - Added tp10gotn, tp100gotn board."
+    REVISION
+        "201305010000Z" -- May 1st 2013
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 50 }
+
+
+-- ----------------------------------------------------
+-- Compliance area, containing groups and compliance
+-- specifications.
+-- ----------------------------------------------------
+
+lumIfOtnConfs OBJECT IDENTIFIER ::= { lumIfOtnMIB 1 }
+lumIfOtnGroups OBJECT IDENTIFIER ::= { lumIfOtnConfs 1 }
+lumIfOtnCompl OBJECT IDENTIFIER ::= { lumIfOtnConfs 2 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the IFOTN MIB
+-- ----------------------------------------------------
+
+lumIfOtnMIBObjects OBJECT IDENTIFIER ::= { lumIfOtnMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+ifOtnGeneral OBJECT IDENTIFIER ::= { lumIfOtnMIBObjects 1 }
+ifOtnOtuList OBJECT IDENTIFIER ::= { lumIfOtnMIBObjects 2 }
+ifOtnOduList OBJECT IDENTIFIER ::= { lumIfOtnMIBObjects 3 }
+ifOtnOpuList OBJECT IDENTIFIER ::= { lumIfOtnMIBObjects 4 }
+ifOtnTpList OBJECT IDENTIFIER ::= { lumIfOtnMIBObjects 5 }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+ifOtnGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was
+        last changed.
+
+"
+    ::= { ifOtnGeneral 1 }
+
+ifOtnGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of the
+	MIB was last changed.
+
+"
+    ::= { ifOtnGeneral 2 }
+
+ifOtnGeneralIfOtnOtuTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn otu table.
+
+"
+    ::= { ifOtnGeneral 3 }
+
+ifOtnGeneralIfOtnOtuConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnGeneral 4 }
+
+ifOtnGeneralIfOtnOtuStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       table was last changed.
+
+"
+   ::= { ifOtnGeneral 5 }
+
+ifOtnGeneralIfOtnOduTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn odu table
+
+"
+    ::= { ifOtnGeneral 6 }
+
+ifOtnGeneralIfOtnOduConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnGeneral 7 }
+
+ifOtnGeneralIfOtnOduStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       MIB was last changed.
+
+"
+   ::= { ifOtnGeneral 8 }
+
+ifOtnGeneralIfOtnOpuTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn opu table
+
+"
+    ::= { ifOtnGeneral 9 }
+
+ifOtnGeneralIfOtnOpuConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnGeneral 10 }
+
+ifOtnGeneralIfOtnOpuStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       MIB was last changed.
+
+"
+   ::= { ifOtnGeneral 11 }
+
+ifOtnGeneralIfOtnTpTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn Tp table
+
+"
+    ::= { ifOtnGeneral 12 }
+
+ifOtnGeneralIfOtnTpConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnGeneral 13 }
+
+ifOtnGeneralIfOtnTpStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       MIB was last changed.
+
+"
+   ::= { ifOtnGeneral 14 }
+
+-- ----------------------------------------------------
+-- Otu group
+-- ----------------------------------------------------
+
+ifOtnOtuTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnOtuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The optical channel transport unit (otu) group contains infor-
+         mation and configuration for the Otu layer objects."
+
+    ::= { ifOtnOtuList 1 }
+
+ifOtnOtuEntry OBJECT-TYPE
+    SYNTAX      IfOtnOtuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtn otu list.
+
+"
+    INDEX { ifOtnOtuIndex }
+    ::= { ifOtnOtuTable 1 }
+
+IfOtnOtuEntry ::=
+    SEQUENCE {
+        ifOtnOtuIndex                              Unsigned32,
+        ifOtnOtuName                               MgmtNameString,
+        ifOtnOtuConnIfBasicIfIndex                 Unsigned32WithNA,
+        ifOtnOtuTxSignalStatus                     SignalStatusWithNA,
+        ifOtnOtuRxSignalStatus                     SignalStatusWithNA,
+        ifOtnOtuLossOfFrame                        FaultStatusWithNA,
+        ifOtnOtuRxAlarmIndicationSignal            FaultStatusWithNA,
+        ifOtnOtuLossOfMultiframe                   FaultStatusWithNA,
+        ifOtnOtuUpPortId                           Integer32}
+
+ifOtnOtuIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnOtuEntry 1 }
+
+ifOtnOtuName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn otu, for example 'otu:1:2:1-2',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers.
+
+"
+    ::= { ifOtnOtuEntry 2 }
+
+ifOtnOtuConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifBasicIf table
+        this object is related.
+
+"
+    ::= { ifOtnOtuEntry 3 }
+
+ifOtnOtuTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnOtuEntry 4 }
+
+ifOtnOtuRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnOtuEntry 5 }
+
+ifOtnOtuLossOfFrame OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loss of frame (LOF).
+
+        Reference: 6.2.5.1 G.798
+
+        alarm: An OTU frame cannot be located.
+
+        ok: An OTU frame can be located.
+
+"
+    ::= { ifOtnOtuEntry 6 }
+
+ifOtnOtuRxAlarmIndicationSignal OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Alarm indication signal (AIS).
+
+        Indicates if alarm indication signal (AIS) alarm
+         exists or not in receiving direction.
+
+        Reference: 16.4 G.709, 6.2, 6.3.3 G.798
+
+        alarm: An AIS in OTU signal is detected.
+
+        ok: AIS inactive.
+
+"
+    ::= { ifOtnOtuEntry 7 }
+
+ifOtnOtuLossOfMultiframe OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loss of multiframe (LOM).
+
+         Indicates loss of multiframe.
+
+         Reference: 6.2.5.2 G.798
+
+        A: Loss of multiframe is active.
+
+        D: Loss of multiframe inactive.
+
+"
+    ::= { ifOtnOtuEntry 8 }
+
+ifOtnOtuUpPortId OBJECT-TYPE
+        SYNTAX      Integer32   (-1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Internal port reference for traffic unit.
+"
+        DEFVAL { -1  }
+    ::= { ifOtnOtuEntry 9 }
+
+-- ----------------------------------------------------
+-- Otn odu group
+-- ----------------------------------------------------
+
+ifOtnOduTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnOduEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The optical channel data unit (odu) group contains information
+         and configuration for the Odu layer objects."
+
+    ::= { ifOtnOduList 1 }
+
+ifOtnOduEntry OBJECT-TYPE
+    SYNTAX      IfOtnOduEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtn odu list.
+
+"
+    INDEX { ifOtnOduIndex }
+    ::= { ifOtnOduTable 1 }
+
+IfOtnOduEntry ::=
+    SEQUENCE {
+        ifOtnOduIndex                              Unsigned32,
+        ifOtnOduName                               MgmtNameString,
+        ifOtnOduConnIfBasicIfIndex                 Unsigned32WithNA,
+        ifOtnOduGcc1Terminated                     TruthValueWithNA,
+        ifOtnOduGcc2Terminated                     TruthValueWithNA,
+        ifOtnOduUsedTcms                           Unsigned32WithNA,
+        ifOtnOduTxSignalStatus                     SignalStatusWithNA,
+        ifOtnOduRxSignalStatus                     SignalStatusWithNA,
+        ifOtnOduType                               INTEGER,
+        ifOtnOduParentOduIndex                     Unsigned32WithNA }
+
+ifOtnOduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnOduEntry 1 }
+
+ifOtnOduName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn odu, for example 'odu:1:2:1-2',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers.
+
+"
+    ::= { ifOtnOduEntry 2 }
+
+ifOtnOduConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifBasicIf table
+        this object is related.
+
+"
+    ::= { ifOtnOduEntry 3 }
+
+ifOtnOduGcc1Terminated OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Set if GCC1 should be terminated or not.
+
+        true - GCC1 should be terminated
+
+        false - GCC1 should not be terminated
+
+"
+    DEFVAL { false }
+    ::= { ifOtnOduEntry 4 }
+
+ifOtnOduGcc2Terminated OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Set if GCC2 should be terminated or not.
+
+        true - GCC2 should be terminated
+
+        false - GCC2 should not be terminated
+
+"
+    DEFVAL { false }
+    ::= { ifOtnOduEntry 5 }
+
+ifOtnOduUsedTcms OBJECT-TYPE
+    SYNTAX       Unsigned32WithNA
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This attribute indicates which ODU related TCMs
+        that has been created.
+
+        This is a bit-mask, where
+             0x00000000 means No TCM
+             0x00000001 means tcm1
+             0x00000010 means tcm2
+             ...
+             0x00100000 means tcm6
+             ...
+             0x00100010 means tcm2 + tcm6
+             ...
+             0x00111111 means all tcms i.e. tcm1 ..tcm6
+"
+    DEFVAL { 0 }
+    ::= { ifOtnOduEntry 6 }
+
+ifOtnOduTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface. This is reflecting
+        the signalStatus of the OTN PM object
+        and any terminated TCMs.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnOduEntry 7 }
+
+ifOtnOduRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (RX) signal
+        of the interface. This is reflecting
+        the signalStatus of the OTN PM object
+        and any terminated TCMs.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnOduEntry 8 }
+
+ifOtnOduType OBJECT-TYPE
+    SYNTAX INTEGER {
+        unused (1),
+        odu0 (2),
+        odu1 (3),
+        odu2 (4),
+        odu3 (5),
+        odu4 (6),
+        oduFlex (7),
+        oduJ2 (8),
+        odu2e (9),
+        notApplicable (2147483647)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The odu type.
+
+"
+    DEFVAL { unused }
+    ::= { ifOtnOduEntry 9 }
+
+ifOtnOduParentOduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifOtnOduIf table
+        this SubOdu object is related.
+
+"
+        DEFVAL { 2147483647 }
+    ::= { ifOtnOduEntry 10 }
+
+-- ----------------------------------------------------
+-- Otn opu group
+-- ----------------------------------------------------
+
+ifOtnOpuTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnOpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The optical channel payload unit (opu) group contains information
+         and configuration for the Opu layer objects."
+
+    ::= { ifOtnOpuList 1 }
+
+ifOtnOpuEntry OBJECT-TYPE
+    SYNTAX      IfOtnOpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtn opu list.
+
+"
+    INDEX { ifOtnOpuIndex }
+    ::= { ifOtnOpuTable 1 }
+
+IfOtnOpuEntry ::=
+    SEQUENCE {
+        ifOtnOpuIndex                          Unsigned32,
+        ifOtnOpuName                           MgmtNameString,
+        ifOtnOpuConnIfBasicIfIndex             Unsigned32WithNA,
+        ifOtnOpuTxSignalStatus                 SignalStatusWithNA,
+        ifOtnOpuRxSignalStatus                 SignalStatusWithNA,
+        ifOtnOpuTxClientMaintenanceIndication  FaultStatusWithNA,
+        ifOtnOpuTxClientSignalFail             FaultStatusWithNA,
+        ifOtnOpuRxPayloadMismatch              FaultStatusWithNA,
+        ifOtnOpuTxPayloadMismatch              FaultStatusWithNA,
+        ifOtnOpuLossOfOpuMultiFrameIdentifier  FaultStatusWithNA,
+        ifOtnOpuRxClientMaintenanceIndication  FaultStatusWithNA,
+        ifOtnOpuConnOduIndex                   Unsigned32WithNA}
+
+ifOtnOpuIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnOpuEntry 1 }
+
+ifOtnOpuName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn opu, for example 'opu:1:2:1-2',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers.
+
+"
+    ::= { ifOtnOpuEntry 2 }
+
+ifOtnOpuConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifBasicIf table
+         this object is related.
+
+"
+    ::= { ifOtnOpuEntry 3 }
+
+ifOtnOpuTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnOpuEntry 4 }
+
+ifOtnOpuRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnOpuEntry 5 }
+
+ifOtnOpuTxClientMaintenanceIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx generic alarm indication signal (generic AIS).
+
+        Indicates if client maintenance signal (PN11)
+        exists or not.
+
+        alarm: A client maintenance signal is active.
+
+        ok: Client maintenance signal inactive.
+
+        Reference: 16.6.1 G.709/Y.1331
+
+"
+    ::= { ifOtnOpuEntry 6 }
+
+ifOtnOpuTxClientSignalFail OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Client signal fail (CSF).
+
+        Indicates if insignal in remote end is failed or not.
+
+        alarm: Remote end client is faulty.
+
+        ok: Remote end client is OK.
+
+        Reference: 17.1 G.709/Y.1331
+
+"
+    ::= { ifOtnOpuEntry 7 }
+
+ifOtnOpuRxPayloadMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Payload mismatch (PLM).
+
+        Monitored overhead: OPUk-PLM
+
+        Direction: Received from the associated physical interface and, unless the ODUk is terminated,
+                   the PLM is sent towards the board-internal G.805 Matrix.
+
+        Reference 6.2.4.1 G.798
+
+        Values:
+        alarm: The OPUk-PLM overhead is declared as active if the incoming payload type is not equal to the expected payload type(s).
+
+        ok: The OPUk-PLM overhead is declared as inactive if the incoming payload type is equal to the expected payload type(s).
+
+"
+    ::= { ifOtnOpuEntry 8 }
+
+ifOtnOpuTxPayloadMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Payload mismatch (PLM).
+
+        Monitored overhead: OPUk-PLM
+
+        Direction: Received from the board-internal G.805 Matrix and, if applicable, sent towards the physical interface.
+
+        Reference 6.2.4.1 G.798
+
+        Values:
+        alarm: The OPUk-PLM overhead is declared as active if the incoming payload type is not equal to the expected payload type(s).
+
+        ok: The OPUk-PLM overhead is declared as inactive if the incoming payload type is equal to the expected payload type(s)
+
+"
+    ::= { ifOtnOpuEntry 9 }
+
+ifOtnOpuLossOfOpuMultiFrameIdentifier OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Loss of OPU Multi-frame identifier (LOOMFI).
+
+        Monitored overhead: OPU4 Multi-Frame Identifier
+
+        Direction: OPU4 Rx. If the expected 80-frame identifier goes out of
+        expected sequence for a period of > 3 ms, LOOMFI is declared.
+
+        Reference: 14.3.10.2 G.798
+
+        Values:
+        alarm: The OPU Multi-frame identifier is lost.
+
+        ok: The OPU Multi-frame identifier is present.
+
+"
+    ::= { ifOtnOpuEntry 10 }
+
+ifOtnOpuRxClientMaintenanceIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx generic alarm indication signal (generic AIS).
+
+        Indicates if client maintenance signal (PN11)
+        exists or not.
+
+        alarm: A client maintenance signal is active.
+
+        ok: Client maintenance signal inactive.
+
+        Reference: 16.6.1 G.709/Y.1331
+
+"
+    ::= { ifOtnOpuEntry 11 }
+
+ifOtnOpuConnOduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in Odu table
+         this object is related.
+
+"
+    ::= { ifOtnOpuEntry 12 }
+
+-- ----------------------------------------------------
+-- Otn tp group
+-- ----------------------------------------------------
+
+ifOtnTpTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnTpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The optical channel payload unit (tp) group contains information
+         and configuration for the Tp layer objects."
+
+    ::= { ifOtnTpList 1 }
+
+ifOtnTpEntry OBJECT-TYPE
+    SYNTAX      IfOtnTpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtn tp list.
+
+"
+    INDEX { ifOtnTpIndex }
+    ::= { ifOtnTpTable 1 }
+
+IfOtnTpEntry ::=
+    SEQUENCE {
+        ifOtnTpIndex                                        Unsigned32,
+        ifOtnTpName                                         MgmtNameString,
+        ifOtnTpConnIfBasicIfIndex                           Unsigned32WithNA,
+        ifOtnTpUsedTribSlots                                Unsigned32WithNA,
+        ifOtnTpTribPortId                                   Unsigned32WithNA,
+        ifOtnTpRxMultiplexStructureIdentifierMismatch       FaultStatusWithNA,
+        ifOtnTpTxSignalStatus                               SignalStatusWithNA,
+        ifOtnTpRxSignalStatus                               SignalStatusWithNA,
+        ifOtnTpXcRefOduIndex                                Unsigned32WithNA,
+        ifOtnTpTribSlotMask                                 DisplayString,
+        ifOtnTpTribSlotView                                 DisplayString,
+        ifOtnTpNotAvailableForUse                           TruthValueWithNA}
+
+ifOtnTpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnTpEntry 1 }
+
+ifOtnTpName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn tp, for example 'tp:1:2:1',
+        where the first number indicates subrack, the second slot
+        number and the third is the tributary port number.
+
+"
+    ::= { ifOtnTpEntry 2 }
+
+ifOtnTpConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in the ifBasicIf table
+        this object is related.
+
+"
+    ::= { ifOtnTpEntry 3 }
+
+ifOtnTpUsedTribSlots OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of tributary slots occupied by this tributary port
+
+"
+    ::= { ifOtnTpEntry 4 }
+
+ifOtnTpTribPortId OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Tributary port id.
+
+"
+    DEFVAL { 2147483647 }
+    ::= { ifOtnTpEntry 5 }
+
+ifOtnTpRxMultiplexStructureIdentifierMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Multiplex structure identifier mismatch (MSIM).
+
+        Indicates received MSI is not equal to expected MSI.
+
+        alarm: The MSIM shall be declared for the ODU tributary port
+               if the received MSI is not equal to the expected MSI.
+
+        ok: MSIM shall be cleared if the received MSI is equal to the
+            expected MSI.
+
+        reference 19.4.1 G709, 6.2.9.1 G.798
+
+"
+    ::= { ifOtnTpEntry 6 }
+
+ifOtnTpTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnTpEntry 7 }
+
+ifOtnTpRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnTpEntry 8 }
+
+ifOtnTpXcRefOduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifOtnOduIf table
+        this TP object is contained in.
+
+"
+        DEFVAL { 2147483647 }
+    ::= { ifOtnTpEntry 9 }
+
+ifOtnTpTribSlotMask OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tributary slot mask string
+
+         Format:
+         '<bit-mask>'
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnTpEntry 10 }
+
+ifOtnTpTribSlotView OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tributary slots
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnTpEntry 11 }
+
+ifOtnTpNotAvailableForUse OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifOtnTpTable is statically populated with entries
+         that may or may not be available for use depending on
+         other configuration items.
+         This attribute states whether the tributary port object
+         is actually possible to allocate or not.
+
+         TRUE  => Not possible to allocate.
+
+         FALSE => Can be allocated.
+
+"
+
+    DEFVAL { notApplicable }
+    ::= { ifOtnTpEntry 12 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+ifOtnGeneralGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnGeneralConfigLastChangeTime,
+        ifOtnGeneralStateLastChangeTime,
+        ifOtnGeneralIfOtnOtuTableSize,
+        ifOtnGeneralIfOtnOtuConfigLastChangeTime,
+        ifOtnGeneralIfOtnOtuStateLastChangeTime,
+        ifOtnGeneralIfOtnOduTableSize,
+        ifOtnGeneralIfOtnOduConfigLastChangeTime,
+        ifOtnGeneralIfOtnOduStateLastChangeTime,
+        ifOtnGeneralIfOtnOpuTableSize,
+        ifOtnGeneralIfOtnOpuConfigLastChangeTime,
+        ifOtnGeneralIfOtnOpuStateLastChangeTime }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfOtnGroups 1 }
+
+ifOtnOtuGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOtuIndex,
+        ifOtnOtuName,
+        ifOtnOtuConnIfBasicIfIndex,
+        ifOtnOtuTxSignalStatus,
+        ifOtnOtuRxSignalStatus,
+        ifOtnOtuLossOfFrame,
+        ifOtnOtuRxAlarmIndicationSignal,
+        ifOtnOtuLossOfMultiframe }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn otu objects (R20.0)."
+    ::= { lumIfOtnGroups 2 }
+
+ifOtnOduGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOduIndex,
+        ifOtnOduName,
+        ifOtnOduConnIfBasicIfIndex,
+        ifOtnOduGcc1Terminated,
+        ifOtnOduGcc2Terminated,
+        ifOtnOduUsedTcms,
+        ifOtnOduTxSignalStatus,
+        ifOtnOduRxSignalStatus }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn odu objects (R20.0)."
+    ::= { lumIfOtnGroups 3 }
+
+ifOtnOpuGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOpuIndex,
+        ifOtnOpuName,
+        ifOtnOpuConnIfBasicIfIndex,
+        ifOtnOpuTxSignalStatus,
+        ifOtnOpuRxSignalStatus,
+        ifOtnOpuTxClientMaintenanceIndication,
+        ifOtnOpuTxClientSignalFail }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn opu objects (R20.0)."
+    ::= { lumIfOtnGroups 4 }
+
+ifOtnTpGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnTpIndex,
+        ifOtnTpName,
+        ifOtnTpConnIfBasicIfIndex,
+        ifOtnTpUsedTribSlots,
+        ifOtnTpTribPortId,
+        ifOtnTpRxMultiplexStructureIdentifierMismatch,
+        ifOtnTpTxSignalStatus,
+        ifOtnTpRxSignalStatus }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn tp objects (R22.0)."
+    ::= { lumIfOtnGroups 5 }
+
+ifOtnOpuGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOpuIndex,
+        ifOtnOpuName,
+        ifOtnOpuConnIfBasicIfIndex,
+        ifOtnOpuTxSignalStatus,
+        ifOtnOpuRxSignalStatus,
+        ifOtnOpuTxClientMaintenanceIndication,
+        ifOtnOpuTxClientSignalFail,
+        ifOtnOpuRxPayloadMismatch,
+        ifOtnOpuTxPayloadMismatch }
+   STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn opu objects (R22.0)."
+    ::= { lumIfOtnGroups 6 }
+
+ifOtnOduGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOduIndex,
+        ifOtnOduName,
+        ifOtnOduConnIfBasicIfIndex,
+        ifOtnOduGcc1Terminated,
+        ifOtnOduGcc2Terminated,
+        ifOtnOduUsedTcms,
+        ifOtnOduTxSignalStatus,
+        ifOtnOduRxSignalStatus,
+        ifOtnOduType,
+        ifOtnOduParentOduIndex }
+
+    STATUS      current
+    DESCRIPTION
+        "The ifOtn odu objects (R22.0)."
+    ::= { lumIfOtnGroups 7 }
+
+ifOtnOtuGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOtuIndex,
+        ifOtnOtuName,
+        ifOtnOtuConnIfBasicIfIndex,
+        ifOtnOtuTxSignalStatus,
+        ifOtnOtuRxSignalStatus,
+        ifOtnOtuLossOfFrame,
+        ifOtnOtuRxAlarmIndicationSignal,
+        ifOtnOtuLossOfMultiframe }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn otu objects (R22.0)."
+    ::= { lumIfOtnGroups 8 }
+
+ifOtnOpuGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOpuIndex,
+        ifOtnOpuName,
+        ifOtnOpuConnIfBasicIfIndex,
+        ifOtnOpuTxSignalStatus,
+        ifOtnOpuRxSignalStatus,
+        ifOtnOpuTxClientMaintenanceIndication,
+        ifOtnOpuTxClientSignalFail,
+        ifOtnOpuRxPayloadMismatch,
+        ifOtnOpuTxPayloadMismatch,
+        ifOtnOpuLossOfOpuMultiFrameIdentifier }
+   STATUS      deprecated
+   DESCRIPTION
+       "The ifOtn opu objects (R23.1)."
+   ::= { lumIfOtnGroups 9 }
+
+ifOtnTpGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnTpIndex,
+        ifOtnTpName,
+        ifOtnTpConnIfBasicIfIndex,
+        ifOtnTpUsedTribSlots,
+        ifOtnTpTribPortId,
+        ifOtnTpRxMultiplexStructureIdentifierMismatch,
+        ifOtnTpTxSignalStatus,
+        ifOtnTpRxSignalStatus,
+        ifOtnTpTribSlotMask,
+        ifOtnTpTribSlotView }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtn tp objects (R28.0)."
+    ::= { lumIfOtnGroups 10 }
+
+ifOtnOtuGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOtuIndex,
+        ifOtnOtuName,
+        ifOtnOtuConnIfBasicIfIndex,
+        ifOtnOtuTxSignalStatus,
+        ifOtnOtuRxSignalStatus,
+        ifOtnOtuLossOfFrame,
+        ifOtnOtuRxAlarmIndicationSignal,
+        ifOtnOtuLossOfMultiframe,
+        ifOtnOtuUpPortId}
+
+    STATUS      current
+    DESCRIPTION
+        "The ifOtn otu objects (R28.0)."
+    ::= { lumIfOtnGroups 11 }
+
+ifOtnGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnGeneralConfigLastChangeTime,
+        ifOtnGeneralStateLastChangeTime,
+        ifOtnGeneralIfOtnOtuTableSize,
+        ifOtnGeneralIfOtnOtuConfigLastChangeTime,
+        ifOtnGeneralIfOtnOtuStateLastChangeTime,
+        ifOtnGeneralIfOtnOduTableSize,
+        ifOtnGeneralIfOtnOduConfigLastChangeTime,
+        ifOtnGeneralIfOtnOduStateLastChangeTime,
+        ifOtnGeneralIfOtnOpuTableSize,
+        ifOtnGeneralIfOtnOpuConfigLastChangeTime,
+        ifOtnGeneralIfOtnOpuStateLastChangeTime,
+        ifOtnGeneralIfOtnTpTableSize,
+        ifOtnGeneralIfOtnTpConfigLastChangeTime,
+        ifOtnGeneralIfOtnTpStateLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfOtnGroups 12 }
+
+ifOtnOpuGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifOtnOpuIndex,
+        ifOtnOpuName,
+        ifOtnOpuConnIfBasicIfIndex,
+        ifOtnOpuTxSignalStatus,
+        ifOtnOpuRxSignalStatus,
+        ifOtnOpuTxClientMaintenanceIndication,
+        ifOtnOpuTxClientSignalFail,
+        ifOtnOpuRxPayloadMismatch,
+        ifOtnOpuTxPayloadMismatch,
+        ifOtnOpuLossOfOpuMultiFrameIdentifier,
+        ifOtnOpuConnOduIndex }
+   STATUS      current
+   DESCRIPTION
+       "The ifOtn opu objects (R31.0)."
+   ::= { lumIfOtnGroups 13 }
+
+   ifOtnTpGroupV3 OBJECT-GROUP
+       OBJECTS {
+           ifOtnTpIndex,
+           ifOtnTpName,
+           ifOtnTpConnIfBasicIfIndex,
+           ifOtnTpUsedTribSlots,
+           ifOtnTpTribPortId,
+           ifOtnTpRxMultiplexStructureIdentifierMismatch,
+           ifOtnTpTxSignalStatus,
+           ifOtnTpRxSignalStatus,
+           ifOtnTpTribSlotMask,
+           ifOtnTpTribSlotView,
+           ifOtnTpNotAvailableForUse}
+
+       STATUS      current
+       DESCRIPTION
+           "The ifOtn tp objects (R33.0)."
+       ::= { lumIfOtnGroups 14 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumIfOtnComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtn MIB. (R20.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnGeneralGroupV1,
+            ifOtnOtuGroupV1,
+            ifOtnOduGroupV1,
+            ifOtnOpuGroupV1 }
+    ::= { lumIfOtnCompl 1 }
+
+lumIfOtnComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtn MIB. (R22.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnGeneralGroupV1,
+            ifOtnOtuGroupV2,
+            ifOtnOduGroupV2,
+            ifOtnOpuGroupV2,
+            ifOtnTpGroupV1 }
+    ::= { lumIfOtnCompl 2 }
+
+lumIfOtnComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtn MIB. (R23.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnGeneralGroupV1,
+            ifOtnOtuGroupV2,
+            ifOtnOduGroupV2,
+            ifOtnOpuGroupV3,
+            ifOtnTpGroupV1 }
+    ::= { lumIfOtnCompl 3 }
+
+lumIfOtnComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtn MIB. (R28.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnGeneralGroupV1,
+            ifOtnOtuGroupV3,
+            ifOtnOduGroupV2,
+            ifOtnOpuGroupV3,
+            ifOtnTpGroupV2 }
+    ::= { lumIfOtnCompl 4 }
+
+lumIfOtnComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtn MIB. (R30.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnGeneralGroupV2,
+            ifOtnOtuGroupV3,
+            ifOtnOduGroupV2,
+            ifOtnOpuGroupV3,
+            ifOtnTpGroupV2 }
+    ::= { lumIfOtnCompl 5 }
+
+lumIfOtnComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtn MIB. (R31.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnGeneralGroupV2,
+            ifOtnOtuGroupV3,
+            ifOtnOduGroupV2,
+            ifOtnOpuGroupV4,
+            ifOtnTpGroupV2 }
+    ::= { lumIfOtnCompl 6 }
+
+    lumIfOtnComplV7 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "Basic implementation requirements for the ifOtn MIB. (R31.0)"
+        MODULE
+            MANDATORY-GROUPS {
+                ifOtnGeneralGroupV2,
+                ifOtnOtuGroupV3,
+                ifOtnOduGroupV2,
+                ifOtnOpuGroupV4,
+                ifOtnTpGroupV3 }
+        ::= { lumIfOtnCompl 7 }
+END
+

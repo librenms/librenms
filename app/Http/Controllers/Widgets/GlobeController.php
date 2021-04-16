@@ -63,7 +63,7 @@ class GlobeController extends WidgetController
         $query = Location::hasAccess($request->user())
             ->with($eager_load)
             ->when($data['device_group'], function ($query) use ($data) {
-                $query->inDeviceGroup($data['device_group']);
+                return $query->inDeviceGroup($data['device_group']);
             });
 
         /** @var Location $location */
