@@ -155,7 +155,7 @@ class Device extends BaseModel
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
-                if (count($this->groups)) {
+                if ($this->groups->isNotEmpty()) {
                     $query->orWhereHas('deviceGroups', function (Builder $query) {
                         $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
