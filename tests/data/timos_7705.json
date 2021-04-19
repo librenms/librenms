@@ -8354,7 +8354,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "active",
                     "context_name": null,
-                    "ifIndex": 1
+                    "ifIndex": null
                 },
                 {
                     "ospf_port_id": "10.18.30.14.0",
@@ -8384,7 +8384,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "active",
                     "context_name": null,
-                    "ifIndex": 2
+                    "ifIndex": null
                 },
                 {
                     "ospf_port_id": "10.18.60.86.0",
@@ -8414,7 +8414,7 @@
                     "ospfIfMetricValue": 100,
                     "ospfIfMetricStatus": "active",
                     "context_name": null,
-                    "ifIndex": 5
+                    "ifIndex": null
                 }
             ],
             "ospf_instances": [
