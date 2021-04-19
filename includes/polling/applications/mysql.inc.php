@@ -96,6 +96,7 @@ $mapping = [
     'CSt'     => 'c5',
     'CUe'     => 'c3',
     'CUMi'    => 'c9',
+    'SlLa'    => 'br',
 ];
 
 $data = explode("\n", $mysql);
@@ -192,7 +193,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('CRSt', 'DERIVE', 0, 125000000000)
     ->addDataset('CSt', 'DERIVE', 0, 125000000000)
     ->addDataset('CUe', 'DERIVE', 0, 125000000000)
-    ->addDataset('CUMi', 'DERIVE', 0, 125000000000);
+    ->addDataset('CUMi', 'DERIVE', 0, 125000000000)
+    ->addDataset('SlLa', 'GAUGE', 0, 125000000000);
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
