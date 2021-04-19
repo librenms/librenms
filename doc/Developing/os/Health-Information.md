@@ -140,6 +140,10 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+When referencing an oid in another table the full index will be used to match the other table.
+If this is undesirable, you may use a single sub index by appending the sub index after a colon to 
+the variable name.  Example `{{ $ifName:2 }}`
+
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
 > from the OID, unless a target index is appended to the OID.
