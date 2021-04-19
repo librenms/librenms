@@ -84,8 +84,10 @@ echo PHP_EOL;
 
 if (($device['os'] == 'routeros')) {
     echo ' LLDP-MIB: ';
-    $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3)[0][0];
+    $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (! empty($lldp_array)) {
+        if(!empty($lldp_array[0][0])) $lldp_array = $lldp_array[0][0];
+
         $lldp_ports = snmpwalk_group($device, 'mtxrInterfaceStatsName', 'MIKROTIK-MIB');
         $lldp_ports_num = snmpwalk_group($device, 'mtxrNeighborInterfaceID', 'MIKROTIK-MIB');
 
