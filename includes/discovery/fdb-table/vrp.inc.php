@@ -69,5 +69,5 @@ if (! empty($hwCfgMacAddrQueryIfIndex)) {
     }
 }
 
-unset ($fdbPort_table);
-unset ($hwCfgMacAddrQueryIfIndex);
+unset($fdbPort_table);
+unset($hwCfgMacAddrQueryIfIndex);
