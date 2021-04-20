@@ -941,12 +941,24 @@ return [
             'group_support' => [
                 'description' => 'Enable the return of groups to Oxidized',
             ],
+            'ignore_os' => [
+                'description' => 'Do not backup these OS',
+                'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces)',
+            ],
+            'ignore_types' => [
+                'description' => 'Do not backup these device types',
+                'help' => 'Do not backup the listed device types with Oxidized.',
+            ],
             'reload_nodes' => [
                 'description' => 'Reload Oxidized nodes list, each time a device is added',
             ],
             'url' => [
                 'description' => 'URL to your Oxidized API',
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)',
+            ],
+            'versioning' => [
+                'description' => 'Enable config versioning support',
+                'help' => 'Enables LibreNMS to access and compare previous config versions known to work with the Oxidized git backend',
             ],
         ],
         'password' => [
