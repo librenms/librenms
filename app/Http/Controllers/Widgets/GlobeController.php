@@ -102,7 +102,7 @@ class GlobeController extends WidgetController
                     $location->lat,
                     $location->lng,
                     $location->location,
-                    $count ? (1 - $up / $count) * 100 : 0, // percent down
+                    (1 - $up / $count) * 100, // percent down
                     $count,
                     $down_items->implode(',<br/> '),
                 ]);
