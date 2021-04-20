@@ -386,9 +386,9 @@ if (! $snmpv3_sha2) {
     <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_aes256 ? '' : ' disabled') . ">AES-192</option>
     <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_aes256 ? '' : ' disabled') . ">AES-256</option>
     <option value='AES-256-C' " . ($device['cryptoalgo'] === 'AES-256-C' ? 'selected' : '') . ($snmpv3_aes256 ? '' : ' disabled') . ">AES-256 Cisco</option>
-    <option value='DES' " . ($device['cryptoalgo'] === 'DES' ? 'selected' : '') . ">DES</option>
+    <option value='DES' " . ($device['cryptoalgo'] === 'DES' ? 'selected' : '') . '>DES</option>
     </select>
-    ";
+    ';
 if (! $snmpv3_aes256) {
     echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }
