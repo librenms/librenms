@@ -85,7 +85,7 @@ class Isis implements Module
                 $port_id = (int) $device->ports()->where('ifIndex', $circuit)->value('port_id');
 
                 if ($circuit_data['isisCircPassiveCircuit'] != '1') {
-                    // Adjancy is UP
+                    // Adjacency is UP
                     if (! empty($adjacencies_poll[$circuit]) && end($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
                         $isis_data['isisISAdjState'] = end($adjacencies_poll[$circuit]['isisISAdjState']);
                         $isis_data['isisISAdjNeighSysID'] = end($adjacencies_poll[$circuit]['isisISAdjNeighSysID']);
