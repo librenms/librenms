@@ -54,11 +54,11 @@ class Isis implements Module
     public function poll(OS $os)
     {
         // Translate system state codes into meaningful strings
-        $isis_codes = array('1' => 'L1',
+        $isis_codes = ['1' => 'L1',
             '2' => 'L2',
             '3' => 'L1L2',
             '4' => 'unknown',
-    );
+        ];
 
         // Get device objects
         $device_array = $os->getDeviceArray();
