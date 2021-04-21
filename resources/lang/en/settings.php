@@ -496,8 +496,8 @@ return [
             ],
             'ipv6-addresses' => [
                 'description' => 'IPv6 Addresses',
-	    ],
-	    'juniper-rpm' => [
+        ],
+        'juniper-rpm' => [
                 'description' => 'Juniper RPM',
             ],
             'junose-atm-vp' => [
@@ -1044,7 +1044,7 @@ return [
             'cisco-sla' => [
                 'description' => 'Cisco SLA',
             ],
-	    'juniper-rpm' => [
+        'juniper-rpm' => [
                 'description' => 'Juniper RPM',
             ],
             'cisco-mac-accounting' => [
