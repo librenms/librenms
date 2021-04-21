@@ -34,7 +34,7 @@
                         <div class="col-md-5 cell">{{ formatSource(source, match) }}</div>
                         <div class="col-md-4 cell">{{ formatTarget(target, match) }}</div>
                         <div class="col-md-3 buttons">
-                            <div class="btn-group" v-tooltip="disabled ? $t('settings.readonly') : false"">
+                            <div class="btn-group" v-tooltip="disabled ? $t('settings.readonly') : false">
                                 <button type="button" class="btn btn-sm btn-info" v-tooltip="$t('Edit')" :disabled="disabled"><i class="fa fa-lg fa-edit"></i></button>
                                 <button type="button" class="btn btn-sm btn-danger" v-tooltip="$t('Delete')" :disabled="disabled"><i class="fa fa-lg fa-remove"></i></button>
                             </div>
@@ -83,9 +83,11 @@ export default {
     white-space: nowrap;
     padding: 0 5px;
 }
+
 .new-btn-div {
     margin-bottom: 5px;
 }
+
 .panel-body {
     padding: 5px 0;
 }
