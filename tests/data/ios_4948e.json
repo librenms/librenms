@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.1178",
+                    "sysDescr": "Cisco IOS Software, Catalyst 4500 L3 Switch Software (cat4500e-ENTSERVICESK9-M), Version 15.0(2)SG10, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Tue 07-Apr-15 10:40",
+                    "sysContact": "<private>",
+                    "version": "15.0(2)SG10",
+                    "hardware": "WS-C4948E",
+                    "features": "ENTSERVICESK9",
+                    "os": "ios",
+                    "type": "network",
+                    "serial": "<private>",
+                    "icon": "cisco.svg",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

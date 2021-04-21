@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'sap-' . $vars['traffic_id']);
+$rrd_filename = Rrd::name($device['hostname'], 'sap-' . $vars['traffic_id']);
 
 $stats = [
     'sapIngressBits' => 'Ingress Bits',

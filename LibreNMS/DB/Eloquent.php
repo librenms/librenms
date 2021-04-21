@@ -41,7 +41,7 @@ class Eloquent
         if (! Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
-            Dotenv::create($install_dir)->load();
+            Dotenv::createMutable($install_dir)->load();
 
             $db_config = include $install_dir . '/config/database.php';
             $settings = $db_config['connections'][$db_config['default']];
@@ -103,7 +103,7 @@ class Eloquent
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
      * @param string $name
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Database\Connection|null
      */
     public static function DB($name = null)
     {
@@ -136,8 +136,8 @@ class Eloquent
             'username' => $db_user,
             'password' => $db_pass,
             'unix_socket' => $db_socket,
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'strict' => true,
             'engine' => null,

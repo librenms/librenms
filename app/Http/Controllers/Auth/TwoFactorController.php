@@ -96,7 +96,7 @@ class TwoFactorController extends Controller
      * Show the form for creating a new resource.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse.
      */
     public function create(Request $request)
     {
@@ -123,7 +123,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse.
      */
     public function destroy(Request $request)
     {
@@ -137,7 +137,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse.
      */
     public function cancelAdd(Request $request)
     {
@@ -148,7 +148,7 @@ class TwoFactorController extends Controller
 
     /**
      * @param User $user
-     * @param string $token
+     * @param int $token
      * @return true
      * @throws AuthenticationException
      */
@@ -199,10 +199,9 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * @param $user
      * @return mixed
      */
-    private function loadSettings($user)
+    private function loadSettings(User $user)
     {
         if (Session::has('twofactoradd')) {
             return Session::get('twofactoradd');

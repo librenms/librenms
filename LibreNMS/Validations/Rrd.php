@@ -41,6 +41,7 @@ class Rrd extends BaseValidation
 
         // Check that rrdtool config version is what we see
         if (Config::has('rrdtool_version')
+            && version_compare(Config::get('rrdtool_version'), '1.5.5', '<')
             && version_compare(Config::get('rrdtool_version'), $versions['rrdtool_ver'], '>')
         ) {
             $validator->fail(
@@ -75,7 +76,7 @@ class Rrd extends BaseValidation
                 $validator->fail("$port doesn't appear to exist, rrdcached test failed");
             }
         } else {
-            $connection = @fsockopen($host, $port);
+            $connection = @fsockopen($host, (int) $port);
             if (is_resource($connection)) {
                 fclose($connection);
             } else {

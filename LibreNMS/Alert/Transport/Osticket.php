@@ -31,6 +31,7 @@ class Osticket extends Transport
     {
         $url = $opts['url'];
         $token = $opts['token'];
+        $email = '';
 
         foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';

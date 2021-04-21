@@ -1,15 +1,16 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
 
 function format_bytes_billing($value)
 {
-    return format_number($value, Config::get('billing.base')) . 'B';
+    return Number::formatBase($value, Config::get('billing.base'));
 }//end format_bytes_billing()
 
 function format_bytes_billing_short($value)
 {
-    return format_number($value, Config::get('billing.base'), 2, 3);
+    return Number::formatBase($value, Config::get('billing.base'), 2, 3, '');
 }//end format_bytes_billing_short()
 
 function getDates($dayofmonth, $months = 0)

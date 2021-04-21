@@ -124,7 +124,7 @@ class Schema
     /**
      * Return all columns for the given table
      *
-     * @param $table
+     * @param string $table
      * @return array
      */
     public function getColumns($table)
@@ -144,6 +144,7 @@ class Schema
     public function getAllRelationshipPaths($base = 'devices')
     {
         $update_cache = true;
+        $cache = [];
         $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
         $db_version = Version::get()->database();
 
@@ -327,7 +328,7 @@ class Schema
 
         foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
             $table = $table->TABLE_NAME;
-            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
+            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")) as $data) {
                 $def = [
                     'Field' => $data->COLUMN_NAME,
                     'Type' => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),

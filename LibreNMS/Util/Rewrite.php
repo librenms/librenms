@@ -57,6 +57,29 @@ class Rewrite
         return $type;
     }
 
+    public static function shortenIfType($type)
+    {
+        return str_ireplace(
+            [
+                'FastEthernet',
+                'TenGigabitEthernet',
+                'GigabitEthernet',
+                'Port-Channel',
+                'Ethernet',
+                'Bundle-Ether',
+            ],
+            [
+                'Fa',
+                'Te',
+                'Gi',
+                'Po',
+                'Eth',
+                'BE',
+            ],
+            $type
+        );
+    }
+
     public static function normalizeIfName($name)
     {
         $rewrite_ifname = [
@@ -114,7 +137,7 @@ class Rewrite
     /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
-     * @param $mac
+     * @param string $mac
      * @return string
      */
     public static function readableMac($mac)

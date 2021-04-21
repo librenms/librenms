@@ -36,7 +36,7 @@ foreach ($storage_cache1['eql-storage'] as $index => $ventry) {
         $iind = $index;
     } else {
         $arrindex = explode('.', $index);
-        $iind = (int) (end($arrindex)) + 0;
+        $iind = (int) cast_number(end($arrindex));
     }
     if (is_int($iind)) {
         $storage_cache10[$iind] = $ventry;
@@ -52,7 +52,7 @@ foreach ($storage_cache2['eql-storage'] as $index => $vsentry) {
         $iind = $index;
     } else {
         $arrindex = explode('.', $index);
-        $iind = (int) (end($arrindex)) + 0;
+        $iind = (int) cast_number(end($arrindex));
     }
     if (is_int($iind)) {
         $storage_cache20[$iind] = $vsentry;

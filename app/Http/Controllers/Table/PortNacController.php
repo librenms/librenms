@@ -73,6 +73,9 @@ class PortNacController extends TableController
         return PortsNac::where('device_id', $request->device_id)->hasAccess($request->user())->with('port');
     }
 
+    /**
+     * @param PortsNac $nac
+     */
     public function formatItem($nac)
     {
         $item = $nac->toArray();

@@ -38,9 +38,9 @@ if (isset($vars['id'])) {
          * Data is split into just two RRD files, memory resources and utilization
          */
         if ($subtype == 'memory') {
-            $rrd_filename = rrd_name($device['hostname'], ['cisco-qfp', 'memory', $components['entPhysicalIndex']]);
+            $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'memory', $components['entPhysicalIndex']]);
         } else {
-            $rrd_filename = rrd_name($device['hostname'], ['cisco-qfp', 'util', $components['entPhysicalIndex']]);
+            $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'util', $components['entPhysicalIndex']]);
         }
 
         /*

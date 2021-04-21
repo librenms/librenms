@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'panos-activetunnels');
+$rrd_filename = Rrd::name($device['hostname'], 'panos-activetunnels');
 
 $ds = 'activetunnels';
 

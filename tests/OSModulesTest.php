@@ -97,13 +97,9 @@ class OSModulesTest extends DBTestCase
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
         } catch (FileNotFoundException $e) {
-            $this->fail($e->getMessage());
-
-            return;
+            return $this->fail($e->getMessage());
         } catch (InvalidModuleException $e) {
-            $this->fail($e->getMessage());
-
-            return;
+            return $this->fail($e->getMessage());
         }
 
         if (is_null($results)) {
@@ -114,8 +110,8 @@ class OSModulesTest extends DBTestCase
         $debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'];
-            $actual = $results[$module]['discovery'];
+            $expected = $expected_data[$module]['discovery'] ?? [];
+            $actual = $results[$module]['discovery'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,
@@ -133,9 +129,9 @@ class OSModulesTest extends DBTestCase
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
-                $expected = $expected_data[$module]['poller'];
+                $expected = $expected_data[$module]['poller'] ?? [];
             }
-            $actual = $results[$module]['poller'];
+            $actual = $results[$module]['poller'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,

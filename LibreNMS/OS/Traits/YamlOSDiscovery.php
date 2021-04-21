@@ -83,7 +83,7 @@ trait YamlOSDiscovery
     public function fetchLocation(): Location
     {
         $os_yaml = $this->getDiscovery('os');
-        $name = $os_yaml['location'] ?? 'SNMPv2-MIB::sysLocation.0';
+        $name = $os_yaml['location'] ?? null;
         $lat = $os_yaml['lat'] ?? null;
         $lng = $os_yaml['long'] ?? null;
 
@@ -94,7 +94,7 @@ trait YamlOSDiscovery
         Log::debug('Yaml location data:', $data);
 
         return new Location([
-            'location' => $this->findFirst($data, $name, $numeric),
+            'location' => $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv'),
             'lat' => $this->findFirst($data, $lat, $numeric),
             'lng' => $this->findFirst($data, $lng, $numeric),
         ]);

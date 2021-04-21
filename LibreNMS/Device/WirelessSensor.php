@@ -200,6 +200,12 @@ class WirelessSensor extends Sensor
             'distance' => [
                 'icon' => 'space-shuttle',
             ],
+            'cell' => [
+                'icon' => 'line-chart',
+            ],
+            'channel' => [
+                'icon' => 'line-chart',
+            ],
         ];
 
         if ($valid) {
@@ -242,7 +248,7 @@ class WirelessSensor extends Sensor
     /**
      * Convert a WiFi channel to a Frequency in MHz
      *
-     * @param $channel
+     * @param int $channel
      * @return int
      */
     public static function channelToFrequency($channel)

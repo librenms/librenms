@@ -1,6 +1,6 @@
 <?php
 
-$device_id = mres($vars['device_id']);
+$device_id = $vars['device_id'];
 
 $param[] = $device_id;
 
@@ -54,4 +54,4 @@ $output = [
     'rows'     => $response,
     'total'    => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -4,7 +4,7 @@ modules:
         power:
             data:
                 -
-                    oid: ATEN-PE-CFG::outlet
+                    oid: outlet
                     skip_value_lt: -200
                     value: outletIntegerPower
                     num_oid: '.1.3.6.1.4.1.21317.1.3.2.2.2.2.99.1.4.{{ $index }}'
@@ -16,7 +16,7 @@ modules:
         current:
             data:
                 -
-                    oid: ATEN-PE-CFG::outlet
+                    oid: outlet
                     value: outletIntegerCurrent
                     skip_value_lt: -200
                     num_oid: '.1.3.6.1.4.1.21317.1.3.2.2.2.2.99.1.2.{{ $index }}'
@@ -28,7 +28,7 @@ modules:
         voltage:
             data:
                 -
-                    oid: ATEN-PE-CFG::outlet
+                    oid: outlet
                     value: outletIntegerVoltage
                     skip_value_lt: -200
                     num_oid: '.1.3.6.1.4.1.21317.1.3.2.2.2.2.99.1.3.{{ $index }}'

@@ -18,19 +18,19 @@ if (is_array($hrDevices)) {
         if (is_array($hrDevice) && is_numeric($hrDevice['hrDeviceIndex'])) {
             if (dbFetchCell('SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?', [$device['device_id'], $hrDevice['hrDeviceIndex']])) {
                 $update_array = [
-                    'hrDeviceType'   => mres($hrDevice['hrDeviceType']),
-                    'hrDeviceDescr'  => mres($hrDevice['hrDeviceDescr']),
-                    'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']),
-                    'hrDeviceErrors' => mres($hrDevice['hrDeviceErrors']),
+                    'hrDeviceType'   => $hrDevice['hrDeviceType'],
+                    'hrDeviceDescr'  => $hrDevice['hrDeviceDescr'],
+                    'hrDeviceStatus' => $hrDevice['hrDeviceStatus'],
+                    'hrDeviceErrors' => $hrDevice['hrDeviceErrors'],
                 ];
                 if ($hrDevice['hrDeviceType'] == 'hrDeviceProcessor') {
-                    $update_array['hrProcessorLoad'] = mres($hrDevice['hrProcessorLoad']);
+                    $update_array['hrProcessorLoad'] = $hrDevice['hrProcessorLoad'];
                 }
 
                 dbUpdate($update_array, 'hrDevice', 'device_id=? AND hrDeviceIndex=?', [$device['device_id'], $hrDevice['hrDeviceIndex']]);
                 echo '.';
             } else {
-                $inserted_rows = dbInsert(['hrDeviceIndex' => mres($hrDevice['hrDeviceIndex']), 'device_id' => mres($device['device_id']), 'hrDeviceType' => mres($hrDevice['hrDeviceType']), 'hrDeviceDescr' => mres($hrDevice['hrDeviceDescr']), 'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']), 'hrDeviceErrors' => (int) mres($hrDevice['hrDeviceErrors'])], 'hrDevice');
+                $inserted_rows = dbInsert(['hrDeviceIndex' => $hrDevice['hrDeviceIndex'], 'device_id' => $device['device_id'], 'hrDeviceType' => $hrDevice['hrDeviceType'], 'hrDeviceDescr' => $hrDevice['hrDeviceDescr'], 'hrDeviceStatus' => $hrDevice['hrDeviceStatus'], 'hrDeviceErrors' => (int) $hrDevice['hrDeviceErrors']], 'hrDevice');
                 echo '+';
                 d_echo($hrDevice);
                 d_echo("$inserted_rows row inserted");

@@ -17,7 +17,7 @@ $scale_min = '0';
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'poller-perf');
+$rrd_filename = Rrd::name($device['hostname'], 'poller-perf');
 
 $rrd_options .= ' DEF:poller=' . $rrd_filename . ':poller:AVERAGE';
 $rrd_options .= " 'COMMENT:Seconds      Cur     Min     Max     Avg\\n'";

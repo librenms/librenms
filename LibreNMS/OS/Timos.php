@@ -94,9 +94,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param tmnxEnacpVal
-     * @return encapsulation string
-     * see TIMETRA-TC-MIB::TmnxEncapVal
+     * @param mixed $tmnxEncapVal
+     * @return string encapsulation
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
      */
     private function nokiaEncap($tmnxEncapVal)
     {
@@ -668,7 +668,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]));
             //create SAP graphs
-            $rrd_name = safename('sap-' . $traffic_id);
+            $rrd_name = \LibreNMS\Data\Store\Rrd::safeName('sap-' . $traffic_id);
             $rrd_def = RrdDefinition::make()
             ->addDataset('sapIngressBits', 'COUNTER', 0)
             ->addDataset('sapEgressBits', 'COUNTER', 0)

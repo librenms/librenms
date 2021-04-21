@@ -43,7 +43,7 @@ foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', [$interface['p
         $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '400';
-        echo overlib_link('#', generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+        echo \LibreNMS\Util\Url::overlibLink('#', \LibreNMS\Util\Url::lazyGraphTag($graph_array), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
     }
 
     echo '</td></tr>';

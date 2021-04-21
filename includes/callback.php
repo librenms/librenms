@@ -57,7 +57,7 @@ if ($enabled == 1) {
         'sensors'         => 'SELECT COUNT(*) AS `total`,`sensor_class` FROM `sensors` GROUP BY `sensor_class`',
         'wireless'        => 'SELECT COUNT(*) AS `total`,`sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`',
         'storage'         => 'SELECT COUNT(*) AS `total`,`storage_type` FROM `storage` GROUP BY `storage_type`',
-        'toner'           => 'SELECT COUNT(*) AS `total`,`toner_type` FROM `toner` GROUP BY `toner_type`',
+        'toner'           => 'SELECT COUNT(*) AS `total`,`supply_type` FROM `printer_supplies` GROUP BY `supply_type`',
         'vlans'           => 'SELECT COUNT(*) AS `total`,`vlan_type` FROM `vlans` GROUP BY `vlan_type`',
         'vminfo'          => 'SELECT COUNT(*) AS `total`,`vm_type` FROM `vminfo` GROUP BY `vm_type`',
         'vmware'          => 'SELECT COUNT(*) AS `total` FROM `vminfo`',

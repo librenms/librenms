@@ -5,7 +5,7 @@ $i = 0;
 $scale_min = 0;
 $nototal = 1;
 $unit_text = 'Per Sec.';
-$rrd_filename = rrd_name($device['hostname'], ['app', 'freeradius-proxy_auth', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'freeradius-proxy_auth', $app['app_id']]);
 $fr_proxy_auth_array = [
     'responses' => 'Responses',
     'duplicate_requests' => 'Duplicate Requests',
@@ -16,7 +16,7 @@ $fr_proxy_auth_array = [
 ];
 $colours = 'mixed';
 $rrd_list = [];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($fr_proxy_auth_array as $ds => $descr) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $descr;

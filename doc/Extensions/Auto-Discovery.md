@@ -183,3 +183,8 @@ optional arguments:
                  verbosity.
 
 ```
+
+# Discovered devices
+
+Newly discovered devices will be added to the `default_poller_group`, this value defaults to 0 if unset.
+When using distributed polling, this value can be changed locally by setting `$config['default_poller_group`]` in config.php or globally by using `lnms config:set`.

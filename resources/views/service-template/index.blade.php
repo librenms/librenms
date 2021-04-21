@@ -31,9 +31,7 @@
                         <th>@lang('Devices')</th>
                         <th>@lang('Device Groups')</th>
                         <th>@lang('Device Type')</th>
-                        <th>@lang('Device Group Type')</th>
                         <th>@lang('Device Rules')</th>
-                        <th>@lang('Device Group Rules')</th>
                         <th>@lang('Actions')</th>
                     </tr>
                     </thead>
@@ -48,10 +46,8 @@
                             <td>
                                 <a href="{{ url("/device-groups/serviceTemplates=$template->id") }}">{{ $template->groups_count }}</a>
                             </td>
-                            <td>{{ __(ucfirst($template->dtype)) }}</td>
-                            <td>{{ __(ucfirst($template->dgtype)) }}</td>
-                            <td>{{ $template->dtype == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>
-                            <td>{{ $template->dgtype == 'dynamic' ? $template->getDeviceGroupParser()->toSql(false) : '' }}</td>
+                            <td>{{ __(ucfirst($template->type)) }}</td>
+                            <td>{{ $template->type == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>
                             <td>
                                 <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
                                     onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.apply', $template->id) }}')">
@@ -94,7 +90,7 @@
                                 @foreach($group->serviceTemplates as $template)
                                     <tr id="row_{{ $template->id }}">
                                         <td>{{ $template->name }}</td>
-                                        <td>{{ $template->type }}</td>
+                                        <td>{{ $template->check }}</td>
                                         <td>{{ $template->param }}</td>
                                         <td>{{ $template->ip }}</td>
                                         <td>{{ $template->desc }}</td>
@@ -133,7 +129,7 @@
                                 @foreach($device->serviceTemplates as $template)
                                     <tr id="row_{{ $template->id }}">
                                         <td>{{ $template->name }}</td>
-                                        <td>{{ $template->type }}</td>
+                                        <td>{{ $template->check }}</td>
                                         <td>{{ $template->param }}</td>
                                         <td>{{ $template->ip }}</td>
                                         <td>{{ $template->desc }}</td>

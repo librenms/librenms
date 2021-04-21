@@ -2,7 +2,7 @@
 
 $row = 1;
 
-foreach (get_disks($device['device_id']) as $drive) {
+foreach (dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', [$device['device_id']]) as $drive) {
     if (is_integer($row / 2)) {
         $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
@@ -18,7 +18,7 @@ foreach (get_disks($device['device_id']) as $drive) {
     $graph_array_zoom['from'] = \LibreNMS\Config::get('time.twoday');
     $graph_array_zoom['to'] = \LibreNMS\Config::get('time.now');
 
-    $overlib_link = overlib_link($fs_url, $drive['diskio_descr'], generate_graph_tag($graph_array_zoom), null);
+    $overlib_link = \LibreNMS\Util\Url::overlibLink($fs_url, $drive['diskio_descr'], \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     $types = [
         'diskio_bits',

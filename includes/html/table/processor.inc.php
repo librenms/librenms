@@ -66,9 +66,9 @@ foreach (dbFetchRows($sql, $param) as $processor) {
     $graph_array_zoom['height'] = '150';
     $graph_array_zoom['width'] = '400';
     $link = 'graphs/id=' . $graph_array['id'] . '/type=' . $graph_array['type'] . '/from=' . $graph_array['from'] . '/to=' . $graph_array['to'] . '/';
-    $mini_graph = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
-    $background = get_percentage_colours($perc, $processor['processor_perc_warn']);
-    $bar_link = overlib_link($link, print_percentage_bar(400, 20, $perc, $perc . '%', 'ffffff', $background['left'], (100 - $perc) . '%', 'ffffff', $background['right']), generate_graph_tag($graph_array_zoom), null);
+    $mini_graph = \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Url::graphTag($graph_array), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
+    $background = \LibreNMS\Util\Colors::percentage($perc, $processor['processor_perc_warn']);
+    $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, $perc . '%', 'ffffff', $background['left'], (100 - $perc) . '%', 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     $response[] = [
         'hostname'        => generate_device_link($processor),
@@ -100,4 +100,4 @@ $output = [
     'rows'     => $response,
     'total'    => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

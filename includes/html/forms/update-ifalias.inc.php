@@ -15,10 +15,10 @@ header('Content-type: application/json');
 
 $status = 'error';
 
-$descr = mres($_POST['descr']);
-$device_id = mres($_POST['device_id']);
-$ifName = mres($_POST['ifName']);
-$port_id = mres($_POST['port_id']);
+$descr = $_POST['descr'];
+$device_id = $_POST['device_id'];
+$ifName = $_POST['ifName'];
+$port_id = $_POST['port_id'];
 
 if (! empty($ifName) && is_numeric($port_id)) {
     // We have ifName and  port id so update ifAlias
@@ -44,4 +44,4 @@ if (! empty($ifName) && is_numeric($port_id)) {
 $response = [
     'status'        => $status,
 ];
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

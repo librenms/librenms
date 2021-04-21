@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring the information of the SAC.
 -- Reference: 
--- Version: V1.01
+-- Version: V1.03
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.20
 		hwWlanSac MODULE-IDENTITY
-			LAST-UPDATED "201506190900Z"		-- June 19, 2015 at 09:00 GMT
+			LAST-UPDATED "201706240900Z"		-- June 24, 2017 at 09:00 GMT
 			ORGANIZATION
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO
@@ -33,7 +33,13 @@
 				  "
                         DESCRIPTION 
 				"The MIB module defines the information of the SAC."
-	                REVISION "201506190900Z"		-- June 19, 2015 at 09:00 GMT
+			REVISION "201706240900Z"		-- June 24, 2017 at 09:00 GMT
+			DESCRIPTION
+				"V1.03, Inital version."			
+	                REVISION "201702140900Z"		-- February 14, 2017 at 09:00 GMT
+			DESCRIPTION
+				"V1.02, Inital version."
+			REVISION "201506190900Z"		-- June 19, 2015 at 09:00 GMT
 			DESCRIPTION
 				"V1.01, Inital version."
 	                REVISION "201502120900Z"		-- February 12, 2015 at 09:00 GMT
@@ -104,7 +110,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.2.1.1
 		hwSACProtocolGroupName OBJECT-TYPE
 			SYNTAX OCTET STRING (SIZE (1..35))
-			MAX-ACCESS not-accessible
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -113,7 +119,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.2.1.2
 		hwSACProtocolGroupRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -150,7 +156,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.3.1.1
 		hwSACProtocolName OBJECT-TYPE
 			SYNTAX OCTET STRING
-			MAX-ACCESS not-accessible
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -159,7 +165,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.3.1.2
 		hwSACProGroupProRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -319,7 +325,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.12
 		hwSACVapStatRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -457,7 +463,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.10
 		hwSACUserStatRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -525,7 +531,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.6.1.4
 		hwSACAppListRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -1278,7 +1284,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.60
 		hwSACVapTop10StatRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -1944,7 +1950,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.58
 		hwSACUserTop10StatRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2034,7 +2040,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.11.1.3
 		hwVoiceAwarePortocolRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2095,7 +2101,7 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.12.1.3
 		hwVideoAwarePortocolRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2438,12 +2444,211 @@
 		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.29
 		hwLyncRecordRowstatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"Description."
 			::= { hwLyncRecordEntry 29 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14
+		hwSACInfoAPTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACInfoAPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSacObjects 14 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14.1
+		hwSACInfoAPEntry OBJECT-TYPE
+			SYNTAX HwSACInfoAPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwSACInfoAPName }
+			::= { hwSACInfoAPTable 1 }
+		
+		HwSACInfoAPEntry ::=
+			SEQUENCE { 
+				hwSACInfoAPName
+					OCTET STRING,
+				hwSACInfoAPSACEnable
+					INTEGER,
+				hwSACInfoAPSignatureState
+					INTEGER,
+				hwSACInfoAPSignatureVersion
+					OCTET STRING,
+				hwSACInfoAPAppNum
+					Integer32
+			 }
 
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14.1.1
+		hwSACInfoAPName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACInfoAPEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14.1.2
+		hwSACInfoAPSACEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACInfoAPEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14.1.3
+		hwSACInfoAPSignatureState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				notloaded(1),
+				loading(2),
+				loaded(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACInfoAPEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14.1.4
+		hwSACInfoAPSignatureVersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACInfoAPEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.14.1.5
+		hwSACInfoAPAppNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACInfoAPEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.15
+		hwSACDirectFwdProtocolGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACDirectFwdProtocolGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSacObjects 15 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.15.1
+		hwSACDirectFwdProtocolGroupEntry OBJECT-TYPE
+			SYNTAX HwSACDirectFwdProtocolGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwSACDirectFwdProtocolGroupName }
+			::= { hwSACDirectFwdProtocolGroupTable 1 }
+		
+		HwSACDirectFwdProtocolGroupEntry ::=
+			SEQUENCE { 
+				hwSACDirectFwdProtocolGroupName
+					OCTET STRING,
+				hwSACDirectFwdProtocolGroupRowstatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.20.1.15.1.1
+		hwSACDirectFwdProtocolGroupName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..35))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACDirectFwdProtocolGroupEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.15.1.2
+		hwSACDirectFwdProtocolGroupRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACDirectFwdProtocolGroupEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.16
+		hwSACAppListDirectFwdTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACAppListDirectFwdEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSacObjects 16 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.16.1
+		hwSACAppListDirectFwdEntry OBJECT-TYPE
+			SYNTAX HwSACAppListDirectFwdEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwSACAppListDirectFwdAppIndex }
+			::= { hwSACAppListDirectFwdTable 1 }
+		
+		HwSACAppListDirectFwdEntry ::=
+			SEQUENCE { 
+				hwSACAppListDirectFwdAppIndex
+					Integer32,
+				hwSACAppListDirectFwdAppID
+					Integer32,
+				hwSACAppListDirectFwdAppName
+					OCTET STRING,
+				hwSACAppListDirectFwdRowstatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.20.1.16.1.1
+		hwSACAppListDirectFwdAppIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACAppListDirectFwdEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.16.1.2
+		hwSACAppListDirectFwdAppID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACAppListDirectFwdEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.16.1.3
+		hwSACAppListDirectFwdAppName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACAppListDirectFwdEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.20.1.16.1.4
+		hwSACAppListDirectFwdRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwSACAppListDirectFwdEntry 4 }
+		
 		--1.3.6.1.4.1.2011.6.139.20.2
 		hwWlanSacConformance OBJECT IDENTIFIER ::= { hwWlanSac 2 }
 
@@ -2501,7 +2706,9 @@
 			hwLyncRecordEndTime, hwLyncRecordProtocol, hwLyncRecordPacketUtilization, hwLyncRecordJitterInterArrival, hwLyncRecordJitterInterArrivalMax, 
 			hwLyncRecordRoundTrip, hwLyncRecordRoundTripMax, hwLyncRecordHealerPacketDropRatio, hwLyncRecordDegradationAvg, hwLyncRecordRatioConcealedSamplesAvg, 
 			hwLyncRecordBurstGapDuration, hwLyncRecordDegradationMax, hwLyncRecordRecvListenMOSMin, hwLyncRecordRecvListenMOS, hwLyncRecordOverallMinNetworkMOS, 
-			hwLyncRecordOverallAvgNetworkMOS, hwLyncRecordAppliedBandwidthLimit, hwLyncRecordRowstatus }
+			hwLyncRecordOverallAvgNetworkMOS, hwLyncRecordAppliedBandwidthLimit, hwLyncRecordRowstatus, hwSACInfoAPSACEnable, hwSACInfoAPSignatureState, 
+				hwSACInfoAPSignatureVersion, hwSACInfoAPAppNum, hwSACDirectFwdProtocolGroupRowstatus, hwSACAppListDirectFwdAppID, hwSACAppListDirectFwdAppName, 
+				hwSACAppListDirectFwdRowstatus }
 			STATUS current
 			DESCRIPTION 
 				"Description."

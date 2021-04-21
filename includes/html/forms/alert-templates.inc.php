@@ -31,7 +31,7 @@ $template_id = 0;
 $template_newid = 0;
 $create = true;
 
-$name = mres($vars['name']);
+$name = $vars['name'];
 if (isset($vars['template']) && empty(view(['template' => $vars['template']], [])->__toString())) {
     $message = 'Template failed to be parsed, please check the syntax';
 } elseif (! empty($name)) {
@@ -85,4 +85,4 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
 
 $response = ['status' => $status, 'message' => $message, 'newid' => $template_newid];
 
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

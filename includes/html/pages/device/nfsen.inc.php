@@ -43,8 +43,8 @@ if (! $vars['nfsen']) {
     $vars['nfsen'] = 'general';
 }
 
-if (is_file('includes/html/pages/device/nfsen/' . mres($vars['nfsen']) . '.inc.php')) {
-    include 'includes/html/pages/device/nfsen/' . mres($vars['nfsen']) . '.inc.php';
+if (is_file('includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php')) {
+    include 'includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php';
 } else {
     include 'includes/html/pages/device/nfsen/general.inc.php';
 }

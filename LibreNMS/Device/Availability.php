@@ -69,7 +69,7 @@ class Availability
      * @param object $found_outages filtered database object with all recorded outages
      * @param int $duration time period to calculate for
      * @param int $now timestamp for 'now'
-     * @return sum of all matching outages in seconds
+     * @return int sum of all matching outages in seconds
      */
     protected static function outageSummary($found_outages, $duration, $now = null)
     {

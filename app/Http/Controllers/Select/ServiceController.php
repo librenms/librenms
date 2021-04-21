@@ -43,6 +43,9 @@ class ServiceController extends SelectController
             ->select('service_id', 'service_type', 'service_desc', 'device_id');
     }
 
+    /**
+     * @param Service $service
+     */
     public function formatItem($service)
     {
         return [

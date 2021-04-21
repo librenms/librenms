@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu">
                             <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu scrollable-menu">
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
                                 @endforeach
@@ -335,7 +335,11 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> @lang('Manage Groups')
+                            </a></li>
 
+                            <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
                                 <li><a href="{{ url('ports/alerted=yes') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
