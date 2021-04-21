@@ -4095,7 +4095,10 @@
                 "value.*.*.*.value": "required|string",
                 "value.*.*.*.regex": "is_regex",
                 "value.*.*.*.match": "string"
-            }
+            },
+            "group": "external",
+            "section": "oxidized",
+            "order": 6
         },
         "oxidized.reload_nodes": {
             "default": false,
@@ -4112,13 +4115,6 @@
             "validate": {
                 "value": "url"
             }
-        },
-        "oxidized.versioning": {
-            "type": "boolean",
-            "group": "external",
-            "section": "oxidized",
-            "order": 6,
-            "default": false
         },
         "snmptraps.eventlog": {
             "default": "unhandled",
