@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS module to Graph Cisco IPSLA UDP Jitter metrics
+ * LibreNMS module to Graph Juniper RPM IcmpEcho metrics
  *
  * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
  *
