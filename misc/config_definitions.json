@@ -1046,6 +1046,13 @@
             "default": false,
             "type": "boolean"
         },
+	"discovery_modules.juniper-rpm": {
+            "order": 80,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "discovery_modules.cisco-cbqos": {
             "order": 40,
             "group": "discovery",
@@ -4312,6 +4319,13 @@
             "type": "boolean"
         },
         "poller_modules.cisco-sla": {
+            "order": 140,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+	},
+	"poller_modules.juniper-rpm": {
             "order": 140,
             "group": "poller",
             "section": "poller_modules",

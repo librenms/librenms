@@ -80,6 +80,7 @@ $config['discovery_modules']['cisco-pw']             = false;
 $config['discovery_modules']['vrf']                  = false;
 $config['discovery_modules']['cisco-cef']            = false;
 $config['discovery_modules']['cisco-sla']            = false;
+$config['discovery_modules']['juniper-rpm']          = false;
 $config['discovery_modules']['cisco-cbqos']          = false;
 $config['discovery_modules']['cisco-otv']            = false;
 $config['discovery_modules']['ipv4-addresses']       = true;
