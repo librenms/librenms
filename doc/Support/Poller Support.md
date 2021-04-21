@@ -85,6 +85,7 @@ $config['poller_modules']['cisco-ipsec-flow-monitor']    = false;
 $config['poller_modules']['cisco-remote-access-monitor'] = false;
 $config['poller_modules']['cisco-cef']                   = false;
 $config['poller_modules']['cisco-sla']                   = false;
+$config['poller_modules']['juniper-rpm']                 = false;
 $config['poller_modules']['cisco-mac-accounting']        = false;
 $config['poller_modules']['cipsec-tunnels']              = false;
 $config['poller_modules']['cisco-ace-loadbalancer']      = false;
