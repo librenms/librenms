@@ -447,7 +447,7 @@ class Rrd extends BaseDatastore
      * via rrdached or localdisk.
      *
      * @param array $device device for which we get the rrd's
-     * @return array $rrdfilearray array of rrd files for this host
+     * @return array array of rrd files for this host
      */
     public function getRrdFiles($device)
     {
@@ -455,14 +455,18 @@ class Rrd extends BaseDatastore
             $filename = sprintf('/%s', $device['hostname']);
             $rrd_files = $this->command('list', $filename, '');
             // Command output is an array, create new array with each filename as a item in array.
-            $rrdfilearray = preg_split('/\s+/', trim($rrd_files[0]));
+            $rrd_files_array = explode("\n", trim($rrd_files[0]));
+            // Remove status line from response
+            array_pop($rrd_files_array);
         } else {
             $rrddir = $this->dirFromHost($device['hostname']);
             $pattern = sprintf('%s/*.rrd', $rrddir);
-            $rrdfilearray = glob($pattern);
+            $rrd_files_array = glob($pattern);
         }
 
-        return $rrdfilearray;
+        sort($rrd_files_array);
+
+        return $rrd_files_array;
     }
 
     /**
@@ -472,14 +476,14 @@ class Rrd extends BaseDatastore
      * @param int   $app_id application id on the device
      * @param string  $app_name name of app to be searched
      * @param string  $category which category of graphs are searched
-     * @return array $rrdfilearray array of rrd files for this host
+     * @return array  array of rrd files for this host
      */
     public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null)
     {
         $entries = [];
         $separator = '-';
 
-        $rrdfilearray = $this->getRrdFiles($device);
+        $rrdfile_array = $this->getRrdFiles($device);
         if ($category) {
             $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
         } else {
@@ -489,7 +493,7 @@ class Rrd extends BaseDatastore
         // app_name contains a separator character? consider it
         $offset = substr_count($app_name, $separator);
 
-        foreach ($rrdfilearray as $rrd) {
+        foreach ($rrdfile_array as $rrd) {
 
             if (str_contains($rrd, $pattern)) {
                 $filename = basename($rrd, '.rrd');
