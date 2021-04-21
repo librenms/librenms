@@ -58,7 +58,7 @@ class Isis implements Module
             '2' => 'L2',
             '3' => 'L1L2',
             '4' => 'unknown',
-        )
+    );
 
         // Get device objects
         $device_array = $os->getDeviceArray();
