@@ -26,7 +26,6 @@ namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
 use LibreNMS\Enum\AlertState;
-use Wpb\String_Blade_Compiler\Facades\StringBlade as View;
 
 class Template
 {
@@ -74,9 +73,9 @@ class Template
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {
-            return View::make(['template' => $data['template']->template], $alert)->__toString();
+            return view(['template' => $data['template']->template], $alert)->__toString();
         } catch (\Exception $e) {
-            return View::make(['template' => $this->getDefaultTemplate()], $alert)->__toString();
+            return view(['template' => $this->getDefaultTemplate()], $alert)->__toString();
         }
     }
 
@@ -90,9 +89,9 @@ class Template
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {
-            return View::make(['template' => $data['title']], $alert)->__toString();
+            return view(['template' => $data['title']], $alert)->__toString();
         } catch (\Exception $e) {
-            return $data['title'] ?: View::make(['template' => 'Template ' . $data['name']], $alert)->__toString();
+            return $data['title'] ?: view(['template' => 'Template ' . $data['name']], $alert)->__toString();
         }
     }
 

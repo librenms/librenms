@@ -1,6 +1,16 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
+			count: 2
+			path: LibreNMS/Alert/Template.php
+
+		-
+			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, string\\> given\\.$#"
+			count: 2
+			path: LibreNMS/Alert/Template.php
+
+		-
 			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php
@@ -214,6 +224,11 @@ parameters:
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: app/Console/LnmsCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
+			count: 1
+			path: app/Http/Controllers/DeviceController.php
 
 		-
 			message: "#^Call to function is_null\\(\\) with PDO will always evaluate to false\\.$#"

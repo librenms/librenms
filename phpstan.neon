@@ -26,6 +26,3 @@ parameters:
 
     parallel:
         processTimeout: 300.0
-
-    stubFiles:
-        - tests/stubs/StringBlade.stub
