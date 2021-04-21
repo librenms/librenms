@@ -78,6 +78,7 @@ class SetConfigCommand extends LnmsCommand
             $sub_data = Config::get($setting, []);
             if (! is_array($sub_data)) {
                 $this->error(trans('commands.config:set.errors.append'));
+
                 return 2;
             }
 
@@ -101,10 +102,6 @@ class SetConfigCommand extends LnmsCommand
             $this->error($message);
 
             return 2;
-        }
-
-        if ($parent) {
-            dd($value);
         }
 
         if (Config::persist($setting, $value)) {
