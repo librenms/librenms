@@ -494,7 +494,6 @@ class Rrd extends BaseDatastore
         $offset = substr_count($app_name, $separator);
 
         foreach ($rrdfile_array as $rrd) {
-
             if (str_contains($rrd, $pattern)) {
                 $filename = basename($rrd, '.rrd');
                 $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
