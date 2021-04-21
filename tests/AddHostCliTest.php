@@ -114,7 +114,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testSnmpV3PrivacyProtocol()
     {
-        $modes = ['DES', 'AES', 'AES-192', 'AES-256'];
+        $modes = ['DES', 'AES', 'AES-192', 'AES-256', 'AES-256-C'];
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
             $result = \Artisan::call('device:add ' . $host . ' -force -x ' . $mode . ' --v3');

@@ -40,7 +40,7 @@ class NetCommand extends Controller
             'query' => 'ip_or_hostname',
         ]);
 
-        ini_set('allow_url_fopen', 0);
+        ini_set('allow_url_fopen', '0');
 
         switch ($request->get('cmd')) {
             case 'whois':

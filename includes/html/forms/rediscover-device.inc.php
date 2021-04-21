@@ -39,7 +39,7 @@ if (isset($_POST['device_id'])) {
         $status = 'error';
         $message = 'Invalid device group id ' . $_POST['device_group_id'];
     } else {
-        $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=' . $_POST['device_group_id']);
+        $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$_POST['device_group_id']]);
         $update = 0;
         foreach ($device_ids as $device_id) {
             $result = device_discovery_trigger($device_id);

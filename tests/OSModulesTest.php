@@ -97,13 +97,9 @@ class OSModulesTest extends DBTestCase
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
         } catch (FileNotFoundException $e) {
-            $this->fail($e->getMessage());
-
-            return;
+            return $this->fail($e->getMessage());
         } catch (InvalidModuleException $e) {
-            $this->fail($e->getMessage());
-
-            return;
+            return $this->fail($e->getMessage());
         }
 
         if (is_null($results)) {

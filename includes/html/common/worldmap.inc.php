@@ -20,7 +20,7 @@
  * @license GPL
  */
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 

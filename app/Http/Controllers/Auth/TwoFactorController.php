@@ -148,7 +148,7 @@ class TwoFactorController extends Controller
 
     /**
      * @param User $user
-     * @param string $token
+     * @param int $token
      * @return true
      * @throws AuthenticationException
      */

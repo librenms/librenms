@@ -26,6 +26,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.{{ $index }}'
                     descr: '{{ $tmnxHwName }} {{ $tmnxHwSerialNumber }} {{ $tmnxHwFailureReason }}'
                     index: 'tmnxHwID.{{ $index }}'
+                    state_name: tmnxHwAlarmState
                     states:
                         - { value: 0, generic: 3, graph: 0, descr: unknown }
                         - { value: 1, generic: 2, graph: 0, descr: alarmActive }
@@ -35,6 +36,7 @@ modules:
                     value: tmnxChassisCriticalLEDState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.12.{{ $index }}'
                     descr: 'Critical LED'
+                    state_name: tmnxChassisCriticalLEDState
                     index: 'tmnxChassisCriticalLEDState.1'
                     states:
                         - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
@@ -52,6 +54,7 @@ modules:
                     value: tmnxChassisMajorLEDState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.13.{{ $index }}'
                     descr: 'Major LED'
+                    state_name: tmnxChassisMajorLEDState
                     index: 'tmnxChassisMajorLEDState.1'
                     states:
                         - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
@@ -68,6 +71,7 @@ modules:
                     oid: tmnxChassisTable
                     value: tmnxChassisMinorLEDState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.14.{{ $index }}'
+                    state_name: tmnxChassisMinorLEDState
                     descr: 'Minor LED'
                     index: 'tmnxChassisMinorLEDState.1'
                     states:
@@ -87,6 +91,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.24.{{ $index }}'
                     descr: 'Chassis Over Temp'
                     index: 'tmnxChassisOverTempState.1'
+                    state_name: tmnxChassisOverTempState
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: Ok }
                         - { value: 2, generic: 2, graph: 0, descr: OverTemp }

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Eloquent\Builder;
+
 function printEntPhysical($device, $ent, $level, $class)
 {
     $ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
@@ -18,9 +20,12 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<i class="fa fa-square fa-lg icon-theme" aria-hidden="true"></i> ';
         } elseif ($ent['entPhysicalClass'] == 'sensor') {
             echo '<i class="fa fa-heartbeat fa-lg icon-theme" aria-hidden="true"></i> ';
-            $sensor = dbFetchRow('SELECT * FROM `sensors` WHERE `device_id` = ? AND (`entPhysicalIndex` = ? OR `sensor_index` = ?)', [$device['device_id'], $ent['entPhysicalIndex'], $ent['entPhysicalIndex']]);
-            if (count($sensor)) {
-                $link = "<a href='graphs/id=" . $sensor['sensor_id'] . '/type=sensor_' . $sensor['sensor_class'] . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor['sensor_id'] . '&amp;type=sensor_' . $sensor['sensor_class'] . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor['sensor_id'] . '&amp;type=sensor_' . $sensor['sensor_class'] . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
+            $sensor = DeviceCache::getPrimary()->sensors()->where(function (Builder $query) use ($ent) {
+                return $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
+                    ->orWhere('sensor_index', $ent['entPhysicalIndex']);
+            })->first();
+            if ($sensor) {
+                $link = "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
             }
         } elseif ($ent['entPhysicalClass'] == 'backplane') {
             echo '<i class="fa fa-bars fa-lg icon-theme" aria-hidden="true"></i> ';
@@ -58,7 +63,7 @@ function printEntPhysical($device, $ent, $level, $class)
 
         if ($ent['entPhysicalClass'] == 'sensor' && isset($sensor)) {
             echo ' ';
-            echo $sensor['sensor_class'] == 'state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
+            echo $sensor->sensor_class == 'state' ? get_state_label($sensor->toArray()) : get_sensor_label_color($sensor->toArray());
         }
 
         if (isset($link)) {

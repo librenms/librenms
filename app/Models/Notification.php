@@ -112,7 +112,7 @@ class Notification extends Model
             ->source()
             ->where('notifications_attribs.user_id', $user->user_id)
             ->where(['key' => 'read', 'value' => 1])
-            ->limit();
+            ->limit(1);
     }
 
     /**
