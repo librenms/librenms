@@ -3,7 +3,6 @@
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
-
 if (Config::get('enable_sla') && $device['os'] == 'junos') {
     $slas = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
 
@@ -20,7 +19,7 @@ if (Config::get('enable_sla') && $device['os'] == 'junos') {
         $owner = $prop_id[1];
         $test = $prop_id[2];
 
-        $sla_table[$owner.".".$test][$property] = $value;
+        $sla_table[$owner . '.' . $test][$property] = $value;
     }
 
     // Get existing SLAs
@@ -46,7 +45,7 @@ if (Config::get('enable_sla') && $device['os'] == 'junos') {
         $sla_data = dbFetchRows('SELECT `sla_id`, `sla_nr` FROM `slas` WHERE `device_id` = :device_id AND `owner` = :owner AND `tag` = :tag', $query_data);
         $sla_id = $sla_data[0]['sla_id'];
         $sla_nr = $sla_data[0]['sla_nr'];
-    
+
         $data = [
             'device_id' => $device['device_id'],
             'sla_nr'    => $sla_nr,
@@ -61,7 +60,7 @@ if (Config::get('enable_sla') && $device['os'] == 'junos') {
         // If it is a standard type delete ping preffix
         $data['rtt_type'] = str_replace('ping', '', $data['rtt_type']);
 
-        // Retrieve Juniper type 
+        // Retrieve Juniper type
         switch ($data['rtt_type']) {
             case 'enterprises.2636.3.7.2.1':
                 $data['rtt_type'] = 'IcmpTimeStamp';
