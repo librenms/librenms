@@ -53,6 +53,13 @@ class Isis implements Module
      */
     public function poll(OS $os)
     {
+        // Translate system state codes into meaningful strings
+        $isis_codes = array('1' => 'L1',
+            '2' => 'L2',
+            '3' => 'L1L2',
+            '4' => 'unknown',
+        )
+
         // Get device objects
         $device_array = $os->getDeviceArray();
         $device = $os->getDevice();
@@ -66,12 +73,6 @@ class Isis implements Module
         $adjacencies = collect();
         $isis_data = [];
 
-        // Translate system state codes into meaningful strings
-        $isis_codes['1'] = 'L1';
-        $isis_codes['2'] = 'L2';
-        $isis_codes['3'] = 'L1L2';
-        $isis_codes['4'] = 'unknown';
-
         if ($os instanceof Junos) {
             // Do not poll loopback interface
             unset($circuits_poll['16']);
@@ -84,7 +85,6 @@ class Isis implements Module
                 $port_id = (int) $device->ports()->where('ifIndex', $circuit)->value('port_id');
 
                 if ($circuit_data['isisCircPassiveCircuit'] != '1') {
-                    //var_dump($adjacencies_poll[$circuit]['isisISAdjState']);
                     // Adjancy is UP
                     if (!empty($adjacencies_poll[$circuit]) && end($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
                         $isis_data['isisISAdjState'] = end($adjacencies_poll[$circuit]['isisISAdjState']);
@@ -120,7 +120,7 @@ class Isis implements Module
                         ]);
                     } else {
                         /*
-                        * Adjancency is configured on the device but not available
+                        * Adjacency is configured on the device but not available
                         * Update existing record to down state
                         * Set the status of the adjacency to down
                         * Also if the adjacency was never up, create a record
@@ -147,7 +147,7 @@ class Isis implements Module
 
         echo "\nFound " . $adjacencies->count() . ' configured adjacencies';
 
-        // Cleanup -> needs testing
+        // Cleanup
         IsisAdjacency::query()
             ->where(['device_id' => $device['device_id']])
             ->whereNotIn('ifIndex', $adjacencies->pluck('ifIndex'))->delete();

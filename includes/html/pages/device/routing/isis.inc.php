@@ -22,20 +22,13 @@ echo '
           </tr>
         </thead>';
 
-// FIXME: Can refer to ports, production.ERROR: Call to undefined relationship [Port] on model [App\Models\IsisAdjacency]
-//foreach (IsisAdjacency::where('device_id', $device['device_id'])->with('Device')->get() as $adj) {
-
 foreach (IsisAdjacency::where('device_id', $device['device_id'])->with('port')->get() as $adj) {
-    //dd($adj);
     if ($adj->isisISAdjState == 'up') {
         $color = 'green';
     } else {
         $color = 'red';
     }
-
-    //dd($adj);
     $interface_name = $adj->port->ifName;
-    //dd($interface_name);
 
     echo '
         <tbody>
