@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\IsisAdjacency;
-use App\Models\Port;
 
 echo '
 <div>
