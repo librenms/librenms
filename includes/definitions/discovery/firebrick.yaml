@@ -1,4 +1,4 @@
-mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING:FIREBRICK-L2TP-MIB
+mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING:FIREBRICK-L2TP-MIB:FIREBRICK-VOIP-MIB
 modules:
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)/m'
@@ -87,6 +87,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Reference Voltage
                     low_limit: 1
                     low_warn_limit: 1.05
                     warn_limit: 1.15
@@ -106,6 +107,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Reference Voltage
                     low_limit: 1.315
                     low_warn_limit: 1.32
                     warn_limit: 1.33
@@ -125,6 +127,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Reference Voltage
                     low_limit: 1.25
                     low_warn_limit: 1.30
                     warn_limit: 1.40
@@ -144,6 +147,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Reference Voltage
                     low_limit: 3.2
                     low_warn_limit: 3.25
                     warn_limit: 3.35
@@ -155,14 +159,35 @@ modules:
                             value: 'Voltage (mV)'
                         -
                             oid: fbMonReadingName
-                            op: not_in_array
-                            value: ['3.3V', '3.3V(Fan)']
+                            op: '!='
+                            value: '3.3V'
                 -
                     oid: fbMonitoringMib
                     value: fbMonReadingValue
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Fan Power
+                    low_limit: 3.2
+                    low_warn_limit: 3.25
+                    warn_limit: 3.35
+                    high_limit: 3.4
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '3.3V(Fan)'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Reference Voltage
                     low_limit: 4.9
                     low_warn_limit: 4.95
                     warn_limit: 5.05
@@ -182,6 +207,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Power Supply Voltage
                     low_limit: 11.9
                     low_warn_limit: 11.95
                     warn_limit: 12.05
@@ -200,7 +226,7 @@ modules:
                     value: fbMonReadingValue
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
-                    descr: fbMonReadingName
+                    descr: True Random Number Generator Voltage
                     low_limit: 1
                     low_warn_limit: 1.05
                     warn_limit: 12.15
@@ -220,6 +246,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Power Supply Voltage
                     low_limit: 10
                     low_warn_limit: 11.4
                     warn_limit: 12.6
@@ -232,7 +259,26 @@ modules:
                         -
                             oid: fbMonReadingName
                             op: not_in_array
-                            value: ['12V-A', '12V-B', '12V-Common']
+                            value: ['12V-A', '12V-B']
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    low_limit: 10
+                    low_warn_limit: 11.4
+                    warn_limit: 12.6
+                    high_limit: 14
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: 12V-Common
                 -
                     oid: fbMonitoringMib
                     value: fbMonReadingValue
@@ -296,6 +342,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
                     divisor: 1000
                     descr: fbMonReadingName
+                    group: Fan Power
                     low_limit: 1.1
                     low_warn_limit: 1.1
                     warn_limit: 1.3
@@ -317,6 +364,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.0'
                     index: 'l2tp.tunnels.0'
                     descr: Free Tunnels
+                    group: L2TP Tunnels
                     low_limit: 10
                     low_warn_limit: 20
                     warn_limit: 30000
@@ -327,6 +375,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.1'
                     index: 'l2tp.tunnels.1'
                     descr: Opening Tunnels
+                    group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -335,6 +384,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.2'
                     index: 'l2tp.tunnels.2'
                     descr: Live Incoming Tunnels
+                    group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -343,6 +393,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.3'
                     index: 'l2tp.tunnels.3'
                     descr: Live Outgoing Tunnels
+                    group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -351,6 +402,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.4'
                     index: 'l2tp.tunnels.4'
                     descr: Closing Tunnels
+                    group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -359,6 +411,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.5'
                     index: 'l2tp.tunnels.5'
                     descr: Failed Tunnels
+                    group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -367,6 +420,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.6'
                     index: 'l2tp.tunnels.6'
                     descr: Closed Tunnels
+                    group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -375,6 +429,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.0'
                     index: 'l2tp.sessions.0'
                     descr: Free Sessions
+                    group: L2TP Sessions
                     low_limit: 10
                     low_warn_limit: 20
                 -
@@ -383,6 +438,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.1'
                     index: 'l2tp.sessions.1'
                     descr: Waiting Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -391,6 +447,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.2'
                     index: 'l2tp.sessions.2'
                     descr: Opening Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -399,6 +456,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.3'
                     index: 'l2tp.sessions.3'
                     descr: Negotiating Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -407,6 +465,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.4'
                     index: 'l2tp.sessions.4'
                     descr: Authentication Pending Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -415,6 +474,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.5'
                     index: 'l2tp.sessions.5'
                     descr: Started Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -423,6 +483,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.6'
                     index: 'l2tp.sessions.6'
                     descr: Live Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -431,6 +492,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.7'
                     index: 'l2tp.sessions.7'
                     descr: Accounting Pending Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -439,6 +501,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.8'
                     index: 'l2tp.sessions.8'
                     descr: Closing Sessions
+                    group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
@@ -447,11 +510,55 @@ modules:
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.9'
                     index: 'l2tp.sessions.9'
                     descr: Closed Sessions
+                    group: L2TP Sessions
                 -
                     oid: fbL2tpGeneralSessions
                     value: fbL2tpSessionNegotiationSlotsFree
                     num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.10'
                     index: 'l2tp.sessions.10'
                     descr: Free Session Slots
+                    group: L2TP Sessions
                     low_limit: 10
                     low_warn_limit: 20
+                -
+                    oid: fbSipActiveLegs
+                    num_oid: '.1.3.6.1.4.1.24693.100.5060.1.0'
+                    index: '1'
+                    descr: Total active call legs
+                    group: VOIP
+                    low_limit: 0
+                    low_warn_limit: 0
+                    warn_limit: 800
+                    high_limit: 1000
+                -
+                    oid: fbSipRadiusRegs
+                    num_oid: '.1.3.6.1.4.1.24693.100.5060.2.0'
+                    index: '2'
+                    descr: RADIUS-based registrations
+                    group: VOIP
+                    low_limit: 0
+                    low_warn_limit: 0
+                    warn_limit: 800
+                    high_limit: 1000
+                -
+                    oid: fbSipCarrierTable
+                    value: fbSipPhoneTotalLegs
+                    num_oid: '.1.3.6.1.4.1.24693.100.5060.3.1.2.{{ $index }}'
+                    index: 'carrierTotal{{ $index }}'
+                    descr: 'Total Legs: {{ $fbSipCarrierName }}'
+                    group: VOIP Carriers
+                    low_limit: 0
+                    low_warn_limit: 0
+                    warn_limit: 800
+                    high_limit: 1000
+                -
+                    oid: fbSipCarrierTable
+                    value: fbSipCarrierConnectedLegs
+                    num_oid: '.1.3.6.1.4.1.24693.100.5060.3.1.3.{{ $index }}'
+                    index: 'carrier{{ $index }}'
+                    descr: 'Connected Legs: {{ $fbSipCarrierName }}'
+                    group: VOIP Carriers
+                    low_limit: 0
+                    low_warn_limit: 0
+                    warn_limit: 800
+                    high_limit: 1000
