@@ -164,7 +164,7 @@ Thanks to maintainers and others that helped with pull requests this month:
 * Add feature to capture a full snmprec ([#12706](https://github.com/librenms/librenms/pull/12706)) - [Jellyfrog](https://github.com/Jellyfrog)
 * Lint with shellcheck ([#12666](https://github.com/librenms/librenms/pull/12666)) - [Jellyfrog](https://github.com/Jellyfrog)
 * Enable Black for linter ([#12663](https://github.com/librenms/librenms/pull/12663)) - [Jellyfrog](https://github.com/Jellyfrog)
-* Add lint Github Action ([#12655](https://github.com/librenms/librenms/pull/12655)) - [murrant](https://github.com/murrant)
+* Add lint GitHub Action ([#12655](https://github.com/librenms/librenms/pull/12655)) - [murrant](https://github.com/murrant)
 
 #### Misc
 * Load device relationship from device cache ([#12712](https://github.com/librenms/librenms/pull/12712)) - [murrant](https://github.com/murrant)
