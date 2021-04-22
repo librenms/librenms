@@ -22,4 +22,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 echo 'swSensorEntry ';
-$pre_cache['fabos_sensors'] = snmpwalk_cache_multi_oid($device, 'swSensorEntry', [], 'SW-MIB');
+$pre_cache['fabos_sensors'] = snmpwalk_cache_multi_oid($device, 'swSensorTable', [], 'SW-MIB', null, '-OQUse');
