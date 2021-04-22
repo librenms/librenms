@@ -88,8 +88,9 @@ are as follows:
 - `oid` (required): This is the name of the table you want to do the snmp walk on.
 - `value` (optional): This is the key within the table that contains
   the value. If not provided willuse `oid`
-- `num_oid` (optional): If not provided, this parameter should be computed
-  automatically by discovery process. This is the numerical OID that contains
+- `num_oid` (required for PullRequests): If not provided, this parameter should be computed
+  automatically by discovery process. This parameter is still required to
+  submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
   In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
@@ -163,13 +164,13 @@ the variable name.  Example `{{ $ifName:2 }}`
                       value: 1
 ```
 
-> ``` op ``` can be any of the following operators :
->
+`op` can be any of the following operators :
+
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
 > not_ends, not_contains, not_regex, not_in_array, exists
->
-> Example:
+
+Example:
 
 ```yaml
                     skip_values:
@@ -185,6 +186,21 @@ the variable name.  Example `{{ $ifName:2 }}`
                       oid: sensorOptionalOID
                       op: 'exists'
                       value: false
+```
+
+```yaml
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
 ```
 
 If you aren't able to use yaml to perform the sensor discovery, you
