@@ -29,12 +29,12 @@
         </div>
             <div class="panel panel-default" v-for="(map, index) in maps">
                 <div class="panel-body">
-                    <div class="col-md-5 cell">{{ map.source }} {{ map.matchType === 'regex' ? '~' : '=' }} {{ map.matchValue }}</div>
-                    <div class="col-md-4 cell">{{ map.target }} &lt; {{ map.replacement }}</div>
+                    <div class="col-md-5 expandable"><span>{{ map.source }} {{ map.matchType === 'regex' ? '~' : '=' }} {{ map.matchValue }}</span></div>
+                    <div class="col-md-4 expandable"><span>{{ map.target }} &lt; {{ map.replacement }}</span></div>
                     <div class="col-md-3 buttons">
                         <div class="btn-group" v-tooltip="disabled ? $t('settings.readonly') : false">
                             <button type="button" class="btn btn-sm btn-info" v-tooltip="$t('Edit')" :disabled="disabled" @click="showModal(index)"><i class="fa fa-lg fa-edit"></i></button>
-                            <button type="button" class="btn btn-sm btn-danger" v-tooltip="$t('Delete')" :disabled="disabled"><i class="fa fa-lg fa-remove"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger" v-tooltip="$t('Delete')" :disabled="disabled" @click="deleteItem(index)"><i class="fa fa-lg fa-remove"></i></button>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
 
                         <div class="form-group">
                             <div class="col-sm-8 col-sm-offset-4">
-                                <button type="button" class="btn btn-primary" @click="submitModal">Submit</button>
+                                <button type="button" class="btn btn-primary" @click="submitModal">{{ $t('Submit') }}</button>
                             </div>
                         </div>
                     </div>
@@ -153,6 +153,11 @@ export default {
             this.mapModalMatchValue = exists ? this.maps[index].matchValue : null;
             this.mapModalTarget = exists ? this.maps[index].target : null;
             this.mapModalReplacement = exists ? this.maps[index].replacement : null;
+        },
+        deleteItem(index) {
+            let newMap = this.maps;
+            newMap.splice(index, 1);
+            this.updateValue(newMap);
         },
         updateValue(newMaps) {
             let newValue = {};
@@ -217,8 +222,7 @@ export default {
 </script>
 
 <style scoped>
-.cell {
-    white-space: nowrap;
+.expandable {
     padding: 5px;
     height: 30px;
 }
