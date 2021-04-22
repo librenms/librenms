@@ -369,89 +369,89 @@ modules:
                     descr: Closed Tunnels
                     warn_limit: 15
                     high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpFreeSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.0'
-#                    index: 'l2tp.sessions.0'
-#                    descr: Free Sessions
-#                    low_limit: 10
-#                    low_warn_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpWaitingSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.1'
-#                    index: 'l2tp.sessions.1'
-#                    descr: Waiting Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpOpeningSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.2'
-#                    index: 'l2tp.sessions.2'
-#                    descr: Opening Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpNegotiatingSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.3'
-#                    index: 'l2tp.sessions.3'
-#                    descr: Negotiating Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpAuthPendingSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.4'
-#                    index: 'l2tp.sessions.4'
-#                    descr: Authentication Pending Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpStartedSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.5'
-#                    index: 'l2tp.sessions.5'
-#                    descr: Started Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpLiveSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.6'
-#                    index: 'l2tp.sessions.6'
-#                    descr: Live Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpAcctPendingSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.7'
-#                    index: 'l2tp.sessions.7'
-#                    descr: Accounting Pending Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpClosingSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.8'
-#                    index: 'l2tp.sessions.8'
-#                    descr: Closing Sessions
-#                    warn_limit: 15
-#                    high_limit: 20
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpClosedSessions
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.9'
-#                    index: 'l2tp.sessions.9'
-#                    descr: Closed Sessions
-#                -
-#                    oid: fbL2tpGeneralSessions
-#                    value: fbL2tpSessionNegotiationSlotsFree
-#                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.10'
-#                    index: 'l2tp.sessions.10'
-#                    descr: Free Session Slots
-#                    low_limit: 10
-#                    low_warn_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpFreeSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.0'
+                    index: 'l2tp.sessions.0'
+                    descr: Free Sessions
+                    low_limit: 10
+                    low_warn_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpWaitingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.1'
+                    index: 'l2tp.sessions.1'
+                    descr: Waiting Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpOpeningSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.2'
+                    index: 'l2tp.sessions.2'
+                    descr: Opening Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpNegotiatingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.3'
+                    index: 'l2tp.sessions.3'
+                    descr: Negotiating Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpAuthPendingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.4'
+                    index: 'l2tp.sessions.4'
+                    descr: Authentication Pending Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpStartedSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.5'
+                    index: 'l2tp.sessions.5'
+                    descr: Started Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpLiveSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.6'
+                    index: 'l2tp.sessions.6'
+                    descr: Live Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpAcctPendingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.7'
+                    index: 'l2tp.sessions.7'
+                    descr: Accounting Pending Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpClosingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.8'
+                    index: 'l2tp.sessions.8'
+                    descr: Closing Sessions
+                    warn_limit: 15
+                    high_limit: 20
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpClosedSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.9'
+                    index: 'l2tp.sessions.9'
+                    descr: Closed Sessions
+                -
+                    oid: fbL2tpGeneralSessions
+                    value: fbL2tpSessionNegotiationSlotsFree
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.10'
+                    index: 'l2tp.sessions.10'
+                    descr: Free Session Slots
+                    low_limit: 10
+                    low_warn_limit: 20
