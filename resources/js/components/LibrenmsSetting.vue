@@ -36,6 +36,7 @@
                        :disabled="setting.overridden"
                        :required="setting.required"
                        :options="setting.options"
+                       :update-status="updateStatus"
                        @input="changeValue($event)"
                        @change="changeValue($event)"
             ></component>
@@ -60,20 +61,24 @@
         data() {
             return {
                 value: this.setting.value,
+                updateStatus: 'none',
                 feedback: ''
             }
         },
         methods: {
             persistValue(value) {
+                this.updateStatus = 'pending';
                 axios.put(route(this.prefix + '.update', this.getRouteParams()), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
                         this.$emit('setting-updated', {name: this.setting.name, value: this.value});
+                        this.updateStatus = 'success';
                         this.feedback = 'has-success';
                         setTimeout(() => this.feedback = '', 3000);
                     })
                     .catch((error) => {
                         this.feedback = 'has-error';
+                        this.updateStatus = 'error';
                         toastr.error(error.response.data.message);
 
                         // don't reset certain types back to actual value on error
