@@ -88,8 +88,9 @@ are as follows:
 - `oid` (required): This is the name of the table you want to do the snmp walk on.
 - `value` (optional): This is the key within the table that contains
   the value. If not provided willuse `oid`
-- `num_oid` (optional): If not provided, this parameter should be computed
-  automatically by discovery process. This is the numerical OID that contains
+- `num_oid` (required for PullRequests): If not provided, this parameter should be computed
+  automatically by discovery process. This parameter is still required to
+  submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
   In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
@@ -196,14 +197,6 @@ Example:
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
-                        -
-                            oid: hwEntityOpticalTemperature
-                            op: '<'
-                            value: '-50'
-                        -
-                            oid: hwEntityOpticalTemperature
-                            op: '>='
-                            value: '2147483646'
 ```
 
 If you aren't able to use yaml to perform the sensor discovery, you

@@ -33,7 +33,7 @@ use LibreNMS\OS;
 
 class YamlDiscovery
 {
-    private static $cache_time = 10800; // 3 hours, Used for oid translation cache
+    private static $cache_time = 1800; // 30 min, Used for oid translation cache
 
     /**
      * @param OS $os
@@ -389,7 +389,7 @@ class YamlDiscovery
         }
 
         //Store the value
-        Cache::put($key, $numeric_oid, $cache_time);
+        Cache::put($key, $numeric_oid, self::$cache_time);
 
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");
