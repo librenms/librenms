@@ -1,0 +1,11 @@
+<?php
+
+namespace Wpb\String_Blade_Compiler\Facades;
+
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * @method static \Wpb\String_Blade_Compiler\StringView make(string|array $view, array $data = [], array $mergeData = [])
+ */
+
+class StringBlade extends Facade {}

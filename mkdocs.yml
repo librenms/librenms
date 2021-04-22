@@ -121,6 +121,7 @@ nav:
       - DeviceGroups: API/DeviceGroups.md
       - Ports: API/Ports.md
       - PortGroups: API/PortGroups.md
+      - Port_Groups: API/Port_Groups.md
       - Alerts: API/Alerts.md
       - Routing: API/Routing.md
       - Switching: API/Switching.md

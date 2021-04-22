@@ -57,9 +57,9 @@ Optional:
   -d, --debug        Enable debug output
       --snmpsim      Run snmpsimd.py using the collected data for manual testing.
 
-Example:
+Examples:
   ./save-test-data.php -o ios -v 2960x
-  ./save-test-data.php -o linux -v freeradius -m freeradius
+  ./save-test-data.php -o linux -v freeradius -m applications
 ";
     exit;
 }

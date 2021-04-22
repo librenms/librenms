@@ -402,7 +402,7 @@ function delete_device($id)
  *
  * @param string $host dns name or ip address
  * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
- * @param string $port the port to connect to for snmp
+ * @param int $port the port to connect to for snmp
  * @param string $transport udp or tcp
  * @param string $poller_group the poller group this device will belong to
  * @param bool $force_add add even if the device isn't reachable
@@ -418,7 +418,7 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
+function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
 {
     // Test Database Exists
     if (host_exists($host)) {

@@ -140,9 +140,18 @@ class ModuleTestHelper
         $this->json_file = $path;
     }
 
-    public function captureFromDevice($device_id, $write = true, $prefer_new = false)
+    public function captureFromDevice($device_id, $write = true, $prefer_new = false, $full = false)
     {
-        $snmp_oids = $this->collectOids($device_id);
+        if ($full) {
+            $snmp_oids[] = [
+                'oid' => '.',
+                'method' => 'walk',
+                'mib' => null,
+                'mibdir' => null,
+            ];
+        } else {
+            $snmp_oids = $this->collectOids($device_id);
+        }
 
         $device = device_by_id_cache($device_id, true);
         DeviceCache::setPrimary($device_id);

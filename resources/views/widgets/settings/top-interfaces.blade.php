@@ -25,11 +25,21 @@
             @endif
         </select>
     </div>
+    <div class="form-group">
+        <label for="port_group-{{ $id }}" class="control-label">@lang('Port group')</label>
+        <select class="form-control" name="port_group" id="port_group-{{ $id }}" data-placeholder="@lang('All Ports')">
+            @if($port_group)
+                <option value="{{ $port_group->id }}" selected>{{ $port_group->name }}</option>
+            @endif
+        </select>
+    </div>
+
 @endsection
 
 @section('javascript')
     <script type="text/javascript">
         init_select2('#interface_filter-{{ $id }}', 'port-field', {limit: 100, field: 'ifType'}, '{{ $interface_filter ?: '' }}');
         init_select2('#device_group-{{ $id }}', 'device-group', {});
+        init_select2('#port_group-{{ $id }}', 'port-group', {});
     </script>
 @endsection

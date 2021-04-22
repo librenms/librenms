@@ -65,13 +65,13 @@ foreach ($_POST as $key => $val) {
 }//end foreach
 
 if ($rows_updated > 0) {
-    $message = $rows_updated . ' Device record updated.';
+    $message = $rows_updated . ' Port record(s) updated.';
     $status = 'ok';
 } elseif ($rows_updated = '-1') {
-    $message = 'Device record unchanged. No update necessary.';
+    $message = 'Port records unchanged. No update necessary.';
     $status = 'ok';
 } else {
-    $message = 'Device record update error.';
+    $message = 'Port record update error.';
 }
 
 $response = [
