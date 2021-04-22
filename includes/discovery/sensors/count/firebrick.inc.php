@@ -5,26 +5,26 @@ $l2tpTable = snmpwalk_cache_multi_oid($device, 'fbL2tpPeerTable', [], 'FIREBRICK
 
 if ($l2tpTable) {
     $tunnels = [
-        0 => ['description' => 'Free Tunnels', 'crit_low' => 10, 'warn_low' => 20, 'warn_high' => 30000, 'crit_high' => 30000],
-        1 => ['description' => 'Opening Tunnels'],
-        2 => ['description' => 'Live Incoming Tunnels'],
-        3 => ['description' => 'Live Outgoing Tunnels'],
-        4 => ['description' => 'Closing Tunnels'],
-        5 => ['description' => 'Failed Tunnels'],
-        6 => ['description' => 'Closed Tunnels'],
+//        0 => ['description' => 'Free Tunnels', 'crit_low' => 10, 'warn_low' => 20, 'warn_high' => 30000, 'crit_high' => 30000],
+//        1 => ['description' => 'Opening Tunnels'],
+//        2 => ['description' => 'Live Incoming Tunnels'],
+//        3 => ['description' => 'Live Outgoing Tunnels'],
+//        4 => ['description' => 'Closing Tunnels'],
+//        5 => ['description' => 'Failed Tunnels'],
+//        6 => ['description' => 'Closed Tunnels'],
     ];
     $sessions = [
-        1 => ['description' => 'Free Sessions', 'crit_low' => 10, 'warn_low' => 20, 'warn_high' => 0, 'crit_high' => 0],
-        2 => ['description' => 'Waiting Sessions'],
-        3 => ['description' => 'Opening Sessions'],
-        4 => ['description' => 'Negotiating Sessions'],
-        5 => ['description' => 'Authentication Pending Sessions'],
-        6 => ['description' => 'Started Sessions'],
-        7 => ['description' => 'Live Sessions'],
-        8 => ['description' => 'Accounting Pending Sessions'],
-        9 => ['description' => 'Closing Sessions'],
-        10 => ['description' => 'Closed Sessions', 'crit_low' => 0, 'warn_low' => 0, 'warn_high' => 0, 'crit_high' => 0],
-        11 => ['description' => 'Free Session Slots', 'crit_low' => 10, 'warn_low' => 20, 'warn_high' => 0, 'crit_high' => 0],
+        0 => ['description' => 'Free Sessions', 'crit_low' => 10, 'warn_low' => 20, 'warn_high' => 0, 'crit_high' => 0],
+        1 => ['description' => 'Waiting Sessions'],
+        2 => ['description' => 'Opening Sessions'],
+        3 => ['description' => 'Negotiating Sessions'],
+        4 => ['description' => 'Authentication Pending Sessions'],
+        5 => ['description' => 'Started Sessions'],
+        6 => ['description' => 'Live Sessions'],
+        7 => ['description' => 'Accounting Pending Sessions'],
+        8 => ['description' => 'Closing Sessions'],
+        9 => ['description' => 'Closed Sessions', 'crit_low' => 0, 'warn_low' => 0, 'warn_high' => 0, 'crit_high' => 0],
+        10 => ['description' => 'Free Session Slots', 'crit_low' => 10, 'warn_low' => 20, 'warn_high' => 0, 'crit_high' => 0],
     ];
 
     foreach ($tunnels as $idx => $cfg) {
