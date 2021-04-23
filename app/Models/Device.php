@@ -464,7 +464,7 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeWhereAttributeDisabled($query, $attribute)
+    public function scopeWhereAttributeDisabled(Builder $query, string $attribute) : Builder
     {
         return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
             $query->on('devices.device_id', 'devices_attribs.device_id')
