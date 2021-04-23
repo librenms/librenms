@@ -14992,6 +14992,10 @@
         }
     },
     "applications": {
+        "discovery": {
+            "applications": [],
+            "application_metrics": []
+        },
         "poller": {
             "applications": [
                 {
