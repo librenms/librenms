@@ -81,7 +81,7 @@
                 "cisco-sla": {
                     "type": "boolean"
                 },
-		"juniper-rpm": {
+                "juniper-rpm": {
                     "type": "boolean"
                 },
                 "cisco-ipsec-flow-monitor": {
@@ -225,7 +225,7 @@
                 "cisco-sla": {
                     "type": "boolean"
                 },
-		"juniper-rpm": {
+                "juniper-rpm": {
                     "type": "boolean"
                 },
                 "cisco-mac-accounting": {

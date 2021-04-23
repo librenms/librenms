@@ -1046,7 +1046,7 @@
             "default": false,
             "type": "boolean"
         },
-	"discovery_modules.juniper-rpm": {
+        "discovery_modules.juniper-rpm": {
             "order": 80,
             "group": "discovery",
             "section": "discovery_modules",
@@ -4324,8 +4324,8 @@
             "section": "poller_modules",
             "default": false,
             "type": "boolean"
-	},
-	"poller_modules.juniper-rpm": {
+        },
+        "poller_modules.juniper-rpm": {
             "order": 140,
             "group": "poller",
             "section": "poller_modules",
@@ -4895,6 +4895,10 @@
             "default": "DLSW",
             "type": "text"
         },
+        "sla_type_labels.DnsQuery": {
+            "default": "DNS Query",
+            "type": "text"
+        },
         "sla_type_labels.dns": {
             "default": "DNS",
             "type": "text"
@@ -4923,8 +4927,24 @@
             "default": "HTTP",
             "type": "text"
         },
+        "sla_type_labels.HttpGet": {
+            "default": "HTTP Get",
+            "type": "text"
+        },
+        "sla_type_labels.HttpGetMetadata": {
+            "default": "HTTP Get Metadata",
+            "type": "text"
+        },
+        "sla_type_labels.IcmpEcho": {
+            "default": "ICMP Echo",
+            "type": "text"
+        },
         "sla_type_labels.icmpjitter": {
             "default": "ICMP jitter",
+            "type": "text"
+        },
+        "sla_type_labels.IcmpTimeStamp": {
+            "default": "ICMP TineStamp",
             "type": "text"
         },
         "sla_type_labels.jitter": {
