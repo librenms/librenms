@@ -4324,6 +4324,13 @@
             "section": "poller_modules",
             "default": false,
             "type": "boolean"
+	},
+	"poller_modules.juniper-rpm": {
+            "order": 140,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
         },
         "poller_modules.juniper-rpm": {
             "order": 140,

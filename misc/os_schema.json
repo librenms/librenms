@@ -81,7 +81,11 @@
                 "cisco-sla": {
                     "type": "boolean"
                 },
+<<<<<<< HEAD
                 "juniper-rpm": {
+=======
+		"juniper-rpm": {
+>>>>>>> 0d1448b76eb729df14b04c78ecad69a93cb73478
                     "type": "boolean"
                 },
                 "cisco-ipsec-flow-monitor": {
