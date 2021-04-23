@@ -121,11 +121,6 @@ parameters:
 			path: LibreNMS/Modules/Mpls.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\AirosAfLtu\\:\\:discoverWirelessDistance\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: LibreNMS/OS/AirosAfLtu.php
-
-		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
 			count: 2
 			path: LibreNMS/OS/ArrisDsr4410md.php
@@ -144,11 +139,6 @@ parameters:
 			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ios.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Routeros\\:\\:discoverWirelessFrequency\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: LibreNMS/OS/Routeros.php
 
 		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
