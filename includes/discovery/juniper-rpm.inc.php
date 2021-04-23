@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Util\IP;
 
 if (Config::get('enable_sla') && $device['os'] == 'junos') {
     $slas = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');

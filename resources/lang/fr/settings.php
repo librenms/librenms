@@ -419,7 +419,7 @@ return [
             'ipv6-addresses' => [
                 'description' => 'IPv6 Addresses',
             ],
-        'juniper-rpm' => [
+            'juniper-rpm' => [
                 'description' => 'Juniper RPM',
             ],
             'junose-atm-vp' => [
