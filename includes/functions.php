@@ -951,15 +951,6 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'];
 
-    if (! empty($ifType)) {
-        // only poll wanted interface types
-        if (! Config::get('interface_types.' . $ifType)) {
-            d_echo("ignored by ifType: $ifType \n");
-
-            return false;
-        }
-    }
-
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
     }
