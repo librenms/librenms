@@ -1168,7 +1168,7 @@ function generate_stacked_graphs($transparency = '88')
 
 /**
  * Parse AT time spec, does not handle the entire spec.
- * @param string $time
+ * @param string|int $time
  * @return int
  */
 function parse_at_time($time)

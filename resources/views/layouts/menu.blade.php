@@ -335,7 +335,11 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> @lang('Manage Groups')
+                            </a></li>
 
+                            <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
                                 <li><a href="{{ url('ports/alerted=yes') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"

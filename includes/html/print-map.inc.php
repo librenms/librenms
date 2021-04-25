@@ -270,8 +270,8 @@ foreach ($list as $items) {
     } else {
         $width = round(0.77 * pow($speed, 0.25));
     }
-    $link_in_used = ($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
-    $link_out_used = ($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
+    $link_in_used = $items['local_ifspeed'] ? (($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100) : 0;
+    $link_out_used = $items['local_ifspeed'] ? (($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100) : 0;
     if ($link_in_used > $link_out_used) {
         $link_used = $link_in_used;
     } else {

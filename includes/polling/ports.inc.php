@@ -738,9 +738,9 @@ foreach ($ports as $port) {
         if (! empty($port['skipped'])) {
             // We don't care about statistics for skipped selective polling ports
             d_echo("$port_id skipped because selective polling ports is set.");
-        } elseif ($port['ifType'] != 'adsl' && $port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && $this_port['ifLastChange'] == $port['ifLastChange']) {
+        } elseif ($port['ifType'] != 'vdsl' && $port['ifType'] != 'adsl' && $port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && $this_port['ifLastChange'] == $port['ifLastChange']) {
             // We don't care about statistics for down ports on which states did not change since last polling
-            // We still take into account 'adsl' ports that may update speed/noise even if the interface is status down
+            // We still take into account 'adsl' & 'vdsl' ports that may update speed/noise even if the interface is status down
             d_echo("$port_id skipped because port is still down since last polling.");
         } else {
             // End parse ifAlias

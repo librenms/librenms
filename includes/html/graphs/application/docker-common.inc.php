@@ -15,7 +15,7 @@ $smalldescrlen = 25;
 if (isset($vars['container'])) {
     $containers = [$vars['container']];
 } else {
-    $containers = get_arrays_with_application($device, $app['app_id'], 'docker');
+    $containers = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'docker');
 }
 
 $int = 0;

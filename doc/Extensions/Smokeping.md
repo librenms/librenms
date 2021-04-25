@@ -186,6 +186,17 @@ You should be able to load the Smokeping web interface at `http://yourhost/cgi-b
 This section assumes you have configured LibreNMS with Nginx as
 specified in [Configure Nginx](../Installation/Installation-Ubuntu-1804-Nginx.md).
 
+Note, you need to install fcgiwrap for CGI wrapper interact with Nginx
+
+```
+apt install fcgiwrap
+```
+Then configure Nginx with the default configuration
+
+```
+cp /usr/share/doc/fcgiwrap/examples/nginx.conf /etc/nginx/fcgiwrap.conf
+```
+
 Add the following configuration to your `/etc/nginx/conf.d/librenms` config file.
 
 The following will configure Nginx to respond to `http://yourlibrenms/smokeping`:

@@ -66,10 +66,6 @@
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
     <script src="{{ asset('js/pace.min.js') }}"></script>
     <script src="{{ asset('js/qrcode.min.js') }}"></script>
-    @if(LibreNMS\Config::get('enable_lazy_load', true))
-        <script src="{{ asset('js/jquery.lazyload.min.js') }}"></script>
-        <script src="{{ asset('js/lazyload.js') }}"></script>
-    @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
         $.ajaxSetup({

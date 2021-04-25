@@ -16,6 +16,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
@@ -1844,6 +1845,41 @@ function rename_device(Illuminate\Http\Request $request)
             return api_error(500, 'Device failed to be renamed');
         }
     }
+}
+
+function add_port_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'name' => 'required|string|unique:port_groups',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $portGroup = PortGroup::make(['name' => $data['name'], 'desc' => $data['desc']]);
+    $portGroup->save();
+
+    return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
+}
+
+function get_port_groups(Illuminate\Http\Request $request)
+{
+    $query = PortGroup::query();
+
+    $groups = $query->orderBy('name')->get();
+
+    if ($groups->isEmpty()) {
+        return api_error(404, 'No port groups found');
+    }
+
+    return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
 function add_device_group(Illuminate\Http\Request $request)
