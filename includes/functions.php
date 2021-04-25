@@ -951,6 +951,15 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'];
 
+    if (! empty($ifType)) {
+        // only poll wanted interface types
+        if (! Config::get('interface_types.' . $ifType)) {
+            d_echo("ignored by ifType: $ifType \n");
+
+            return false;
+        }
+    }
+
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
     }
@@ -1033,26 +1042,6 @@ function port_fill_missing(&$port, $device)
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
     }
-}
-
-/**
- * returns if a port should be filtered out, like a disabled oder ignored port
- *
- * @param array $port
- * @return bool
- */
-function port_filter($port)
-{
-    // return value
-    // true: do filter port
-    // false: do not filter port
-
-    if ($port['ifType']) {
-        // only poll wanted interface types
-        return ! Config::has('interface_types.' . $port['ifType']);
-    }
-
-    return false;
 }
 
 function scan_new_plugins()
