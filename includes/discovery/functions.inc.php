@@ -152,7 +152,7 @@ function discover_device(&$device, $force_module = false)
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
         d_echo('Device' . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
-            $attribs['discover_' . $module] ||
+            isset($attribs['discover_' . $module]) ||
             ($os_module_status && ! isset($attribs['discover_' . $module])) ||
             ($module_status && ! isset($os_module_status) && ! isset($attribs['discover_' . $module]))
         ) {
