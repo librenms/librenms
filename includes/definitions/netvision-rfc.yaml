@@ -1,0 +1,15 @@
+os: netvision-rfc
+text: 'Socomec Net Vision'
+type: power
+icon: netvision
+rfc1628_compat: true
+over:
+    - { graph: device_current, text: Current }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: UPS-MIB::upsIdentAgentSoftwareVersion.0
+            op: starts
+            value: 'Net Vision'
+

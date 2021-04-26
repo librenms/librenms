@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
@@ -31,7 +31,7 @@ d_echo($name);
 $sdfsinfo = snmp_walk($device, $oid, $options);
 
 if (is_string($sdfsinfo)) {
-    $rrd_name = array('app', $name, $app_id);
+    $rrd_name = ['app', $name, $app_id];
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('files', 'GAUGE', 0)
@@ -46,9 +46,9 @@ if (is_string($sdfsinfo)) {
         ->addDataset('actual_savings', 'GAUGE', 0)
         ->addDataset('comp_rate', 'GAUGE', 0);
 
-    list($files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate) = explode(" ", $sdfsinfo);
+    [$files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate] = explode(' ', $sdfsinfo);
 
-    $fields = array(
+    $fields = [
         'files' => $files,
         'vol_capacity' => $vol_capacity,
         'vol_logic_size' => $vol_logic_size,
@@ -60,9 +60,9 @@ if (is_string($sdfsinfo)) {
         'dedup_rate' => $dedup_rate,
         'actual_savings' => $actual_savings,
         'comp_rate' => $comp_rate,
-    );
+    ];
 
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
     update_application($app, $sdfsinfo, $fields);
 

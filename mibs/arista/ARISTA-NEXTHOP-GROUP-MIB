@@ -1,0 +1,286 @@
+ARISTA-NEXTHOP-GROUP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter64             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP   FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION                FROM SNMPv2-TC
+    aristaMibs                        FROM ARISTA-SMI-MIB;
+
+aristaNexthopGroupMIB  MODULE-IDENTITY
+    LAST-UPDATED "201604170000Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 5453 Great America Parkway
+                 Santa Clara, CA 95054
+
+         Tel: +1 408 547-5500
+
+         E-mail: snmp@arista.com"
+    DESCRIPTION
+            "This MIB contains information about NextHop Groups (NHG).
+            
+            General L3 routing creates routing table entries, each of
+            which are associated with a nexthop. If multiple paths
+            exist for a specific route, the route points to a set of
+            nexthops (commonly referred as ECMP or Equal Cost
+            MultiPath).
+
+            Arista devices support a feature which allows customers to
+            manually create a nexthop list, and use this list to
+            route packets to the specified set of nexthop
+            addresses. Customers can associate a tunnel type (GRE,
+            for example) with the nexthop group, allowing relevant
+            packets to be tunneled as well. The packet forwarding or
+            routing decision happens in hardware. 
+
+            Nexthop group feature gives customers full control of how
+            a route should be forwarded (tunneled or otherwise). The
+            number of entries in the nexthop group is also determined
+            by the user, and directly translates to the number of
+            nexthop entries in the hardware for the specified route.
+
+            Let's provide an example, looking at EOS CLI example.
+
+            nexthop-group foo type ip-in-ip
+              ttl 64 
+              entry 0 tunnel-destination 10.1.1.1 
+              entry 1 tunnel-destination 20.1.1.1 
+            !
+            ip route 30.1.1.0/24 Nexthop-Group foo
+
+            In the above configuration, any packet destined to
+            30.1.1.0/24 will be forwarded by the nexthop group
+            'foo'. Each entry inside the nexthop group specifies a
+            particular nexthop ('tunnel destination') chosen by the
+            customer. In this example, packets can be forwarded via
+            either of the nexthop (traffic split equally between the 2
+            entries).
+
+            This MIB module provides information relevant to the
+            nexthop group feature, specifically the status of various
+            nexthop groups configured, and traffic statistics."
+    REVISION     "201604170000Z"
+    DESCRIPTION
+           "Initial revision of the MIB module."
+    ::= { aristaMibs 21 }
+
+aristaNexthopGroupMibObjects      OBJECT IDENTIFIER
+    ::= { aristaNexthopGroupMIB 1 }
+
+aristaNexthopGroupMibConformance  OBJECT IDENTIFIER
+    ::= { aristaNexthopGroupMIB 2 }
+
+-- Textual Convention
+
+NexthopGroupName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT   "255a"
+    STATUS         current
+    DESCRIPTION
+        "Each nexthop group configured by the user is associated with
+        a name, by configuration."
+    SYNTAX         OCTET STRING (SIZE (0..255))
+                 
+NexthopGroupType ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION
+        "A nexthop group is associated with a type, which determines
+        the packet forwarding behavior. 
+
+        Type 'ip' refers to L3 IP routing. A route pointing to a
+        nexthop group in this case is equivalent to multiple static
+        route configuration entries each with a particular nexthop.
+        
+        Types 'gre', 'mpls', 'ip-in-ip' all refer to tunnel types. In
+        this case a route pointing to the specified nexthop group is
+        used to tunnel packets using the appropriate encapsulation to
+        a tunnel destination. The encapsulation information depends on
+        the tunnel type itself."
+    SYNTAX INTEGER {
+               invalid(0),
+               ipInIp(1),
+               gre(2),
+               mpls(3),
+               ip(4),
+               mplsOverGre(5)
+           }
+
+-- Nexthop Group table
+
+aristaNexthopGroupTable        OBJECT-TYPE
+    SYNTAX                     SEQUENCE OF AristaNexthopGroupEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "This table contains information about the nexthop groups
+        that are present in the device."
+    ::= { aristaNexthopGroupMibObjects 1 }
+
+aristaNexthopGroupEntry        OBJECT-TYPE
+    SYNTAX                     AristaNexthopGroupEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "A conceptual row, containing information for a specific
+        nexthop group."
+    INDEX                  { aristaNexthopGroupId }
+    ::= { aristaNexthopGroupTable 1 }
+
+AristaNexthopGroupEntry       ::= SEQUENCE {
+    aristaNexthopGroupId               Unsigned32,
+    aristaNexthopGroupName             NexthopGroupName,
+    aristaNexthopGroupType             NexthopGroupType
+}
+
+aristaNexthopGroupId       OBJECT-TYPE
+    SYNTAX                 Unsigned32
+    MAX-ACCESS             not-accessible
+    STATUS                 current
+    DESCRIPTION
+        "Unique index identifying a nexthop group."
+    ::= { aristaNexthopGroupEntry 1 }
+
+aristaNexthopGroupName     OBJECT-TYPE
+    SYNTAX                 NexthopGroupName
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION
+        "Unique name identifying a nexthop group."
+    ::= { aristaNexthopGroupEntry 2 }
+
+aristaNexthopGroupType     OBJECT-TYPE
+    SYNTAX                 NexthopGroupType
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION
+        "The type of the nexthop group. The encapsulation information
+        provided for each entry in the nexthop group corresponds to
+        the type."
+    ::= { aristaNexthopGroupEntry 3 }
+
+-- Nexthop Group counter table
+
+aristaNexthopGroupCounterTable OBJECT-TYPE
+    SYNTAX                     SEQUENCE OF AristaNexthopGroupCounterEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "Each nexthop group contains several entries - each
+        entry specifies a particular nexthop through which a packet
+        can be forwarded. There is packet and byte counter information
+        associated with each such nexthop. 
+
+        This table represents the per nexthop counter information for
+        every nexthop group."
+    ::= { aristaNexthopGroupMibObjects 2 }
+
+aristaNexthopGroupCounterEntry        OBJECT-TYPE
+    SYNTAX                            AristaNexthopGroupCounterEntry
+    MAX-ACCESS                        not-accessible
+    STATUS                            current
+    DESCRIPTION
+        "A conceptual row, containing counter information for every
+        nexthop defined inside the nexthop group."
+    INDEX                      { aristaNexthopGroupId,
+                                 aristaNexthopGroupEntryIndex
+                               }
+    ::= { aristaNexthopGroupCounterTable 1 }
+
+AristaNexthopGroupCounterEntry  ::= SEQUENCE {
+    aristaNexthopGroupEntryIndex          Unsigned32,
+    aristaNexthopGroupCounterIndex        Unsigned32,
+    aristaNexthopGroupCounterPacketCount  Counter64,
+    aristaNexthopGroupCounterByteCount    Counter64
+}
+
+aristaNexthopGroupEntryIndex   OBJECT-TYPE
+    SYNTAX                     Unsigned32
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "As described in the beginning of the MIB module each nexthop
+        group can have multiple entries, one per 'destination' or
+        'nexthop'. Each entry within a nexthop group has a number or
+        index as configured by the user. This MIB object represents
+        the entry index within the nexthop group."
+    ::= { aristaNexthopGroupCounterEntry 1 }
+
+aristaNexthopGroupCounterIndex  OBJECT-TYPE
+    SYNTAX                            Unsigned32
+    MAX-ACCESS                        read-only
+    STATUS                            current
+    DESCRIPTION
+        "For every nexthop within a nexthop group, packet and byte
+        counters are maintained by the device. Counters can be shared
+        by multiple such nexthops and the counter index will be the
+        same for all of those nexthops."
+    ::= { aristaNexthopGroupCounterEntry 2 }
+
+aristaNexthopGroupCounterPacketCount OBJECT-TYPE
+    SYNTAX                           Counter64
+    MAX-ACCESS                       read-only
+    STATUS                           current
+    DESCRIPTION
+        "The number of packets forwarded through the specific
+        nexthop. Note that since counters are shared with multiple
+        nexthops, the packet count is an aggregate of packets
+        forwarded through all the relevant nexthops."
+    ::= { aristaNexthopGroupCounterEntry 3 }
+
+aristaNexthopGroupCounterByteCount   OBJECT-TYPE
+    SYNTAX                           Counter64
+    MAX-ACCESS                       read-only
+    STATUS                           current
+    DESCRIPTION
+        "The byte count of packets forwarded through the specific
+        nexthop. Note that since counters are shared with multiple
+        nexthops, the byte count is an aggregate of packets
+        forwarded through all the relevant nexthops."
+    ::= { aristaNexthopGroupCounterEntry 4 }
+
+-- Conformance and Compliance
+
+aristaNexthopGroupMibCompliances OBJECT IDENTIFIER
+    ::= { aristaNexthopGroupMibConformance 1 }
+
+aristaNexthopGroupMibGroups OBJECT IDENTIFIER
+    ::= { aristaNexthopGroupMibConformance 2 }
+
+aristaNexthopGroupMibCompliance  MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for Arista switches that implement
+        the ARISTA-NEXTHOP-GROUP-MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS {
+        aristaNexthopGroupGroup,
+        aristaNexthopGroupCounterGroup
+    }
+    ::= { aristaNexthopGroupMibCompliances 1 }
+
+aristaNexthopGroupGroup  OBJECT-GROUP
+    OBJECTS {
+        aristaNexthopGroupName,
+        aristaNexthopGroupType
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects that provide nexthop group
+        information in the system."
+    ::= { aristaNexthopGroupMibGroups 1 }
+
+aristaNexthopGroupCounterGroup  OBJECT-GROUP
+    OBJECTS {
+        aristaNexthopGroupCounterIndex,
+        aristaNexthopGroupCounterPacketCount,
+        aristaNexthopGroupCounterByteCount
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects that provide counter information
+        for every nexthop in the nexthop group."
+    ::= { aristaNexthopGroupMibGroups 2 }
+
+END

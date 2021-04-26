@@ -15,14 +15,14 @@
 session_start();
 session_write_close();
 if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
-    $init_modules = array('web', 'nodb');
+    $init_modules = ['web', 'nodb'];
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 } else {
-    $init_modules = array('web', 'auth', 'alerts');
+    $init_modules = ['web', 'auth', 'alerts'];
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-    if (!Auth::check()) {
-        die('Unauthorized');
+    if (! Auth::check()) {
+        exit('Unauthorized');
     }
 }
 

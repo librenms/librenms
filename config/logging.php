@@ -8,6 +8,7 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
@@ -24,7 +25,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'logfile'),
+    'default' => env('LOG_CHANNEL', 'stack'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +43,7 @@ return [
     */
 
     'channels' => [
-        'logfile' => [
+        'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
             'ignore_exceptions' => false,
@@ -57,13 +58,13 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-            'level' => 'error',
+            'level' => env('LOG_LEVEL', 'error'),
         ],
 
         'daily' => [
             'driver' => 'daily',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-            'level' => 'error',
+            'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,
         ],
 
@@ -72,12 +73,12 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
-            'level' => 'critical',
+            'level' => env('LOG_LEVEL', 'critical'),
         ],
 
         'papertrail' => [
             'driver' => 'monolog',
-            'level' => 'debug',
+            'level' => env('LOG_LEVEL', 'debug'),
             'handler' => SyslogUdpHandler::class,
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
@@ -97,12 +98,21 @@ return [
 
         'syslog' => [
             'driver' => 'syslog',
-            'level' => 'debug',
+            'level' => env('LOG_LEVEL', 'debug'),
         ],
 
         'errorlog' => [
             'driver' => 'errorlog',
-            'level' => 'debug',
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        'null' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ],
+
+        'emergency' => [
+            'path' => storage_path('logs/laravel.log'),
         ],
     ],
 

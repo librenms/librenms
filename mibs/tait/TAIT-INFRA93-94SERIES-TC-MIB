@@ -1,0 +1,186 @@
+TAIT-INFRA93-94SERIES-TC-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Textual conventions and enumerations for the monitored Base Station
+--
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32,
+    Unsigned32             FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+   infra93-94MibModule
+      FROM TAIT-INFRA93-94SERIES-COMMON-MIB;
+
+-- TODO: Automatically inject these versions numbers and timestamps from the buildsystem to reduce chance of human error.
+infra93-94TC MODULE-IDENTITY
+    LAST-UPDATED  "201808310000Z"
+    ORGANIZATION  "www.taitradio.com"
+    CONTACT-INFO  "Tait Communications
+                   245 Wooldridge Road
+                   PO Box 1645
+                   Christchurch
+                   New Zealand
+
+           phone:  +64 3358 3399
+           email:  support@taitradio.com"
+    DESCRIPTION   "Textual conventions used in the Tait-infrastructure-93-94-series MIBs"
+
+    REVISION      "201808310000Z"
+    DESCRIPTION   "Version 1.13.00 - Added generic textual conventions for gate state property (open/closed) and an option property that can be enabled/disabled"
+    
+    REVISION      "201805220026Z"
+    DESCRIPTION   "Version 1.12.00 - Removed dmr specific textual conventions textual convention"
+    
+    REVISION      "201711280000Z"
+    DESCRIPTION   "Version 1.11.00 - The textual convention for ChannelGroupStatus cleaned up"
+
+    REVISION      "201707280000Z"
+    DESCRIPTION   "Version 1.10.00 - The textual conventions for ChannelGroupStatus, Milliseconds, TimingControlType added
+                                   - The textual conventions for ChannelGroupStatus updated to include single-base-station status and description"
+
+    REVISION      "201603210000Z"
+    DESCRIPTION   "Version 1.09.00 - Added Condition, VoltageV, CurrentmA from TB9400 specific textual conventions"
+
+    REVISION      "201505151200Z"
+
+    DESCRIPTION   "Version 1.08.00 - Modified range of alarmState to include unavailable (0)"
+
+    REVISION      "201410301500Z"
+    DESCRIPTION   "Version 1.01.03 - Description text reviewed"
+
+    REVISION      "201401141100Z"
+    DESCRIPTION   "Version 1.01.02"
+    ::= { infra93-94MibModule 1}
+
+-- =====================
+--
+--  Textual Conventions
+--
+-- =====================
+
+BaseStationMode ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Base Station Run Mode"
+   SYNTAX      INTEGER {
+                        offline(0),
+                        online(1),
+                        unknown(2)
+                       }
+
+Condition ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Condition"
+   SYNTAX      INTEGER {
+                        bad(0),
+                        good(1),
+                        notFitted(2)
+                       }
+
+CurrentmA ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 1 mA. Displayed unit is A"
+    SYNTAX       Unsigned32 (0..65535)
+
+AlarmState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Base Station Alarm status"
+   SYNTAX      INTEGER {
+                        unavailable(0),
+                        cleared(1),
+                        raised(2),
+                        disabled(3)
+                       }
+
+FrequencyHz ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-6"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 1 Hz. Displayed unit is MHz"
+    SYNTAX       Unsigned32 (0..4294967295)
+
+PowerW ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 1 W"
+    SYNTAX       Unsigned32 (0..255)
+
+TransmitterStatus ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Base Station Transmitter status"
+   SYNTAX      INTEGER {
+                        unknown(0),
+                        unconfigured(1),
+                        untuned(2),
+                        idle(3),
+                        transmitting(4),
+                        calibrating(5),
+                        fault(6)
+                       }
+
+
+VoltageV ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-2"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 0.01 V. Displayed unit is V"
+    SYNTAX       Integer32 (-32768..32767)
+
+
+Milliseconds ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 1 ms"
+    SYNTAX       Unsigned32 (0..4294967295)
+
+
+ChannelGroupStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "It describes the role that base-station is playing in a channelgroup. The possible values are -
+                   no license(0): The base station does not have a feature license permitting it to be part of a channel group.
+                   offline(1): The base station is offline. It is not operational.
+                   Isolated(2): The base station is operating as best-efforts repeater. This type of voting should not occur in trunked networks.
+                   satellite(3): The base station has acknowledged another channel group member as the central voter. It plays a supporting role to the central voter.
+                   central voter(4): The base station is operating as the central voter for the channel group. All incoming voice streams are sent to it for voting. Only one channel group member can be the central voter at any one time.
+                   single base station(5): The base station is operating as a single basestation with channelgroup disabled.
+                   backup central(6): The base station is capable of operating as master but is currently a satellite to a better master"
+    SYNTAX      INTEGER {
+            noLicense(0),
+            offline(1),
+            isolated(2),
+            satellite(3),
+            centralVoter(4),
+            singleBaseStation(5),
+            backupCentral(6)
+            }
+
+
+TimingControlType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "TimingControlType"
+    SYNTAX      INTEGER {
+                        fixed(0),
+                        selfRegulating(1)
+                       }
+
+
+GateState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The state of a gate"
+    SYNTAX      INTEGER {
+                        closed(0),
+                        open(1)
+                        }
+
+OptionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The state of an option"
+    SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                        }
+
+END

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -33,7 +32,7 @@ class AdvaNetThresholdCrossingAlertTest extends SnmpTrapTestCase
 {
     public function testNetThresholdTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -52,7 +51,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "NETWORK PORT-1-1-1-2 unavailable seconds threshold exceeded for interval-15min";
+        $message = 'NETWORK PORT-1-1-1-2 unavailable seconds threshold exceeded for interval-15min';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetNetPortThresholdCrossingAlert unavailable seconds exceeded');
@@ -74,7 +73,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "NETWORK PORT-1-1-1-1 1519 to MTU byte octets received threshold exceeded for interval-15min";
+        $message = 'NETWORK PORT-1-1-1-1 1519 to MTU byte octets received threshold exceeded for interval-15min';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetNetPortThresholdCrossingAlert jumbo frame exceeded');
@@ -96,7 +95,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "NETWORK PORT-1-1-1-1 acl drop no match threshold exceeded for interval-1day";
+        $message = 'NETWORK PORT-1-1-1-1 acl drop no match threshold exceeded for interval-1day';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetNetPortThresholdCrossingAlert no acl match exceeded');
@@ -118,7 +117,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "NETWORK PORT-1-1-1-1 unknown threshold exceeded for interval-1day";
+        $message = 'NETWORK PORT-1-1-1-1 unknown threshold exceeded for interval-1day';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetNetPortThresholdCrossingAlert unknown exceeded');

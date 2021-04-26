@@ -10,13 +10,13 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 $graph_type = 'sensor_humidity';
-$unit       = '%';
-$class      = 'humidity';
+$unit = '%';
+$class = 'humidity';
 
 require 'includes/html/pages/health/sensors.inc.php';

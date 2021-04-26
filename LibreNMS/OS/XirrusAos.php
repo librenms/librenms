@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,7 +45,6 @@ class XirrusAos extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -55,9 +53,10 @@ class XirrusAos extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
-        return array(
+
+        return [
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
-        );
+        ];
     }
 
     /**
@@ -141,9 +140,9 @@ class XirrusAos extends OS implements
     private function discoverSensor($type, $oid, $oid_num_prefix)
     {
         $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
-        $nf = snmp_cache_oid($oid, $this->getDevice(), array(), 'XIRRUS-MIB');
+        $nf = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'XIRRUS-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($nf as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 $type,
@@ -152,7 +151,7 @@ class XirrusAos extends OS implements
                 'xirrus',
                 $index,
                 $names[$index],
-                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) :$entry[$oid]
+                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }
 

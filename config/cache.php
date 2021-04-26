@@ -22,10 +22,11 @@ return [
     | not explicitly specified when executing a given caching function.
     |
     | Supported: "apc", "array", "database", "file",
-    |            "memcached", "redis", "dynamodb"    |
+    |            "memcached", "redis", "dynamodb"
+    |
     */
 
-    'default' => env('CACHE_DRIVER', 'array'),
+    'default' => env('CACHE_DRIVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,6 +47,7 @@ return [
 
         'array' => [
             'driver' => 'array',
+            'serialize' => false,
         ],
 
         'database' => [
@@ -105,6 +107,6 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
+    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache'),
 
 ];

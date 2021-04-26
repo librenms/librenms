@@ -4,9 +4,9 @@ type: environment
 icon: hwg
 over:
     - { graph: device_temperature, text: Temperature }
-mib_dir:
-    - hwg
+mib_dir: hwg
 nobulk: true
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.21796.4.9
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.21796.4.9

@@ -15,29 +15,27 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'rrdcached.inc.php';
 
 $colours = 'pinks';
 
-$rrd_list = array(
-    array(
+$rrd_list = [
+    [
         'ds' => 'journal_rotate',
         'filename' => $rrd_filename,
         'descr' => 'Journal Rotated',
-    ),
-    array(
+    ],
+    [
         'ds' => 'journal_bytes',
         'filename' => $rrd_filename,
         'descr' => 'Journal Bytes Written',
-    )
-);
+    ],
+];
 
 require 'includes/html/graphs/generic_multi.inc.php';

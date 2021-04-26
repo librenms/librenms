@@ -7,5 +7,6 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
 bad_uptime: true
 discovery:
-    - sysDescr_regex:
-        - '/^Meraki MR/'
+    -
+        sysDescr_regex:
+            - '/^Meraki MR/'

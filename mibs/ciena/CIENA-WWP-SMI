@@ -1,0 +1,76 @@
+WWP-SMI DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+			FROM SNMPv2-SMI;
+
+--
+-- Node definitions
+--
+	-- 1.3.6.1.4.1.6141
+	wwp MODULE-IDENTITY
+		LAST-UPDATED "201304230000Z"		-- April 23, 2013 at 00:00 GMT (201304230000Z)
+		ORGANIZATION
+			"Ciena, Inc."
+		CONTACT-INFO
+			"       Mib Meister
+			115 North Sullivan Road
+			Spokane Valley, WA 99037
+			   	USA		 		
+			   	Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+		DESCRIPTION
+			"Top-level WWP node definitions."
+		REVISION "201304230000Z"		-- April 23, 2013 at 00:00 GMT (201304230000Z)
+		DESCRIPTION
+			"Miscellaneous spelling and description corrections."
+		REVISION "201212260000Z"		-- December 26, 2012 at 00:00 GMT (201212260000Z)
+		DESCRIPTION
+			"Fixed the initial creation revision date.  
+			Changed from erroneous 201608161804Z to the actual date."
+		REVISION "200507280000Z"		-- July 28, 2005 at 00:00 GMT (200507280000Z)
+		DESCRIPTION
+			"Initial Creation.
+			MIB Version: 04-15-01-0017"
+	::= { enterprises 6141 }
+
+	-- 1.3.6.1.4.1.6141.1
+	wwpProducts OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"wwpProducts is the root OBJECT-IDENTIFIER for all
+			Ciena Packet Networking products. sysObjectID values are assigned the OID
+			representing the product specified in WWP-PRODUCTS-MIB.my."
+	::= { wwp 1 }
+
+
+	-- 1.3.6.1.4.1.6141.2
+	wwpModules OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"wwpModules provides a root object identifier that can be
+			used to assign MODULE-IDENTIFY values."
+	::= { wwp 2 }
+
+
+	-- 1.3.6.1.4.1.6141.2.60
+	wwpModulesLeos OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"wwpModulesLeos provides a root object identifier for leos that can be
+			used to assign MODULE-IDENTIFY values."
+	::= { wwpModules 60 }
+
+
+	-- 1.3.6.1.4.1.6141.2.61
+	wwpModulesLeosTce OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"wwpModulesLeosTce provides a root object identifier for leos TCE that can be
+			used to assign MODULE-IDENTIFY values."
+	::= { wwpModules 61 }
+
+
+END
+
+

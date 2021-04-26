@@ -2,8 +2,8 @@
 
 // FIXME - wtfbbq
 
-if (Auth::user()->hasGlobalRead() || $auth) {
-    $id    = mres($vars['id']);
+if ($auth || Auth::user()->hasGlobalRead()) {
+    $id = $vars['id'];
     $title = generate_device_link($device);
-    $auth  = true;
+    $auth = true;
 }

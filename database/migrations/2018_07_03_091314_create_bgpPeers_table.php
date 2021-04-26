@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateBgpPeersTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,12 +16,12 @@ class CreateBgpPeersTable extends Migration
             $table->increments('bgpPeer_id');
             $table->unsignedInteger('device_id');
             $table->string('astext');
-            $table->text('bgpPeerIdentifier', 65535);
+            $table->text('bgpPeerIdentifier');
             $table->bigInteger('bgpPeerRemoteAs');
-            $table->text('bgpPeerState', 65535);
-            $table->text('bgpPeerAdminStatus', 65535);
-            $table->text('bgpLocalAddr', 65535);
-            $table->text('bgpPeerRemoteAddr', 65535);
+            $table->text('bgpPeerState');
+            $table->text('bgpPeerAdminStatus');
+            $table->text('bgpLocalAddr');
+            $table->text('bgpPeerRemoteAddr');
             $table->string('bgpPeerDescr')->default('');
             $table->integer('bgpPeerInUpdates');
             $table->integer('bgpPeerOutUpdates');
@@ -31,7 +30,7 @@ class CreateBgpPeersTable extends Migration
             $table->integer('bgpPeerFsmEstablishedTime');
             $table->integer('bgpPeerInUpdateElapsedTime');
             $table->string('context_name', 128)->nullable();
-            $table->index(['device_id','context_name'], 'device_id');
+            $table->index(['device_id', 'context_name']);
         });
     }
 

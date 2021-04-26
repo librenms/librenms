@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,7 +38,7 @@ class AvailabilityMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
-            'type' => (int)Config::get('webui.availability_map_compact', 0),
+            'type' => (int) Config::get('webui.availability_map_compact', 0),
             'tile_size' => 12,
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
@@ -60,10 +59,10 @@ class AvailabilityMapController extends WidgetController
 
         $mode = $data['mode_select'];
         if ($mode == 0 || $mode == 2) {
-            list($devices, $device_totals) = $this->getDevices($request);
+            [$devices, $device_totals] = $this->getDevices($request);
         }
         if ($mode > 0) {
-            list($services, $services_totals) = $this->getServices($request);
+            [$services, $services_totals] = $this->getServices($request);
         }
 
         $data['device'] = Device::first();
@@ -75,8 +74,6 @@ class AvailabilityMapController extends WidgetController
 
         return view('widgets.availability-map', $data);
     }
-
-
 
     public function getSettingsView(Request $request)
     {
@@ -98,24 +95,24 @@ class AvailabilityMapController extends WidgetController
             $device_query = Device::hasAccess($request->user());
         }
 
-        if (!$settings['show_disabled_and_ignored']) {
-            $device_query->isActive();
+        if (! $settings['show_disabled_and_ignored']) {
+            $device_query->isNotDisabled();
         }
         $device_query->orderBy($settings['order_by']);
-        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'ignore')->get();
+        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id')->get();
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'ignored' => 0, 'disabled' => 0];
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
         foreach ($devices as $device) {
             if ($device->disabled) {
                 $totals['disabled']++;
-                $device->stateName = "disabled";
-                $device->labelClass = "blackbg";
-            } elseif ($device->ignore) {
+                $device->stateName = 'disabled';
+                $device->labelClass = 'blackbg';
+            } elseif ($device->disable_notify) {
                 $totals['ignored']++;
-                $device->stateName = "ignored";
-                $device->labelClass = "label-default";
+                $device->stateName = 'alert-dis';
+                $device->labelClass = 'label-default';
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
                     $totals['warn']++;
@@ -131,7 +128,13 @@ class AvailabilityMapController extends WidgetController
                 $device->stateName = 'down';
                 $device->labelClass = 'label-danger';
             }
+
+            if ($device->isUnderMaintenance()) {
+                $device->labelClass = 'label-default';
+                $totals['maintenance']++;
+            }
         }
+
         return [$devices, $totals];
     }
 
@@ -159,19 +162,20 @@ class AvailabilityMapController extends WidgetController
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0];
         foreach ($services as $service) {
             if ($service->service_status == 0) {
-                $service->labelClass = "label-success";
-                $service->stateName = "up";
+                $service->labelClass = 'label-success';
+                $service->stateName = 'up';
                 $totals['up']++;
             } elseif ($service->service_status == 1) {
-                $service->labelClass = "label-warning";
-                $service->stateName = "warn";
+                $service->labelClass = 'label-warning';
+                $service->stateName = 'warn';
                 $totals['warn']++;
             } else {
-                $service->labelClass = "label-danger";
-                $service->stateName = "down";
+                $service->labelClass = 'label-danger';
+                $service->stateName = 'down';
                 $totals['down']++;
             }
         }
+
         return [$services, $totals];
     }
 }

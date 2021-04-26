@@ -2,18 +2,16 @@
 
 namespace LibreNMS\Authentication;
 
-use App\Models\Notification;
-use App\Models\NotificationAttrib;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\AuthenticationException;
-use Phpass\PasswordHash;
 
 class MysqlAuthorizer extends AuthorizerBase
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 1;
-    protected static $CAN_UPDATE_USER = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 1;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = true;
 
     public function authenticate($credentials)
     {
@@ -28,29 +26,11 @@ class MysqlAuthorizer extends AuthorizerBase
             throw new AuthenticationException($message = 'login denied');
         }
 
-        // check for old passwords
-        if (strlen($hash) == 32) {
-            // md5
-            if (md5($password) === $hash) {
+        if (Hash::check($password, $hash)) {
+            if (Hash::needsRehash($hash)) {
                 $this->changePassword($username, $password);
-                return true;
             }
-        } elseif (starts_with($hash, '$1$')) {
-            // old md5 crypt
-            if (crypt($password, $hash) == $hash) {
-                $this->changePassword($username, $password);
-                return true;
-            }
-        } elseif (starts_with($hash, '$P$')) {
-            // Phpass
-            $hasher = new PasswordHash();
-            if ($hasher->CheckPassword($password, $hash)) {
-                $this->changePassword($username, $password);
-                return true;
-            }
-        }
 
-        if (password_verify($password, $hash)) {
             return true;
         }
 
@@ -64,10 +44,10 @@ class MysqlAuthorizer extends AuthorizerBase
          * user is explicitly prohibited to do so.
          */
 
-        if (!static::$CAN_UPDATE_PASSWORDS) {
-            return 0;
-        } elseif (empty($username) || !$this->userExists($username)) {
-            return 1;
+        if (! static::$CAN_UPDATE_PASSWORDS) {
+            return false;
+        } elseif (empty($username) || ! $this->userExists($username)) {
+            return true;
         } else {
             return User::thisAuth()->where('username', $username)->value('can_modify_passwd');
         }
@@ -76,8 +56,8 @@ class MysqlAuthorizer extends AuthorizerBase
     public function changePassword($username, $password)
     {
         // check if updating passwords is allowed (mostly for classes that extend this)
-        if (!static::$CAN_UPDATE_PASSWORDS) {
-            return 0;
+        if (! static::$CAN_UPDATE_PASSWORDS) {
+            return false;
         }
 
         /** @var User $user */
@@ -85,6 +65,7 @@ class MysqlAuthorizer extends AuthorizerBase
 
         if ($user) {
             $user->setPassword($password);
+
             return $user->save();
         }
 
@@ -97,16 +78,16 @@ class MysqlAuthorizer extends AuthorizerBase
 
         // no nulls
         $user_array = array_filter($user_array, function ($field) {
-            return !is_null($field);
+            return ! is_null($field);
         });
 
         $new_user = User::thisAuth()->firstOrNew(['username' => $username], $user_array);
 
         // only update new users
-        if (!$new_user->user_id) {
+        if (! $new_user->user_id) {
             $new_user->auth_type = LegacyAuth::getType();
             $new_user->setPassword($password);
-            $new_user->email = (string)$new_user->email;
+            $new_user->email = (string) $new_user->email;
 
             $new_user->save();
             $user_id = $new_user->user_id;
@@ -144,10 +125,11 @@ class MysqlAuthorizer extends AuthorizerBase
         // could be used on cli, use Eloquent helper
         Eloquent::DB()->table('bill_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('devices_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('devices_group_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('ports_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('users_prefs')->where('user_id', $user_id)->delete();
 
-        return User::destroy($user_id);
+        return (bool) User::destroy($user_id);
     }
 
     public function getUserlist()
@@ -161,7 +143,8 @@ class MysqlAuthorizer extends AuthorizerBase
         if ($user) {
             return $user->toArray();
         }
-        return null;
+
+        return false;
     }
 
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
@@ -169,10 +152,10 @@ class MysqlAuthorizer extends AuthorizerBase
         $user = User::find($user_id);
 
         $user->realname = $realname;
-        $user->level = (int)$level;
-        $user->can_modify_passwd = (int)$can_modify_passwd;
+        $user->level = (int) $level;
+        $user->can_modify_passwd = (int) $can_modify_passwd;
         $user->email = $email;
 
-        $user->save();
+        return $user->save();
     }
 }

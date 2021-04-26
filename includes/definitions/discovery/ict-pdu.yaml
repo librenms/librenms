@@ -1,0 +1,4 @@
+modules:
+    os:
+        hardware: ICT-DISTRIBUTION-PANEL-MIB::deviceModel.0
+        version: ICT-DISTRIBUTION-PANEL-MIB::deviceFirmware.0

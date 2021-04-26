@@ -6,7 +6,7 @@ path: blob/master/doc/
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 7.1.3**
+**Please note the minimum supported PHP version is @= php.version_min =@**
 
 
 ## Install Common Required Packages ##
@@ -16,7 +16,7 @@ yum install epel-release
 ```
 
 ```
-yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip
+yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip python3 python3-pip
 ```
 
 ### Install PHP
@@ -29,21 +29,16 @@ There are multiple ways to install php 7.x on CentOS 7, like Webtatic, Remi or S
 ```
 yum localinstall http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 ```
+Install the yum-config-manager to change to Remi PHP 7.3 Repo.
+```
+yum install yum-utils
+yum-config-manager --enable remi-php73
+```
+Install the required packages
 
 ```
-yum install php73-mod_php php73-php-cli php73-php-common php73-php-curl php73-php-gd php73-php-mbstring php73-php-process php73-php-snmp php73-php-xml php73-php-zip php73-php-memcached php73-php-mysqlnd
+yum install mod_php php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd
 ```
-
-#### Running with Webtatic PHP
-
-```
-rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-```
-
-```
-yum install php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip
-```
-
 
 #### Running with CentOS SCL php
 
@@ -98,14 +93,14 @@ exit
 ## Configure MySQL
 
 ```
-systemctl start mariadb
+systemctl enable --now mariadb
 mysql -u root
 ```
 
 > NOTE: Please change the 'password' below to something secure.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
@@ -124,7 +119,6 @@ lower_case_table_names=0
 ```
 
 ```
-systemctl enable mariadb
 systemctl restart mariadb
 ```
 
@@ -133,14 +127,14 @@ systemctl restart mariadb
 ## Configure PHP
 
 Ensure date.timezone is set in php.ini to your preferred time zone.
-See <http://php.net/manual/en/timezones.php> for a list of supported
+See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 
 When PHP is configured with open_basedir, be sure to allow the following paths for LibreNMS to work:
 
 ```
-php_admin_value[open_basedir] = /opt/librenms:/usr/lib64/nagios/plugins:/dev/urandom:/usr/sbin/fping:/usr/sbin/fping6:/usr/bin/snmpgetnext:/usr/bin/rrdtool:/usr/bin/snmpwalk:/usr/bin/snmpget:/usr/bin/snmpbulkwalk:/usr/bin/snmptranslate:/usr/bin/traceroute:/usr/bin/whois:/bin/ping:/usr/sbin/mtr:/usr/bin/nmap:/usr/sbin/ipmitool:/usr/bin/virsh:/usr/bin/nfdump"
+php_admin_value[open_basedir] = "/opt/librenms:/usr/lib64/nagios/plugins:/dev/urandom:/usr/sbin/fping:/usr/sbin/fping6:/usr/bin/snmpgetnext:/usr/bin/rrdtool:/usr/bin/snmpwalk:/usr/bin/snmpget:/usr/bin/snmpbulkwalk:/usr/bin/snmptranslate:/usr/bin/traceroute:/usr/bin/whois:/bin/ping:/usr/sbin/mtr:/usr/bin/nmap:/usr/sbin/ipmitool:/usr/bin/virsh:/usr/bin/nfdump"
 ```
 
 ```
@@ -183,8 +177,7 @@ Add the following config, edit `ServerName` as required:
 > should be :)) then you will need to disable the default site. `rm -f /etc/httpd/conf.d/welcome.conf`
 
 ```
-systemctl enable httpd
-systemctl restart httpd
+systemctl enable --now httpd
 ```
 
 # SELinux
@@ -293,7 +286,7 @@ cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 > settings in config.php is possible too. The config.php file will be
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
-> <https://docs.librenms.org/Support/Configuration/#proxy-support>
+> <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 # Copy logrotate config
 
@@ -352,20 +345,18 @@ site: <https://www.librenms.org/#support>
 Now that you've installed LibreNMS, we'd suggest that you have a read
 of a few other docs to get you going:
 
-- [Performance tuning](http://docs.librenms.org/Support/Performance)
-- [Alerting](http://docs.librenms.org/Extensions/Alerting/)
-- [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
-- [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
+- [Performance tuning](../Support/Performance.md)
+- [Alerting](../Extensions/Alerting.md)
+- [Device Groups](../Extensions/Device-Groups.md)
+- [Auto discovery](../Extensions/Auto-Discovery.md)
 
 # Closing
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you
 would consider opting into the stats system we have, please see [this
-page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on
+page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You
-can also [back LibreNMS on Open
-Collective](https://t.libren.ms/donations).
-
+help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-helpa). You
+can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

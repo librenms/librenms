@@ -15,19 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Alerting;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Schema;
-use Symfony\Component\Yaml\Yaml;
 
 class QueryBuilderFilter implements \JsonSerializable
 {
@@ -69,7 +68,7 @@ class QueryBuilderFilter implements \JsonSerializable
                 continue; // don't include the time based macros, they don't work like that
             }
 
-            if ((ends_with($key, '_usage_perc')) || (starts_with($key, 'packet_loss_'))) {
+            if ((Str::endsWith($key, '_usage_perc')) || (Str::startsWith($key, 'packet_loss_'))) {
                 $this->filter[$field] = [
                     'id' => $field,
                     'type' => 'integer',
@@ -91,11 +90,11 @@ class QueryBuilderFilter implements \JsonSerializable
         $db_schema = $this->schema->getSchema();
         $valid_tables = array_diff(array_keys($this->schema->getAllRelationshipPaths()), self::$table_blacklist);
 
-        foreach ((array)$db_schema as $table => $data) {
+        foreach ((array) $db_schema as $table => $data) {
             $columns = array_column($data['Columns'], 'Type', 'Field');
 
             // only allow tables with a direct association to device_id
-            if (!in_array($table, $valid_tables)) {
+            if (! in_array($table, $valid_tables)) {
                 continue;
             }
 
@@ -114,7 +113,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
                 $field = "$table.$column";
 
-                if (ends_with($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
+                if (Str::endsWith($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
                     $this->filter[$field] = [
                         'id' => $field,
                         'type' => 'string',
@@ -142,17 +141,16 @@ class QueryBuilderFilter implements \JsonSerializable
         }
     }
 
-
     private function getColumnType($type)
     {
-        if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
+        if (Str::startsWith($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
-        } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
+        } elseif (Str::startsWith($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
             //TODO implement field selection and change back to integer
             return 'string';
-        } elseif (starts_with($type, ['timestamp', 'datetime'])) {
+        } elseif (Str::startsWith($type, ['timestamp', 'datetime'])) {
             return 'datetime';
-        } elseif (starts_with($type, 'enum')) {
+        } elseif (Str::startsWith($type, 'enum')) {
             return 'enum';
         }
 
@@ -162,14 +160,17 @@ class QueryBuilderFilter implements \JsonSerializable
 
     /**
      * Specify data which should be serialized to JSON
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
     public function jsonSerialize()
     {
-        return array_values($this->filter);
+        $filter = $this->filter;
+        asort($filter);
+
+        return array_values($filter);
     }
 
     /**

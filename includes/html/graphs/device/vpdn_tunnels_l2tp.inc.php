@@ -2,20 +2,20 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'vpdn-l2tp');
+$rrd_filename = Rrd::name($device['hostname'], 'vpdn-l2tp');
 
-$stats = array('tunnels');
+$stats = ['tunnels'];
 
 $i = 0;
 foreach ($stats as $stat) {
     $i++;
     $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['ds']       = $stat;
+    $rrd_list[$i]['ds'] = $stat;
 }
 
 $colours = 'mixed';
 
-$nototal    = 1;
+$nototal = 1;
 $simple_rrd = 1;
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

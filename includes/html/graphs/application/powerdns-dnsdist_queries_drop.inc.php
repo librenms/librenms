@@ -8,36 +8,36 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
 require 'includes/html/graphs/common.inc.php';
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Queries drop';
-$unitlen       = 16;
-$bigdescrlen   = 25;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Queries drop';
+$unitlen = 16;
+$bigdescrlen = 25;
 $smalldescrlen = 25;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array = array(
-    'queries_drop_no_policy' => array('descr' => 'No server', 'colour' => 'aa0635',),
-    'queries_drop_nc' => array('descr' => 'Non-compliant', 'colour' => 'cc6985',),
-    'queries_drop_nc_answer' => array('descr' => 'Non-compliant answer', 'colour' => '2d2d2d',),
-    'queries_acl_drop' => array('descr' => 'ACL', 'colour' => '008442',),
-    'queries_failure' => array('descr' => 'Failure', 'colour' => 'e55b38',),
-    'queries_serv_fail' => array('descr' => 'Servfail', 'colour' => '9a3e3e',),
-);
+$array = [
+    'queries_drop_no_policy' => ['descr' => 'No server', 'colour' => 'aa0635'],
+    'queries_drop_nc' => ['descr' => 'Non-compliant', 'colour' => 'cc6985'],
+    'queries_drop_nc_answer' => ['descr' => 'Non-compliant answer', 'colour' => '2d2d2d'],
+    'queries_acl_drop' => ['descr' => 'ACL', 'colour' => '008442'],
+    'queries_failure' => ['descr' => 'Failure', 'colour' => 'e55b38'],
+    'queries_serv_fail' => ['descr' => 'Servfail', 'colour' => '9a3e3e'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

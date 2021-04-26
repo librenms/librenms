@@ -1,0 +1,131 @@
+mib: CELLULAR:DEVICE:PEPVPN-SPEEDFUSION:WAN:WLC
+modules:
+    os:
+        hardware: DEVICE::deviceModel.0
+        serial: DEVICE::deviceSerialNumber.0
+        version: DEVICE::deviceFirmwareVersion.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - devicePowerSourceName
+                        - wanName
+                        - pepVpnStatusProfileName
+        temperature:
+            data:
+                -
+                    oid: deviceTemperatureCelsius
+                    num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.4.1.{{ $index }}"
+                    descr: System Temperature
+                    index: "deviceTemperatureCelsius.{{ $index }}"
+                    divisor: 1000
+        count:
+            data:
+                -
+                    oid: wlcMaxNumAp
+                    num_oid: ".1.3.6.1.4.1.27662.4.1.1.3.{{ $index }}"
+                    descr: Max. Number of Supported AP Licensed
+                    group: WLC
+                    index: "wlcMaxNumAp.{{ $index }}"
+                -
+                    oid: wlcNumApProfile
+                    num_oid: ".1.3.6.1.4.1.27662.4.1.1.4.{{ $index }}"
+                    descr: Number of AP Profile Created
+                    group: WLC
+                    index: "wlcNumApProfile.{{ $index }}"
+                -
+                    oid: wlcNumWlanNetwork
+                    num_oid: ".1.3.6.1.4.1.27662.4.1.1.5.{{ $index }}"
+                    descr: Number of WLAN Network Created
+                    group: WLC
+                    index: "wlcNumWlanNetwork.{{ $index }}"
+                -
+                    oid: wlcNumApReg
+                    num_oid: ".1.3.6.1.4.1.27662.4.1.1.6.{{ $index }}"
+                    descr: Number of AP Registered
+                    group: WLC
+                    index: "wlcNumApReg.{{ $index }}"
+                -
+                    oid: wlcNumAssocSta
+                    num_oid: ".1.3.6.1.4.1.27662.4.1.1.8.{{ $index }}"
+                    descr: Number of Associated WLAN Station
+                    group: WLC
+                    index: "wlcNumAssocSta.{{ $index }}"
+        power:
+            data:
+                -
+                    oid: deviceCurrentPower
+                    num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.1.1.3.{{ $index }}"
+                    descr: Power Consumption
+                    index: "deviceCurrentPower.{{ $index }}"
+        signal:
+            options:
+                skip_values: -9999
+            data:
+                -
+                    oid: wanSignal
+                    num_oid: ".1.3.6.1.4.1.27662.2.1.2.1.5.{{ $index }}"
+                    descr: "{{ $wanName }} Signal"
+                    index: "wanSignal.{{ $index }}"
+
+        state:
+            data:
+                -
+                    oid: devicePSUStatus
+                    num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.1.1.2.{{ $index }}"
+                    descr: PSU Status
+                    group: Power Consumption
+                    state_name: devicePSUStatus
+                    states:
+                        - { descr: error, graph: 1, value: 0, generic: 2 }
+                        - { descr: on, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: deviceFANStatus
+                    num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.4.1.{{ $index }}"
+                    descr: FAN Status
+                    group: Fan
+                    state_name: deviceFANStatus
+                    states:
+                        - { descr: error, graph: 1, value: 0, generic: 2 }
+                        - { descr: on, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: devicePowerSourceStatus
+                    num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.3.1.3.{{ $index }}"
+                    descr: "{{ $devicePowerSourceName }}"
+                    group: "Power Source"
+                    index: "devicePowerSourceStatus.{{ $index }}"
+                    state_name: devicePowerSourceStatus
+                    states:
+                        - { descr: noCableDetected, graph: 1, value: 0, generic: 3 }
+                        - { descr: connected, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: pepVpnStatusConnectionState
+                    num_oid: ".1.3.6.1.4.1.23695.200.1.10.1.1.2.1.3.{{ $index }}"
+                    descr: "{{ $pepVpnStatusProfileName }}"
+                    group: "VPN"
+                    index: "pepVpnStatusConnectionState.{{ $index }}"
+                    state_name: pepVpnStatusConnectionState
+                    states:
+                        - { descr: start, graph: 1, value: 0, generic: 3 }
+                        - { descr: authen, graph: 1, value: 1, generic: 3 }
+                        - { descr: tunnel, graph: 1, value: 2, generic: 3 }
+                        - { descr: route, graph: 1, value: 3, generic: 3 }
+                        - { descr: connected, graph: 1, value: 4, generic: 0 }
+                -
+                    oid: wanState
+                    num_oid: ".1.3.6.1.4.1.27662.2.1.2.1.3.{{ $index }}"
+                    descr: "{{ $wanName }}"
+                    group: "WAN"
+                    index: "wanState.{{ $index }}"
+                    state_name: wanState
+                    states:
+                        - { descr: unknown, graph: 1, value: 0, generic: 3 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: disconnected, graph: 1, value: 2, generic: 2 }
+                        - { descr: connected, graph: 1, value: 3, generic: 0 }
+                        - { descr: connecting, graph: 1, value: 4, generic: 1 }
+                        - { descr: activating, graph: 1, value: 5, generic: 1 }
+                        - { descr: helt-check-fail, graph: 1, value: 6, generic: 2 }
+                        - { descr: disconnected-manually, graph: 1, value: 7, generic: 3 }
+                        - { descr: standby, graph: 1, value: 4, generic: 3 }

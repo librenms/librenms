@@ -1,7 +1,7 @@
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: HUAWEI Private Extended Interface MIB
 -- Reference:
--- Version: V2.18
+-- Version: V2.21
 -- History:
 -- Version: V2.0
 -- History:
@@ -29,14 +29,18 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
         FROM IF-MIB
 
     lldpPortConfigPortNum,lldpLocSysCapSupported,lldpLocSysCapEnabled,
-    LldpPortNumber,LldpPortId,lldpRemEntry
+    LldpPortNumber,LldpPortId,lldpRemEntry,LldpManAddress,LldpManAddrIfSubtype,
+    lldpRemTimeMark,lldpRemLocalPortNum,lldpRemIndex,LldpChassisId,LldpSystemCapabilitiesMap
       	FROM LLDP-MIB  
-
+    
+    AddressFamilyNumbers
+        FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+        
     hwDatacomm
         FROM HUAWEI-MIB;
  
     hwLldpMIB MODULE-IDENTITY
-        LAST-UPDATED "201708172019Z"
+        LAST-UPDATED "201808300000Z"
 
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
@@ -53,6 +57,15 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
            globally enabling or disabling the LLDP protocol, enabling the global
            alarm, clearing statistics on ports and configuring network management 
            IP addresses and some alarms."
+        REVISION "201808300000Z"
+        DESCRIPTION "add trap hwLldpInterfaceParaChange"
+
+        REVISION  "201804070000Z"
+        DESCRIPTION "add hwLldpRemManAddrTable"
+
+        REVISION  "201803270000Z"
+        DESCRIPTION "modify decription of hwLldpNotificationEnable"
+
         REVISION  "201708172019Z"
         DESCRIPTION "modify decription of hwLldpMdnRemTable"
 
@@ -75,7 +88,9 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION "add trap hwLldpRateExcessive"
         
         REVISION  "201503101558Z"
-        DESCRIPTION "modify hwLldpCounterReset"
+        DESCRIPTION "modify hwLldpCounterReset" 
+        
+
 
             ::= { hwDatacomm 134 }  
          
@@ -115,7 +130,6 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
   hwLldpInterfaceRemData  OBJECT IDENTIFIER ::= { hwLldpObjects 3} 
   hwLldpTrapObjects OBJECT IDENTIFIER ::= { hwLldpObjects 51 }
   hwLldpDdpFilterType OBJECT IDENTIFIER ::= { hwLldpObjects 53 }
-
 
   hwLldpDdpFilterTypeTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF HwLldpDdpFilterTypeEntry
@@ -199,8 +213,7 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION
 			"The global alarming that is used to control alarms on all ports.
              If it is 1, the global alarming is enabled. If it is 2, the global
-             alarming is disabled.
-			By default, the global alarming is enabled."     
+             alarming is disabled."     
 		::= { hwLldpConfiguration 4 } 
 
    hwLldpPortConfigTable  OBJECT-TYPE
@@ -344,7 +357,107 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
    		DESCRIPTION 
    				"The MacAddress of LLDP MacAddress discovery neighbor."     
    		::= {hwLldpMdnRemEntry 8}  
-
+    --hwLldpRemManAddrTable : Management addresses of the remote system
+    --
+    hwLldpRemManAddrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwLldpRemManAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains one or more rows per management address
+        information on the remote system learned on a particular port
+        contained in the local chassis known to this agent."
+    ::= { hwLldpRemoteSystemData 4 } 
+    
+    hwLldpRemManAddrEntry OBJECT-TYPE
+    SYNTAX HwLldpRemManAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Management address information about a particular chassis
+        component. There may be multiple management addresses
+        configured on the remote system identified by a particular
+        lldpRemIndex whose information is received on
+        lldpRemLocalPortNum of the local system. Each management
+        address should have distinct 'management address
+        type' (hwLldpRemManAddrSubtype) and 'management address'
+        (hwLldpRemManAddr.)
+        Entries may be created and deleted in this table by the
+        agent."
+    INDEX { lldpRemTimeMark,
+    lldpRemLocalPortNum,
+    lldpRemIndex,
+    hwLldpRemManAddrSubtype,
+    hwLldpRemManAddr
+    }
+    ::= { hwLldpRemManAddrTable 1 }   
+    
+    HwLldpRemManAddrEntry ::= SEQUENCE {
+    hwLldpRemManAddrSubtype AddressFamilyNumbers,
+    hwLldpRemManAddr LldpManAddress,
+    hwLldpRemManAddrIfSubtype LldpManAddrIfSubtype,
+    hwLldpRemManAddrIfId Integer32,
+    hwLldpRemManAddrOID OBJECT IDENTIFIER
+    }                       
+    
+    hwLldpRemManAddrSubtype OBJECT-TYPE
+    SYNTAX AddressFamilyNumbers
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of management address identifier encoding used in
+        the associated 'lldpRemManagmentAddr' object."
+    REFERENCE
+        "IEEE Std 802.1AB-2005 9.5.9.3"
+    ::= { hwLldpRemManAddrEntry 1 }    
+    
+    hwLldpRemManAddr OBJECT-TYPE
+    SYNTAX LldpManAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The string value used to identify the management address
+        component associated with the remote system. The purpose
+        of this address is to contact the management entity."
+    REFERENCE
+        "IEEE Std 802.1AB-2005 9.5.9.4"
+    ::= { hwLldpRemManAddrEntry 2 }     
+    
+    hwLldpRemManAddrIfSubtype OBJECT-TYPE
+    SYNTAX LldpManAddrIfSubtype
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The enumeration value that identifies the interface numbering
+        method used for defining the interface number, associated
+        with the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-2005 9.5.9.5"
+    ::= { hwLldpRemManAddrEntry 3 }    
+    
+    hwLldpRemManAddrIfId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The integer value used to identify the interface number
+        regarding the management address component associated with
+        the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-2005 9.5.9.6"
+    ::= { hwLldpRemManAddrEntry 4 }   
+    
+    hwLldpRemManAddrOID OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OID value used to identify the type of hardware component
+        or protocol entity associated with the management address
+        advertised by the remote system agent."
+    REFERENCE
+        "IEEE Std 802.1AB-2005 9.5.9.8"
+    ::= { hwLldpRemManAddrEntry 5 }     
    hwLldpRemNetworkIdTable  OBJECT-TYPE
         SYNTAX SEQUENCE OF HwLldpRemNetworkIdEntry
         MAX-ACCESS not-accessible
@@ -503,7 +616,95 @@ hwLldpDdpTrapNbrIfindex OBJECT-TYPE
 			DESCRIPTION
 				"Lldp trap message interface name."
 			::= { hwLldpTrapObjects 1 } 		   		    		  		  		   		   		
-   
+                                
+    --- define paramet trap   
+    hwLldpTrapParaObjects OBJECT IDENTIFIER ::= { hwLldpObjects 54 }	 
+    hwLldpParaTrapLocPortId OBJECT-TYPE
+			SYNTAX LldpPortId
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Lldp trap interface name."
+		::= { hwLldpTrapParaObjects 1 }	
+    hwLldpParaTrapPeerPortId OBJECT-TYPE
+		SYNTAX LldpPortId
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 2 }	
+    hwLldpParaTrapLocStatus OBJECT-TYPE
+		SYNTAX EnabledStatus
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 3 }	
+    hwLldpParaTrapLocChassisId OBJECT-TYPE
+		SYNTAX LldpChassisId
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 4 }	
+    hwLldpParaTrapLocTTL OBJECT-TYPE
+    		SYNTAX Integer32
+		MAX-ACCESS accessible-for-notify
+		STATUS current		
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 5 }	
+    hwLldpParaTrapLocMngIp OBJECT-TYPE
+		SYNTAX LldpManAddress
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 6 }	
+    hwLldpParaTrapPeerChassisId OBJECT-TYPE
+		SYNTAX LldpChassisId
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 7 }	
+    hwLldpParaTrapPeerPortDesc OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 8 }	
+    hwLldpParaTrapPeerSysName OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 9 }	
+    hwLldpParaTrapPeerSysDesc OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 10 }	
+    hwLldpParaTrapPeerSysCap OBJECT-TYPE
+		SYNTAX LldpSystemCapabilitiesMap
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 11 }	
+    hwLldpParaTrapPeerMngIp OBJECT-TYPE
+		SYNTAX LldpManAddress
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { hwLldpTrapParaObjects 12 }
+		                         
+                                
   	hwLldpEnabled  NOTIFICATION-TYPE
   	STATUS current	
 	DESCRIPTION 
@@ -570,6 +771,17 @@ hwLldpDdpTrapNbrIfindex OBJECT-TYPE
 		DESCRIPTION 
 			"Description."
 		::= { hwLldpTraps 9 }	
+            
+                   
+  hwLldpInterfaceParaChange  NOTIFICATION-TYPE
+	OBJECTS {
+	hwLldpParaTrapLocPortId, hwLldpParaTrapPeerPortId, hwLldpParaTrapLocStatus, hwLldpParaTrapLocChassisId, hwLldpParaTrapLocTTL,
+	hwLldpParaTrapLocMngIp, hwLldpParaTrapPeerChassisId, hwLldpParaTrapPeerPortDesc, hwLldpParaTrapPeerSysName, hwLldpParaTrapPeerSysDesc,
+    hwLldpParaTrapPeerSysCap, hwLldpParaTrapPeerMngIp }
+	STATUS current	
+	DESCRIPTION 
+      	"Notify the NMS that the LLDP parament of the interface was changed."
+	::= { hwLldpTraps 10}
 		
   --
 	-- ***********************************************************
@@ -644,7 +856,8 @@ hwLldpDdpTrapNbrIfindex OBJECT-TYPE
 	hwLldpLocManIPAddrChange,
 	hwLldpMdnRemTablesChange,
 	hwLldpRateExcessive,
-	hwLldpInterfaceRemTablesChange
+	hwLldpInterfaceRemTablesChange,
+	hwLldpInterfaceParaChange
 	}
 	STATUS current
 	DESCRIPTION

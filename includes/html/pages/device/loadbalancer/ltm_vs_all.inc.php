@@ -30,7 +30,7 @@
         if ($array['type'] != 'f5-ltm-vs') {
             continue;
         }
-        $string = $array['IP'].":".$array['port'];
+        $string = $array['IP'] . ':' . $array['port'];
         if ($array['status'] != 0) {
             $message = $array['error'];
             $status = 2;
@@ -48,8 +48,7 @@
             if ($v['label'] == $array['pool']) {
                 $id = $k;
             }
-        }
-        ?>
+        } ?>
         <tr>
             <td><?php echo $vs_id; ?></td>
             <td><?php echo $id; ?></td>
@@ -71,13 +70,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_ltm_allvs_conns';
+        $graph_array['type'] = 'device_bigip_ltm_allvs_conns';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -89,13 +88,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_ltm_allvs_bytesin';
+        $graph_array['type'] = 'device_bigip_ltm_allvs_bytesin';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -107,13 +106,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_ltm_allvs_bytesout';
+        $graph_array['type'] = 'device_bigip_ltm_allvs_bytesout';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -125,13 +124,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_ltm_allvs_pktsin';
+        $graph_array['type'] = 'device_bigip_ltm_allvs_pktsin';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -143,13 +142,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_ltm_allvs_pktsout';
+        $graph_array['type'] = 'device_bigip_ltm_allvs_pktsout';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -161,7 +160,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo generate_url($vars, array('type' => 'ltm_vs', 'subtype' => 'ltm_vs_det')); ?>vsid='+row['vsid']+'/poolid='+row['poolid'];
+            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_vs', 'subtype' => 'ltm_vs_det']); ?>vsid='+row['vsid']+'/poolid='+row['poolid'];
             window.location.href = link;
         });
     </script>

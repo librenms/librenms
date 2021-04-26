@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,16 +29,16 @@ use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
 use App\Models\Storage;
-use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use LibreNMS\Util\Colors;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Validate;
 
 class TopDevicesController extends WidgetController
 {
@@ -47,7 +46,7 @@ class TopDevicesController extends WidgetController
     protected $defaults = [
         'title' => null,
         'top_query' => 'traffic',
-        'sort_order' => 'asc',
+        'sort_order' => 'desc',
         'device_count' => 5,
         'time_interval' => 15,
         'device_group' => null,
@@ -56,6 +55,7 @@ class TopDevicesController extends WidgetController
     public function title()
     {
         $settings = $this->getSettings();
+
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 
@@ -67,6 +67,9 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
         $sort = $settings['sort_order'];
+
+        // We use raw() function below, validate input and default to sane value.
+        $sort = Validate::ascDesc($sort, 'ASC');
 
         switch ($settings['top_query']) {
             case 'traffic':
@@ -110,7 +113,7 @@ class TopDevicesController extends WidgetController
     private function formatData($headers, $rows)
     {
         return [
-            'headers' => (array)$headers,
+            'headers' => (array) $headers,
             'rows' => $rows,
         ];
     }
@@ -120,32 +123,32 @@ class TopDevicesController extends WidgetController
      * @param string $left_table
      * @return Builder
      */
-    private function withDeviceQuery($query, $left_table)
+    private function withDeviceQuery(Builder $query, $left_table)
     {
         $settings = $this->getSettings();
 
         /** @var Builder $query */
         return $query->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status');
+            $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
             ->select("$left_table.device_id")
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
             ->groupBy("$left_table.device_id")
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
             ->when($settings['device_group'], function ($query) use ($settings) {
-                $query->inDeviceGroup($settings['device_group']);
+                /** @var Builder<\App\Models\DeviceRelatedModel> $query */
+                return $query->inDeviceGroup($settings['device_group']);
             });
     }
 
     /**
-     * @param Builder $query
      * @return Builder
      */
     private function deviceQuery()
     {
         $settings = $this->getSettings();
 
-        return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'status')
+        return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'status', 'os')
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
             ->when($settings['device_group'], function ($query) use ($settings) {
                 $query->inDeviceGroup($settings['device_group']);
@@ -179,9 +182,8 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
         $query = Port::hasAccess(Auth::user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status');
+            $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
             ->select('device_id')
             ->groupBy('device_id')
@@ -209,6 +211,7 @@ class TopDevicesController extends WidgetController
         $query = $this->deviceQuery()->orderBy('uptime', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
+            /** @var Device $device */
             return $this->standardRow($device, 'device_uptime', ['tab' => 'graphs', 'group' => 'system']);
         });
 
@@ -223,6 +226,7 @@ class TopDevicesController extends WidgetController
         $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
+            /** @var Device $device */
             return $this->standardRow($device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
@@ -233,7 +237,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
+        /** @var Processor $query */
         $query = $this->withDeviceQuery(Processor::hasAccess(Auth::user()), (new Processor)->getTable())
             ->orderByRaw('AVG(`processor_usage`) ' . $sort)
             ->limit($settings['device_count']);
@@ -249,7 +253,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
+        /** @var Mempool $query */
         $query = $this->withDeviceQuery(Mempool::hasAccess(Auth::user()), (new Mempool)->getTable())
             ->orderBy('mempool_perc', $sort)
             ->limit($settings['device_count']);
@@ -265,10 +269,10 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
         $query = $this->deviceQuery()->orderBy('last_polled_timetaken', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
+            /** @var Device $device */
             return $this->standardRow($device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
@@ -279,9 +283,8 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
         $query = Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status');
+            $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
             ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
             ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
@@ -311,17 +314,14 @@ class TopDevicesController extends WidgetController
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
             $link = Url::generate($link_array);
 
-            $percent = $storage->storage_perc;
-            $background = Colors::percentage($percent, $storage->storage_perc_warn);
-
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
                 StringHelpers::shortenText($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
-                    Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']),
+                    Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),
                     $overlib_content
-                )
+                ),
             ];
         });
 

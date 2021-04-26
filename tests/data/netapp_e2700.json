@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.789.1123.2",
                     "sysDescr": "NETAPP   INF-01-00        0852",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "netapp",
-                    "type": "storage",
-                    "serial": null,
-                    "icon": "netapp.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.789.1123.2",
-                    "sysDescr": "NETAPP   INF-01-00        0852",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

@@ -6,12 +6,12 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    LibreNMS
- * @subpackage billing
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-$init_modules = array();
+use LibreNMS\Util\Number;
+
+$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('r');
@@ -22,7 +22,7 @@ if (isset($options['r'])) {
 }
 
 foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
-    echo str_pad($bill['bill_id'].' '.$bill['bill_name'], 30)." \n";
+    echo str_pad($bill['bill_id'] . ' ' . $bill['bill_name'], 30) . " \n";
 
     $i = 0;
     while ($i <= 24) {
@@ -31,9 +31,9 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
         $day_data = getDates($bill['bill_day'], $i);
 
         $datefrom = $day_data['0'];
-        $dateto   = $day_data['1'];
+        $dateto = $day_data['1'];
 
-        $check = dbFetchRow('SELECT * FROM `bill_history` WHERE bill_id = ? AND bill_datefrom = ? AND bill_dateto = ? LIMIT 1', array($bill['bill_id'], $datefrom, $dateto));
+        $check = dbFetchRow('SELECT * FROM `bill_history` WHERE bill_id = ? AND bill_datefrom = ? AND bill_dateto = ? LIMIT 1', [$bill['bill_id'], $datefrom, $dateto]);
 
         $period = getPeriod($bill['bill_id'], $datefrom, $dateto);
 
@@ -43,36 +43,36 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
         $dir_95th = $bill['dir_95th'];
 
         if ($period > 0 && $dateto > $date_updated) {
-            $rate_data    = getRates($bill['bill_id'], $datefrom, $dateto, $dir_95th);
-            $rate_95th    = $rate_data['rate_95th'];
-            $dir_95th     = $rate_data['dir_95th'];
-            $total_data   = $rate_data['total_data'];
+            $rate_data = getRates($bill['bill_id'], $datefrom, $dateto, $dir_95th);
+            $rate_95th = $rate_data['rate_95th'];
+            $dir_95th = $rate_data['dir_95th'];
+            $total_data = $rate_data['total_data'];
             $rate_average = $rate_data['rate_average'];
 
             if ($bill['bill_type'] == 'cdr') {
-                $type         = 'CDR';
-                $allowed      = $bill['bill_cdr'];
-                $used         = $rate_data['rate_95th'];
-                $allowed_text = format_si($allowed).'bps';
-                $used_text    = format_si($used).'bps';
-                $overuse      = ($used - $allowed);
-                $overuse      = (($overuse <= 0) ? '0' : $overuse);
-                $percent      = round((($rate_data['rate_95th'] / $bill['bill_cdr']) * 100), 2);
+                $type = 'CDR';
+                $allowed = $bill['bill_cdr'];
+                $used = $rate_data['rate_95th'];
+                $allowed_text = Number::formatSi($allowed, 2, 3, 'bps');
+                $used_text = Number::formatSi($used, 2, 3, 'bps');
+                $overuse = ($used - $allowed);
+                $overuse = (($overuse <= 0) ? '0' : $overuse);
+                $percent = round((($rate_data['rate_95th'] / $bill['bill_cdr']) * 100), 2);
             } elseif ($bill['bill_type'] == 'quota') {
-                $type         = 'Quota';
-                $allowed      = $bill['bill_quota'];
-                $used         = $rate_data['total_data'];
+                $type = 'Quota';
+                $allowed = $bill['bill_quota'];
+                $used = $rate_data['total_data'];
                 $allowed_text = format_bytes_billing($allowed);
-                $used_text    = format_bytes_billing($used);
-                $overuse      = ($used - $allowed);
-                $overuse      = (($overuse <= 0) ? '0' : $overuse);
-                $percent      = round((($rate_data['total_data'] / $bill['bill_quota']) * 100), 2);
+                $used_text = format_bytes_billing($used);
+                $overuse = ($used - $allowed);
+                $overuse = (($overuse <= 0) ? '0' : $overuse);
+                $percent = round((($rate_data['total_data'] / $bill['bill_quota']) * 100), 2);
             }
 
-            echo strftime('%x @ %X', strtotime($datefrom)).' to '.strftime('%x @ %X', strtotime($dateto)).' '.str_pad($type, 8).' '.str_pad($allowed_text, 10).' '.str_pad($used_text, 10).' '.$percent.'%';
+            echo strftime('%x @ %X', strtotime($datefrom)) . ' to ' . strftime('%x @ %X', strtotime($dateto)) . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';
 
             if ($i == '0') {
-                $update = array(
+                $update = [
                     'rate_95th'        => $rate_data['rate_95th'],
                     'rate_95th_in'     => $rate_data['rate_95th_in'],
                     'rate_95th_out'    => $rate_data['rate_95th_out'],
@@ -83,15 +83,15 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                     'rate_average'     => $rate_data['rate_average'],
                     'rate_average_in'  => $rate_data['rate_average_in'],
                     'rate_average_out' => $rate_data['rate_average_out'],
-                    'bill_last_calc'   => array('NOW()'),
-                );
+                    'bill_last_calc'   => ['NOW()'],
+                ];
 
-                dbUpdate($update, 'bills', '`bill_id` = ?', array($bill['bill_id']));
+                dbUpdate($update, 'bills', '`bill_id` = ?', [$bill['bill_id']]);
                 echo ' Updated! ';
             }
 
             if ($check['bill_id'] == $bill['bill_id']) {
-                $update = array(
+                $update = [
                     'rate_95th'        => $rate_data['rate_95th'],
                     'rate_95th_in'     => $rate_data['rate_95th_in'],
                     'rate_95th_out'    => $rate_data['rate_95th_out'],
@@ -105,13 +105,13 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                     'bill_used'        => $used,
                     'bill_overuse'     => $overuse,
                     'bill_percent'     => $percent,
-                    'updated'          => array('NOW()'),
-                );
+                    'updated'          => ['NOW()'],
+                ];
 
-                dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', array($check['bill_hist_id']));
+                dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', [$check['bill_hist_id']]);
                 echo ' Updated history! ';
             } else {
-                $update = array(
+                $update = [
                     'rate_95th'        => $rate_data['rate_95th'],
                     'rate_95th_in'     => $rate_data['rate_95th_in'],
                     'rate_95th_out'    => $rate_data['rate_95th_out'],
@@ -130,7 +130,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                     'bill_overuse'     => $overuse,
                     'bill_percent'     => $percent,
                     'bill_id'          => $bill['bill_id'],
-                );
+                ];
                 dbInsert($update, 'bill_history');
                 echo ' Generated history! ';
             }//end if

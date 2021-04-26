@@ -1,0 +1,239 @@
+-- ==================================================================
+-- Copyright(c) 2008-2010 Shenzhen TP-LINK Technologies Co.Ltd.
+--
+-- Description: Lan Switch VLAN MIB
+-- Reference:
+-- Version: V0.1
+-- History: Create by weishuifeng, 2102.11.28
+-- ==================================================================
+
+TPLINK-DOT1Q-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ifIndex
+				FROM RFC1213-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+	TPRowStatus
+				FROM TPLINK-TC-MIB
+	DisplayString 
+				FROM SNMPv2-TC
+	tplinkMgmt
+				FROM TPLINK-MIB;
+
+
+tplinkDot1qVlanMIB MODULE-IDENTITY
+	LAST-UPDATED    "200812160000Z"
+	ORGANIZATION    "Shenzhen TP-LINK Technologies Co.Ltd."
+	CONTACT-INFO	"www.tplink.com.cn"
+	DESCRIPTION
+			"VLAN (Virtual Local Area Network) technology is developed for
+			the switch to divide the LAN into multiple logical LANs flexibly.
+			Hosts in the same VLAN can communicate with each other, regardless
+			of their physical locations. VLAN can enhance performance by conserving
+			bandwidth, and improve security by limiting traffic to specific domains."
+	REVISION        "200908030000Z"
+	DESCRIPTION
+			"Initial version of this MIB module."
+::= { tplinkMgmt 14 }
+				
+tplinkDot1qVlanMIBObjects			OBJECT IDENTIFIER	::= { tplinkDot1qVlanMIB 1 }     
+tplinkDot1qVlanNotifications	    OBJECT IDENTIFIER 	::= { tplinkDot1qVlanMIB 2}
+          	
+	vlanTableCreate NOTIFICATION-TYPE
+		OBJECTS {
+				dot1qVlanId          
+				}
+		STATUS          current
+		DESCRIPTION
+			""
+	::= { tplinkDot1qVlanNotifications 1}               	          
+		
+	vlanPortConfig  				OBJECT IDENTIFIER ::= {tplinkDot1qVlanMIBObjects 1}
+    vlanConfig	 					OBJECT IDENTIFIER ::= {tplinkDot1qVlanMIBObjects 2}
+        
+
+vlanPortConfigTable OBJECT-TYPE
+	SYNTAX  	SEQUENCE OF VLANPORTCONFIGENTRY
+	MAX-ACCESS  not-accessible
+	STATUS  	current
+	DESCRIPTION
+			"The switch provides three Link Types for the ports. Usually,
+			the ACCESS port is to connect to the terminal hosts, such as
+			PC and Server; the TRUNK port is to connect to the switch;
+			the GENERAL port can connect to the terminal hosts or the
+			switch also."
+::= { vlanPortConfig 1 }
+
+vlanPortConifgEntry OBJECT-TYPE
+	SYNTAX  	VLANPORTCONFIGENTRY
+	MAX-ACCESS  not-accessible
+	STATUS  	current
+	DESCRIPTION
+			"An entry contains of the information of a port parameter."
+	INDEX   { ifIndex }
+::= { vlanPortConfigTable 1 }
+
+VLANPORTCONFIGENTRY ::=
+	SEQUENCE {
+	    vlanPortNumber
+                OCTET STRING,
+		vlanPortType
+				INTEGER,
+		vlanPortPvid
+				INTEGER,
+		vlanPortLag
+				DisplayString ( SIZE (0..10) )
+	}
+	
+	vlanPortNumber  OBJECT-TYPE
+			     SYNTAX  OCTET STRING (SIZE (0..16))  
+			      MAX-ACCESS  read-only
+			      STATUS  current
+			      DESCRIPTION
+			              "The port id."
+			      ::= { vlanPortConifgEntry 1}
+				  
+				  
+	vlanPortType OBJECT-TYPE
+		SYNTAX  	INTEGER{
+						access(0), 					--ACCESS
+						trunk(1),					--TRUNK
+						general(2)					--GENERAL
+					}
+		MAX-ACCESS  	read-write
+		STATUS  		current
+		DESCRIPTION
+				"0.ACCESS:The ACCESS port can be added in a single VLAN,and the
+				egress rule of the port is UNTAG. The PVID is same as the current
+				VLAN ID. If the current VLAN is deleted,the PVID will be set to 1
+				by default.
+				1.TRUNK:The TRUNK port can be added in multiple VLANs, and the
+				egress rule of the port is TAG. The PVID can be set as the VID
+				number of any VLAN the port belongs to.
+				2.GENERAL:The GENERAL port can be added in multiple VLANs and set
+				various egress rules according to the different VLANs. The default
+				egress rule is UNTAG. The PVID can be set as the VID number of any
+				VLAN the port belongs to."
+	::= { vlanPortConifgEntry 2 }
+
+	vlanPortPvid OBJECT-TYPE
+		SYNTAX  	INTEGER(1..4094)
+		MAX-ACCESS  read-write
+		STATUS  	current
+		DESCRIPTION
+				"Enter the PVID number of the port, 1-4094"
+	::= { vlanPortConifgEntry 3 }
+
+	vlanPortLag OBJECT-TYPE
+		SYNTAX  	DisplayString (SIZE (0..10))
+		MAX-ACCESS  read-only
+		STATUS  	current
+		DESCRIPTION
+				"Displays the LAG to which the port belongs."
+	::= { vlanPortConifgEntry 4 }
+
+    vlanPortUnknown OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..256))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                ""
+    ::= { vlanPortConifgEntry 5 }
+
+vlanConfigTable OBJECT-TYPE
+	SYNTAX  	SEQUENCE OF DOT1QVLANCONFIGENTRY
+	MAX-ACCESS  not-accessible
+	STATUS  	current
+	DESCRIPTION
+			"Here you can view and modify the VLAN Table."
+::= { vlanConfig 1 }
+
+vlanConfigEntry OBJECT-TYPE
+	SYNTAX  	DOT1QVLANCONFIGENTRY
+	MAX-ACCESS  not-accessible
+	STATUS  	current
+	DESCRIPTION
+			"An entry contains of the information of a vlan."
+	INDEX   { dot1qVlanId }
+::= { vlanConfigTable 1 }
+
+DOT1QVLANCONFIGENTRY ::=
+	SEQUENCE {
+		dot1qVlanId
+				INTEGER(1..4094),
+		dot1qVlanDescription
+				OCTET STRING (SIZE (0..64)),
+		vlanTagPortMemberAdd
+				OCTET STRING,
+		vlanUntagPortMemberAdd
+				OCTET STRING,
+		vlanPortMemberRemove
+				OCTET STRING,
+		dot1qVlanStatus
+				TPRowStatus
+	}
+
+	dot1qVlanId OBJECT-TYPE
+		SYNTAX 	 	INTEGER(1..4094)
+              MAX-ACCESS  read-create
+		STATUS  	current
+		DESCRIPTION
+				"Enter the ID number of VLAN,2-4094."
+	::= { vlanConfigEntry 1 }
+
+	dot1qVlanDescription OBJECT-TYPE
+		SYNTAX 			OCTET STRING (SIZE (0..64))
+              MAX-ACCESS  read-create
+		STATUS  		current
+		DESCRIPTION
+				"Give a description to the VLAN for identification,1-16 characters"
+	::= { vlanConfigEntry 2 }
+
+	vlanTagPortMemberAdd OBJECT-TYPE
+		SYNTAX 			OCTET STRING
+		MAX-ACCESS  	read-create
+		STATUS  		current
+		DESCRIPTION
+				"Enter the desired port to be a tag member of VLAN,The format of input
+				port number shoud be like '1, 3, 4-7, 11'.
+				tag:All packets forwarded by the port are tagged. The packets contain
+				VLAN information."
+	::= { vlanConfigEntry 3 }
+
+	vlanUntagPortMemberAdd OBJECT-TYPE
+		SYNTAX 			OCTET STRING
+		MAX-ACCESS  	read-create
+		STATUS			current
+		DESCRIPTION
+				"Enter the desired port to be a untag member of VLAN,The format of input
+				port number shoud be like '1, 3, 4-7, 11'.
+				untag:Packets forwarded by the port are untagged."
+	::= { vlanConfigEntry 4 }
+	vlanPortMemberRemove OBJECT-TYPE
+		SYNTAX 			OCTET STRING
+		MAX-ACCESS  	read-create
+		STATUS  		current
+		DESCRIPTION
+				"Remove port member of vlan,The format of input port number shoud be like
+				'1, 3, 4-7, 11'."
+	::= { vlanConfigEntry 5 }
+
+	dot1qVlanStatus OBJECT-TYPE
+		SYNTAX  		TPRowStatus
+		MAX-ACCESS  	read-create
+		STATUS  		current
+		DESCRIPTION
+				"the following two values are states:
+				these values may be read or written
+				active(1),
+
+				the following three values are
+				actions: these values may be written,
+				but are never read
+				createAndGo(4),
+
+				destroy(6)"
+	::= { vlanConfigEntry 6 }
+
+END

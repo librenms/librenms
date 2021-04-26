@@ -31,7 +31,7 @@ $config['snmp']['community'][] = "another_community";
 $config['snmp']['v3'][0]['authlevel'] = 'authPriv';
 $config['snmp']['v3'][0]['authname'] = 'my_username';
 $config['snmp']['v3'][0]['authpass'] = 'my_password';
-$config['snmp']['v3'][0]['authalgo'] = 'MD5';
+$config['snmp']['v3'][0]['authalgo'] = 'SHA';
 $config['snmp']['v3'][0]['cryptopass'] = 'my_crypto';
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 ```
@@ -107,6 +107,9 @@ Enabled by default.
 
 This includes FDP, CDP and LLDP support based on the device type.
 
+The LLDP/xDP links with neighbours will always be discovered as soon as the discovery module is enabled.
+However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true`; 
+
 Devices may be excluded from xdp discovery by sysName and sysDescr.
 
 ```php
@@ -180,3 +183,8 @@ optional arguments:
                  verbosity.
 
 ```
+
+# Discovered devices
+
+Newly discovered devices will be added to the `default_poller_group`, this value defaults to 0 if unset.
+When using distributed polling, this value can be changed locally by setting `$config['default_poller_group`]` in config.php or globally by using `lnms config:set`.

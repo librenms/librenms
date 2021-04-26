@@ -4,7 +4,7 @@ path: blob/master/doc/
 #### Validating Code
 
 As part of the pull request process with GitHub we run some automated
-build tests to ensure that  the code is error free, standards [compliant](http://docs.librenms.org/Developing/Code-Guidelines/)
+build tests to ensure that  the code is error free, standards [compliant](../Developing/Code-Guidelines.md)
 and our test suite builds successfully.
 
 Rather than submit a pull request and wait for the results, you can
@@ -25,7 +25,7 @@ Now install the dependencies we require:
 
 Once composer is installed you can now run the code validation script:
 
-`./scripts/pre-commit.php`
+`./lnms dev:check`
 
 If you see `Tests ok, submit away :)` then all is well. If you see
 other output then it should contain  what you need to resolve the issues and re-test.
@@ -33,16 +33,10 @@ other output then it should contain  what you need to resolve the issues and re-
 #### Git Hooks
 
 Git has a hook system which you can use to trigger checks at various
-stages. Utilising the `pre-commit.php`  you can make this part of your
-commit process. You can do this in two ways:
+stages. Utilising the `./lnms dev:check`  you can make this part of your
+commit process.
 
-1. If you already make use of `.git/hooks/pre-commit` then you can add:
+Add `./lnms dev:check` to your `.git/hooks/pre-commit`:
 
-./scripts/pre-commit.php
-
-to be excecuted when you run `git commit`.
-
-1. You can symlink the `pre-commit.php` file so it's executed directly
-   on a `git commit`:
-
-`ln -s /opt/librenms/scripts/pre-commit.php /opt/librenms/.git/hooks/pre-commit`
+    echo "/opt/librenms/lnms dev:check" >> /opt/librenms/.git/hooks/pre-commit
+    chmod +x /opt/librenms/.git/hooks/pre-commit

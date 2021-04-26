@@ -15,19 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
-    for ($x=1; $x<=$raritan_data['inletPoleCount']; $x++) {
+    for ($x = 1; $x <= $raritan_data['inletPoleCount']; $x++) {
         $tmp_index = "$index.$x";
         $new_index = "inletPoleVoltage.$tmp_index";
-        $oid = '.1.3.6.1.4.1.13742.4.1.21.2.1.4.'. $tmp_index;
+        $oid = '.1.3.6.1.4.1.13742.4.1.21.2.1.4.' . $tmp_index;
         $descr = 'Inlet ' . $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleLabel'];
         $divisor = 1000;
         $low_limit = $raritan_data['inletVoltageUpperCritical'] / $divisor;
@@ -35,17 +33,17 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         $warn_limit = $raritan_data['inletVoltageLowerWarning'] / $divisor;
         $high_limit = $raritan_data['inletVoltageLowerCritical'] / $divisor;
         $current = $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleVoltage'] / $divisor;
-        discover_sensor($valid["sensor"], "voltage", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
 }
 
 foreach ($pre_cache['raritan_inletLabel'] as $index => $inlet_data) {
     $inlet_descr = $inlet_data['inletLabel'];
-    $inlet_oid     = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$index.4";
+    $inlet_oid = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$index.4";
     $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$index.rmsVoltage", '-Ovq', 'PDU2-MIB'));
-    $inlet_power   = (snmp_get($device, "measurementsInletSensorValue.$index.rmsVoltage", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
+    $inlet_power = (snmp_get($device, "measurementsInletSensorValue.$index.rmsVoltage", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
 
     if ($inlet_power >= 0) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $inlet_oid, $index.'.rmsVoltage', 'raritan', $inlet_descr, $inlet_divisor, 1, null, null, null, null, $inlet_power);
+        discover_sensor($valid['sensor'], 'voltage', $device, $inlet_oid, $index . '.rmsVoltage', 'raritan', $inlet_descr, $inlet_divisor, 1, null, null, null, null, $inlet_power);
     }
 }

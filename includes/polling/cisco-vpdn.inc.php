@@ -12,26 +12,25 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'cisco') {
     $data = snmpwalk_cache_oid($device, 'cvpdnSystemEntry', null, 'CISCO-VPDN-MGMT-MIB');
 
-    foreach ((array)$data as $type => $vpdn) {
+    foreach ((array) $data as $type => $vpdn) {
         if ($vpdn['cvpdnSystemTunnelTotal'] || $vpdn['cvpdnSystemSessionTotal']) {
-            $rrd_name = array('vpdn', $type);
+            $rrd_name = ['vpdn', $type];
             $rrd_def = RrdDefinition::make()
                 ->addDataset('tunnels', 'GAUGE', 0)
                 ->addDataset('sessions', 'GAUGE', 0)
                 ->addDataset('denied', 'COUNTER', 0, 100000);
 
-            $fields = array(
+            $fields = [
                 'tunnels'   => $vpdn['cvpdnSystemTunnelTotal'],
                 'sessions'  => $vpdn['cvpdnSystemSessionTotal'],
                 'denied'    => $vpdn['cvpdnSystemDeniedUsersTotal'],
-            );
-
+            ];
 
             $tags = compact('type', 'rrd_name', 'rrd_def');
             data_update($device, 'vpdn', $tags, $fields);
 
-            $graphs['vpdn_sessions_'.$type] = true;
-            $graphs['vpdn_tunnels_'.$type]  = true;
+            $os->enableGraph("vpdn_sessions_$type");
+            $os->enableGraph("vpdn_tunnels_$type");
 
             echo " Cisco VPDN ($type) ";
         }

@@ -64,7 +64,7 @@ return [
     'noise-floor' => [
         'short' => 'Рівень шуму',
         'long' => 'Рівень шуму',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
         'short' => 'Сила сигналу',

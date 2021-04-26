@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1429.2.2.6.5",
                     "sysDescr": "D9854 APR",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ciscosat",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1429.2.2.6.5",
-                    "sysDescr": "D9854 APR",
                     "sysContact": "<private>",
                     "version": "1.50(1.11)",
                     "hardware": "D9859",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

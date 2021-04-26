@@ -8,32 +8,32 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
 require 'includes/html/graphs/common.inc.php';
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Dynamic Blocks';
-$unitlen       = 16;
-$bigdescrlen   = 25;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Dynamic Blocks';
+$unitlen = 16;
+$bigdescrlen = 25;
 $smalldescrlen = 25;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array = array(
-    'dynamic_blocked' => array('descr' => 'Dropped', 'colour' => 'BF3F7F',),
-    'dynamic_block_size' => array('descr' => 'Size', 'colour' => '264C72',),
-);
+$array = [
+    'dynamic_blocked' => ['descr' => 'Dropped', 'colour' => 'BF3F7F'],
+    'dynamic_block_size' => ['descr' => 'Size', 'colour' => '264C72'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

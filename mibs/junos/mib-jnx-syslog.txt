@@ -24,7 +24,7 @@ jnxSyslog MODULE-IDENTITY
     CONTACT-INFO
             "Juniper Technical Assistance Center
              Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
+             1133 Innovation Way
              Sunnyvale, CA 94089
              E-mail: support@juniper.net"
 
@@ -249,6 +249,13 @@ JnxSyslogFacility  ::= TEXTUAL-CONVENTION
             "Value of the attribute identified by jnxSyslogAvAttribute."
         ::= { jnxSyslogAvEntry 3 }
 
+    jnxUserDefinedTrapOID OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Value will be a OID to be set and send to NMS using spoof traps."
+        ::= { jnxSyslogNotifyVars 3 }
 
 --
 -- Syslog Notification definitions
@@ -274,5 +281,16 @@ JnxSyslogFacility  ::= TEXTUAL-CONVENTION
 	     pairs shall be identified by objects jnxSyslogAvAttribute 
 	     and jnxSyslogAvValue."
         ::= { jnxSyslogNotificationPrefix 1 }
+
+    jnxUserDefinedNotification NOTIFICATION-TYPE
+        OBJECTS  { 
+                       jnxUserDefinedTrapOID, 
+                       jnxSyslogMessage 
+               }
+        STATUS   current
+        DESCRIPTION
+            "The SNMP trap that will be used only for sending spoofed
+             traps from customer scripts running from JUNOS."
+        ::= { jnxSyslogNotificationPrefix 2 } 
 
 END

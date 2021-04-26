@@ -8,45 +8,45 @@
  *
  * @package    LibreNMS
  * @subpackage nfs-server
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     SvennD <svennd@svennd.be>
 */
 
 require 'includes/html/graphs/common.inc.php';
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'v3 write operations';
-$unitlen       = 10;
-$bigdescrlen   = 15;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'v3 write operations';
+$unitlen = 10;
+$bigdescrlen = 15;
 $smalldescrlen = 15;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
 
-$rrd_filename  = rrd_name($device['hostname'], array('app', 'nfs-server-proc3', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-proc3', $app['app_id']]);
 
-$array         = array(
-                 'proc3_setattr' => array('descr' => 'Set attributes'),
-                 'proc3_create' => array('descr' => 'Create'),
-                 'proc3_mkdir' => array('descr' => 'Make dir'),
-                 'proc3_mknod' => array('descr' => 'Make nod'),
-                 'proc3_link' => array('descr' => 'Link'),
-                 'proc3_remove' => array('descr' => 'Remove'),
-                 'proc3_rmdir' => array('descr' => 'Remove dir'),
-                 'proc3_rename' => array('descr' => 'Rename'),
-                 'proc3_symlink' => array('descr' => 'Symlink'),
-                 'proc3_commit' => array('descr' => 'Commit'),
-                );
+$array = [
+    'proc3_setattr' => ['descr' => 'Set attributes'],
+    'proc3_create' => ['descr' => 'Create'],
+    'proc3_mkdir' => ['descr' => 'Make dir'],
+    'proc3_mknod' => ['descr' => 'Make nod'],
+    'proc3_link' => ['descr' => 'Link'],
+    'proc3_remove' => ['descr' => 'Remove'],
+    'proc3_rmdir' => ['descr' => 'Remove dir'],
+    'proc3_rename' => ['descr' => 'Rename'],
+    'proc3_symlink' => ['descr' => 'Symlink'],
+    'proc3_commit' => ['descr' => 'Commit'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
         $rrd_list[$i]['colour'] = \LibreNMS\Config::get("graph_colours.$colours.$i");
         $i++;
     }

@@ -1,23 +1,12 @@
-mib: ALCATEL-IND1-CHASSIS-MIB:RADLAN-rndMng:RADLAN-HWENVIROMENT
+mib: RADLAN-rndMng:RADLAN-HWENVIROMENT
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>OmniStack \S+ \S+|OS\S+)? ?(?<version>\d+\.\d+\.\S+)?/'
+        hardware: .1.3.6.1.4.1.89.53.4.1.6.1 # RADLAN-Physicaldescription-MIB::rlPhdStackProductID
+        version: .1.3.6.1.4.1.89.53.14.1.2.1 # RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion
     sensors:
         state:
             data:
-                -
-                    oid: alaChasEntPhysFanTable
-                    value: alaChasEntPhysFanStatus
-                    num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.{{ $index }}'
-                    descr: 'Fan {{ $subindex1 }}'
-                    index: 'FanStatus.{{ $index }}'
-                    states:
-                        - { value: 0, descr: noStatus, graph: 1, generic: 2 }
-                        - { value: 1, descr: notRunning, graph: 1, generic: 1 }
-                        - { value: 2, descr: running, graph: 1, generic: 0 }
-                    skip_values:
-                      -
-                        oid: alaChasEntPhysFanStatus
-                        op: '='
-                        value: 0
                 -
                     oid: rlEnvMonFanStatusTable
                     value: rlEnvMonFanState
@@ -32,10 +21,10 @@ modules:
                         - { value: 5, descr: notpresent, graph: 1, generic: 3 }
                         - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
                     skip_values:
-                      -
-                        oid: rlEnvMonFanState
-                        op: '='
-                        value: 5
+                        -
+                            oid: rlEnvMonFanState
+                            op: '='
+                            value: 5
                 -
                     oid: rlEnvMonSupplyStatusTable
                     value: rlEnvMonSupplyState
@@ -50,13 +39,13 @@ modules:
                         - { value: 5, descr: notpresent, graph: 1, generic: 3 }
                         - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
                     skip_values:
-                      -
-                        oid: rlEnvMonSupplyState
-                        op: '='
-                        value: 5
+                        -
+                            oid: rlEnvMonSupplyState
+                            op: '='
+                            value: 5
     processors:
-          data:
-              -
-                  oid: rlCpuUtilDuringLastMinute
-                  num_oid: '.1.3.6.1.4.1.89.1.8.{{ $index }}'
-                  index: 0
+        data:
+            -
+                oid: rlCpuUtilDuringLastMinute
+                num_oid: '.1.3.6.1.4.1.89.1.8.{{ $index }}'
+                index: 0

@@ -3,5 +3,6 @@ text: 'Juniper JWOS'
 type: network
 icon: junos
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.8239.1.2.9
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8239.1.2.9

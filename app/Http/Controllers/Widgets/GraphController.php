@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +30,6 @@ use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
 use App\Models\Service;
-use App\Models\UserWidget;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -44,6 +42,7 @@ class GraphController extends WidgetController
     protected $title = 'Graph';
     protected $defaults = [
         'title' => null,
+        'refresh' => 60,
         'graph_type' => null,
         'graph_range' => 'oneday',
         'graph_legend' => 'yes',
@@ -62,7 +61,7 @@ class GraphController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        if (!empty($settings['title'])) {
+        if (! empty($settings['title'])) {
             return $settings['title'];
         }
 
@@ -70,6 +69,7 @@ class GraphController extends WidgetController
         $type = $this->getGraphType();
         if ($type == 'device') {
             $device = Device::find($settings['graph_device']);
+
             return ($device ? $device->displayName() : 'Device') . ' / ' . $settings['graph_type'];
         } elseif ($type == 'aggregate') {
             return 'Overall ' . $this->getGraphType(false) . ' Bits (' . $settings['graph_range'] . ')';
@@ -111,7 +111,7 @@ class GraphController extends WidgetController
         $type_parts = explode('_', $data['graph_type']);
         $primary = array_shift($type_parts);
         $secondary = implode('_', $type_parts);
-        $name = $primary  . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
+        $name = $primary . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
 
         // format display for selected items
         if ($primary == 'device' && $data['graph_device']) {
@@ -174,18 +174,18 @@ class GraphController extends WidgetController
         $params = [];
 
         if ($type == 'device') {
-            $params[] = 'device='.$settings['graph_device'];
+            $params[] = 'device=' . $settings['graph_device'];
         } elseif ($type == 'application') {
-            $params[] = 'id='.$settings['graph_application'];
+            $params[] = 'id=' . $settings['graph_application'];
         } elseif ($type == 'munin') {
             if ($mplug = MuninPlugin::find($settings['graph_munin'])) {
-                $params[] = 'device='.$mplug->device_id;
-                $params[] = 'plugin='.$mplug->mplug_type;
+                $params[] = 'device=' . $mplug->device_id;
+                $params[] = 'plugin=' . $mplug->mplug_type;
             }
         } elseif ($type == 'service') {
             if ($service = Service::find($settings['graph_service'])) {
-                $params[] = 'device='.$service->device_id;
-                $params[] = 'id='.$service->service_id;
+                $params[] = 'device=' . $service->device_id;
+                $params[] = 'id=' . $service->service_id;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
@@ -196,7 +196,7 @@ class GraphController extends WidgetController
             if ($aggregate_type == 'ports') {
                 $port_ids = $settings['graph_ports'];
             } else {
-                $port_types = collect((array)$aggregate_type)->map(function ($type) {
+                $port_types = collect((array) $aggregate_type)->map(function ($type) {
                     // check for config definitions
                     if (Config::has("{$type}_descr")) {
                         return Config::get("{$type}_descr", []);
@@ -216,7 +216,7 @@ class GraphController extends WidgetController
             $params[] = 'id=' . implode(',', $port_ids);
             $settings['graph_type'] = 'multiport_bits_separate';
         } else {
-            $params[] = 'id='.$settings['graph_'.$type];
+            $params[] = 'id=' . $settings['graph_' . $type];
         }
 
         $data = $settings;
@@ -252,10 +252,7 @@ class GraphController extends WidgetController
     public function getSettings($settingsView = false)
     {
         if (is_null($this->settings)) {
-            $id = \Request::get('id');
-            $widget = UserWidget::findOrFail($id);
-            $settings = array_replace($this->defaults, (array)$widget->settings);
-            $settings['id'] = $id;
+            $settings = parent::getSettings($settingsView);
 
             // legacy data conversions
             if ($settings['graph_type'] == 'manual') {
@@ -274,9 +271,8 @@ class GraphController extends WidgetController
             $settings['graph_service'] = $this->convertLegacySettingId($settings['graph_service'], 'service_id');
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
-            $settings['graph_custom'] = (array)$settings['graph_custom'];
-            $settings['graph_ports'] = (array)$settings['graph_ports'];
-
+            $settings['graph_custom'] = (array) $settings['graph_custom'];
+            $settings['graph_ports'] = (array) $settings['graph_ports'];
 
             $this->settings = $settings;
         }
@@ -286,8 +282,9 @@ class GraphController extends WidgetController
 
     private function convertLegacySettingId($setting, $key)
     {
-        if ($setting && !is_numeric($setting)) {
+        if ($setting && ! is_numeric($setting)) {
             $data = json_decode($setting, true);
+
             return isset($data[$key]) ? $data[$key] : 0;
         }
 

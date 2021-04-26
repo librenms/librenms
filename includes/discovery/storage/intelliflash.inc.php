@@ -17,23 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.storage snmpgnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
 use LibreNMS\Config;
-if($device['os'] == 'intelliflash') {
+
+if ($device['os'] == 'intelliflash') {
     $tegile_storage = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     if (is_array($tegile_storage)) {
         echo 'poolEntry ';
         foreach ($tegile_storage as $index => $storage) {
-            $units  = 1;
+            $units = 1;
             $fstype = $storage['poolState'];
-            $descr  = $storage['poolName'];
+            $descr = $storage['poolName'];
             //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-            $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
-            $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
+            $size = (($storage['poolSizeHigh'] << 32) + $storage['poolSizeLow']) * $units;
+            $used = (($storage['poolUsedSizeHigh'] << 32) + $storage['poolUsedSizeLow']) * $units;
             if (is_numeric($index)) {
                 discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pl', $descr, $size, $units, $used);
             }
@@ -47,10 +47,10 @@ if($device['os'] == 'intelliflash') {
             $units = 1;
             $descr = $storage['projectName'];
             $fstype = 1;
-            $pdsh = ($storage['projectDataSizeHigh'] << 32 );
+            $pdsh = ($storage['projectDataSizeHigh'] << 32);
             $pdsl = ($storage['projectDataSizeLow']);
             $pdst = (($pdsh + $pdsl) * $units);
-            $pfsh = ($storae['projectFreeSizeHigh'] << 32 );
+            $pfsh = ($storae['projectFreeSizeHigh'] << 32);
             $pfsl = ($storage['projectFreeSizeLow']);
             $pfst = (($pfsh + $pfsl) * $units);
             //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.

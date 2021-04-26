@@ -1,148 +1,149 @@
 <?php
+
 $name = 'fbsd-nfs-client';
 $app_id = $app['app_id'];
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'per second';
-$unitlen       = 10;
-$bigdescrlen   = 10;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'per second';
+$unitlen = 10;
+$bigdescrlen = 10;
 $smalldescrlen = 10;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 15;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 15;
 
-$rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $rrd_list = array(
-        array(
+if (Rrd::checkRrdExists($rrd_filename)) {
+    $rrd_list = [
+        [
             'filename' => $rrd_filename,
             'descr'    => 'getattr',
             'ds'       => 'getattr',
-            'colour'   => '582a72'
-        ),
-        array(
+            'colour'   => '582a72',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'setattr',
             'ds'       => 'setattr',
-            'colour'   => '28774f'
-        ),
-        array(
+            'colour'   => '28774f',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'lookup',
             'ds'       => 'lookup',
-            'colour'   => 'aa6c39'
-        ),
-        array(
+            'colour'   => 'aa6c39',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'readlink',
             'ds'       => 'readlink',
-            'colour'   => '88cc88'
-        ),
-        array(
+            'colour'   => '88cc88',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'read',
             'ds'       => 'read',
-            'colour'   => 'd46a6a'
-        ),
-        array(
+            'colour'   => 'd46a6a',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'write',
             'ds'       => 'write',
-            'colour'   => 'ffd1aa'
-        ),
-        array(
+            'colour'   => 'ffd1aa',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'create',
             'ds'       => 'create',
-            'colour'   => '582a72'
-        ),
-        array(
+            'colour'   => '582a72',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'remove',
             'ds'       => 'remove',
-            'colour'   => 'aa8839'
-        ),
-        array(
+            'colour'   => 'aa8839',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'rename',
             'ds'       => 'rename',
-            'colour'   => '28536c'
-        ),
-        array(
+            'colour'   => '28536c',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'link',
             'ds'       => 'link',
-            'colour'   => '880000'
-        ),
-        array(
+            'colour'   => '880000',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'symlink',
             'ds'       => 'symlink',
-            'colour'   => 'ff0000'
-        ),
-        array(
+            'colour'   => 'ff0000',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'mkdir',
             'ds'       => 'mkdir',
-            'colour'   => '285300'
-        ),
-        array(
+            'colour'   => '285300',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'rmdir',
             'ds'       => 'rmdir',
-            'colour'   => '2800ff'
-        ),
-        array(
+            'colour'   => '2800ff',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'readdir',
             'ds'       => 'readdir',
-            'colour'   => '000080'
-        ),
-        array(
+            'colour'   => '000080',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'rdirplus',
             'ds'       => 'rdirplus',
-            'colour'   => '500000'
-        ),
-        array(
+            'colour'   => '500000',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'access',
             'ds'       => 'access',
-            'colour'   => 'aa6511'
-        ),
-        array(
+            'colour'   => 'aa6511',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'mknod',
             'ds'       => 'mknod',
-            'colour'   => '98139c'
-        ),
-        array(
+            'colour'   => '98139c',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'fsstat',
             'ds'       => 'fsstat',
-            'colour'   => 'd853dc'
-        ),
-        array(
+            'colour'   => 'd853dc',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'fsinfo',
             'ds'       => 'fsinfo',
-            'colour'   => 'd853dc'
-        ),
-        array(
+            'colour'   => 'd853dc',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'pathconf',
             'ds'       => 'pathconf',
-            'colour'   => 'f8f36c'
-        ),
-        array(
+            'colour'   => 'f8f36c',
+        ],
+        [
             'filename' => $rrd_filename,
             'descr'    => 'commit',
             'ds'       => 'commit',
-            'colour'   => 'ff536c'
-        )
-    );
+            'colour'   => 'ff536c',
+        ],
+    ];
 } else {
     echo "file missing: $rrd_filename";
 }

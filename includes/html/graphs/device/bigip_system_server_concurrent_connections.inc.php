@@ -1,8 +1,8 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'bigip_system_server_concurrent_connections');
+$rrd_filename = Rrd::name($device['hostname'], 'bigip_system_server_concurrent_connections');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'ServerCurConns';
 
@@ -16,4 +16,4 @@ $graph_min = 0;
 
 $unit_text = 'Active connections';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

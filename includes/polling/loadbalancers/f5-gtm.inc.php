@@ -15,26 +15,26 @@
 use LibreNMS\RRD\RrdDefinition;
 
 // Define some error messages
-$error_poolaction = array();
-$error_poolaction[0] = "Unused";
-$error_poolaction[1] = "Reboot";
-$error_poolaction[2] = "Restart";
-$error_poolaction[3] = "Failover";
-$error_poolaction[4] = "Failover and Restart";
-$error_poolaction[5] = "Go Active";
-$error_poolaction[6] = "None";
+$error_poolaction = [];
+$error_poolaction[0] = 'Unused';
+$error_poolaction[1] = 'Reboot';
+$error_poolaction[2] = 'Restart';
+$error_poolaction[3] = 'Failover';
+$error_poolaction[4] = 'Failover and Restart';
+$error_poolaction[5] = 'Go Active';
+$error_poolaction[6] = 'None';
 
 $component = new LibreNMS\Component();
-$options['filter']['disabled'] = array('=',0);
-$options['filter']['ignore'] = array('=',0);
+$options['filter']['disabled'] = ['=', 0];
+$options['filter']['ignore'] = ['=', 0];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
 // We extracted all the components for this device, now lets only get the GTM ones.
-$keep = array();
-$types = array('f5-gtm-wide', 'f5-gtm-pool');
+$keep = [];
+$types = ['f5-gtm-wide', 'f5-gtm-pool'];
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -45,7 +45,7 @@ foreach ($components as $k => $v) {
 $components = $keep;
 
 // Only collect SNMP data if we have enabled components
-if (count($components > 0)) {
+if (! empty($components)) {
     // Let's gather the stats..
     $f5_stats['gtmWideIPStatEntryRequests'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.3.12.2.3.1.2', 0);
     $f5_stats['gtmWideIPStatEntryResolved'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.3.12.2.3.1.3', 0);
@@ -63,7 +63,7 @@ if (count($components > 0)) {
         $UID = $array['UID'];
         $label = $array['label'];
         $hash = $array['hash'];
-        $rrd_name = array($type, $label, $hash);
+        $rrd_name = [$type, $label, $hash];
 
         if ($type == 'f5-gtm-wide') {
             $rrd_def = RrdDefinition::make()
@@ -71,32 +71,32 @@ if (count($components > 0)) {
                 ->addDataset('resolved', 'COUNTER', 0)
                 ->addDataset('dropped', 'COUNTER', 0);
 
-            $fields = array(
-                'requests' => $f5_stats['gtmWideIPStatEntryRequests']['1.3.6.1.4.1.3375.2.3.12.2.3.1.2.'.$UID],
-                'resolved' => $f5_stats['gtmWideIPStatEntryResolved']['1.3.6.1.4.1.3375.2.3.12.2.3.1.3.'.$UID],
-                'dropped' => $f5_stats['gtmWideIPStatEntryDropped']['1.3.6.1.4.1.3375.2.3.12.2.3.1.7.'.$UID],
-            );
+            $fields = [
+                'requests' => $f5_stats['gtmWideIPStatEntryRequests']['1.3.6.1.4.1.3375.2.3.12.2.3.1.2.' . $UID],
+                'resolved' => $f5_stats['gtmWideIPStatEntryResolved']['1.3.6.1.4.1.3375.2.3.12.2.3.1.3.' . $UID],
+                'dropped' => $f5_stats['gtmWideIPStatEntryDropped']['1.3.6.1.4.1.3375.2.3.12.2.3.1.7.' . $UID],
+            ];
 
             // Let's print some debugging info.
-            d_echo("\n\nComponent: ".$key."\n");
-            d_echo("    Type: ".$type."\n");
-            d_echo("    Label: ".$label."\n");
+            d_echo("\n\nComponent: " . $key . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
         } elseif ($type == 'f5-gtm-pool') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('resolved', 'COUNTER', 0)
                 ->addDataset('dropped', 'COUNTER', 0);
 
-            $fields = array(
-                'resolved' => $f5_stats['gtmPoolEntryResolved']['1.3.6.1.4.1.3375.2.3.6.2.3.1.2.'.$UID],
-                'dropped' => $f5_stats['gtmPoolEntryDropped']['1.3.6.1.4.1.3375.2.3.6.2.3.1.5.'.$UID],
-            );
+            $fields = [
+                'resolved' => $f5_stats['gtmPoolEntryResolved']['1.3.6.1.4.1.3375.2.3.6.2.3.1.2.' . $UID],
+                'dropped' => $f5_stats['gtmPoolEntryDropped']['1.3.6.1.4.1.3375.2.3.6.2.3.1.5.' . $UID],
+            ];
 
             // Let's print some debugging info.
-            d_echo("\n\nComponent: ".$key."\n");
-            d_echo("    Type: ".$type."\n");
-            d_echo("    Label: ".$label."\n");
+            d_echo("\n\nComponent: " . $key . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
         } else {
-            d_echo("Type is unknown: ".$type."\n");
+            d_echo('Type is unknown: ' . $type . "\n");
             continue;
         }
 

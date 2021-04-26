@@ -30,7 +30,7 @@ Table of Content:
   - [Linux (snmpd v2)](#linux-snmpd)
   - [Linux (snmpd v3)](#linux-snmpd-v3)
   - [Windows Server 2008 R2](#windows-server-2008-r2)
-  - [Windows Server 2012 R2 and 2016](#windows-server-2012-r2-and-2016)
+  - [Windows Server 2012 R2 and newer](#windows-server-2012-r2-and-newer)
   - [Mac OSX](#Mac-OSX)
 
 ## Devices
@@ -115,6 +115,15 @@ snmp-server location <YOUR-LOCATION>
 1. Add your community name and leave IP addresses empty
 1. Click Apply and Save
 
+### Eaton
+
+#### Network Card-MS
+
+1. Connect to the Web UI of the device
+1. Upgrade to the latest available manufacturer firmware which applies to your hardware revision. Refer to the release notes.   For devices which can use the Lx releases, *do* install LD.
+1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
+1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
+
 ### HPE 3PAR
 
 #### Inform OS 3.2.x
@@ -172,14 +181,45 @@ set snmp view mysnmpv3view oid iso include
 
 #### RouterOS 6.x
 
+CLI SNMP v2 Configuration
+
 ```
-#Terminal SNMP v2 Configuration
 /snmp community
 set [ find default=yes ] read-access=no
-add addresses=<SRC IP/NETWORK> name=<COMMUNITY>
+add addresses=<ALLOWED-SRC-IPs/NETMASK> name=<COMMUNITY>
 /snmp
 set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
 ```
+Notes:
+
+* About the snmp community commands:
+    * The commands change the default snmp community.  It is probably possible to create a new one instead.
+    * <ALLOWED-SRC-IPs/NETMASK> specify the address and host (not network) netmask of the LibreNMS server.  Example: 192.168.8.71/32
+    * trap-version=2 must also be specified if some other trap-version has been set
+    * trap-interfaces may also be used to limit the interfaces the router listens on
+* About the snmp command:
+    * contact, engine-id and location are optional
+    * trap-community is probably required if a new snmp community has been created.
+
+CLI SNMP v3 Configuration for *authPriv*
+```
+/snmp community 
+add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>" 
+set "<COMMUNITY>" authentication-password="<AUTH_PASS>" authentication-protocol=MD5
+set "<COMMUNITY>" encryption-password="<ENCRYP_PASS>" encryption-protocol=AES
+set "<COMMUNITY>" read-access=yes write-access=no security=private
+#Disable public SNMP
+set public read-access=no write-access=no security=private
+/snmp
+set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCALTION>"
+```
+Notes:
+
+* Use password with length of min 8 chars
+
+Notes for both SNMP v2 and v3
+
+* In some cases of advanced routing one may need to set explicitly the source IP address from which the SNMP daemon will reply - `/snmp set src-address=<SELF_IP_ADDRESS>`
 
 ### Palo Alto
 
@@ -274,7 +314,7 @@ esxcli system snmp set -C noc@your.org
 esxcli system snmp set --enable true
 ```
 
->Note: In case of snmp timouts, disable the firewall with `esxcli
+>Note: In case of snmp timeouts, disable the firewall with `esxcli
 >network firewall set --enabled false` If snmp timeouts still occur
 >with firewall disabled, migrate VMs if needed and reboot ESXi host.
 
@@ -327,12 +367,11 @@ syslocation Rack, Room, Building, City, Country [GPSX,Y]
 syscontact Your Name <your@email.address>
 
 #Distro Detection
-extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
-
+extend distro /usr/bin/distro
 #Hardware Detection (uncomment to enable)
-#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
-#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
-#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
+#extend hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
 ```
 
 **NOTE**: On some systems the snmpd is running as its own user, which
@@ -340,6 +379,13 @@ means it can't read `/sys/devices/virtual/dmi/id/product_serial` which
 is mode 0400. One solution is to include `@reboot chmod 444
 /sys/devices/virtual/dmi/id/product_serial` in the crontab for root or
 equivalent.
+
+Non-x86 or SMBIOS-based systems, such as ARM-based Raspberry Pi units should
+query device tree locations for this metadata, for example:
+```
+extend hardware '/bin/cat /sys/firmware/devicetree/base/model'
+extend serial '/bin/cat /sys/firmware/devicetree/base/serial-number'
+```
 
 The LibreNMS server include a copy of this example here:
 
@@ -363,7 +409,7 @@ line to create SNMPV3 User (replace username and passwords with your
 own):
 
 ```
-createUser authPrivUser MD5 "authPassword" DES "privPassword"
+createUser authPrivUser SHA "authPassword" AES "privPassword"
 ```
 
 Make sure the agent listens to all interfaces by adding the following
@@ -433,9 +479,10 @@ service snmpd restart
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
 
-### Windows Server 2012 R2 and 2016
+### Windows Server 2012 R2 and newer
 
-1. Log in to your Windows Server 2012 R2
+#### GUI
+1. Log in to your Windows Server 2012 R2 or newer
 1. Start "Server Manager" under "Administrative Tools"
 1. Click "Manage" and then "Add Roles and Features"
 1. Continue by pressing "Next" to the "Features" menu
@@ -448,7 +495,18 @@ service snmpd restart
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
 
->Note: SNMPv3 can be supported on Windows playforms with the use of Net-SNMP.
+#### PowerShell
+The following example will install SNMP, set the Librenms IP and set a read only community string.  
+Replace `$IP` and `$communitystring` with your values.  
+
+```Powershell
+Install-WindowsFeature -Name 'SNMP-Service','RSAT-SNMP'
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\services\SNMP\Parameters\PermittedManagers"  -Name 2 -Value $IP
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\services\SNMP\Parameters\ValidCommunities"  -Name $communitystring -Value 4
+
+```
+
+>Note: SNMPv3 can be supported on Windows platforms with the use of Net-SNMP.
 
 ### Mac OSX
 

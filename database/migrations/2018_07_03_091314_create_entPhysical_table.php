@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateEntPhysicalTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,23 +14,23 @@ class CreateEntPhysicalTable extends Migration
     {
         Schema::create('entPhysical', function (Blueprint $table) {
             $table->increments('entPhysical_id');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->integer('entPhysicalIndex');
-            $table->text('entPhysicalDescr', 65535);
-            $table->text('entPhysicalClass', 65535);
-            $table->text('entPhysicalName', 65535);
+            $table->text('entPhysicalDescr');
+            $table->text('entPhysicalClass');
+            $table->text('entPhysicalName');
             $table->string('entPhysicalHardwareRev', 64)->nullable();
             $table->string('entPhysicalFirmwareRev', 64)->nullable();
             $table->string('entPhysicalSoftwareRev', 64)->nullable();
             $table->string('entPhysicalAlias', 32)->nullable();
             $table->string('entPhysicalAssetID', 32)->nullable();
             $table->string('entPhysicalIsFRU', 8)->nullable();
-            $table->text('entPhysicalModelName', 65535);
-            $table->text('entPhysicalVendorType', 65535)->nullable();
-            $table->text('entPhysicalSerialNum', 65535);
+            $table->text('entPhysicalModelName');
+            $table->text('entPhysicalVendorType')->nullable();
+            $table->text('entPhysicalSerialNum');
             $table->integer('entPhysicalContainedIn');
             $table->integer('entPhysicalParentRelPos');
-            $table->text('entPhysicalMfgName', 65535);
+            $table->text('entPhysicalMfgName');
             $table->integer('ifIndex')->nullable();
         });
     }

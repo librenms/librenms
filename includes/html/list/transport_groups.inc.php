@@ -15,24 +15,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta>
  */
-
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     return [];
 }
 
-list($transports, $t_more) = include 'transports.inc.php';
+[$transports, $t_more] = include 'transports.inc.php';
 
 $query = '';
 $params = [];
 
-if (!empty($_REQUEST['search'])) {
+if (! empty($_REQUEST['search'])) {
     $query .= ' WHERE `transport_group_name` LIKE ?';
     $params[] = '%' . $vars['search'] . '%';
 }
@@ -40,7 +38,7 @@ if (!empty($_REQUEST['search'])) {
 $total = dbFetchCell("SELECT COUNT(*) FROM `alert_transport_groups` $query", $params);
 $more = false;
 
-if (!empty($_REQUEST['limit'])) {
+if (! empty($_REQUEST['limit'])) {
     $limit = (int) $_REQUEST['limit'];
     $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $offset = ($page - 1) * $limit;
@@ -52,10 +50,11 @@ if (!empty($_REQUEST['limit'])) {
 
 $sql = "SELECT `transport_group_id` AS `id`, `transport_group_name` AS `text` FROM `alert_transport_groups` $query";
 $groups = dbFetchRows($sql, $params);
-$more = ($offset + count($groups))<$total;
+$more = ($offset + count($groups)) < $total;
 $groups = array_map(function ($group) {
-    $group['text'] = "Group: ".$group['text'];
-    $group['id'] = "g".$group['id'];
+    $group['text'] = 'Group: ' . $group['text'];
+    $group['id'] = 'g' . $group['id'];
+
     return $group;
 }, $groups);
 

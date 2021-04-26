@@ -1,0 +1,73 @@
+  NSCRTV-ROOT DEFINITIONS ::= BEGIN
+
+IMPORTS
+     enterprises
+          FROM RFC1155-SMI
+;
+nscrtvRoot  OBJECT IDENTIFIER ::= { enterprises 17409 }
+
+-- DESCRIPTION
+
+nscrtvHFCemsTree  OBJECT IDENTIFIER  ::= { nscrtvRoot 1 }
+
+-- DESCRIPTION
+
+propertyIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 1}
+
+--     DESCRIPTION
+
+alarmsIdent   OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 2}
+
+--     DESCRIPTION
+
+commonIdent   OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 3}
+
+--     DESCRIPTION
+
+tvmodIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 4}
+
+--     DESCRIPTION
+
+qammodIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 5}
+
+--     DESCRIPTION
+
+otdIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 6}
+
+--     DESCRIPTION
+
+otxIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 7}
+
+--     DESCRIPTION
+
+uporIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 8}
+
+
+
+dorIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 9}
+
+--     DESCRIPTION
+
+fnIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 10}
+
+--     DESCRIPTION
+
+oaIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 11}
+
+--     DESCRIPTION
+
+addIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 12}
+
+--     DESCRIPTION
+
+cacIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 13}
+
+--     DESCRIPTION
+
+lineIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 14}
+
+--     DESCRIPTION
+
+
+END
+ 

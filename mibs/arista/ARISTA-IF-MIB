@@ -1,0 +1,183 @@
+-- ARISTA-IF-MIB: Arista structure of interface management information
+-- Copyright (c) 2014 Arista Networks, Inc.  All rights reserved.
+
+ARISTA-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    TimeTicks, Gauge32, Counter32      FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    ifIndex                            FROM IF-MIB
+    CounterBasedGauge64                FROM HCNUM-TC
+    aristaMibs                         FROM ARISTA-SMI-MIB;
+
+aristaIfMIB MODULE-IDENTITY
+    LAST-UPDATED "201410090000Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 5453 Great America Parkway
+                 Santa Clara, CA 95054
+
+         Tel: +1 408 547-5500
+
+         E-mail: snmp@arista.com"
+    DESCRIPTION
+            "The MIB module for reporting additional interface statistics
+            on Arista devices."
+    REVISION      "201410090000Z"
+    DESCRIPTION "Initial version."
+    ::= { aristaMibs 15 }
+
+
+aristaIf OBJECT IDENTIFIER ::= { aristaIfMIB 1 }
+
+aristaIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AristaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "This table contains additional interface statistics not
+                contained in the IF-MIB."
+    ::= { aristaIf 1 }
+
+aristaIfEntry OBJECT-TYPE
+    SYNTAX      AristaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry containing statistics for a given interface."
+    INDEX   { ifIndex }
+    ::= { aristaIfTable 1 }
+
+AristaIfEntry ::= SEQUENCE {
+    aristaIfCounterLastUpdated        TimeTicks,
+    aristaIfRateInterval              TimeTicks,
+    aristaIfInPktRate                 Gauge32,
+    aristaIfOutPktRate                Gauge32,
+    aristaIfInOctetRate               CounterBasedGauge64,
+    aristaIfOutOctetRate              CounterBasedGauge64,
+    aristaIfRatesLastUpdated          TimeTicks,
+    aristaIfOperStatusChanges         Counter32,
+    aristaIfInAclDrops                Counter32
+}
+
+aristaIfCounterLastUpdated OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at which the counters in the ifTable and ifXTable
+        were sampled from the hardware."
+    ::= { aristaIfEntry 1 }
+
+aristaIfRateInterval OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of time over which the aristaIf*Rate values
+        are averaged for this interface."
+    ::= { aristaIfEntry 2 }
+
+aristaIfInPktRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate, in packets per second, of packets inbound on
+        this interface, averaged over aristaIfRateInterval."
+    ::= { aristaIfEntry 3 }
+
+aristaIfOutPktRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate, in packets per second, of packets outbound on
+        this interface, averaged over aristaIfRateInterval."
+    ::= { aristaIfEntry 4 }
+
+aristaIfInOctetRate OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate, in octets per second, of data inbound on
+        this interface, averaged over aristaIfRateInterval."
+    ::= { aristaIfEntry 5 }
+
+aristaIfOutOctetRate OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate, in octets per second, of data inbound on
+        this interface, averaged over aristaIfRateInterval."
+    ::= { aristaIfEntry 6 }
+
+aristaIfRatesLastUpdated OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at which the aristaIf*Rate gauges were
+        last calculated."
+    ::= { aristaIfEntry 7 }
+
+aristaIfOperStatusChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times since system boot that ifOperStatus has
+        changed."
+    ::= { aristaIfEntry 8 }
+
+aristaIfInAclDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inbound packets dropped because of an
+        Access Control List (ACL).
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at other
+        times as indicated by the value of
+        ifCounterDiscontinuityTime."
+    ::= { aristaIfEntry 9 }
+
+-- Conformance information
+aristaIfConformance OBJECT IDENTIFIER ::= { aristaIfMIB 2 }
+
+aristaIfGroups      OBJECT IDENTIFIER ::= { aristaIfConformance 1 }
+aristaIfCompliances OBJECT IDENTIFIER ::= { aristaIfConformance 2 }
+
+-- Compliance statements
+aristaIfCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for Arista devices
+        that implement the IF-MIB"
+
+    MODULE -- this module
+    MANDATORY-GROUPS { aristaIfAdditionalInformationGroup }
+    ::= { aristaIfCompliances 1 }
+
+-- Units of conformance
+aristaIfAdditionalInformationGroup OBJECT-GROUP
+    OBJECTS { aristaIfCounterLastUpdated, aristaIfRateInterval,
+              aristaIfInPktRate, aristaIfOutPktRate,
+              aristaIfInOctetRate, aristaIfOutOctetRate,
+              aristaIfRatesLastUpdated, aristaIfOperStatusChanges,
+              aristaIfInAclDrops }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing additional information
+        above and beyond what the IF-MIB provides, applicable to
+        all network interfaces."
+    ::= { aristaIfGroups 1 }
+
+END

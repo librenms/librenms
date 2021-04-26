@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], array('Snom', 'asa'))) {
+if (! Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' ICMP';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
-    $oids = array(
+    $oids = [
         'icmpInMsgs',
         'icmpOutMsgs',
         'icmpInErrors',
@@ -33,24 +34,24 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
         'icmpOutTimestampReps',
         'icmpOutAddrMasks',
         'icmpOutAddrMaskReps',
-    );
+    ];
 
-    $data = snmpwalk_cache_oid($device, 'icmp', array(), 'IP-MIB');
+    $data = snmpwalk_cache_oid($device, 'icmp', [], 'IP-MIB');
     $data = $data[0];
 
     if (isset($data['icmpInMsgs']) && isset($data['icmpOutMsgs'])) {
         $rrd_def = new RrdDefinition();
-        $fields = array();
+        $fields = [];
         foreach ($oids as $oid) {
             $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
-            $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
+            $fields[substr($oid, 0, 19)] = isset($data[$oid]) ? $data[$oid] : 'U';
         }
 
         $tags = compact('rrd_def');
         data_update($device, 'netstats-icmp', $tags, $fields);
 
-        $graphs['netstat_icmp']      = true;
-        $graphs['netstat_icmp_info'] = true;
+        $os->enableGraph('netstat_icmp');
+        $os->enableGraph('netstat_icmp_info');
     }
 
     unset($oids, $data, $rrd_def, $fields, $tags);

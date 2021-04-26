@@ -15,23 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $output_oid = '.1.3.6.1.4.1.13891.101.4.2.0';
 $output_current = snmp_get($device, $output_oid, '-Oqv');
 
-if (!empty($output_current) || $output_current == 0) {
-    $divisor          = 10;
-    $current          = $output_current / $divisor;
-    $descr            = 'Output';
-    $type             = 'sinetica';
-    $index            = '4.2.0';
+if (! empty($output_current) || $output_current == 0) {
+    $divisor = 10;
+    $current = $output_current / $divisor;
+    $descr = 'Output';
+    $type = 'sinetica';
+    $index = '4.2.0';
 
     discover_sensor($valid['sensor'], 'frequency', $device, $output_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
@@ -39,12 +37,12 @@ if (!empty($output_current) || $output_current == 0) {
 $bypass_oid = '.1.3.6.1.4.1.13891.101.5.1.0';
 $bypass_current = snmp_get($device, $bypass_oid, '-Oqv');
 
-if (!empty($bypass_current) || $bypass_current == 0) {
-    $divisor          = 10;
-    $current          = $bypass_current / $divisor;
-    $descr            = 'Bypass';
-    $type             = 'sinetica';
-    $index            = '5.1.0';
+if (! empty($bypass_current) || $bypass_current == 0) {
+    $divisor = 10;
+    $current = $bypass_current / $divisor;
+    $descr = 'Bypass';
+    $type = 'sinetica';
+    $index = '5.1.0';
 
     discover_sensor($valid['sensor'], 'frequency', $device, $bypass_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
@@ -55,14 +53,14 @@ foreach ($oids as $oid => $data) {
     $current_id = substr($oid, strrpos($oid, '.') + 1);
 
     $current_oid = ".$oid";
-    $descr   = 'Input';
+    $descr = 'Input';
     if (count($oids) > 1) {
         $descr .= " Phase $current_id";
     }
     $divisor = 10;
     $current = current($data) / $divisor;
-    $type    = 'sinetica';
-    $index   = '3.3.1.2.'.$current_id;
+    $type = 'sinetica';
+    $index = '3.3.1.2.' . $current_id;
 
     discover_sensor($valid['sensor'], 'frequency', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

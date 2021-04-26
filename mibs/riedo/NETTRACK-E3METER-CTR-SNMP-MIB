@@ -1,0 +1,1806 @@
+NETTRACK-E3METER-CTR-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	TimeTicks,
+	Unsigned32
+		FROM SNMPv2-SMI
+	enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	;
+
+nettrack OBJECT IDENTIFIER
+	::= { enterprises 21695 }
+
+public OBJECT IDENTIFIER
+	::= { nettrack 1 }
+
+e3Mib MODULE-IDENTITY
+	LAST-UPDATED    "201903200000Z"
+	ORGANIZATION    "net-track GmbH"
+	CONTACT-INFO    "net-track GmbH
+			Duensstrasse 1
+			3186 Duedingen
+			Switzerland
+			Tel: +41 26 4240924
+
+			http://www.net-track.ch
+			info@net-track.ch"
+	DESCRIPTION
+		"Management Information for the E3METER suite."
+
+	REVISION
+		"201903200000Z"
+	DESCRIPTION
+		"Add tables containing information about IPS and PRO meters:
+
+		* e3MeterConfigTable, e3MeterDataTable, e3MeterSensorTable"
+
+	REVISION
+		"201810230000Z"
+	DESCRIPTION
+		"Add residual current monitoring data:
+
+		* e3IpsRcm and e3IpsRcmTable"
+
+	REVISION
+		"201707100000Z"
+	DESCRIPTION
+		"Add traps for events:
+
+		* Add objects: e3CtrEventTime, e3CtrEventSeverityLevel,
+		  e3CtrEventSource and e3CtrEventDescription
+
+		* Add notification: e3ConcentratorEventLog"
+
+	REVISION
+		"201506170000Z"
+	DESCRIPTION
+		"Numerous changes for providing the data collected with
+		period oriented polling:
+
+		* Changes to e3Concentrator:
+
+		  - renamed e3ConcentratorVersion to
+		    e3ConcentratorFWVersion and changed it to string.
+
+		  - added: e3ConcentratorSystemTime
+
+		  - deprecated: e3ConcentratorUptime
+
+		* Removed entire e3IpsLocal.
+
+		* Changes to e3IpsNetwork:
+
+		  - deprecated: e3IpsUnknownNodes, e3IpsActiveNodes,
+		    e3IpsDeadNodes
+
+		  - added: e3IpsPolledPeriodStart,
+		    e3IpsPolledPeriodDuration, e3IpsPolledNodesSuccess
+
+		* Changes to e3IpsTable:
+
+		  - removed: e3IpsLastDataTime
+
+		  - added: e3IpsBuild
+
+		* Changes to e3IpsMeterTable:
+
+		  - removed: e3IpsEnergyQ, e3IpsEnergyS
+
+		  - deprecated: e3IpsEnergyP, e3IpsPowerP,
+		    e3IpsPowerQ, e3IpsPowerS, e3IpsUrms, e3IpsIrms,
+		    e3IpsFrequency
+
+		  - added: e3IpsPolledPeriodStart,
+		    e3IpsPolledPeriodDuration,
+		    e3IpsPolledNodesSuccess, e3IpsPeriodType,
+		    e3IpsPeriodStart, e3IpsPeriodDuration,
+		    e3IpsDataStatus, e3IpsPMin/Max/Avg,
+		    e3IpsQMin/Max/Avg, e3IpsSAvg,
+		    e3IpsUrmsMin/Max/Avg, e3IpsIrmsMin/Max/Avg,
+		    e3IpsFreqMin/Max
+
+		* Changes to e3IpsSensorTable:
+
+		  - deprecated: e3IpsSensorTemperatureCelsius,
+		    e3IpsSensorHumidity
+
+		  - added: e3IpsSensorPeriodType,
+		    e3IpsSensorPeriodStart, e3IpsSensorPeriodDuration,
+		    e3IpsSensorDataType, e3IpsSensorTempCMin/Max,
+		    e3IpsSensorRHMin/Max"
+
+	REVISION
+		"201303270000Z"
+	DESCRIPTION
+		"Added e3ConcentratorUptime and e3IpsLastDataTime."
+
+	REVISION
+		"201301040000Z"
+	DESCRIPTION
+		"Added e3IpsChannelConfig."
+
+	REVISION
+		"201204120000Z"
+	DESCRIPTION
+		"Added import of TEXTUAL-CONVENTION."
+
+	REVISION
+		"201104060000Z"
+        DESCRIPTION
+		"Corrected some syntax errors."
+
+	REVISION
+		"201003110000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+
+	::= { public 10 }
+
+-- ===========================================================================
+-- Textual conventions
+--
+
+Watts ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Watts"
+	SYNTAX		INTEGER
+
+VoltAmpereReactives ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Volt-ampere reactives"
+	SYNTAX		Integer32
+
+VoltAmperes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Volt-amperes"
+	SYNTAX		Integer32
+
+WattHours ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Watt hours"
+	SYNTAX		Integer32
+
+VoltAmpereReactiveHours ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Volt-ampere reactive hours"
+	SYNTAX		Integer32
+
+VoltAmpereHours ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Volt-ampere hours"
+	SYNTAX		Integer32
+
+MilliAmperes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Milli-amperes"
+	SYNTAX		Integer32
+
+MilliVolts ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Milli-volts"
+	SYNTAX		Integer32
+
+DeciDegreesCelsius ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Deci-degrees celsius"
+	SYNTAX		Integer32
+
+MilliHertz ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Milli-hertz"
+	SYNTAX		Integer32
+
+Percent ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Percent"
+	SYNTAX		INTEGER
+
+-- ===========================================================================
+-- Agent information
+--
+
+e3Concentrator OBJECT IDENTIFIER
+	::= { e3Mib 1 }
+
+e3ConcentratorFWVersion OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"CTR firmware version."
+	::= { e3Concentrator 1 }
+
+e3ConcentratorUptime OBJECT-TYPE
+	SYNTAX		TimeTicks
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The system uptime in hundredths of a second."
+	::= { e3Concentrator 2 }
+
+e3ConcentratorSystemTime OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The current system time represented in seconds since 1970-01-01
+		00:00:00 UTC."
+	::= { e3Concentrator 3 }
+
+-- ===========================================================================
+-- IPS network information
+--
+
+e3IpsNetwork OBJECT IDENTIFIER
+	::= { e3Mib 2 }
+
+e3IpsTotalNodes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of configured nodes in total."
+	::= { e3IpsNetwork 1 }
+
+e3IpsUnknownNodes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Number of unknown nodes.
+		 This object is deprecated, it will return 0."
+	::= { e3IpsNetwork 2 }
+
+e3IpsActiveNodes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Number of active nodes.
+		 This object is deprecated, use e3IpsPolledNodesSuccess instead."
+	::= { e3IpsNetwork 3 }
+
+e3IpsDeadNodes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Number of dead (unreachable) nodes.
+		 This object is deprecated, it will return 0."
+	::= { e3IpsNetwork 4 }
+
+e3IpsPolledPeriodStart OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start of the most recent polling period in seconds since
+		1970-01-01 00:00:00 UTC."
+	::= { e3IpsNetwork 5 }
+
+e3IpsPolledPeriodDuration OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Duration of the data period in seconds."
+	::= { e3IpsNetwork 6 }
+
+e3IpsPolledNodesSuccess OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of nodes for which data was available for the most
+		 reccently polled period."
+	::= { e3IpsNetwork 7 }
+
+-- ===========================================================================
+-- IPS information
+--
+
+e3IpsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpsTable holds information about all IPS nodes in the
+		network."
+	::= { e3Mib 3 }
+
+e3IpsEntry OBJECT-TYPE
+	SYNTAX		E3IpsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds information about one particular IPS."
+	INDEX		{ e3IpsSerial }
+	::=		{ e3IpsTable 1 }
+
+E3IpsEntry ::= SEQUENCE {
+		e3IpsSerial		Integer32,
+		e3IpsCtrSerial		Integer32,
+		e3IpsModel		Integer32,
+		e3IpsHWVersion		INTEGER,
+		e3IpsFWVersion		Integer32,
+		e3IpsPLCVersion		Integer32,
+		e3IpsPLCBand		INTEGER,
+		e3IpsLabel		OCTET STRING,
+		e3IpsState		INTEGER,
+		e3IpsMeters		INTEGER,
+		e3IpsSensors		INTEGER,
+		e3IpsChannelConfig	INTEGER,
+		e3IpsBuild		OCTET STRING,
+		e3IpsRcm		INTEGER
+	}
+
+e3IpsSerial OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The serial number is the primary identification for
+		for every IPS."
+	::= { e3IpsEntry 1 }
+
+e3IpsCtrSerial OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The serial number of the concentrator this IPS is
+		connected to."
+	::= { e3IpsEntry 2 }
+
+e3IpsModel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Model number."
+	::= { e3IpsEntry 3 }
+
+e3IpsHWVersion OBJECT-TYPE
+	SYNTAX		INTEGER {
+		rev-a (0),
+		rev-b (1),
+		rev-c (2),
+		rev-d (3),
+		rev-e (4)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Hardware revision."
+	::= { e3IpsEntry 4 }
+
+e3IpsFWVersion OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Integer representation of the firmware revision
+		(major.minor) represented as a 16 bit integer."
+	::= { e3IpsEntry 5 }
+
+e3IpsPLCVersion OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"PLC firmware revision (major.minor.build) represented
+		as a 24 bit integer."
+	::= { e3IpsEntry 6 }
+
+e3IpsPLCBand OBJECT-TYPE
+	SYNTAX		INTEGER {
+		fcc (0),
+		arib (1),
+		cenelec-a (2),
+		cenelec-b (3)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Holds the PLC band used by the corresponding node."
+	::= { e3IpsEntry 7 }
+
+e3IpsLabel OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (0..15))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"IPS label shown on display."
+	::= { e3IpsEntry 8 }
+
+e3IpsState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		active (1),
+		dead (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"State of this node."
+	::= { e3IpsEntry 9 }
+
+e3IpsMeters OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of power meters in this IPS."
+	::= { e3IpsEntry 10 }
+
+e3IpsSensors OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of sensors connected to this IPS."
+	::= { e3IpsEntry 11 }
+
+e3IpsChannelConfig OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		1L (1),
+		3L1N (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel configuration."
+	::= { e3IpsEntry 12 }
+
+e3IpsBuild OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (0..15))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"IPS firmware build number."
+	::= { e3IpsEntry 14 }
+
+e3IpsRcm OBJECT-TYPE
+	SYNTAX		INTEGER {
+		none (0),
+		total-rcm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of installed residual current monitoring: none (0)
+		or total (1), where the total residual current of all phases
+		is monitored."
+	::= { e3IpsEntry 15 }
+
+-- ===========================================================================
+-- IPS meters
+--
+
+e3IpsMeterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpsMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpsMeterTable holds information related to the
+		powermeters of all IPS nodes."
+	::= { e3Mib 4 }
+
+e3IpsMeterEntry OBJECT-TYPE
+	SYNTAX		E3IpsMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific powermeter."
+	INDEX		{ e3IpsSerial, e3IpsMeter }
+	::=		{ e3IpsMeterTable 1 }
+
+E3IpsMeterEntry ::= SEQUENCE {
+		e3IpsMeter		Integer32,
+		e3IpsEnergyP		WattHours,
+		e3IpsPowerP		Watts,
+		e3IpsPowerQ		VoltAmpereReactives,
+		e3IpsPowerS		VoltAmperes,
+		e3IpsUrms		MilliVolts,
+		e3IpsIrms		MilliAmperes,
+		e3IpsFrequency		MilliHertz,
+		e3IpsPeriodType		INTEGER,
+		e3IpsPeriodStart	Unsigned32,
+		e3IpsPeriodDuration	Unsigned32,
+		e3IpsDataStatus		INTEGER,
+		e3IpsPMin		Watts,
+		e3IpsPMax		Watts,
+		e3IpsPAvg		Watts,
+		e3IpsQMin		VoltAmpereReactives,
+		e3IpsQMax		VoltAmpereReactives,
+		e3IpsQAvg		VoltAmpereReactives,
+		e3IpsSAvg		VoltAmperes,
+		e3IpsUrmsMin		MilliVolts,
+		e3IpsUrmsMax		MilliVolts,
+		e3IpsUrmsAvg		MilliVolts,
+		e3IpsIrmsMin		MilliAmperes,
+		e3IpsIrmsMax		MilliAmperes,
+		e3IpsIrmsAvg		MilliAmperes,
+		e3IpsFreqMin		MilliHertz,
+		e3IpsFreqMax		MilliHertz,
+		e3IpsPFAvg		INTEGER,
+		e3IpsActiveEnergy	WattHours,
+		e3IpsReactiveEnergyL	VoltAmpereReactiveHours,
+		e3IpsReactiveEnergyC	VoltAmpereReactiveHours
+	}
+
+e3IpsMeter OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index of this power meter in the current node."
+	::= { e3IpsMeterEntry 2 }
+
+e3IpsEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Active energy in watt hours.
+		This object is deprecated, use the e3IpsActiveEnergy object instead."
+	::= { e3IpsMeterEntry 3 }
+
+e3IpsPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Active power at a given instant.
+		This object is deprecated, use the e3IpsPAvg object instead."
+	::= { e3IpsMeterEntry 6 }
+
+e3IpsPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Reactive power at a given instant.
+		This object is deprecated, use the e3IpsQAvg object instead."
+	::= { e3IpsMeterEntry 7 }
+
+e3IpsPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Apparent power at a given instant.
+		This object is deprecated, use the e3IpsQAvg object instead."
+	::= { e3IpsMeterEntry 8 }
+
+e3IpsUrms OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"RMS voltage at a given instant.
+		This object is deprecated, use the e3IpsUrmsAvg object instead."
+	::= { e3IpsMeterEntry 9 }
+
+e3IpsIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"RMS current at a given instant.
+		This object is deprecated, use the e3IpsIrmsAvg object instead."
+	::= { e3IpsMeterEntry 10 }
+
+e3IpsFrequency OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Frequency measured a given instant.
+		This object is deprecated, use e3IpsFreqMin/Max instead."
+	::= { e3IpsMeterEntry 11 }
+
+e3IpsPeriodType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		aggregated (0),
+		sample (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the data is truly aggregated over
+		the indicated period or if it represents just a sample
+		during the indicated period (for old firmware
+		versions)."
+	::= { e3IpsMeterEntry 12 }
+
+e3IpsPeriodStart OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start of the data period which is represented by the
+		values in the MIB. This is given in seconds since
+		1970-01-01 00:00:00 UTC. If this is 0, no data has
+		been received from this node yet."
+	::= { e3IpsMeterEntry 13 }
+
+e3IpsPeriodDuration OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Duration of the data period in seconds."
+	::= { e3IpsMeterEntry 14 }
+
+e3IpsDataStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		current-data (1),
+		old-data (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Informs about the nature of the data in this table
+		entry: 0 (unknown) means no data has yet been received
+		from this node, 1 (current-data) means that the data
+		is from the most recently polled period, 2 (old-data)
+		means the data is from a previous period."
+	::= { e3IpsMeterEntry 15 }
+
+e3IpsPMin OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min active power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 16 }
+
+e3IpsPMax OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max active power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 17 }
+
+e3IpsPAvg OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg active power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 18 }
+
+e3IpsQMin OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min reactive power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 19 }
+
+e3IpsQMax OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max reactive power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 20 }
+
+e3IpsQAvg OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg reactive power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 21 }
+
+e3IpsSAvg OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg apparent power measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 22 }
+
+e3IpsUrmsMin OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min RMS voltage measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 23 }
+
+e3IpsUrmsMax OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max RMS voltage measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 24 }
+
+e3IpsUrmsAvg OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg RMS voltage measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 25 }
+
+e3IpsIrmsMin OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min RMS current measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 26 }
+
+e3IpsIrmsMax OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max RMS current measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 27 }
+
+e3IpsIrmsAvg OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg RMS current measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 28 }
+
+e3IpsFreqMin OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min frequency measured during the indicated period."
+	::= { e3IpsMeterEntry 29 }
+
+e3IpsFreqMax OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max frequency measured during the indicated period."
+	::= { e3IpsMeterEntry 30 }
+
+e3IpsPFAvg OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg power factor * 100 measured during the indicated
+		period."
+	::= { e3IpsMeterEntry 31 }
+
+e3IpsActiveEnergy OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active energy at the end of the indicated period."
+	::= { e3IpsMeterEntry 32 }
+
+e3IpsReactiveEnergyL OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive inductive energy at the end of the indicated
+		period."
+	::= { e3IpsMeterEntry 33 }
+
+e3IpsReactiveEnergyC OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive capacitive energy at the end of the
+		indicated period."
+	::= { e3IpsMeterEntry 34 }
+
+-- ===========================================================================
+-- IPS sensors
+--
+
+e3IpsSensorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpsSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The sensor table holds all the sensors of this E3METER
+		concentrator."
+	::= { e3Mib 5 }
+
+e3IpsSensorEntry OBJECT-TYPE
+	SYNTAX		E3IpsSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry containing all data related to a sensor."
+	INDEX		{ e3IpsSerial, e3IpsSensorPort }
+	::=		{ e3IpsSensorTable 1 }
+
+E3IpsSensorEntry ::= SEQUENCE {
+		e3IpsSensorPort			Integer32,
+		e3IpsSensorType			INTEGER,
+		e3IpsSensorTemperatureCelsius	DeciDegreesCelsius,
+		e3IpsSensorHumidity		Percent,
+		e3IpsSensorPeriodType		INTEGER,
+		e3IpsSensorPeriodStart		Unsigned32,
+		e3IpsSensorPeriodDuration	Unsigned32,
+		e3IpsSensorDataStatus		INTEGER,
+		e3IpsSensorTempCMin		DeciDegreesCelsius,
+		e3IpsSensorTempCMax		DeciDegreesCelsius,
+		e3IpsSensorRHMin		Percent,
+		e3IpsSensorRHMax		Percent
+	}
+
+e3IpsSensorPort OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor port number. Zero denotes the built-in sensor."
+	::= { e3IpsSensorEntry 2 }
+
+e3IpsSensorType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		none (0),
+		internal-temp (1),
+		temp (2),
+		temp-rh (3)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor type."
+	::= { e3IpsSensorEntry 3 }
+
+e3IpsSensorTemperatureCelsius OBJECT-TYPE
+	SYNTAX		DeciDegreesCelsius
+	UNITS		"deg-C/10"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Temperature in tenth degrees measured at a given instant."
+	::= { e3IpsSensorEntry 4 }
+
+e3IpsSensorHumidity OBJECT-TYPE
+	SYNTAX		Percent
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"Humidity measured at a given instant."
+	::= { e3IpsSensorEntry 5 }
+
+e3IpsSensorPeriodType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		aggregated (0),
+		sample (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the data is truly aggregated over
+		the indicated period or if it represents just a sample
+		during the indicated period (for old firmware
+		versions)."
+	::= { e3IpsSensorEntry 6 }
+
+e3IpsSensorPeriodStart OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start of the data period which is represented by the
+		values in the MIB. This is given in seconds since the
+		1970-01-01 00:00:00 UTC. If this is 0, no data was
+		received from this node yet."
+	::= { e3IpsSensorEntry 7 }
+
+e3IpsSensorPeriodDuration OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Duration of the data period in seconds."
+	::= { e3IpsSensorEntry 8 }
+
+e3IpsSensorDataStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		current-data (1),
+		old-data (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Informs about the nature of the data in this table
+		entry: 0 (unknown) means no data has yet been received
+		from this node, 1 (current-data) means that the data
+		is from the most recently polled period, 2 (old-data)
+		means the data is from a previous period."
+	::= { e3IpsSensorEntry 9 }
+
+e3IpsSensorTempCMin OBJECT-TYPE
+	SYNTAX		DeciDegreesCelsius
+	UNITS		"deg-C/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min temperature in celsius measured during the
+		indicated period."
+	::= { e3IpsSensorEntry 10 }
+
+e3IpsSensorTempCMax OBJECT-TYPE
+	SYNTAX		DeciDegreesCelsius
+	UNITS		"deg-C/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max temperature in celsius measured during the
+		indicated period."
+	::= { e3IpsSensorEntry 11 }
+
+e3IpsSensorRHMin OBJECT-TYPE
+	SYNTAX		Percent
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min relative humidity measured during the indicated
+		period."
+	::= { e3IpsSensorEntry 12 }
+
+e3IpsSensorRHMax OBJECT-TYPE
+	SYNTAX		Percent
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max relative humidity measured during the indicated
+		period."
+	::= { e3IpsSensorEntry 13 }
+
+-- ===========================================================================
+-- RCM objects
+--
+
+e3IpsRcmTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpsRcmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The sensor table holds the residual current monitoring data
+		of this E3METER concentrator."
+	::= { e3Mib 11 }
+
+e3IpsRcmEntry OBJECT-TYPE
+	SYNTAX		E3IpsRcmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry containing all data related to an rcm measuring point."
+	INDEX		{ e3IpsSerial }
+	::=		{ e3IpsRcmTable 1 }
+
+E3IpsRcmEntry ::= SEQUENCE {
+		e3IpsRcmPeriodStart		Unsigned32,
+		e3IpsRcmPeriodDuration		Unsigned32,
+		e3IpsRcmDataStatus		INTEGER,
+		e3IpsRcmAcMin			MilliAmperes,
+		e3IpsRcmAcMax			MilliAmperes,
+		e3IpsRcmAcAvg			MilliAmperes,
+		e3IpsRcmDcMin			MilliAmperes,
+		e3IpsRcmDcMax			MilliAmperes,
+		e3IpsRcmDcAvg			MilliAmperes
+	}
+
+e3IpsRcmPeriodStart OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start of the data period which is represented by the
+		values in the MIB. This is given in seconds since
+		1970-01-01 00:00:00 UTC. If this is 0, no data has
+		been received from this node yet."
+	::= { e3IpsRcmEntry 2 }
+
+e3IpsRcmPeriodDuration OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Duration of the data period in seconds."
+	::= { e3IpsRcmEntry 3 }
+
+e3IpsRcmDataStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		current-data (1),
+		old-data (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Informs about the nature of the data in this table
+		entry: 0 (unknown) means no data has yet been received
+		from this node, 1 (current-data) means that the data
+		is from the most recently polled period, 2 (old-data)
+		means the data is from a previous period."
+	::= { e3IpsRcmEntry 4 }
+
+e3IpsRcmAcMin OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min AC residual current measured during the indicated
+		period"
+	::= { e3IpsRcmEntry 5 }
+
+e3IpsRcmAcMax OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max AC residual current measured during the indicated
+		period"
+	::= { e3IpsRcmEntry 6 }
+
+e3IpsRcmAcAvg OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg AC residual current measured during the indicated
+		period"
+	::= { e3IpsRcmEntry 7 }
+
+e3IpsRcmDcMin OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min DC residual current measured during the indicated
+		period"
+	::= { e3IpsRcmEntry 8 }
+
+e3IpsRcmDcMax OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max DC residual current measured during the indicated
+		period"
+	::= { e3IpsRcmEntry 9 }
+
+e3IpsRcmDcAvg OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg DC residual current measured during the indicated
+		period"
+	::= { e3IpsRcmEntry 10 }
+
+-- ===========================================================================
+-- Static information about the available meters
+--
+
+e3MeterConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3MeterConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3MeterConfigTable holds information about all meters."
+	::= { e3Mib 12 }
+
+e3MeterConfigEntry OBJECT-TYPE
+	SYNTAX		E3MeterConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific meter."
+	INDEX		{ e3MeterIndex }
+	::=		{ e3MeterConfigTable 1 }
+
+E3MeterConfigEntry ::= SEQUENCE {
+		e3MeterIndex		Integer32,
+		e3MeterUID		OCTET STRING,
+		e3MeterType		Integer32,
+		e3MeterVersion		OCTET STRING,
+		e3MeterLabel		OCTET STRING,
+		e3MeterSerial		OCTET STRING,
+		e3MeterModel		OCTET STRING,
+		e3MeterChannelConfig	Integer32,
+		e3MeterNumSensors	Integer32
+	}
+
+e3MeterIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index of the meter on this CTR. The index is maintained
+		across CTR reboots and changes only if a meter is deleted
+		and added again."
+	::= { e3MeterConfigEntry 1 }
+
+e3MeterUID OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (0..8))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unique ID of the meter on this CTR."
+	::= { e3MeterConfigEntry 2 }
+
+e3MeterType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		ips (1),
+		pro (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Meter type."
+	::= { e3MeterConfigEntry 3 }
+
+e3MeterVersion OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Hardware & software versions."
+	::= { e3MeterConfigEntry 4 }
+
+e3MeterLabel OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Device label."
+	::= { e3MeterConfigEntry 5 }
+
+e3MeterSerial OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Serial number of a meter."
+	::= { e3MeterConfigEntry 6 }
+
+e3MeterModel OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Meter model."
+	::= { e3MeterConfigEntry 7 }
+
+e3MeterChannelConfig OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ch-unknown (0),
+		ch-1L (1),
+		ch-3L1N (2),
+		ch-3L (3)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel configuration of this meter. This defines the
+		number of channels of a meter and the nature of the
+		individual meters in e3MeterTable:
+		- 1L: 1 live wire channel
+		- 3L1N: 3 live wires, 1 neutral wire (4 channels total)
+		- 3L: 3 live wires"
+	::= { e3MeterConfigEntry 8 }
+
+e3MeterNumSensors OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of sensors of this meter in e3MeterSensorTable"
+	::= { e3MeterConfigEntry 9 }
+
+-- ===========================================================================
+-- Metering data of each channel of every meter
+--
+
+e3MeterDataTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3MeterDataEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table holds the metering data of all meters."
+	::= { e3Mib 13 }
+
+e3MeterDataEntry OBJECT-TYPE
+	SYNTAX		E3MeterDataEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry containing all measurement data related a meter."
+	INDEX		{ e3MeterDataMeterIndex, e3MeterDataChannel }
+	::=		{ e3MeterDataTable 1 }
+
+E3MeterDataEntry ::= SEQUENCE {
+		e3MeterDataMeterIndex		Integer32,
+		e3MeterDataChannel		Integer32,
+		e3MeterDataPeriodType		INTEGER,
+		e3MeterDataPeriodStart		Unsigned32,
+		e3MeterDataPeriodDuration	Unsigned32,
+		e3MeterDataStatus		INTEGER,
+		e3MeterDataPMin			Watts,
+		e3MeterDataPMax			Watts,
+		e3MeterDataPAvg			Watts,
+		e3MeterDataQMin			VoltAmpereReactives,
+		e3MeterDataQMax			VoltAmpereReactives,
+		e3MeterDataQAvg			VoltAmpereReactives,
+		e3MeterDataSAvg			VoltAmperes,
+		e3MeterDataUrmsMin		MilliVolts,
+		e3MeterDataUrmsMax		MilliVolts,
+		e3MeterDataUrmsAvg		MilliVolts,
+		e3MeterDataIrmsMin		MilliAmperes,
+		e3MeterDataIrmsMax		MilliAmperes,
+		e3MeterDataIrmsAvg		MilliAmperes,
+		e3MeterDataFreqMin		MilliHertz,
+		e3MeterDataFreqMax		MilliHertz,
+		e3MeterDataPFAvg		INTEGER,
+		e3MeterDataActiveEnergy		WattHours,
+		e3MeterDataReactiveEnergyL	VoltAmpereReactiveHours,
+		e3MeterDataReactiveEnergyC	VoltAmpereReactiveHours
+	}
+
+e3MeterDataMeterIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Corresponds to the e3MeterIndex entry in e3MeterConfig table."
+	::= { e3MeterDataEntry 1 }
+
+e3MeterDataChannel OBJECT-TYPE
+	SYNTAX		Integer32 (0..3)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel number."
+	::= { e3MeterDataEntry 2 }
+
+e3MeterDataPeriodType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		aggregated (0),
+		sample (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the data is truly aggregated over
+		the indicated period or if it represents just a sample
+		during the indicated period (for old firmware
+		versions)."
+	::= { e3MeterDataEntry 3 }
+
+e3MeterDataPeriodStart OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start of the data period which is represented by the
+		values in the MIB. This is given in seconds since
+		1970-01-01 00:00:00 UTC. If this is 0, no data has
+		been received from this meter yet."
+	::= { e3MeterDataEntry 4 }
+
+e3MeterDataPeriodDuration OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Duration of the data period in seconds."
+	::= { e3MeterDataEntry 5 }
+
+e3MeterDataStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		current-data (1),
+		old-data (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Informs about the nature of the data in this table
+		entry: 0 (unknown) means no data has yet been received
+		from this meter, 1 (current-data) means that the data
+		is from the most recently polled period, 2 (old-data)
+		means the data is from a previous period."
+	::= { e3MeterDataEntry 6 }
+
+e3MeterDataPMin OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min active power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 7 }
+
+e3MeterDataPMax OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max active power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 8 }
+
+e3MeterDataPAvg OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg active power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 9 }
+
+e3MeterDataQMin OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min reactive power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 10 }
+
+e3MeterDataQMax OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max reactive power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 11 }
+
+e3MeterDataQAvg OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg reactive power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 12 }
+
+e3MeterDataSAvg OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg apparent power measured during the indicated
+		period."
+	::= { e3MeterDataEntry 13 }
+
+e3MeterDataUrmsMin OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min RMS voltage measured during the indicated
+		period."
+	::= { e3MeterDataEntry 14 }
+
+e3MeterDataUrmsMax OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max RMS voltage measured during the indicated
+		period."
+	::= { e3MeterDataEntry 15 }
+
+e3MeterDataUrmsAvg OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg RMS voltage measured during the indicated
+		period."
+	::= { e3MeterDataEntry 16 }
+
+e3MeterDataIrmsMin OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min RMS current measured during the indicated
+		period."
+	::= { e3MeterDataEntry 17 }
+
+e3MeterDataIrmsMax OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max RMS current measured during the indicated
+		period."
+	::= { e3MeterDataEntry 18 }
+
+e3MeterDataIrmsAvg OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg RMS current measured during the indicated
+		period."
+	::= { e3MeterDataEntry 19 }
+
+e3MeterDataFreqMin OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min frequency measured during the indicated period."
+	::= { e3MeterDataEntry 20 }
+
+e3MeterDataFreqMax OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max frequency measured during the indicated period."
+	::= { e3MeterDataEntry 21 }
+
+e3MeterDataPFAvg OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Avg power factor * 100 measured during the indicated
+		period."
+	::= { e3MeterDataEntry 22 }
+
+e3MeterDataActiveEnergy OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active energy at the end of the indicated period."
+	::= { e3MeterDataEntry 23 }
+
+e3MeterDataReactiveEnergyL OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive inductive energy at the end of the indicated
+		period."
+	::= { e3MeterDataEntry 24 }
+
+e3MeterDataReactiveEnergyC OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive capacitive energy at the end of the
+		indicated period."
+	::= { e3MeterDataEntry 25 }
+
+-- ===========================================================================
+-- Sensor data of each channel of every meter
+--
+
+e3MeterSensorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3MeterSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table holds the sensor data of all meters."
+	::= { e3Mib 14 }
+
+e3MeterSensorEntry OBJECT-TYPE
+	SYNTAX		E3MeterSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry containing each meter's sensor data."
+	INDEX		{ e3MeterSensorMeterIndex, e3MeterSensorIndex }
+	::=		{ e3MeterSensorTable 1 }
+
+E3MeterSensorEntry ::= SEQUENCE {
+		e3MeterSensorMeterIndex		Integer32,
+		e3MeterSensorIndex		Integer32,
+		e3MeterSensorPeriodType		INTEGER,
+		e3MeterSensorPeriodStart	Unsigned32,
+		e3MeterSensorPeriodDuration	Unsigned32,
+		e3MeterSensorStatus		INTEGER,
+		e3MeterSensorDescription	OCTET STRING,
+		e3MeterSensorType		INTEGER,
+		e3MeterSensorTempCMin		DeciDegreesCelsius,
+		e3MeterSensorTempCMax		DeciDegreesCelsius,
+		e3MeterSensorRHMin		Percent,
+		e3MeterSensorRHMax		Percent
+	}
+
+e3MeterSensorMeterIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Corresponds to the e3MeterIndex entry in e3MeterConfig table."
+	::= { e3MeterSensorEntry 1 }
+
+e3MeterSensorIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..3)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor index."
+	::= { e3MeterSensorEntry 2 }
+
+e3MeterSensorPeriodType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		aggregated (0),
+		sample (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the data is truly aggregated over
+		the indicated period or if it represents just a sample
+		during the indicated period (for old firmware
+		versions)."
+	::= { e3MeterSensorEntry 3 }
+
+e3MeterSensorPeriodStart OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start of the data period which is represented by the
+		values in the MIB. This is given in seconds since
+		1970-01-01 00:00:00 UTC. If this is 0, no data has
+		been received from this meter yet."
+	::= { e3MeterSensorEntry 4 }
+
+e3MeterSensorPeriodDuration OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Duration of the data period in seconds."
+	::= { e3MeterSensorEntry 5 }
+
+e3MeterSensorStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown (0),
+		current-data (1),
+		old-data (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Informs about the nature of the data in this table
+		entry: 0 (unknown) means no data has yet been received
+		from this meter, 1 (current-data) means that the data
+		is from the most recently polled period, 2 (old-data)
+		means the data is from a previous period."
+	::= { e3MeterSensorEntry 6 }
+
+e3MeterSensorDescription OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Textual description of the sensor."
+	::= { e3MeterSensorEntry 7 }
+
+e3MeterSensorType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		none (0),
+		temp (1),
+		temprh (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor type."
+	::= { e3MeterSensorEntry 8 }
+
+e3MeterSensorTempCMin OBJECT-TYPE
+	SYNTAX		DeciDegreesCelsius
+	UNITS		"deg-C/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min temperature in celsius measured during the
+		indicated period."
+	::= { e3MeterSensorEntry 9 }
+
+e3MeterSensorTempCMax OBJECT-TYPE
+	SYNTAX		DeciDegreesCelsius
+	UNITS		"deg-C/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max temperature in celsius measured during the
+		indicated period."
+	::= { e3MeterSensorEntry 10 }
+
+e3MeterSensorRHMin OBJECT-TYPE
+	SYNTAX		Percent
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Min relative humidity measured during the indicated
+		period."
+	::= { e3MeterSensorEntry 11 }
+
+e3MeterSensorRHMax OBJECT-TYPE
+	SYNTAX		Percent
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Max relative humidity measured during the indicated
+		period."
+	::= { e3MeterSensorEntry 12 }
+
+-- ===========================================================================
+-- CTR Trap objects
+--
+
+e3ConcentratorTrapObjects OBJECT IDENTIFIER
+
+	::= { e3Mib 9 }
+
+e3CtrEventTime OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"The time at which the event occurred represented in seconds since
+		1970-01-01 00:00:00 UTC."
+	::= { e3ConcentratorTrapObjects 1 }
+
+e3CtrEventSeverityLevel OBJECT-TYPE
+	SYNTAX		INTEGER {
+		informational(10),
+		warning(20),
+		critical(30),
+		emergency(40)
+	}
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"The severity level of the event."
+	::= { e3ConcentratorTrapObjects 2 }
+
+e3CtrEventSource OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"Type and serial number of the device which caused the event."
+	::= { e3ConcentratorTrapObjects 3 }
+
+e3CtrEventDescription OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"Description of the event."
+	::= { e3ConcentratorTrapObjects 4 }
+
+-- ===========================================================================
+-- CTR Traps
+--
+
+e3ConcentratorTraps OBJECT IDENTIFIER
+
+	::= { e3Mib 10 }
+
+e3ConcentratorEventLog NOTIFICATION-TYPE
+	OBJECTS		{	e3CtrEventTime,
+					e3CtrEventSeverityLevel,
+					e3CtrEventSource,
+					e3CtrEventDescription }
+	STATUS		current
+	DESCRIPTION
+		"Event detected by the Data Concentrator in a 'log' format.
+		Fields are delimited by the ';' character."
+	::= { e3ConcentratorTraps 1 }
+
+END

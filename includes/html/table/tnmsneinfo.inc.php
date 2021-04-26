@@ -15,27 +15,27 @@
  * the source code distribution for details.
  */
 
-$columns = array(
+$columns = [
     'neName',
     'neLocation',
     'neType',
     'neOpMode',
     'neAlarm',
     'neOpState',
-);
+];
 
 if (isset($vars['device_id'])) {
-    $params = array(
+    $params = [
         $vars['device_id'],
-    );
+    ];
     $sql = 'SELECT `neName`,`neLocation`,`neType`,`neOpMode`,`neAlarm`,`neOpState` FROM `tnmsneinfo`';
     $wheresql = ' WHERE `device_id` = ?';
     $sortcolumns = 3;
-    $count_sql = "SELECT COUNT(id) FROM `tnmsneinfo`".$wheresql;
+    $count_sql = 'SELECT COUNT(id) FROM `tnmsneinfo`' . $wheresql;
 
     // all columns are searchable - search across them
-    if (isset($searchPhrase) && !empty($searchPhrase)) {
-        $searchsql = implode(' OR ', array_map("search_phrase_column", array_map("mres", $columns)));
+    if (isset($searchPhrase) && ! empty($searchPhrase)) {
+        $searchsql = implode(' OR ', array_map('search_phrase_column', $columns));
         $wheresql .= " AND ( $searchsql )";
     }
     $sql .= $wheresql;
@@ -47,14 +47,14 @@ if (isset($vars['device_id'])) {
     }
 
     // set up default sort
-    if (!isset($sort) || empty($sort)) {
-        $sort = implode(', ', array_map("mres", array_slice($columns, 0, $sortcolumns)));
+    if (! isset($sort) || empty($sort)) {
+        $sort = implode(', ', array_slice($columns, 0, $sortcolumns));
     }
     $sql .= " ORDER BY $sort";
 
     // select only the required rows
     if (isset($current)) {
-        $limit_low  = (($current * $rowCount) - ($rowCount));
+        $limit_low = (($current * $rowCount) - ($rowCount));
         $limit_high = $rowCount;
     }
     if ($rowCount != -1) {
@@ -62,7 +62,7 @@ if (isset($vars['device_id'])) {
     }
 
     // load data from database into response array
-    $response = array();
+    $response = [];
     foreach (dbFetchRows($sql, $params) as $tnmsne) {
         if ($tnmsne['neOpMode'] == 'operation') {
             $neop = '<span style="min-width:40px; display:inlink-block;" class="label label-success">operation</span>';
@@ -70,16 +70,16 @@ if (isset($vars['device_id'])) {
             $neop = '<span style="min-width:40px; display:inlink-block;" class="label label-danger">' . $tnmsne['neOpMode'] . '</span>';
         }
         switch ($tnmsne['neAlarm']) {
-            case "cleared":
+            case 'cleared':
                 $alarm = '<span style="min-width:40px; display:inline-block;" class="label label-success">cleared</span>';
                 break;
-            case "warning":
+            case 'warning':
                 $alarm = '<span style="min-width:40px; display:inline-block;" class="label label-warning">warning</span>';
                 break;
-            case "minor":
-            case "major":
-            case "critical":
-            case "indeterminate":
+            case 'minor':
+            case 'major':
+            case 'critical':
+            case 'indeterminate':
                 $alarm = '<span style="min-width:40px; display:inline-block;" class="label label-danger">' . $tnmsne['neAlarm'] . '</span>';
                 break;
             default:
@@ -88,23 +88,23 @@ if (isset($vars['device_id'])) {
         if ($tnmsne['neOpState'] == 'enabled') {
             $opstate = '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-success">enabled</span></td>';
         } else {
-            $opstate = '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-danger">'.$tnmsne['neOpState'].'</span></td>';
+            $opstate = '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-danger">' . $tnmsne['neOpState'] . '</span></td>';
         }
-        $response[] = array(
+        $response[] = [
             'neName'     => $tnmsne['neName'],
             'neLocation' => $tnmsne['neLocation'],
             'neType'     => $tnmsne['neType'],
             'neOpMode'   => $neop,
             'neAlarm'    => $alarm,
             'neOpState'  => $opstate,
-        );
+        ];
     }
 
-    $output = array(
+    $output = [
         'current'  => $current,
         'rowCount' => $rowCount,
         'rows'     => $response,
         'total'    => $total,
-    );
-    echo _json_encode($output);
+    ];
+    echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }

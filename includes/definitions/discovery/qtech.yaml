@@ -1,0 +1,9 @@
+mib: QTECH-MIB
+modules:
+    os:
+        sysDescr_regex: '/^(?<hardware>\S+).*SoftWare Version.*?(?<version>\d+\.[\d.]+(\(R[\d.]+\))?).*?((Serial No\.:|Device serial number )(?<serial>\d*))?\s+Copyright/s'
+    processors:
+        data:
+            -
+                oid: switchCpuUsage
+                num_oid: '.1.3.6.1.4.1.27514.100.1.11.10.{{ $index }}'

@@ -24,12 +24,12 @@ IMPORTS
 
 
 jnxSubscriberMIB  MODULE-IDENTITY
-       LAST-UPDATED "201312130000Z"  -- 20-Dec-13
+       LAST-UPDATED "201602160000Z"  -- 16-Feb-16
        ORGANIZATION "Juniper Networks, Inc."
        CONTACT-INFO
              " Juniper Technical Assistance Center
              Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
+             1133 Innovation Way
              Sunnyvale, CA 94089
              E-mail: support@juniper.net"
        DESCRIPTION
@@ -47,6 +47,10 @@ jnxSubscriberMIB  MODULE-IDENTITY
        REVISION    "201411030000Z"  -- 03-Nov-14
        DESCRIPTION
              "Added jnxSubscriberPicCountTable and jnxSubscriberSlotCountTable."
+       REVISION    "201602160000Z"  -- 16-Feb-2016
+       DESCRIPTION
+             "Added jnxSubscriberUnderlyingInterface and
+             jnxSubscriberPhysicalInterface objects."
        ::= { jnxSubscriberMibRoot  1 }
 
 
@@ -86,7 +90,17 @@ JnxSubscriberClientType  ::= TEXTUAL-CONVENTION
                 mobileIp            Mobile Ip clients only
                 vplsPw              VPLS pseudowires only
                 static              Static clients only
-                mlppp               MLPPP clients only "
+                mlppp               MLPPP clients only
+                xauth               XAUTH clients only
+                fwauth              FWAUTH clients only
+                dot1x               DOT1X clients only
+                essm                ESSM clients only
+                l2ald               L2ALD clients only
+                gre                 GRE clients only
+                vlanOob             Out-of-band VLAN clients only
+                hagTunnel           Hag Tunnel clients only
+                hagBundle           Hag Bundle clients only
+                fwa                 FWA clients only "
        SYNTAX      BITS {
              none(0),
              dhcp(1),
@@ -98,7 +112,17 @@ JnxSubscriberClientType  ::= TEXTUAL-CONVENTION
              ppppoe(7),
              l2tp(8),
              static(9),
-             mlppp(10) }
+             mlppp(10),
+             xauth(11),
+             fwauth(12),
+             dot1x(13),
+             essm(14),
+             l2ald(15),
+             gre(16),
+             vlanOob(17),
+             hagTunnel(18),
+             hagBundle(19),
+	     fwa(20) }
 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -261,7 +285,9 @@ JnxSubscriberEntry ::= SEQUENCE {
        jnxSubscriberMacAddress           MacAddress,
        jnxSubscriberState                JnxSubscriberState,
        jnxSubscriberLoginTime            DisplayString,
-       jnxSubscriberAcctSessionId        DisplayString }
+       jnxSubscriberAcctSessionId        DisplayString,
+       jnxSubscriberUnderlyingInterface  DisplayString,
+       jnxSubscriberPhysicalInterface    DisplayString }
 
 jnxSubscriberHandleHiWord OBJECT-TYPE
        SYNTAX      Unsigned32(0..4294967295)
@@ -386,6 +412,22 @@ jnxSubscriberAcctSessionId OBJECT-TYPE
              "The accounting session id associated with this subscriber."
        ::= { jnxSubscriberEntry 14 }
 
+jnxSubscriberUnderlyingInterface OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The underlying interface associated with this subscriber interface."
+       ::= { jnxSubscriberEntry 15 }
+
+jnxSubscriberPhysicalInterface OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The physical interface associated with this subscriber interface."
+       ::= { jnxSubscriberEntry 16 }
+
 
 jnxSubscriberPortCountEntry OBJECT-TYPE
        SYNTAX      JnxSubscriberPortCountEntry
@@ -400,7 +442,8 @@ jnxSubscriberPortCountEntry OBJECT-TYPE
 JnxSubscriberPortCountEntry ::= SEQUENCE {
        jnxSubscriberPort                  DisplayString,
        jnxSubscriberPortTunneledCounter  CounterBasedGauge64, 
-       jnxSubscriberPortTerminatedCounter  CounterBasedGauge64 }
+       jnxSubscriberPortTerminatedCounter  CounterBasedGauge64,
+       jnxSubscriberPortL2CrossConnectCounter  CounterBasedGauge64 }
 
 jnxSubscriberPort  OBJECT-TYPE
        SYNTAX       DisplayString (SIZE(1..32))
@@ -426,6 +469,14 @@ jnxSubscriberPortTerminatedCounter OBJECT-TYPE
        DESCRIPTION
              "Number of active Tunneled subscribers present on the port"
        ::= { jnxSubscriberPortCountEntry 3  }
+
+jnxSubscriberPortL2CrossConnectCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of Layer-2 cross-connected subscribers present on the port"
+       ::= { jnxSubscriberPortCountEntry 4  }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Subscriber information by logical system

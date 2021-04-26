@@ -1,0 +1,3764 @@
+
+
+        -- Teldat, S.A.
+        -- Parque Tecnologico de Madrid
+        -- 28760, Tres Cantos (Madrid)
+        -- Tlf: +34-918076565
+        -- Fax: +34-918076521
+        -- e-mail: id@teldat.com
+
+
+        -- MIB privada de Teldat
+
+
+        -- Historial:
+        --      12-04-16    P. Alonso           USB3.0
+        --      11-03-16    Benjamin G.         DR 416 Regesta Compact PLC
+	--      02-03-16    jmarcos             DR 284. New device Teldat H2 Rail
+	--      04-02-16    L. Saiz             New SMGT events subsystem
+        --      22-12-15    S. Font             H2 Auto Plus correction
+        --      10-12-15    S. Font             H2 Auto Plus
+        --      24-03-15    Benjamin G.         DR 336 GPS on H2Auto.
+        --      18-11-15    fmiguel.            New device H2Rail-Lite2 (M1 based with Rail board).
+        --      10-11-15    fmiguel.            New product H2 Rail-Lite.
+	--      02-11-15    P. Nogueira         Revision for mib2c
+        --      20-10-15    Benjamin G.         DR 161 Regesta PLC PRIME.
+        --      16-10-15    A.Campa             CFM fix compilation II	
+        --      11-09-15    S. Font             MII cards for iM
+        --      27-05-15    E. Amorena          Teldat iM: ethernet with switch and poe.
+        --      25-03-15    I. Serrano          New USB-Ethernet interface adapter	
+        --      12-09-14    A. Mata             Variable to save running configuration
+        --      05-12-14    J. Lamamie          DHCPv6 Server Stateless
+	--      03-11-14    P. Nogueira         WNMS
+        --      24-07-14    Benjamin G.         New products H2 Automotive. 	
+        --      12-09-14    A. Mata             Removed UDAFO and DEP
+        --      31-07-14    Benjamin G.         New products line bintec RVC series. 
+        --      30-07-14    A. Mata             Visoralarm no longer supported
+        --      20-06-14    S. Font             New product Teldat V for DSL over ISDN (Annex BJ)
+        --      19-02-14    fmiguel		New product RegestaLite
+	--      14-02-14    I. Munoz            Rebranding bintec elmeg	
+	--      31-01-14    I. Serrano          Standard format of SNMP traps	
+        --  	03-12-13    F. Hernandez       	XI 3280. Alsa Custom Trap.
+        --      24-09-13    fmiguel             New product Connect 4GE
+        --      16-09-13    fmiguel             New product Connect 104KF
+        --      06-09-13    fmiguel             New product Connect 104V
+        --      19-06-13    P. Alonso           Wrong ID for Teldat 4Ge or ESR-WWAN-ENABLER..
+        --      14-06-13    P. Alonso           Compilation errors.
+        --      12-06-13    P. Alonso           Teldat 4Ge or ESR-WWAN-ENABLER.
+        --      08-04-13    A. Mata             Device identifiers added for ALU devices.
+        --      02-04-13    I. Munoz            XH-2788. Group of traps added to 
+        --                                      telAdminStatusSRESubRecordTable.
+        --      07-03-13    N. Moro             XI 2441. MSDP protocol
+        --      05-03-13    fmiguel             USB Ethernet adapter
+        --      19-02-13    fmiguel             New product Teldat M1
+        --      11-02-13    P. Nogueira         Teldat-V: switch management
+     	--      22-01-13    I. Munoz            Code clean-up.
+        -- 17.0 02-01-13    E. Amorena          Compilation error
+        -- 16.9 29-11-12    E. Amorena          Mibs checks
+        -- 16.8 22-11-12    Benjamín G.         Events subsystem NIC and add H1 Rail device.
+        -- 16.7 22-11-12    J. Lamamie          OSPFv3. Commented duplicate RIP6.
+        -- 16.6 13-11-12    N. Moro             PIM protocol and MROUTE
+        -- 16.5 12-11-12    E. Amorena          New ACL events subsystem
+        -- 16.4 09-07-12    P. Nogueira         WLAN subinterfaces on Colibri platforms
+        -- 16.3 27-07-12    M. Fadón            New product Connect 104
+        -- 16.2 07-06-12    C. Godoy            Subsistema de eventos LLDP, RIP6 y MLD6.
+        -- 16.1 30-01-12    J. Rodrigo          Nuevos interfaces
+        -- 16.0 14-12-11    GrupoIPv6           Nuevo IPv6: Fase 1
+        -- 15.9 18-01-12    V. Espejo           Subsistema de eventos IPSF
+        -- 15.8 20-07-11    S. Font             Subsistema de eventos SDEV
+        -- 15.7 18-07-11    M.A. Pastor         Atlas 60: añadidos equipos,
+        --                                      licencias, tipos de placa, tipos
+        --                                      de interfaz y tipos de conector
+        -- 15.6 20-05-11    M.A. Pastor         Añadidos equipos, tipos de placa,
+        --                                      tipos de interfaz, conectores,
+        --                                      subsistemas de eventos y licencias
+        -- 15.5 23-12-10    P. Nogueira         Subinterfaces WLAN
+        -- 15.4 29-12-10    P. Ortiz            RegestaPro6xER. Feature ACAT
+        -- 15.3 27-10-10    E. Amorena          Nuevo equipo RegestaPro6xER
+        -- 15.2 15-10-10    M. Fadón            XI 988. iRouter Pro. Feature VLI.
+        -- 15.1 05-10-10    P. Ortiz            Equipos Regesta-1, RP81 y RP82
+        -- 15.0 30-06-10    M.A. Pastor         Compatibilidad con Spectrum
+        -- 14.9 10-03-10    I. Muñoz            Se añade conector usb en teladminstatusiftable
+        -- 14.8 30-12-09    FdMB                Plataforma H1+
+        -- 14.7 03-11-09    FdMB                Plataforma T200W
+        -- 14.6 23-10-09    FdMB                Plataforma H4
+        -- 14.5 07-09-09    Benjamín G.         PMP-909 Agente SPI.
+        -- 14.4 08-07-09    I. Muñoz            Revisión de todas las MIB para
+        --                  M.A. Pastor         evitar warnings y errores de
+        --                                      compilación
+        -- 14.3 31-08-09    N. Moro             PMP 855. Contadores de bits en entrada
+        -- 14.2 03-07-09    FdMB                Equipos C1+L y V1
+        -- 14.1 20-05-09    Benjamín G.         Cambio nombre H1 Ind. a AUTOMOTIVE.
+        -- 14.0 08-04-09    Benjamín G.         Equipo Teldat G1N
+        -- 13.9 18-03-09    Benjamín G.         Equipo Teldat H1 Industrial
+        -- 13.8 11-03-09    J.Sirodey           Equipo Teldat T200 pasa a ser Teldat T200G
+        -- 13.7 31-10-08    M.Fad & P.Ort       Prot MGCP obsoletando el anterior
+        -- 13.6 30-07-08    FdMB                Plataforma TELDAT_T200
+        -- 13.5 24-06-08    R. Roldan           Se añade susbsistema NETFLOW y
+        --                                      RIP obsoletando el anterior
+        -- 13.4 05-03-08    J. Herrero          Reservado sistema de eventos para PIO
+        -- 13.3 05-03-08    M. Fadón            VyDa 4M
+        -- 13.2 21-02-08    M.A. Pastor         Actualización de los tipos de
+        --                  J. Herrero          interfaz y de los tipos de
+        --                                      conector para soportar todos los
+        --                                      incluidos en el CIT.
+        --                                      Se añaden los subsistemas de
+        --                                      eventos ME, ARLY, DNS Updater,
+        --                                      UDP6, ICMP6, RIP6, SSL y SCCP
+        -- 13.1 24-01-08    P. Nogueira         Eventos para CDP
+        -- 13.0 30-11-07    P. Ortiz            Protocolo SSH
+        -- 12.9 27-01-08    F. Tresgallo        Subsistema de eventos EOAM
+        -- 12.8 11-09-07    P. Nogueira         Eventos para 802.1X
+        -- 12.7 02-08-07    M.A. Berrojo        Subsistema de eventos ISTD
+        -- 12.6 30-10-07    M.A. Berrojo        Subsistema de eventos WWAN
+        -- 12.5 14-09-07    FdMB                ATLAS260/ATASL160
+        -- 12.4 20-06-07    P. Nogueira         Eventos para TFTP
+        -- 12.3 20-06-07    P. Nogueira         Subinterfaces BVI
+        -- 12.2 18-06-07    M.A. Berrojo        Subsistema de eventos cell
+        -- 12.1 16-06-07    FdMB                Plataformas H1.
+        -- 12.0 18-04-07    R. Roldan           PMP 554: facilidad confirm-cfg-needed por SNMP
+        -- 11.9 19-03-07    M.A. Berrojo        voip-cellular y cellular
+        -- 11.8 08-03-07    P. Alonso           Traps BFD.
+        -- 11.7 20-12-06    M. Fadón            Traps NOE y AFS.
+        -- 11.6 05-12-06    Benjamín G.         Traps X28.
+        -- 11.5 20/10/06    J. Iglesias         Subsistema TIDP
+        -- 11.4 26-07-06    P. Nogueira         Eventos de RSTP
+        -- 11.3 10/10/06    A. Mata             Traps para IRVOZ
+        -- 11.2 19/09/06    M.A. Pastor         Nuevo equipo CIRUS
+        -- 11.1 06-07-06    C. García           CIRUS: Implementación bridge-spoofing
+        -- 11.0 15-06-06    FdMB                (II) HAP 222: Atlas3g. Soporte 85xx. Plataforma PQIII
+        -- 10.9 16-02-06    FdMB                Plataformas X2-a, X4-a.
+        -- 10.2 30-05-06    M.A. Pastor         La TELDAT-MIB no compilaba
+        -- 10.1 02-03-06    M.A. Berrojo        Interfaz voip dummy
+        -- 10.0 28-02-06    J. Rodrigo          VisorALARM_EU, VisorALARM_US.
+        -- 10.8 16-02-06    FdMB                Plataformas X1-a.
+        -- 10.7 14/12/05    P. Nogueira         EAP
+        -- 10.6 24-01-05    FdMB                GigabitEthernet eTSEC PQIII
+        -- 10.5 22/11/05    J.Sirodey           C8+, C9+
+        -- 10.4 04-01-06    S. Font             G4[i]-CDMA, G3[i]-CDMA, G1[i]-CDMA
+        -- 10.3 30-11-05    FDMB                CISCO-HDLC
+        -- 10.2 12/12/05    Benjamín G.         Traps SCADA FW.
+        -- 10.1 22/11/05    FdMB                C1+
+        -- 10.0 29/08/05    M. Fadon            VyDa-Compacto
+        -- 9.9  24/10/05    P. Marzo            Cliente STUN
+        -- 9.8  18/10/05    P. Nogueira         WLAN
+        -- 9.7  28/09/05    FdMB                ATLAS152
+        -- 9.6  03/10/05    M.A. Pastor         La TELDAT-MIB no compilaba
+        -- 9.5  20/09/05    FdMB                ATLAS300 de verdad (ATLAS150+BUS@100+CPU@400)
+        -- 9.4  15/09/05    J. Roman            Se obsoleta parte no utilizada
+        -- 9.3  13/09/05    P. Alonso           Protocolo NHRP
+        -- 9.2  05/09/05    O. Mateo            Subsistema de eventos SNAT
+        -- 9.1  29/08/05    M. Fadon            Nuevas licencias VyDa
+        -- 9.0  29/07/05    S. Font             G PLus (corregir 8.8 y 8.9)
+        -- 8.9  26/07/05    S. Font             G PLus (completar 8.8)
+        -- 8.8  21/07/05    S. Font             G PLus
+        -- 8.7  21/07/05    FdMB                Atlas2G Sondas Web
+        -- 8.6  14/07/05    M.A. Pastor         La TELDAT-MIB no compilaba
+        -- 8.5  14/07/05    FdMB                Tarjeta PCI-GIGABIT-Ethernet
+        -- 8.4  17/06/05    M. Fadon            Nuevo subsistema de eventos
+        --                                      TLPHY y se elimina mib h323
+        -- 8.3  17/06/05    M.A. Pastor         No se había añadido el ATLAS 250
+        --                                      en telobjid ni en
+        --                                      telAdminStatusSystemCode.
+        --                                      Se corrige la etiqueta
+        --                                      correspondiente al ATLAS 50 en
+        --                                      el tipo enumerado de
+        --                                      telAdminStatusSystemCode
+        -- 8.2  30/05/05    R. Sánchez          Eventos de consola
+        -- 8.1  03/06/05    M.A. Pastor         Nuevos tipos de hardware:
+        --                                      * PCI soporte VoIP analógico
+        --                                        3DXS, 1FXO con bypass
+        --                                      * PCI soporte VoIP analógico
+        --                                        2FXS, 2FXO con bypass
+        --                                      * PCI E1/T1 sobre Acodes 490x
+        --                                      * PCI soporte VoIP isdn BRI-TE
+        --                                      * Soporte ISDN VoIP como dial
+        -- 8.0  26/04/05    J. Sirodey          ATLAS 50
+        -- 7.9  09/05/05    M.A. Pastor         DHCP cliente
+        -- 7.8  27/04/05    FdMB                Tarjetas PCI-ATM-PQ2 y PCI-BRI-PQ2
+        -- 7.7  21/03/05    D. Rodriguez        IPHC
+        -- 7.6  16/03/05    M. Fadon            Protocolo SIP
+        -- 7.5  16/03/05    S. Font             Teldat C1i/S1i [SNA] [IPSec] VOIP CR
+        -- 7.4  18/01/05    FdMB                TeldatA (Modular hija analogica)
+        -- 7.3  17/01/05    FdMB                Completadas licencias ATLAS 150
+        -- 7.2  21/01/05    M.A. Pastor         Licencias VoIP corregidas
+        -- 7.1  17/01/05    D. Rodriguez        Protocolo VRRP
+        -- 7.0  10/01/05    P. Marzo            Agregada licencia VoIP
+        -- 6.9  22/12/04    Benjamin G.         Protocolo SCADA.
+        -- 6.8  14/12/04    M.A. Pastor         Corregidos identificadores de
+        --                                      licencias (deben comenzar con
+        --                                      minúscula)
+        -- 6.7  13/12/04    FdMB                Completadas licencias ATLAS 250
+        -- 6.6  09/12/04    M.A. Pastor         ATLAS 100-B
+        -- 6.5  09/12/04    M.A. Pastor         Nuevas licencias para ATLAS 100
+        -- 6.4  29/11/04    M.A. Pastor         Corregidos valores medio activo
+        -- 6.3  25/11/04    M.A. Pastor         Se añaden nuevos tipos de placa
+        -- 6.2  25/11/04    M.A. Pastor         Esta MIB no compilaba
+        -- 6.1  24/11/04    M. Fuertes          Se agrega interfaz virtual de bridge (BVI)
+        -- 6.0  26/10/04    S. Font             C4G
+        -- 5.9  20/10/04    P. Nogueira         SR-DSCC4-HSSI
+        -- 5.8  04/10/04    FdMB                SR_PCMCIA_SERIAL
+        -- 5.7  28/09/04    O. Mateo            Subsistema de eventos IKE
+        -- 5.6  22/09/04    M.A. Pastor         Se acortan los nombres de los
+        --                                      identificadores en los tipos
+        --                                      enumerados (no se compilaba en
+        --                                      OpenView)
+        -- 5.5  10/09/04    FdMB                ATLAS300
+        -- 5.4  09/09/04    Benjamin G.         PMP(HT53) Se añade sub. TTTP.
+        -- 5.3  01-09-04    M.A. Berrojo        Se soportan eventos voip
+        -- 5.2  09/07/04    M.A. Pastor         Cambio en las variables que
+        --                                      ejecutan el restart y el reload
+        --                                      para que coincidan con la acción
+        --                                      que realizan en equipos antiguos
+        -- 5.1  05/05/04    M.A. Pastor         Nuevos equipos Atlas 300 y C1G.
+        -- 5.0  23/06/04    M.A. Pastor         Nuevas licencias (CR: Calidad de
+        --                                      Respaldo) y nuevo subsistema de
+        --                                      eventos NSLA
+        -- 4.9  01/06/04    M.A. Pastor         Nuevos tipos de interfaz (PCI
+        --                                      soporte VoIP analógico y L2TP)
+        --                                      y nuevos subsistemas de eventos
+        --                                      (Telnet y L2TP)
+        -- 4.8  11/05/04    M.A. Pastor         Se añaden las licencias de los
+        --                                      equipos antiguos por si desde
+        --                                      una misma estación se quiere
+        --                                      gestionar todo un parque en el
+        --                                      que todavía convivan este tipo
+        --                                      de equipos junto con los nuevos
+        -- 4.7  05/05/04    M.A. Pastor         Revisión tipos de interfaz.
+        --                                      Se añaden nuevas licencias.
+        --                                      Notificación de eventos mediante
+        --                                      mensajes syslog. Se obsoletan
+        --                                      las alarmas propietarias.
+        -- 4.6  04/02/04    M.A. Pastor         Revisión tipos de interfaz y
+        --                                      subsistemas de eventos.
+        -- 4.5  09/12/03    F. Hernández        Cambio en las traps generadas en
+        --                                      el proceso de sondeo de los
+        --                                      estados de los TE-Circuits
+        -- 4.4  20/11/03    M.A. Pastor         Nuevo tipo de placa (board type)
+        -- 4.3  14/11/03    M.A. Pastor         Nuevas licencias y códigos de
+        --                                      gestión de los equipos.
+        -- 4.2  22/10/03    M.A. Pastor         Nuevas licencias, códigos de
+        --                                      equipo, tipos de interfaz y
+        --                                      subsistemas de eventos.
+        --                                      Los equipos Teldat C5x pasan a
+        --                                      denominarse Teldat C4x SNA.
+        -- 4.1  19/09/03    M.A. Pastor         Nuevos equipos Teldat C1/S1/G1.
+        --                                      Motorola FEC con Switch KS8995M
+        -- 4.0  19/09/03    F. Hernández        Traps generadas en el proceso de
+        --                                      sondeo de los estados de los
+        --                                      TE-Circuits encargado por MCI
+        -- 3.9  24/07/03    M.A. Pastor         Nuevas licencias y sublicencias.
+        --                                      Revisión del subsistema de
+        --                                      eventos, de los códigos de
+        --                                      equipo y de los tipos de interfaz
+        -- 3.8  05/12/02    M.A. Pastor         Nuevas variables para obtener el
+        --                                      tipo de placa y la revisión de
+        --                                      la misma y para saber si está o
+        --                                      no montado el controlador de
+        --                                      SmartCard.
+        --                                      Se aprovecha para revisar el
+        --                                      sistema de eventos, licencias y
+        --                                      códigos de los equipos
+        -- 3.7  16/10/02    P. Nogueira         Nuevas variables relacionadas
+        --                                      con la elección del medio activo
+        --                                      (Flash o SmartCard)
+        -- 3.6  19/07/02    M.A. Pastor         Se actualizan los códigos o
+        --                                      identificadores de los equipos
+        --                                      de Teldat en telobjid. También
+        --                                      se revisa el sistema de eventos
+        -- 3.4  14/02/02    M.A. Pastor         Nuevas licencias para C2-UP
+        --                                      y C6. Cambios en las licencias
+        --                                      correspondientes al Visornet
+        -- 3.3  14/02/02    M.A. Pastor         Se corrige la descripción de la
+        --                                      variable sreEvnStatusAct (no se
+        --                                      indicaban bien los valores de
+        --                                      las máscaras a aplicar)
+        -- 3.2  04/02/02    M.A. Pastor         Cambios en los tipos de los
+        --                                      interfaces
+        -- 3.1  04/02/02    M.A. Pastor         Nuevas licencias para Centrix-D
+        --                                      y Centrix-Sec-A (versión Atlas).
+        --                                      Nuevo código de equipo para el
+        --                                      C2-UP.
+        --                                      Se agregan los posibles tipos de
+        --                                      conector que no se contemplaban
+        -- 3.0  21/01/01    M.A. Pastor         Nuevos equipos Centrix-Sec y
+        --                                      Atlas-D. Inclusión de la
+        --                                      licencia de C-Master_Router
+        -- 2.9  14/12/01    M.A. Pastor         Revisión del sistema de eventos
+        -- 2.8  25/10/01    J. L. Fuentes       Se agregan los interfaces serie
+        --                                      sincrono y asincrono
+        -- 2.7  25/10/01    M.A. Pastor         Revision de las licencias y de
+        --                                      los códigos de los equipos
+        -- 2.6  01/10/01    N. Villaseñor       Traducción a inglés
+        -- 2.5  10/04/01    M.A. Pastor         Se actualizan los posibles tipos
+        --                                      de interfaces y se agrega el
+        --                                      interfaz de Loopback
+        -- 2.4  01/12/00    M.A. Pastor         Modificaciones para que pueda ser
+        --                                      compilada utilizando compiladores
+        --                                      distintos del de Teldat
+        -- 2.3  13/12/99    V.Ruiz-Ruano        Añado OID de subsistema ICU PLUS
+        --                                      para que haga de enterprise en
+        --                                      TRAPS específicas de Teldat
+        -- 2.2  01/03/99    V.Ruiz-Ruano        Elimino SRETrapEquipo, puesto que
+        --                                      no todas las TRAPS devuelven el
+        --                                      equipo como tercer parámetro.
+        -- 2.1  01/03/99    V.Ruiz-Ruano        Añado los OIDs que harán la
+        --                                      función de Enterprise en las TRAPS
+
+        -- 2.0          08/07/98    Jose Picot  Agregacion de nuevos equipos
+
+        -- 1.0 (beta)   27/06/97    Eduardo Tejedor y Jorge Sirodey
+        --                          Implementacion inicial
+
+    --------------------------------------------------------------------------
+
+TELDAT-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+            enterprises, IpAddress, Counter, Opaque
+        FROM RFC1155-SMI
+            OBJECT-TYPE
+        FROM RFC-1212
+            DisplayString
+        FROM RFC1213-MIB
+            TRAP-TYPE
+        FROM RFC-1215;
+
+    teldat  OBJECT IDENTIFIER ::= { enterprises 2007 }
+
+    -- Grupos en la MIB de TELDAT
+
+    teladmin            OBJECT IDENTIFIER ::= { teldat 1 }
+    -- telxface         OBJECT IDENTIFIER ::= { teldat 2 }
+    telproto            OBJECT IDENTIFIER ::= { teldat 3 }
+    telproducts         OBJECT IDENTIFIER ::= { teldat 4 }
+    -- telDot3ChipSets  OBJECT IDENTIFIER ::= { teldat 5 }
+
+
+    -- --------------
+    -- Grupo teladmin
+    -- --------------
+
+    telobjid    OBJECT IDENTIFIER ::= { teladmin 1 }
+
+    -- Identificadores de los equipos de Teldat.
+
+    -- Notas:
+    -- 1) Este valor no coincide con el de la rama de telproducts donde se
+    --    encuentra la MIB privada de ese equipo.
+    -- 2) Inicialmente este OID tenia como mision identificar el equipo que
+    --    habia originado una trap a partir de este valor, que se incluia como
+    --    un parametro de la trap. Actualmente no se incluye tal variable en las
+    --    traps.
+    -- 3) Se sigue incluyendo este OID en el campo enterprise de las traps
+    --    standard.
+
+    -- equipo-rexis-ft         OBJECT IDENTIFIER ::= { telobjid 3 }
+
+    -- equipo-bir-64           OBJECT IDENTIFIER ::= { telobjid 11 }
+
+    equipo-rexis-mru        OBJECT IDENTIFIER ::= { telobjid 15 }
+
+    equipo-mbbu             OBJECT IDENTIFIER ::= { telobjid 16 }
+
+    equipo-bir-u            OBJECT IDENTIFIER ::= { telobjid 20 }
+
+    equipo-ebano            OBJECT IDENTIFIER ::= { telobjid 21 }
+
+    equipo-nucleox-plus     OBJECT IDENTIFIER ::= { telobjid 32 }
+
+    equipo-cbra             OBJECT IDENTIFIER ::= { telobjid 33 }
+
+    equipo-centrix-b        OBJECT IDENTIFIER ::= { telobjid 34 }
+
+    equipo-centrix-p        OBJECT IDENTIFIER ::= { telobjid 35 }
+
+    equipo-temis            OBJECT IDENTIFIER ::= { telobjid 36 }
+
+    equipo-novacom          OBJECT IDENTIFIER ::= { telobjid 37 }
+
+    equipo-router-maestro   OBJECT IDENTIFIER ::= { telobjid 38 }
+
+    equipo-cbra20           OBJECT IDENTIFIER ::= { telobjid 39 }
+
+    equipo-np20h            OBJECT IDENTIFIER ::= { telobjid 40 }
+
+    equipo-icu-plus         OBJECT IDENTIFIER ::= { telobjid 41 }
+
+    equipo-centrix-f        OBJECT IDENTIFIER ::= { telobjid 42 }
+
+    equipo-cbra-tar         OBJECT IDENTIFIER ::= { telobjid 43 }
+
+    equipo-aura             OBJECT IDENTIFIER ::= { telobjid 44 }
+
+    equipo-kronos           OBJECT IDENTIFIER ::= { telobjid 45 }
+
+    -- equipo-cbra-adsl     OBJECT IDENTIFIER ::= { telobjid 46 }
+
+    equipo-teldat-C2        OBJECT IDENTIFIER ::= { telobjid 46 }
+
+    equipo-operador-remoto  OBJECT IDENTIFIER ::= { telobjid 47 }
+
+    equipo-visor            OBJECT IDENTIFIER ::= { telobjid 48 }
+
+    equipo-voxnet           OBJECT IDENTIFIER ::= { telobjid 49 }
+
+    equipo-dusac32          OBJECT IDENTIFIER ::= { telobjid 50 }
+
+    equipo-novacom-x25      OBJECT IDENTIFIER ::= { telobjid 51 }
+
+    equipo-enaplan          OBJECT IDENTIFIER ::= { telobjid 52 }
+
+    equipo-teldat-C3        OBJECT IDENTIFIER ::= { telobjid 53 }
+
+    equipo-atlas-standard   OBJECT IDENTIFIER ::= { telobjid 56 }   --$M4.3
+
+    equipo-teldat-C2B       OBJECT IDENTIFIER ::= { telobjid 57 }
+
+    equipo-teldat-CSW       OBJECT IDENTIFIER ::= { telobjid 58 }
+
+    equipo-teldat-C3-1      OBJECT IDENTIFIER ::= { telobjid 59 }
+
+    equipo-teldat-C3B-1     OBJECT IDENTIFIER ::= { telobjid 60 }
+
+    equipo-teldat-C2BM      OBJECT IDENTIFIER ::= { telobjid 61 }
+
+    equipo-atlas-basico     OBJECT IDENTIFIER ::= { telobjid 62 }   --$M4.3
+
+    equipo-teldat-C2i       OBJECT IDENTIFIER ::= { telobjid 63 }
+
+    equipo-teldat-C3i       OBJECT IDENTIFIER ::= { telobjid 64 }
+
+    equipo-teldat-C3B       OBJECT IDENTIFIER ::= { telobjid 65 }
+
+    equipo-teldat-C3G       OBJECT IDENTIFIER ::= { telobjid 66 }
+
+    -- equipo-teldat-C4-teldat-C5      OBJECT IDENTIFIER ::= { telobjid 67 }
+
+    equipo-teldat-C4        OBJECT IDENTIFIER ::= { telobjid 67 }   --$M4.2
+
+    -- equipo-teldat-C4i-teldat-C5i    OBJECT IDENTIFIER ::= { telobjid 68 }
+
+    equipo-teldat-C4i       OBJECT IDENTIFIER ::= { telobjid 68 }   --$M4.2
+
+    -- equipo-teldat-C4B-teldat-C5B    OBJECT IDENTIFIER ::= { telobjid 69 }
+
+    equipo-teldat-C4B       OBJECT IDENTIFIER ::= { telobjid 69 }   --$M4.2
+
+    equipo-centrix-sec      OBJECT IDENTIFIER ::= { telobjid 70 }
+
+    equipo-centrix-d        OBJECT IDENTIFIER ::= { telobjid 71 }
+
+    equipo-teldat-C2-UP     OBJECT IDENTIFIER ::= { telobjid 72 }
+
+    equipo-teldat-C6        OBJECT IDENTIFIER ::= { telobjid 73 }
+
+    equipo-centrix-ng       OBJECT IDENTIFIER ::= { telobjid 74 }   --$M3.9
+
+    equipo-atlas-voxnet     OBJECT IDENTIFIER ::= { telobjid 75 }   --$M3.9
+
+    equipo-s2               OBJECT IDENTIFIER ::= { telobjid 76 }   --$M4.3
+
+    equipo-s4               OBJECT IDENTIFIER ::= { telobjid 77 }   --$M4.3
+
+    equipo-s2i              OBJECT IDENTIFIER ::= { telobjid 78 }   --$M4.3
+
+    equipo-s4i              OBJECT IDENTIFIER ::= { telobjid 79 }   --$M4.3
+
+    equipo-g2               OBJECT IDENTIFIER ::= { telobjid 80 }   --$M4.3
+
+    equipo-g3               OBJECT IDENTIFIER ::= { telobjid 81 }   --$M4.3
+
+    equipo-g4               OBJECT IDENTIFIER ::= { telobjid 82 }   --$M4.3
+
+    equipo-g2i              OBJECT IDENTIFIER ::= { telobjid 83 }   --$M4.3
+
+    equipo-g3i              OBJECT IDENTIFIER ::= { telobjid 84 }   --$M4.3
+
+    equipo-g4i              OBJECT IDENTIFIER ::= { telobjid 85 }   --$M4.3
+
+    equipo-c1               OBJECT IDENTIFIER ::= { telobjid 86 }   --$M4.3
+
+    equipo-c1B              OBJECT IDENTIFIER ::= { telobjid 87 }   --$M4.3
+
+    equipo-c1i              OBJECT IDENTIFIER ::= { telobjid 88 }   --$M4.3
+
+    equipo-s1               OBJECT IDENTIFIER ::= { telobjid 89 }   --$M4.3
+
+    equipo-s1i              OBJECT IDENTIFIER ::= { telobjid 90 }   --$M4.3
+
+    equipo-g1               OBJECT IDENTIFIER ::= { telobjid 91 }   --$M4.3
+
+    equipo-g1i              OBJECT IDENTIFIER ::= { telobjid 92 }   --$M4.3
+
+    equipo-g3-lite          OBJECT IDENTIFIER ::= { telobjid 93 }   --$M4.3
+
+    equipo-C3G-lite         OBJECT IDENTIFIER ::= { telobjid 94 }   --$M4.3
+
+    equipo-atlas-100        OBJECT IDENTIFIER ::= { telobjid 96 }   --$M4.3
+
+    equipo-atlas-300V       OBJECT IDENTIFIER ::= { telobjid 97 }   --$M4.7
+
+    equipo-c1G              OBJECT IDENTIFIER ::= { telobjid 98 }   --$M4.7
+
+    equipo-atlas-250        OBJECT IDENTIFIER ::= { telobjid 101 }
+
+    equipo-c4G              OBJECT IDENTIFIER ::= { telobjid 102 }  --$M6.0
+
+    equipo-atlas-100B       OBJECT IDENTIFIER ::= { telobjid 103 }
+
+    equipo-atlas-150        OBJECT IDENTIFIER ::= { telobjid 104 }
+
+    equipo-a2               OBJECT IDENTIFIER ::= { telobjid 105 }
+
+    equipo-a3               OBJECT IDENTIFIER ::= { telobjid 106 }
+
+    equipo-a4               OBJECT IDENTIFIER ::= { telobjid 107 }
+
+    equipo-a2i              OBJECT IDENTIFIER ::= { telobjid 108 }
+
+    equipo-a3i              OBJECT IDENTIFIER ::= { telobjid 109 }
+
+    equipo-a4i              OBJECT IDENTIFIER ::= { telobjid 110 }
+
+    equipo-a1               OBJECT IDENTIFIER ::= { telobjid 111 }
+
+    equipo-a1i              OBJECT IDENTIFIER ::= { telobjid 112 }
+
+    equipo-g4-cdma          OBJECT IDENTIFIER ::= { telobjid 114 }
+
+    equipo-g4i-cdma         OBJECT IDENTIFIER ::= { telobjid 115 }
+
+    equipo-g3-cdma          OBJECT IDENTIFIER ::= { telobjid 116 }
+
+    equipo-g3i-cdma         OBJECT IDENTIFIER ::= { telobjid 117 }
+
+    equipo-g1-cdma          OBJECT IDENTIFIER ::= { telobjid 118 }
+
+    equipo-g1i-cdma         OBJECT IDENTIFIER ::= { telobjid 119 }
+
+    equipo-c1plus           OBJECT IDENTIFIER ::= { telobjid 122 }
+
+    equipo-c1iplus          OBJECT IDENTIFIER ::= { telobjid 123 }
+
+    equipo-atlas-50         OBJECT IDENTIFIER ::= { telobjid 126 }
+
+    equipo-g4plus           OBJECT IDENTIFIER ::= { telobjid 127 }
+
+    equipo-g3plus           OBJECT IDENTIFIER ::= { telobjid 128 }
+
+    equipo-g1plus           OBJECT IDENTIFIER ::= { telobjid 129 }
+
+    equipo-g4iplus          OBJECT IDENTIFIER ::= { telobjid 130 }
+
+    equipo-g3iplus          OBJECT IDENTIFIER ::= { telobjid 131 }
+
+    equipo-g1iplus          OBJECT IDENTIFIER ::= { telobjid 132 }
+
+    equipo-atlas-250SW      OBJECT IDENTIFIER ::= { telobjid 133 }
+
+    equipo-atlas-150SW      OBJECT IDENTIFIER ::= { telobjid 134 }
+
+    equipo-atlas-50SW       OBJECT IDENTIFIER ::= { telobjid 135 }
+
+    equipo-vyda-1M          OBJECT IDENTIFIER ::= { telobjid 136 }
+
+    equipo-vyda-2M          OBJECT IDENTIFIER ::= { telobjid 137 }
+
+    equipo-vyda-3M          OBJECT IDENTIFIER ::= { telobjid 138 }
+
+    equipo-atlas-300        OBJECT IDENTIFIER ::= { telobjid 139 }
+
+    equipo-atlas-152        OBJECT IDENTIFIER ::= { telobjid 140 }
+
+    equipo-vyda-compact     OBJECT IDENTIFIER ::= { telobjid 141 }
+
+    equipo-C8plus           OBJECT IDENTIFIER ::= { telobjid 142 }
+
+    equipo-C8iplus           OBJECT IDENTIFIER ::= { telobjid 143 }
+
+    equipo-C9plus           OBJECT IDENTIFIER ::= { telobjid 144 }
+
+    equipo-C9iplus           OBJECT IDENTIFIER ::= { telobjid 145 }
+
+    equipo-atlas-360        OBJECT IDENTIFIER ::= { telobjid 146 }
+
+    equipo-c1plus-SW        OBJECT IDENTIFIER ::= { telobjid 147 }
+
+    equipo-c1a              OBJECT IDENTIFIER ::= { telobjid 148 }
+
+    equipo-s1a              OBJECT IDENTIFIER ::= { telobjid 149 }
+
+    equipo-g1a              OBJECT IDENTIFIER ::= { telobjid 150 }
+
+    equipo-g1a-cdma         OBJECT IDENTIFIER ::= { telobjid 151 }
+
+    equipo-a1a              OBJECT IDENTIFIER ::= { telobjid 152 }
+
+    equipo-c2a              OBJECT IDENTIFIER ::= { telobjid 155 }
+
+    equipo-s2a              OBJECT IDENTIFIER ::= { telobjid 156 }
+
+    equipo-g2a              OBJECT IDENTIFIER ::= { telobjid 157 }
+
+    equipo-a2a              OBJECT IDENTIFIER ::= { telobjid 158 }
+
+    equipo-c4a              OBJECT IDENTIFIER ::= { telobjid 159 }
+
+    equipo-s4a              OBJECT IDENTIFIER ::= { telobjid 160 }
+
+    equipo-g4a              OBJECT IDENTIFIER ::= { telobjid 161 }
+
+    equipo-g4a-cdma         OBJECT IDENTIFIER ::= { telobjid 162 }
+
+    equipo-a4a              OBJECT IDENTIFIER ::= { telobjid 163 }
+
+    equipo-cirus            OBJECT IDENTIFIER ::= { telobjid 165 }
+
+    equipo-h1               OBJECT IDENTIFIER ::= { telobjid 166 }
+
+    equipo-atlas-260        OBJECT IDENTIFIER ::= { telobjid 167 }
+
+    equipo-atlas-160        OBJECT IDENTIFIER ::= { telobjid 168 }
+
+    equipo-vyda-4M          OBJECT IDENTIFIER ::= { telobjid 169 }
+
+    equipo-t200g            OBJECT IDENTIFIER ::= { telobjid 170 }
+
+    equipo-h1-auto          OBJECT IDENTIFIER ::= { telobjid 171 }
+
+    equipo-g1n              OBJECT IDENTIFIER ::= { telobjid 172 }
+
+    equipo-v1               OBJECT IDENTIFIER ::= { telobjid 173 }
+
+    equipo-c1plusl          OBJECT IDENTIFIER ::= { telobjid 174 }
+
+    equipo-h4               OBJECT IDENTIFIER ::= { telobjid 175 }
+
+    equipo-t200             OBJECT IDENTIFIER ::= { telobjid 176 }
+
+    equipo-h1plus           OBJECT IDENTIFIER ::= { telobjid 177 }
+
+    equipo-regesta-rp81     OBJECT IDENTIFIER ::= { telobjid 178 }
+
+    equipo-regesta-rp82     OBJECT IDENTIFIER ::= { telobjid 179 }
+
+    equipo-regesta-1        OBJECT IDENTIFIER ::= { telobjid 180 }
+
+    equipo-f1plus           OBJECT IDENTIFIER ::= { telobjid 181 }
+
+    equipo-l1plus           OBJECT IDENTIFIER ::= { telobjid 183 }
+
+    equipo-regesta-rp61er   OBJECT IDENTIFIER ::= { telobjid 184 }
+
+    equipo-regesta-rp62er   OBJECT IDENTIFIER ::= { telobjid 185 }
+
+    equipo-3geplus          OBJECT IDENTIFIER ::= { telobjid 186 }
+
+    equipo-atlas-60         OBJECT IDENTIFIER ::= { telobjid 187 }
+
+    equipo-3geplus-cdma      OBJECT IDENTIFIER ::= { telobjid 188 }
+
+    equipo-h1auto-plus      OBJECT IDENTIFIER ::= { telobjid 189 }
+
+    equipo-k                OBJECT IDENTIFIER ::= { telobjid 190 }
+
+    equipo-v                OBJECT IDENTIFIER ::= { telobjid 191 }
+
+    equipo-connect-104      OBJECT IDENTIFIER ::= { telobjid 192 }
+
+    equipo-h1rail           OBJECT IDENTIFIER ::= { telobjid 193 }
+
+    equipo-kf               OBJECT IDENTIFIER ::= { telobjid 194 }
+
+    equipo-m1               OBJECT IDENTIFIER ::= { telobjid 199 }
+
+    equipo-m1f               OBJECT IDENTIFIER ::= { telobjid 200 }
+
+    equipo-4Ge              OBJECT IDENTIFIER ::= { telobjid 201 }
+
+    router-oa5710v           OBJECT IDENTIFIER ::= { telobjid 202 }
+
+    router-oa5720            OBJECT IDENTIFIER ::= { telobjid 203 }
+
+    router-oa5840            OBJECT IDENTIFIER ::= { telobjid 204 }
+
+    router-oa5850            OBJECT IDENTIFIER ::= { telobjid 205 }
+
+    router-oa5725r61er       OBJECT IDENTIFIER ::= { telobjid 206 }
+
+    router-oa5725r62er       OBJECT IDENTIFIER ::= { telobjid 207 }
+
+    router-oa5725a3g         OBJECT IDENTIFIER ::= { telobjid 208 }
+
+    router-oa5725alte        OBJECT IDENTIFIER ::= { telobjid 209 }
+
+    router-esrwwanenabler    OBJECT IDENTIFIER ::= { telobjid 210 }
+
+    equipo-connect-104-v     OBJECT IDENTIFIER ::= { telobjid 211 }
+
+    equipo-connect-104-kf    OBJECT IDENTIFIER ::= { telobjid 212 }
+
+    equipo-connect-4ge       OBJECT IDENTIFIER ::= { telobjid 213 }
+
+    equipo-bintecrsc         OBJECT IDENTIFIER ::= { telobjid 214 }
+
+    equipo-regesta-lite      OBJECT IDENTIFIER ::= { telobjid 215 }
+    
+    equipo-bintecrvc         OBJECT IDENTIFIER ::= { telobjid 216 }
+        
+    equipo-H2auto            OBJECT IDENTIFIER ::= { telobjid 217 }
+
+    equipo-iM8               OBJECT IDENTIFIER ::= { telobjid 219 }
+
+    equipo-iM8-Plus          OBJECT IDENTIFIER ::= { telobjid 220 }
+
+    equipo-H2auto-Plus       OBJECT IDENTIFIER ::= { telobjid 221 }
+ 
+    equipo-regesta-plc       OBJECT IDENTIFIER ::= { telobjid 222 }
+
+    equipo-Atlas-i70         OBJECT IDENTIFIER ::= { telobjid 223 }
+
+    equipo-Atlas-i70-Plus    OBJECT IDENTIFIER ::= { telobjid 224 }
+
+    equipo-h2rail-lite       OBJECT IDENTIFIER ::= { telobjid 225 }
+        
+    equipo-h2rail-lite2      OBJECT IDENTIFIER ::= { telobjid 226 }
+
+    equipo-h2rail            OBJECT IDENTIFIER ::= { telobjid 227 }
+
+    equipo-regesta-comp-plc  OBJECT IDENTIFIER ::= { telobjid 229 }
+
+    -- Identificadores de los parametros de las traps propietarias de Teldat
+
+    -- sreTrapVar1 OBJECT IDENTIFIER ::= { telobjid 4 }     $M2.2
+
+    -- sreTrapVar2 OBJECT IDENTIFIER ::= { telobjid 5 }     $M2.2
+
+    -- sreTrapVar3 OBJECT IDENTIFIER ::= { telobjid 6 }     $M2.2
+
+    -- sreTrapVar4 OBJECT IDENTIFIER ::= { telobjid 7 }     $M2.2
+
+    -- sreTrapVar5 OBJECT IDENTIFIER ::= { telobjid 8 }     $M2.2
+
+    -- sreTrapVar6 OBJECT IDENTIFIER ::= { telobjid 9 }     $M2.2
+
+    -- sreTrapVar7 OBJECT IDENTIFIER ::= { telobjid 10 }    $M2.2
+
+    -- sreTrapVar8 OBJECT IDENTIFIER ::= { telobjid 11 }    $M2.2
+
+    -- sreTrapVar9 OBJECT IDENTIFIER ::= { telobjid 12 }    $M2.2
+
+    teldatSreTrap   OBJECT IDENTIFIER ::= { telobjid 1 }
+
+    -- sreTrapSubSist  OBJECT IDENTIFIER ::= { telobjid 2 }
+
+    -- sreTrapEvento   OBJECT IDENTIFIER ::= { telobjid 3 }
+
+    -- sreTrapEquipo    OBJECT IDENTIFIER ::= { telobjid 4 }    comentada por $M2.2
+
+    sreTrapSubSist OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "First variable inside the variable-bindings field of the SNMP
+            Trap-PDU: Events subsystem number."
+        ::= { telobjid 2 }
+
+    sreTrapEvento OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Second variable inside the variable-bindings field of the SNMP
+            Trap-PDU: Event number (inside the subsystem)."
+        ::= { telobjid 3 }
+
+    sreTrapVar1 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Third variable inside the variable-bindings field of the SNMP
+            Trap-PDU: first variable of the event mask."
+        ::= { telobjid 4 }
+
+     sreTrapVar2 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Fourth variable inside the variable-bindings field of the SNMP
+            Trap-PDU: second variable of the event mask."
+        ::= { telobjid 5 }
+
+    sreTrapVar3 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Fifth variable inside the variable-bindings field of the SNMP
+            Trap-PDU: third variable of the event mask."
+        ::= { telobjid 6 }
+
+    sreTrapVar4 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Sixth variable inside the variable-bindings field of the SNMP
+            Trap-PDU: fourth variable of the event mask."
+        ::= { telobjid 7 }
+
+    sreTrapVar5 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Seventh variable inside the variable-bindings field of the SNMP
+            Trap-PDU: fifth variable of the event mask."
+        ::= { telobjid 8 }
+
+    sreTrapVar6 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Eighth variable inside the variable-bindings field of the SNMP
+            Trap-PDU: sixth variable of the event mask."
+        ::= { telobjid 9 }
+
+    sreTrapVar7 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Ninth variable inside the variable-bindings field of the SNMP
+            Trap-PDU: seventh variable of the event mask."
+        ::= { telobjid 10 }
+
+    sreTrapVar8 OBJECT-TYPE
+        SYNTAX Opaque
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Tenth variable inside the variable-bindings field of the SNMP
+            Trap-PDU: eighth variable of the event mask."
+        ::= { telobjid 11 }
+
+    sreTrapVar9 OBJECT-TYPE
+        SYNTAX  Opaque
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Eleventh variable inside the variable-bindings field of the SNMP
+            Trap-PDU: ninth variable of the event mask."
+        ::= { telobjid 12 }
+
+
+  -- Identificadores de los subsistemas que tienen TRAP asociada    $M2.1
+  -- En el apartado { teldatSreTrap xyz} xyz es el valor correspondiente al
+  -- fichero trpparam.h
+
+    teldatSreTrap-GW        OBJECT IDENTIFIER ::= { teldatSreTrap 1 }
+    teldatSreTrap-FLT       OBJECT IDENTIFIER ::= { teldatSreTrap 2 }
+    teldatSreTrap-BRS       OBJECT IDENTIFIER ::= { teldatSreTrap 3 }
+    teldatSreTrap-ARP       OBJECT IDENTIFIER ::= { teldatSreTrap 5 }
+    teldatSreTrap-IP        OBJECT IDENTIFIER ::= { teldatSreTrap 10 }
+    teldatSreTrap-ICMP      OBJECT IDENTIFIER ::= { teldatSreTrap 11 }
+    teldatSreTrap-TCP       OBJECT IDENTIFIER ::= { teldatSreTrap 12 }
+    teldatSreTrap-UDP       OBJECT IDENTIFIER ::= { teldatSreTrap 13 }
+    teldatSreTrap-ORIP      OBJECT IDENTIFIER ::= { teldatSreTrap 15 }
+--  teldatSreTrap-EGP       OBJECT IDENTIFIER ::= { teldatSreTrap 16 }  $M3.9
+    teldatSreTrap-SPF       OBJECT IDENTIFIER ::= { teldatSreTrap 17 }
+--  teldatSreTrap-MSPF      OBJECT IDENTIFIER ::= { teldatSreTrap 18 }  $M2.9
+    teldatSreTrap-TFTP      OBJECT IDENTIFIER ::= { teldatSreTrap 19 }
+--  teldatSreTrap-TN        OBJECT IDENTIFIER ::= { teldatSreTrap 20 }  $M2.9
+    teldatSreTrap-SNMP      OBJECT IDENTIFIER ::= { teldatSreTrap 21 }
+--  teldatSreTrap-IPX       OBJECT IDENTIFIER ::= { teldatSreTrap 35 }  $M2.9
+    teldatSreTrap-SRT       OBJECT IDENTIFIER ::= { teldatSreTrap 72 }
+--  teldatSreTrap-STP       OBJECT IDENTIFIER ::= { teldatSreTrap 73 }  $M2.9
+    teldatSreTrap-BR        OBJECT IDENTIFIER ::= { teldatSreTrap 74 }
+--  teldatSreTrap-SRLY      OBJECT IDENTIFIER ::= { teldatSreTrap 75 }  $M2.9
+    teldatSreTrap-FTP       OBJECT IDENTIFIER ::= { teldatSreTrap 80 }  --$M2.9
+    teldatSreTrap-ETH       OBJECT IDENTIFIER ::= { teldatSreTrap 81 }
+--  teldatSreTrap-PN        OBJECT IDENTIFIER ::= { teldatSreTrap 82 }  $M2.9
+    teldatSreTrap-SL        OBJECT IDENTIFIER ::= { teldatSreTrap 83 }
+    teldatSreTrap-TKR       OBJECT IDENTIFIER ::= { teldatSreTrap 84 }
+--  teldatSreTrap-X25       OBJECT IDENTIFIER ::= { teldatSreTrap 85 }  $M2.9
+--  teldatSreTrap-MAN       OBJECT IDENTIFIER ::= { teldatSreTrap 87 }  $M2.9
+--  teldatSreTrap-FDDI      OBJECT IDENTIFIER ::= { teldatSreTrap 88 }  $M2.9
+--  teldatSreTrap-ATR       OBJECT IDENTIFIER ::= { teldatSreTrap 89 }  $M2.9
+    teldatSreTrap-SDLC      OBJECT IDENTIFIER ::= { teldatSreTrap 90 }
+    teldatSreTrap-FR        OBJECT IDENTIFIER ::= { teldatSreTrap 92 }
+    teldatSreTrap-PPP       OBJECT IDENTIFIER ::= { teldatSreTrap 95 }
+--  teldatSreTrap-X251      OBJECT IDENTIFIER ::= { teldatSreTrap 96 }  $M2.9
+    teldatSreTrap-X252      OBJECT IDENTIFIER ::= { teldatSreTrap 97 }
+    teldatSreTrap-X253      OBJECT IDENTIFIER ::= { teldatSreTrap 98 }
+    teldatSreTrap-RDSI      OBJECT IDENTIFIER ::= { teldatSreTrap 99 }
+--  teldatSreTrap-IPPN      OBJECT IDENTIFIER ::= { teldatSreTrap 100 } $M2.9
+--  teldatSreTrap-R2        OBJECT IDENTIFIER ::= { teldatSreTrap 100 } $M2.9
+--  teldatSreTrap-WRS       OBJECT IDENTIFIER ::= { teldatSreTrap 101 } $M2.9
+--  teldatSreTrap-LNM       OBJECT IDENTIFIER ::= { teldatSreTrap 102 } $M2.9
+    teldatSreTrap-LLC       OBJECT IDENTIFIER ::= { teldatSreTrap 103 }
+--  teldatSreTrap-BGP       OBJECT IDENTIFIER ::= { teldatSreTrap 104 } $M2.9
+--  teldatSreTrap-MCF       OBJECT IDENTIFIER ::= { teldatSreTrap 105 } $M2.9
+--  teldatSreTrap-DLSO      OBJECT IDENTIFIER ::= { teldatSreTrap 107 } $M2.9
+--  teldatSreTrap-V25B      OBJECT IDENTIFIER ::= { teldatSreTrap 108 } $M2.9
+    teldatSreTrap-BAN       OBJECT IDENTIFIER ::= { teldatSreTrap 109 }
+    teldatSreTrap-NBS       OBJECT IDENTIFIER ::= { teldatSreTrap 110 }
+    teldatSreTrap-CIF       OBJECT IDENTIFIER ::= { teldatSreTrap 111 }
+    teldatSreTrap-GSTP      OBJECT IDENTIFIER ::= { teldatSreTrap 112 }
+--  teldatSreTrap-NVA       OBJECT IDENTIFIER ::= { teldatSreTrap 113 } $M2.9
+    teldatSreTrap-FRBK      OBJECT IDENTIFIER ::= { teldatSreTrap 114 }
+    teldatSreTrap-PRI       OBJECT IDENTIFIER ::= { teldatSreTrap 115 }
+    teldatSreTrap-DLS       OBJECT IDENTIFIER ::= { teldatSreTrap 116 }
+--  teldatSreTrap-IPTN      OBJECT IDENTIFIER ::= { teldatSreTrap 117 } $M2.9
+    teldatSreTrap-PCMC      OBJECT IDENTIFIER ::= { teldatSreTrap 118 }
+    teldatSreTrap-LAPD      OBJECT IDENTIFIER ::= { teldatSreTrap 119 }
+    teldatSreTrap-TNIP      OBJECT IDENTIFIER ::= { teldatSreTrap 120 }
+--  teldatSreTrap-BIRU      OBJECT IDENTIFIER ::= { teldatSreTrap 121 }     Está definida en biru.mib  (pruebas)
+--  teldatSreTrap-EBANO     OBJECT IDENTIFIER ::= { teldatSreTrap 122 }     Está definida en ebano.mib (pruebas)
+    teldatSreTrap-MBBU      OBJECT IDENTIFIER ::= { teldatSreTrap 123 }
+    teldatSreTrap-BIR64     OBJECT IDENTIFIER ::= { teldatSreTrap 124 }
+    teldatSreTrap-REXISMRU  OBJECT IDENTIFIER ::= { teldatSreTrap 125 }
+    teldatSreTrap-REXISFT   OBJECT IDENTIFIER ::= { teldatSreTrap 126 }
+    teldatSreTrap-ICUPLUS   OBJECT IDENTIFIER ::= { teldatSreTrap 127 } --$M2.3
+    teldatSreTrap-Q933      OBJECT IDENTIFIER ::= { teldatSreTrap 128 } --$M2.9
+    teldatSreTrap-IPPN      OBJECT IDENTIFIER ::= { teldatSreTrap 129 } --$M2.9
+    teldatSreTrap-RAD       OBJECT IDENTIFIER ::= { teldatSreTrap 130 } --$M2.9
+    teldatSreTrap-H323      OBJECT IDENTIFIER ::= { teldatSreTrap 131 } --$M2.9
+--  teldatSreTrap-MIT       OBJECT IDENTIFIER ::= { teldatSreTrap 132 } $M2.9
+    teldatSreTrap-DHCP      OBJECT IDENTIFIER ::= { teldatSreTrap 133 } --$M2.9
+    teldatSreTrap-IP6       OBJECT IDENTIFIER ::= { teldatSreTrap 134 } --$M2.9
+    teldatSreTrap-TVRP      OBJECT IDENTIFIER ::= { teldatSreTrap 135 } --$M2.9
+    teldatSreTrap-ATM       OBJECT IDENTIFIER ::= { teldatSreTrap 136 } --$M2.9
+--  teldatSreTrap-OLD0      OBJECT IDENTIFIER ::= { teldatSreTrap 137 } $M2.9
+    teldatSreTrap-IPSEC     OBJECT IDENTIFIER ::= { teldatSreTrap 138 } --$M2.9
+    teldatSreTrap-NTP       OBJECT IDENTIFIER ::= { teldatSreTrap 139 } --$M2.9
+    teldatSreTrap-ADSL      OBJECT IDENTIFIER ::= { teldatSreTrap 140 } --$M2.9
+--  teldatSreTrap-CIF       OBJECT IDENTIFIER ::= { teldatSreTrap 141 } $M2.9
+    teldatSreTrap-HTTP      OBJECT IDENTIFIER ::= { teldatSreTrap 142 } --$M2.9
+    teldatSreTrap-DEP       OBJECT IDENTIFIER ::= { teldatSreTrap 144 } --$M2.9
+    teldatSreTrap-ASDP      OBJECT IDENTIFIER ::= { teldatSreTrap 145 } --$M2.9
+    teldatSreTrap-LDAP      OBJECT IDENTIFIER ::= { teldatSreTrap 146 } --$M2.9
+    teldatSreTrap-SCEP      OBJECT IDENTIFIER ::= { teldatSreTrap 147 } --$M2.9
+    teldatSreTrap-P3OE      OBJECT IDENTIFIER ::= { teldatSreTrap 148 } --$M2.9
+    teldatSreTrap-AT        OBJECT IDENTIFIER ::= { teldatSreTrap 149 } --$M2.9
+    teldatSreTrap-ASYNC     OBJECT IDENTIFIER ::= { teldatSreTrap 150 } --$M2.9
+    teldatSreTrap-SYNC      OBJECT IDENTIFIER ::= { teldatSreTrap 151 } --$M2.9
+    teldatSreTrap-DNS       OBJECT IDENTIFIER ::= { teldatSreTrap 152 } --$M3.6
+    teldatSreTrap-VSN       OBJECT IDENTIFIER ::= { teldatSreTrap 153 } --$M3.6
+    teldatSreTrap-NAPT      OBJECT IDENTIFIER ::= { teldatSreTrap 154 } --$M3.6
+    teldatSreTrap-VID       OBJECT IDENTIFIER ::= { teldatSreTrap 155 } --$M3.6
+    teldatSreTrap-PRL       OBJECT IDENTIFIER ::= { teldatSreTrap 156 } --$M3.6
+    teldatSreTrap-HDSL      OBJECT IDENTIFIER ::= { teldatSreTrap 157 } --$M3.6
+    teldatSreTrap-PGMO      OBJECT IDENTIFIER ::= { teldatSreTrap 158 } --$M3.6
+    teldatSreTrap-RTSP      OBJECT IDENTIFIER ::= { teldatSreTrap 159 } --$M3.6
+    teldatSreTrap-DNAT      OBJECT IDENTIFIER ::= { teldatSreTrap 160 } --$M3.8
+    teldatSreTrap-G703      OBJECT IDENTIFIER ::= { teldatSreTrap 161 } --$M3.9
+    teldatSreTrap-POLR      OBJECT IDENTIFIER ::= { teldatSreTrap 162 } --$M3.9
+    teldatSreTrap-XN        OBJECT IDENTIFIER ::= { teldatSreTrap 163 } --$M3.9
+    teldatSreTrap-XNS       OBJECT IDENTIFIER ::= { teldatSreTrap 164 } --$M3.9
+    teldatSreTrap-IPX       OBJECT IDENTIFIER ::= { teldatSreTrap 165 } --$M3.9
+    teldatSreTrap-IGMP      OBJECT IDENTIFIER ::= { teldatSreTrap 166 } --$M3.9
+    teldatSreTrap-AINST     OBJECT IDENTIFIER ::= { teldatSreTrap 167 } --$M3.9
+    teldatSreTrap-BGP       OBJECT IDENTIFIER ::= { teldatSreTrap 169 } --$M4.6
+    teldatSreTrap-NSM       OBJECT IDENTIFIER ::= { teldatSreTrap 170 } --$M4.6
+    teldatSreTrap-TLNT      OBJECT IDENTIFIER ::= { teldatSreTrap 171 } --$M4.9
+    teldatSreTrap-L2TP      OBJECT IDENTIFIER ::= { teldatSreTrap 172 } --$M4.9
+    teldatSreTrap-NSLA      OBJECT IDENTIFIER ::= { teldatSreTrap 173 } --$M5.0
+    teldatSreTrap-VOIP      OBJECT IDENTIFIER ::= { teldatSreTrap 174 } --$M5.3
+    teldatSreTrap-TTTP      OBJECT IDENTIFIER ::= { teldatSreTrap 175 } --$M5.4
+    teldatSreTrap-IKE       OBJECT IDENTIFIER ::= { teldatSreTrap 176 }
+    teldatSreTrap-HSSI      OBJECT IDENTIFIER ::= { teldatSreTrap 177 }
+    teldatSreTrap-SCADA     OBJECT IDENTIFIER ::= { teldatSreTrap 178 }
+    teldatSreTrap-VRRP      OBJECT IDENTIFIER ::= { teldatSreTrap 179 }
+    teldatSreTrap-SIP       OBJECT IDENTIFIER ::= { teldatSreTrap 180 }
+    teldatSreTrap-IPHC      OBJECT IDENTIFIER ::= { teldatSreTrap 181 }
+    teldatSreTrap-DHCPC     OBJECT IDENTIFIER ::= { teldatSreTrap 182 }
+    teldatSreTrap-CNSL      OBJECT IDENTIFIER ::= { teldatSreTrap 183 }
+    teldatSreTrap-TLPHY     OBJECT IDENTIFIER ::= { teldatSreTrap 184 }
+    teldatSreTrap-NHRP      OBJECT IDENTIFIER ::= { teldatSreTrap 185 }
+    teldatSreTrap-SNAT      OBJECT IDENTIFIER ::= { teldatSreTrap 186 }
+    teldatSreTrap-STUN      OBJECT IDENTIFIER ::= { teldatSreTrap 187 }
+    teldatSreTrap-WLAN      OBJECT IDENTIFIER ::= { teldatSreTrap 188 }
+    teldatSreTrap-SCDFW     OBJECT IDENTIFIER ::= { teldatSreTrap 189 }
+    teldatSreTrap-HDLC      OBJECT IDENTIFIER ::= { teldatSreTrap 190 }
+    teldatSreTrap-EAP       OBJECT IDENTIFIER ::= { teldatSreTrap 191 }
+    teldatSreTrap-EIBZ      OBJECT IDENTIFIER ::= { teldatSreTrap 192 }
+    teldatSreTrap-PHYS      OBJECT IDENTIFIER ::= { teldatSreTrap 193 }
+    teldatSreTrap-SPOOF     OBJECT IDENTIFIER ::= { teldatSreTrap 194 }
+    teldatSreTrap-IRVOZ     OBJECT IDENTIFIER ::= { teldatSreTrap 195 }
+    teldatSreTrap-RSTP      OBJECT IDENTIFIER ::= { teldatSreTrap 196 }
+    teldatSreTrap-TIDP      OBJECT IDENTIFIER ::= { teldatSreTrap 197 }
+    teldatSreTrap-NOE       OBJECT IDENTIFIER ::= { teldatSreTrap 198 }
+    teldatSreTrap-AFS       OBJECT IDENTIFIER ::= { teldatSreTrap 199 }
+    teldatSreTrap-X28       OBJECT IDENTIFIER ::= { teldatSreTrap 200 }
+    teldatSreTrap-BFD       OBJECT IDENTIFIER ::= { teldatSreTrap 203 }
+    teldatSreTrap-DNSU      OBJECT IDENTIFIER ::= { teldatSreTrap 204 }
+    teldatSreTrap-UDP6      OBJECT IDENTIFIER ::= { teldatSreTrap 205 }
+    teldatSreTrap-ICM6O     OBJECT IDENTIFIER ::= { teldatSreTrap 206 }
+--  teldatSreTrap-RIP6      OBJECT IDENTIFIER ::= { teldatSreTrap 207 }
+    teldatSreTrap-CELL      OBJECT IDENTIFIER ::= { teldatSreTrap 208 }
+    teldatSreTrap-SSL       OBJECT IDENTIFIER ::= { teldatSreTrap 209 }
+    teldatSreTrap-SCCP      OBJECT IDENTIFIER ::= { teldatSreTrap 210 }
+    teldatSreTrap-WWAN      OBJECT IDENTIFIER ::= { teldatSreTrap 211 }
+    teldatSreTrap-ISTD      OBJECT IDENTIFIER ::= { teldatSreTrap 212 }
+    teldatSreTrap-DOT1X     OBJECT IDENTIFIER ::= { teldatSreTrap 213 }
+    teldatSreTrap-EOAM      OBJECT IDENTIFIER ::= { teldatSreTrap 214 }
+    teldatSreTrap-SSH       OBJECT IDENTIFIER ::= { teldatSreTrap 215 }
+    teldatSreTrap-CDP       OBJECT IDENTIFIER ::= { teldatSreTrap 216 }
+    teldatSreTrap-PIO       OBJECT IDENTIFIER ::= { teldatSreTrap 217 }
+    teldatSreTrap-FLOW      OBJECT IDENTIFIER ::= { teldatSreTrap 218 }
+    teldatSreTrap-RIP       OBJECT IDENTIFIER ::= { teldatSreTrap 219 }
+    teldatSreTrap-MGCP      OBJECT IDENTIFIER ::= { teldatSreTrap 220 }
+    teldatSreTrap-TIPS      OBJECT IDENTIFIER ::= { teldatSreTrap 221 }
+    teldatSreTrap-SRVP      OBJECT IDENTIFIER ::= { teldatSreTrap 222 }
+    teldatSreTrap-SPI       OBJECT IDENTIFIER ::= { teldatSreTrap 223 }
+    teldatSreTrap-VLI       OBJECT IDENTIFIER ::= { teldatSreTrap 224 }
+    teldatSreTrap-ACAT      OBJECT IDENTIFIER ::= { teldatSreTrap 225 }
+    teldatSreTrap-AAA       OBJECT IDENTIFIER ::= { teldatSreTrap 226 }
+    teldatSreTrap-SDEV      OBJECT IDENTIFIER ::= { teldatSreTrap 227 }
+    teldatSreTrap-G104      OBJECT IDENTIFIER ::= { teldatSreTrap 228 }
+    teldatSreTrap-I101      OBJECT IDENTIFIER ::= { teldatSreTrap 229 }
+    teldatSreTrap-IPSF      OBJECT IDENTIFIER ::= { teldatSreTrap 230 }
+    teldatSreTrap-DH6C      OBJECT IDENTIFIER ::= { teldatSreTrap 231 }
+    teldatSreTrap-NEIG      OBJECT IDENTIFIER ::= { teldatSreTrap 232 }
+    teldatSreTrap-ND        OBJECT IDENTIFIER ::= { teldatSreTrap 233 }
+    teldatSreTrap-ICM6      OBJECT IDENTIFIER ::= { teldatSreTrap 234 }
+    teldatSreTrap-LLDP      OBJECT IDENTIFIER ::= { teldatSreTrap 235 }
+    teldatSreTrap-RIP6      OBJECT IDENTIFIER ::= { teldatSreTrap 236 }
+    teldatSreTrap-MLD6      OBJECT IDENTIFIER ::= { teldatSreTrap 237 }
+    teldatSreTrap-PIM       OBJECT IDENTIFIER ::= { teldatSreTrap 238 }
+    teldatSreTrap-MRTE      OBJECT IDENTIFIER ::= { teldatSreTrap 239 }
+    teldatSreTrap-ACL       OBJECT IDENTIFIER ::= { teldatSreTrap 240 }
+    teldatSreTrap-SPF6      OBJECT IDENTIFIER ::= { teldatSreTrap 241 }
+    teldatSreTrap-NIC       OBJECT IDENTIFIER ::= { teldatSreTrap 242 }
+    teldatSreTrap-MSDP      OBJECT IDENTIFIER ::= { teldatSreTrap 244 }
+    teldatSreTrap-ACT       OBJECT IDENTIFIER ::= { teldatSreTrap 245 }
+    teldatSreTrap-TDGS      OBJECT IDENTIFIER ::= { teldatSreTrap 255 }
+    teldatSreTrap-GPSF      OBJECT IDENTIFIER ::= { teldatSreTrap 256 }
+    teldatSreTrap-WNMS      OBJECT IDENTIFIER ::= { teldatSreTrap 257 }
+    teldatSreTrap-DH6S      OBJECT IDENTIFIER ::= { teldatSreTrap 259 }
+    teldatSreTrap-CFM       OBJECT IDENTIFIER ::= { teldatSreTrap 264 }
+    teldatSreTrap-PRIME     OBJECT IDENTIFIER ::= { teldatSreTrap 265 }
+    teldatSreTrap-SMGT      OBJECT IDENTIFIER ::= { teldatSreTrap 266 }
+
+    telstatus   OBJECT IDENTIFIER ::= { teladmin 2 }
+
+    -- --------------------------
+    -- Grupo telAdminStatusSystem
+    -- --------------------------
+    telAdminStatusSystem    OBJECT IDENTIFIER ::= { telstatus 1 }
+
+    -- $M2.7
+    telAdminStatusSystemCode OBJECT-TYPE
+        SYNTAX  INTEGER{
+--                rexis-ft(3),
+--                bir-64(11),
+                rexis-mru(15),
+                mbbu(16),
+                bir-u(20),
+                ebano(21),
+                nucleox-plus(32),
+                cbra(33),
+                centrix-b(34),
+                centrix-p(35),
+                temis(36),
+                novacom(37),
+                master-router(38),
+                cbra2x(39),
+                np2xh(40),
+                icu-plus(41),
+                centrix-f(42),
+                cbra-tar(43),
+                aura(44),
+                kronos(45),
+                teldat-C(46),
+                remote-operator(47),
+                visor(48),
+                voxnet(49),
+                dusac32(50),
+                novacom-x25(51),
+                enaplan(52),
+                teldat-C3(53),
+                atlas(56),
+                c2B(57),
+                web-probe(58),
+                c3-1(59),
+                c3B-1(60),
+                c2BM(61),
+                basic-atlas(62),
+                c2i(63),
+                c3i(64),
+                c3B(65),
+                c3G(66),
+                -- c4-c5(67),
+                c4(67),             --$M4.2
+                -- c4i-c5i(68),
+                c4i(68),            --$M4.2
+                -- c4B-c5B(69),
+                c4B(69),            --$M4.2
+                centrix-sec(70),
+                centrix-d(71),
+                c2-UP(72),
+                c6(73),             --$M3.8
+                centrix-ng(74),     --$M3.9
+                atlas-voxnet(75),   --$M3.9
+                s2(76),             --$M4.3
+                s4(77),             --$M4.3
+                s2i(78),            --$M4.3
+                s4i(79),            --$M4.3
+                g2(80),             --$M4.3
+                g3(81),             --$M4.3
+                g4(82),             --$M4.3
+                g2i(83),            --$M4.3
+                g3i(84),            --$M4.3
+                g4i(85),            --$M4.3
+                c1(86),             --$M4.3
+                c1B(87),            --$M4.3
+                c1i(88),            --$M4.3
+                s1(89),             --$M4.3
+                s1i(90),            --$M4.3
+                g1(91),             --$M4.3
+                g1i(92),            --$M4.3
+                g3-lite(93),        --$M4.3
+                c3G-lite(94),       --$M4.3
+                atlas-100(96),      --$M4.3
+                atlas-300V(97),      --$M4.7
+                c1G(98),            --$M4.7
+                atlas-250(101),
+                c4G(102),           --$M6.0
+                atlas-100B(103),
+                atlas-150(104),
+                a2(105),
+                a3(106),
+                a4(107),
+                a2i(108),
+                a3i(109),
+                a4i(110),
+                a1(111),
+                a1i(112),
+                g4-cdma(114),
+                g4i-cdma(115),
+                g3-cdma(116),
+                g3i-cdma(117),
+                g1-cdma(118),
+                g1i-cdma(119),
+                c1plus(122),
+                c1iplus(123),
+                atlas-50(126),
+                g4plus(127),
+                g3plus(128),
+                g1plus(129),
+                g4iplus(130),
+                g3iplus(131),
+                g1iplus(132),
+                atlas-250-web-probe(133),
+                atlas-150-web-probe(134),
+                atlas-50-web-probe(135),
+                vyda-1M(136),
+                vyda-2M(137),
+                vyda-3M(138),
+                atlas-300(139),
+                atlas-152(140),
+                vyda-compact(141),
+                c8plus(142),
+                c8iplus(143),
+                c9plus(144),
+                c9iplus(145),
+                atlas-360(146),
+                c1plus-web-probe(147),
+                c1a(148),
+                s1a(149),
+                g1a(150),
+                g1a-cdma(151),
+                a1a(152),
+                c2a(155),
+                s2a(156),
+                g2a(157),
+                a2a(158),
+                c4a(159),
+                s4a(160),
+                g4a(161),
+                g4a-cdma(162),
+                a4a(163),
+                cirus(165),
+                h1(166),
+                atlas-260(167),
+                atlas-160(168),
+                vyda-4M(169),
+                teldat-t200g(170),
+                teldat-h1-auto(171),
+                teldat-g1n(172),
+                teldat-v1(173),
+                teldat-c1plusl(174),
+                teldat-h4(175),
+                teldat-t200(176),
+                teldat-h1plus(177),
+                regesta-rp81(178),
+                regesta-rp82(179),
+                regesta-1(180),
+                teldat-f1plus(181),
+                teldat-l1plus(183),
+                regesta-rp61er(184),
+                regesta-rp62er(185),
+                teldat-3geplus(186),
+                atlas-60(187),
+                teldat-3geplus-cdma(188),
+                teldat-h1auto-plus(189),
+                teldat-k(190),
+                teldat-v(191),
+                connect-104(192),
+                teldat-h1rail(193),
+                teldat-kf(194),
+                teldat-m1(199),
+                teldat-m1f(200),
+                teldat-4Ge(201),
+                oa5710v(202),
+                oa5720(203),
+                oa5840(204),
+                oa5850(205),
+                oa5725r61er(206),
+                oa5725r62er(207),
+                oa5725a3g(208),
+                oa5725alte(209),
+                esrwwanenabler(210),
+                connect-104v(211),
+                connect-104kf(212),
+                connect-4ge(213),
+                bintecrsc(214),
+                regesta-lite(215),
+                bintecrvc(216),
+                teldat-h2auto(217),
+                teldat-im8(219),
+                teldat-im8plus(220),
+                teldat-h2auto-plus(221),
+                regesta-plc(222),
+                atlasi70(223),
+                atlasi70plus(224),
+                teldat-h2rail-lite(225),
+                teldat-h2rail-lite2(226),
+                teldat-h2rail(227),
+                regesta-compact-plc(229)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Product identifier determined by Teldat identifiers table."
+        ::={ telAdminStatusSystem 1 }
+
+    -- $M2.7 $M3.9
+    telAdminStatusSystemSwLicLev OBJECT-TYPE
+        SYNTAX  INTEGER{
+                default(0),
+                teldatC(1),
+                atlas(2),
+                visornet(3),
+                teldatS(4),
+                teldatG(5),
+                atlas2G(6),
+                atlas150(7),
+                teldatA(8),
+                atlas50(9),
+                atlas300(10),
+                atlas152(11),
+                teldatc1plus(12),
+                teldatc8plus(13),
+                teldatc9plus(14),
+                atlas360(15),
+                teldatH1(16),
+                atlas260(17),
+                atlas160(18),
+                teldatt200g(19),
+                teldath1auto(20),
+                teldatg1n(21),
+                teldatc1pluslite(22),
+                teldatv1(23),
+                teldatH4-teldatl1plus(24),
+                teldatt200(25),
+                teldath1plus-teldatf1plus-teldat3Geplus(26),
+                regestaPro-ER(27),
+                atlas60(28),
+                teldath1autoplus(29),
+                teldatv(30),
+                teldatconnect104(31),
+                teldatk(32),
+                teldathrail(33),
+                teldatm1(34),
+                teldat4ge(35),
+                teldatconnect104v(36),
+                teldatconnect104kf(37),
+                teldatconnect4ge(38),
+                teldath2auto(39),
+                teldatim8(40),
+                teldatim8plus(41),
+                atlasi70(42),
+                atlasi70plus(43),
+                teldath2autoplus(44),
+                teldath2rail(45)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Main level of software licence. This variable indicates the
+            specific family where the product is included. The value 0 is the
+            default value taken when the real value is not associated to any
+            licence recognized or supported. The possible values for this
+            variable and their meaning are:
+            (1)  Teldat C.
+            (2)  Atlas.
+            (3)  Visornet.
+            (4)  Teldat S.
+            (5)  Teldat G.
+            (6)  Atlas 2G.
+            (7)  Atlas 150.
+            (8)  Teldat A.
+            (9)  Atlas 50.
+            (10) Atlas 300.
+            (11) Atlas 152.
+            (12) Teldat C1+.
+            (13) Teldat C8+.
+            (14) Teldat C9+.
+            (15) Atlas 360.
+            (16) Teldat H.
+            (17) Atlas 260.
+            (18) Atlas 160.
+            (19) Teldat T200G.
+            (20) Teldat H1 Auto.
+            (21) Teldat G1N.
+            (22) Teldat C1+L.
+            (23) Teldat V1.
+            (24) Teldat H4 or L1+.
+            (25) Teldat T200.
+            (26) Teldat H1+, Teldat F1+ or Teldat 3Ge+.
+            (27) RegestaPro-ER.
+            (28) Atlas 60.
+            (29) Teldat H1 Auto.+
+            (30) Teldat V
+            (31) Teldat Connect 104
+            (32) Teldat K
+            (33) Teldat H Rail Family
+            (34) Teldat M1
+            (35) Teldat 4Ge
+            (36) Teldat Connect 104V
+            (37) Teldat Connect 104KF
+            (38) Teldat Connect 4Ge
+            (39) Teldat H2 Auto. 
+            (40) Teldat H2 Auto Plus.
+            (41) Teldat H2 Rail.
+
+            If the value of this variable is teldatC (1), atlas (2),
+            visornet (3), teldatS (4), teldatG (5), atlas2g (5), atlas150 (7),
+            teldatA (8) or atlas50 (9) it will be necessary to consider also the
+            value of the next variable to completely determine the type of the
+            accessed product. In any other case, different products can take the
+            same value for this level of software licence and second level of
+            software licence will be always 0, so it will be not possible to
+            distinguish them through their licence."
+        ::={ telAdminStatusSystem 2 }
+
+    -- $M2.7
+    telAdminStatusSystemSwLicSub OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Second level of software licence. This variable is used to know the
+            family funcionality group inside the family indicated with the
+            previous value. The value 0 is the only value taken by this variable
+            in 360-based routers, and also the default value taken when the
+            real value is not associated to any licence recognized or supported.
+            It is necessary to consider also the value of the previous variable
+            to completely determine the type of the product accessed."
+        ::={ telAdminStatusSystem 3 }
+
+    telAdminStatusSystemNumSerie OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Series number of the node."
+        ::={ telAdminStatusSystem 4 }
+
+    telAdminStatusSystemPcbType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Board type."
+        ::={ telAdminStatusSystem 5 }
+
+    telAdminStatusSystemAppVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Version of the application running at the moment in the system."
+        ::={ telAdminStatusSystem 6 }
+
+    telAdminStatusSystemBootVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Version of the system eprom software."
+        ::={ telAdminStatusSystem 7 }
+
+    telAdminStatusSystemClock OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Node time and date. 8 Bytes EBCDIC show respectively
+            seconds, minutes, padding, day, month, week day (monday, etc)
+            and year."
+        ::={ telAdminStatusSystem 8 }
+
+    --$M3.8
+    telAdminStatusSystemBoardType OBJECT-TYPE
+        SYNTAX  INTEGER{
+                adsl-860(8),
+                visornet-860(16),
+                h1-autoplus(24),
+                adsl-855(32),
+                h1-rail(40),
+                cbra-univ(56),
+                visornet-2C(48),
+                atlas(64),
+                cbra-dual(72),
+                tldt-new-C3(80),
+                univ-tjt(88),   --$M3.9
+                tldt-m(96),     --$M4.4
+                hermes(112),
+                univ-bas(120),
+                zeus(128),
+                nike(136),
+                minos(144),
+                pnlp(152),
+                hades(160),
+                tldt-m-a(168),
+                univ-tjt-a(184),
+                at-h1(192),
+                tldt-t200(176),
+                h1-auto(200),
+                at-h4(208),
+                tldt-t200-w(216),
+                h1-like-h2-rail(224),
+                ares(272),
+                at-160(288),
+                iropro(296),
+                tldt-k(304),
+                tldt-m1(312),
+                anteth4g(320),
+                tldt-im1(328),
+                tldt-im2(336),
+                tldt-h2-auto-plus(368),
+                tldt-h2-rail(376),
+                c1plusl(520),
+                v1(528),
+                h1plus(536),
+                c1plusl-b(544),
+                c1plusl-ur2(552),
+                c1plusl-annexm(560),
+                rp61er(576),
+                rp62er(584),
+                rp61er-ac(592),
+                rp62er-ac(600),
+                vdsl2(608),
+                rp62er-ur2(616),
+                rp61er-ur2(624),
+                rp62er-ac-ur2(632),
+                rp61er-ac-ur2(640),
+                rp62er-bj(648),
+                rp61er-bj(656),
+                rp62er-ac-bj(664),
+                rp61er-ac-bj(672),
+                rp62er-j(680),
+                rp61er-j(688),
+                rp62er-ac-j(696),
+                rp61er-ac-j(704),
+                rp62er-b(712),
+                rp61er-b(720),
+                rp62er-ac-b(728),
+                rp61er-ac-b(736),
+                rp21er(744),
+                rp22er(752),
+                v1-bj(760),
+                rp-plc(872),
+                rp-cmp-plc(880)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Board type."
+        ::={ telAdminStatusSystem 9 }
+
+    --$M3.8
+    telAdminStatusSystemBoardRevision OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Board revision."
+        ::={ telAdminStatusSystem 10 }
+
+    --$M3.8
+    telAdminStatusSystemSmartCard OBJECT-TYPE
+        SYNTAX  INTEGER{
+                no(0),
+                yes(1)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This variable indicates whether Smart Card controler is installed.
+            Possible values: no(0), yes(1)."
+        ::={ telAdminStatusSystem 11 }
+
+    -- Tabla telAdminStatusLedsTable
+
+    telAdminStatusLedsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusLedsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telAdminStatusLedsTable contains information about
+            leds."
+        ::={ telstatus 2 }
+
+    telAdminStatusLedsEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusLedsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains the number and state of each led."
+        INDEX   { telAdminStatusLedNum }
+        ::={ telAdminStatusLedsTable 1 }
+
+    TelAdminStatusLedsEntry ::=
+        SEQUENCE{
+            telAdminStatusLedNum
+                INTEGER,
+            telAdminStatusLedStatus
+                INTEGER
+                }
+
+    telAdminStatusLedNum OBJECT-TYPE
+        SYNTAX  INTEGER{
+                led-1(1),
+                led-2(2),
+                led-3(3),
+                led-4(4),
+                led-5(5),
+                led-6(6),
+                led-7(7),
+                led-8(8),
+                led-9(9),
+                led-10(10),
+                led-11(11),
+                led-12(12),
+                led-13(13),
+                led-14(14),
+                led-15(15),
+                led-16(16),
+                led-17(17),
+                led-18(18),
+                led-19(19),
+                led-20(20),
+                led-21(21),
+                led-22(22),
+                led-23(23),
+                led-24(24)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Led identifier number."
+        ::={ telAdminStatusLedsEntry 1 }
+
+    telAdminStatusLedStatus OBJECT-TYPE
+        SYNTAX  INTEGER{
+                off(0),
+                red(1),
+                green(2),
+                orange(3)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Led state."
+        ::={ telAdminStatusLedsEntry 2 }
+
+    -- Tabla telAdminStatusBugsTable
+
+    telAdminStatusBugsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusBugsEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "The table named telAdminStatusBugsTable gives information about
+            the system bug messages."
+        ::={ telstatus 3 }
+
+    telAdminStatusBugsEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusBugsEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "Each entry contains the message number (1 is the last) and the
+            string of the corresponding message."
+        INDEX   { telAdminStatusBugNum }
+        ::={ telAdminStatusBugsTable 1 }
+
+    TelAdminStatusBugsEntry ::=
+        SEQUENCE{
+            telAdminStatusBugNum
+                INTEGER,
+            telAdminStatusBugMsg
+                DisplayString
+        }
+
+    telAdminStatusBugNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Bug number."
+        ::={ telAdminStatusBugsEntry 1 }
+
+    telAdminStatusBugMsg OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Bug text."
+        ::={ telAdminStatusBugsEntry 2 }
+
+    telAdminStatusBugsClear OBJECT-TYPE
+        SYNTAX  INTEGER{
+                not-delete-bugs(0),
+                delete-bugs(1)
+            }
+        ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+            "In a writing operation, 1 resets the number of bugs stored
+            by the system, in a reading operation it is always 0."
+        ::={ telstatus 4 }
+
+    telAdminStatusReload OBJECT-TYPE
+        SYNTAX  INTEGER{
+                undefined(0),
+                reset(1),
+                already-reset(2),
+                not-reset(3)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation 1 resets the system (Reset Hard),
+            In a reading operation, 0 shows unknown output from the last
+            set operation, 2 shows the set operation succeded and 3 shows
+            the last set operation failed."
+        ::={ telstatus 5 }
+
+    telAdminStatusRestart OBJECT-TYPE
+        SYNTAX  INTEGER{
+                undefined(0),
+                restart(1),
+                restarted(2),
+                not-restarted(3)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation 1 resets the system (Reset Soft),
+            In a reading operation, 0 shows the unknown output from the last
+            set operation, 2 shows the set operation succeded and 3 shows
+            the last set operation failed."
+        ::={ telstatus 6 }
+
+    telAdminStatusSaveConfig OBJECT-TYPE
+        SYNTAX  INTEGER{
+                undefined(0),
+                save-configuration(1),
+                saved-configuration(2),
+                not-saved-configuration(3)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation 1 saves to RAM the current system
+            configuration. In a reading operation, 0 shows unknown output from
+            the last set operation, 2 shows the set operation succeded
+            and 3 shows the last set operation failed."
+        ::={ telstatus 7 }
+
+    -- Grupo telAdminStatusSram
+
+    telAdminStatusSram  OBJECT IDENTIFIER ::= { telstatus 8 }
+
+    -- Tabla telAdminStatusSramRecordTable
+
+    telAdminStatusSramRecordTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusSramRecordEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "The table telAdminStatusSramRecordTable contains information about
+            non volatil or SRAM system memory. This memory consists of records
+            that are instances of concrete types and subtypes."
+        ::={ telAdminStatusSram 1 }
+
+    telAdminStatusSramRecordEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusSramRecordEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "Each entry gives information about type, subtype, instance and
+            specific object in SRAM."
+        INDEX   { sramRecordType,
+                  sramRecordSubtype,
+                  sramRecordInstance }
+        ::={ telAdminStatusSramRecordTable 1 }
+
+    TelAdminStatusSramRecordEntry ::=
+        SEQUENCE{
+            sramRecordType
+                INTEGER,
+            sramRecordSubtype
+                INTEGER,
+            sramRecordInstance
+                INTEGER,
+            sramRecordItem
+                Opaque
+        }
+
+    sramRecordType OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "SRAM register type."
+        ::= { telAdminStatusSramRecordEntry 1 }
+
+    sramRecordSubtype OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "SRAM register subtype."
+        ::= { telAdminStatusSramRecordEntry 2 }
+
+    sramRecordInstance OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Instance of the SRAM register."
+        ::= { telAdminStatusSramRecordEntry 3 }
+
+    sramRecordItem OBJECT-TYPE
+        SYNTAX  Opaque
+        ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+            "Specific SRAM register. Since registers may have different sizes
+            depending on the data type of the object (type and subtype), the
+            writing operations only must be performed if the data type of each
+            object (type and subtype) is known. In case data types were not
+            similar, the final configuration could result erroneous."
+        ::= { telAdminStatusSramRecordEntry 4}
+
+    -- Grupo telAdminStatusSRE
+
+    telAdminStatusSRE   OBJECT IDENTIFIER ::= { telstatus 9 }
+
+    -- Tabla telAdminStatusSRESubRecordTable
+
+    telAdminStatusSRESubRecordTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusSRESubRecordEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telAdminStatusSRESubRecordTable contains information
+            about the event subsystem."
+        ::={ telAdminStatusSRE 1 }
+
+    telAdminStatusSRESubRecordEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusSRESubRecordEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains information about identifier, short name,
+            long name, level, event number and if the concrete subsystem
+            is enabled or not for traces, syslog messages and/or SNMP traps."
+        INDEX   { sreSubId }
+        ::={ telAdminStatusSRESubRecordTable 1 }
+
+    TelAdminStatusSRESubRecordEntry ::=
+        SEQUENCE{
+            sreSubId
+                INTEGER,
+            sreSubShortName
+                DisplayString,
+            sreSubLongName
+                DisplayString,
+            sreSubNumEvent
+                INTEGER,
+            sreSubTraceLvlConf
+                INTEGER,
+            sreSubSyslogLvlConf
+                INTEGER,
+            sreSubTrapLvlConf
+                INTEGER,
+            sreSubTrap1LvlConf
+                INTEGER,
+            sreSubTrap2LvlConf
+                INTEGER,
+            sreSubTrap3LvlConf
+                INTEGER,
+            sreSubTrap4LvlConf
+                INTEGER
+        }
+
+    sreSubId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Subsystem identifier."
+        ::= { telAdminStatusSRESubRecordEntry 1 }
+
+    sreSubShortName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Subsystem short name."
+        ::= { telAdminStatusSRESubRecordEntry 2 }
+
+    sreSubLongName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Subsystem long name."
+        ::= { telAdminStatusSRESubRecordEntry 3 }
+
+    sreSubNumEvent OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Number of subsystem defined events."
+        ::= { telAdminStatusSRESubRecordEntry 4}
+
+    sreSubTraceLvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for traces. The
+            mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 5}
+
+    sreSubSyslogLvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for syslog
+            messages.
+            The mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 6}
+
+    sreSubTrapLvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for SNMP traps.
+            The mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 7}
+
+    sreSubTrap1LvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for SNMP traps
+            group 1.
+            The mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 8}
+
+    sreSubTrap2LvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for SNMP traps
+            group 2.
+            The mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 9}
+
+    sreSubTrap3LvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for SNMP traps
+            group 3.
+            The mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 10}
+
+    sreSubTrap4LvlConf OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This mask defines the way the subsystem is enabled for SNMP traps
+            group 4.
+            The mask´s meaning is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSRESubRecordEntry 11}
+
+    -- Tabla telAdminStatusSREEventRecordTable
+
+    telAdminStatusSREEventRecordTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusSREEventRecordEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telAdminStatusSREEventRecordTable contains information
+            about the subsystem events."
+        ::={ telAdminStatusSRE 2 }
+
+    telAdminStatusSREEventRecordEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusSREEventRecordEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains information about the subsystem identifier,
+            event identifier in the subsystem, mask of the event message,
+            event level, times the event occured, current enable mask and
+            configured enable mask."
+        INDEX   { sreEvnSubId, sreEvnEvnId }
+        ::={ telAdminStatusSREEventRecordTable 1 }
+
+    TelAdminStatusSREEventRecordEntry ::=
+        SEQUENCE{
+            sreEvnSubId
+                INTEGER,
+            sreEvnEvnId
+                INTEGER,
+            sreEvnMsg
+                DisplayString,
+            sreEvnLvl
+                INTEGER,
+            sreEvnMeter
+                Counter,
+            sreEvnStatusAct
+                INTEGER,
+            sreEvnStatusCon
+                INTEGER
+        }
+
+    sreEvnSubId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, it is similar
+            to the subsystem identifier that exists in the subsystem table."
+        ::= { telAdminStatusSREEventRecordEntry 1 }
+
+    sreEvnEvnId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREEventRecordEntry 2 }
+
+    sreEvnMsg OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event message mask."
+        ::= { telAdminStatusSREEventRecordEntry 3 }
+
+    sreEvnLvl OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Message level. It is a mask with the following meaning:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSREEventRecordEntry 4}
+
+    sreEvnMeter OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Times the event has ocurred since the last restart/reload.
+            The meaning of the mask is:
+            (UI-ERROR,0x0001); (CI-ERROR,0x0002); (UE-ERROR,0x0004);
+            (CE-ERROR,0x0008); (ERROR,0x000F); (U-INFO,0x0010); (C-INFO,0x0020);
+            (INFO,0x0030); (P-TRACE,0x0100); (U-TRACE,0x0200); (C-TRACE,0x0400)
+            (TRACE,0x0700); (STANDARD,0x001F); (ALWAYS,0x8000); (ALL,0xFFFF)"
+        ::= { telAdminStatusSREEventRecordEntry 5}
+
+    sreEvnStatusAct OBJECT-TYPE
+        SYNTAX  INTEGER(0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The mask defines the way the event is enabled at the moment.
+            The meaning of the mask is:
+            (for traces,0x01); (for syslog messages, 0x02);
+            (for SNMP traps, 0x04); (all, 0x07); (for specific traps with
+            correspondence with generic traps, 0x08); (disabled, 0x00)"
+        ::= { telAdminStatusSREEventRecordEntry 6}
+
+    sreEvnStatusCon OBJECT-TYPE
+        SYNTAX  INTEGER(0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The mask defines the way the event is enabled in configuration at
+            the moment. The meaning of the mask is:
+            (for traces,0x01); (for syslog messages, 0x02);
+            (for SNMP traps, 0x04); (all, 0x07);
+            (disabled, 0x00)"
+        ::= { telAdminStatusSREEventRecordEntry 7}
+
+    -- Tabla telAdminStatusSREGroupRecordTable
+
+    telAdminStatusSREGroupRecordTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusSREGroupRecordEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telAdminStatusSREGroupRecordTable contains information
+            about defined sets of events."
+        ::={ telAdminStatusSRE 3 }
+
+    telAdminStatusSREGroupRecordEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusSREGroupRecordEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains information about the group identifier,
+            group name, enable mask, and the event and subsystem identifier
+            for each of the 20 possible events of the group."
+        INDEX   { sreGrpId }
+        ::={ telAdminStatusSREGroupRecordTable 1 }
+
+    TelAdminStatusSREGroupRecordEntry ::=
+        SEQUENCE{
+            sreGrpId
+                INTEGER,
+            sreGrpName
+                DisplayString,
+            sreGrpStatusCon
+                INTEGER,
+            sreGrpGrpSub1Id
+                INTEGER,
+            sreGrpGrpEvn1Id
+                INTEGER,
+            sreGrpGrpSub2Id
+                INTEGER,
+            sreGrpGrpEvn2Id
+                INTEGER,
+            sreGrpGrpSub3Id
+                INTEGER,
+            sreGrpGrpEvn3Id
+                INTEGER,
+            sreGrpGrpSub4Id
+                INTEGER,
+            sreGrpGrpEvn4Id
+                INTEGER,
+            sreGrpGrpSub5Id
+                INTEGER,
+            sreGrpGrpEvn5Id
+                INTEGER,
+            sreGrpGrpSub6Id
+                INTEGER,
+            sreGrpGrpEvn6Id
+                INTEGER,
+            sreGrpGrpSub7Id
+                INTEGER,
+            sreGrpGrpEvn7Id
+                INTEGER,
+            sreGrpGrpSub8Id
+                INTEGER,
+            sreGrpGrpEvn8Id
+                INTEGER,
+            sreGrpGrpSub9Id
+                INTEGER,
+            sreGrpGrpEvn9Id
+                INTEGER,
+            sreGrpGrpSub10Id
+                INTEGER,
+            sreGrpGrpEvn10Id
+                INTEGER,
+            sreGrpGrpSub11Id
+                INTEGER,
+            sreGrpGrpEvn11Id
+                INTEGER,
+            sreGrpGrpSub12Id
+                INTEGER,
+            sreGrpGrpEvn12Id
+                INTEGER,
+            sreGrpGrpSub13Id
+                INTEGER,
+            sreGrpGrpEvn13Id
+                INTEGER,
+            sreGrpGrpSub14Id
+                INTEGER,
+            sreGrpGrpEvn14Id
+                INTEGER,
+            sreGrpGrpSub15Id
+                INTEGER,
+            sreGrpGrpEvn15Id
+                INTEGER,
+            sreGrpGrpSub16Id
+                INTEGER,
+            sreGrpGrpEvn16Id
+                INTEGER,
+            sreGrpGrpSub17Id
+                INTEGER,
+            sreGrpGrpEvn17Id
+                INTEGER,
+            sreGrpGrpSub18Id
+                INTEGER,
+            sreGrpGrpEvn18Id
+                INTEGER,
+            sreGrpGrpSub19Id
+                INTEGER,
+            sreGrpGrpEvn19Id
+                INTEGER,
+            sreGrpGrpSub20Id
+                INTEGER,
+            sreGrpGrpEvn20Id
+                INTEGER
+        }
+
+    sreGrpId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Group identifier."
+        ::= { telAdminStatusSREGroupRecordEntry 1 }
+
+    sreGrpName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Group name."
+        ::= { telAdminStatusSREGroupRecordEntry 2 }
+
+    sreGrpStatusCon OBJECT-TYPE
+        SYNTAX  INTEGER(0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The mask defines the way the group is enabled at the moment.
+            The meaning of the mask is:
+            (for traces,0x01); (for syslog messages, 0x02);
+            (for SNMP traps, 0x04); (all, 0x07);
+            (disabled, 0x00)"
+        ::= { telAdminStatusSREGroupRecordEntry 3 }
+
+    sreGrpGrpSub1Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that apperars in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 4}
+
+    sreGrpGrpEvn1Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 5}
+
+    sreGrpGrpSub2Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 6}
+
+    sreGrpGrpEvn2Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 7}
+
+    sreGrpGrpSub3Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 8}
+
+    sreGrpGrpEvn3Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 9}
+
+    sreGrpGrpSub4Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 10}
+
+    sreGrpGrpEvn4Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 11}
+
+    sreGrpGrpSub5Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 12}
+
+    sreGrpGrpEvn5Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 13}
+
+    sreGrpGrpSub6Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 14}
+
+    sreGrpGrpEvn6Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 15}
+
+    sreGrpGrpSub7Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 16}
+
+    sreGrpGrpEvn7Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 17}
+
+    sreGrpGrpSub8Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 18}
+
+    sreGrpGrpEvn8Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 19}
+
+    sreGrpGrpSub9Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 20}
+
+    sreGrpGrpEvn9Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 21}
+
+    sreGrpGrpSub10Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 22}
+
+    sreGrpGrpEvn10Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 23}
+
+    sreGrpGrpSub11Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 24}
+
+    sreGrpGrpEvn11Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 25}
+
+    sreGrpGrpSub12Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 26}
+
+    sreGrpGrpEvn12Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 27}
+
+    sreGrpGrpSub13Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 28}
+
+    sreGrpGrpEvn13Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 29}
+
+    sreGrpGrpSub14Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 30}
+
+    sreGrpGrpEvn14Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 31}
+
+    sreGrpGrpSub15Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 32}
+
+    sreGrpGrpEvn15Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 33}
+
+    sreGrpGrpSub16Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 34}
+
+    sreGrpGrpEvn16Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 35}
+
+    sreGrpGrpSub17Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 36}
+
+    sreGrpGrpEvn17Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 37}
+
+    sreGrpGrpSub18Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 38}
+
+    sreGrpGrpEvn18Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 39}
+
+    sreGrpGrpSub19Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 40}
+
+    sreGrpGrpEvn19Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 41}
+
+    sreGrpGrpSub20Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Identifier of the subsystem the event belongs to, similar to the
+            subsystem identifier that appears in the subsystems table."
+        ::= { telAdminStatusSREGroupRecordEntry 42}
+
+    sreGrpGrpEvn20Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Event identifier in the subsystem."
+        ::= { telAdminStatusSREGroupRecordEntry 43}
+
+   -- Variable de limpieza de configuracion de eventos
+
+    telAdminStatusSREClearConf OBJECT-TYPE
+        SYNTAX  INTEGER{
+                with-configuration(0),
+                without-configuration(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This variable deletes the events configuration of the router.
+            If a set operation is performed we can select without-configuration
+            (1) to delete the events configuration. The configuration
+            takes effect after reseting the router."
+        ::= { telAdminStatusSRE 4}
+
+    -- Tabla telAdminStatusIfTable
+
+    telAdminStatusIfTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelAdminStatusIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telAdminStatusifTable contains specific information about
+            Teldat interfaces."
+        ::={ telstatus 10 }
+
+    telAdminStatusIfEntry OBJECT-TYPE
+        SYNTAX  TelAdminStatusIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry gives information about the interface type, connector
+            type, and a description of the hardware type for each interface."
+        INDEX   { telAdminStatusIfIndex }
+        ::={ telAdminStatusIfTable 1 }
+
+    TelAdminStatusIfEntry ::=
+        SEQUENCE{
+            telAdminStatusIfIndex
+                INTEGER,
+            telAdminStatusIfType
+                INTEGER,
+            telAdminStatusIfCon
+                INTEGER,
+            telAdminStatusIfHdw
+                DisplayString
+                }
+
+    telAdminStatusIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Interface index."
+        ::={ telAdminStatusIfEntry 1 }
+
+    -- $M2.5 $M3.2
+    telAdminStatusIfType OBJECT-TYPE
+        SYNTAX  INTEGER{
+            --sr-PRO10(1),                  Pronet-10 interface
+            --sr-PRO80(2),                  Pronet-80 interface
+            --sr-ETHER(3),                  Interlan Ethernet interface
+            --sr-1822(4),                   M/1822 ARPAnet interface
+            --sr-COM2(5),                   SBE COM-2 serial interface
+            sr-MICRO-NODE-X25-NET(1),       --Net ficticia de X25
+            --sr-MICRO-NODE-RDSI-B-NET(2),  Net ficticia de RDSI
+            sr-PCI-WAN-PQ2-SDLC(2),         --SDLC sobre WAN PCI
+            sr-MICRO-NODE-ISAC-NET(3),      --Net ficticia canal D RDSI
+            sr-MICRO-NODE-XOT-NET(4),
+            sr-MICRO-NODE-270-NET(5),
+            sr-COM4(6),                     --SBE COM-4 serial interface
+            sr-PRO4(7),                     --Pronet-4 interface
+            sr-IBD(8),                      --Self-boot hardware type
+            --sr-PETH(9),                   Tldtnet Ethernet interface
+            sr-PCI-AMDETH(9),               --AMD79C973 Ethernet Interface
+            --sr-WDETH(10),                 Western Digital Ethernet interface (LER)
+            sr-AMDETH(10),                  --AMD79C960 Ethernet Interface
+            --sr-GWSL(11),                  GW Serial Line interface (LER)
+            sr-QUIC-SL-X28(11),             --Serial Line interface - X.28
+            sr-QUIC-SL-ASTM(12),            --SBE Com-4 X.25interface
+            --sr-XCOM4(12),                 SBE Com-4 X.25interface
+            --sr-FDDI(13),                  Fiber Distributed Data Interface
+            sr-QUIC-SL-UDAFO(13),           --Interfaz UDAFO
+            --sr-VLANE(14),                 SBE VLAN-E Ethernet interface
+            sr-FASTETH(14),                 --860T Fast Ethernet
+            sr-VCOM4(15),                   --SBE VCOM-4 serial interface
+            --sr-ATR(16),                   Apollo Token Ring
+            sr-dummy-voip(16),              --VOIP dummy
+            sr-PCI-CELLULAR-VOIP(17),       --VOIP cellular
+            sr-ATC2(18),                    --AT COM-2
+            --sr-XATC2(19),                 AT COM-2 X.25
+            --sr-I5ETH(20),                 Intel 82596 Ethernet interface
+            --sr-GENSL(21),                 Dual Serial Line for CNX (Louie)
+            sr-DIAL-G-HDLC(19),             --HDLC encapsulation dial circuit
+            sr-DIAL-G-FR(20),               --FR encapsulation dial circuit
+            sr-DIAL-G-PPP(21),              --PPP encapsulation dial circuit
+            sr-DIAL-G-X25(22),              --X25 encapsulation dial circuit
+            --sr-NP600(22),                 Racal InterLan NP600 smart Ethernet
+            sr-SRLY-GWSL(23),               --SDLC relay interface for gateway SL
+            sr-SRLY-ATC2(24),               --SDLC relay interface for ATComm2 SL
+            sr-SRLY-G1SL(25),               --SDLC relay interface for Louie SL
+            sr-FRGENSL(26),                 --Frame Relay on Genesis serial line
+            sr-NSETH(27),                   --National Semiconductor Ethernet
+            sr-TELDAT-BVI-SUBIFC(28),       --Subinterfaz BVI
+            --sr-FRATC2(29),                Frame Relay on ATComm2 T1
+            sr-TELDAT-FR-SUBIFC(29),        --Subinterfaz FR
+            sr-PPPGENSL(30),                --PPP on Genesis serial line
+            sr-PPPATC2(31),                 --PPP on ATComm2 T1
+            sr-PPPCOM2(32),                 --PPP on P4200 COM2
+            sr-QSL(33),                     --Quad Serial Line for CNX (Weasel)
+            sr-PPPQSL(34),                  --PPP Quad Serial Line for CNX
+            sr-FRQSL(35),                   --Frame Relay Quad Serial Line for CNX
+            sr-SRLY-QSL(36),                --SDLC Relay Quad Serial Line for CNX
+            sr-XQSL(37),                    --X.25 Quad Serial Line for CNX
+            sr-NULL-DEV(38),                --NULL DEVICE
+            sr-YDC-ISDN(39),                --ISDN port on CNX 500
+            --sr-DIAL-SLC(40),              Tldtnet encapsulation dial circuit
+            sr-DIAL-FR(40),                 --FR encapsulation dial circuit
+            sr-DIAL-PPP(41),                --PPP encapsulation dial circuit
+            sr-QUIC-PRI-SIG(42),            --Channel 16 signalling
+            --sr-DNX-YDC-ISDN(42),          ISDN port on DNX 300
+            sr-SDLC-QSL(43),                --SDLC protocol over QSL
+            sr-QSLCH(44),                   --QSL for DNX
+            sr-SDLC-QSLCH(45),              --SDLC protocol over QSL
+            sr-PPP-QSLCH(46),               --PPP over QSL
+            sr-FR-QSLCH(47),                --Frame Relay over QSL
+            sr-XQSLCH(48),                  --X.25 Quad Serial Line for DNX
+            sr-SRLY-QSLCH(49),              --SRLY Quad Serial Line for DNX
+            sr-PCI-PRI-ACODES(50),          --PCI E1/T1 sobre Acodes 490x
+            sr-PCI-BRI-ACODES(51),          --PCI soporte VoIP isdn BRI-TE
+            sr-ISDN-VOIP(52),               --Soporte ISDN VoIP como dial
+            sr-SL-HSSI(53),                 --SLC for High Speed Serial Interface
+            sr-FR-HSSI(54),                 --Frame-Relay for HSSI
+            sr-PPP-HSSI(55),                --PPP for HSSI
+            sr-QUIC-ETH(56),                --Quicksilver Ethernet
+            sr-QUIC-TKR(57),                --Quicksilver 802.5 Token-Ring
+            sr-QUIC-SL-PSL(58),             --Quicksilver Serial - Tldtnet Serial
+            sr-QUIC-SL-PPP(59),             --Quicksilver Serial - PPP
+            sr-QUIC-SL-X25(60),             --Quicksilver Serial - X.25
+            sr-QUIC-SL-FR(61),              --Quicksilver Serial - Frame Relay
+            sr-QUIC-SL-SRLY(62),            --Quicksilver Serial - SDLC Relay
+            sr-QUIC-SL-SDLC(63),            --Quicksilver Serial - Real SDLC
+            sr-QUIC-SL-V25B(64),            --Quicksilver Serial - V.25bis
+            sr-QUIC-ISDNH(65),              --Quicksilver ISDN - Host based
+            sr-TEL-PRU(66),                 --Teldat test
+            sr-TEL-PRU-FAST(67),            --Teldat test !!!! FAST  !!!!
+            sr-TEL-MOTOROLA(68),            --Teldat Router->Node
+            sr-TELDAT-TKR(69),              --Teldat Token Ring
+            sr-TELDAT-ETH(70),              --Teldat Ethernet
+            sr-TELDAT-ISAC(71),             --Controller ISAC de RDSI
+            sr-TELDAT-XOT(72),              --Port XOT
+            sr-TELDAT-270(73),              --Port 270
+            sr-TELDAT-TNIP(74),             --IP Tunnel
+            sr-TELDAT-MPPP(75),             --Multilink PPP
+            sr-FR-ISDN(76),                 --FR over RDSI
+            sr-TELDAT-ATM(77),              --ATM interface
+            sr-TELDAT-ATM-SUBIFC(78),       --ATM subinterface
+            sr-TELDAT-ASDP(79),             --Interfaz ASDP
+            sr-QMC-BRI(80),                 --BRI
+            sr-TELDAT-SYNC-SL(81),          --Interfaz serie sincrono   $M2.8
+            sr-TELDAT-ASYNC-SL(82),         --Interfaz serie asincrono  $M2.8
+            sr-QUIC-SL-APTB(83),            --Async Port Bridge $M3.9
+            sr-TELDAT-ATM-FS(84),           --Generic ATM with FireStream $M3.9
+            sr-TELDAT-LPBK(85),             --Interfaz de Loopback (real) $M3.9
+            sr-TELDAT-PCI-PRI-M32X(86),     --PCI/PRI with Munich32X $M3.9
+            sr-TELDAT-DIALROUT(87),         --Interfaz DIAL ROUTE $M3.9
+            --sr-DSCC4-ASYNC(88),           ASYNC sobre PCI DSCC4 $M3.9
+            sr-PCI-WAN-PQ2-ASYNC(88),       --ASYNC sobre PCI 8272
+            sr-DSCC4-ATC2(89),              --AT sobre PCI DSCC4 $M3.9
+            --sr-DSCC4-SYNC(90),            SYNC sobre PCI DSCC4 $M3.9
+            sr-PCI-WAN-PQ2-SYN(90),         --SYNC sobre PCI 8272
+            sr-PCI-AMD-MICREL-ETH(91),      --AMD79C973 Ethernet con Switch KS8995M $M3.9
+            sr-MOT-MICREL-ETH(92),          --Motorola FEC con Switch KS8995M $M4.1
+            sr-ALARM-RELY(93),              --Reenvia alarmas recibidas a Sw alarmas $M4.2
+            sr-PCI-MEMORY-CARD(94),         --Tarjeta de memoria PCI $4.2
+            sr-TELDAT-ETH-SUBIFC(95),       --Subinterfaz ethernet para vlan $M4.6
+            sr-PCI-POTS-VOIP-CARD(96),      --PCI soporte VoIP analogico $M4.7
+            sr-PCI-BRI-VOIP-CARD(97),       --PCI soporte VoIP isdn bri $M4.7
+            sr-PCI-PRI-VOIP-CARD(98),       --PCI soporte VoIP isdn pri $M4.7
+            sr-PCI-E-M-VOIP-CARD(99),       --PCI soporte VoIP analógico $M4.9
+            sr-TELDAT-LOOPBACK(100),        --Loopback interface
+            sr-TELDAT-L2TP(101),            --Interfaz virtual L2TP $M4.9
+            sr-FCC-ETH(102),                --FCC Fast Ethernet Interface
+            sr-PCMCIA-SERIAL(103),          --PCMCIA Serial (Modem o UMTS)
+            sr-DSCC4-HSSI(104),             --HSSI sobre PCI DSCC4
+            sr-TELDAT-BVI(105),             --Bridge Virtual Interface
+            sr-QUIC-SL-SCADA(106),          --SCADA Serial Interface
+            sr-TELDAT-ATM-PQ2SAR(107),      --Tarjeta PCI ATM con PQ2SAR
+            sr-PCI-QMC-BRI(108),            --Tarjeta PCI PQ2BRI
+            sr-PCI-POTS-3S10VOIP-CARD(109), --PCI soporte VoIP analógico 3DXS, 1FXO con bypass
+            sr-PCI-POTS-2S2OVOIP-CARD(110), --PCI soporte VoIP analógico 2FXS, 2FXO con bypass
+            sr-PCI-INTEL-GIGABIT-ETH(111),  --Tarjeta PCI GIGABIT Ethernet Intel 8254x
+            sr-ATHEROS-WLAN-BASE(112),      --WLAN
+            sr-FCC-MARVELL(113),            --Ethernet Switch 8 o 16 puertas
+            sr-TELDAT-SEPI(114),            --Interfaz SEPI
+            sr-FCC-MICREL(115),             --Ethernet Switch 4
+            sr-ETSEC-ETH(116),              --Enhanced Three Speed Ethernet Controller Power Quicc III
+            sr-EIB-ZENNIO(117),             --Interfaz EIB zennio
+            sr-GPIO-12(118),
+            sr-QUIC-AUTO-INST-SL(119),
+            sr-PCI-PRI-PQ2(120),
+            sr-ETSEC-MARVELL-ETH(121),      --ETSEC + SWITCH
+            sr-QUIC-SL-MODEMEMU(122),       --Interfaz de emulación de modem AT
+            sr-PCI-VALARM-SL-MDMEMU(123),   --AT Modem Emulatión sobre PCI VisorAlarm UL
+            sr-PCI-VALARM-SL-SEPI(124),     --Interfaz SEPI sobre PCI VisorAlarm UL
+            sr-PCI-CELLULAR(125),           --Interfaz PCI HSDPA
+            sr-REMOTE-CELLULAR(126),        --Interfaz Remote Cellular
+            sr-PCI-WAN-PQ2-SCADA(127),      --Interfaz SCADA sobre PMC de 3 WAN
+            sr-TELDAT-ETH-SOFTETH(128),
+            sr-TELDAT-ATM-SOFTSAR(129),     -- SOFTSAR
+            sr-PCI-PQII-FCC-MARVELL-ETH(130), -- PQII + PCI + MARVELL
+            sr-TELDAT-ETH-SOFTPTM(131),     -- SOFTPTM
+            sr-TELDAT-SERIAL-SOFTUSB(132),  -- SOFTUSB
+            sr-PCI-PQII-WDMPON(133),        -- PQII + PCI + INTEL + WDMPON(NORTEL)
+            sr-TELDAT-SOFTWLAN-BASE(134),   -- SOFTWLAN
+            sr-PCI-WAN-PQ2-ASTM(135),
+            sr-PCI-WAN-PQ2-X28(136),
+            sr-PCI-WAN-PQ2-ASDP(137),
+            sr-TELDAT-SOFTNIC(138),
+            sr-DIAL-G-DIP(139),             -- Direct IP Encapsulation dial circuit
+            sr-TELDAT-USBNIC(140),
+            sr-ATHEROS-WLAN-VAP(141),       --Subinterfaz WLAN
+            sr-TELDAT-SOFTWAN(142),
+            sr-TELDAT-SWETH(143),           --Interfaz Ethernet segregado de switch
+            sr-QUIC-SL-IEC101GW(144),
+            sr-PCI-WAN-PQ2-IEC101GW(145),
+            sr-TELDAT-SOFTUART(146),
+            sr-TELDAT-SOFTSCADA(147),
+            sr-TELDAT-SOFTIEC101GW(148),
+            sr-TELDAT-SOFTASDP(149),
+            sr-STANDALONE-GPS(150),
+            sr-SL-GPSDATA(151),
+            sr-SOFTWLAN-VAP(152),
+            sr-FSL-CELLULAR(153),           --Freescale EHCI-USB on-chip controller
+            sr-SOFTETH-SWITCH(154),
+            sr-TELDAT-USBETH(155),
+            sr-TELDAT-SOFTUSBETH(156),
+            sr-TELDAT-ETH-FMAN(157),
+            sr-TELDAT-ETH-FMAN-SWITCH(158),
+            sr-TELDAT-SOFTPRIME(159),
+            sr-FSL-GPSUSB(160),
+            sr-TELDAT-ETH-FMAN-MII(161),
+            sr-XHCI-CELLULAR(162),          --Renesas XHCI-USB controller
+            sr-MICRO-NODE-ROUTER(61441),    --Teldat Node->Router
+            sr-MICRO-NODE-RDSI-B(61442),    --Teldat Channel B: X.25
+            sr-MICRO-NODE-ISAC(61443),      --Teldat Channel D:X.25
+            sr-MICRO-NODE-X25(61444),       --Teldat X.25
+            sr-MICRO-NODE-XOT(61445),       --Teldat XOT
+            sr-MICRO-NODE-270(61446)        --Teldat 270
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Teldat Specific Interface Type."
+        ::={ telAdminStatusIfEntry 2 }
+
+    telAdminStatusIfCon OBJECT-TYPE
+        SYNTAX  INTEGER{
+                no-conn(0),     -- Los valores se extraen del fichero comu.ha
+                lan-conn(1),
+                wan1-conn(2),
+                wan2-conn(3),
+                wan3-conn(4),
+                wan4-conn(5),
+                wan5-conn(6),
+                wan6-conn(7),
+                wan7-conn(8),
+                wan8-conn(9),
+                rdsi1-conn(10),
+                rdsi2-conn(11),
+                adsl1-conn(12),
+                adsl2-conn(13),
+                adsl3-conn(14),
+                adsl4-conn(15),
+                lan-conn-exp(16),
+                uart1-conn(17),
+                uart2-conn(18),
+                uart3-conn(19),
+                uart4-conn(20),
+                rs232-conn(21),
+                rs485-conn(22),
+                slot1-conn(23),
+                slot2-conn(24),
+                slot3-conn(25),
+                rf-conn(26),
+                lan1-conn(27),
+                lan2-conn(28),
+                lan3-conn(29),
+                lan4-conn(30),
+                pots-conn(31),
+                slot4-conn(32),
+                slot5-conn(33),
+                exp-switch1(34),
+                usb-conn(35),
+                ethwan-conn(36),
+                config-conn(37),
+                lan1-switch-conn(38),
+                irp-slot3-conn(39),
+                usb-uart-conn-1(40),
+                usb-uart-conn-2(41),
+                gps-conn(42),
+                rf-conn-1(43),
+                rf-conn-2(44),
+                usb-conn-1(45),
+                usb-conn-2(46),
+                irp-slot2-conn(47),
+                wifi1-conn(48),
+                wifi2-conn(49),
+                im-slot1-conn(50),
+                im-slot2-conn(51),
+                prime-pw-conn(52),
+                slot1-switch-0-conn(53),
+                slot1-switch-1-conn(54)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Connector related to the interface."
+        ::={ telAdminStatusIfEntry 3 }
+
+    telAdminStatusIfHdw OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Description of the hardware related to the interface."
+        ::={ telAdminStatusIfEntry 4 }
+
+    telAdminStatusEthTime OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Date and time Ethernet statistics were updated for last time."
+        ::={ telstatus 11 }
+
+    telAdminConfActDev OBJECT-TYPE
+        SYNTAX  INTEGER
+                    {
+                        smartcard-flash(1),
+                        smartcard(2),
+                        flash(3)
+                    }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Active Device. Device used to read and write configuration files."
+        ::={ telstatus 12 }
+
+    telAdminConfConfSavedDev OBJECT-TYPE
+        SYNTAX  INTEGER
+                    {
+                        smartcard(1),
+                        flash(2),
+                        smartcard-flash(3)
+                    }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Device where the last configuration has been saved."
+        ::={ telstatus 13 }
+
+    telAdminStatusConfirmConfig OBJECT-TYPE
+        SYNTAX  INTEGER{
+                confirmed(0),
+                test-cnfg-inactive(1),
+                test-cnfg-active(2),
+                configuration-recovered(3),
+                undefined(4)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation 1 confirms the current configuration.
+            In a writing operation 0 rejects the current test configuration
+            restarting the device with the previous configuration.
+            In a reading operation, 0 shows that the current configuration has
+            been confirmed, 1 shows that the current configuration has not been
+            confirmed yet (therefore it is a testing configuration) and it is
+            active the old ones, 2 shows that the current configuration
+            has not been confirmed yet (therefore it is a testing configuration)
+            and it is active the new ones, 3 shows that the old configuration
+            has been recovered and it is confirmed and active, 4 shows unknown
+            state"
+        ::={ telstatus 14 }
+
+
+    telAdminStatusConfirmEnabled OBJECT-TYPE
+        SYNTAX  INTEGER{
+                disable(0),
+                enable(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation 1 enables the need to confirm the
+            saved configuration. In a writing operation 0 disables the
+            need to confirm the newly saved configurations.
+            In a reading operation, 0 shows that the need to confirm the saved
+            configurations is disabled. In a reading operation, 1 shows that
+            the need to confirm the saved configurations is enabled."
+        ::={ telstatus 15 }
+
+     telAdminStatusTimeoutConfirm OBJECT-TYPE
+        SYNTAX  INTEGER(60..3024000)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation values between 60 to 3024000 configures
+            the new configuration test time which the device will wait before
+            restarting the previous configuration if confirmation is not carried out.
+            The minimum is one minute and the maximum is 5 weeks.
+            In a reading operation, values between 60 to 3024000 shows the test
+            time which the device will wait before restarting the previous
+            configuration if confirmation is not carried out."
+        ::={ telstatus 16 }
+
+     telAdminStatusSaveRunningConfig OBJECT-TYPE
+        SYNTAX  INTEGER{
+                undefined(0),
+                save-configuration(1),
+                saved-configuration(2),
+                not-saved-configuration(3)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "In a writing operation 1 saves to flash the current running
+            configuration. In a reading operation, 0 shows unknown output from
+            the last set operation, 2 shows the set operation succeeded
+            and 3 shows the last set operation failed."
+        ::={ telstatus 17 }
+
+
+    -- $M4.0 $M4.5
+    -- -----------------
+    -- Grupo telMciTraps
+    -- -----------------
+    -- En este grupo se recogen las traps que se generan en para el proceso
+    -- de sondeo de los estados de los TE-Circuits encargado por MCI
+
+    telMciTraps                     OBJECT IDENTIFIER ::= { teladmin 3 }
+
+    -- Datos del TE-Circuit
+    -- telTrapVarIPAddr                OBJECT IDENTIFIER ::= { telMciTraps 1 }
+    -- telTrapVarVelCir                OBJECT IDENTIFIER ::= { telMciTraps 2 }
+    -- telTrapVarVelBckp               OBJECT IDENTIFIER ::= { telMciTraps 3 }
+    -- telTrapVarPrioBackp             OBJECT IDENTIFIER ::= { telMciTraps 4 }
+    -- telTrapVarTipoBackp             OBJECT IDENTIFIER ::= { telMciTraps 5 }
+    -- telTrapVarTipoEquip             OBJECT IDENTIFIER ::= { telMciTraps 6 }
+
+    -- Datos de la WildCard
+    -- telTrapVarCustomerName          OBJECT IDENTIFIER ::= { telMciTraps 7 }
+    -- telTrapVarRouterName            OBJECT IDENTIFIER ::= { telMciTraps 8 }
+    -- telTrapVarRouterPort            OBJECT IDENTIFIER ::= { telMciTraps 9 }
+    -- telTrapVarCircuitID             OBJECT IDENTIFIER ::= { telMciTraps 10 }
+
+    -- Secuencia del trap
+    -- telTrapVarSequenceNum           OBJECT IDENTIFIER ::= { telMciTraps 11 }
+
+    -- Datos del TE-Circuit
+
+    telTrapVarIPAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "IP address of the circuit."
+        ::= { telMciTraps 1 }
+
+    telTrapVarVelCir OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Speed of the circuit."
+        ::= { telMciTraps 2 }
+
+    telTrapVarVelBckp OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Speed of the backup line."
+        ::= { telMciTraps 3 }
+
+    telTrapVarPrioBackp OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Backup priority."
+        ::= { telMciTraps 4 }
+
+    telTrapVarTipoBackp OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Backup type."
+        ::= { telMciTraps 5 }
+
+    telTrapVarTipoEquip OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Device model."
+        ::= { telMciTraps 6 }
+
+    -- Datos de la WildCard
+
+    telTrapVarCustomerName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Customer Name."
+        ::= { telMciTraps 7 }
+
+    telTrapVarRouterName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Router name. Format: ShortCustomerName+LocationName+ESP+aXXX."
+        ::= { telMciTraps 8 }
+
+    telTrapVarRouterPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Port or the router."
+        ::= { telMciTraps 9 }
+
+    telTrapVarCircuitID OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Circuit identifier."
+        ::= { telMciTraps 10 }
+
+    -- Secuencia del trap
+
+    telTrapVarSequenceNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Number of the sequence."
+        ::= { telMciTraps 11 }
+
+    -- Traps generadas
+
+    -- Circuito pasa a estado UP
+    telTECircuitTrapUp TRAP-TYPE
+        ENTERPRISE telMciTraps
+        VARIABLES { telTrapVarIPAddr, telTrapVarVelCir, telTrapVarVelBckp,
+                    telTrapVarPrioBackp, telTrapVarTipoBackp,
+                    telTrapVarTipoEquip, telTrapVarCustomerName,
+                    telTrapVarRouterName, telTrapVarRouterPort,
+                    telTrapVarCircuitID, telTrapVarSequenceNum }
+        DESCRIPTION
+            "The TE-Circuit is UP."
+        ::= 1
+
+    -- Circuito pasa a estado BACKUP
+    telTECircuitTrapBackup TRAP-TYPE
+        ENTERPRISE telMciTraps
+        VARIABLES { telTrapVarIPAddr, telTrapVarVelCir, telTrapVarVelBckp,
+                    telTrapVarPrioBackp, telTrapVarTipoBackp,
+                    telTrapVarTipoEquip, telTrapVarCustomerName,
+                    telTrapVarRouterName, telTrapVarRouterPort,
+                    telTrapVarCircuitID, telTrapVarSequenceNum }
+        DESCRIPTION
+            "The TE-Circuit is BACKUP."
+        ::= 2
+
+    -- Circuito pasa a estado DOWN
+    telTECircuitTrapDown TRAP-TYPE
+        ENTERPRISE telMciTraps
+        VARIABLES { telTrapVarIPAddr, telTrapVarVelCir, telTrapVarVelBckp,
+                    telTrapVarPrioBackp, telTrapVarTipoBackp,
+                    telTrapVarTipoEquip, telTrapVarCustomerName,
+                    telTrapVarRouterName, telTrapVarRouterPort,
+                    telTrapVarCircuitID, telTrapVarSequenceNum }
+        DESCRIPTION
+            "The TE-Circuit is DOWN."
+        ::= 3
+
+    -- --------------
+    -- Grupo telproto
+    -- --------------
+
+    -- Grupo del Protocolo IP
+    telproip            OBJECT IDENTIFIER ::= { telproto 2 }
+
+    -- Router por defecto
+    teldefgw            OBJECT IDENTIFIER ::= { telproip 1 }
+
+    telProtoIpDefGwAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "IP address of the default router of the system."
+        ::= { teldefgw 1 }
+
+    telProtoIpDefGwCost OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "Cost of the default router of the system."
+        ::= { teldefgw 2 }
+
+    telProtoIpDefGwAge OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "Age of the default router of the system."
+        ::= { teldefgw 3 }
+
+    -- Grupo de frame-relay
+    telprofr    OBJECT IDENTIFIER ::= { telproto 3 }
+
+    -- Tabla telfrLmiTable
+
+    telfrLmiTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelfrLmiEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telfrLmiTable contains LMI information about each
+            frame-relay interface of the system."
+        ::={ telprofr 1 }
+
+    telfrLmiEntry OBJECT-TYPE
+        SYNTAX  TelfrLmiEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains LMI information of the interface."
+        INDEX   { telfrLmiifIndex }
+        ::={ telfrLmiTable 1 }
+
+    TelfrLmiEntry ::=
+        SEQUENCE{
+            telfrLmiifIndex
+                INTEGER,
+            telfrLmiBroadcas
+                INTEGER,
+            telfrLmiMonitConges
+                INTEGER,
+            telfrLmiMonitCIR
+                INTEGER,
+            telfrLmiOrphans
+                INTEGER,
+            telfrLmiIRIncrement
+                INTEGER,
+            telfrLmiIRDecrement
+                INTEGER,
+            telfrLmiMIRCIR
+                INTEGER
+        }
+
+    telfrLmiifIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Frame-relay interface (ifIndex)."
+        ::={ telfrLmiEntry 1 }
+
+    telfrLmiBroadcas OBJECT-TYPE
+        SYNTAX  INTEGER{
+                false(0),
+                true(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "It points out if there is a broadcast service in the interface."
+        ::={ telfrLmiEntry 2 }
+
+    telfrLmiMonitConges OBJECT-TYPE
+        SYNTAX  INTEGER{
+                false(0),
+                true(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "It points out if the interface performs congestion monitoring."
+        ::={ telfrLmiEntry 3 }
+
+    telfrLmiMonitCIR OBJECT-TYPE
+        SYNTAX  INTEGER{
+                false(0),
+                true(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "It points out if the interface performs CIR monitoring."
+        ::={ telfrLmiEntry 4 }
+
+    telfrLmiOrphans OBJECT-TYPE
+        SYNTAX  INTEGER{
+                false(0),
+                true(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "It points out if orphan circuits exit."
+        ::={ telfrLmiEntry 5 }
+
+    telfrLmiIRIncrement OBJECT-TYPE
+        SYNTAX  INTEGER(1..100)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of IR increase."
+        ::={ telfrLmiEntry 6 }
+
+    telfrLmiIRDecrement OBJECT-TYPE
+        SYNTAX  INTEGER(1..100)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Percentage of IR decrease."
+        ::={ telfrLmiEntry 7 }
+
+    telfrLmiMIRCIR OBJECT-TYPE
+        SYNTAX  INTEGER(1..100)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "MIR as CIR percentage."
+        ::={ telfrLmiEntry 8 }
+
+    -- Tabla telfrCircuitTable
+
+    telfrCircuitTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelfrCircuitEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The table telfrCircuitTable contains information about every
+            configured PVC circuit in the different frame-relay interfaces
+            of the system. This information does no appear in the frCircuitTable
+            table."
+        ::={ telprofr 2 }
+
+    telfrCircuitEntry OBJECT-TYPE
+        SYNTAX  TelfrCircuitEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains information about every PVC of the interface."
+        INDEX   { telfrCircuitifIndex, telfrCircuitDlci }
+        ::={ telfrCircuitTable 1 }
+
+    TelfrCircuitEntry ::=
+        SEQUENCE{
+            telfrCircuitifIndex
+                INTEGER,
+            telfrCircuitDlci
+                INTEGER,
+            telfrCircuitCifrar
+                INTEGER,
+            telfrCircuitBack-Up-FR
+                INTEGER,
+            telfrCircuitBack-Up-RDSI
+                INTEGER,
+            telfrCircuitBack-Up-RDSI-siempre
+                INTEGER,
+            telfrCircuitName
+                DisplayString
+        }
+
+    telfrCircuitifIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Frame-relay interface (ifIndex)."
+        ::={ telfrCircuitEntry 1 }
+
+    telfrCircuitDlci OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "DLCI number of the PVC."
+        ::={ telfrCircuitEntry 2 }
+
+    telfrCircuitCifrar OBJECT-TYPE
+        SYNTAX  INTEGER{
+                false(0),
+                true(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "Coding or not data."
+        ::={ telfrCircuitEntry 3 }
+
+    telfrCircuitBack-Up-FR OBJECT-TYPE
+        SYNTAX  INTEGER(16..1007)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Back Up circuit through frame-relay."
+        ::={ telfrCircuitEntry 4 }
+
+    telfrCircuitBack-Up-RDSI OBJECT-TYPE
+        SYNTAX  INTEGER(16..1007)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Back Up circuit through RDSI."
+        ::={ telfrCircuitEntry 5 }
+
+    telfrCircuitBack-Up-RDSI-siempre OBJECT-TYPE
+        SYNTAX  INTEGER{
+                false(0),
+                true(1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Back Up to RDSI when this is possible through FR, regardless of the
+            reasons."
+        ::={ telfrCircuitEntry 6 }
+
+    telfrCircuitName OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..23))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Circuit name assigned."
+        ::={ telfrCircuitEntry 7 }
+
+    -- Grupo de isdn
+    telproisdn  OBJECT IDENTIFIER ::= { telproto 4 }
+
+    -- Tabla telproisdncallTable
+
+    telproisdncallTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelproisdncallEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "The table telproisdncallTable contains information about the rdsi
+            active calls of the system."
+        ::={ telproisdn 1 }
+
+    telproisdncallEntry OBJECT-TYPE
+        SYNTAX  TelproisdncallEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "Each entry contains information about a rdsi line."
+        INDEX   { telproisdncallid }
+        ::={ telproisdncallTable 1 }
+
+    TelproisdncallEntry ::=
+        SEQUENCE{
+            telproisdncallstatus
+                INTEGER,
+            telproisdncalltype
+                INTEGER,
+            telproisdncallref
+                INTEGER,
+            telproisdncallchannel
+                INTEGER,
+            telproisdncallid
+                INTEGER,
+            telproisdncallcallednum
+                DisplayString,
+            telproisdncallcallingnum
+                DisplayString,
+            telproisdncallchargedunits
+                INTEGER,
+            telproisdncallinittime
+                OCTET STRING,
+            telproisdncallinitdate
+                OCTET STRING
+            }
+
+    telproisdncallstatus OBJECT-TYPE
+        SYNTAX  INTEGER{
+            inactive(0),
+            active(1)
+            }
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Call state. It shows if there is really an active call
+            in this line."
+        ::={ telproisdncallEntry 1 }
+
+    telproisdncalltype OBJECT-TYPE
+        SYNTAX  INTEGER{
+            incoming(0),
+            outgoing(1)
+            }
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Call type."
+        ::={ telproisdncallEntry 2 }
+
+    telproisdncallref OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Call reference."
+        ::={ telproisdncallEntry 3 }
+
+    telproisdncallchannel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Channel B used to perform the call."
+        ::={ telproisdncallEntry 4 }
+
+    telproisdncallid OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "RDSI line used to perform the call."
+        ::={ telproisdncallEntry 5 }
+
+    telproisdncallcallednum OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Called number."
+        ::={ telproisdncallEntry 6 }
+
+    telproisdncallcallingnum OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Calling number."
+        ::={ telproisdncallEntry 7 }
+
+    telproisdncallchargedunits OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Cost of the call."
+        ::={ telproisdncallEntry 8 }
+
+    telproisdncallinittime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Byte string that shows hours, minutes and seconds since
+            the call was initiated."
+        ::={ telproisdncallEntry 9 }
+
+    telproisdncallinitdate OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Byte string that shows the date the call was initiated."
+        ::={ telproisdncallEntry 10 }
+
+    -- Tabla telproisdncallhistoryTable
+
+    telproisdncallhistoryTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TelproisdncallhistoryEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "The table telproisdncallhistoryTable contains information about
+            the rdsi calls released of the system."
+        ::={ telproisdn 2 }
+
+    telproisdncallhistoryEntry OBJECT-TYPE
+        SYNTAX  TelproisdncallhistoryEntry
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "Each entry contains information about a released rdsi call."
+        INDEX   { telproisdncallhistoryindex }
+        ::={ telproisdncallhistoryTable 1 }
+
+    TelproisdncallhistoryEntry ::=
+        SEQUENCE{
+            telproisdncallhistoryindex
+                INTEGER,
+            telproisdncallhistorytype
+                INTEGER,
+            telproisdncallhistoryref
+                INTEGER,
+            telproisdncallhistorychannel
+                INTEGER,
+            telproisdncallhistoryid
+                INTEGER,
+            telproisdncallhistorycallednum
+                DisplayString,
+            telproisdncallhistorycallingnum
+                DisplayString,
+            telproisdncallhistorychargedunits
+                INTEGER,
+            telproisdncallhistorycause
+                INTEGER,
+            telproisdncallhistorydiagnostic
+                INTEGER,
+            telproisdncallhistoryinittime
+                OCTET STRING,
+            telproisdncallhistoryendtime
+                OCTET STRING,
+            telproisdncallhistoryinitdate
+                OCTET STRING,
+            telproisdncallhistoryenddate
+                OCTET STRING
+            }
+
+    telproisdncallhistoryindex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "The index identifies each table entry. The smallest indexes fit
+            the calls released more time ago."
+        ::={ telproisdncallhistoryEntry 1 }
+
+    telproisdncallhistorytype OBJECT-TYPE
+        SYNTAX  INTEGER{
+                incoming(0),
+                outgoing(1)
+            }
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Call type."
+        ::={ telproisdncallhistoryEntry 2 }
+
+    telproisdncallhistoryref OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Call reference."
+        ::={ telproisdncallhistoryEntry 3 }
+
+    telproisdncallhistorychannel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Channel B used to perform the call."
+        ::={ telproisdncallhistoryEntry 4 }
+
+    telproisdncallhistoryid OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "RDSI line used to perform the call."
+        ::={ telproisdncallhistoryEntry 5 }
+
+    telproisdncallhistorycallednum OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Called number."
+        ::={ telproisdncallhistoryEntry 6 }
+
+    telproisdncallhistorycallingnum OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Calling number."
+        ::={ telproisdncallhistoryEntry 7 }
+
+    telproisdncallhistorychargedunits OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Cost of the call."
+        ::={ telproisdncallhistoryEntry 8 }
+
+    telproisdncallhistorycause OBJECT-TYPE
+        SYNTAX  INTEGER{
+            non-attributed-number(1),
+            no-route-to-destination(3),
+            unacceptable-channel(6),
+            normal-call-release(16),
+            user-busy(17),
+            user-do-not-answer(18),
+            notified-user-no-answer-from-user(19),
+            rejected-call(21),
+            changed-number(22),
+            destination-out-of-service(27),
+            non-valid-number-format(28),
+            normal(31),
+            no-circuit-or-available-channel(34),
+            network-out-of-service(38),
+            temporal-failure(41),
+            congestion-in-switching-node(42),
+            demanded-circuit-or-non-available-channel(44),
+            non-available-resources(47),
+            non-available-quality-of-service(49),
+            not-authorized-carrier-capacity(57),
+            not-authorized-carrier-capacity-at-the-moment(58),
+            service-class-or-non-available-option(63),
+            not-performed-carrier-capacity(65),
+            not-performed-channel-type(66),
+            not-performed-option-or-service(79),
+            non-valid-call-reference-value(81),
+            non-existent-identified-channel(82),
+            incompatible-destination(88),
+            non-valid-message(95),
+            mandatory-information-element-absent(96),
+            message-type-non-existent-or-non-performed(97),
+            message-non-existent-or-non-performed(98),
+            information-element-non-existent-or-non-performed(99),
+            information-element-content-non-valid(100),
+            incompatible-message-with-call-status(101),
+            recovering-at-timer-expiration(102),
+            protocol-error(111),
+            interworking(127)
+            }
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Release reasons."
+        ::={ telproisdncallhistoryEntry 9 }
+
+    telproisdncallhistorydiagnostic OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Release diagnostic."
+        ::={ telproisdncallhistoryEntry 10 }
+
+    telproisdncallhistoryinittime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "String of bytes that shows the hours, minutes and seconds since
+            the call was initiated."
+        ::={ telproisdncallhistoryEntry 11 }
+
+    telproisdncallhistoryendtime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "String of bytes that shows the hours, minutes and seconds since
+            the call was finished."
+        ::={ telproisdncallhistoryEntry 12 }
+
+    telproisdncallhistoryinitdate OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Byte string that shows the date the call was initiated."
+        ::={ telproisdncallhistoryEntry 13 }
+
+    telproisdncallhistoryenddate OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "Byte string that shows the date the call was finished."
+        ::={ telproisdncallhistoryEntry 14 }
+
+    -- Traps relacionadas con la mib de teldat
+
+    telSistemaEventos TRAP-TYPE
+        ENTERPRISE teldat
+        VARIABLES { sreTrapSubSist, sreTrapEvento, sreTrapVar1, sreTrapVar2,
+                    sreTrapVar3, sreTrapVar4, sreTrapVar5, sreTrapVar6,
+                    sreTrapVar7, sreTrapVar8, sreTrapVar9 }
+        DESCRIPTION
+            "This trap shows the event happened in the system. In order to
+             identify the event, the trap has the mask of the event and
+             its parameters, moreover, the subsystem and the event number
+             in the subsystem. Furthermore it has the sequence number of
+             the traps of the same type."
+        ::= 1
+
+    -- Identifier for new event traps
+
+    telEventTraps                     OBJECT IDENTIFIER ::= { teladmin 4 }
+
+END

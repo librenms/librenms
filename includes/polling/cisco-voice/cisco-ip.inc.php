@@ -13,8 +13,8 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-if ($device['os_group'] == "cisco") {
-    $output = snmpwalk_cache_oid($device, "cvCallVolConnActiveConnection", [], "CISCO-VOICE-DIAL-CONTROL-MIB");
+if ($device['os_group'] == 'cisco') {
+    $output = snmpwalk_cache_oid($device, 'cvCallVolConnActiveConnection', [], 'CISCO-VOICE-DIAL-CONTROL-MIB');
     d_echo($output);
     if (is_array($output)) {
         $rrd_def = RrdDefinition::make()
@@ -24,19 +24,19 @@ if ($device['os_group'] == "cisco") {
             ->addDataset('sccp', 'GAUGE', 0)
             ->addDataset('multicast', 'GAUGE', 0);
 
-        $fields = array(
+        $fields = [
             'h323' => $output['h323']['cvCallVolConnActiveConnection'],
             'sip' => $output['sip']['cvCallVolConnActiveConnection'],
             'mgcp' => $output['mgcp']['cvCallVolConnActiveConnection'],
             'sccp' => $output['sccp']['cvCallVolConnActiveConnection'],
             'multicast' => $output['multicast']['cvCallVolConnActiveConnection'],
-        );
+        ];
         d_echo($fields);
         $tags = compact('rrd_def');
         data_update($device, 'cisco-voice-ip', $tags, $fields);
 
-        $graphs['cisco-voice-ip'] = true;
-        echo(" Cisco IOS Voice IP ");
+        $os->enableGraph('cisco-voice-ip');
+        echo ' Cisco IOS Voice IP ';
         unset($rrd_def, $active, $fields, $tags);
     }
 }

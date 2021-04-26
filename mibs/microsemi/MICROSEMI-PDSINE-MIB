@@ -1,0 +1,402 @@
+--                            PoE Private MIB Ver 2.0
+
+MICROSEMI-PDSINE-MIB
+DEFINITIONS ::= BEGIN   
+
+IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+       Gauge32, Counter32, NOTIFICATION-TYPE
+              FROM SNMPv2-SMI
+       TruthValue
+              FROM SNMPv2-TC
+       enterprises
+              FROM RFC1155-SMI; 
+       
+
+polPowerOverLan MODULE-IDENTITY
+
+       LAST-UPDATED    "201111150000Z"  -- Nov 15, 2011
+       ORGANIZATION ""
+       CONTACT-INFO ""
+       DESCRIPTION  ""
+
+    ::= {enterprises 7428  }
+
+-- MIB ObjID entery
+     products          OBJECT IDENTIFIER ::= { polPowerOverLan 1}
+     description       OBJECT IDENTIFIER ::= { products 1 }
+     sysObjectID       OBJECT IDENTIFIER ::= { description 1 }
+     pseDevice         OBJECT IDENTIFIER ::= { products 2 }
+     portObjects       OBJECT IDENTIFIER ::= { pseDevice 1 }
+     mainObjects       OBJECT IDENTIFIER ::= { pseDevice 2 } 
+     poeNotifications  OBJECT IDENTIFIER ::= { products 3 } 
+
+
+-- SysObjID Products list
+     midspanUnknown                          OBJECT IDENTIFIER ::= {sysObjectID  1}
+     midspan6portAC                        OBJECT IDENTIFIER ::= {sysObjectID  2}
+     midspan6portACDC                     OBJECT IDENTIFIER ::= {sysObjectID  3}
+     midspan12portAC                       OBJECT IDENTIFIER ::= {sysObjectID  4}
+     midspan12portACDC                    OBJECT IDENTIFIER ::= {sysObjectID  5}
+     midspan24portAC                       OBJECT IDENTIFIER ::= {sysObjectID  6}
+     midspan24portACDC                    OBJECT IDENTIFIER ::= {sysObjectID  7}
+     midspan48portAC                       OBJECT IDENTIFIER ::= {sysObjectID  8}
+     midspan48portACDC                    OBJECT IDENTIFIER ::= {sysObjectID  9}
+     midspan6portHPAC                     OBJECT IDENTIFIER ::= {sysObjectID 10}
+     midspan6portHPACDC                  OBJECT IDENTIFIER ::= {sysObjectID 11}
+     midspan12portHPAC                    OBJECT IDENTIFIER ::= {sysObjectID 12}
+     midspan12portHPACDC                 OBJECT IDENTIFIER ::= {sysObjectID 13}
+     midspanGigabit6portAC                OBJECT IDENTIFIER ::= {sysObjectID 14}
+     midspanGigabit12portAC               OBJECT IDENTIFIER ::= {sysObjectID 15}
+     midspanGigabit24portAC               OBJECT IDENTIFIER ::= {sysObjectID 16}
+     midspanHiPoEGigabit6portAC          OBJECT IDENTIFIER ::= {sysObjectID 17}
+     midspanHiPoEGigabit12portAC         OBJECT IDENTIFIER ::= {sysObjectID 18}
+     midspanHiPoEGigabit24portAC         OBJECT IDENTIFIER ::= {sysObjectID 19}
+     midspanHiPoEATGigabit6portAC       OBJECT IDENTIFIER ::= {sysObjectID 20}
+     midspanHiPoEATGigabit12portACDC   OBJECT IDENTIFIER ::= {sysObjectID 21}
+     midspanHiPoEATGigabit24portACDC   OBJECT IDENTIFIER ::= {sysObjectID 22}
+     midspan4PairATGigabit6portACDC    OBJECT IDENTIFIER ::= {sysObjectID 23}
+     midspan4PairATGigabit12portACDC   OBJECT IDENTIFIER ::= {sysObjectID 24}
+     midspanHiPoEATGigabit6portDC       OBJECT IDENTIFIER ::= {sysObjectID 25}
+     midspanHiPoEATGigabit12portDC      OBJECT IDENTIFIER ::= {sysObjectID 26}
+     midspanHiPoEATGigabit24portDC      OBJECT IDENTIFIER ::= {sysObjectID 27}
+     midspan4PairATGigabit24portACDC   OBJECT IDENTIFIER ::= {sysObjectID 28}
+     midspanEEPoEGigabit24portACDC      OBJECT IDENTIFIER ::= {sysObjectID 29}
+     midspanPoHGigabit6portACDC         OBJECT IDENTIFIER ::= {sysObjectID 30}
+     midspanPoHGigabit12portACDC        OBJECT IDENTIFIER ::= {sysObjectID 31}
+     midspanPoHGigabit24portACDC        OBJECT IDENTIFIER ::= {sysObjectID 32}
+
+
+
+
+-- PSE Port Objects
+
+   portTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control the power
+            characteristics of power Ethernet ports on a Power Source
+            Entity (PSE) device.  This group will be implemented in
+            managed power Ethernet switches and mid-span devices.
+            Values of all read-write objects in this table are
+            persistent at restart/reboot."
+       ::= { portObjects 1 }
+
+   portEntry OBJECT-TYPE
+       SYNTAX      PortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A set of objects that display and control the power
+               characteristics of a power Ethernet PSE port."
+       INDEX    { portGroupIndex , portIndex  }
+       ::= { portTable 1 }
+
+   PortEntry ::= SEQUENCE {
+       portGroupIndex
+          Integer32,
+       portIndex
+          Integer32,
+       portConsumptionPower
+          Gauge32,
+       portMaxPower
+          Integer32,
+       portType
+           INTEGER
+       }
+
+   portGroupIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the group
+            containing the port to which a power Ethernet PSE is
+            connected.  Group means box in the stack, module in a
+            rack and the value 1 MUST be used for non-modular devices."
+       ::= { portEntry 1 }
+
+   portIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the power Ethernet PSE
+            port within group portGroupIndex to which the
+            power Ethernet PSE entry is connected."
+       ::= { portEntry 2 }
+
+   portConsumptionPower    OBJECT-TYPE
+        SYNTAX             Gauge32   
+        UNITS              "Watt"
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION  
+         "A read-only value indicates the measured usage power expressed in Watts for a specific port "
+        ::= { portEntry 3 }  
+   
+   portMaxPower            OBJECT-TYPE
+        SYNTAX             Integer32 (1..99)
+        UNITS              "Watt"
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION  
+         "Read/Write maximum power consumption that PD device may consume in Watts
+          NOTE:
+          1. For Midspan 60xx,60xxG,6500 series, Max PD power consumption = 17Watt
+          2. For Midspan 70xxG series, Max PD power consumption = 30Watt
+          3 .For Midspan 80xx series, this parameter is read-only !!
+          4. For Midspan 90xxG series, Max PD power consumption = 30/36Watt
+          5. For Midspan 95xxG series, Max PD power consumption = 60/72Watt (four pair) or 30/36Watt (two pair)
+          6. For Midspan 55xxG series, Max PD power consumption = 30/36Watt"
+        ::= { portEntry 4 }  
+
+     portType OBJECT-TYPE
+       SYNTAX INTEGER   {
+               twopair(1),
+               fourpair(2),
+          }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+               "Enable/Disable Four-pair/EEPoE PoE
+                Read : Applicable to all Midspan series
+                Write: Applicable only to 95xxG/55xxG Midspan series
+                twopair  (1)  Two-pair PoE port capable of providing up to 16.8Watt or 30-36Watt.
+                fourpair (2)  Four-pair/EEPoE-mode PoE port capable of providing up to 60-72Watt (95xxG) or 30-36W (55xxG)."
+        ::= { portEntry 5 }
+
+
+-- PSE Main Objects
+
+   mainPseTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF MainPseEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control attributes
+            of the main PSE device."
+       ::= { mainObjects 1 }
+
+   mainPseEntry OBJECT-TYPE
+       SYNTAX      MainPseEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "A set of objects that display and control the Main PSE device."
+       INDEX    { pethMainPseGroupIndex }
+       ::= { mainPseTable 1 }
+
+   MainPseEntry ::= SEQUENCE {
+       mainGroupIndex
+           Integer32,
+       mainVoltage
+           Gauge32 ,
+       mainDetectionMethod
+           INTEGER,
+       mainPowerUsageBudget
+           Integer32,
+       mainPSEMaxPower
+           Gauge32,
+       highPowerLegacyPDSupport
+           INTEGER,
+       highPowerExtendedPortPower
+           INTEGER,
+       powerBackupStatus
+           INTEGER,
+       internalPowerSourceStatus
+           INTEGER,
+       externalPowerSourceStatus
+           INTEGER,
+       temperature
+           INTEGER,
+       temperatureformat
+           INTEGER
+   }
+   
+     mainGroupIndex OBJECT-TYPE
+       SYNTAX       Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the group to which
+           power Ethernet PSE is connected.  Group means (box in
+           the stack, module in a rack) and the value 1 MUST be
+           used for non-modular devices."
+       ::= { mainPseEntry 1 }
+
+     mainVoltage OBJECT-TYPE
+       SYNTAX      Gauge32  (1..65535)
+       UNITS      "Volt"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Power Supply Voltage in Volt."
+       ::= { mainPseEntry 2 }
+
+     mainDetectionMethod OBJECT-TYPE
+       SYNTAX INTEGER   {
+               ieee8023afat(1),
+               ieee8023afatandlegacy(2)
+          }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Read/Write PD device detection method (802.3af / 802.3af+Legacy)."
+       ::= { mainPseEntry 3 }
+       
+     mainPowerUsageBudget OBJECT-TYPE
+       SYNTAX      Integer32  (10..100)
+       UNITS      "%"
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Allow external SNMP manager to limit maximum power that all PD's may consume
+                Whenever total power consumption exceeds maximum power, Midspan may turn off
+                automatically Low priority and High priority PSE ports.
+                Percentage Value refers to Midspan maximum power." 
+       ::= { mainPseEntry 4 }
+
+     mainPSEMaxPower OBJECT-TYPE
+       SYNTAX      Gauge32  (1..65535)
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Maximum power that Midspan can provide (Watt), after including power budget percentage limitation.
+                Example: Midspan maximum power without power limit = 860Watt, and Power Limit = 50%
+                         mainPSEMaxPower = 430Watt"
+       ::= { mainPseEntry 5 }
+
+     highPowerLegacyPDSupport OBJECT-TYPE
+       SYNTAX INTEGER   {
+               enable(1),
+               disable(2),
+               notsupported(3)
+          }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+               "Applicable only for Midspan 90xxG series
+                enable (1)       - Power Cisco 125x access point (pre 802.3at legacy high power PD device).
+                disable(2)       - Power only 802.3at compliant devices.
+                notsupported(3) - SNMP GET result for Midspan which doesn't support this feature" 
+       ::= { mainPseEntry 6 }
+
+     highPowerExtendedPortPower OBJECT-TYPE
+       SYNTAX INTEGER   {
+               enable(1),
+               disable(2),
+               notsupported(3)
+          }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+               "Applicable only for Midspan 90xxG/55xxG series
+                enable (1)       - Extend maximum power to PD device beyond 802.3at specification.
+                disable(2)       - Maximum power to PD device per 802.3at specification.
+                notsupported(3) - SNMP GET result for Midspan which doesn't support this feature" 
+       ::= { mainPseEntry 7 }
+
+     powerBackupStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+               standalone(1),
+               powerbackupbyrps(2),
+               powerbackupbymidspan(3),
+               incompatiblepowerbackupdevice(4)
+          }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Applicable only for Midspan 90xxG/95xxG/55xxG series
+                standalone                      - Midspan isn't connected to any power backup device                  
+                powerbackupbyrps              - Redundant power supply (RPS) backup Midspan device          
+                powerbackupbymidspan          - Two Midspan devices backup each other        
+                incompatiblepowerbackupdevice - Midspan was connected to incompatible power backup device.
+                                                   For example RPS 430Watt to Midspan 950Watt"
+
+       ::= { mainPseEntry 8 }
+
+     internalPowerSourceStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+               ok(1),
+               fail(2)
+          }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Applicable only for Midspan 90xxG/95xxG/55xxG series
+                ok(1)   - Internal Power Source is OK
+                fail(2) - Internal Power Source failure" 
+       ::= { mainPseEntry 9 }
+
+     externalPowerSourceStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+               ok(1),
+               fail(2),
+               notsupported(3)
+          }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Applicable only for Midspan 90xxG/95xxG/55xxG series
+                ok(1)            - External Power Source is OK
+                fail(2)          - External Power Source failure
+                notsupported(3) - SNMP GET result for Midspan which doesn't support this feature" 
+       ::= { mainPseEntry 10 }
+
+     temperature OBJECT-TYPE
+       SYNTAX INTEGER
+       UNITS      "Degree"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Unit temperature - Applicable only for Midspan 95xxG series"
+       ::= { mainPseEntry 11 }
+
+     temperatureformat OBJECT-TYPE
+       SYNTAX INTEGER   {
+               celcius(1),
+               fahrenheit(2),
+               notsupported(3)
+          }
+     MAX-ACCESS read-write
+       STATUS      current
+       DESCRIPTION
+               "Unit temperature format - Applicable only for Midspan 95xxG series
+                Celcius(1)       - Report unit temperature in Celcius
+                Fahrenheit(2)    - Report unit temperature in Fahrenheit
+                NotSupported(3) - No temperature sensor inside the Midspan unit" 
+       ::= { mainPseEntry 12 }
+
+-- Notifications Section
+
+     powerBackupStatusNotification NOTIFICATION-TYPE
+         OBJECTS     { powerBackupStatus }
+         STATUS      current
+         DESCRIPTION
+               "Applicable only for Midspan 90xxG/95xxG/55xxG series
+                This Notification reports power backup status change, and whenever incompatible
+                power backup source is connected (as RPS 430Watt to Midspan 950Watt)"
+          ::= { poeNotifications 1 }
+
+     internalPowerSourceStatusNotification NOTIFICATION-TYPE
+         OBJECTS     { internalPowerSourceStatus }
+         STATUS      current
+         DESCRIPTION
+               "Applicable only for Midspan 90xxG/95xxG/55xxG series
+                This Notification reports internal Power Source failure" 
+          ::= { poeNotifications 2 }
+
+     externalPowerSourceStatusNotification NOTIFICATION-TYPE
+         OBJECTS     { externalPowerSourceStatus }
+         STATUS      current
+         DESCRIPTION
+               "Applicable only for Midspan 90xxG/95xxG/55xxG series
+                This Notification reports external Power Source failure" 
+          ::= { poeNotifications 3 }
+
+END
+

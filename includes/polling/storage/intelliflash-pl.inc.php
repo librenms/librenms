@@ -15,20 +15,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (!is_array($storage_cache['intelliflash-pl'])) {
+if (! is_array($storage_cache['intelliflash-pl'])) {
     $storage_cache['intelliflash-pl'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
 //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $entry = $storage_cache['intelliflash-pl'][$storage['storage_index']];
 $storage['units'] = 1;
-$storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];
-$storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
+$storage['size'] = (($entry['poolSizeHigh'] << 32) + $entry['poolSizeLow']) * $storage['units'];
+$storage['used'] = (($entry['poolUsedSizeHigh'] << 32) + $entry['poolUsedSizeLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);

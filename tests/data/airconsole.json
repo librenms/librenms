@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.14358.1",
+                    "sysDescr": "Airconsole 2.80",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "airconsole",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "airconsole.png",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

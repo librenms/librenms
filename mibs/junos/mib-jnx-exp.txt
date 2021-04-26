@@ -12,42 +12,9 @@ JUNIPER-EXPERIMENT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY
         FROM SNMPv2-SMI               -- RFC 2578
-    juniperMIB
+    juniperMIB, jnxExperiment
         FROM JUNIPER-SMI;
 
-jnxExperiment MODULE-IDENTITY
-    LAST-UPDATED "200701080000Z" -- Jan 8 00:00:00 2007 UTC
-    ORGANIZATION "Juniper Networks, Inc."
-    CONTACT-INFO
-            "Juniper Technical Assistance Center
-             Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
-             Sunnyvale, CA 94089
-             E-mail: support@juniper.net"
-    DESCRIPTION
-        "The object identifiers for experimental MIBs for the Juniper Networks,
-        Inc. products.  This is the top-level object identifier registry for 
-        SNMP modules containing experimental MIB definitions.  Experimental 
-        MIBs are defined as:
-
-        1) IETF work-in-process MIBs which have not been assigned a permanent
-           object identifier by the IANA.
-
-        2) Juniper work-in-process MIBs that have not achieved final
-           production quality or field experience.
-
-        NOTE: Support for MIBs under the this OID subtree is temporary and
-              changes to objects may occur without notice."
-    REVISION     "200304170100Z" -- 17-Apr-03
-    DESCRIPTION
-            "Initial revision"
-    REVISION     "200509010000Z" -- Sept 1 00:00:00 2005 UTC
-    DESCRIPTION
-            "Added jnxLdapExperiment branch"
-    REVISION     "200701080000Z" -- Jan 8 00:00:00 2007 UTC
-    DESCRIPTION
-            "Added jnxExampleMibRoot branch"
-    ::= { juniperMIB 5 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Experimental MIB OID assignments.
@@ -117,5 +84,13 @@ jnxMvpnExperiment OBJECT-IDENTITY
         "This branch anchors the experimental IETF draft for Multicast
          VPN MIB."
     ::= { jnxExperiment 12 }
+    
+jnxMldpExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft
+         for the mLDP MIB."
+    ::= { jnxExperiment 13 }
+    
 
 END

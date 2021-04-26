@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateMempoolsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,7 +20,7 @@ class CreateMempoolsTable extends Migration
             $table->string('mempool_type', 32);
             $table->integer('mempool_precision')->default(1);
             $table->string('mempool_descr', 64);
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->integer('mempool_perc');
             $table->bigInteger('mempool_used');
             $table->bigInteger('mempool_free');

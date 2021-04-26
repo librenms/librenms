@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Janno Schouwenburg
  * @author     Janno Schouwenburg <handel@janno.nl>
  */
@@ -26,11 +25,9 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\OS;
 
 class SafCfm extends OS implements
@@ -46,7 +43,7 @@ class SafCfm extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return array(
+        return [
             // SAF-MPMUX-MIB::cfml4radioTxFrequency
             new WirelessSensor(
                 'frequency',
@@ -82,7 +79,7 @@ class SafCfm extends OS implements
                 'cfml4radioR2RxFrequency',
                 'Radio 2 Rx Frequency'
             ),
-        );
+        ];
     }
 
     /**
@@ -93,7 +90,7 @@ class SafCfm extends OS implements
      */
     public function discoverWirelessPower()
     {
-        return array(
+        return [
             // SAF-MPMUX-MIB::rf1TxLevel
             new WirelessSensor(
                 'power',
@@ -130,7 +127,7 @@ class SafCfm extends OS implements
                 'cfml4radioR2RxLevel',
                 'Radio 2 Rx Level'
             ),
-        );
+        ];
     }
 
     /**
@@ -141,7 +138,7 @@ class SafCfm extends OS implements
      */
     public function discoverWirelessErrors()
     {
-        return array(
+        return [
             // SAF-MPMUX-MIB::termFrameErrors
             new WirelessSensor(
                 'errors',
@@ -160,6 +157,6 @@ class SafCfm extends OS implements
                 'cfml4termBFrameErr',
                 'Background Frame errors'
             ),
-        );
+        ];
     }
 }

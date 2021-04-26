@@ -1,0 +1,30 @@
+mib: AVIAT-MODEM-MIB
+modules:
+    os:
+        hardware: ENTITY-MIB::entPhysicalModelName.2
+        serial: ENTITY-MIB::entPhysicalSerialNum.2
+        version: ENTITY-MIB::entPhysicalSoftwareRev.2
+    sensors:
+        state:
+            data:
+                -
+                    oid: aviatModemCurModulationRx
+                    num_oid: '.1.3.6.1.4.1.2509.9.3.2.1.1.13.{{ $index }}'
+                    descr: Tx Mod Rate (Carrier1/{{ $index }})
+                    index: '{{ $index }}'
+                    state_name: aviatModemCurModulationRx
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: 'N/A' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'QPSK' }
+                        - { value: 3, generic: 0, graph: 1, descr: '16-QAM' }
+                        - { value: 4, generic: 0, graph: 1, descr: '32-QAM' }
+                        - { value: 5, generic: 0, graph: 1, descr: '64-QAM' }
+                        - { value: 6, generic: 0, graph: 1, descr: '128-QAM' }
+                        - { value: 7, generic: 0, graph: 1, descr: '256-QAM' }
+                        - { value: 8, generic: 0, graph: 1, descr: '512-QAM' }
+                        - { value: 9, generic: 0, graph: 1, descr: '1024-QAM' }
+                        - { value: 10, generic: 0, graph: 1, descr: '256-QAM-HG' }
+                        - { value: 11, generic: 0, graph: 1, descr: '512-QAM-HD' }
+                        - { value: 12, generic: 0, graph: 1, descr: '1024-QAM-HD' }
+                        - { value: 13, generic: 0, graph: 1, descr: '2048-QAM' }
+                        - { value: 14, generic: 0, graph: 1, descr: '4096-QAM' }

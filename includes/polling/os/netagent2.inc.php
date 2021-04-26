@@ -15,14 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Mikael Sipilainen
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
-
 $oid = snmp_get_multi($device, ['.1.3.6.1.2.1.33.1.1.4.0', '.1.3.6.1.2.1.33.1.1.1.0'], '-OQU');
-$version  = $oid[0]['.1.3.6.1.2.1.33.1.1.4.0'];
+$version = $oid[0]['.1.3.6.1.2.1.33.1.1.4.0'];
 $hardware = $oid[0]['.1.3.6.1.2.1.33.1.1.1.0'];

@@ -12,35 +12,60 @@
 */
 
 // Auth
-Auth::routes();
+Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
-Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
-    // Test
-    Route::get('/vue/{sub?}', function () {
-        return view('vue');
-    })->where('sub', '.*');
+Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
+    Route::resource('port-groups', 'PortGroupController');
+    Route::resource('port', 'PortController', ['only' => 'update']);
+    Route::group(['prefix' => 'poller'], function () {
+        Route::get('', 'PollerController@pollerTab')->name('poller.index');
+        Route::get('log', 'PollerController@logTab')->name('poller.log');
+        Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
+        Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
+        Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
+        Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
+    });
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::resource('templates', 'ServiceTemplateController');
+        Route::post('templates/applyAll', 'ServiceTemplateController@applyAll')->name('templates.applyAll');
+        Route::post('templates/apply/{template}', 'ServiceTemplateController@apply')->name('templates.apply');
+        Route::post('templates/remove/{template}', 'ServiceTemplateController@remove')->name('templates.remove');
+    });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
+    Route::get('overview', 'OverviewController@index')->name('overview');
+    Route::get('/', 'OverviewController@index')->name('home');
+    Route::view('vminfo', 'vminfo');
+
+    // Device Tabs
+    Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
+        Route::put('notes', 'NotesController@update')->name('notes.update');
+    });
+
+    Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
+        ->name('device')->where(['vars' => '.*']);
+
+    // Maps
+    Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+    });
 
     // admin pages
-    Route::group(['guard' => 'admin'], function () {
+    Route::group(['middleware' => ['can:admin']], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
     });
 
     // old route redirects
-    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
-    Route::get('settings/sub={tab}', function ($tab) {
-        return redirect("settings/$tab");
-    });
+    Route::permanentRedirect('poll-log', 'poller/log');
 
     // Two Factor Auth
     Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
@@ -58,7 +83,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::group(['prefix' => 'ajax'], function () {
         // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
-
+        Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
@@ -68,12 +93,12 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('ripe/raw', 'RipeNccApiController@raw');
         });
 
-
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
 
         // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
             Route::resource('widget-settings', 'WidgetSettingsController');
+            Route::post('copy-dashboard', 'CopyDashboardController@store');
         });
 
         // js select2 data controllers
@@ -84,6 +109,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('device', 'DeviceController');
             Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');
+            Route::get('port-group', 'PortGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
@@ -92,26 +118,33 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('service', 'ServiceController');
+            Route::get('template', 'ServiceTemplateController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
 
         // jquery bootgrid data controllers
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('alert-schedule', 'AlertScheduleController');
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
+            Route::post('edit-ports', 'EditPortsController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
-            Route::post('routes', 'RoutesTablesController');
             Route::post('graylog', 'GraylogController');
             Route::post('location', 'LocationController');
+            Route::post('mempools', 'MempoolsController');
+            Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
+            Route::post('vminfo', 'VminfoController');
         });
 
         // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');
+            Route::post('alertlog', 'AlertlogController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
@@ -128,18 +161,32 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('worldmap', 'WorldMapController');
+            Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });
 
     // demo helper
     Route::permanentRedirect('demo', '/');
-
-    // blank page, dummy page for external code using Laravel::bootWeb()
-    Route::any('/blank', function () {
-        return '';
-    });
-
-    // Legacy routes
-    Route::any('/{path?}', 'LegacyController@index')
-        ->where('path', '^((?!_debugbar).)*');
 });
+
+// installation routes
+Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
+    Route::get('/', 'InstallationController@redirectToFirst')->name('install');
+    Route::get('/checks', 'ChecksController@index')->name('install.checks');
+    Route::get('/database', 'DatabaseController@index')->name('install.database');
+    Route::get('/user', 'MakeUserController@index')->name('install.user');
+    Route::get('/finish', 'FinalizeController@index')->name('install.finish');
+
+    Route::post('/user/create', 'MakeUserController@create')->name('install.action.user');
+    Route::post('/database/test', 'DatabaseController@test')->name('install.acton.test-database');
+    Route::get('/ajax/database/migrate', 'DatabaseController@migrate')->name('install.action.migrate');
+    Route::get('/ajax/steps', 'InstallationController@stepsCompleted')->name('install.action.steps');
+    Route::any('{path?}', 'InstallationController@invalid')->where('path', '.*'); // 404
+});
+
+// Legacy routes
+Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth');
+Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
+Route::any('/{path?}', 'LegacyController@index')
+    ->where('path', '^((?!_debugbar).)*')
+    ->middleware('auth');

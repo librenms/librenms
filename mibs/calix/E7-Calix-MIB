@@ -6,25 +6,28 @@ E7-Calix-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     Integer32,
--- not used yet
     Counter64,
     IpAddress,
     mib-2
                     FROM SNMPv2-SMI
     RowStatus,
--- not used yet
     DisplayString,
--- not used yet
     MacAddress
                     FROM SNMPv2-TC
+    InterfaceIndex,
     ifIndex         FROM IF-MIB
     e7, e7Modules
                     FROM CALIX-PRODUCT-MIB
     E7AdminStatus,
-	E7CardType,
-	E7PowerLevel,
-	E7SnmpVers
-					FROM E7-TC;
+    E7CardType,
+    E7PowerLevel,
+    E7SnmpVers,
+    E7EtherType,
+    E7Pbit,
+    E7BondedInterfaceIndex
+    E7OperStatus
+    E7XdslGrpOperStatus 
+                    FROM E7-TC;
 
     e7ResourceModule MODULE-IDENTITY
     LAST-UPDATED "201304030000Z"
@@ -47,11 +50,15 @@ IMPORTS
 
 -- really old regions (E5-8 era) can be reused
     e7Resource             OBJECT IDENTIFIER ::= { e7 2 }
-    e7NodeResource           OBJECT IDENTIFIER ::= { e7Resource 1 }
-    e7CardGroup                OBJECT IDENTIFIER ::= { e7NodeResource 6 }
-    e7SystemGroup              OBJECT IDENTIFIER ::= { e7NodeResource 7 }
-    e7TrapDestGroup            OBJECT IDENTIFIER ::= { e7NodeResource 8 }
+    e7NodeResource         OBJECT IDENTIFIER ::= { e7Resource 1 }
+    e7CraftGroup           OBJECT IDENTIFIER ::= { e7NodeResource 4 }
+    e7CraftUserGroup       OBJECT IDENTIFIER ::= { e7NodeResource 5 }
+    e7CardGroup            OBJECT IDENTIFIER ::= { e7NodeResource 6 }
+    e7SystemGroup          OBJECT IDENTIFIER ::= { e7NodeResource 7 }
     e7PortGroup            OBJECT IDENTIFIER ::= { e7NodeResource 9 }
+    e7OntGroup             OBJECT IDENTIFIER ::= { e7NodeResource 10 }
+    e7LaserGroup           OBJECT IDENTIFIER ::= { e7NodeResource 14 }
+
 
 --
 --  Calix enterprise-specific management objects
@@ -61,8 +68,6 @@ IMPORTS
 -- Card data
 --
 
--- ZZZ note that only line cards are being implemented for now, as
--- ZZZ E5-2 mods has no SCs
 e7CardTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF E7CardEntry
     MAX-ACCESS  not-accessible
@@ -92,7 +97,6 @@ E7CardEntry ::= SEQUENCE {
 	e7CardPartNumber			 OCTET STRING,
 	e7CardStartMacRange			 OCTET STRING,
 	e7CardEndMacRange            OCTET STRING,
-	e7CardHardwareRevision		OCTET STRING
     }
 
 e7CardBank OBJECT-TYPE
@@ -188,19 +192,219 @@ e7CardEndMacRange OBJECT-TYPE
     DESCRIPTION "End of MAC range (ascii)"
     ::= { e7CardEntry 13 }
 
-e7CardHardwareRevision OBJECT-TYPE
-    SYNTAX      OCTET STRING
+--
+-- Card ODN status 
+--
+
+e7OltPonPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7OltPonPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains OLT ODN port entries"
+    ::= { e7CardGroup 2 }
+
+e7OltPonPortEntry OBJECT-TYPE
+    SYNTAX      E7OltPonPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to OLT ODN port"
+    INDEX { e7OltPonPortShelf, e7OltPonPortSlot, e7OltPonPortId }
+    ::= { e7OltPonPortTable 1 }
+
+E7OltPonPortEntry ::= SEQUENCE {
+        e7OltPonPortShelf                Integer32,
+        e7OltPonPortSlot                 Integer32,
+        e7OltPonPortId                   Integer32,
+        e7OltPonPortStatus               INTEGER,
+        e7OltPonPortTemperature          Integer32,
+        e7OltPonPortTxBias               Integer32,
+        e7OltPonPortTxPower              Integer32,
+        e7OltPonPortRxPower              Integer32,
+        e7OltPonPortVoltage              Integer32
+    }
+e7OltPonPortShelf OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Shelf number"
+    ::= { e7OltPonPortEntry 1 }
+
+e7OltPonPortSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot number"
+    ::= { e7OltPonPortEntry 2 }
+
+e7OltPonPortId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { e7OltPonPortEntry 3 }
+
+e7OltPonPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    linkUp(1),
+                    linkDown(2)
+                }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Hardware revision, dotted string notation"
-    ::= { e7CardEntry 14 }
+    DESCRIPTION "ODN-I operational status"
+    ::= { e7OltPonPortEntry 4 }
 
-e7CardTableEnd OBJECT-TYPE
+e7OltPonPortTemperature OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "denotes the end of the e7CardTable (for getnext)"
-    ::= { e7CardGroup 2 }
+    DESCRIPTION "ODN-I laser temperature (degrees Celsius) "
+    ::= { e7OltPonPortEntry 5 }
+
+e7OltPonPortTxBias OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I laser bias current (muA) "
+    ::= { e7OltPonPortEntry 6 }
+
+e7OltPonPortTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I Tx signal level ((value / 10000) = mW) "
+    ::= { e7OltPonPortEntry 7 }
+
+e7OltPonPortRxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I Rx signal level ((value / 10000) = mW) "
+    ::= { e7OltPonPortEntry 8 }
+
+e7OltPonPortVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I voltage in mV "
+    ::= { e7OltPonPortEntry 9 }
+
+--
+-- ONT data
+--
+
+e7OntTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7OntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains ONT entries"
+    ::= { e7OntGroup 1 }
+
+e7OntEntry OBJECT-TYPE
+    SYNTAX      E7OntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to ONT"
+    INDEX { e7OntUnitId }
+    ::= { e7OntTable 1 }
+
+E7OntEntry ::= SEQUENCE {
+        e7OntUnitId                  Integer32,
+        e7OntRowStatus               RowStatus,
+        e7OntAdminStatus             E7AdminStatus,
+        e7OntOperStatus              INTEGER,
+        e7OntDyingGasp               INTEGER,
+        e7OntRxOpticalLevel          Integer32,
+        e7OntTxOpticalLevel          Integer32,
+        e7OntFarEndRxOpticalLevel    Integer32,
+        e7OntSoftwareVersion         OCTET STRING,
+        e7OntCleiCode                OCTET STRING
+    }
+
+e7OntUnitId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Unit identifier "
+    ::= { e7OntEntry 1 }
+
+e7OntRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation & deletion of table entries.  Only
+                 active(get), createAndGo(set), and destroy(set) are
+                 supported."
+    ::= { e7OntEntry 2 }
+
+e7OntAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { e7OntEntry 3 }
+
+e7OntOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    enabled(1),
+                    degraded(2),
+                    systemDisabled(3),
+                    userDisabled(4),
+                    waitRegistration(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational status"
+    ::= { e7OntEntry 4 }
+
+e7OntDyingGasp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ont dying gasp status "
+    ::= { e7OntEntry 5 }
+
+e7OntRxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+        UNITS           "0.002 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT Rx signal level (mW) "
+    ::= { e7OntEntry 6 }
+
+e7OntTxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+        UNITS           "0.002 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT Tx signal level (mW) "
+    ::= { e7OntEntry 7 }
+
+e7OntFarEndRxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+        UNITS           "0.002 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OLT Rx signal level (mW) "
+    ::= { e7OntEntry 8 }
+
+e7OntSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Running software version, dotted string notation"
+    ::= { e7OntEntry 9 }
+
+e7OntCleiCode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware CLEI code "
+    ::= { e7OntEntry 10 }
 
 --
 --system
@@ -279,7 +483,7 @@ e7SystemTimezone OBJECT-TYPE
    ::= {e7SystemGroup 9}
 
 e7SystemChassisSerialNumber OBJECT-TYPE
-   SYNTAX      DisplayString
+   SYNTAX      OCTET STRING
    MAX-ACCESS  read-create
    STATUS      current
    DESCRIPTION "Chassis serial number"
@@ -305,97 +509,6 @@ e7SystemDate OBJECT-TYPE
    STATUS      current
    DESCRIPTION "system date"
    ::= {e7SystemGroup 13}
-
--- ZZZ leaving chassis for different object class, as there may be several
--- ZZZ instances in the future
-
---
---e7TrapDestGroup
---
-
-e7TrapDestTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF E7TrapDestEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "Contains SNMP Trap Dest entries"
-    ::= { e7TrapDestGroup 1 }
-
-e7TrapDestEntry OBJECT-TYPE
-    SYNTAX      E7TrapDestEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "List of attributes related to SNMP Trap Dest"
-    INDEX { e7TrapDestIndex }
-    ::= { e7TrapDestTable 1 }
-
-E7TrapDestEntry ::= SEQUENCE {
-    e7TrapDestIndex                  Integer32,
-    e7TrapDestRowStatus              RowStatus,
-	e7TrapDestAdminStatus            E7AdminStatus,
-	e7TrapDestIpAddress              IpAddress,
-	e7TrapDestPortNumber             Integer32,
-	e7TrapDestSnmpVers               E7SnmpVers,
-	e7TrapDestV3User			     OCTET STRING,
-	e7TrapDestCommunity              OCTET STRING
-    }
-
-e7TrapDestIndex OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "trap index"
-    ::= { e7TrapDestEntry 1 }
-
-e7TrapDestRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "Controls creation & deletion of table entries.  Only
-                 active(get), createAndGo(set), and destroy(set) are
-                 supported."
-    ::= { e7TrapDestEntry 2 }
-
-e7TrapDestAdminStatus OBJECT-TYPE
-    SYNTAX      E7AdminStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "Administrative status"
-    ::= { e7TrapDestEntry 3 }
-
-e7TrapDestIpAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "destination IP address"
-    ::= { e7TrapDestEntry 4 }
-
-e7TrapDestPortNumber OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "destination UDP port number"
-    ::= { e7TrapDestEntry 5 }
-
-e7TrapDestSnmpVers OBJECT-TYPE
-    SYNTAX      E7SnmpVers
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "v2c or v3 trap type"
-    ::= { e7TrapDestEntry 6 }
-
-e7TrapDestV3User OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "user used in v3 traps" 
-    ::= { e7TrapDestEntry 7 }
-
-e7TrapDestCommunity OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION "community string used in v2c traps"
-    ::= { e7TrapDestEntry 8 }
 
 --
 --e7PortGroup
@@ -690,7 +803,8 @@ E7VdslPortCfgEntry ::= SEQUENCE {
         e7VdslPortCfgUsMaxSnr                       Integer32,
         e7VdslPortCfgUsTargetSnr                    Integer32,
         e7VdslPortCfgPsdMask                        INTEGER,
-        e7VdslPortCfgLastTemplate                   DisplayString
+        e7VdslPortCfgLastTemplate                   DisplayString,
+        e7VdslPortCfgBondedInterface                E7BondedInterfaceIndex
     }
 
 e7VdslPortCfgServiceType OBJECT-TYPE
@@ -719,7 +833,7 @@ e7VdslPortCfgPathLatency OBJECT-TYPE
     SYNTAX      INTEGER {
                     none(0),
                     fast(1),
-                    interleaved(2),
+                    interleaved(2)
                  }
     MAX-ACCESS   read-write
     STATUS       current
@@ -975,6 +1089,15 @@ e7VdslPortCfgLastTemplate OBJECT-TYPE
            "VDSL port configured last template name. "
     ::= { e7VdslPortCfgEntry 19 }
 
+e7VdslPortCfgBondedInterface OBJECT-TYPE
+    SYNTAX      E7BondedInterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VDSL port configured as a member of a DSL bonded interface.
+If the DSL bonded interface attribute is not set, value reported will be 0."
+    ::= { e7VdslPortCfgEntry 20 }
+
 e7VdslPortCfgTemplateTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF E7VdslPortCfgTemplateEntry
     MAX-ACCESS  not-accessible
@@ -1056,7 +1179,7 @@ e7VdslPortCfgTemplatePathLatency OBJECT-TYPE
     SYNTAX      INTEGER {
                     none(0),
                     fast(1),
-                    interleaved(2),
+                    interleaved(2)
                  }
     MAX-ACCESS   read-write
     STATUS       current
@@ -1357,5 +1480,140 @@ e7VdslPortPerfIntervalUAS OBJECT-TYPE
    DESCRIPTION 
            "VDSL port performance interval unavailable seconds. "
     ::= { e7VdslPortPerfIntervalEntry 3 }
+
+e7VdslBondedInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslBondedInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains DSL bonded interface entries"
+    ::= { e7VdslPortGroup 7 }
+
+e7VdslBondedInterfaceEntry OBJECT-TYPE
+    SYNTAX      E7VdslBondedInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to DSL bonded interface entries"
+    INDEX { e7VdslBondedInterfaceIndex }
+    ::= { e7VdslBondedInterfaceTable 1 }
+
+E7VdslBondedInterfaceEntry ::= SEQUENCE {
+    e7VdslBondedInterfaceIndex        E7BondedInterfaceIndex,
+    e7VdslBondedInterfaceName         DisplayString
+    e7VdslBondedInterfaceAdminStatus  E7AdminStatus 
+    e7VdslBondedInterfaceOperStatus   E7OperStatus
+    e7VdslBondedInterfaceBondState    E7XdslGrpOperStatus
+    e7VdslBondedInterfaceDSRate       Integer32
+    e7VdslBondedInterfaceUSRate       Integer32
+    e7VdslBondedInterfaceActPorts     DisplayString 
+    e7VdslBondedInterfaceInActPorts   DisplayString 
+    
+    }
+
+e7VdslBondedInterfaceIndex OBJECT-TYPE
+    SYNTAX      E7BondedInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "DSL bonded interface index."
+    ::= { e7VdslBondedInterfaceEntry 1 }
+
+e7VdslBondedInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The textual name of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 2 }
+
+e7VdslBondedInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The admin status of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 3 }
+
+e7VdslBondedInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      E7OperStatus 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The operator status of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 4 }
+
+e7VdslBondedInterfaceBondState OBJECT-TYPE
+    SYNTAX      E7XdslGrpOperStatus 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The bonding status of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 5 }
+
+e7VdslBondedInterfaceDSRate OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Downstream rate of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 6 }
+
+e7VdslBondedInterfaceUSRate OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Upstream rate of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 7 }
+
+e7VdslBondedInterfaceActPorts OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The active ports of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 8 }
+
+e7VdslBondedInterfaceInActPorts OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The inactive ports of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 9 }
+
+e7VdslStackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains DSL bonded interface member entries"
+    ::= { e7VdslPortGroup 8 }
+
+e7VdslStackEntry OBJECT-TYPE
+    SYNTAX      E7VdslStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to DSL bonded interface member entries"
+    INDEX { e7VdslStackBondedInterfaceIndex, e7VdslStackVdslPort }
+    ::= { e7VdslStackTable 1 }
+
+E7VdslStackEntry ::= SEQUENCE {
+    e7VdslStackBondedInterfaceIndex    E7BondedInterfaceIndex,
+    e7VdslStackVdslPort           InterfaceIndex,
+    e7VdslStackStatus             RowStatus
+    }
+
+e7VdslStackBondedInterfaceIndex OBJECT-TYPE
+    SYNTAX      E7BondedInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "DSL bonded interface index."
+    ::= { e7VdslStackEntry 1 }
+
+e7VdslStackVdslPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ifIndex of VDSL Port."
+    ::= { e7VdslStackEntry 2 }
+
+e7VdslStackStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the relationship between a DSL bonded interface and a VDSL port.
+        Only 'active' is appropriate for this object."
+    ::= { e7VdslStackEntry 3 }
 
 END

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 PipoCanaja
  * @author     PipoCanaja <pipocanaja@gmail.com>
  */
@@ -43,12 +42,13 @@ class UpsmgUtilityFailure implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $sensor = $device->sensors()->where('sensor_type', 'upsmgInputBadStatus')->first();
-        if (!$sensor) {
-            Log::warning("Snmptrap UpsmgUtilityFailure: Could not find matching sensor upsmgInputBadStatus for device: " . $device->hostname);
+        if (! $sensor) {
+            Log::warning('Snmptrap UpsmgUtilityFailure: Could not find matching sensor upsmgInputBadStatus for device: ' . $device->hostname);
+
             return;
         }
         $sensor->sensor_current = 1;
         $sensor->save();
-        Log::event("UPS power failed, state sensor " . $sensor->sensor_descr . " has changed to ".$sensor->sensor_current . ".", $device->device_id, "Power", 5);
+        Log::event('UPS power failed, state sensor ' . $sensor->sensor_descr . ' has changed to ' . $sensor->sensor_current . '.', $device->device_id, 'Power', 5);
     }
 }

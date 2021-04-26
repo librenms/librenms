@@ -2,9 +2,9 @@ os: websensor
 text: 'Comet System Web Sensor'
 type: environment
 icon: comet
-mib_dir:
-    - comet
+mib_dir: comet
 over:
     - { graph: device_temperature, text: temperature }
 discovery:
-    - sysObjectID: .1.3.6.1.4.1.22626.1.
+    -
+        sysObjectID: .1.3.6.1.4.1.22626.1.

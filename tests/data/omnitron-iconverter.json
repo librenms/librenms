@@ -6,26 +6,8 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.7342.5.1",
                     "sysDescr": "Omnitron iConverter GM4-HPOE 8991T11D v5.2.14 s/n 00827398 - GM4-PoE - x",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "omnitron-iconverter",
-                    "type": "management",
-                    "serial": null,
-                    "icon": "omnitron.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.7342.5.1",
-                    "sysDescr": "Omnitron iConverter GM4-HPOE 8991T11D v5.2.14 s/n 00827398 - GM4-PoE - x",
                     "sysContact": "<private>",
-                    "version": "v5.2.14",
+                    "version": "5.2.14",
                     "hardware": "GM4-HPOE 8991T11D",
                     "features": null,
                     "os": "omnitron-iconverter",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

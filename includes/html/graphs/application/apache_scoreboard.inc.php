@@ -4,66 +4,66 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'apache', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'apache', $app['app_id']]);
 
-$array = array(
-    'sb_reading'   => array(
+$array = [
+    'sb_reading'   => [
         'descr'  => 'Reading',
         'colour' => '750F7DFF',
-    ),
-    'sb_writing'   => array(
+    ],
+    'sb_writing'   => [
         'descr'  => 'Writing',
         'colour' => '00FF00FF',
-    ),
-    'sb_wait'      => array(
+    ],
+    'sb_wait'      => [
         'descr'  => 'Waiting',
         'colour' => '4444FFFF',
-    ),
-    'sb_start'     => array(
+    ],
+    'sb_start'     => [
         'descr'  => 'Starting',
         'colour' => '157419FF',
-    ),
-    'sb_keepalive' => array(
+    ],
+    'sb_keepalive' => [
         'descr'  => 'Keepalive',
         'colour' => 'FF0000FF',
-    ),
-    'sb_dns'       => array(
+    ],
+    'sb_dns'       => [
         'descr'  => 'DNS',
         'colour' => '6DC8FEFF',
-    ),
-    'sb_closing'   => array(
+    ],
+    'sb_closing'   => [
         'descr'  => 'Closing',
         'colour' => 'FFAB00FF',
-    ),
-    'sb_logging'   => array(
+    ],
+    'sb_logging'   => [
         'descr'  => 'Logging',
         'colour' => 'FFFF00FF',
-    ),
-    'sb_graceful'  => array(
+    ],
+    'sb_graceful'  => [
         'descr'  => 'Graceful',
         'colour' => 'FF5576FF',
-    ),
-    'sb_idle'      => array(
+    ],
+    'sb_idle'      => [
         'descr'  => 'Idle',
         'colour' => 'FF4105FF',
-    ),
-);
+    ],
+];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {
     echo "file missing: $file";
 }
 
-$colours   = 'mixed';
-$nototal   = 1;
+$colours = 'mixed';
+$nototal = 1;
 $unit_text = 'Workers';
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

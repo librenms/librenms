@@ -15,31 +15,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     return [];
 }
 
 $query = '';
 $params = [];
 
-if (!empty($_REQUEST['search'])) {
+if (! empty($_REQUEST['search'])) {
     $query .= ' WHERE `name` LIKE ?';
-    $params[] = '%' . mres($_REQUEST['search']) . '%';
+    $params[] = '%' . $_REQUEST['search'] . '%';
 }
-
 
 $total = dbFetchCell("SELECT COUNT(*) FROM `device_groups` $query", $params);
 $more = false;
 
-if (!empty($_REQUEST['limit'])) {
+if (! empty($_REQUEST['limit'])) {
     $limit = (int) $_REQUEST['limit'];
     $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $offset = ($page - 1) * $limit;
@@ -48,7 +45,6 @@ if (!empty($_REQUEST['limit'])) {
 } else {
     $offset = 0;
 }
-
 
 $sql = "SELECT `id`, `name` AS `text` FROM `device_groups` $query order by `name`";
 $groups = dbFetchRows($sql, $params);

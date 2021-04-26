@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  * 3 Phase support extension
@@ -27,7 +26,7 @@
  */
 
 // Detect type of UPS (Signle-Phase/3 Phase)
-    # Number of input lines
+    // Number of input lines
     $upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
     $in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
 
@@ -36,16 +35,16 @@ if ($in_phaseNum == '1') {
     $load_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.3.0';
     $output_load = snmp_get($device, $load_oid, '-Oqv');
 
-    if (!empty($output_load) || $output_load == 0) {
-        $type           = 'netagent2';
-        $index          = 0;
-        $limit          = 100;
-        $warnlimit      = 80;
-        $lowlimit       = 0;
-        $lowwarnlimit   = null;
-        $divisor        = 1;
-        $load           = $output_load / $divisor;
-        $descr          = 'Output load';
+    if (! empty($output_load) || $output_load == 0) {
+        $type = 'netagent2';
+        $index = 0;
+        $limit = 100;
+        $warnlimit = 80;
+        $lowlimit = 0;
+        $lowwarnlimit = null;
+        $divisor = 1;
+        $load = $output_load / $divisor;
+        $descr = 'Output load';
 
         discover_sensor(
             $valid['sensor'],
@@ -72,16 +71,16 @@ if ($in_phaseNum == '3') {
     $load_oid = '.1.3.6.1.4.1.935.1.1.1.8.3.5.0';
     $output_load = snmp_get($device, $load_oid, '-Oqv');
 
-    if (!empty($output_load) || $output_load == 0) {
-        $type           = 'netagent2';
-        $index          = 0;
-        $limit          = 100;
-        $warnlimit      = 80;
-        $lowlimit       = 0;
-        $lowwarnlimit   = null;
-        $divisor        = 10;
-        $load           = $output_load / $divisor;
-        $descr          = 'Out L1 (R)';
+    if (! empty($output_load) || $output_load == 0) {
+        $type = 'netagent2';
+        $index = 0;
+        $limit = 100;
+        $warnlimit = 80;
+        $lowlimit = 0;
+        $lowwarnlimit = null;
+        $divisor = 10;
+        $load = $output_load / $divisor;
+        $descr = 'Out L1 (R)';
 
         discover_sensor(
             $valid['sensor'],
@@ -104,16 +103,16 @@ if ($in_phaseNum == '3') {
     $load_oid = '.1.3.6.1.4.1.935.1.1.1.8.3.6.0';
     $output_load = snmp_get($device, $load_oid, '-Oqv');
 
-    if (!empty($output_load) || $output_load == 0) {
-        $type           = 'netagent2';
-        $index          = 1;
-        $limit          = 100;
-        $warnlimit      = 80;
-        $lowlimit       = 0;
-        $lowwarnlimit   = null;
-        $divisor        = 10;
-        $load           = $output_load / $divisor;
-        $descr          = 'Out L2 (S)';
+    if (! empty($output_load) || $output_load == 0) {
+        $type = 'netagent2';
+        $index = 1;
+        $limit = 100;
+        $warnlimit = 80;
+        $lowlimit = 0;
+        $lowwarnlimit = null;
+        $divisor = 10;
+        $load = $output_load / $divisor;
+        $descr = 'Out L2 (S)';
 
         discover_sensor(
             $valid['sensor'],
@@ -136,16 +135,16 @@ if ($in_phaseNum == '3') {
     $load_oid = '.1.3.6.1.4.1.935.1.1.1.8.3.7.0';
     $output_load = snmp_get($device, $load_oid, '-Oqv');
 
-    if (!empty($output_load) || $output_load == 0) {
-        $type           = 'netagent2';
-        $index          = 2;
-        $limit          = 100;
-        $warnlimit      = 80;
-        $lowlimit       = 0;
-        $lowwarnlimit   = null;
-        $divisor        = 10;
-        $load           = $output_load / $divisor;
-        $descr          = 'Out L3 (T)';
+    if (! empty($output_load) || $output_load == 0) {
+        $type = 'netagent2';
+        $index = 2;
+        $limit = 100;
+        $warnlimit = 80;
+        $lowlimit = 0;
+        $lowwarnlimit = null;
+        $divisor = 10;
+        $load = $output_load / $divisor;
+        $descr = 'Out L3 (T)';
 
         discover_sensor(
             $valid['sensor'],

@@ -8,7 +8,7 @@
 --
 
 
-JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
+JUNIPER-L2ALD-MIB DEFINITIONS ::= BEGIN
    IMPORTS
       MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, 
       NOTIFICATION-TYPE, Unsigned32, Counter64, TimeTicks, Integer32
@@ -22,12 +22,12 @@ JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
     ;
     
     jnxl2aldMib MODULE-IDENTITY
-       LAST-UPDATED "201208081000Z" -- Wednesday August 08 10:00:00 2012 UTC
+       LAST-UPDATED "201605310000Z"     -- Tue May  31 00:00:00 2016 UTC
        ORGANIZATION "Juniper Networks, Inc."
        CONTACT-INFO
               "        Juniper Technical Assistance Center
                        Juniper Networks, Inc.
-                       1194 N. Mathilda Avenue
+                       1133 Innovation Way
                        Sunnyvale, CA 94089
                        E-mail: support@juniper.net"
        DESCRIPTION
@@ -49,6 +49,11 @@ JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
     REVISION "200702151000Z" -- Thursday February 15 10:00:00 2007 UTC
     DESCRIPTION
             "Initial Version"
+
+    REVISION    "201605310000Z" -- 31-May-16
+    DESCRIPTION
+            "Corrected type"
+
     ::= { jnxl2aldMibRoot 1 }
 
     jnxl2aldNotification OBJECT IDENTIFIER ::= { jnxl2aldMib 0 }

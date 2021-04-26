@@ -107,6 +107,7 @@ Input:
 
 - state: Filter the alerts by state, 0 = ok, 1 = alert, 2 = ack
 - severity: Filter the alerts by severity. Valid values are `ok`, `warning`, `critical`.
+- alert_rule: Filter alerts by alert rule ID.
 - order: How to order the output, default is by timestamp
   (descending). Can be appended by DESC or ASC to change the order.
 
@@ -122,6 +123,10 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?seve
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?order=timestamp%20ASC
+```
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?alert_rule=49
 ```
 
 Output:

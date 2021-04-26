@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux GSE200M 2.6.27-SPEAr310 #5 Fri Mar 9 23:07:56 CST 2012 armv5tejl",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "huawei-smu",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "huawei.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux GSE200M 2.6.27-SPEAr310 #5 Fri Mar 9 23:07:56 CST 2012 armv5tejl",
                     "sysContact": "<private>",
                     "version": "V100R002C01B104SP04",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

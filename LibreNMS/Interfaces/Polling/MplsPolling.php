@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -62,4 +61,14 @@ interface MplsPolling
      * @return Collection MplsSdpBind objects
      */
     public function pollMplsSdpBinds($sdps, $svcs);
+
+    /**
+     * @return Collection MplsTunnelArHop objects
+     */
+    public function pollMplsTunnelArHops($paths);
+
+    /**
+     * @return Collection MplsTunnelCHop objects
+     */
+    public function pollMplsTunnelCHops($paths);
 }

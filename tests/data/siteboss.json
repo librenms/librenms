@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3052.12.3.2",
+                    "sysDescr": "SiteBoss 530 2.10.540 STD",
+                    "sysContact": "<private>",
+                    "version": "2.10.540 STD",
+                    "hardware": "SiteBoss 530",
+                    "features": null,
+                    "os": "siteboss",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "siteboss.png",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

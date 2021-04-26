@@ -1,0 +1,838 @@
+-- ****************************************************************************
+-- aviatG826.mib: Aviat Networks G.826 MIB
+--
+-- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-G826-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        DateAndTime, TruthValue, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        Gauge32, MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        entPhysicalIndex
+            FROM ENTITY-MIB
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatG826Module MODULE-IDENTITY
+        LAST-UPDATED    "201401210157Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This MIB module supports the ITU standard G.826 Error
+                 Performance Measure."
+        REVISION        "201401210157Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 14 }
+
+
+-- ****************************************************************************
+-- Textual Conventions
+-- ****************************************************************************
+    AviatPackedG826Data ::=     TEXTUAL-CONVENTION
+        DISPLAY-HINT    "55x"
+        STATUS          current
+        DESCRIPTION     "This is the G826 data packed into a single object.
+                         Note that these are fixed size fields. The Date and
+                         Time bytes are padded with trailing zeros. Refer to
+                         the individual object definitions in
+                         aviatPerformanceTable for details on the syntax of
+                         each object.
+
+                             Bytes 1-4:     G826 Errored Blocks
+                             Bytes 5-8:     G826 Errored Seconds
+                             Bytes 9-12:    G826 Errored Seconds Ratio
+                             Bytes 13-16:   G826 Severely Errored Seconds
+                             Bytes 17-20:   G826 Severely Errored Seconds Ratio
+                             Bytes 21-24:   G826 Background Block Errors
+                             Bytes 25-28:   G826 Background Block Errors Ratio
+                             Bytes 29-32:   G826 Available Seconds
+                             Bytes 33-36:   G826 Unavailable Seconds
+                             Bytes 37-47:   Date And Time
+                             "
+        SYNTAX          OCTET STRING ( SIZE ( 0 | 47 ) )
+
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatG826Conformance        OBJECT IDENTIFIER ::= { aviatG826Module 1 }
+
+    aviatG826Groups             OBJECT IDENTIFIER ::= { aviatG826Conformance 1 }
+
+    aviatG826Compliance         OBJECT IDENTIFIER ::= { aviatG826Conformance 2 }
+
+
+-- ****************************************************************************
+-- Sub-tree for G.826 MIB objects
+-- ****************************************************************************
+    aviatG826MIBObjects         OBJECT IDENTIFIER ::= { aviatG826Module 2 }
+
+
+-- ****************************************************************************
+-- G.826 Control Table
+-- ****************************************************************************
+    aviatG826ControlTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatG826ControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing G.826 control objects for entities
+                         within the system."
+            ::= { aviatG826MIBObjects 1 }
+
+    aviatG826ControlEntry       OBJECT-TYPE
+        SYNTAX          AviatG826ControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A row in the aviatG826ControlTable."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatG826ControlTable 1 }
+
+    AviatG826ControlEntry ::=
+        SEQUENCE {
+            aviatG826LastQHourChangeIndex
+                Gauge32,
+            aviatG826LastDayChangeIndex
+                Gauge32,
+            aviatG826Reset
+                INTEGER
+        }
+
+    aviatG826LastQHourChangeIndex   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the index number of the last entry in
+                         aviatG826QHourTable that refers to the given entity.
+                         This index number refers to the aviatG826QHourPeriod
+                         index of the table."
+            ::= { aviatG826ControlEntry 1 }
+
+    aviatG826LastDayChangeIndex OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the index number of the last entry in
+                         aviatG826DayTable that refers to the given entity.
+                         This index number refers to the aviatG826DayPeriod
+                         index of the table."
+            ::= { aviatG826ControlEntry 2 }
+
+    aviatG826Reset              OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    none (1),
+                                    all (2),
+                                    realtime (3),
+                                    quarterhour (4),
+                                    daily (5)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This object resets G826 statistics for an entity.
+                         Setting all(2) will reset realtime, quarter hourly and
+                         daily statistics. Setting realtime(3), quarterhour(4)
+                         or daily(5) will reset only the selected type of
+                         statistics. If quarter hour or daily statistics are
+                         reset, then all saved statistics data of that type
+                         will be deleted. Resetting also resets the current bin
+                         so statistic will begin on next boundary.
+
+                         Reading this object will return none(1)."
+            ::= { aviatG826ControlEntry 3 }
+
+
+-- ****************************************************************************
+--  G.826 Performance Table
+-- ****************************************************************************
+    aviatG826PerformTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatG826PerformEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the table containing information about the
+                         radio path G.826 performance of each terminal in the
+                         domain. This performance data is updated every 1
+                         second."
+            ::= { aviatG826MIBObjects 2 }
+
+    aviatG826PerformEntry       OBJECT-TYPE
+        SYNTAX          AviatG826PerformEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing the receiver
+                         performance data of an entity in the system."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatG826PerformTable 1 }
+
+    AviatG826PerformEntry ::=
+        SEQUENCE {
+            aviatG826ErroredBlocks
+                Gauge32,
+            aviatG826ErroredSeconds
+                Gauge32,
+            aviatG826ErroredSecondsRatio
+                Gauge32,
+            aviatG826SeverelyErroredSeconds
+                Gauge32,
+            aviatG826SeverelyErroredSecsRatio
+                Gauge32,
+            aviatG826BackgroundBlockErrors
+                Gauge32,
+            aviatG826BackgroundBlockErrorsRatio
+                Gauge32,
+            aviatG826AvailableSeconds
+                Gauge32,
+            aviatG826UnavailableSeconds
+                Gauge32,
+            aviatG826PackedData
+                AviatPackedG826Data
+        }
+
+    aviatG826ErroredBlocks      OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Errored Blocks since the
+                         start of monitoring. This parameter is updated every 1
+                         second.
+
+                         This parameter indicates the number of blocks in which
+                         one or more bits are in error."
+            ::= { aviatG826PerformEntry 3 }
+
+    aviatG826ErroredSeconds     OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Errored Seconds since the
+                         start of monitoring. This parameter is updated every 1
+                         second.
+
+                         This parameter indicates the number of one second
+                         periods with one or more errored blocks."
+            ::= { aviatG826PerformEntry 4 }
+
+    aviatG826ErroredSecondsRatio    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the G.826 Errored Seconds Ratio since the
+                         start of monitoring. This parameter is updated every 1
+                         second.
+
+                         The ratio is calculated by dividing the number of
+                         errored seconds by the available time. The ratio is
+                         then multiplied by 1E+7 to preserve 7 decimal places
+                         of the ratio while it is represented as an integer. If
+                         the available time is 0, then this object will also be
+                         0."
+            ::= { aviatG826PerformEntry 5 }
+
+    aviatG826SeverelyErroredSeconds OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Severely Errored Seconds
+                         since the start of monitoring. This parameter is
+                         updated every 1 second.
+
+                         This parameter indicates the number of one second
+                         periods that contain 30%, or more, errored blocks or
+                         at least one defect."
+            ::= { aviatG826PerformEntry 6 }
+
+    aviatG826SeverelyErroredSecsRatio   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the G.826 Severely Errored Seconds Ratio since
+                         the start of monitoring. This parameter is updated
+                         every 1 second.
+
+                         The ratio is calculated by dividing the number of
+                         severely errored seconds by the available time. The
+                         ratio is then multiplied by 1E+7 to preserve 7 decimal
+                         places of the ratio while it is represented as an
+                         integer. If the available time is 0, then this object
+                         will also be 0."
+            ::= { aviatG826PerformEntry 7 }
+
+    aviatG826BackgroundBlockErrors  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Background Block Errors
+                         since the start of monitoring. This parameter is
+                         updated every 1 second."
+            ::= { aviatG826PerformEntry 8 }
+
+    aviatG826BackgroundBlockErrorsRatio OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the Background Block Errors Ratio since the
+                         start of monitoring. This parameter is updated every 1
+                         second.
+
+                         The ratio is calculated by dividing the number of
+                         Background Block Errors by the total number of blocks
+                         (excluding blocks transmitted during severely errored
+                         seconds). The ratio is then multiplied by 1E+14 to
+                         preserve 14 decimal places of the ratio while it is
+                         represented as an integer. If the total number of
+                         blocks is 0, then this object will also be 0."
+            ::= { aviatG826PerformEntry 9 }
+
+    aviatG826AvailableSeconds   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of Available Seconds since the
+                         start of monitoring. This parameter is updated every 1
+                         second.
+
+                         This parameter indicates the time in seconds that the
+                         link is available.
+
+                         Note that available time ends at the start of a block
+                         of ten consecutive Severely Errored Seconds and
+                         recommences at the start of a block of ten seconds
+                         each of which is not severely errored."
+            ::= { aviatG826PerformEntry 10 }
+
+    aviatG826UnavailableSeconds OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of Unavailable Seconds since the
+                         start of monitoring. This parameter is updated every 1
+                         second.
+
+                         Note that unavailable time commences at the start of a
+                         block of ten consecutive Severely Errored Seconds and
+                         ends at the start of a block of ten seconds each of
+                         which is not severely errored."
+            ::= { aviatG826PerformEntry 11 }
+
+    aviatG826PackedData         OBJECT-TYPE
+        SYNTAX          AviatPackedG826Data
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is all of the Performance data for this table,
+                         updated every 1 second, packed into a single object.
+
+                         This object is provided to guarantee a 'snapshot'
+                         collection of the performance measures in an entity.
+                         Slowly stepping through the aviatG826PerformTable may
+                         result in changing information being read."
+            ::= { aviatG826PerformEntry 12 }
+
+
+-- ****************************************************************************
+--  G.826 Quarter Hourly Table
+-- ****************************************************************************
+    aviatG826QuarterHourTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatG826QuarterHourEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the table containing information about the
+                         radio path G.826 performance of each terminal in the
+                         domain. This performance data is recorded for 15
+                         minute periods."
+            ::= { aviatG826MIBObjects 3 }
+
+    aviatG826QuarterHourEntry   OBJECT-TYPE
+        SYNTAX          AviatG826QuarterHourEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing the G.826
+                         performance data of a particular entity within the
+                         agent during a 15 minute period. This is required to
+                         maintain a unique index even when the table wraps."
+        INDEX           { entPhysicalIndex, aviatG826QHourIndex,
+                          aviatG826QHourPeriod }
+            ::= { aviatG826QuarterHourTable 1 }
+
+    AviatG826QuarterHourEntry ::=
+        SEQUENCE {
+            aviatG826QHourIndex
+                Gauge32,
+            aviatG826QHourPeriod
+                Gauge32,
+            aviatG826QHourDateAndTime
+                DateAndTime,
+            aviatG826QHourErroredBlocks
+                Gauge32,
+            aviatG826QHourErroredSeconds
+                Gauge32,
+            aviatG826QHourErroredSecondsRatio
+                Gauge32,
+            aviatG826QHourSeverelyErroredSeconds
+                Gauge32,
+            aviatG826QHourSeverelyErroredSecsRatio
+                Gauge32,
+            aviatG826QHourBackgroundBlockErrors
+                Gauge32,
+            aviatG826QHourBackgroundBlockErrorsRatio
+                Gauge32,
+            aviatG826QHourAvailableSeconds
+                Gauge32,
+            aviatG826QHourUnavailableSeconds
+                Gauge32,
+            aviatG826QHourInvalidEntry
+                TruthValue
+        }
+
+    aviatG826QHourIndex         OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the row number referencing to the quarter
+                         hourly G.826 performance data of a particular entity
+                         in the system."
+            ::= { aviatG826QuarterHourEntry 1 }
+
+    aviatG826QHourPeriod        OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the unique row number for the 15 minute period
+                         during which this block of performance data was
+                         collected."
+            ::= { aviatG826QuarterHourEntry 2 }
+
+    aviatG826QHourDateAndTime   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the date and time at the start of the current
+                         15 minute period during which this block of
+                         performance data was collected."
+            ::= { aviatG826QuarterHourEntry 3 }
+
+    aviatG826QHourErroredBlocks OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Errored Blocks for the
+                         current 15 minute period of monitoring.
+
+                         This parameter indicates the number of blocks in which
+                         one or more bits are in error."
+            ::= { aviatG826QuarterHourEntry 4 }
+
+    aviatG826QHourErroredSeconds    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Errored Seconds for the
+                         current 15 minute period of monitoring.
+
+                         This parameter indicates the number of one second
+                         periods with one or more errored blocks."
+            ::= { aviatG826QuarterHourEntry 5 }
+
+    aviatG826QHourErroredSecondsRatio   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the G.826 Errored Seconds Ratio for the
+                         current 15 minute period of monitoring.
+
+                         The ratio is calculated by dividing the number of
+                         errored seconds by the available time. The ratio is
+                         then multiplied by 1E+7 to preserve 7 decimal places
+                         of the ratio while it is represented as an integer. If
+                         the available time is 0, then this object will also be
+                         0."
+            ::= { aviatG826QuarterHourEntry 6 }
+
+    aviatG826QHourSeverelyErroredSeconds    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Severely Errored Seconds
+                         for the current 15 minute period of monitoring.
+
+                         This parameter indicates the number of one second
+                         periods that contain 30%, or more, errored blocks or
+                         at least one defect."
+            ::= { aviatG826QuarterHourEntry 7 }
+
+    aviatG826QHourSeverelyErroredSecsRatio  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the G.826 Severely Errored Seconds Ratio for
+                         the current 15 minute period of monitoring.
+
+                         The ratio is calculated by dividing the number of
+                         severely errored seconds by the available time. The
+                         ratio is then multiplied by 1E+7 to preserve 7 decimal
+                         places of the ratio while it represented as an
+                         integer. If the available time is 0, then this object
+                         will also be 0."
+            ::= { aviatG826QuarterHourEntry 8 }
+
+    aviatG826QHourBackgroundBlockErrors OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Background Block Errors
+                         for the current 15 minute period of monitoring."
+            ::= { aviatG826QuarterHourEntry 9 }
+
+    aviatG826QHourBackgroundBlockErrorsRatio    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the Background Block Errors Ratio for the
+                         current 15 minute period of monitoring.
+
+                         The ratio is calculated by dividing the number of
+                         Background Block Errors by the total number of blocks
+                         (excluding blocks transmitted during severely errored
+                         seconds). The ratio is then multiplied by 1E+7 to
+                         preserve 7 decimal places of the ratio while it is
+                         represented as an integer. If the total number of
+                         blocks is 0, then this object will also be 0."
+            ::= { aviatG826QuarterHourEntry 10 }
+
+    aviatG826QHourAvailableSeconds  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of Available Seconds for the
+                         current 15 minute period of monitoring.
+
+                         This parameter indicates the time in seconds that the
+                         link is available.
+
+                         Note that available time ends at the start of a block
+                         of ten consecutive Severely Errored Seconds and
+                         recommences at the start of a block of ten seconds
+                         each of which is not severely errored."
+            ::= { aviatG826QuarterHourEntry 11 }
+
+    aviatG826QHourUnavailableSeconds    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of Unavailable Seconds for the
+                         current 15 minute period of monitoring.
+
+                         Note that unavailable time commences at the start of a
+                         block of ten consecutive Severely Errored Seconds and
+                         ends at the start of a block of ten seconds each of
+                         which is not severely errored."
+            ::= { aviatG826QuarterHourEntry 12 }
+
+    aviatG826QHourInvalidEntry  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This indicates the validity of the performance data in
+                         this row of the table. It is set to TRUE when the data
+                         becomes invalid due to the interval not being within
+                         ten seconds of its nominal length otherwise it is set
+                         to FALSE.
+
+                         This could be a result of a time-of-day change."
+            ::= { aviatG826QuarterHourEntry 14 }
+
+
+-- ****************************************************************************
+--  G.826 Daily Table
+-- ****************************************************************************
+    aviatG826DayTable           OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatG826DayEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing a collection of information
+                         about the radio path performance of each terminal in
+                         the domain. Performance data in this table is recorded
+                         for 1 day periods."
+            ::= { aviatG826MIBObjects 4 }
+
+    aviatG826DayEntry           OBJECT-TYPE
+        SYNTAX          AviatG826DayEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing performance
+                         data of a particular entity within the agent during a
+                         24 hour period."
+        INDEX           { entPhysicalIndex, aviatG826DayIndex,
+                          aviatG826DayPeriod }
+            ::= { aviatG826DayTable 1 }
+
+    AviatG826DayEntry ::=
+        SEQUENCE {
+            aviatG826DayIndex
+                Gauge32,
+            aviatG826DayPeriod
+                Gauge32,
+            aviatG826DayDateAndTime
+                DateAndTime,
+            aviatG826DayErroredBlocks
+                Gauge32,
+            aviatG826DayErroredSeconds
+                Gauge32,
+            aviatG826DayErroredSecondsRatio
+                Gauge32,
+            aviatG826DaySeverelyErroredSeconds
+                Gauge32,
+            aviatG826DaySeverelyErroredSecsRatio
+                Gauge32,
+            aviatG826DayBackgroundBlockErrors
+                Gauge32,
+            aviatG826DayBackgroundBlockErrorsRatio
+                Gauge32,
+            aviatG826DayAvailableSeconds
+                Gauge32,
+            aviatG826DayUnavailableSeconds
+                Gauge32,
+            aviatG826DayInvalidEntry
+                TruthValue
+        }
+
+    aviatG826DayIndex           OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the row number referencing to the daily G.826
+                         performance data of a particular entity in the system."
+            ::= { aviatG826DayEntry 1 }
+
+    aviatG826DayPeriod          OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the unique row number of the 1 day period
+                         during which this block of performance data was
+                         collected."
+            ::= { aviatG826DayEntry 2 }
+
+    aviatG826DayDateAndTime     OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the date and time at the start of the current
+                         day period during which this block of performance data
+                         was collected."
+            ::= { aviatG826DayEntry 3 }
+
+    aviatG826DayErroredBlocks   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Errored Blocks for the
+                         current 24 hour period of monitoring.
+
+                         This parameter indicates the number of blocks in which
+                         one or more bits are in error."
+            ::= { aviatG826DayEntry 4 }
+
+    aviatG826DayErroredSeconds  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Errored Seconds for the
+                         current 24 hour period of monitoring.
+
+                         This parameter indicates the number of one second
+                         periods with one or more errored blocks."
+            ::= { aviatG826DayEntry 5 }
+
+    aviatG826DayErroredSecondsRatio OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the G.826 Errored Seconds Ratio for the
+                         current 24 hour period of monitoring.
+
+                         The ratio is calculated by dividing the number of
+                         errored seconds by the available time. The ratio is
+                         then multiplied by 1E+7 to preserve 7 decimal places
+                         of the ratio while it is represented as an integer. If
+                         the available time is 0, then this object will also be
+                         0."
+            ::= { aviatG826DayEntry 6 }
+
+    aviatG826DaySeverelyErroredSeconds  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Severely Errored Seconds
+                         for the current 24 hour period of monitoring.
+
+                         This parameter indicates the number of one second
+                         periods that contain 30%, or more, errored blocks or
+                         at least one defect."
+            ::= { aviatG826DayEntry 7 }
+
+    aviatG826DaySeverelyErroredSecsRatio    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the G.826 Severely Errored Seconds Ratio for
+                         the current 24 hour period of monitoring.
+
+                         The ratio is calculated by dividing the number of
+                         severely errored seconds by the available time. The
+                         ratio is then multiplied by 1E+7 to preserve 7 decimal
+                         places of the ratio while it represented as an
+                         integer. If the available time is 0, then this object
+                         will also be 0."
+            ::= { aviatG826DayEntry 8 }
+
+    aviatG826DayBackgroundBlockErrors   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of G.826 Background Block Errors
+                         for the current 24 hour period of monitoring."
+            ::= { aviatG826DayEntry 9 }
+
+    aviatG826DayBackgroundBlockErrorsRatio  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the Background Block Errors Ratio for the
+                         current 24 hour period of monitoring.
+
+                         The ratio is calculated by dividing the number of
+                         Background Block Errors by the total number of blocks
+                         (excluding blocks transmitted during severely errored
+                         seconds). The ratio is then multiplied by 1E+14 to
+                         preserve 14 decimal places of the ratio while it is
+                         represented as an integer. If the total number of
+                         blocks is 0, then this object will also be 0."
+            ::= { aviatG826DayEntry 10 }
+
+    aviatG826DayAvailableSeconds    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of Available Seconds for the
+                         current 24 hour period of monitoring.
+
+                         This parameter indicates the time in seconds that the
+                         link is available.
+
+                         Note that available time ends at the start of a block
+                         of ten consecutive Severely Errored Seconds and
+                         recommences at the start of a block of ten seconds
+                         each of which is not severely errored."
+            ::= { aviatG826DayEntry 11 }
+
+    aviatG826DayUnavailableSeconds  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of Unavailable Seconds for the
+                         current 24 hour period of monitoring.
+
+                         Note that unavailable time commences at the start of a
+                         block of ten consecutive Severely Errored Seconds and
+                         ends at the start of a block of ten seconds each of
+                         which is not severely errored."
+            ::= { aviatG826DayEntry 12 }
+
+    aviatG826DayInvalidEntry    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This indicates the validity of the performance data in
+                         this row of the table. It is set to TRUE when the data
+                         becomes invalid due to the interval not being within
+                         ten seconds of its nominal length otherwise it is set
+                         to FALSE.
+
+                         This could be a result of a time-of-day change."
+            ::= { aviatG826DayEntry 13 }
+
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatG826ObjectGroup        OBJECT-GROUP
+        OBJECTS {
+            aviatG826LastQHourChangeIndex,
+            aviatG826LastDayChangeIndex,
+            aviatG826Reset,
+            aviatG826ErroredBlocks,
+            aviatG826ErroredSeconds,
+            aviatG826ErroredSecondsRatio,
+            aviatG826SeverelyErroredSeconds,
+            aviatG826SeverelyErroredSecsRatio,
+            aviatG826BackgroundBlockErrors,
+            aviatG826BackgroundBlockErrorsRatio,
+            aviatG826AvailableSeconds,
+            aviatG826UnavailableSeconds,
+            aviatG826PackedData,
+            aviatG826QHourDateAndTime,
+            aviatG826QHourErroredBlocks,
+            aviatG826QHourErroredSeconds,
+            aviatG826QHourErroredSecondsRatio,
+            aviatG826QHourSeverelyErroredSeconds,
+            aviatG826QHourSeverelyErroredSecsRatio,
+            aviatG826QHourBackgroundBlockErrors,
+            aviatG826QHourBackgroundBlockErrorsRatio,
+            aviatG826QHourAvailableSeconds,
+            aviatG826QHourUnavailableSeconds,
+            aviatG826QHourInvalidEntry,
+            aviatG826DayDateAndTime,
+            aviatG826DayErroredBlocks,
+            aviatG826DayErroredSeconds,
+            aviatG826DayErroredSecondsRatio,
+            aviatG826DaySeverelyErroredSeconds,
+            aviatG826DaySeverelyErroredSecsRatio,
+            aviatG826DayBackgroundBlockErrors,
+            aviatG826DayBackgroundBlockErrorsRatio,
+            aviatG826DayAvailableSeconds,
+            aviatG826DayUnavailableSeconds,
+            aviatG826DayInvalidEntry
+        }
+        STATUS          current
+        DESCRIPTION     "These are objects in the G826 MIB."
+            ::= { aviatG826Groups 1 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatG826ComplV1            MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatG826ObjectGroup
+                                }
+            ::= { aviatG826Compliance 1 }
+
+END

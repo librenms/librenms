@@ -9,5 +9,5 @@
  */
 
 return [
-    'options' => []
+    'options' => [],
 ];

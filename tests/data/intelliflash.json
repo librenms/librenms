@@ -8,13 +8,13 @@
                     "sysDescr": "Tegile IntelliFlash (3.5.4.1.171031) SNMP Agent",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "intelliflash",
                     "type": "storage",
                     "serial": null,
-                    "icon": "tegile.svg"
+                    "icon": "tegile.svg",
+                    "location": null
                 }
             ]
         },

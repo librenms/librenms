@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -17,10 +17,10 @@ $where = '1';
 
 if (is_numeric($vars['device'])) {
     $where .= ' AND E.device_id = ?';
-    $param[] = (int)$vars['device'];
+    $param[] = (int) $vars['device'];
 }
 
-if (!empty($vars['eventtype'])) {
+if (! empty($vars['eventtype'])) {
     $where .= ' AND `E`.`type` = ?';
     $param[] = $vars['eventtype'];
 }
@@ -37,8 +37,14 @@ if (Auth::user()->hasGlobalRead()) {
     $param[] = Auth::id();
 }
 
-if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `D`.`sysName` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
+if (isset($searchPhrase) && ! empty($searchPhrase)) {
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`datetime` LIKE ? OR `E`.`message` LIKE ? OR `E`.`type` LIKE ? OR `E`.`username` LIKE ?)';
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(event_id) $sql";
@@ -47,7 +53,7 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
+if (! isset($sort) || empty($sort)) {
     $sort = 'datetime DESC';
 }
 
@@ -78,19 +84,19 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         $eventlog['username'] = 'System';
     }
 
-    $response[] = array(
-        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate'] . "</span>",
+    $response[] = [
+        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate'] . '</span>',
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type' => $type,
         'message' => htmlspecialchars($eventlog['message']),
         'username' => $eventlog['username'],
-    );
+    ];
 }
 
-$output = array(
+$output = [
     'current' => $current,
     'rowCount' => $rowCount,
     'rows' => $response,
     'total' => $total,
-);
-echo _json_encode($output);
+];
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

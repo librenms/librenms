@@ -7,4 +7,5 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_temperature, text: 'Temperature' }
 discovery:
-    - sysObjectID: [ .1.3.6.1.4.1.3902.1004., .1.3.6.1.4.1.3902.1015. ]
+    -
+        sysObjectID: [ .1.3.6.1.4.1.3902.1004., .1.3.6.1.4.1.3902.1015. ]

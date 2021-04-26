@@ -11,6 +11,7 @@ return [
     |
     */
 
+    'title' => 'Sensors',
     'airflow' => [
         'short' => 'Airflow',
         'long' => 'Airflow',
@@ -95,6 +96,12 @@ return [
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
+    'loss' => [
+        'short' => 'Percent',
+        'long' => 'Loss Percentage',
+        'unit' => '%',
+        'unit_long' => 'percentage',
+    ],
     'power' => [
         'short' => 'Power',
         'long' => 'Power',
@@ -137,6 +144,12 @@ return [
         'unit' => 'dBm',
         'unit_long' => 'Decibal-Milliwatts',
     ],
+    'tv_signal' => [
+        'short' => 'Signal',
+        'long' => 'TV signal',
+        'unit' => 'dBmV',
+        'unit_long' => 'Decibel-Millivolts',
+    ],
     'snr' => [
         'short' => 'SNR',
         'long' => 'Signal to Noise Ratio',
@@ -165,5 +178,11 @@ return [
         'long' => 'Water Flow',
         'unit' => 'l/m',
         'unit_long' => 'Liters Per Minute',
+    ],
+    'percent' => [
+        'short' => 'Percent',
+        'long' => 'Percent',
+        'unit' => '%',
+        'unit_long' => 'Percent',
     ],
 ];

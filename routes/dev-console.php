@@ -34,4 +34,4 @@ Artisan::command('release:tag
     } catch (\Exception $e) {
         $this->error($e->getMessage());
     }
-})->describe('Create a new LibreNMS release including changelog');
+})->purpose('Create a new LibreNMS release including changelog');

@@ -6,8 +6,8 @@ over:
     - { graph: device_cooling, text: 'Cooling Capacity' }
     - { graph: device_temperature, text: Temperatures }
     - { graph: device_power, text: 'Power Consumption' }
-mib_dir:
-    - carel
+mib_dir: carel
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.9839.2606.1
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9839.2606.1

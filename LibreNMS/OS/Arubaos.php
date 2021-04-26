@@ -15,19 +15,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -36,6 +37,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Arubaos extends OS implements
+    OsDiscovery,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -44,6 +46,19 @@ class Arubaos extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+        $aruba_info = snmp_get_multi($this->getDeviceArray(), [
+            'wlsxSwitchRole.0',
+            'wlsxSwitchMasterIp.0',
+            'wlsxSwitchLicenseSerialNumber.0',
+        ], '-OQUs', 'WLSX-SWITCH-MIB');
+
+        $device->features = $aruba_info[0]['wlsxSwitchRole'] == 'master' ? 'Master Controller' : "Local Controller for {$aruba_info[0]['wlsxSwitchMasterIp']}";
+        $device->serial = $aruba_info[0]['wlsxSwitchLicenseSerialNumber'];
+    }
+
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -53,8 +68,9 @@ class Arubaos extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
+
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count')
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count'),
         ];
     }
 
@@ -71,7 +87,7 @@ class Arubaos extends OS implements
         $sensors = [];
 
         foreach ($data as $key => $value) {
-            $oid = snmp_translate($mib.'::'.$key, 'ALL', 'arubaos', '-On', null);
+            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On');
             $value = intval($value);
 
             $low_warn_const = 1; // Default warning threshold = 1 down AP
@@ -96,7 +112,7 @@ class Arubaos extends OS implements
 
             // If AP count is less than twice the default warning threshold,
             // then set the critical threshold to zero.
-            if ($value > 0  && $value <= $low_warn_const * 2) {
+            if ($value > 0 && $value <= $low_warn_const * 2) {
                 $low_limit = 0;
             }
 
@@ -139,17 +155,17 @@ class Arubaos extends OS implements
     public function discoverWirelessPower()
     {
         // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', "Radio %s: Tx Power");
+        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
     }
 
     protected function decodeChannel($channel)
     {
-        return $channel & 255; // mask off the channel width information
+        return cast_number($channel) & 255; // mask off the channel width information
     }
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
     {
-        $data = snmpwalk_cache_numerical_oid($this->getDevice(), $oid, [], 'AI-AP-MIB');
+        $data = snmpwalk_cache_numerical_oid($this->getDeviceArray(), $oid, [], 'AI-AP-MIB');
 
         $sensors = [];
         foreach ($data as $index => $entry) {

@@ -1,0 +1,10 @@
+mib: SFOS-FIREWALL-MIB
+modules:
+   os:
+      version:  
+         - SFOS-FIREWALL-MIB::sfosDeviceFWVersion.0
+      hardware: 
+         - SFOS-FIREWALL-MIB::sfosDeviceType.0
+      serial:   
+         - SFOS-FIREWALL-MIB::sfosDeviceAppKey.0
+

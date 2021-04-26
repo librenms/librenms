@@ -1,0 +1,304 @@
+SL-SECU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, transmission, IpAddress
+          FROM SNMPv2-SMI
+	InterfaceIndex		               	FROM IF-MIB
+    DisplayString, TruthValue, RowStatus, DateAndTime
+          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+          FROM SNMPv2-CONF
+    slMain				      		   	FROM SL-MAIN-MIB;
+
+--  This is the MIB module for PL security.
+
+
+slSecuMib MODULE-IDENTITY
+	LAST-UPDATED "201105170000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This security module. This mib is used to configure the firewall."
+	::= { slMain 24 }
+
+
+SlSecuType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The security protocol types:
+        	Telnet 	- CLI
+        	SSH  	- Secured Telnet
+        	HTTP 	- Hyper Text
+        	HTTPS	- Secured HTTP
+        	ICMP	- Ping
+        	SNMP	- Simple Network Management (only 161 is supported)
+        	FTP		- File Transfer
+        	TFTP	- Trivial FTP
+        	TL1		- TL1 over Telnet
+        	TL1SSH  - TL1 over SSH
+        	WL		- White list (port number is 0)
+        	SNMPOVERTCP - SNMP over TCP
+        	SFTP	- Client side"
+       SYNTAX       INTEGER {
+            telnet(1),
+            ssh(2),
+            http(3),
+            https(4),
+            icmp(5),
+            snmp(6),
+            ftp(7),
+            tftp(8),
+            tl1(9),
+            tl1ssh(10),
+            wl(11),
+            snmpovertcp(12),  
+            sftp(13)  
+       }
+
+
+slSecuGen	            OBJECT IDENTIFIER ::= { slSecuMib 1 }
+slSecuSelect            OBJECT IDENTIFIER ::= { slSecuMib 2 }
+slSecuWl		        OBJECT IDENTIFIER ::= { slSecuMib 3 }  
+slSecuEncryption	    OBJECT IDENTIFIER ::= { slSecuMib 4 }  
+
+
+-- The Security general part 
+
+slSecuFirewallEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "General Enable/Disable of the firewall operation."
+       ::= { slSecuGen 1 }
+
+
+-- The Security Selection Table 
+
+slSecuSelectTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlSecuSelectEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The security protocol selection table."
+     ::= { slSecuSelect 1 }
+
+slSecuSelectEntry OBJECT-TYPE
+    SYNTAX  SlSecuSelectEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "An entry in the security selection table."
+    INDEX   { slSecuSelectType }            
+     ::= { slSecuSelectTable 1 }
+
+SlSecuSelectEntry ::=
+    SEQUENCE {
+         slSecuSelectType			  	SlSecuType,
+         slSecuSelectPort				INTEGER,
+         slSecuSelectEnable	  			TruthValue
+    }
+
+slSecuSelectType OBJECT-TYPE
+    SYNTAX  SlSecuType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The secutity protocol type"
+     ::= { slSecuSelectEntry 1 }
+
+slSecuSelectPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The corresponding port number of the protocol.
+       Port number 0 is used when not applicable/available."
+     ::= { slSecuSelectEntry 2 }
+
+slSecuSelectEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "True - Enables the firewall for the corresponding protocol.
+       False - Dsables the firewall for the corresponding protocol.
+       When enabled the firewall blocks the protocol."
+     ::= { slSecuSelectEntry 3 }
+
+
+
+--  IP White List Table
+
+--  The IP white list Table odefine which IP addresses are allowed.
+
+slSecuWlTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF SlSecuWlEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "This white list table."
+    ::= { slSecuWl 1 }
+
+slSecuWlEntry OBJECT-TYPE
+    SYNTAX   SlSecuWlEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A particular IP address."
+    INDEX { slSecuWlIp }
+    ::= { slSecuWlTable 1 }
+
+SlSecuWlEntry ::=
+    SEQUENCE {
+        slSecuWlIp
+            IpAddress,
+        slSecuWlMask
+            IpAddress,
+        slSecuWlStatus
+            RowStatus
+    }
+
+slSecuWlIp OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The IP address to allow"
+    ::= { slSecuWlEntry 1 }
+
+slSecuWlMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "Indicate the mask to be logical-ANDed with the
+       destination  address  before  being compared to
+       the value  in  the  slSecuWlIp field."
+    ::= { slSecuWlEntry 2 }
+
+slSecuWlStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { slSecuWlEntry 3 }
+
+
+-- *******************************************
+--
+-- The Encryption Table
+--
+-- *******************************************
+	
+slSecuEncryptionTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlSecuEncryptionEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The encryption table. This table has an entry per transponder."
+	::= { slSecuEncryption 1 }
+
+slSecuEncryptionEntry OBJECT-TYPE
+	SYNTAX  SlSecuEncryptionEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This entry is used to control the necryption per transponder."
+	INDEX   { slSecuEncryptionIfIndex }
+	::= { slSecuEncryptionTable 1 }
+
+SlSecuEncryptionEntry ::=
+	SEQUENCE {
+		slSecuEncryptionIfIndex				InterfaceIndex,
+		slSecuEncryptionEnable				TruthValue,
+		slSecuEncryptionStatus				INTEGER,
+		slSecuEncryptionForceInit			INTEGER,
+		slSecuEncryptionPreShared			DisplayString,
+		slSecuEncryptionKeyExchangePeriod	INTEGER,
+		slSecuEncryptionLock				TruthValue,
+		slSecuEncryptionProtectedStatus		INTEGER
+	}	
+
+slSecuEncryptionIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Interface Index of the uplink port."
+    ::= { slSecuEncryptionEntry 1 }
+
+slSecuEncryptionEnable OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"Enable/Disable the encryption on this uplink."
+	::= { slSecuEncryptionEntry 2 }
+
+slSecuEncryptionStatus OBJECT-TYPE
+	SYNTAX        INTEGER {
+		init(1),      --- init/link-failure state
+		exchange(2),  --- public key exchange state
+		kdf(3),       --- key derivation function state
+		active(4)     --- active state
+	}
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"The state of the encryption finite state machine."
+	::= { slSecuEncryptionEntry 3 }
+
+slSecuEncryptionForceInit OBJECT-TYPE
+	SYNTAX        INTEGER
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"Writing this valiable forces init to the encryption state machine."
+	::= { slSecuEncryptionEntry 4 }
+
+slSecuEncryptionPreShared OBJECT-TYPE
+	SYNTAX        DisplayString 
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"The pre-shared secret. 
+		Either the pre-shared key, or the shared secret to avoid Mitm when using DH public key exchange."
+	::= { slSecuEncryptionEntry 5 }
+
+slSecuEncryptionKeyExchangePeriod OBJECT-TYPE
+	SYNTAX        INTEGER 
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"The Key Exchage Period, specified in minutes.
+		The value 0 means to perform the key exchange only once at link establishment."
+	::= { slSecuEncryptionEntry 6 }
+
+slSecuEncryptionLock OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"Lock/Unlock the encrypted service for this uplink."
+	::= { slSecuEncryptionEntry 7 }
+
+slSecuEncryptionProtectedStatus OBJECT-TYPE
+	SYNTAX        INTEGER {
+		init(1),      --- init/link-failure state
+		exchange(2),  --- public key exchange state
+		kdf(3),       --- key derivation function state
+		active(4)     --- active state
+	}
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"The protected port state of the encryption finite state machine."
+	::= { slSecuEncryptionEntry 8 }
+
+
+END

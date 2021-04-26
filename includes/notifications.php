@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Notification Poller
@@ -20,9 +20,7 @@
  * @author    Daniel Preussker
  * @author    Tony Murray <murraytony@gmail.com>
  * @license   GPL
- * @package   LibreNMS
- * @link      http://librenms.org
- * @subpackage Notifications
+ * @link      https://www.librenms.org
  */
 
 /**
@@ -31,9 +29,9 @@
  */
 function get_notifications()
 {
-    $obj = array();
+    $obj = [];
     foreach (\LibreNMS\Config::get('notifications') as $name => $url) {
-        echo '[ '.date('r').' ] '.$url.' ';
+        echo '[ ' . date('r') . ' ] ' . $url . ' ';
         $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
         if (isset($feed['channel'])) {
             $feed = parse_rss($feed);
@@ -44,9 +42,10 @@ function get_notifications()
             $items['source'] = $url;
         }, $url);
         $obj = array_merge($obj, $feed);
-        echo '('.sizeof($obj).')'.PHP_EOL;
+        echo '(' . sizeof($obj) . ')' . PHP_EOL;
     }
     $obj = array_sort_by_column($obj, 'datetime');
+
     return $obj;
 }
 
@@ -57,9 +56,9 @@ function get_notifications()
 function post_notifications()
 {
     $notifs = get_notifications();
-    echo '[ '.date('r').' ] Updating DB ';
+    echo '[ ' . date('r') . ' ] Updating DB ';
     foreach ($notifs as $notif) {
-        if (dbFetchCell('select 1 from notifications where checksum = ?', array($notif['checksum'])) != 1 && dbInsert($notif, 'notifications') > 0) {
+        if (dbFetchCell('select 1 from notifications where checksum = ?', [$notif['checksum']]) != 1 && dbInsert($notif, 'notifications') > 0) {
             echo '.';
         }
     }
@@ -74,18 +73,19 @@ function post_notifications()
  */
 function parse_rss($feed)
 {
-    $obj = array();
-    if (!array_key_exists('0', $feed['channel']['item'])) {
-        $feed['channel']['item'] = array( $feed['channel']['item'] );
+    $obj = [];
+    if (! array_key_exists('0', $feed['channel']['item'])) {
+        $feed['channel']['item'] = [$feed['channel']['item']];
     }
     foreach ($feed['channel']['item'] as $item) {
-        $obj[] = array(
+        $obj[] = [
             'title'=>$item['title'],
             'body'=>$item['description'],
-            'checksum'=>hash('sha512', $item['title'].$item['description']),
-            'datetime'=>strftime('%F', strtotime($item['pubDate']))
-            );
+            'checksum'=>hash('sha512', $item['title'] . $item['description']),
+            'datetime'=>strftime('%F', strtotime($item['pubDate']) ?: time()),
+        ];
     }
+
     return $obj;
 }
 
@@ -96,18 +96,19 @@ function parse_rss($feed)
  */
 function parse_atom($feed)
 {
-    $obj = array();
-    if (!array_key_exists('0', $feed['entry'])) {
-        $feed['entry'] = array( $feed['entry'] );
+    $obj = [];
+    if (! array_key_exists('0', $feed['entry'])) {
+        $feed['entry'] = [$feed['entry']];
     }
     foreach ($feed['entry'] as $item) {
-        $obj[] = array(
+        $obj[] = [
             'title'=>$item['title'],
             'body'=>$item['content'],
-            'checksum'=>hash('sha512', $item['title'].$item['content']),
-            'datetime'=>strftime('%F', strtotime($item['updated']))
-            );
+            'checksum'=>hash('sha512', $item['title'] . $item['content']),
+            'datetime'=>strftime('%F', strtotime($item['updated']) ?: time()),
+        ];
     }
+
     return $obj;
 }
 
@@ -123,16 +124,16 @@ function parse_atom($feed)
  */
 function new_notification($title, $message, $severity = 0, $source = 'adhoc', $date = null)
 {
-    $notif = array(
+    $notif = [
         'title' => $title,
         'body' => $message,
         'severity' => $severity,
         'source' => $source,
         'checksum' => hash('sha512', $title . $message),
-        'datetime' => strftime('%F', is_null($date) ? time() : strtotime($date))
-    );
+        'datetime' => strftime('%F', is_null($date) ? time() : strtotime($date)),
+    ];
 
-    if (dbFetchCell('SELECT 1 FROM `notifications` WHERE `checksum` = ?', array($notif['checksum'])) != 1) {
+    if (dbFetchCell('SELECT 1 FROM `notifications` WHERE `checksum` = ?', [$notif['checksum']]) != 1) {
         return dbInsert($notif, 'notifications') > 0;
     }
 
@@ -147,9 +148,9 @@ function new_notification($title, $message, $severity = 0, $source = 'adhoc', $d
  */
 function remove_notification($title)
 {
-    $ids = dbFetchColumn('SELECT `notifications_id` FROM `notifications` WHERE `title`=?', array($title));
+    $ids = dbFetchColumn('SELECT `notifications_id` FROM `notifications` WHERE `title`=?', [$title]);
     foreach ($ids as $id) {
-        dbDelete('notifications', '`notifications_id`=?', array($id));
-        dbDelete('notifications_attribs', '`notifications_id`=?', array($id));
+        dbDelete('notifications', '`notifications_id`=?', [$id]);
+        dbDelete('notifications_attribs', '`notifications_id`=?', [$id]);
     }
 }

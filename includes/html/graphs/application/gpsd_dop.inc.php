@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2016 Karl Shea, LibreNMS
 * @author     Karl Shea <karl@karlshea.com>
 *
@@ -27,15 +27,15 @@ $colours = 'mixed';
 $unit_text = 'DOP';
 $nototal = 1;
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
-$array = array(
-    'hdop' => array('descr' => 'Horizontal'),
-    'vdop' => array('descr' => 'Vertical'),
-);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
+$array = [
+    'hdop' => ['descr' => 'Horizontal'],
+    'vdop' => ['descr' => 'Vertical'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

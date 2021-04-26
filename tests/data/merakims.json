@@ -8,24 +8,6 @@
                     "sysDescr": "Meraki MS",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "merakims",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "meraki.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": "Meraki MS",
-                    "sysContact": null,
-                    "version": null,
                     "hardware": "Meraki MS",
                     "features": null,
                     "os": "merakims",
@@ -35,6 +17,7 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

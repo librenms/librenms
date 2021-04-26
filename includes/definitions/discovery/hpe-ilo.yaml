@@ -1,5 +1,26 @@
 mib: CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB:CPQHOST-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: CPQHOST-MIB::cpqHoPhysicalMemorySize
+                free: CPQHOST-MIB::cpqHoPhysicalMemoryFree
+                index: 0
+                precision: 1048576
+                descr: 'Physical Memory'
+            -
+                total: CPQHOST-MIB::cpqHoPagingMemorySize
+                free: CPQHOST-MIB::cpqHoPagingMemoryFree
+                index: 1
+                precision: 1048576
+                descr: 'Paging Memory'
+
+    os:
+        sysDescr_regex: '/Integrated Lights-Out \d (?<version>[\d.]+)/'
+        hardware: CPQSINFO-MIB::cpqSiProductName.0
+        serial: CPQSINFO-MIB::cpqSiSysSerialNum.0
+        version: CPQHOST-MIB::cpqHoFwVerVersion.0
+        version_regex: '/(?<version>[\d.]+)/'
     sensors:
         power:
             data:
@@ -113,3 +134,36 @@ modules:
                         - { descr: ok, graph: 1, value: 2, generic: 0 }
                         - { descr: degraded, graph: 1, value: 3, generic: 1 }
                         - { descr: failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqDaLogDrvTable
+                    value: cpqDaLogDrvStatus
+                    num_oid:  '.1.3.6.1.4.1.232.3.2.3.1.1.4.{{ $index }}'
+                    descr: 'Logical Drive Status #{{ $cpqDaLogDrvIndex }}'
+                    index: 'cpqDaLogDrvIndex.{{ $index }}'
+                    state_name: cpqDaLogDrvStatus
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: failed, graph: 1, value: 3, generic: 2 }
+                        - { descr: unconfigured, graph: 1, value: 4, generic: 3 }
+                        - { descr: recovering, graph: 1, value: 5, generic: 2 }
+                        - { descr: readyRebuild, graph: 1, value: 6, generic: 1 }
+                        - { descr: rebuilding, graph: 1, value: 7, generic: 2 }
+                        - { descr: wrongDrive, graph: 1, value: 8, generic: 2 }
+                        - { descr: badConnect, graph: 1, value: 9, generic: 1 }
+                        - { descr: overheating, graph: 1, value: 10, generic: 2 }
+                        - { descr: shutdown, graph: 1, value: 11, generic: 2 }
+                        - { descr: expanding, graph: 1, value: 12, generic: 1 }
+                        - { descr: notAvailable, graph: 1, value: 13, generic: 3 }
+                        - { descr: queuedForExpansion, graph: 1, value: 14, generic: 1 }
+                        - { descr: multipathAccessDegraded, graph: 1, value: 15, generic: 1 }
+                        - { descr: erasing, graph: 1, value: 16, generic: 1 }
+                        - { descr: predictiveSpareRebuildReady, graph: 1, value: 17, generic: 1 }
+                        - { descr: rapidParityInitializationInProgress, graph: 1, value: 18, generic: 1 }
+                        - { descr: rapidParityInitializationPending, graph: 1, value: 19, generic: 1 }
+                        - { descr: noAccessEncryptedWithNoControllerKey, graph: 1, value: 20, generic: 0 }
+                        - { descr: unencryptedToEncryptedTransformationInProgress, graph: 1, value: 21, generic: 1 }
+                        - { descr: newLogicalDriveKeyRekeyInProgress, graph: 1, value: 22, generic: 1 }
+                        - { descr: noAccessEncryptedWithControllerEncryptionNotEnabled, graph: 1, value: 23, generic: 1 }
+                        - { descr: unencryptedToEncryptedTransformationNotStarted, graph: 1, value: 24, generic: 1 }
+                        - { descr: newLogicalDriveKeyRekeyRequestReceived, graph: 1, value: 25, generic: 1 }

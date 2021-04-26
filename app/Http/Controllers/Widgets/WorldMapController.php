@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,9 +25,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
-use App\Models\Location;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use LibreNMS\Config;
 
 class WorldMapController extends WidgetController
@@ -49,7 +46,6 @@ class WorldMapController extends WidgetController
         ];
     }
 
-
     public function getView(Request $request)
     {
         $settings = $this->getSettings();
@@ -67,12 +63,14 @@ class WorldMapController extends WidgetController
             ->get()
             ->filter(function ($device) use ($status) {
                 /** @var Device $device */
-                if (!($device->location_id && $device->location && $device->location->coordinatesValid())) {
+                if (! ($device->location_id && $device->location && $device->location->coordinatesValid())) {
                     return false;
                 }
 
                 // add extra data
+                /** @phpstan-ignore-next-line */
                 $device->markerIcon = 'greenMarker';
+                /** @phpstan-ignore-next-line */
                 $device->zOffset = 0;
 
                 if ($device->status == 0) {

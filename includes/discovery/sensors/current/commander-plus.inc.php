@@ -15,26 +15,24 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
-$current  = snmp_get($device, 'batteryCurrent.0', '-Oqv', 'CCPOWER-MIB');
+$current = snmp_get($device, 'batteryCurrent.0', '-Oqv', 'CCPOWER-MIB');
 $oid = '.1.3.6.1.4.1.18642.1.2.2.1.0';
 $descr = 'Battery current';
 $divisor = 1;
 $multiplier = 1;
 discover_sensor($valid['sensor'], 'current', $device, $oid, 'batteryCurrent', 'commander-plus', $descr, $divisor, $multiplier, null, null, null, null, $current);
 
-$current    = snmp_get($device, 'rectifierLoadCurrent.0', '-Oqv', 'CCPOWER-MIB');
-$oid        = '.1.3.6.1.4.1.18642.1.2.1.2.0';
-$descr      = 'Rectifier Current';
-$divisor    = 1;
+$current = snmp_get($device, 'rectifierLoadCurrent.0', '-Oqv', 'CCPOWER-MIB');
+$oid = '.1.3.6.1.4.1.18642.1.2.1.2.0';
+$descr = 'Rectifier Current';
+$divisor = 1;
 $multiplier = 1;
-$limit_low  = 0;
-$limit      = 5000;
+$limit_low = 0;
+$limit = 5000;
 discover_sensor($valid['sensor'], 'current', $device, $oid, 'rectifierLoadCurrent', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);

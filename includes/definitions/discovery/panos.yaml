@@ -1,6 +1,17 @@
 mib: PAN-COMMON-MIB
 modules:
+    os:
+        hardware: PAN-COMMON-MIB::panChassisType.0
+        serial: PAN-COMMON-MIB::panSysSerialNumber.0
+        version: PAN-COMMON-MIB::panSysSwVersion.0
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - panSessionMax
+                        - panVsysName
+                        - panVsysMaxSessions
         state:
             data:
                 -
@@ -32,9 +43,77 @@ modules:
         count:
             data:
                 -
-                    oid: panSession
-                    value: panSessionActive
-                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.{{ $index }}'
-                    group: Sessions
+                    oid: panSessionActive
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.3.{{ $index }}'
+                    index: 'panSessionActive.{{ $index }}'
                     descr: Active Sessions
+                    group: Sessions
                     high_limit: panSessionMax
+                -
+                    oid: panSessionActiveSslProxy
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.7.{{ $index }}'
+                    index: 'panSessionActiveSslProxy.{{ $index }}'
+                    descr: Active Sessions in SSL Proxy
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panSessionActiveTcp
+                    value: panSessionActiveTcp
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.4.{{ $index }}'
+                    index: 'panSessionActiveTcp.{{ $index }}'
+                    descr: Active TCP Sessions
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panSessionActiveUdp
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.5.{{ $index }}'
+                    index: 'panSessionActiveUdp.{{ $index }}'
+                    descr: Active UDP Sessions
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panVsysActiveSessions
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
+                    index: 'panVsysActiveSessions.{{ $index }}'
+                    descr: Active Sessions
+                    group: '{{ $panVsysName }}'
+                    high_limit: panVsysMaxSessions
+                -
+                    oid: panVsysActiveTcpCps
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.6.{{ $index }}'
+                    index: 'panVsysActiveTcpCps.{{ $index }}'
+                    descr: TCP Connections Per Second
+                    group: '{{ $panVsysName }}'
+                -
+                    oid: panVsysActiveUdpCps
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.7.{{ $index }}'
+                    index: 'panVsysActiveUdpCps.{{ $index }}'
+                    descr: UDP Connections Per Second
+                    group: '{{ $panVsysName }}'
+                -
+                    oid: panVsysActiveOtherIpCps
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.8.{{ $index }}'
+                    index: 'panVsysActiveOtherIpCps.{{ $index }}'
+                    descr: Other IP Connections Per Second
+                    group: '{{ $panVsysName }}'
+        load:
+            data:
+                -
+                    oid: panSessionUtilization
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.1.{{ $index }}'
+                    index: 'panSessionUtilization.{{ $index }}'
+                    descr: Session Utilization
+                    group: Sessions
+                -
+                    oid: panSessionSslProxyUtilization
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'
+                    index: 'panSessionSslProxyUtilization.{{ $index }}'
+                    descr: Session Utilization in SSL Proxy
+                    group: Sessions
+                -
+                    oid: panVsysSessionUtilizationPct
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.3.{{ $index }}'
+                    index: 'panVsysSessionUtilizationPct.{{ $index }}'
+                    descr: Session Utilization
+                    group: '{{ $panVsysName }}'
+

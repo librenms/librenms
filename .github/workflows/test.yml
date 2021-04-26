@@ -1,0 +1,206 @@
+name: test
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/doc.yml'
+      - 'doc/**'
+      - 'mkdocs.yml'
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/doc.yml'
+      - 'doc/**'
+      - 'mkdocs.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          -
+            php-version: 8.0
+            name: Unit
+            skip-web-check: 1
+            database: mariadb:10.5
+          -
+            php-version: 8.0
+            name: Web
+            skip-unit-check: 1
+            database: mysql:5.7
+          -
+            php-version: 7.4
+            name: Unit
+            skip-web-check: 1
+            database: mysql:5.7
+          -
+            php-version: 7.3
+            name: Unit
+            skip-web-check: 1
+            database: mysql:8.0
+          -
+            php-version: 7.3
+            name: Web
+            skip-unit-check: 1
+            database: mysql:8.0
+    services:
+      database:
+        image: ${{ matrix.database }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: librenms_phpunit_78hunjuybybh
+          MYSQL_USER: librenms
+          MYSQL_PASSWORD: librenms
+        ports:
+          - 3306
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      -
+         name: Set $FILES
+         run: |
+           FILES=$(git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g')
+           echo $FILES
+
+           echo 'FILES<<EOF' >> $GITHUB_ENV
+           echo $FILES >> $GITHUB_ENV
+           echo 'EOF' >> $GITHUB_ENV
+      -
+         name: Set $PATH
+         run: |
+           echo "/home/runner/.local/bin/" >> $GITHUB_PATH
+      -
+        name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer,php-cs-fixer
+      -
+        name: Get composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      -
+        name: Cache composer
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
+      -
+        name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
+      -
+        name: Install packages
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y fping python3-pip python3-setuptools snmp
+      -
+        name: Pip install
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade --user snmpsim pylint python-memcached mysqlclient
+      -
+        name: Composer validate
+        run: |
+          composer validate
+      -
+        name: Init env
+        run: |
+          cat > .env <<EOL
+          APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
+          APP_URL=http://127.0.0.1:8000
+          APP_ENV=testing
+          DB_DRIVER=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=${{ job.services.database.ports[3306] }}
+          DB_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_USERNAME=librenms
+          DB_PASSWORD=librenms
+          DB_TEST_DRIVER=mysql
+          DB_TEST_HOST=127.0.0.1
+          DB_TEST_PORT=${{ job.services.database.ports[3306] }}
+          DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_TEST_USERNAME=librenms
+          DB_TEST_PASSWORD=librenms
+          EOL
+      -
+        name: Composer install
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress
+      -
+        name: Artisan dusk:update
+        if: matrix.skip-web-check != '1'
+        run: |
+          php artisan dusk:update --detect
+      -
+        name: Ensure MySQL is up
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysqladmin -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms ping --wait=5
+      -
+        name: Set MySQL authentication plugin
+        if: matrix.database == 'mysql:8.0'
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" --user=root -e "ALTER USER 'librenms'@'%' IDENTIFIED WITH mysql_native_password BY 'librenms'"
+      -
+        name: Set MySQL collate
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+      -
+        name: Artisan serve
+        if: matrix.skip-web-check != '1'
+        run: |
+          php artisan serve --env=dusk.testing >/tmp/artisan-serve.log 2>&1 &
+          sleep 5
+      -
+        name: Start SNMP
+        if: matrix.skip-unit-check != '1'
+        run: |
+          ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
+      -
+        name: lnms dev:check ci
+        run: |
+          php lnms dev:check ci
+        env:
+          SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
+          SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
+      -
+        name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
+      -
+        name: Dump serve logs
+        if: always() && matrix.skip-web-check != '1'
+        run: |
+          cat /tmp/artisan-serve.log
+      -
+        name: Dump snmp logs
+        if: always() && matrix.skip-unit-check != '1'
+        run: |
+          cat /tmp/snmpsimd.log
+      -
+        name: Dump context
+        if: always()
+        uses: crazy-max/ghaction-dump-context@v1

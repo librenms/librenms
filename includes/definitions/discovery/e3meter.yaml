@@ -1,0 +1,84 @@
+mib: NETTRACK-E3METER-SNMP-MIB
+modules:
+    os:
+        version: NETTRACK-E3METER-CTR-SNMP-MIB::e3ConcentratorFWVersion
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - e3IpmLabel
+        temperature:
+            data:
+                -
+                    oid: e3IpmSensorEntry
+                    value: e3IpmSensorTemperatureCelsius
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.3.1.4.{{ $index }}'
+                    descr: 'Temperature {{ $e3IpmSensorVersion }}'
+                    index: '{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: e3IpmSensorType
+                            op: '!='
+                            value: '1'
+                        -
+                            oid: e3IpmSensorTemperatureCelsius
+                            op: '='
+                            value: '0'
+        frequency:
+            data:
+                -
+                    oid: e3IpmMeterEntry
+                    value: e3IpmFrequency
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.10.{{ $index }}'
+                    descr: 'Frequency {{ $e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: e3IpmFrequency
+                            op: '='
+                            value: '0'
+        power:
+            data:
+                -
+                    oid: e3IpmMeterEntry
+                    value: e3IpmPowerP
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.5.{{ $index }}'
+                    descr: 'Power {{ $e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: e3IpmFrequency
+                            op: '='
+                            value: '0'
+        voltage:
+            data:
+                -
+                    oid: e3IpmMeterEntry
+                    value: e3IpmUrms
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.8.{{ $index }}'
+                    descr: 'Voltage {{ $e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: e3IpmFrequency
+                            op: '='
+                            value: '0'
+        current:
+            data:
+                -
+                    oid: e3IpmMeterEntry
+                    value: e3IpmIrms
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.9.{{ $index }}'
+                    descr: 'Current {{ $e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: e3IpmFrequency
+                            op: '='
+                            value: '0'
+

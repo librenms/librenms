@@ -7,8 +7,8 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_count, text: 'Ongoing Calls' }
-mib_dir:
-    - patton
+mib_dir: patton
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.1768.100
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1768.100

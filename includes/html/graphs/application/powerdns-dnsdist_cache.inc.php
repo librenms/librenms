@@ -8,38 +8,38 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Cache';
-$unitlen       = 6;
-$bigdescrlen   = 25;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Cache';
+$unitlen = 6;
+$bigdescrlen = 25;
 $smalldescrlen = 25;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array = array(
-    'cache_hits' => array('descr' => 'Hits', 'colour' => '4CB24C',),
-    'cache_miss' => array('descr' => 'Miss', 'colour' => 'BF3F3F',),
-);
+$array = [
+    'cache_hits' => ['descr' => 'Hits', 'colour' => '4CB24C'],
+    'cache_miss' => ['descr' => 'Miss', 'colour' => 'BF3F3F'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

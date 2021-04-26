@@ -1,0 +1,1828 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+--
+-- CIENA-CES-OAM-MIB.my
+
+ CIENA-CES-OAM-MIB DEFINITIONS ::= BEGIN
+ 
+  IMPORTS
+   Integer32, Unsigned32, Counter32, Counter64, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY                 
+         FROM SNMPv2-SMI   
+   TimeStamp
+         FROM SNMPv2-TC
+   cienaGlobalSeverity, cienaGlobalMacAddress
+   		FROM CIENA-GLOBAL-MIB    
+   CienaStatsClear
+   		FROM CIENA-TC
+   cienaCesNotifications, cienaCesStatistics
+        FROM CIENA-SMI;
+        
+         
+    cienaCesOamMibModule MODULE-IDENTITY 
+              LAST-UPDATED "201812050000Z"
+              ORGANIZATION "Ciena Corp."
+              CONTACT-INFO
+              "   Mib Meister
+                  7035 Ridge Road
+                  Hanover, Maryland 21076
+                  USA
+                  Phone:  +1 800 921 1144
+                  Email:  support@ciena.com"
+	      DESCRIPTION
+		       "This module defines the EFM OAM statistics objects and also the objects required for
+		       EFM OAM related notifications."
+
+              REVISION "201812050000Z"
+              DESCRIPTION
+                       "Removed Integer32 range from cienaCesOamEventLogPort to
+                        accommodate PGID range available on some devices."
+
+              REVISION "201706070000Z"
+              DESCRIPTION
+                       "Updated contact info."
+
+              REVISION "201701090000Z"
+              DESCRIPTION
+                       "Added cienaCesOamEventNotifChannelNumber to CienaCesOamEventLogEntry and
+                        cienaCesOamLinkEventTrap"
+
+              REVISION "201602192049Z"
+	      DESCRIPTION
+		       "Adding new Tables to the Oam Mib : 
+		        cienaCesOamTable,
+		        cienaCesOamPeerTable,
+			cienaCesOamLoopbackTable,
+                        cienaCesOamSystemEnableDisable,
+			cienaCesOamEventConfigTable."
+
+	      REVISION "201005100000Z"
+	      DESCRIPTION
+		       "Initial creation."
+          ::= { cienaCesStatistics 5 }
+        
+--
+-- Node definitions
+--
+        
+ cienaCesOamMIB OBJECT IDENTIFIER ::= { cienaCesOamMibModule 1 }
+ cienaCesOamStatistics OBJECT IDENTIFIER ::= { cienaCesOamMIB 1 } 
+
+ cienaCesOamConformance OBJECT IDENTIFIER ::= { cienaCesOamMIB 2 }
+ cienaCesOamGroups OBJECT IDENTIFIER ::= { cienaCesOamConformance 2 }
+ cienaCesOamCompliances OBJECT IDENTIFIER ::= { cienaCesOamConformance 1 }
+
+ cienaCesOamNotifMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 15 } 
+ cienaCesOamNotifMIBNotification        OBJECT IDENTIFIER ::= { cienaCesOamNotifMIBNotificationPrefix 0 }
+
+ cienaCesOamStatsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF CienaCesOamStatsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "Statistics for the OAM function on a particular Ethernet-like
+          interface."
+      ::= { cienaCesOamStatistics 1 }
+
+  cienaCesOamStatsEntry OBJECT-TYPE
+       SYNTAX CienaCesOamStatsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "An entry in the table, containing statistical information on
+            the Ethernet OAM function for a single Ethernet-like interface."
+       INDEX { cienaCesOamStatsPort }
+       ::= { cienaCesOamStatsTable 1 }
+
+  CienaCesOamStatsEntry ::=  SEQUENCE { 
+       cienaCesOamInformationTx				           Counter32,
+       cienaCesOamInformationRx             	       Counter32,
+       cienaCesOamUniqueEventNotificationTx            Counter32,
+       cienaCesOamUniqueEventNotificationRx            Counter32,
+       cienaCesOamLoopbackControlTx                    Counter32,
+       cienaCesOamLoopbackControlRx                    Counter32,
+       cienaCesOamVariableRequestTx                    Counter32,
+       cienaCesOamVariableRequestRx                    Counter32,
+       cienaCesOamVariableResponseTx                   Counter32,
+       cienaCesOamVariableResponseRx                   Counter32,
+       cienaCesOamOrgSpecificTx                        Counter32,
+       cienaCesOamOrgSpecificRx                        Counter32,
+       cienaCesOamUnsupportedCodesTx                   Counter32,
+       cienaCesOamUnsupportedCodesRx                   Counter32,
+       cienaCesOamframesLostDueToOam                   Counter32,
+       cienaCesOamStatsPort                            Integer32,
+       cienaCesOamDuplicateEventNotificationTx         Counter32,
+       cienaCesOamDuplicateEventNotificationRx         Counter32
+  }
+
+ cienaCesOamInformationTx OBJECT-TYPE
+     SYNTAX Counter32
+     UNITS "frames"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+         "A count of the number of Information OAMPDUs transmitted on
+          this interface.
+                                  
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code equal to the
+          OAM Information code.  
+                                  
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+     ::= { cienaCesOamStatsEntry 1 }
+
+ cienaCesOamInformationRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "A count of the number of Information OAMPDUs received on this interface.
+                                  
+           An Information OAMPDU is indicated by a valid frame with (1)
+           destination MAC address equal to that of the reserved MAC
+           address for Slow Protocols (See 43B of [802.3ah]), (2) a
+           lengthOrType field equal to the reserved type for Slow
+           Protocols, (3) a Slow Protocols subtype equal to that of the
+           subtype reserved for OAM, and (4) an OAMPDU code equal to the
+           OAM Information code. 
+                                  
+           Discontinuities of this counter can occur at re-initialization
+           of the management system, and at other times as indicated by
+           the value of the ifCounterDiscontinuityTime. "
+     ::= { cienaCesOamStatsEntry 2 }
+
+ cienaCesOamUniqueEventNotificationTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of unique Event OAMPDUs transmitted on
+                                         this interface. Event notifications may be sent in duplicate
+                                         to increase the probability of successfully being received,
+                                         given the possibility that a frame may be lost in transit. 
+                                  
+                                         An Event Notification OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Event code. 
+                                  
+                                         A unique Event Notification OAMPDU is indicated as an Event
+                                         Notification OAMPDU with a Sequence Number field that is
+                                         distinct from the previously transmitted Event Notification
+                                         OAMPDU Sequence Number. 
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime."
+      ::= { cienaCesOamStatsEntry 3 }
+
+ cienaCesOamUniqueEventNotificationRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of unique Event OAMPDUs received on
+                                         this interface. Event notification OAMPDUs may be sent in
+                                         duplicate to increase the probability of successfully being
+                                         received, given the possibility that a frame may be lost in
+                                         transit. 
+                                  
+                                         An Event Notification OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equals the
+                                         OAM Event code. 
+                                  
+                                         A unique Event Notification OAMPDU is indicated as an Event
+                                         Notification OAMPDU with a Sequence Number field that is
+                                         distinct from the previously received Event Notification                
+                                         OAMPDU Sequence Number.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime."
+      ::= { cienaCesOamStatsEntry 4 }
+
+ cienaCesOamLoopbackControlTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Loopback Control OAMPDUs transmitted
+                                         on this interface. 
+                                  
+                                         An Loopback Control OAMPDU is indicated by a valid frame with
+                                         (1) destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Loopback Control code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+                                       REFERENCE   "[802.3ah], 30.3.6.1.26."
+      ::= { cienaCesOamStatsEntry 5 }
+
+ cienaCesOamLoopbackControlRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Loopback Control OAMPDUs transmitted
+                                         on this interface. 
+                                  
+                                         An Loopback Control OAMPDU is indicated by a valid frame with
+                                         (1) destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Loopback Control code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+                                       REFERENCE   "[802.3ah], 30.3.6.1.27."
+      ::= { cienaCesOamStatsEntry 6 }
+
+ cienaCesOamVariableRequestTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Variable Request OAMPDUs transmitted
+                                         on this interface.  
+                                  
+                                         An Variable Request OAMPDU is indicated by a valid frame with
+                                         (1) destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Variable Request code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+                                       REFERENCE   "[802.3ah], 30.3.6.1.28."
+      ::= { cienaCesOamStatsEntry 7 }
+
+ cienaCesOamVariableRequestRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Variable Request OAMPDUs received on
+                                         this interface.  
+                                         An Variable Request OAMPDU is indicated by a valid frame with
+                                         (1) destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Variable Request code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime."
+     ::= { cienaCesOamStatsEntry 8 }
+
+ cienaCesOamVariableResponseTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Variable Response OAMPDUs
+                                         transmitted on this interface.  
+                                  
+                                         An Variable Response OAMPDU is indicated by a valid frame with
+                                         (1) destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Variable Response code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+      ::= { cienaCesOamStatsEntry 9 }
+
+ cienaCesOamVariableResponseRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Variable Response OAMPDUs received
+                                         on this interface.  
+                                  
+                                         An Variable Response OAMPDU is indicated by a valid frame with
+                                         (1) destination MAC address equal to that of the reserved MAC      
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Variable Response code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+      ::= { cienaCesOamStatsEntry 10 }
+
+ cienaCesOamOrgSpecificTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Organization Specific OAMPDUs
+                                         transmitted on this interface.  
+                                  
+                                         An Organization Specific OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Organization Specific code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+      ::= { cienaCesOamStatsEntry 11 }
+
+ cienaCesOamOrgSpecificRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of Organization Specific OAMPDUs
+                                         received on this interface.  
+                                  
+                                         An Organization Specific OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Organization Specific code.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+      ::= { cienaCesOamStatsEntry 12 }
+
+ cienaCesOamUnsupportedCodesTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of OAMPDUs transmitted on this
+                                         interface with an unsupported op-code.  
+                                  
+                                         An unsupported op-code OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         op-code for a function that is not supported by the device. 
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+      ::= { cienaCesOamStatsEntry 13 }
+
+ cienaCesOamUnsupportedCodesRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of OAMPDUs received on this interface
+                                         with an unsupported op-code.  
+                                  
+                                         An unsupported op-code OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         opcode for a function that is not supported by the device.
+                                         
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime."
+      ::= { cienaCesOamStatsEntry 14 }
+
+ cienaCesOamframesLostDueToOam OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of frames that were dropped by the OAM
+                                         multiplexer. Since the OAM multiplexer has multiple inputs
+                                         and a single output, there may be cases where frames are
+                                         dropped due to transmit resource contention. This counter is
+                                         incremented whenever a frame is dropped by the OAM layer.
+                                         When this counter is incremented, no other counters in this
+                                         MIB are incremented. 
+                                                       
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime."
+      ::= { cienaCesOamStatsEntry 15 }
+
+ cienaCesOamStatsPort OBJECT-TYPE
+      SYNTAX Integer32 (1..1000)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                                "An Ethernet port on the switch."
+      ::= { cienaCesOamStatsEntry 16 }
+
+ cienaCesOamDuplicateEventNotificationTx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of duplicate Event OAMPDUs transmitted
+                                         on this interface. Event notification OAMPDUs may be sent in
+                                         duplicate to increase the probability of successfully being
+                                         received, given the possibility that a frame may be lost in
+                                         transit.  
+                                  
+                                         An Event Notification OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equals to the
+                                         OAM Event code. 
+                                  
+                                         A duplicate Event Notification OAMPDU is indicated as an Event
+                                         Notification OAMPDU with a Sequence Number field that is
+                                         identical to the previously transmitted Event Notification
+                                         OAMPDU Sequence Number.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime."
+      ::= { cienaCesOamStatsEntry 17 }
+
+ cienaCesOamDuplicateEventNotificationRx OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "frames"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+                                "A count of the number of duplicate Event OAMPDUs received on
+                                         this interface. Event notification OAMPDUs may be sent in
+                                         duplicate to increase the probability of successfully being
+                                         received, given the possibility that a frame may be lost in
+                                         transit. 
+                                  
+                                         An Event Notification OAMPDU is indicated by a valid frame
+                                         with (1) destination MAC address equal to that of the reserved
+                                         MAC address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAMPDU code equal to the
+                                         OAM Event code.  
+                                  
+                                         A duplicate Event Notification OAMPDU is indicated as an Event
+                                         Notification OAMPDU with a Sequence Number field that is
+                                         identical to the previously received Event Notification OAMPDU
+                                         Sequence Number.  
+                                  
+                                         Discontinuities of this counter can occur at re-initialization
+                                         of the management system, and at other times as indicated by
+                                         the value of the ifCounterDiscontinuityTime. "
+      ::= { cienaCesOamStatsEntry 18 }
+
+
+ cienaCesOamEventLogTable   OBJECT-TYPE 
+      SYNTAX       SEQUENCE OF CienaCesOamEventLogEntry 
+      MAX-ACCESS   not-accessible 
+      STATUS       current 
+      DESCRIPTION 
+                                "This table records a history of the events that have occurred
+                                         at the Ethernet OAM level. These events can include locally
+                                         detected events, which may result in locally generated
+                                         OAMPDUs, and remotely detected events, which are detected by
+                                         the OAM peer entity and signaled to the local entity via
+                                         Ethernet OAM. Ethernet OAM events can be signaled by Event
+                                         Notification OAMPDUs or by the flags field in any OAMPDU. "
+ ::= { cienaCesOamStatistics 2 } 
+  
+ cienaCesOamEventLogEntry OBJECT-TYPE 
+      SYNTAX      CienaCesOamEventLogEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS      current 
+      DESCRIPTION "An entry in the cienaCesOamEventLogTable." 
+      INDEX       { cienaCesOamEventLogPort, cienaCesOamEventLogIndex }
+ ::= { cienaCesOamEventLogTable 1 } 
+  
+ CienaCesOamEventLogEntry ::= SEQUENCE {
+ cienaCesOamEventLogPort                 Integer32,
+ cienaCesOamEventLogIndex                Unsigned32,
+ cienaCesOamEventLogTimestamp            TimeStamp,
+ cienaCesOamEventLogOui                  OCTET STRING, 
+ cienaCesOamEventLogType                 INTEGER,
+ cienaCesOamEventLogLocation             INTEGER,
+ cienaCesOamEventLogWindowHi             Unsigned32,
+ cienaCesOamEventLogWindowLo             Unsigned32,                                                              
+ cienaCesOamEventLogThresholdHi          Unsigned32,
+ cienaCesOamEventLogThresholdLo          Unsigned32,
+ cienaCesOamEventLogValue                Counter64,
+ cienaCesOamEventLogRunningTotal         Counter64,
+ cienaCesOamEventLogEventTotal           Unsigned32,
+ cienaCesOamEventNotifChassisIndex       Unsigned32,
+ cienaCesOamEventNotifShelfIndex         Unsigned32,
+ cienaCesOamEventNotifSlotIndex	         Unsigned32,
+ cienaCesOamEventNotifPortNumber         Unsigned32,
+ cienaCesOamEventNotifChannelNumber      Unsigned32
+ }
+        
+ cienaCesOamEventLogPort OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                                                        "An Ethernet port on the switch."
+ ::= { cienaCesOamEventLogEntry 1 }       
+  
+ cienaCesOamEventLogIndex       OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current 
+     DESCRIPTION 
+                                "An arbitrary integer for identifying individual events
+                                        within the event log. "
+ ::= { cienaCesOamEventLogEntry 2 }
+  
+ cienaCesOamEventLogTimestamp  OBJECT-TYPE 
+     SYNTAX      TimeStamp 
+     MAX-ACCESS  read-only
+     STATUS      current 
+     DESCRIPTION 
+                                "The value of sysUpTime at the time of the logged event. For
+                                         locally generated events, the time of the event can be
+                                         accurately retrieved from sysUpTime. For remotely generated
+                                         events, the time of the event is indicated by the reception of
+                                         the Event Notification OAMPDU indicating the event occurred on
+                                         the peer. A system may attempt to adjust the timestamp value
+                                         to more accurately reflect the time of the event at the peer
+                                         OAM entity by using other information, such as that found in
+                                         the timestamp found on the Event Notification TLVs, which
+                                         provides an indication of the relative time between events at
+                                         the peer entity. "
+ ::= { cienaCesOamEventLogEntry 3 }
+  
+ cienaCesOamEventLogOui  OBJECT-TYPE 
+     SYNTAX      OCTET STRING(SIZE(3))
+     MAX-ACCESS  read-only
+     STATUS      current 
+     DESCRIPTION 
+                                "The OUI of the entity defining the object type. All IEEE
+                                         802.3 defined events (as appearing in [802.3ah] except for the
+                                         Organizationally Unique Event TLVs) use the IEEE 802.3 OUI of
+                                         0x0180C2. Organizations defining their own Event Notification
+                                         TLVs include their OUI in the Event Notification TLV, which
+                                         gets reflected here. "
+ ::= { cienaCesOamEventLogEntry 4 }
+  
+ cienaCesOamEventLogType      OBJECT-TYPE
+     SYNTAX      INTEGER
+     					{
+     						errFramePeriodEvent(1),
+     						errFrameEvent(2),
+     						errFrameSecSummEvent(3),
+     						linkFaultEvent(4),
+     						dyingGaspEvent(5),
+     						criticalLinkEvent(6),
+     						noEvent(99)
+     					} 
+     MAX-ACCESS  read-only
+     STATUS      current 
+     DESCRIPTION 
+                                "The type of event that generated this entry in the event log.
+  
+                                        When the OUI is the IEEE 802.3 OUI of 0x0180C2, the following
+                                        event types are defined:
+                                             erroredSymbolEvent(1), 
+                                             erroredFramePeriodEvent (2), 
+                                             erroredFrameEvent(3),
+                                             erroredFrameSecondsEvent(4), 
+                                             linkFault(256), 
+                                             dyingGaspEvent(257),
+                                             criticalLinkEvent(258)
+                                         The first four are considered threshold crossing events as
+                                         they are generated when a metric exceeds a given value within
+                                         a specified window. The other three are not threshold
+                                         crossing events. 
+                                  
+                                         When the OUI is not 0x0180C2, then some other organization has
+                                         defined the event space. If event subtyping is known to the
+                                         implementation, it may be reflected here. Otherwise, this
+                                         value should return noEvent (99). 
+                                         "
+     REFERENCE   "[802.3ah], 30.3.6.1.10 and 57.5.3."
+ ::= { cienaCesOamEventLogEntry 5 }
+  
+ cienaCesOamEventLogLocation OBJECT-TYPE 
+     SYNTAX      INTEGER 
+     					{
+     					 local(1), 
+     					 remote(2) 
+     			}
+     MAX-ACCESS  read-only
+     STATUS      current 
+     DESCRIPTION 
+                                "Whether this event occurred locally, or was received from the
+                                        OAM peer via Ethernet OAM."
+ ::= { cienaCesOamEventLogEntry 6 }
+                                
+ cienaCesOamEventLogWindowHi      OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current 
+     DESCRIPTION 
+                                                "If the event represents a threshold crossing event, the two
+                                                objects cienaCesOamEventWindowHi and cienaCesOamEventWindowLo form an
+                                                unsigned 64-bit integer yielding the window over which the
+                                                value was measured for the threshold crossing event (e.g., 5,
+                                                when 11 occurrences happened in 5 seconds while the threshold
+                                                was 10). The two objects are combined as:
+                
+                                                cienaCesOamEventLogWindow = ((2^32) * cienaCesOamEventLogWindowHi)
+                                                + cienaCesOamEventLogWindowLo.
+                                                Otherwise, this value is returned as all Fs (0xFFFFFFFF) and 
+                                                adds no useful information. "
+     REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 7 }     
+               
+ cienaCesOamEventLogWindowLo      OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current 
+     DESCRIPTION 
+                                                "If the event represents a threshold crossing event, the two
+                                                objects cienaCesOamEventWindowHi and cienaCesOamEventWindowLo form an
+                                                unsigned 64-bit integer yielding the window over which the
+                                                value was measured for the threshold crossing event (e.g., 5,
+                                                when 11 occurrences happened in 5 seconds while the threshold
+                                                was 10).  The two objects are combined as:
+  
+                                                cienaCesOamEventLogWindow = ((2^32) * cienaCesOamEventLogWindowHi)
+                                                + cienaCesOamEventLogWindowLo.
+  
+                                                Otherwise, this value is returned as all Fs (0xFFFFFFFF) and 
+                                                adds no useful information. "
+     REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 8 }
+     
+ cienaCesOamEventLogThresholdHi      OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current 
+      DESCRIPTION 
+                                                        "If the event represents a threshold crossing event, the two
+                                                        objects cienaCesOamEventThresholdHi and cienaCesOamEventThresholdLo 
+                                                        form an unsigned 64-bit integer yielding the value that was
+                                                        crossed for the threshold crossing event (e.g., 10, when 11 
+                                                        occurrences happened in 5 seconds while the threshold was 10).
+                                                        The two objects are combined as:
+  
+                                                        cienaCesOamEventLogThreshold = ((2^32) * cienaCesOamEventLogThresholdHi)
+                                                        + cienaCesOamEventLogThresholdLo.
+  
+                                                        Otherwise, this value is returned as all Fs (0xFFFFFFFF) and 
+                                                        adds no useful information. "
+      REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 9 }
+     
+ cienaCesOamEventLogThresholdLo      OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current 
+       DESCRIPTION 
+         "If the event represents a threshold crossing event, the two
+         objects cienaCesOamEventThresholdHi and cienaCesOamEventThresholdLo 
+         form an unsigned 64-bit integer yielding the value that was
+         crossed for the threshold crossing event (e.g., 10, when 11 
+         occurrences happened in 5 seconds while the threshold was 10).
+         The two objects are combined as:
+         cienaCesOamEventLogThreshold = ((2^32) * cienaCesOamEventLogThresholdHi) 
+         + cienaCesOamEventLogThresholdLo.
+  
+         Otherwise, this value is returned as all Fs (0xFFFFFFFF) and
+         adds no useful information. "
+       REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 10 }
+  
+                
+ cienaCesOamEventLogValue      OBJECT-TYPE
+      SYNTAX      Counter64 
+      MAX-ACCESS  read-only
+      STATUS      current 
+      DESCRIPTION 
+                                "If the event represents a threshold crossing event, this
+                                         value indicates the value of the parameter within the given
+                                         window that generated this event (e.g., 11, when 11 occurrences
+                                         happened in 5 seconds while the threshold was 10). 
+                                  
+                                         Otherwise, this value is returned as all F's 
+                                         (0xFFFFFFFFFFFFFFFF) and adds no useful information. 
+                                         "
+      REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 11 }
+  
+ cienaCesOamEventLogRunningTotal      OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current 
+      DESCRIPTION 
+                                "This value represents the total number of times this
+                                         occurrence has happened since the last reset (e.g., 3253, when
+                                         3253 symbol errors have occurred since the last reset, which
+                                         has resulted in 51 symbol error threshold crossing events
+                                         since the last reset). "
+      REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 12 }
+  
+ cienaCesOamEventLogEventTotal      OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current 
+      DESCRIPTION 
+                                "This value represents the total number of times one or more
+                                         of these occurrences have resulted in an event (e.g., 51 when
+                                         3253 symbol errors have occurred since the last reset, which
+                                         has resulted in 51 symbol error threshold crossing events
+                                         since the last reset)."
+      REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+ ::= { cienaCesOamEventLogEntry 13 }
+
+ cienaCesOamEventNotifChassisIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the chassis index for the port used for trap definition."               
+     ::= { cienaCesOamEventLogEntry 14 }
+     
+ cienaCesOamEventNotifShelfIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the shelf index for the port used for trap definition."               
+     ::= { cienaCesOamEventLogEntry 15 }
+
+ cienaCesOamEventNotifSlotIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..7)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the slot index for the port used for trap definition."
+     ::= { cienaCesOamEventLogEntry 16 }
+
+ cienaCesOamEventNotifPortNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..65535)
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"This object indicates the port number for the corresponding PGID
+ 		used for trap definition."
+ 	::= { cienaCesOamEventLogEntry 17 }
+
+ cienaCesOamEventNotifChannelNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32
+  	MAX-ACCESS		accessible-for-notify
+  	STATUS			current
+  	DESCRIPTION
+  		"This object indicates the channel number for the corresponding PGID
+  		used for trap definition. The value 0 is used if port of concern is
+  		not channelized."
+  	::= { cienaCesOamEventLogEntry 18 }
+                        
+ 
+ cienaCesOamStatsClear      OBJECT-TYPE
+      SYNTAX      CienaStatsClear
+      MAX-ACCESS  read-write
+      STATUS      current 
+      DESCRIPTION           
+                    "Setting this object to 'true' causes the values of all objects maintained 
+                     within the cienaCesOamStatsTable to reset to the value of zero. 
+                     When read, this object always returns the value of false."
+ ::= { cienaCesOamStatistics 3 }
+
+
+  cienaCesOamTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF CienaCesOamEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+                      "Primary controls and status for the OAM capabilities of an
+                       Ethernet like interface.  There is one row in this table
+                       for each Ethernet like interface in the system that supports
+                       the Ethernet OAM functions defined in [802.3ah]."
+  ::= { cienaCesOamStatistics 4 }
+
+                
+  cienaCesOamEntry OBJECT-TYPE
+        SYNTAX CienaCesOamEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                       "An entry in the table. Contains an Ethernet like interface
+              		in the system that supports the Ethernet OAM functions
+              		defined in [802.3ah]."
+        INDEX { cienaCesOamPort }
+                ::= { cienaCesOamTable 1 }
+
+                
+  CienaCesOamEntry ::=
+                        SEQUENCE { 
+                                cienaCesOamPort
+                                        Integer32,
+				cienaCesOamAdminState
+                                        INTEGER,
+                                cienaCesOamOperStatus
+                                        INTEGER,
+                                cienaCesOamMode
+                                        INTEGER,
+                                cienaCesMaxOamPduSize
+                                        Integer32,
+                                cienaCesOamConfigRevision
+                                        Unsigned32,
+                                cienaCesOamFunctionsSupported
+                                        BITS,
+                                cienaCesOamPduTimer
+                                		INTEGER,
+                                cienaCesOamLinkLostTimer
+                                		INTEGER
+                         }
+
+                cienaCesOamPort OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An Ethernet port on the switch."
+                        ::= { cienaCesOamEntry 1 }
+
+                cienaCesOamAdminState OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                enabled(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object is used to provision the default administrative OAM mode for this 
+                                interface.  This object represents the desired state of OAM for this interface.  
+                                  
+                                The cienaCesOamAdminState always starts in the disabled(1) state
+                                         until an explicit management action or configuration
+                                         information retained by the system causes a transition to the
+                                         enabled(2) state. 
+                                  
+                                         Note that the value of this object is ignored when the
+                                         interface is not operating in full-duplex mode. OAM is not
+                                         supported on half-duplex links."
+                        ::= { cienaCesOamEntry 2 }
+
+                
+                cienaCesOamOperStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                linkfault(2),
+                                passiveWait(3),
+                                activeSendLocal(4),
+                                sendLocalAndRemote(5),
+                                sendLocalAndRemoteOk(6),
+                                oamPeeringLocallyRejected(7),
+                                oamPeeringRemotelyRejected(8),
+                                operational(9)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "At initialization and failure conditions, two OAM entities on
+                                         the same full-duplex Ethernet link begin a discovery phase to
+                                         determine what OAM capabilities may be used on that link.  The
+                                         progress of this initialization is controlled by the OAM
+                                         sub layer.  
+                                                    
+                                         This value is always disabled(1) if OAM is disabled on this
+                                         interface via the cienaCesOamAdminState.  
+                                  
+                                         If the link has detected a fault and is transmitting OAMPDUs
+                                         with a link fault indication, the value is linkFault(2). 
+                                                          
+                                         The passiveWait(3) state is returned only by OAM entities in
+                                         passive mode (cienaCesOamMode) and reflects the state in which the
+                                         OAM entity is waiting to see if the peer device is OAM
+                                         capable.  The activeSendLocal(4) is used by active mode
+                                         devices (cienaCesOamMode) and reflects the OAM entity actively
+                                         trying to discover whether the peer has OAM capability but has
+                                         not yet made that determination.
+                                                          
+                                         The state sendLocalAndRemote(5) indicates that the local OAM
+                                         entity has discovered the peer but has not yet accepted or
+                                         rejected the configuration of the peer.  The local device can,
+                                         for whatever reason, decide that the peer device is
+                                         unacceptable and decline OAM peering.  If the local OAM entity
+                                         rejects the peer OAM entity, the state becomes
+                                         oamPeeringLocallyRejected(7).  If the OAM peering is allowed
+                                         by the local device, the state moves to
+                                         sendLocalAndRemoteOk(6).  Note that both the
+                                         sendLocalAndRemote(5) and oamPeeringLocallyRejected(7) states
+                                         fall within the state SEND_LOCAL_REMOTE of the Discovery state
+                                         diagram [802.3ah, Figure 57-5], with the difference being
+                                         whether the local OAM client has actively rejected the peering
+                                         or has just not indicated any decision yet.  Whether a peering
+                                         decision has been made is indicated via the local flags field
+                                         in the OAMPDU (reflected in the aOAMLocalFlagsField of
+                                         30.3.6.1.10).  
+                                  
+                                         If the remote OAM entity rejects the peering, the state
+                                         becomes oamPeeringRemotelyRejected(8).  Note that both the
+                                         sendLocalAndRemoteOk(6) and oamPeeringRemotelyRejected(8)
+                                         states fall within the state SEND_LOCAL_REMOTE_OK of the
+                                         Discovery state diagram [802.3ah, Figure 57-5], with the
+                                         difference being whether the remote OAM client has rejected
+                                         the peering or has just not yet decided.  This is indicated
+                                         via the remote flags field in the OAM PDU (reflected in the
+                                         aOAMRemoteFlagsField of 30.3.6.1.11).  
+                                                          
+                                         When the local OAM entity learns that both it and the remote
+                                         OAM entity have accepted the peering, the state moves to
+                                         operational(9) corresponding to the SEND_ANY state of the
+                                         Discovery state diagram [802.3ah, Figure 57-5]."
+                        ::= { cienaCesOamEntry 3 }
+
+                
+                cienaCesOamMode OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                active(1),
+                                passive(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the mode of OAM operation for this
+                                         Ethernet like interface.  OAM on Ethernet interfaces may be in
+                                         'active' mode or 'passive' mode.  These two modes differ in
+                                         that active mode provides additional capabilities to initiate
+                                         monitoring activities with the remote OAM peer entity, while
+                                         passive mode generally waits for the peer to initiate OAM
+                                         actions with it.  As an example, an active OAM entity can put
+                                         the remote OAM entity in a loopback state, where a passive OAM
+                                         entity cannot.  
+                                  
+                                         The default value of cienaCesOamMode is dependent on the type of
+                                         system on which this Ethernet like interface resides.  The
+                                         default value should be 'active(1)' unless it is known that
+                                         this system should take on a subservient role to the other
+                                         device connected over this interface.  
+                                  
+                                         If this values gets changed it value results in incrementing the 
+					 configuration revision field of locally generated OAMPDUs (30.3.6.1.12) 
+	                                 and potentially re-doing the OAM discovery process if the
+                                         cienaCesOamOperStatus was already operational(9)."
+                        ::= { cienaCesOamEntry 4 }
+
+                
+                cienaCesMaxOamPduSize OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The largest OAMPDU that the OAM entity supports.  OAM
+                                         entities exchange maximum OAMPDU sizes and negotiate to use
+                                         the smaller of the two maximum OAMPDU sizes between the peers.
+                                         This value is determined by the local implementation."
+                        ::= { cienaCesOamEntry 5 }
+
+                
+                cienaCesOamConfigRevision OBJECT-TYPE
+                        SYNTAX Unsigned32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The configuration revision of the OAM entity as reflected in
+                                         the latest OAMPDU sent by the OAM entity.  The configuration revision
+                                         is used by OAM entities to indicate configuration changes have
+                                         occurred which might require the peer OAM entity to re-evaluate
+                                         whether the peering is allowed.  See local_satisfied in
+                                         [802.3ah, 57.3.1.2]."
+                        ::= { cienaCesOamEntry 6 }
+
+                
+                cienaCesOamFunctionsSupported OBJECT-TYPE
+                        SYNTAX BITS
+                                {
+                                unidirectionalSupport(0),
+                                loopbackSupport(1),
+                                eventSupport(2),
+                                variableSupport(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The OAM functions supported on this Ethernet like interface.
+                                         OAM consists of separate functional sets beyond the basic
+                                         discovery process which is always required.  These functional
+                                         groups can be supported independently by any implementation.
+                                         These values are communicated to the peer via the local
+                                         configuration field of Information OAMPDUs."
+                        ::= { cienaCesOamEntry 7 }
+
+
+                cienaCesOamPduTimer OBJECT-TYPE
+                        SYNTAX INTEGER (100..1000)
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The time in milliseconds between Information OAMPDUs
+                                being transmitted via the Ethernet port."
+                        ::= { cienaCesOamEntry 8 }
+
+                cienaCesOamLinkLostTimer OBJECT-TYPE
+                        SYNTAX INTEGER (500..5000)
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The time in milliseconds to wait for an Information OAMPDU
+                                via the Ethernet port, from a peer, before declaring the link lost."
+                        ::= { cienaCesOamEntry 9 }
+
+                cienaCesOamPeerTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF CienaCesOamPeerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information about the OAM peer for a particular Ethernet like
+                                         interface. OAM entities communicate with a single OAM peer
+                                         entity on full-duplex Ethernet links on which OAM is enabled
+                                         and operating properly.  
+                                         
+                                         In certain states, the OAM peer information is not available.
+                                         Whether peer information is available is communicated via the
+                                         cienaCesOamPeerStatus object.  When this object is inactive, all
+                                         other information in the row is considered invalid."
+                        ::= { cienaCesOamStatistics 5 }
+
+                
+                cienaCesOamPeerEntry OBJECT-TYPE
+                        SYNTAX CienaCesOamPeerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the table, containing information on the peer OAM
+                                         entity for a single Ethernet like interface.  
+                                  
+                                         Note that there is at most one OAM peer for each Ethernet like
+                                         interface.  There is exactly one row in this table for each
+                                         Ethernet like interface supporting OAM."
+                        INDEX { cienaCesOamLocalPort }
+                        ::= { cienaCesOamPeerTable 1 }
+
+                
+                CienaCesOamPeerEntry ::=
+                        SEQUENCE {                              
+                                cienaCesOamLocalPort                                     Integer32,
+                                cienaCesOamPeerStatus                                    INTEGER,
+                                cienaCesOamPeerMacAddress                                OCTET STRING,
+                                cienaCesOamPeerVendorOui                                 OCTET STRING,
+                                cienaCesOamPeerVendorInfo                                Unsigned32,
+                                cienaCesOamPeerMode                                      INTEGER,
+                                cienaCesOamPeerMaxOamPduSize                             Integer32,
+                                cienaCesOamPeerConfigRevision                            Unsigned32,
+                                cienaCesOamPeerFunctionsSupported                        BITS
+                         }
+
+                cienaCesOamLocalPort OBJECT-TYPE
+                        SYNTAX Integer32 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An Ethernet port on the local switch."
+                        ::= { cienaCesOamPeerEntry 1 }
+
+                cienaCesOamPeerStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                active(1),
+                                inactive(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the information in this row
+                                         should be considered valid.  When active(1), the information
+                                         is valid and represents the current peer of the OAM entity.
+                                         When inactive(2), the information in this row is invalid.  
+                                  
+                                         A value of inactive(2) is returned if the cienaCesOamOperStatus is
+                                         disabled, passiveWait, or activeSendLocal.  For all other
+                                         values of cienaCesOamOperStatus, a value of active(1) is returned."
+                        ::= { cienaCesOamPeerEntry 2 }
+
+                
+                cienaCesOamPeerMacAddress OBJECT-TYPE
+                        SYNTAX OCTET STRING(SIZE(6))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The MAC address of the peer OAM entity.  The MAC address is
+                                         derived from the most recently received OAMPDU.  This value is
+                                         initialized to all zeros (0x000000000000).  This value is
+                                         invalid if the cienaCesOamPeerStatus is inactive.  
+                                  
+                                         An OAMPDU is indicated by a valid frame with (1) destination
+                                         MAC address equal to that of the reserved MAC address for Slow
+                                         Protocols (See 43B of [802.3ah]), (2) a lengthOrType field
+                                         equal to the reserved type for Slow Protocols, (3) and a Slow
+                                         Protocols subtype equal to that of the subtype reserved for
+                                         OAM."
+                        ::= { cienaCesOamPeerEntry 3 }
+
+                
+                cienaCesOamPeerVendorOui OBJECT-TYPE
+                        SYNTAX OCTET STRING(SIZE(3))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The OUI of the OAM peer as reflected in the latest
+                                         Information OAMPDU received with a Local Information TLV.  The
+                                         OUI can be used to identify the vendor of the remote OAM
+                                         entity.  This value is initialized to all zeros (0x000000).
+                                         This value is considered invalid if the cienaCesOamPeerStatus is
+                                         inactive.  
+                                  
+                                         An Information OAMPDU is indicated by a valid frame with (1)
+                                         destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow Protocols, (3) 
+	                                 a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAM code that equals the code
+                                         reserved for Information OAMPDUs."
+                        ::= { cienaCesOamPeerEntry 4 }
+
+                
+                cienaCesOamPeerVendorInfo OBJECT-TYPE
+                        SYNTAX Unsigned32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Vendor Info of the OAM peer as reflected in the latest
+                                         Information OAMPDU received with a Local Information TLV.  The
+                                         vendor information field is within the Local Information TLV,
+                                         and can be used to determine additional information about the
+                                         peer entity.  The format of the vendor information is
+                                         unspecified within the 32-bit field.  This value is initialized
+                                         to all zero.  This value is invalid if the cienaCesOamPeerStatus 
+					 is inactive.  
+                                  
+                                         An Information OAMPDU is indicated by a valid frame with (1)
+                                         destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAM code that equals the
+                                         code reserved for Information OAMPDUs."
+                        ::= { cienaCesOamPeerEntry 5 }
+
+                
+                cienaCesOamPeerMode OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                active(1),
+                                passive(2),
+                                unknown(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The mode of the OAM peer as reflected in the latest
+                                         Information OAMPDU received with a Local Information TLV.  The
+                                         mode of the peer can be determined from the Configuration
+                                         field in the Local Information TLV of the last Information
+                                         OAMPDU received from the peer.  This value is initialized to
+                                         unknown(3), and is not valid if the cienaCesOamPeerStatus is
+                                         inactive.  
+                                  
+                                         An Information OAMPDU is indicated by a valid frame with (1)
+                                         destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAM code that equals the
+                                         code reserved for Information OAMPDUs."
+                        ::= { cienaCesOamPeerEntry 6 }
+
+                
+                cienaCesOamPeerMaxOamPduSize OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The maximum size of OAMPDU supported by the peer as reflected
+                                         in the latest Information OAMPDU received with a Local
+                                         Information TLV.   Ethernet OAM on this interface must not use
+                                         OAMPDUs that exceed this size.  The maximum OAMPDU size can be
+                                         determined from the PDU Configuration field of the Local
+                                         Information TLV of the last Information OAMPDU received from
+                                         the peer.  This value is initialized to 64, and is invalid if
+                                         the cienaCesOamPeerStatus is inactive.
+                                  
+                                         An Information OAMPDU is indicated by a valid frame with (1)
+                                         destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAM code that equals the
+                                         code reserved for Information OAMPDUs."
+                        ::= { cienaCesOamPeerEntry 7 }
+
+                
+                cienaCesOamPeerConfigRevision OBJECT-TYPE
+                        SYNTAX Unsigned32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The configuration revision of the OAM peer as reflected in
+                                         the latest OAMPDU.  This attribute is changed by the peer
+                                         whenever it has a local configuration change for Ethernet OAM
+                                         this interface.  This value is initialized to zero, 
+					 and is invalid if the cienaCesOamPeerStatus is
+                                         inactive.
+                                  
+                                         The configuration revision can be determined from the Revision
+                                         field of the Local Information TLV of the most recently
+                                         received Information OAMPDU with a Local Information TLV.
+                                                         
+                                         An Information OAMPDU is indicated by a valid frame with (1)
+                                         destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAM code that equals the
+                                         code reserved for Information OAMPDUs."
+                        ::= { cienaCesOamPeerEntry 8 }
+
+                
+                cienaCesOamPeerFunctionsSupported OBJECT-TYPE
+                        SYNTAX BITS
+                                {
+                                unidirectionalSupport(0),
+                                loopbackSupport(1),
+                                eventSupport(2),
+                                variableSupport(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The OAM functions supported on this Ethernet like interface.
+                                         OAM consists of separate functionality sets above the basic
+                                         discovery process.  This value indicates the capabilities of
+                                         the peer OAM entity with respect to these functions.  This
+                                         value is initialized so all bits are clear, and is invalid if
+                                         the cienaCesOamPeerStatus is inactive.
+                                  
+                                         The capbilities of the OAM peer can be determined from the
+                                         configuration field of the Local Information TLV of the most
+                                         recently received Information OAMPDU with a Local Information
+                                         TLV.
+                                                         
+                                         An Information OAMPDU is indicated by a valid frame with (1)
+                                         destination MAC address equal to that of the reserved MAC
+                                         address for Slow Protocols (See 43B of [802.3ah]), (2) a
+                                         lengthOrType field equal to the reserved type for Slow
+                                         Protocols, (3) a Slow Protocols subtype equal to that of the
+                                         subtype reserved for OAM, and (4) an OAM code that equals the
+                                         code reserved for Information OAMPDUs."
+                        ::= { cienaCesOamPeerEntry 9 }
+
+
+                
+                cienaCesOamLoopbackTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF CienaCesOamLoopbackEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table contains methods to control the loopback state of
+                                 the local link as well as indicating the status of the
+                                 loopback function.
+                                  
+                                 Loopback can be used to place the remote OAM entity in a state
+                                 where every received frame (except OAMPDUs) are echoed back
+                                 over the same interface on which they were received.   In this
+                                 state, at the remote entity, 'normal' traffic is disabled as
+                                 only the looped back frames are transmitted on the interface.
+                                 Loopback is thus an intrusive operation that prohibits normal
+                                 data flow and should be used accordingly."
+                        ::= { cienaCesOamStatistics 6 }
+
+                
+                cienaCesOamLoopbackEntry OBJECT-TYPE
+                        SYNTAX CienaCesOamLoopbackEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the table, containing information on the loopback
+                                         status for a single Ethernet like interface.  There is an
+                                         entry in this table for every Ethernet like interface which
+                                         supports OAM and loopback function within OAM (as indicated in
+                                         cienaCesOamFunctionsSupported)."
+                        INDEX { cienaCesOamLoopbackPort }
+                        ::= { cienaCesOamLoopbackTable 1 }
+
+                
+                CienaCesOamLoopbackEntry ::=
+                        SEQUENCE { 
+                                cienaCesOamLoopbackPort
+                                        Integer32,
+                                cienaCesOamLoopbackCommand
+                                        INTEGER,
+                                cienaCesOamLoopbackStatus
+                                        INTEGER,
+                                cienaCesOamLoopbackIgnoreRx
+                                        INTEGER
+                         }
+
+                cienaCesOamLoopbackPort OBJECT-TYPE
+                        SYNTAX Integer32 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An Ethernet port on the switch."
+                        ::= { cienaCesOamLoopbackEntry 1 }
+
+                cienaCesOamLoopbackCommand OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                noLoopback(1),
+                                startRemoteLoopback(2),
+                                stopRemoteLoopback(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This attribute initiates or terminates remote loopback with
+                                         an OAM peer.  Value startRemoteLoopback(2) of this attribute
+                                         indicates the local OAM client to send a loopback OAMPDU to the
+                                         OAM peer with the loopback enable flags set.  Value
+                                         stopRemoteLoopback(3) of this attribute indicates the local
+                                         OAM client to send a loopback OAMPDU to the OAM peer with the
+                                         loopback enable flags cleared.  Value noLoopback(1) to this
+                                         attribute has no effect.  
+                                  
+                                         The attribute always returns noLoopback on a read.  To
+                                         determine the loopback status, use the attribute
+                                         cienaCesOamLoopbackStatus."
+                        ::= { cienaCesOamLoopbackEntry 2 }
+
+                
+                cienaCesOamLoopbackStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                noLoopback(1),
+                                initiatingLoopback(2),
+                                remoteLoopback(3),
+                                terminatingLoopback(4),
+                                localLoopback(5),
+                                unknown(6)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The loopback status of the OAM entity.  This status is
+                                         determined by a combination of the local parser and
+                                         multiplexer states, the remote parser and multiplexer states,
+                                         as well as by the actions of the local OAM client.  When
+                                         operating in normal mode with no loopback in progress, the
+                                         status reads noLoopback(1).  
+                                                         
+                                         If the OAM client has sent a Loopback OAMPDU and is waiting
+                                         for a response, where the local parser and multiplexer states
+                                         are DISCARD (see [802.3ah, 57.2.11.1]), the status is
+                                         'initiatingLoopback'.  In this case, the local OAM entity has
+                                         yet to receive any acknowledgement that the remote OAM entity
+                                         has received its loopback command request.  
+                                                         
+                                         If the local OAM client knows that the remote OAM entity is in
+                                         loopback mode (via the remote state information as described
+                                         in [802.3ah, 57.2.11.1, 30.3.6.1.15]), the status is remoteLoopback(3).  
+					 If the local OAM client is in the process
+                                         of terminating the remote loopback [802.3ah, 57.2.11.3,
+                                         30.3.6.1.14], with its local multiplexer and parser states in
+                                         DISCARD, the status is terminatingLoopback(4).  If the remote
+                                         OAM client has put the local OAM entity in loopback mode as
+                                         indicated by its local parser state, the status is
+                                         localLoopback(5).  
+                                  
+                                         The unknown(6) status indicates the parser and multiplexer
+                                         combination is unexpected.  This status may be returned if the
+                                         OAM loopback is in a transition state but should not persist. 
+                                  
+                                         The values of this attribute correspond to the following
+                                         values of the local and remote parser and multiplexer states. 
+                                  
+                                                            LclPrsr   LclMux    RmtPrsr   RmtMux
+                                           noLoopback         FWD       FWD       FWD       FWD  
+                                           initLoopback     DISCARD   DISCARD     FWD       FWD 
+                                           rmtLoopback      DISCARD     FWD      LPBK    DISCARD
+                                           tmtngLoopback    DISCARD   DISCARD    LPBK    DISCARD
+                                           lclLoopback        LPBK    DISCARD   DISCARD     FWD
+                                           unknown            ***   any other combination   ***"
+                        ::= { cienaCesOamLoopbackEntry 3 }
+
+                
+                cienaCesOamLoopbackIgnoreRx OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                ignore(1),
+                                process(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Since OAM loopback is a disruptive operation (user traffic
+                                         does not pass), this attribute provides a mechanism to provide
+                                         controls over whether received OAM loopback commands are
+                                         processed or ignored.  When the value is ignore(1), received
+                                         loopback commands are ignored.  When the value is process(2),
+                                         OAM loopback commands are processed.  The default value is to
+                                         ignore loopback commands (ignore(1)).  
+                                  
+                                         The attribute has no meaning if the local OAM entity does not
+                                         support the loopback function (as defined in
+                                         cienaCesOamFunctionsSupported)."
+                        ::= { cienaCesOamLoopbackEntry 4 }
+
+
+
+                cienaCesOamSystemEnableDisable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the administratively configurable state of the 
+				OAM on the switch."
+                        ::= { cienaCesOamStatistics 7 }
+
+                
+                cienaCesOamEventConfigTable OBJECT-TYPE  
+                        SYNTAX SEQUENCE OF CienaCesOamEventConfigEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Ethernet OAM includes the ability to generate and receive
+                                 event notifications to indicate various link problems.  This
+                                 table contains the mechanisms to configure the thresholds to
+                                 generate the standard Ethernet OAM Event.
+                                 These events are:
+                                    - Errored Symbol Period Event.  Generated when the number of
+                                      symbol errors exceeds a threshold within a given window
+                                      defined by a number of symbols (e.g. 1,000 symbols out of
+                                      1,000,000 had errors).
+                                    - Errored Frame Period Event.  Generated when the number of
+                                      frame errors exceeds a threshold within a given window
+                                      defined by a number of frames (e.g. 10 frames out of 1000
+                                      had errors).
+                                    - Errored Frame Event.  Generated when the number of frame
+                                      errors exceeds a threshold within a given window defined
+                                      by a period of time (e.g. 10 frames in 1 second had
+                                      errors).
+                                    - Errored Frame Seconds Summary Event.  Generated when the
+                                      number of errored frame seconds exceeds a threshold within
+                                      a given time period (e.g. 10 errored frame seconds within
+                                      the last 100 seconds).  An errored frame second is defined
+                                      as a 1 second interval that had >0 frame errors."   
+                        ::= { cienaCesOamStatistics 8 }
+  
+                cienaCesOamEventConfigEntry OBJECT-TYPE
+                        SYNTAX CienaCesOamEventConfigEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "Event configuration information is available for every
+                                Ethernet like interface that supports OAM and the event
+                                function of OAM as indicated in the cienaCesOamFunctionsSupported
+                                attribute.  
+                                           
+                                Event configuration controls when the local management entity
+                                sends Event Notification OAMPDUs to its OAM peer."
+                  
+                        INDEX { cienaCesOamEventPort }
+                        ::= { cienaCesOamEventConfigTable 1 }
+                
+                CienaCesOamEventConfigEntry ::=
+                        SEQUENCE { 
+                                cienaCesOamEventPort                               Integer32,
+                                cienaCesOamErrFramePeriodWindow                    Unsigned32,
+                                cienaCesOamErrFramePeriodThreshold                 Unsigned32,
+                                cienaCesOamErrFramePeriodEvNotifEnable             INTEGER,
+                                cienaCesOamErrFrameWindow                          Unsigned32,             
+                                cienaCesOamErrFrameThreshold                       Unsigned32,
+                                cienaCesOamErrFrameEvNotifEnable                   INTEGER,
+                                cienaCesOamErrFrameSecsSummaryWindow               Integer32,
+                                cienaCesOamErrFrameSecsSummaryThreshold            Integer32,
+                                cienaCesOamErrFrameSecsEvNotifEnable               INTEGER,
+                                cienaCesOamDyingGaspEnable                         INTEGER,
+                                cienaCesOamCriticalEventEnable                     INTEGER
+                                        }
+        
+                cienaCesOamEventPort OBJECT-TYPE
+                    SYNTAX Integer32
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                           "An Ethernet port on the switch"
+                       ::= { cienaCesOamEventConfigEntry 1 }
+
+
+                cienaCesOamErrFramePeriodWindow OBJECT-TYPE
+                    SYNTAX      Unsigned32
+                    UNITS       "frames"
+                    MAX-ACCESS  read-only
+                    STATUS      current
+                    DESCRIPTION 
+                                "The number of frames over which the threshold is defined. 
+                                 The default value of the window is the number of minimum size
+                                 Ethernet frames that can be received over the physical layer in
+                                 one second.  
+                                                 
+                                 If cienaCesOamErrFramePeriodThreshold frame errors occur within a 
+                                 window of cienaCesOamErrFramePeriodWindow frames, an Event
+                                 Notification OAMPDU should be generated with an Errored Frame
+                                 Period Event TLV indicating the threshold has been crossed in
+                                 this window. 
+                                 
+                                 +------------ Range of errd-frame-period-window values------------+
+                                 |         10    mbps link   : 1488    - 892800                    |
+                                 |         100   mbps link   : 14880   - 8928000                   |
+                                 |         1000  mbps link   : 148810  - 89285760                  |
+                                 |         10000 mbps link   : 1488096 - 892857120                 |
+                                 +-----------------------------------------------------------------+
+                                 "
+                       REFERENCE   "[802.3ah], 30.3.6.1.38"  
+                       ::= { cienaCesOamEventConfigEntry 2 }
+
+                 cienaCesOamErrFramePeriodThreshold OBJECT-TYPE
+                        SYNTAX      Unsigned32 (0..4294967293)
+                        UNITS       "frames"
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                              "The number of frame errors that must occur for this event to
+                               be triggered.  The default value is one frame error.  
+                                                         
+                               If cienaCesOamErrFramePeriodThreshold frame errors occur within a
+                               window of cienaCesOamErrFramePeriodWindow frames, an Event
+                               Notification OAMPDU should be generated with an Errored Frame
+                               Period Event TLV indicating the threshold has been crossed in
+                               this window."
+                        REFERENCE   "[802.3ah], 30.3.6.1.38"  
+                        ::= { cienaCesOamEventConfigEntry 3 }
+                       
+                cienaCesOamErrFramePeriodEvNotifEnable OBJECT-TYPE 
+                        SYNTAX      INTEGER 
+                                    { 
+				        enabled(1), 
+					disabled(2) 
+				    }
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "Indicates whether the occurrence of an Errored Frame Period
+                                 Event should result in an Event Notification OAMPDU generated
+                                 by the OAM layer.  
+                                                         
+                                 By default, this object should have the value enabled(1) for
+                                 Ethernet like interfaces that support OAM.  If the OAM layer
+                                 does not support event notifications (as indicated via the
+                                 cienaCesOamFunctionsSupported attribute), this value is ignored."
+                        ::= { cienaCesOamEventConfigEntry 4 }
+                        
+                cienaCesOamErrFrameWindow OBJECT-TYPE
+                        SYNTAX      Unsigned32 (10..600)
+                        UNITS       "tenths of a second"
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "The amount of time (in 100ms increments) over which the
+                                 threshold is defined.  The default value is 10 (1 second).
+                                                        
+                                 If cienaCesOamErrFrameThreshold frame errors occur within a window
+                                 of cienaCesOamErrFrameWindow seconds (measured in tenths of
+                                 seconds), an Event Notification OAMPDU should be generated with
+                                 an Errored Frame Event TLV indicating the threshold has been
+                                 crossed in this window."
+                        REFERENCE   "[802.3ah], 30.3.6.1.36"  
+                        ::= { cienaCesOamEventConfigEntry 5 }
+                       
+                 cienaCesOamErrFrameThreshold OBJECT-TYPE
+                        SYNTAX      Unsigned32 (0..4294967293)
+                        UNITS       "frames"
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "The number of frame errors that must occur for this event to
+                                 be triggered.  The default value is one frame error.  
+                                                        
+                                 If cienaCesOamErrFrameThreshold frame errors occur within a window
+                                 of cienaCesOamErrFrameWindow (in tenths of seconds), an Event
+                                 Notification OAMPDU should be generated with an Errored Frame
+                                 Event TLV indicating the threshold has been crossed in this
+                                 window."
+                        REFERENCE   "[802.3ah], 30.3.6.1.36"  
+                        ::= { cienaCesOamEventConfigEntry 6 }
+                       
+                cienaCesOamErrFrameEvNotifEnable OBJECT-TYPE 
+                        SYNTAX      INTEGER 
+                                    { 
+				        enabled(1), 
+					disabled(2) 
+				    }
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "Indicates whether the occurrence of an Errored Frame Event
+                                         should result in an Event Notification OAMPDU generated by the
+                                         OAM layer.
+                                                         
+                                         By default, this object should have the value enabled(1) for
+                                         Ethernet like interfaces that support OAM.  If the OAM layer
+                                         does not support event notifications (as indicated via the
+                                         cienaCesOamFunctionsSupported attribute), this value is ignored."
+                        ::= { cienaCesOamEventConfigEntry 7 }
+                          
+                cienaCesOamErrFrameSecsSummaryWindow OBJECT-TYPE
+                        SYNTAX      Integer32 (100..9000)
+                        UNITS       "tenths of a second"
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "The amount of time (in 100ms intervals) over which the
+                                         threshold is defined.  The default value is 100 (10 seconds).
+                                                         
+                                         If cienaCesOamErrFrameSecsSummaryThreshold frame errors occur
+                                         within a window of cienaCesOamErrFrameSecsSummaryWindow (in tenths
+                                         of seconds), an Event Notification OAMPDU should be generated
+                                         with an Errored Frame Seconds Summary Event TLV indicating the
+                                         threshold has been crossed in this window."
+                        REFERENCE   "[802.3ah], 30.3.6.1.40"  
+                        ::= { cienaCesOamEventConfigEntry 8 }
+                
+                cienaCesOamErrFrameSecsSummaryThreshold OBJECT-TYPE
+                        SYNTAX      Integer32 (0..65535)
+                        UNITS       "errored frame seconds"
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "The number of errored frame seconds that must occur for this
+                                         event to be triggered.  The default value is one errored frame
+                                         second.
+                                                         
+                                         If cienaCesOamErrFrameSecsSummaryThreshold frame errors occur
+                                         within a window of cienaCesOamErrFrameSecsSummaryWindow (in tenths
+                                         of seconds), an Event Notification OAMPDU should be generated
+                                         with an Errored Frame Seconds Summary Event TLV indicating the
+                                         threshold has been crossed in this window."
+                        REFERENCE   "[802.3ah], 30.3.6.1.40"  
+                        ::= { cienaCesOamEventConfigEntry 9 }
+                       
+                cienaCesOamErrFrameSecsEvNotifEnable OBJECT-TYPE 
+                        SYNTAX      INTEGER 
+                                    { 
+				       enabled(1), 
+				       disabled(2) 
+				    }
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "Indicates whether the occurrence of an Errored Frame Seconds
+                                         Summary Event should result in an Event Notification OAMPDU
+                                         generated by the OAM layer.
+                                                         
+                                         By default, this object should have the value enabled(1) for
+                                         Ethernet like interfaces that support OAM.  If the OAM layer
+                                         does not support event notifications (as indicated via the
+                                         cienaCesOamFunctionsSupported attribute), this value is ignored."
+                        ::= { cienaCesOamEventConfigEntry 10 }
+                       
+                cienaCesOamDyingGaspEnable OBJECT-TYPE 
+                        SYNTAX      INTEGER 
+                                    { 
+				        enabled(1), 
+					disabled(2) 
+				    }
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "Indicates whether the local device should attempt to indicate
+                                         a dying gasp fault via the OAMPDU flags field to its peer OAM
+                                         entity.  If the system does not support dying gasp capability,
+                                         reading the object should always result in 'disabled(2)'.
+                                         
+                                         By default, this object should have the value enabled(1) for
+                                         Ethernet like interfaces that support OAM.  If the OAM layer
+                                         does not support event notifications (as indicated via the
+                                         OamFunctionsSupported attribute), this value is ignored."
+                        ::= { cienaCesOamEventConfigEntry 11 }
+                 
+
+                cienaCesOamCriticalEventEnable OBJECT-TYPE 
+                        SYNTAX      INTEGER 
+                                    { 
+				       enabled(1), 
+				       disabled(2) 
+				    }
+                        MAX-ACCESS  read-only
+                        STATUS      current
+                        DESCRIPTION 
+                                "Indicates whether the local device should attempt to indicate
+                                         a critical event has occurred via the OAMPDU flags field to its peer OAM
+                                         entity.  If the system does not support dying gasp capability,
+                                         reading the object should always result in 'disabled(2)'.
+                                         
+                                         By default, this object should have the value enabled(1) for
+                                         Ethernet like interfaces that support OAM.  If the OAM layer
+                                         does not support event notifications (as indicated via the
+                                         OamFunctionsSupported attribute), this value is ignored."
+                        ::= { cienaCesOamEventConfigEntry 12 }
+                                                               
+                                                               
+    --
+    -- Notifications
+    --  
+
+    cienaCesOamLinkEventTrap  NOTIFICATION-TYPE
+        OBJECTS     {                                                        
+                         cienaGlobalSeverity,
+                         cienaGlobalMacAddress,
+                         cienaCesOamEventNotifChassisIndex,
+                         cienaCesOamEventNotifShelfIndex, 
+                         cienaCesOamEventNotifSlotIndex, 
+                         cienaCesOamEventNotifPortNumber,
+                         cienaCesOamEventLogType,
+                         cienaCesOamEventLogLocation,
+                         cienaCesOamEventNotifChannelNumber
+                    }
+         STATUS     current
+         DESCRIPTION
+                     "A cienaCesOamLinkEventTrap notification is sent whenever a local or remote link event is detected
+                      and recorded in the cienaCesOamEventLogTable.
+                      To enable the device to send this trap, cienaCesOamLinkEventTrapState needs to be set to enabled. 
+                      The cienaCesOamLinkEventTrapState is enabled by default. Variable bindings include: 
+                      cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesOamEventNotifChassisIndex, 
+                      cienaCesOamEventNotifShelfIndex, cienaCesOamEventNotifSlotIndex, cienaCesOamEventNotifPortNumber,
+                      cienaCesOamEventLogType, cienaCesOamEventLogLocation, and cienaCesOamEventNotifChannelNumber."
+            ::= { cienaCesOamNotifMIBNotification 1 }
+
+        END
+
+--
+-- CIENA-CES-OAM-MIB.my
+--

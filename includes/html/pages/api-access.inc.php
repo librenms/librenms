@@ -19,9 +19,7 @@ use LibreNMS\Authentication\LegacyAuth;
 if (Auth::user()->hasGlobalAdmin()) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
-    }
-
-?>
+    } ?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
@@ -59,12 +57,10 @@ if (Auth::user()->hasGlobalAdmin()) {
               <label for="user_id" class="col-sm-2 control-label">User: </label>
               <div class="col-sm-4">
                 <select class="form-control" id="user_id" name="user_id">
-<?php
-foreach ($userlist = User::all() as $user) {
-    echo '<option value="' . $user->user_id . '">' . $user->username . ' (' . $user->auth_type . ')</option>';
-}
-
-?>
+    <?php
+    foreach ($userlist = User::all() as $user) {
+        echo '<option value="' . $user->user_id . '">' . $user->username . ' (' . $user->auth_type . ')</option>';
+    } ?>
                 </select>
               </div>
             </div>
@@ -108,22 +104,22 @@ foreach ($userlist = User::all() as $user) {
        </div>
      </div>
    </div>
-<?php
-echo '
+    <?php
+    echo '
   <div class="row">
     <div class="col-md-12">
       <span id="thanks"></span>
     </div>
   </div>
 ';
-if (Session::get('api_token') === true) {
-    echo "<script>
+    if (Session::get('api_token') === true) {
+        echo "<script>
       $('#thanks').html('<div class=\"alert alert-info\">The API token has been added.</div>');</script>
     ";
-    Session::forget('api_token');
-}
+        Session::forget('api_token');
+    }
 
-echo '
+    echo '
   <h3>API Access</h3>
   <hr>
   <div class="row">
@@ -143,32 +139,31 @@ echo '
         </tr>
 ';
 
-foreach (ApiToken::all() as $api) {
-    $user_details = $userlist->where('user_id', $api->user_id)->first();
+    foreach (ApiToken::all() as $api) {
+        $user_details = $userlist->where('user_id', $api->user_id)->first();
 
-    $api_disabled = $api->disabled == 1 ? 'checked' : '';
-    $color = $user_details->auth_type == LegacyAuth::getType() ? '' : 'bgcolor="lightgrey"';
+        $api_disabled = $api->disabled == 1 ? 'checked' : '';
+        $color = $user_details->auth_type == LegacyAuth::getType() ? '' : 'bgcolor="lightgrey"';
 
-    echo '
-        <tr id="'.$api->id.'" ' . $color . '>
-          <td>'.$user_details->username.'</td>
-          <td>'.$user_details->auth_type.'</td>
-          <td>'.$api->token_hash.'</td>
-          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api->token_hash.'"><i class="fa fa-qrcode" ></i></button></td>
-          <td>'.$api->description.'</td>
-          <td><input type="checkbox" name="token-status" data-token_id="'.$api->id.'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
-          <td><button type="button" class="btn btn-danger btn-xs" id="'.$api->id.'" data-token_id="'.$api->id.'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
+        echo '
+        <tr id="' . $api->id . '" ' . $color . '>
+          <td>' . $user_details->username . '</td>
+          <td>' . $user_details->auth_type . '</td>
+          <td>' . $api->token_hash . '</td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . $api->token_hash . '"><i class="fa fa-qrcode" ></i></button></td>
+          <td>' . htmlspecialchars($api->description) . '</td>
+          <td><input type="checkbox" name="token-status" data-token_id="' . $api->id . '" data-off-text="No" data-on-text="Yes" data-on-color="danger" ' . $api_disabled . ' data-size="mini"></td>
+          <td><button type="button" class="btn btn-danger btn-xs" id="' . $api->id . '" data-token_id="' . $api->id . '" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
 ';
-}
+    }
 
-  echo '
+    echo '
       </table>
       <center>
           <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
       </center>
-';
-?>
+'; ?>
 <script>
   $("[name='token-status']").bootstrapSwitch('offColor','success');
   $('input[name="token-status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
@@ -232,7 +227,7 @@ foreach (ApiToken::all() as $api) {
         }
       },
       error: function(){
-        $("#thanks").html('<div class="alert alert-info">An error occurred removing the token.</div>');
+        $("#thanks").html('<div class="alert alert-info">An error occurred creating the token.</div>');
         $("#create-token").modal('hide');
       }
     });
@@ -244,7 +239,7 @@ foreach (ApiToken::all() as $api) {
   });
 </script>
 
-<?php
+    <?php
 } else {
-    include 'includes/html/error-no-perm.inc.php';
-}//end if
+        include 'includes/html/error-no-perm.inc.php';
+    }//end if

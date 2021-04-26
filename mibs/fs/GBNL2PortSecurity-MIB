@@ -17,14 +17,14 @@
     gbnL2Switch                 OBJECT IDENTIFIER ::= { gbnL2 1 }
 
     gbnL2PortSecurityMib MODULE-IDENTITY
-        LAST-UPDATED    "2013/01/24"  -- Jan 24, 2013
+        LAST-UPDATED    "201301240000Z"  -- Jan 24, 2013
         ORGANIZATION    "Admin"
         CONTACT-INFO    "Admin
                          E-mail: support@admin.com"
 
         DESCRIPTION     "gbn PortSecurity Enterprise MIB definition."
 
-        REVISION        "2013/01/24"  -- Jan 24, 2013
+        REVISION        "201301240000Z"  -- Jan 24, 2013
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnL2Switch 8 }

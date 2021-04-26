@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], ['Snom', 'asa'])) {
+if (! Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' UDP';
 
     $oids = [
@@ -24,7 +25,7 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-udp', $tags, $fields);
 
-        $graphs['netstat_udp'] = true;
+        $os->enableGraph('netstat_udp');
 
         unset($rrd_def, $fields, $tags, $oid);
     }

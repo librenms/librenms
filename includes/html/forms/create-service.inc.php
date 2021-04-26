@@ -1,46 +1,60 @@
 <?php
 
 /*
- * LibreNMS
+ * create-service.inc.php
  *
- * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
+ * -Description-
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2016 Aaron Daniels
+ * @author     Aaron Daniels <aaron@daniels.id.au>
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
-$service_id = $vars['service_id'];
-$type = $vars['stype'];
-$desc = $vars['desc'];
-$ip = $vars['ip'];
-$param = $vars['param'];
-$ignore = isset($vars['ignore']) ? 1 : 0;
-$disabled = isset($vars['disabled']) ? 1 : 0;
-$device_id = $vars['device_id'];
+foreach (['desc', 'ip', 'ignore', 'disabled', 'param', 'name', 'template_id'] as $varname) {
+    if (isset($vars[$varname])) {
+        $update['service_' . $varname] = $vars[$varname];
+        $$varname = $vars[$varname];
+    }
+}
+foreach (['stype', 'device_id', 'service_id'] as $varname) {
+    if (isset($vars[$varname])) {
+        $$varname = $vars[$varname];
+    }
+}
 
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
-    $update = array('service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled);
     if (is_numeric(edit_service($update, $service_id))) {
-        $status = array('status' =>0, 'message' => 'Modified Service: <i>'.$service_id.': '.$type.'</i>');
+        $status = ['status' =>0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];
     } else {
-        $status = array('status' =>1, 'message' => 'ERROR: Failed to modify service: <i>'.$service_id.'</i>');
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
     }
 } else {
     // Need to add.
-    $service_id = add_service($device_id, $type, $desc, $ip, $param, $ignore, $disabled);
+    $service_id = add_service($device_id, $stype, $desc, $ip, $param, $ignore, $disabled, 0, $name);
     if ($service_id == false) {
-        $status = array('status' =>1, 'message' => 'ERROR: Failed to add Service: <i>'.$type.'</i>');
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to add Service: <i>' . $stype . '</i>'];
     } else {
-        $status = array('status' =>0, 'message' => 'Added Service: <i>'.$service_id.': '.$type.'</i>');
+        $status = ['status' =>0, 'message' => 'Added Service: <i>' . $service_id . ': ' . $stype . '</i>'];
     }
 }
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

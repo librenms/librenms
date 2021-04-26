@@ -15,12 +15,7 @@
 
             @config('twofactor')
             <br/>
-            <div class="panel panel-default col-sm-offset-3">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Two-Factor Authentication</h3>
-                </div>
-                <div class="panel-body">
-
+            <x-panel title="{{ __('Two-Factor Authentication') }}" class="col-sm-offset-3">
                 @if($twofactor_enabled)
                     @if($twofactor_locked)
                         <div class="form-group" id="twofactor-unlock-form">
@@ -34,8 +29,7 @@
                 @else
                     <p>@lang('No TwoFactor key generated for this user, Nothing to do.')</p>
                 @endif
-                </div>
-            </div>
+            </x-panel>
             @endconfig
 
             <div class="form-group">

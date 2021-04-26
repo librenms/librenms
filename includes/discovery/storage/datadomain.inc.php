@@ -7,7 +7,7 @@
  * the source code distribution for details.
 
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 ACL
  * @author     Abel Laura <abel.laura@gmail.com>
 */
@@ -20,7 +20,7 @@ if (is_array($ddos_storage)) {
         $units = 1073741824;
         $total = $storage['fileSystemSpaceSize'] * $units;
         $used = $storage['fileSystemSpaceUsed'] * $units;
-        if ($descr == "/data: post-comp") {
+        if ($descr == '/data: post-comp') {
             discover_storage($valid_storage, $device, $index, $fstype, 'datadomain', $descr, $total, $units, $used);
         }
     }

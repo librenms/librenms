@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -60,8 +59,8 @@ class MapquestApi extends BaseApi implements Geocoder
     protected function buildGeocodingOptions($address)
     {
         $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
-            throw new Exception("MapQuest API key missing, set geoloc.api_key");
+        if (! $api_key) {
+            throw new Exception('MapQuest API key missing, set geoloc.api_key');
         }
 
         return [
@@ -69,7 +68,7 @@ class MapquestApi extends BaseApi implements Geocoder
                 'key' => $api_key,
                 'location' => $address,
                 'thumbMaps' => 'false',
-            ]
+            ],
         ];
     }
 

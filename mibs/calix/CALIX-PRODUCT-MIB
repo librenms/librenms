@@ -106,6 +106,24 @@ CALIX-PRODUCT-MIB DEFINITIONS ::= BEGIN
 	    "The E7-20 product."
 	::= { e7Devices 4 }
 
+    e3x48 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E3-48 product."
+	::= { e7Devices 5 }
+
+    e5x48 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E5-48 product."
+	::= { e7Devices 6 }
+
+    e3x8g OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E3-8g product."
+	::= { e7Devices 7 }
+
     e5x100 OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION

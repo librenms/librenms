@@ -1,4 +1,5 @@
 <?php
+
   /*
    * LibreNMS module to Graph Digital Signal Processor (DSP) Resources in a Cisco Voice Router
    *
@@ -11,23 +12,23 @@
    * the source code distribution for details.
    */
 
-include "includes/html/graphs/common.inc.php";
-$rrd_options .= " -l 0 -E ";
-$rrd_filename = rrd_name($device['hostname'], 'cisco-iosdsp');
+include 'includes/html/graphs/common.inc.php';
+$rrd_options .= ' -l 0 -E ';
+$rrd_filename = Rrd::name($device['hostname'], 'cisco-iosdsp');
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
-    $rrd_options .= " DEF:Total=" . $rrd_filename . ":total:AVERAGE ";
-    $rrd_options .= " AREA:Total#c099ff ";
+    $rrd_options .= ' DEF:Total=' . $rrd_filename . ':total:AVERAGE ';
+    $rrd_options .= ' AREA:Total#c099ff ';
     $rrd_options .= " LINE1.25:Total#0000ee:'DSPs total              ' ";
-    $rrd_options .= " GPRINT:Total:LAST:%3.0lf ";
-    $rrd_options .= " GPRINT:Total:MIN:%3.0lf ";
+    $rrd_options .= ' GPRINT:Total:LAST:%3.0lf ';
+    $rrd_options .= ' GPRINT:Total:MIN:%3.0lf ';
     $rrd_options .= " GPRINT:Total:MAX:%3.0lf\l ";
 
-    $rrd_options .= " DEF:Active=" . $rrd_filename . ":active:AVERAGE ";
-    $rrd_options .= " AREA:Active#aaff99 ";
+    $rrd_options .= ' DEF:Active=' . $rrd_filename . ':active:AVERAGE ';
+    $rrd_options .= ' AREA:Active#aaff99 ';
     $rrd_options .= " LINE1.25:Active#00ee00:'DSPs in use             ' ";
-    $rrd_options .= " GPRINT:Active:LAST:%3.0lf ";
-    $rrd_options .= " GPRINT:Active:MIN:%3.0lf ";
+    $rrd_options .= ' GPRINT:Active:LAST:%3.0lf ';
+    $rrd_options .= ' GPRINT:Active:MIN:%3.0lf ';
     $rrd_options .= " GPRINT:Active:MAX:%3.0lf\l ";
 }

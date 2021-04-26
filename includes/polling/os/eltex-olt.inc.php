@@ -15,16 +15,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $tmp_eltex = snmp_get($device, 'ltp8xFirmwareRevision.0', '-Ovq', 'ELTEX-LTP8X-STANDALONE');
-list($hardware, $tmp_eltex) = explode(':', $tmp_eltex);
+[$hardware, $tmp_eltex] = explode(':', $tmp_eltex);
 $tmp_eltex = preg_split('/(software version| on)/', $tmp_eltex);
 $version = $tmp_eltex['1'];
 

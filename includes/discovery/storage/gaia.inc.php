@@ -15,18 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 if ($device['os'] === 'gaia') {
-    $gaia_tmp = snmpwalk_cache_double_oid($device, 'multiDiskTable', array(), 'CHECKPOINT-MIB');
+    $gaia_tmp = snmpwalk_cache_double_oid($device, 'multiDiskTable', [], 'CHECKPOINT-MIB');
 
-    $fstype = "dsk";
+    $fstype = 'dsk';
 
     foreach ($gaia_tmp as $index => $data) {
         $descr = $data['multiDiskName'];

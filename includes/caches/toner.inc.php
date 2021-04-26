@@ -1,10 +1,13 @@
 <?php
 
 if (Auth::user()->hasGlobalRead()) {
-    $data['count'] = array('query' => "SELECT COUNT(`toner_id`) FROM toner");
+    $data['count'] = ['query' => 'SELECT COUNT(`supply_id`) FROM printer_supplies'];
 } else {
-    $data['count'] = array(
-        'query'  => "SELECT COUNT(`toner_id`) FROM toner AS T, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND T.`device_id` = D.`device_id`",
-        'params' => array(Auth::id()),
-    );
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $perms_sql = '`printer_supplies`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+
+    $data['count'] = [
+        'query'  => "SELECT COUNT(`supply_id`) FROM printer_supplies WHERE $perms_sql",
+        'params' => $device_ids,
+    ];
 }

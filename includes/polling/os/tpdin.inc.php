@@ -15,17 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $tycon_data = snmp_get_multi_oid($device, ['name.0', 'version.0'], '-OUQs', 'TPDIN2-MIB');
 
 $hardware = $tycon_data['name.0'];
-$version  = $tycon_data['version.0'];
+$version = $tycon_data['version.0'];
 
 unset($tycon_data);

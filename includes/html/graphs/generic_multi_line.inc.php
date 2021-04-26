@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -17,14 +17,16 @@ require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 
-$descr_len = 12;
+if (! isset($descr_len)) {
+    $descr_len = 12;
+}
 
 if ($nototal) {
     $descr_len += '2';
     $unitlen += '2';
 }
 
-$rrd_options .= " COMMENT:'" . rrdtool_escape($unit_text, $descr_len) . "      Now      Min      Max     Avg\l'";
+$rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "      Now      Min      Max     Avg\l'";
 
 $i = 0;
 $iter = 0;
@@ -34,21 +36,21 @@ foreach ($rrd_list as $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (!\LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
         $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
         $iter++;
     }
 
-    if (!empty($rrd['area']) && empty($rrd['areacolour'])) {
-        $rrd['areacolour'] = $colour . "20";
+    if (! empty($rrd['area']) && empty($rrd['areacolour'])) {
+        $rrd['areacolour'] = $colour . '20';
     }
 
     $ds = $rrd['ds'];
     $filename = $rrd['filename'];
 
-    $descr = rrdtool_escape($rrd['descr'], $descr_len);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
 
     $id = 'ds' . $i;
 
@@ -66,18 +68,18 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked['stacked'] . ',*';
 
         $rrd_optionsb .= ' LINE1.25:' . $id . 'i#' . $colour . ":'$descr'";
-        if (!empty($rrd['areacolour'])) {
+        if (! empty($rrd['areacolour'])) {
             $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'];
         }
     } else {
         $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
-        if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] ;
+        if (! empty($rrd['areacolour'])) {
+            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'];
         }
     }
 
-    $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.2lf%s' . $units . ' GPRINT:' . $id . 'min:MIN:%5.2lf%s' . $units;
-    $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.2lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5.2lf%s$units\\n'";
+    $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . 'min:MIN:%5.' . $float_precision . 'lf%s' . $units;
+    $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
 
     $i++;
 }

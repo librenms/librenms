@@ -23,7 +23,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxPPPoEMIB  MODULE-IDENTITY
-    LAST-UPDATED "201007220942Z"  -- 22-Jul-10 03:12 PM EST
+    LAST-UPDATED "201602160000Z"  -- 16-Feb-2016
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -41,6 +41,10 @@ jnxPPPoEMIB  MODULE-IDENTITY
 
     -- Revision History
 
+    REVISION    "201602160000Z"  -- 16-Feb-2016
+    DESCRIPTION
+        "Added objects jnxPPPoESubIfSubscriberIdHiWord and
+         jnxPPPoESubIfSubscriberIdLoWord."
     REVISION    "201306130000Z"  -- 13-Jun-13 05:32 AM EST  - JUNOS 13.1
     DESCRIPTION
         "Deprecated InterfaceIndex type and added InterfaceIndexOrZero type 
@@ -697,7 +701,9 @@ JnxPPPoESubIfEntry ::= SEQUENCE {
     jnxPPPoESubIfId             Unsigned32,
     jnxPPPoESubIfSessionId      Integer32,
     jnxPPPoESubIfMotm           DisplayString,
-    jnxPPPoESubIfUrl            DisplayString }
+    jnxPPPoESubIfUrl            DisplayString,
+    jnxPPPoESubIfSubscriberIdHiWord  Unsigned32,
+    jnxPPPoESubIfSubscriberIdLoWord  Unsigned32 }
 
 jnxPPPoESubIfIndex OBJECT-TYPE
     SYNTAX      InterfaceIndex
@@ -802,6 +808,26 @@ jnxPPPoESubIfUrl OBJECT-TYPE
         transitions to the ifOperStatusUp state.  The client may use this URL as
         the initial web-page for the user."
     ::= { jnxPPPoESubIfEntry 7 }
+
+jnxPPPoESubIfSubscriberIdHiWord OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber handle associated with this PPPoEsubinterface which can
+        be used to index into the JUNIPER-SUBSCRIBER-MIB table entries.
+        This object is equal to the most significant 32 bit of the 64 bit subscriber id."
+    ::= { jnxPPPoESubIfEntry 8 }
+
+jnxPPPoESubIfSubscriberIdLoWord OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber handle associated with this PPPoEsubinterface which can
+        be used to index into the JUNIPER-SUBSCRIBER-MIB table entries.
+        This object is equal to the least significant 32 bit of the 64 bit subscriber id."
+    ::= { jnxPPPoESubIfEntry 9 }
 
 -- /////////////////////////////////////////////////////////////////////////////
 --

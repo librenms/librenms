@@ -32,5 +32,6 @@ discovery_modules:
     ucd-diskio: false
     vlans: false
 discovery:
-    - sysDescr_regex:
-        - '/^Cisco Adaptive Security Appliance/'
+    -
+        sysDescr_regex:
+            - '/^Cisco Adaptive Security Appliance/'

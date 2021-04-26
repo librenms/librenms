@@ -8,38 +8,38 @@
  *
  * @package    LibreNMS
  * @subpackage nfs-server
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     SvennD <svennd@svennd.be>
 */
 
 require 'includes/html/graphs/common.inc.php';
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'net stats packets';
-$unitlen       = 15;
-$bigdescrlen   = 15;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'net stats packets';
+$unitlen = 15;
+$bigdescrlen = 15;
 $smalldescrlen = 15;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
 
-$rrd_filename  = rrd_name($device['hostname'], array('app', 'nfs-server-default', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
 
-$array = array(
-    'net_udp' => array('descr' => 'udp','colour' => 'AA3F39',),
-    'net_tcp' => array('descr' => 'tcp','colour' => '2C8437',),
-);
+$array = [
+    'net_udp' => ['descr' => 'udp', 'colour' => 'AA3F39'],
+    'net_tcp' => ['descr' => 'tcp', 'colour' => '2C8437'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

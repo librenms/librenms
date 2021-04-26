@@ -103,6 +103,100 @@ Output:
 }
 ```
 
+### `availability`
+
+Get calculated availabilities of given device.
+
+Route: `/api/v0/devices/:hostname/availability`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/availability
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "availability": [
+        {
+            "duration": 86400,
+            "availability_perc": "100.000000"
+        },
+        {
+            "duration": 604800,
+            "availability_perc": "100.000000"
+        },
+        {
+            "duration": 2592000,
+            "availability_perc": "99.946000"
+        },
+        {
+            "duration": 31536000,
+            "availability_perc": "99.994000"
+        }
+    ],
+    "count": 4
+}
+```
+
+### `outages`
+
+Get detected outages of given device.
+
+Route: `/api/v0/devices/:hostname/outages`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/outages
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "outages": [
+        {
+            "going_down": 1593194031,
+            "up_again": 1593194388
+        },
+        {
+            "going_down": 1593946507,
+            "up_again": 1593946863
+        },
+        {
+            "going_down": 1594628616,
+            "up_again": 1594628968
+        },
+        {
+            "going_down": 1594628974,
+            "up_again": 1594629339
+        },
+        {
+            "going_down": 1594638668,
+            "up_again": 1594638992
+        }
+    ],
+    "count": 5
+}
+```
+
 ### `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.
@@ -1018,6 +1112,7 @@ Route: `/api/v0/devices`
 Input (JSON):
 
 - hostname: device hostname
+- overwrite_ip: alternate polling IP. Will be use instead of hostname (optional)
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
 - version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
@@ -1265,5 +1360,51 @@ Output:
 {
     "status": "ok",
     "config": "DEVICE CONFIG HERE"
+}
+```
+
+### `add_parents_to_host`
+
+Add one or more parents to a host.
+
+Route: `/api/v0/devices/:device/parents`
+
+Input (JSON):
+
+- parent_ids: one or more parent ids or hostnames
+
+Example:
+```curl
+curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "Device dependencies have been saved"
+}
+```
+
+### `delete_parents_from_host`
+
+Deletes some or all the parents from a host.
+
+Route: `/api/v0/devices/:device/parents`
+
+Input (JSON):
+
+- parent_ids: One or more parent ids or hostnames, if not specified deletes all parents from host.
+
+Example:
+```curl
+curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "All device dependencies have been removed"
 }
 ```

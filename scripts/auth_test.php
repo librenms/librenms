@@ -1,11 +1,12 @@
 #!/usr/bin/php
 <?php
 
-use LibreNMS\Config;
+use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 $options = getopt('u:rldvh');
-if (isset($options['h']) || (!isset($options['l']) && !isset($options['u']))) {
+if (isset($options['h']) || (! isset($options['l']) && ! isset($options['u']))) {
     echo ' -u <username>  (Required) username to test
  -l             List all users (checks that auth can enumerate all allowed users)
  -d             Enable debug output
@@ -28,16 +29,16 @@ if (isset($options['v'])) {
     Config::set('auth_ldap_debug', 1);
 }
 
-echo "Authentication Method: " . Config::get('auth_mechanism') . PHP_EOL;
+echo 'Authentication Method: ' . Config::get('auth_mechanism') . PHP_EOL;
 
 // if ldap like, check selinux
-if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == "active_directory") {
+if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == 'active_directory') {
     $enforce = shell_exec('getenforce 2>/dev/null');
-    if (str_contains($enforce, 'Enforcing')) {
+    if (Str::contains($enforce, 'Enforcing')) {
         // has selinux
         $output = shell_exec('getsebool httpd_can_connect_ldap');
         if ($output != "httpd_can_connect_ldap --> on\n") {
-            print_error("You need to run: setsebool -P httpd_can_connect_ldap=1");
+            print_error('You need to run: setsebool -P httpd_can_connect_ldap=1');
             exit;
         }
     }
@@ -61,7 +62,7 @@ try {
         $bind_success = false;
         if (Config::has('auth_ad_binduser') && Config::has('auth_ad_bindpassword')) {
             $bind_success = $adbind_rm->invoke($authorizer, false, true);
-            if (!$bind_success) {
+            if (! $bind_success) {
                 $ldap_error = ldap_error($lc_rp->getValue($authorizer));
                 echo $ldap_error . PHP_EOL;
                 if ($ldap_error == 'Invalid credentials') {
@@ -73,16 +74,16 @@ try {
             }
         } else {
             $bind_success = $adbind_rm->invoke($authorizer, true, true);
-            if (!$bind_success) {
+            if (! $bind_success) {
                 echo ldap_error($lc_rp->getValue($authorizer)) . PHP_EOL;
-                print_message("Could not anonymous bind to AD");
+                print_message('Could not anonymous bind to AD');
             } else {
                 print_message('AD bind anonymous successful');
             }
         }
 
-        if (!$bind_success) {
-            print_error("Could not bind to AD, you will not be able to use the API or alert AD users");
+        if (! $bind_success) {
+            print_error('Could not bind to AD, you will not be able to use the API or alert AD users');
         }
     }
 
@@ -92,8 +93,8 @@ try {
             return "{$user['username']} ({$user['user_id']})";
         }, $users);
 
-        echo "Users: " . implode(', ', $output) . PHP_EOL;
-        echo "Total users: " . count($users) . PHP_EOL;
+        echo 'Users: ' . implode(', ', $output) . PHP_EOL;
+        echo 'Total users: ' . count($users) . PHP_EOL;
         exit;
     }
 
@@ -138,6 +139,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    echo "Error: " . get_class($e) . " thrown!\n";
+    echo 'Error: ' . get_class($e) . " thrown!\n";
     echo $e->getMessage() . PHP_EOL;
 }

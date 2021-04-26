@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePackagesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreatePackagesTable extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->increments('pkg_id');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->string('name', 64);
             $table->string('manager', 16)->default('1');
             $table->boolean('status');
@@ -23,7 +22,7 @@ class CreatePackagesTable extends Migration
             $table->string('build', 64);
             $table->string('arch', 16);
             $table->bigInteger('size')->nullable();
-            $table->unique(['device_id','name','manager','arch','version','build'], 'unique_key');
+            $table->unique(['device_id', 'name', 'manager', 'arch', 'version', 'build']);
         });
     }
 

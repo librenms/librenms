@@ -1,0 +1,3042 @@
+
+-- File Name : GW-EPON-MIB.mi2
+-- Date      : Tue Nov 27 13:46:08 CST 2012
+-- Author    : AdventNet Agent Toolkit C Edition - MibEditor 6
+
+
+
+GW-EPON-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		devices
+			FROM GWTT-SMI
+		RowStatus, TruthValue, DisplayString, MacAddress, TEXTUAL-CONVENTION, DateAndTime
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks, NOTIFICATION-TYPE, Counter32, IpAddress
+			FROM SNMPv2-SMI;
+
+	gwEponMib	MODULE-IDENTITY
+		LAST-UPDATED	"200804100000Z"
+		ORGANIZATION	"Organization"
+		CONTACT-INFO	"Contact-info"
+		DESCRIPTION		"EPON private MIB information definitions"
+		REVISION		"200603240959Z"
+		DESCRIPTION		""
+		::=  {  devices  20  }
+
+-- TEXTUAL-CONVENTIONS --
+	ChassisSlotSupportType ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"The value indicates the type of board this slot surpports."
+		SYNTAX 			BITS  { sw ( 0 ) , 
+		                        epon ( 1 ) , 
+								gpon ( 2 ) , 
+								get ( 3 ) , 
+								geo ( 4 ) , 
+								tdm ( 5 ) , 
+								stm1 ( 6 ) , 
+								pwu48 ( 7 ) ,
+								pwu220 ( 8 ) , 
+								smb ( 9 ) , 
+								gem ( 10 ) , 
+								sig ( 11 ) , 
+								onuEponB ( 12 ) , 
+								onu6FeC ( 13 ) , 
+								onu8FeD ( 14 ) , 
+								onu16FeD ( 15 ) , 
+								onu8PotsA ( 16 ) , 
+								onu8PotsB ( 17 ) , 
+								onu8FxsA ( 18 ) , 
+								onu8FxsB ( 19 ) , 
+								oltMain ( 20 ) , 
+								olt2Epon ( 21 ) , 
+								e1 ( 22 ) , 
+								oltE1 ( 23 ) , 
+								onuE1A ( 24 ) , 
+								onuE1B ( 25 ) , 
+								sw_6900 ( 26 ) , 
+								olt4epon ( 27 ) , 
+								olt8epon ( 28 ) , 
+								olt12epon ( 29 ) , 
+								gem4ge ( 30 ) , 
+								gem10ge ( 31 ) , 
+								fan_6900 ( 32 ) , 
+								pwu_48 ( 33 ) , 
+								pwu_220 ( 34 ) ,
+								olt4epon4ge(35),
+								pwu_220_6900m(36),
+								pwu_48_6900m(37),
+								fan_6900s(38),							
+								pwu_220_6900s(39),
+								pwu_48_6900s(40)} 
+								
+	OnuAlarmLevelList ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"Each octet within this value specifies a alarm-level of one ONU of
+         a PON, with the first octet specifying ONU1 alarm-level, and the
+         second octet specifying ONU2 alarm-level, etc. 
+         Per octet value is defined:
+         '0' - null
+         '1' - vital
+         '2' - major
+         '3' - minor
+         '4' - warning
+         '5' - clear
+         '6' - information
+         '7' - off-line."
+		SYNTAX 			OCTET STRING
+
+	EponDeviceType ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	"d"
+		STATUS			current
+		DESCRIPTION
+			"The value indicates the type of this device:
+	            	  1  - unknown, 
+					  2  - GFA6700,
+					  3  - GFA6100,
+					  4  - GT811,
+					  5  - GT831,
+					  6  - GT831-CATV,
+					  7  - GT812,
+					  8  - GT813,
+					  9  - GT881,
+					  10 - GT861,
+					  11 - GT891,
+					  12 - GT810,
+					  13 - GT863,
+					  14 - other,
+					  15 - GT865,
+					  16 - GT816,
+					  17 - GT811A,
+					  18 - GT812A,
+					  19 - GT831A,
+					  20 - GT831A-CATV,
+					  21 - GT815,
+					  22 - GT812B,
+					  23 - GT831B,
+					  24 - GT866,
+					  25 - GT811_B,
+					  26 - GT851,
+					  27 - GT813_B,
+					  28 - GT862,
+					  29 - GT892,
+					  30 - GT835,
+					  31 - GT831_B_CATV,
+					  32 - GT815_B,
+					  33 - GT871,
+					  34 - GT871R,
+					  35 - GD5048,
+					  36 - GD6024,
+					  37 - GT872,
+					  38 - GT872P,			--GT872B(deprecated)
+					  39 - GT872R,
+					  40 - GT873,
+					  41 - GT873P,
+					  42 - GT873R,
+					  43 - GT871P,
+					  44 - GT870,
+					  45 - GT811_C,
+					  46 - GT810_A,
+					  47 - GT811_D,
+					  96 - GFA6900M,
+					  97 - GGA6900S,
+					  99 - GFA6900"
+		SYNTAX 			Integer32
+
+	OnuList ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"Each octet within this value specifies a set of eight ONUs, with
+         the first octet specifying ONUs ID 1 through 8, the second octet
+         specifying ONUs ID 9 through 16, etc. Within each octet, the most
+         significant bit represents the lowest numbered ONU ID, and the
+         least significant bit represents the highest numbered ONU ID. Thus,
+         each ONU of a PON is represented by a single bit within the value
+         of this object. If the bit has a value of '1', then the ONU is
+         registered and included in this list; if the bit has a value of
+         '0', then the ONU is disregistered and not included."
+		SYNTAX 			OCTET STRING
+
+	ChassisSlotBoardType ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"The value indicates the type of this board:
+		              null(1)     - NULL,
+		              unknown(2)  - Unknown,
+		              sw(3)       - SW (OLT), master control and switch board.
+		              epon(4)     - EPON (OLT), slave epon board.
+                      gpon(5)     - GPON (OLT), slave gpon board.
+		              get(6)      - GET (OLT, 4GE-TX), using category 5 UTP interface.
+                      geo(7)      - GEO (OLT, 4GE-XX), using X fiber over PMT interface.
+		              tdm(8)      - TDM (OLT), slave tdm board.
+		              stm1(9)     - STM1 (OLT), slave stm1 board.
+		              pwu48(10)   - PWR48, power board with input of -48V(DC).
+		              pwu220(11)  - PWR220, power board with input of 220V(AC).
+		              smb(12)     - SMB (ONU), the simple mainboard of box device.
+		              gem(13)     - GEM (OLT), slave board.
+		              sig(14)     - SIG (OLT), slave board.
+		              onuEponB(15) - EPON-B (ONU).
+					  onu6FeC(16)  - 6FE_C (ONU), RJ45 connector.
+					  onu8FeD(17)  - 8FE_D (ONU), SCSI68 connector.
+					  onu16FeD(18) - 16FE_D (ONU), SCSI68 connector.
+					  onu8PotsA(19)- 8POTS-A (ONU), RJ11 connector.
+					  onu8PotsB(20)- 8POTS-B (ONU), RJ21 connector.
+					  onu8FxsA(21) - 8FXS-A (ONU), RJ11 connector.
+					  onu8FxsB(22) - 8FXS-B (ONU), RJ21 connector.
+					  oltMain(23) - the master board of box-device OLT.
+					  olt2Epon(24) - the EPON board of box-device OLT.
+					  E1 ( 25 )   -  
+					  oltE1 ( 26 ) , 
+					  onuE1A ( 27 ) , 
+					  onuE1B ( 28 ) , 
+					  sw_6900 ( 29 )   - SW (OLT), master control and switch board of GFA6900. 
+					  olt4epon ( 30 )  - EPON (OLT) , PON board with 4 PON ports.
+					  olt8epon ( 31 )  - EPON (OLT) , PON board with 8 PON ports. 
+					  olt12epon ( 32 ) - EPON (OLT) , PON board with 12 PON ports and 4 GE ports. 
+				      gem4ge ( 33 )    - GEM (OLT) , GEM board with 4 GE ports.  
+					  gem10ge ( 34 )   - GEM (OLT) , GEM board with 1 10GE port and 4 GE ports. 
+					  fan_6900 ( 35 )  - FAN (OLT) , FAN board of GFA6900. 
+					  pwu_48 ( 36 )    - PWU (OLT) , 48V Power board of GFA6900 and GFA6900M.  
+					  pwu_220 ( 37 )   - PWU (OLT) , 220V Power board of GFA6900.
+					  olt4epon4ge(38) - EPON (OLT) , EPON board with 4 PON ports and 4 GE ports
+					  pwu_220_6900m(39)  - PWU (OLT) , 220V Power board of GFA6900M.
+					  fan_6900s(40)      - FAN (OLT) , FAN board of GFA6900S. 
+					  pwu_48_6900s(41)   - PWU (OLT) , 48V Power board of GFA6900S.  
+					  pwu_220_6900s(42)  - PWU (OLT) , 220V Power board of GFA6900S. "
+					  
+		SYNTAX 			INTEGER  { null ( 1 ) , 
+		                           unknown ( 2 ) , 
+								   sw ( 3 ) , 
+								   epon ( 4 ) , 
+								   gpon ( 5 ) , 
+								   get ( 6 ) , 
+								   geo ( 7 ) , 
+								   tdm ( 8 ) , 
+								   stm1 ( 9 ) , 
+								   pwu48 ( 10 ) , 
+								   pwu220 ( 11 ) , 
+								   smb ( 12 ) , 
+								   gem ( 13 ) , 
+								   sig ( 14 ) , 
+								   onuEponB ( 15 ) , 
+								   onu6FeC ( 16 ) , 
+								   onu8FeD ( 17 ) , 
+								   onu16FeD ( 18 ) , 
+								   onu8PotsA ( 19 ) , 
+								   onu8PotsB ( 20 ) , 
+								   onu8FxsA ( 21 ) , 
+								   onu8FxsB ( 22 ) , 
+								   oltMain ( 23 ) , 
+								   olt2Epon ( 24 ) , 
+								   e1 ( 25 ) , 
+								   oltE1 ( 26 ) , 
+								   onuE1A ( 27 ) , 
+								   onuE1B ( 28 ) , 
+								   sw_6900 ( 29 ) , 
+								   olt4epon ( 30 ) , 
+								   olt8epon ( 31 ) , 
+								   olt12epon ( 32 ) , 
+								   gem4ge ( 33 ) , 
+								   gem10ge ( 34 ) , 
+								   fan_6900 ( 35 ) , 
+								   pwu_48 ( 36 ) , 
+								   pwu_220 ( 37 ) ,
+									olt4epon4ge(38) ,
+									pwu_220_6900m(39) ,
+									fan_6900s(40) ,
+									pwu_48_6900s(41) ,
+									pwu_220_6900s(42)} 
+
+	gwEponMibObjects	OBJECT IDENTIFIER
+		::=  {  gwEponMib  1  }
+
+	gwEponCfgGroup	OBJECT IDENTIFIER
+		::=  {  gwEponMibObjects  1  }
+
+	gwEponDevice	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  1  }
+
+	gwEponBoard	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  2  }
+
+	gwEponPon	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  3  }
+
+	gwEponPonOnuAuth	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  4  }
+
+	gwEponLlid	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  5  }
+
+	gwDevTrapGroup	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  6  }
+
+	gwAlarmLevelGroup	OBJECT IDENTIFIER
+		::=  {  gwEponCfgGroup  7  }
+
+       gwConsoleCfgGroup OBJECT IDENTIFIER
+	       ::= { gwEponCfgGroup 8 }
+
+
+	gwEponDevTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  GwEponDevEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of device informations"
+		::=  { gwEponDevice  1 }
+
+	gwEponDevEntry	OBJECT-TYPE
+		SYNTAX		GwEponDevEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing properties and some descriptions"
+		INDEX		{  deviceIndex  }
+		::=  { gwEponDevTable 1 }
+
+	GwEponDevEntry  ::=  SEQUENCE {
+		deviceIndex  Integer32,
+		deviceType  EponDeviceType,
+		deviceName  DisplayString,
+		deviceDescription  DisplayString,
+		deviceLocation  DisplayString,
+		deviceVendor  DisplayString,
+		deviceFirmWareVersion  DisplayString,
+		deviceSoftWareVersion  DisplayString,
+		deviceHardWareVersion  DisplayString,
+		deviceOperStatus  INTEGER,
+		deviceAlarmStatus  INTEGER,
+		deviceMacAddress  MacAddress,
+		deviceLastChange  TimeTicks,
+		deviceReset  INTEGER,
+		deviceEntLogicalIndex  Integer32,
+		deviceEntLogicalCommunity  DisplayString,
+		deviceOnuTestDistance  Integer32,
+		deviceUpTime  TimeTicks,
+		deviceStpEnable  INTEGER,
+		deviceChipsetVendor  DisplayString,
+		deviceChipsetMode  Integer32,
+		deviceChipsetRevision  DisplayString,
+		deviceChipsetDate  DisplayString,
+		deviceCapPortDesc  DisplayString,
+		deviceCapEthPortNum  Integer32,
+		deviceCapIadPotsPortNum  Integer32,
+		deviceCapE1PortNum  Integer32,
+		deviceCapUQueueTotal  Integer32,
+		deviceCapUQueuePort  Integer32,
+		deviceCapDQueueTotal  Integer32,
+		deviceCapDQueuePort  Integer32,
+		deviceCapBattery  INTEGER,
+		deviceMulticastSwitch  INTEGER,
+		deviceSystemTime  DateAndTime,
+		deviceRestartupTime  DateAndTime,
+		deviceTrafficServiceStatus  INTEGER,
+		deviceAlarmMask  BITS,
+		deviceModel  DisplayString,
+		deviceMulticastFastLeaveAbility  BITS,
+		deviceMulticastFastLeaveOperState  INTEGER,
+		deviceMulticastFastLeaveAdminState  INTEGER,
+		onuMacTableAlarmThreshold  Integer32,
+		onuMacNumbers  Integer32
+		}
+
+
+	deviceIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Index of device"
+		::=  {  gwEponDevEntry  1  }
+
+
+	deviceType	OBJECT-TYPE	
+		SYNTAX			EponDeviceType
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the type of this device"
+		::=  {  gwEponDevEntry  2  }
+
+
+	deviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"A string indicates or configure device name"
+		::=  {  gwEponDevEntry  3  }
+
+
+	deviceDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Description  for this device"
+		::=  {  gwEponDevEntry  4  }
+
+
+	deviceLocation	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"A string indicates and configure the device location"
+		::=  {  gwEponDevEntry  5  }
+
+
+	deviceVendor	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"A string indicates the vendor"
+		::=  {  gwEponDevEntry  6  }
+
+
+	deviceFirmWareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the version of firmware"
+		::=  {  gwEponDevEntry  7  }
+
+
+	deviceSoftWareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the version of software"
+		::=  {  gwEponDevEntry  8  }
+
+
+	deviceHardWareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the version of PCB"
+		::=  {  gwEponDevEntry  9  }
+
+
+	deviceOperStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) , unknown ( 3 ) , dormant ( 4 ) , powerDown ( 5 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current operational state of the device, 'down(2)' indicates
+						 that the ONU is off-line. 'dormant(4)' indicates the device is
+						 waiting for external actions (such as no bandwidth for any service),
+						 'powerDown(5)' indicates the device is power down or dying gasp."
+		DEFVAL			{ down }
+		::=  {  gwEponDevEntry  10  }
+
+
+	deviceAlarmStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { vital ( 1 ) , major ( 2 ) , minor ( 3 ) , warning ( 4 ) , clear ( 5 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates alarm status for this device, it means unique alarm occur that unique bit is set '1', on the other hand,  unique bit is set 0 while this alarm is cleared."
+		::=  {  gwEponDevEntry  11  }
+
+
+	deviceMacAddress	OBJECT-TYPE	
+		SYNTAX			MacAddress  ( SIZE ( 6  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value indicates and confgure device MAC address"
+		::=  {  gwEponDevEntry  12  }
+
+
+	deviceLastChange	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the last time for this device change"
+		::=  {  gwEponDevEntry  15  }
+
+
+	deviceReset	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noop ( 1 ) , reset ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Description"
+		DEFVAL			{ noop }
+		::=  {  gwEponDevEntry  16  }
+
+
+	deviceEntLogicalIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of this object uniquely identifies the logical
+            entity. The value should be a small positive integer; index
+            values for different logical entities are are not
+            necessarily contiguous."
+		::=  {  gwEponDevEntry  17  }
+
+
+	deviceEntLogicalCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"An SNMPv1 or SNMPv2C community-string which can be used to
+            access detailed management information for this logical
+            entity.  The agent should allow read access with this
+            community string (to an appropriate subset of all managed
+            objects) and may also return a community string based on the
+            privileges of the request used to read this object.  Note
+            that an agent may return a community string with read-only
+            privileges, even if this object is accessed with a read-
+            write community string. However, the agent must take care
+            not to return a community string which allows more
+            privileges than the community string used to access this
+            object.
+
+            A compliant SNMP agent may wish to conserve naming scopes by
+            representing multiple logical entities in a single 'default'
+            naming scope.  This is possible when the logical entities
+            represented by the same value of entLogicalCommunity have no
+            object instances in common.  For example, 'bridge1' and
+            'repeater1' may be part of the main naming scope, but at
+            least one additional community string is needed to represent
+            'bridge2' and 'repeater2'.
+
+            Logical entities 'bridge1' and 'repeater1' would be
+            represented by sysOREntries associated with the 'default'
+            naming scope.
+
+            For agents not accessible via SNMPv1 or SNMPv2C, the value
+            of this object is the empty string.  This object may also
+            contain an empty string if a community string has not yet
+            been assigned by the agent, or no community string with
+            suitable access rights can be returned for a particular SNMP
+            request.
+
+            Note that this object is deprecated. Agents which implement
+            SNMPv3 access should use the entLogicalContextEngineID and
+            entLogicalContextName objects to identify the context
+            associated with each logical entity.  SNMPv3 agents may
+            return a zero-length string for this object, or may continue
+            to return a community string (e.g., tri-lingual agent
+            support)."
+		::=  {  gwEponDevEntry  18  }
+
+
+	deviceOnuTestDistance	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the distance between OLT and unique ONU, unit:meter"
+		::=  {  gwEponDevEntry  19  }
+
+
+	deviceUpTime	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of this object uniquely identifies up time about this device."
+		::=  {  gwEponDevEntry  20  }
+
+
+	deviceStpEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"OLT or ONU spanning tree contral, enable(1)-
+				enable the spanning tree protocol, disable(2)-
+				disable the spanning tree protocol."
+		::=  {  gwEponDevEntry  21  }
+
+
+	deviceChipsetVendor	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON chipset vendor ID"
+		::=  {  gwEponDevEntry  22  }
+
+
+	deviceChipsetMode	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON chipset type"
+		::=  {  gwEponDevEntry  23  }
+
+
+	deviceChipsetRevision	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON chipset revision"
+		::=  {  gwEponDevEntry  24  }
+
+
+	deviceChipsetDate	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON chipset design date"
+		::=  {  gwEponDevEntry  25  }
+
+
+	deviceCapPortDesc	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Port capabilities description, include GE/FE/E1/POTS etc."
+		::=  {  gwEponDevEntry  26  }
+
+
+	deviceCapEthPortNum	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of ethernet port supported"
+		::=  {  gwEponDevEntry  27  }
+
+
+	deviceCapIadPotsPortNum	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of POTS port of IAD supported"
+		::=  {  gwEponDevEntry  28  }
+
+
+	deviceCapE1PortNum	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of E1 port supported"
+		::=  {  gwEponDevEntry  29  }
+
+
+	deviceCapUQueueTotal	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of upstream queues"
+		::=  {  gwEponDevEntry  30  }
+
+
+	deviceCapUQueuePort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Maximum queues per port upstream"
+		::=  {  gwEponDevEntry  31  }
+
+
+	deviceCapDQueueTotal	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of downstream queues"
+		::=  {  gwEponDevEntry  32  }
+
+
+	deviceCapDQueuePort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Maximum queues per port downstream"
+		::=  {  gwEponDevEntry  33  }
+
+
+	deviceCapBattery	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Battery Backup"
+		::=  {  gwEponDevEntry  34  }
+
+
+	deviceMulticastSwitch	OBJECT-TYPE	
+		SYNTAX			INTEGER  { snooping ( 1 ) , ctc ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ONU multicast switch"
+		::=  {  gwEponDevEntry  35  }
+
+
+	deviceSystemTime	OBJECT-TYPE	
+		SYNTAX			DateAndTime
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Current system clock-time.
+             OCTET-STRING consisting of eleven octets whose contents
+             are defined by RFC2579."
+		::=  {  gwEponDevEntry  36  }
+
+
+	deviceRestartupTime	OBJECT-TYPE	
+		SYNTAX			DateAndTime
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The time of device(OLT or ONU) restartup-time.
+             OCTET-STRING consisting of eleven octets whose contents
+             are defined by RFC2579."
+		::=  {  gwEponDevEntry  37  }
+
+
+	deviceTrafficServiceStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ONU traffic service state. 'enable(1)' indicates the traffic is
+						 in-service. 'disable(2)' indicates the traffic is out of service,
+						 but is still registered."
+		DEFVAL			{ enable }
+		::=  {  gwEponDevEntry  38  }
+
+
+	deviceAlarmMask	OBJECT-TYPE	
+		SYNTAX			BITS  { power ( 0 ) , fan ( 1 ) , cpu ( 2 ) , temperature ( 3 ) , register ( 4 ) , present ( 5 ) , ethlink ( 6 ) , ethfer ( 7 ) , ethflr ( 8 ) , ethti ( 9 ) , ethloop ( 10 ) , ponber ( 11 ) , ponfer ( 12 ) , ponabnormal ( 13 ) , ponaps ( 14 ) , ponlink ( 15 ) , onuLaserAlwayOn ( 16 ) , onuOpticalPowerLow ( 17 ) , onuOpticalPowerHigh ( 18 ) , ponLOS ( 19 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"."
+		::=  {  gwEponDevEntry  39  }
+
+
+	deviceModel	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 32  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"."
+		::=  {  gwEponDevEntry  40  }
+
+
+	deviceMulticastFastLeaveAbility	OBJECT-TYPE	
+		SYNTAX			BITS  { ctc ( 0 ) , snooping ( 1 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Fast Leave Mode: If the bit value of 'ctc(0)' is 0, the mode is CTC 
+					 and non-fast-leave function, if the bit value of 'ctc(0)' is 1, the
+					 mode is CTC and fast-leave function; If the bit value of 'snooping(1)' 
+					 is 0, the mode is snooping and non-fast-leave function, If the bit value
+					 of 'snooping(1)' is 1, the mode is snooping and fast-leave function."
+		::=  {  gwEponDevEntry  41  }
+
+
+	deviceMulticastFastLeaveOperState	OBJECT-TYPE	
+		SYNTAX			INTEGER  { active ( 1 ) , deactive ( 2 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Fast Leave Function is active or deactive"
+		::=  {  gwEponDevEntry  42  }
+
+
+	deviceMulticastFastLeaveAdminState	OBJECT-TYPE	
+		SYNTAX			INTEGER  { active ( 1 ) , deactive ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"active or deactivate Fast Leave Function"
+		::=  {  gwEponDevEntry  43  }
+
+
+	onuMacTableAlarmThreshold	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"onu MAC table alarm threshold"
+		::=  {  gwEponDevEntry  44  }
+
+
+	onuMacNumbers	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"show onu actual mac number"
+		::=  {  gwEponDevEntry  45  }
+
+	gwEponBoardTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  GwEponBoardEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"table of board informations"
+		::=  { gwEponBoard  1 }
+
+	gwEponBoardEntry	OBJECT-TYPE
+		SYNTAX		GwEponBoardEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containig status and configrue information about boards"
+		INDEX		{  deviceIndex, boardIndex  }
+		::=  { gwEponBoardTable 1 }
+
+	GwEponBoardEntry  ::=  SEQUENCE {
+		boardIndex  Integer32,
+		curBoardType  ChassisSlotBoardType,
+		boardDescription  DisplayString,
+		boardActMode  INTEGER,
+		boardOperStatus  INTEGER,
+		boardAlarmLevel  INTEGER,
+		boardLastChangeTime  TimeTicks,
+		boardSupprotType  ChassisSlotSupportType,
+		boardReset  INTEGER,
+		boardTemperature  Integer32,
+		boardEntLogicalIndex  Integer32,
+		boardEntLogicalCommunity  DisplayString,
+		boardSoftwareVersion  DisplayString,
+		boardFirmwareVersion  DisplayString,
+		boardBootVersion  DisplayString,
+		boardHardwareVersion  DisplayString,
+		boardManufactureDate  DisplayString,
+		boardSerialNo  DisplayString,
+		boardCpuUsage  Integer32,
+		boardMemoryUsage  Integer32,
+		boardHasSnmpAgent  INTEGER,
+		boardSnmpAgentIpAddr  IpAddress,
+		boardSnmpAgentReadCommunity  DisplayString,
+		boardSnmpAgentWriteCommunity  DisplayString,
+		boardTemperatureHighThresholds  Integer32,
+		boardCpuUsageThresholds  Integer32,
+		boardMemoryUsageThresholds  Integer32,
+		boardMemorySize  Integer32,
+		boardTemperatureLowThresholds  Integer32,
+		boardAdminStatus  INTEGER
+		}
+
+
+	boardIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"index of boards in unique device which is specified by 'deviceIndex'"
+		::=  {  gwEponBoardEntry  1  }
+
+
+	curBoardType	OBJECT-TYPE	
+		SYNTAX			ChassisSlotBoardType
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the type of this board."
+		::=  {  gwEponBoardEntry  2  }
+
+
+	boardDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value indicates and confgure board description"
+		::=  {  gwEponBoardEntry  3  }
+
+
+	boardActMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { master-active ( 1 ) , master-redundancy ( 2 ) , slave ( 3 ) , unknown ( 4 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates acting mode of unique board"
+		::=  {  gwEponBoardEntry  4  }
+
+
+	boardOperStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { null ( 1 ) , initing ( 2 ) , upgrating ( 3 ) , running ( 4 ) , exception ( 5 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The Value indicates board operating status"
+		::=  {  gwEponBoardEntry  5  }
+
+
+	boardAlarmLevel	OBJECT-TYPE	
+		SYNTAX			INTEGER  { vital ( 1 ) , major ( 2 ) , minor ( 3 ) , warning ( 4 ) , noAlarm ( 5 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates alarm level for unique board"
+		::=  {  gwEponBoardEntry  6  }
+
+
+	boardLastChangeTime	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the time of last change about this board"
+		::=  {  gwEponBoardEntry  7  }
+
+
+	boardSupprotType	OBJECT-TYPE	
+		SYNTAX			ChassisSlotSupportType
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the type of board this slot surpports."
+		::=  {  gwEponBoardEntry  8  }
+
+
+	boardReset	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noop ( 1 ) , reset ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value of this object determines whether reset this board.
+					 	 'noop(1)' - only read value. 'reset(2)' - only write value,
+					 	 if the active master board is resetted, and another master
+					 	 board is running, then, the two boards will be switchover."
+		DEFVAL			{ noop }
+		::=  {  gwEponBoardEntry  9  }
+
+
+	boardTemperature	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value indicates the temperature of this board"
+		::=  {  gwEponBoardEntry  10  }
+
+
+	boardEntLogicalIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of this object uniquely identifies the logical
+            entity. The value should be a small positive integer; index
+            values for different logical entities are are not
+            necessarily contiguous."
+		::=  {  gwEponBoardEntry  11  }
+
+
+	boardEntLogicalCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"An SNMPv1 or SNMPv2C community-string which can be used to
+            access detailed management information for this logical
+            entity.  The agent should allow read access with this
+            community string (to an appropriate subset of all managed
+            objects) and may also return a community string based on the
+            privileges of the request used to read this object.  Note
+            that an agent may return a community string with read-only
+            privileges, even if this object is accessed with a read-
+            write community string. However, the agent must take care
+            not to return a community string which allows more
+            privileges than the community string used to access this
+            object.
+
+            A compliant SNMP agent may wish to conserve naming scopes by
+            representing multiple logical entities in a single 'default'
+            naming scope.  This is possible when the logical entities
+            represented by the same value of entLogicalCommunity have no
+            object instances in common.  For example, 'bridge1' and
+            'repeater1' may be part of the main naming scope, but at
+            least one additional community string is needed to represent
+            'bridge2' and 'repeater2'.
+
+            Logical entities 'bridge1' and 'repeater1' would be
+            represented by sysOREntries associated with the 'default'
+            naming scope.
+
+            For agents not accessible via SNMPv1 or SNMPv2C, the value
+            of this object is the empty string.  This object may also
+            contain an empty string if a community string has not yet
+            been assigned by the agent, or no community string with
+            suitable access rights can be returned for a particular SNMP
+            request.
+
+            Note that this object is deprecated. Agents which implement
+            SNMPv3 access should use the entLogicalContextEngineID and
+            entLogicalContextName objects to identify the context
+            associated with each logical entity.  SNMPv3 agents may
+            return a zero-length string for this object, or may continue
+            to return a community string (e.g., tri-lingual agent
+            support)."
+		::=  {  gwEponBoardEntry  12  }
+
+
+	boardSoftwareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the value indicates the version of software"
+		::=  {  gwEponBoardEntry  13  }
+
+
+	boardFirmwareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the value indicates the version of firmware"
+		::=  {  gwEponBoardEntry  14  }
+
+
+	boardBootVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Boot Version"
+		::=  {  gwEponBoardEntry  15  }
+
+
+	boardHardwareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Hardware Version"
+		::=  {  gwEponBoardEntry  16  }
+
+
+	boardManufactureDate	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Manufacture Date"
+		::=  {  gwEponBoardEntry  17  }
+
+
+	boardSerialNo	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Manufacture Serial No"
+		::=  {  gwEponBoardEntry  18  }
+
+
+	boardCpuUsage	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The percentage of CPU usage"
+		::=  {  gwEponBoardEntry  19  }
+
+
+	boardMemoryUsage	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The percentage of used memory"
+		::=  {  gwEponBoardEntry  20  }
+
+
+	boardHasSnmpAgent	OBJECT-TYPE	
+		SYNTAX			INTEGER  { notpresent ( 0 ) , snmpv1 ( 1 ) , snmpv2c ( 2 ) , snmpv3 ( 3 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the object indicates whether there is a SNMP agent running on this board."
+		::=  {  gwEponBoardEntry  21  }
+
+
+	boardSnmpAgentIpAddr	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"this object indicates and configure IP address of SNMP agent running on this board. now, only GT861's IAD boards surpport this function."
+		::=  {  gwEponBoardEntry  22  }
+
+
+	boardSnmpAgentReadCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 16  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the object indicates and configure the read-only community of SNMP agent running on the board. now, only GT861's IAD boards surpport this function."
+		::=  {  gwEponBoardEntry  23  }
+
+
+	boardSnmpAgentWriteCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 16  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the object indicates and configure the read-write community of SNMP agent running on the board. now, only GT861's IAD boards surpport this function."
+		::=  {  gwEponBoardEntry  24  }
+
+
+	boardTemperatureHighThresholds	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponBoardEntry  25  }
+
+
+	boardCpuUsageThresholds	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponBoardEntry  26  }
+
+
+	boardMemoryUsageThresholds	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The percentage of used memory"
+		::=  {  gwEponBoardEntry  27  }
+
+
+	boardMemorySize	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponBoardEntry  28  }
+
+
+	boardTemperatureLowThresholds	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponBoardEntry  29  }
+
+	boardAdminStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up(1), down(2) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The desired state of the board."
+		::=  {  gwEponBoardEntry  30  }
+
+
+
+	ponPortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PonPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"table of pon port informations"
+		::=  { gwEponPon  1 }
+
+	ponPortEntry	OBJECT-TYPE
+		SYNTAX		PonPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing status and configure information about pon port"
+		INDEX		{  deviceIndex, boardIndex, ponPortIndex  }
+		::=  { ponPortTable 1 }
+
+	PonPortEntry  ::=  SEQUENCE {
+		ponPortIndex  Integer32,
+		ponPortIfIndex  Integer32,
+		ponPortDot1dBasePort  Integer32,
+		ponPortPartnerDev  Integer32,
+		ponPortPartnerBrd  Integer32,
+		ponPortPartnerPort  Integer32,
+		ponPortProtectionDev  Integer32,
+		ponPortProtectionBrd  Integer32,
+		ponPortProtectionPort  Integer32,
+		ponPortType  INTEGER,
+		ponPortMaxOnu  Integer32,
+		ponPortCurrOnu  Integer32,
+		ponPortOperStatus  INTEGER,
+		ponPortAlarmStatus  BITS,
+		ponPortAlarmMask  BITS,
+		ponPortMaxBW  Integer32,
+		ponPortActBW  Integer32,
+		ponPortRemainBW  Integer32,
+		ponPortApsCtrl  INTEGER,
+		ponPortApsStatus  INTEGER,
+		ponPortEncryptSet  INTEGER,
+		ponPortOnuLpbCtrl  INTEGER,
+		ponPortOnuLpbSource  INTEGER,
+		ponPortOnuLpbTime  Integer32,
+		ponPortOnuLpbTxFrms  Counter32,
+		ponPortOnuLpbRxFrms  Counter32,
+		ponEntLogicalIndex  Integer32,
+		ponEntLogicalCommunity  DisplayString,
+		ponPortLinkedOnuCounter  Integer32,
+		ponPortAdminStatus  INTEGER,
+		ponPortReset  INTEGER,
+		ponPortWindowRange  INTEGER,
+		ponPortDownlinkPolicingEbl  INTEGER,
+		ponPortAllOnuAlmLevel  OnuAlarmLevelList
+		}
+
+
+	ponPortIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"index of pon port"
+		::=  {  ponPortEntry  1  }
+
+
+	ponPortIfIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value equipped to the index of this pon port in the IF-MIB"
+		::=  {  ponPortEntry  2  }
+
+
+	ponPortDot1dBasePort	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 65536  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"port id in the bridge, equipped to the value in the bridge 'dot1dBasePort'"
+		::=  {  ponPortEntry  3  }
+
+
+	ponPortPartnerDev	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"index of the device which contains parter pon port"
+		::=  {  ponPortEntry  4  }
+
+
+	ponPortPartnerBrd	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"index of board which contains parter pon port "
+		::=  {  ponPortEntry  5  }
+
+
+	ponPortPartnerPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"partnet physical pon port index"
+		::=  {  ponPortEntry  6  }
+
+
+	ponPortProtectionDev	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"PON Automatic Protection Switching, index of device"
+		::=  {  ponPortEntry  7  }
+
+
+	ponPortProtectionBrd	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"PON Automatic Protection Switching, index of board"
+		::=  {  ponPortEntry  8  }
+
+
+	ponPortProtectionPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"PON Automatic Protection Switching, index of pon port"
+		::=  {  ponPortEntry  9  }
+
+
+	ponPortType	OBJECT-TYPE	
+		SYNTAX			INTEGER  { eponMauType1000BasePXOLT ( 1 ) , eponMauType1000BasePXONU ( 2 ) , eponMauType1000BasePX10DOLT ( 3 ) , eponMauType1000BasePX10DONU ( 4 ) , eponMauType1000BasePX10UOLT ( 5 ) , eponMauType1000BasePX10UONU ( 6 ) , eponMauType1000BasePX20DOLT ( 7 ) , eponMauType1000BasePX20DONU ( 8 ) , eponMauType1000BasePX20UOLT ( 9 ) , eponMauType1000BasePX20UONU ( 10 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"type of pon port"
+		::=  {  ponPortEntry  10  }
+
+
+	ponPortMaxOnu	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The max number of supported ONUs in this PON port."
+		DEFVAL			{ 64 }
+		::=  {  ponPortEntry  11  }
+
+
+	ponPortCurrOnu	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 64  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current number of registered ONUs in this PON port."
+		::=  {  ponPortEntry  12  }
+
+
+	ponPortOperStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) , unknown ( 3 ) , loop ( 4 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"operation status of unique pon port"
+		DEFVAL			{ down }
+		::=  {  ponPortEntry  13  }
+
+
+	ponPortAlarmStatus	OBJECT-TYPE	
+		SYNTAX			BITS  { ber ( 0 ) , fer ( 1 ) , abnormal ( 2 ) , aps ( 3 ) , link ( 4 ) , onuLaserAlwaysOn ( 5 ) , onuOpticalPowerLow ( 6 ) , onuOpticalPowerHigh ( 7 ) , ponLOS ( 8 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON port alarm status, it indicates an alarm with bit=1,
+             if all bit is 0, indicates no alarm."
+		::=  {  ponPortEntry  14  }
+
+
+	ponPortAlarmMask	OBJECT-TYPE	
+		SYNTAX			BITS  { ber ( 0 ) , fer ( 1 ) , abnormal ( 2 ) , aps ( 3 ) , link ( 4 ) , onuLaserAlwaysOn ( 5 ) , onuOpticalPowerLow ( 6 ) , onuOpticalPowerHigh ( 7 ) , ponLOS ( 8 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"PON Port Alarm mask, the bit=1 indicates mask."
+		::=  {  ponPortEntry  15  }
+
+
+	ponPortMaxBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 1000000  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The max bandwidth supported, unit:KB."
+		::=  {  ponPortEntry  16  }
+
+
+	ponPortActBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the actual bandwidth, unit:KB."
+		::=  {  ponPortEntry  17  }
+
+
+	ponPortRemainBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 1000000  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current available bandwidth, unit:KB."
+		DEFVAL			{ 1024 }
+		::=  {  ponPortEntry  18  }
+
+
+	ponPortApsCtrl	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disable ( 1 ) , auto ( 2 ) , force ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"PON automatic-protection-switching control."
+		DEFVAL			{ auto }
+		::=  {  ponPortEntry  19  }
+
+
+	ponPortApsStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { unknown ( 1 ) , active ( 2 ) , passive ( 3 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON automatic-protection-switching status."
+		DEFVAL			{ active }
+		::=  {  ponPortEntry  20  }
+
+
+	ponPortEncryptSet	OBJECT-TYPE	
+		SYNTAX			INTEGER  { pure ( 1 ) , downstreamonly ( 2 ) , bidirectional ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Encryption set according to every ONU, this value is ignored when the pon port belongs to OLT."
+		DEFVAL			{ pure }
+		::=  {  ponPortEntry  21  }
+
+
+	ponPortOnuLpbCtrl	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noop ( 1 ) , lpbStart ( 2 ) , lpbStop ( 3 ) , inProcess ( 4 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ONU Loopback Control, 'noop(1)' is no operation, i.e. the
+             current status is idle; 'lpbStart(2)' is start loopback,
+             only when the object value is 'noop', it can be configurated
+             'lpbStart(2)', otherwise forbidden, and if success, its
+             value become 'inProcess(4)'; 'lpbStop(3)' is stop loopback,
+             only when the object value is 'inProcess(4)', it can be
+             configurated 'lpbStop(3)', and if success, its value become
+             'noop(1)'; 'inProcess(4)' is loopbacking status now."
+		DEFVAL			{ noop }
+		::=  {  ponPortEntry  22  }
+
+
+	ponPortOnuLpbSource	OBJECT-TYPE	
+		SYNTAX			INTEGER  { internal ( 1 ) , external ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Loopback Data Source, 'internal' indicates internal data source, to
+
+             use testing the link up or down, like ping function; 'external'
+
+             indicates external data source, to use testing the bandwidth of the
+
+             ONU ethernet."
+		DEFVAL			{ internal }
+		::=  {  ponPortEntry  23  }
+
+
+	ponPortOnuLpbTime	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Loopback Timeout, if the object value is 0, indicate the
+             loopback is processing at all time, if the value is none 0,
+             indicate the loopback time from begin to end, when the time
+             is end it will be auto-stopped. unit:second."
+		DEFVAL			{ 0 }
+		::=  {  ponPortEntry  24  }
+
+
+	ponPortOnuLpbTxFrms	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of frames transmit by this ONU Logical Link."
+		::=  {  ponPortEntry  25  }
+
+
+	ponPortOnuLpbRxFrms	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of frames transmit by this ONU Logical Link."
+		::=  {  ponPortEntry  26  }
+
+
+	ponEntLogicalIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of this object uniquely identifies the logical
+            entity. The value should be a small positive integer; index
+            values for different logical entities are are not
+            necessarily contiguous."
+		::=  {  ponPortEntry  27  }
+
+
+	ponEntLogicalCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 1 .. 20  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"An SNMPv1 or SNMPv2C community-string which can be used to
+            access detailed management information for this logical
+            entity.  The agent should allow read access with this
+            community string (to an appropriate subset of all managed
+            objects) and may also return a community string based on the
+            privileges of the request used to read this object.  Note
+            that an agent may return a community string with read-only
+            privileges, even if this object is accessed with a read-
+            write community string. However, the agent must take care
+            not to return a community string which allows more
+            privileges than the community string used to access this
+            object.
+            A compliant SNMP agent may wish to conserve naming scopes by
+            representing multiple logical entities in a single 'default'
+            naming scope.  This is possible when the logical entities
+            represented by the same value of entLogicalCommunity have no
+            object instances in common.  For example, 'bridge1' and
+            'repeater1' may be part of the main naming scope, but at
+            least one additional community string is needed to represent
+            'bridge2' and 'repeater2'.
+
+            Logical entities 'bridge1' and 'repeater1' would be
+            represented by sysOREntries associated with the 'default'
+            naming scope.
+
+            For agents not accessible via SNMPv1 or SNMPv2C, the value
+            of this object is the empty string.  This object may also
+            contain an empty string if a community string has not yet
+            been assigned by the agent, or no community string with
+            suitable access rights can be returned for a particular SNMP
+            request.
+
+            Note that this object is deprecated. Agents which implement
+            SNMPv3 access should use the entLogicalContextEngineID and
+            entLogicalContextName objects to identify the context
+            associated with each logical entity.  SNMPv3 agents may
+            return a zero-length string for this object, or may continue
+            to return a community string (e.g., tri-lingual agent
+            support)."
+		::=  {  ponPortEntry  28  }
+
+
+	ponPortLinkedOnuCounter	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 64  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current number of linked ONUs in this PON port."
+		::=  {  ponPortEntry  29  }
+
+
+	ponPortAdminStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The desired state of the PON port."
+		::=  {  ponPortEntry  30  }
+
+
+	ponPortReset	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noop ( 1 ) , reset ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"PON interface reset."
+		::=  {  ponPortEntry  31  }
+
+
+	ponPortWindowRange	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disable ( 1 ) , wr20km ( 2 ) , wr40km ( 3 ) , wr60km ( 4 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The max window range of ONU register."
+		::=  {  ponPortEntry  32  }
+
+
+	ponPortDownlinkPolicingEbl	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Config onu downlink-policer enable"
+		::=  {  ponPortEntry  33  }
+
+
+	ponPortAllOnuAlmLevel	OBJECT-TYPE	
+		SYNTAX			OnuAlarmLevelList
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"All ONUs alarm-level list."
+		::=  {  ponPortEntry  34  }
+
+	ponOnuMapTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PonOnuMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"table of pon-ONU map"
+		::=  { gwEponPon  2 }
+
+	ponOnuMapEntry	OBJECT-TYPE
+		SYNTAX		PonOnuMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table"
+		INDEX		{  deviceIndex, boardIndex, ponPortIndex, mappingOnuIndex  }
+		::=  { ponOnuMapTable 1 }
+
+	PonOnuMapEntry  ::=  SEQUENCE {
+		mappingOnuIndex  Integer32,
+		onuDevIndex  Integer32,
+		onuName  DisplayString
+		}
+
+
+	mappingOnuIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 64  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"index of mapping onu"
+		::=  {  ponOnuMapEntry  1  }
+
+
+	onuDevIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device index of this ONU"
+		::=  {  ponOnuMapEntry  2  }
+
+
+	onuName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device name of this ONU"
+		::=  {  ponOnuMapEntry  3  }
+
+	ponPerfMonTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PonPerfMonEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of pon performence"
+		::=  { gwEponPon  3 }
+
+	ponPerfMonEntry	OBJECT-TYPE
+		SYNTAX		PonPerfMonEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing pon performence monitor information ."
+		INDEX		{  deviceIndex, boardIndex, ponPortIndex  }
+		::=  { ponPerfMonTable 1 }
+
+	PonPerfMonEntry  ::=  SEQUENCE {
+		ponPerfBER  Counter32,
+		ponPerfFER  Counter32,
+		ponPerfBerAlmEnable  INTEGER,
+		ponPerfFerAlmEnable  INTEGER,
+		ponPerfUpBandwidth  Counter32,
+		ponPerfDownBandwidth  Counter32
+		}
+
+
+	ponPerfBER	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"byte error rate of specified pon port upstream, UNIT: 10E-6"
+		::=  {  ponPerfMonEntry  1  }
+
+
+	ponPerfFER	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"frame error rate of specified pon port downstream, UNIT: 10E-6"
+		::=  {  ponPerfMonEntry  4  }
+
+
+	ponPerfBerAlmEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value indicates whether enable pon performence BER alarm"
+		DEFVAL			{ enable }
+		::=  {  ponPerfMonEntry  5  }
+
+
+	ponPerfFerAlmEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value indicates whether enable pon performence FER alarm"
+		DEFVAL			{ enable }
+		::=  {  ponPerfMonEntry  6  }
+
+
+	ponPerfUpBandwidth	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the value indicates upstream bandwidth on this port"
+		::=  {  ponPerfMonEntry  7  }
+
+
+	ponPerfDownBandwidth	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the value indicates downstream bandwidth on this port"
+		::=  {  ponPerfMonEntry  8  }
+
+	ponHisCtrlTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PonHisCtrlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of pon performence"
+		::=  { gwEponPon  4 }
+
+	ponHisCtrlEntry	OBJECT-TYPE
+		SYNTAX		PonHisCtrlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing pon performence monitor information ."
+		INDEX		{  deviceIndex, boardIndex, ponPortIndex  }
+		::=  { ponHisCtrlTable 1 }
+
+	PonHisCtrlEntry  ::=  SEQUENCE {
+		ponHis15MinuteEnable  INTEGER,
+		ponHis24HourEnable  INTEGER
+		}
+
+
+	ponHis15MinuteEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value indicates whether enable history statistic with interval 15 minutes"
+		DEFVAL			{ disable }
+		::=  {  ponHisCtrlEntry  1  }
+
+
+	ponHis24HourEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value indicates whether enable history statistic with interval 24 hours"
+		DEFVAL			{ disable }
+		::=  {  ponHisCtrlEntry  2  }
+
+	ponBERThreashold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 8  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Ber measurement threshold, the value defination: 0=1e-0=1, 1=1e-1=0.1,......"
+		::=  {  gwEponPon  5  }
+
+	ponFERThreashold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 10  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Fer measurement threshold, the value defination: 0=1.00e-0=1, 1=1.00e-1=0.1,......"
+		::=  {  gwEponPon  6  }
+
+	gwEponPonCtcExt	OBJECT IDENTIFIER
+		::=  {  gwEponPon  7  }
+
+	onuAuthEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disable ( 1 ) , auth_new_only ( 2 ) , auth_all ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			deprecated
+		DESCRIPTION		""
+		::=  {  gwEponPonOnuAuth  1  }
+
+	onuAuthTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  OnuAuthEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table of ONU authentication based MAC address."
+		::=  { gwEponPonOnuAuth  2 }
+
+	onuAuthEntry	OBJECT-TYPE
+		SYNTAX		OnuAuthEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table"
+		INDEX		{  eponBoardIndex, eponPonPortIndex, onuAuthIndex  }
+		::=  { onuAuthTable 1 }
+
+	OnuAuthEntry  ::=  SEQUENCE {
+		eponBoardIndex  Integer32,
+		eponPonPortIndex  Integer32,
+		onuAuthIndex  Integer32,
+		onuAuthMacAddress  MacAddress,
+		onuAuthRowStatus  RowStatus
+		}
+
+
+	eponBoardIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The epon board index"
+		::=  {  onuAuthEntry  1  }
+
+
+	eponPonPortIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON port index"
+		::=  {  onuAuthEntry  2  }
+
+
+	onuAuthIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"MAC address index"
+		::=  {  onuAuthEntry  3  }
+
+
+	onuAuthMacAddress	OBJECT-TYPE	
+		SYNTAX			MacAddress
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"MAC address"
+		::=  {  onuAuthEntry  4  }
+
+
+	onuAuthRowStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This object indicates the status of this entry."
+		::=  {  onuAuthEntry  5  }
+
+	onuToPonBindingEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponPonOnuAuth  3  }
+	
+	onuAuthModeTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  OnuAuthModeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table of ONU authentication Mode."
+		::=  { gwEponPonOnuAuth  4 }
+
+	onuAuthModeEntry	OBJECT-TYPE
+		SYNTAX		OnuAuthModeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table"
+		INDEX		{  onuAuthModeBrdIdx, onuAuthModePonIdx  }
+		::=  { onuAuthModeTable 1 }
+
+	OnuAuthModeEntry  ::=  SEQUENCE {
+		onuAuthModeBrdIdx  Integer32,
+		onuAuthModePonIdx  Integer32,
+		onuAuthMode  INTEGER,
+		onuAuthEnableForPon  INTEGER,      
+		onuAuthEntryReorganize INTEGER
+		}
+
+
+	onuAuthModeBrdIdx	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthModeEntry  1  }
+
+
+	onuAuthModePonIdx	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthModeEntry  2  }
+
+
+	onuAuthMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { macAddr(1), loid(2), hybrid(3), loidNoPwd(4), hybridNoPwd(5), disable(6) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"'macAddr(1)' : based ONU MAC address.
+						 'loid(2)' : based ONU logical ID.
+						 'hybrid(3)' : based both macAddr and loid.
+						 'loidNoPwd(4) : based loid, but not check password.
+						 'hybridNoPwd(5)' : based hybrid, but not check password."
+		::=  {  onuAuthModeEntry  3  }
+
+
+	onuAuthEnableForPon	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disable ( 1 ) , auth_new_only ( 2 ) , auth_all ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  onuAuthModeEntry  4  }       
+	
+	onuAuthEntryReorganize OBJECT-TYPE
+      SYNTAX INTEGER{ organize(1) }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION  "For PonPort"
+      ::= { onuAuthModeEntry  5 }          
+      
+    onuAuthEntryReorganizeForAll	OBJECT-TYPE	
+		SYNTAX			INTEGER  { organize(1)  } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponPonOnuAuth  9  }
+
+
+	onuAuthLoidTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  OnuAuthLoidEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table of ONU authentication based LOID(Logical ONU ID)."
+		::=  { gwEponPonOnuAuth  5 }
+
+	onuAuthLoidEntry	OBJECT-TYPE
+		SYNTAX		OnuAuthLoidEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table"
+		INDEX		{  onuAuthLoidBrdIdx, onuAuthLoidPonIdx, onuAuthLoidIdx  }
+		::=  { onuAuthLoidTable 1 }
+
+	OnuAuthLoidEntry  ::=  SEQUENCE {
+		onuAuthLoidBrdIdx  Integer32,
+		onuAuthLoidPonIdx  Integer32,
+		onuAuthLoidIdx  Integer32,
+		onuAuthLoid  DisplayString,
+		onuAuthLoidPassword  DisplayString,
+		onuAuthLoidDevIdx  Integer32,
+		onuAuthLoidRowStatus  RowStatus
+		}
+
+
+	onuAuthLoidBrdIdx	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthLoidEntry  1  }
+
+
+	onuAuthLoidPonIdx	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthLoidEntry  2  }
+
+
+	onuAuthLoidIdx	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 128  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthLoidEntry  3  }
+
+
+	onuAuthLoid	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 24  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthLoidEntry  4  }
+
+
+	onuAuthLoidPassword	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 12  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthLoidEntry  5  }
+
+
+	onuAuthLoidDevIdx	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  onuAuthLoidEntry  6  }
+
+
+	onuAuthLoidRowStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This object indicates the status of this entry."
+		::=  {  onuAuthLoidEntry  7  }
+
+	onuUnauthenticatedTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  OnuAuth1Entry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table of unauthenticated ONUs based MAC address."
+		::=  { gwEponPonOnuAuth  6 }
+
+	onuUnauthenticatedEntry	OBJECT-TYPE
+		SYNTAX		OnuAuth1Entry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table"
+		INDEX		{  eponUnauthenticatedBoardIndex, eponUnauthenticatedPonPortIndex, onuUnauthenticatedIndex  }
+		::=  { onuUnauthenticatedTable 1 }
+
+	OnuAuth1Entry  ::=  SEQUENCE {
+		eponUnauthenticatedBoardIndex  Integer32,
+		eponUnauthenticatedPonPortIndex  Integer32,
+		onuUnauthenticatedIndex  Integer32,
+		onuUnauthenticatedMacAddress  MacAddress
+		}
+
+
+	eponUnauthenticatedBoardIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The epon board index"
+		::=  {  onuUnauthenticatedEntry  1  }
+
+
+	eponUnauthenticatedPonPortIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"PON port index"
+		::=  {  onuUnauthenticatedEntry  2  }
+
+
+	onuUnauthenticatedIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"MAC address index"
+		::=  {  onuUnauthenticatedEntry  3  }
+
+
+	onuUnauthenticatedMacAddress	OBJECT-TYPE	
+		SYNTAX			MacAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"MAC address"
+		::=  {  onuUnauthenticatedEntry  4  }
+
+	ponLlidTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PonLlidEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of the pon llid information"
+		::=  { gwEponLlid  1 }
+
+	ponLlidEntry	OBJECT-TYPE
+		SYNTAX		PonLlidEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing status or configure information"
+		INDEX		{  deviceIndex, ponLlidIndex  }
+		::=  { ponLlidTable 1 }
+
+	PonLlidEntry  ::=  SEQUENCE {
+		ponLlidIndex  Integer32,
+		ponLlidType  INTEGER,
+		ponLlidOltBoard  Integer32,
+		ponLlidOltPort  Integer32,
+		ponLlidOltPortIfIndex  Integer32,
+		ponLlidOnuPortIfIndex  Integer32,
+		ponLlidOnuBoard  Integer32,
+		ponLlidOnuPort  Integer32,
+		ponLlidLLID  Integer32,
+		ponLlidIfIndex  Integer32,
+		ponLlidUpFixedBW  Integer32,
+		ponLlidDownFixedBW  Integer32,
+		ponLlidDesc  DisplayString,
+		ponLlidSurportMacNum  Integer32,
+		ponLlidOnuMacAddress  MacAddress,
+		ponLlidRowStatus  RowStatus,
+		ponLlidUpBWClass  Integer32,
+		ponLlidUpDelay  INTEGER,
+		ponLlidUpAssuredBW  Integer32,
+		ponLlidUpBesteffortBW  Integer32,
+		ponLlidDownBWClass  Integer32,
+		ponLlidDownDelay  INTEGER,
+		ponLlidDownAssuredBW  Integer32,
+		ponLlidDownBesteffortBW  Integer32,
+		ponLlidCtcFecAbility  INTEGER,
+		ponLlidCtcFecMode  INTEGER,
+		ponLlidCtcEncrypCtrl  INTEGER,
+		ponLlidCtcDbaQueSetNum  Integer32,
+		ponLlidCtcDbaQueSetCfgStatus  INTEGER
+		}
+
+
+	ponLlidIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The pon logic link index"
+		::=  {  ponLlidEntry  1  }
+
+
+	ponLlidType	OBJECT-TYPE	
+		SYNTAX			INTEGER  { unkown ( 0 ) , ethlink ( 1 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"type of pon logic link"
+		::=  {  ponLlidEntry  2  }
+
+
+	ponLlidOltBoard	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The value equals to entPhysicalIndex in ENTITY-MIB"
+		::=  {  ponLlidEntry  3  }
+
+
+	ponLlidOltPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"the pon port id "
+		::=  {  ponLlidEntry  4  }
+
+
+	ponLlidOltPortIfIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"ifIndex of the olt port "
+		::=  {  ponLlidEntry  5  }
+
+
+	ponLlidOnuPortIfIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"ifIndex of the onu port "
+		::=  {  ponLlidEntry  6  }
+
+
+	ponLlidOnuBoard	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The value indicates board id for this LLID"
+		::=  {  ponLlidEntry  7  }
+
+
+	ponLlidOnuPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The value indicates onu port for this LLID"
+		::=  {  ponLlidEntry  8  }
+
+
+	ponLlidLLID	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION		"the vlaue of LLID "
+		::=  {  ponLlidEntry  9  }
+
+
+	ponLlidIfIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value equals to  ''ifIndex'' in IF-MIB according this object'"
+		::=  {  ponLlidEntry  10  }
+
+
+	ponLlidUpFixedBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 1000000  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"upstream fixed bandwidth about this pon port, unit:KBps"
+		::=  {  ponLlidEntry  11  }
+
+
+	ponLlidDownFixedBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 1000000  ) 
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"upstream fixed bandwidth about this pon port, unit:KBps, not support"
+		::=  {  ponLlidEntry  12  }
+
+
+	ponLlidDesc	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"description of the LLID"
+		::=  {  ponLlidEntry  13  }
+
+
+	ponLlidSurportMacNum	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 8192  ) 
+		MAX-ACCESS		read-create
+		STATUS			deprecated
+		DESCRIPTION		"The value of maximum MAC addresses"
+		::=  {  ponLlidEntry  14  }
+
+
+	ponLlidOnuMacAddress	OBJECT-TYPE	
+		SYNTAX			MacAddress  ( SIZE ( 6  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The value indicates and confgure onu MAC address"
+		::=  {  ponLlidEntry  15  }
+
+
+	ponLlidRowStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"row status of this entry"
+		::=  {  ponLlidEntry  16  }
+
+
+	ponLlidUpBWClass	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 7  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"upstream class level for this pon port bandwidth allocation"
+		::=  {  ponLlidEntry  17  }
+
+
+	ponLlidUpDelay	OBJECT-TYPE	
+		SYNTAX			INTEGER  { low ( 1 ) , high ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			deprecated
+		DESCRIPTION		"upstream delay level for this pon port bandwidth allocation"
+		::=  {  ponLlidEntry  18  }
+
+
+	ponLlidUpAssuredBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 64 .. 1000000  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"upstream assured bandwidth about this pon port, unit:KBps"
+		::=  {  ponLlidEntry  19  }
+
+
+	ponLlidUpBesteffortBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 64 .. 1000000  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"upstream best-effort bandwidth about this pon port, unit:KBps"
+		::=  {  ponLlidEntry  20  }
+
+
+	ponLlidDownBWClass	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 7  ) 
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"upstream class level for this pon port bandwidth allocation"
+		::=  {  ponLlidEntry  21  }
+
+
+	ponLlidDownDelay	OBJECT-TYPE	
+		SYNTAX			INTEGER  { low ( 1 ) , high ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"upstream delay level for this pon port bandwidth allocation"
+		::=  {  ponLlidEntry  22  }
+
+
+	ponLlidDownAssuredBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 64 .. 1000000  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"downstream assured bandwidth about this pon port, unit:KBps"
+		::=  {  ponLlidEntry  23  }
+
+
+	ponLlidDownBesteffortBW	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 64 .. 1000000  ) 
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"downstream best-effort bandwidth about this pon port, unit:KBps"
+		::=  {  ponLlidEntry  24  }
+
+
+	ponLlidCtcFecAbility	OBJECT-TYPE	
+		SYNTAX			INTEGER  { unknown ( 1 ) , supported ( 2 ) , notSupported ( 3 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FEC ability"
+		::=  {  ponLlidEntry  25  }
+
+
+	ponLlidCtcFecMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { unknown ( 1 ) , enable ( 2 ) , disable ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"FEC mode, unknown(1)-initializing, true state not yet known. 
+		                 enable(2)-activate FEC. disable(3)-deactivate FEC."
+		::=  {  ponLlidEntry  26  }
+
+
+	ponLlidCtcEncrypCtrl	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CTC encryption control"
+		::=  {  ponLlidEntry  27  }
+
+
+	ponLlidCtcDbaQueSetNum	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 8  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"DBA queue set number"
+		::=  {  ponLlidEntry  28  }
+
+
+	ponLlidCtcDbaQueSetCfgStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noop ( 1 ) , get ( 2 ) , set ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The Queue sets configuration status, this object value is always 'noop(1)'
+             			when read, 'get(2)' will refresh the object of ponLlidCtcDbaQueSetNum and 
+             			the table of ponLlidCtcDbaQueSetTable, 'set(3)' will config the data, 
+             			include ponLlidCtcDbaQueSetNum and ponLlidCtcDbaQueSetTable. 'get(2)' and 
+             			'set(3) are only write value."
+		::=  {  ponLlidEntry  29  }
+
+	ponLlidCtcDbaQueSetTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PonLlidCtcDbaQueSetEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of the pon llid DBA information"
+		::=  { gwEponLlid  2 }
+
+	ponLlidCtcDbaQueSetEntry	OBJECT-TYPE
+		SYNTAX		PonLlidCtcDbaQueSetEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"CTC DBA entry"
+		INDEX		{  deviceIndex, ponLlidIndex, ponLlidCtcDbaQueSetIndex  }
+		::=  { ponLlidCtcDbaQueSetTable 1 }
+
+	PonLlidCtcDbaQueSetEntry  ::=  SEQUENCE {
+		ponLlidCtcDbaQueSetIndex  Integer32,
+		ponLlidCtcDbaReportBitmap  BITS,
+		ponLlidCtcDbaQueue0Threshold  Integer32,
+		ponLlidCtcDbaQueue1Threshold  Integer32,
+		ponLlidCtcDbaQueue2Threshold  Integer32,
+		ponLlidCtcDbaQueue3Threshold  Integer32,
+		ponLlidCtcDbaQueue4Threshold  Integer32,
+		ponLlidCtcDbaQueue5Threshold  Integer32,
+		ponLlidCtcDbaQueue6Threshold  Integer32,
+		ponLlidCtcDbaQueue7Threshold  Integer32
+		}
+
+
+	ponLlidCtcDbaQueSetIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The DBA queue-sets index"
+		::=  {  ponLlidCtcDbaQueSetEntry  1  }
+
+
+	ponLlidCtcDbaReportBitmap	OBJECT-TYPE	
+		SYNTAX			BITS  { queue0 ( 0 ) , queue1 ( 1 ) , queue2 ( 2 ) , queue3 ( 3 ) , queue4 ( 4 ) , queue5 ( 5 ) , queue6 ( 6 ) , queue7 ( 7 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"bit=0 - queue x report is not present,
+					 bit=1 - queue x report is present"
+		::=  {  ponLlidCtcDbaQueSetEntry  2  }
+
+
+	ponLlidCtcDbaQueue0Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue0 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  3  }
+
+
+	ponLlidCtcDbaQueue1Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue1 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  4  }
+
+
+	ponLlidCtcDbaQueue2Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue2 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  5  }
+
+
+	ponLlidCtcDbaQueue3Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue3 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  6  }
+
+
+	ponLlidCtcDbaQueue4Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue4 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  7  }
+
+
+	ponLlidCtcDbaQueue5Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue5 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  8  }
+
+
+	ponLlidCtcDbaQueue6Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue6 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  9  }
+
+
+	ponLlidCtcDbaQueue7Threshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 65535  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Queue7 threshold"
+		::=  {  ponLlidCtcDbaQueSetEntry  10  }
+
+	onuNewRegSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, deviceType, deviceSoftWareVersion, deviceFirmWareVersion, deviceHardWareVersion }
+		STATUS			current
+		DESCRIPTION		"A new ONU register success."
+		::=  {  gwDevTrapGroup  1  }
+
+	onuReregSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, deviceType, deviceSoftWareVersion, deviceFirmWareVersion, deviceHardWareVersion }
+		STATUS			current
+		DESCRIPTION		"An ONU reregister success."
+		::=  {  gwDevTrapGroup  2  }
+
+	onuNotPresent	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"An ONU is not present alarm"
+		::=  {  gwDevTrapGroup  3  }
+
+	devPowerOff	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		" device Power Off Alarm"
+		::=  {  gwDevTrapGroup  4  }
+
+	devPowerOn	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, deviceType, deviceSoftWareVersion, deviceFirmWareVersion, deviceHardWareVersion, deviceRestartupTime }
+		STATUS			current
+		DESCRIPTION		" device Power On Alarm"
+		::=  {  gwDevTrapGroup  5  }
+
+	cfgDataSaveSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"saving config data to flash successfully"
+		::=  {  gwDevTrapGroup  6  }
+
+	cfgDataSaveFail	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"saving config data to flash unsuccessfully"
+		::=  {  gwDevTrapGroup  7  }
+
+	flashClearSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"clear config data successfully"
+		::=  {  gwDevTrapGroup  8  }
+
+	flashClearFail	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"clear config data unsuccessfully"
+		::=  {  gwDevTrapGroup  9  }
+
+	softwareUpdateSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"update software successfully"
+		::=  {  gwDevTrapGroup  10  }
+
+	softwareUpdateFail	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"update software unsuccessfully"
+		::=  {  gwDevTrapGroup  11  }
+
+	firmwareUpdateSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"firmware update successfully"
+		::=  {  gwDevTrapGroup  12  }
+
+	firmwareUpdateFail	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"update firmware unsuccessfully"
+		::=  {  gwDevTrapGroup  13  }
+
+	cfgDataBackupSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"backup configuration data to NMS successfully."
+		::=  {  gwDevTrapGroup  14  }
+
+	cfgDataBackupFail	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"backup configuration data  to NMS unsuccessfully."
+		::=  {  gwDevTrapGroup  15  }
+
+	cfgDataRestoreSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"restore configuration data from NMS successfully."
+		::=  {  gwDevTrapGroup  16  }
+
+	cfgDataRestoreFail	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"restore configuration data from NMS unsuccessfully."
+		::=  {  gwDevTrapGroup  17  }
+
+	autoProtectSwitch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"Auto Protect Switch(APS) occurs"
+		::=  {  gwDevTrapGroup  18  }
+
+	cpuUsageFactorHigh	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"high cpu usage factor alarm"
+		::=  {  gwDevTrapGroup  19  }
+
+	ponPortBERAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, ponPortBrdIndex, ponPortIndex, ponPortBER }
+		STATUS			current
+		DESCRIPTION		"pon port BER alarm"
+		::=  {  gwDevTrapGroup  20  }
+
+	ponPortBERAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, ponPortBrdIndex, ponPortIndex, ponPortBER }
+		STATUS			current
+		DESCRIPTION		"pon port BER alarm clear"
+		::=  {  gwDevTrapGroup  21  }
+
+	ponPortFERAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, ponPortBrdIndex, ponPortIndex, ponPortFER }
+		STATUS			current
+		DESCRIPTION		"pon port FER alarm"
+		::=  {  gwDevTrapGroup  22  }
+
+	ponPortFERAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, ponPortBrdIndex, ponPortIndex, ponPortFER }
+		STATUS			current
+		DESCRIPTION		"pon port FER alarm clear"
+		::=  {  gwDevTrapGroup  23  }
+
+	llidActBWExceeding	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, ponPortBrdIndex, ponPortIndex, ponLlidIndex }
+		STATUS			current
+		DESCRIPTION		"llid bandwidth exceed the limit"
+		::=  {  gwDevTrapGroup  24  }
+
+	llidActBWExceedingClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, ponPortBrdIndex, ponPortIndex, ponLlidIndex }
+		STATUS			current
+		DESCRIPTION		"llid bandwidth return to appropriate value"
+		::=  {  gwDevTrapGroup  25  }
+
+	devBoardInterted	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, curBoardType }
+		STATUS			current
+		DESCRIPTION		"insert a board"
+		::=  {  gwDevTrapGroup  26  }
+
+	devBoardPull	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, curBoardType }
+		STATUS			current
+		DESCRIPTION		"pull a board out"
+		::=  {  gwDevTrapGroup  27  }
+
+	powerOffAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"power OFF alarm"
+		::=  {  gwDevTrapGroup  30  }
+
+	powerOnAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"power ON alarm"
+		::=  {  gwDevTrapGroup  31  }
+
+	boardTemperatureHigh	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"board temperature high alarm"
+		::=  {  gwDevTrapGroup  32  }
+
+	boardTemperatureHighClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"board temperature high alarm clear"
+		::=  {  gwDevTrapGroup  33  }
+
+	ponBoardReset	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"PON board reset event occur"
+		::=  {  gwDevTrapGroup  34  }
+
+	swBoardProtectedSwitch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"sw board protected switch event occur"
+		::=  {  gwDevTrapGroup  35  }
+
+	ponPortAbnormal	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"abnormal status on PON port occur"
+		::=  {  gwDevTrapGroup  36  }
+
+	onuRegisterConflict	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"onu register conflict"
+		::=  {  gwDevTrapGroup  37  }
+
+	firmwareLoadSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"firmware load successfully"
+		::=  {  gwDevTrapGroup  38  }
+
+	firmwareLoadFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"firmware load fail"
+		::=  {  gwDevTrapGroup  39  }
+
+	dbaUpdateSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"update dba successfully"
+		::=  {  gwDevTrapGroup  40  }
+
+	dbaUpdateFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"update dba faul"
+		::=  {  gwDevTrapGroup  41  }
+
+	dbaLoadSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"load dba successfully"
+		::=  {  gwDevTrapGroup  42  }
+
+	dbaLoadFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"load dba fail"
+		::=  {  gwDevTrapGroup  43  }
+
+	ponToEthLinkdown	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"."
+		::=  {  gwDevTrapGroup  44  }
+
+	ponToEthLinkup	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		"."
+		::=  {  gwDevTrapGroup  45  }
+
+	onuSoftwareLoadSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"load onu software successfully"
+		::=  {  gwDevTrapGroup  46  }
+
+	onuSoftwareLoadFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"load onu software fail"
+		::=  {  gwDevTrapGroup  47  }
+
+	ethLinkdown	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port linkdown alarm."
+		::=  {  gwDevTrapGroup  54  }
+
+	ethLinkup	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port linkup alarm."
+		::=  {  gwDevTrapGroup  55  }
+
+	bootUpdateSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"boot firmware update successfully notification"
+		::=  {  gwDevTrapGroup  56  }
+
+	bootUpdateFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"boot firmware update fail notification"
+		::=  {  gwDevTrapGroup  57  }
+
+	batFileBackupSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"bat file backup successfully notification"
+		::=  {  gwDevTrapGroup  58  }
+
+	batFileBackupFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"bat file backup fail notification"
+		::=  {  gwDevTrapGroup  59  }
+
+	batFileRestoreSuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"bat file restore successfully notification"
+		::=  {  gwDevTrapGroup  60  }
+
+	batFileRestoreFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"bat file restore fail notification"
+		::=  {  gwDevTrapGroup  61  }
+
+	onuRegAuthFailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex, deviceMacAddress }
+		STATUS			current
+		DESCRIPTION		"Illegal ONU register."
+		::=  {  gwDevTrapGroup  62  }
+
+	deviceColdStart	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, deviceType, deviceSoftWareVersion, deviceFirmWareVersion, deviceHardWareVersion, deviceRestartupTime }
+		STATUS			current
+		DESCRIPTION		"Only report OLT cold start. this trap is not sent if a devPowerOn trap
+        				 is sent for the same restart. Implementation of this trap is optional."
+		::=  {  gwDevTrapGroup  63  }
+
+	deviceWarmStart	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, deviceType, deviceSoftWareVersion, deviceFirmWareVersion, deviceHardWareVersion, deviceRestartupTime }
+		STATUS			current
+		DESCRIPTION		"Only report OLT warm start."
+		::=  {  gwDevTrapGroup  64  }
+
+	deviceExceptionRestart	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, deviceType, deviceSoftWareVersion, deviceFirmWareVersion, deviceHardWareVersion, deviceRestartupTime }
+		STATUS			current
+		DESCRIPTION		"Only report OLT restart because of exception."
+		::=  {  gwDevTrapGroup  65  }
+
+	ethLoopAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port loop alarm."
+		::=  {  gwDevTrapGroup  84  }
+
+	ethLoopAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port loop clear."
+		::=  {  gwDevTrapGroup  85  }
+
+	onuLoopAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"Onu loop alarm."
+		::=  {  gwDevTrapGroup  86  }
+
+	onuLoopAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"Onu loop clear."
+		::=  {  gwDevTrapGroup  87  }
+
+	backboneEthLinkdown	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port linkdown alarm."
+		::=  {  gwDevTrapGroup  88  }
+
+	backboneEthLinkup	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port linkup alarm."
+		::=  {  gwDevTrapGroup  89  }
+
+	boardCpuUsageAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"cpu usage factor alarm"
+		::=  {  gwDevTrapGroup  116  }
+
+	boardCpuUsageAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		"cpu usage factor alarm clear"
+		::=  {  gwDevTrapGroup  117  }
+
+	boardMemoryUsageAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  118  }
+
+	boardMemoryUsageAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  119  }
+
+	ponPortFullAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  132  }
+
+	ponPortAbnormalClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  133  }
+
+	ethPortBroadCastFloodControl	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port broadcast flood alarm."
+		::=  {  gwDevTrapGroup  136  }
+
+	ethPortBroadCastFloodControlClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ethPortIndex }
+		STATUS			current
+		DESCRIPTION		"Ethernet port broadcast flood alarm clear."
+		::=  {  gwDevTrapGroup  137  }
+
+	sysfileUploadsuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  138  }
+
+	sysfileUploadfailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  139  }
+
+	sysfileDownloadsuccess	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  140  }
+
+	sysfileDownloadfailure	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  141  }
+
+	ponPortLosAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  142  }
+
+	ponPortLosAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  143  }
+
+	ponFWVersionMismatch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  144  }
+
+	ponFWVersionMatch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  145  }
+
+	ponDBAVersionMismatch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  146  }
+
+	ponDBAVersionMatch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  147  }
+
+	ponSFPTypeMismatch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  148  }
+
+	ponSFPTypeMitch	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  149  }
+
+	ponPortBRASAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex, brasMacAddress }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  150  }
+
+	ponPortBRASAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex, brasMacAddress }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  151  }
+
+	ponPortUpNoTraffic	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  152  }
+
+	ponPortUpNoTrafficClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, boardIndex, ponPortIndex }
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwDevTrapGroup  153  }
+
+	onuDeletingNotify	NOTIFICATION-TYPE
+		OBJECTS			{ onuPredefPonSlotIdx, onuPredefPonPortIdx, onuPredefOnuIdx, onuPredefOnuMacAddr, onuPredefOnuDevIdx }
+		STATUS			current
+		DESCRIPTION		"Illegal ONU register."
+		::=  {  gwDevTrapGroup  154  }
+
+	onuMacTableOverFlow	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"onu mac table over flow."
+		::=  {  gwDevTrapGroup  208  }
+
+	onuMacTableOverFlowClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"onu mac table over flow clear."
+		::=  {  gwDevTrapGroup  209  }
+
+	onuNotPresentAlmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  1  }
+
+	devPowerOffAlmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  2  }
+
+	ponPortBERAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  3  }
+
+	ponPortFERAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  4  }
+
+	llidActBWExceedingAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  5  }
+
+	powerOffAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  6  }
+
+	boardTemperatureHighAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  7  }
+
+	devBoardPullAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  8  }
+
+	ethLinkdownAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  9  }
+
+	devFanAlarmAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  10  }
+
+	ethFlrAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  11  }
+
+	ethFerAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  12  }
+
+	ethTransmittalIntermitAlarmLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 4  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the value indicates an alarm level is set on this event"
+		::=  {  gwAlarmLevelGroup  13  }
+
+	gwEponPonCtcExtOamDiscoveryTiming	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 2550  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"extended oam discovery timing, unit: ms"
+		::=  {  gwEponPonCtcExt  1  }
+
+	gwEponPonCtcExtOamCtcOui	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 16  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  gwEponPonCtcExt  2  }
+
+	gwEponPonCtcExtOamCtcVer	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 255  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CTC ext-oam version"
+		::=  {  gwEponPonCtcExt  3  }
+
+	gwEponPonCtcEncrypUpdKeyTime	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 255  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Update key time, unit: s"
+		::=  {  gwEponPonCtcExt  4  }
+
+	gwEponPonCtcEncrypNoReplyTimeout	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 2550  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"No reply timeout, unit: ms"
+		::=  {  gwEponPonCtcExt  5  }
+
+	gwEponPonCtcEncrypTimingThreshold	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Encryption timing threshold"
+		::=  {  gwEponPonCtcExt  6  }
+
+gwConsoleBaudRate	OBJECT-TYPE	
+		SYNTAX			INTEGER  { b300 ( 1 ) , b600 ( 2 ) , b1200 ( 3 ) , b2400 ( 4 ) , b4800 ( 5 ) , b9600 ( 6 ) , b19200 ( 7 ) , b38400 ( 8 ) , b115200 ( 9 ) , b230400 ( 10 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the baud rate for the system console"
+		::=  {  gwConsoleCfgGroup  1  }
+
+
+	gwConsoleDataBits	OBJECT-TYPE	
+		SYNTAX			INTEGER  { b5 ( 5 ) , b6 ( 6 ) , b7 ( 7 ) , b8 ( 8 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the data bits length for the system console"
+		::=  {  gwConsoleCfgGroup  2  }
+
+
+	gwConsoleStopBitSet	OBJECT-TYPE	
+		SYNTAX			INTEGER  { sb1 ( 1 ) , sb2 ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the stop bits for the system console"
+		::=  {  gwConsoleCfgGroup  3  }
+
+
+	gwConsoleParitySet	OBJECT-TYPE	
+		SYNTAX			INTEGER  { none ( 1 ) , even ( 2 ) , odd ( 3 ) , space ( 4 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the parity set for the system console"
+		::=  {  gwConsoleCfgGroup  4  }       
+		
+	gwConsoleFlowCtrlSet	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable( 1 ) , disable(2) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the flow control set for the system console"
+		::=  {  gwConsoleCfgGroup  5  }                   
+
+END

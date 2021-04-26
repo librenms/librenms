@@ -9,14 +9,14 @@
  * the source code distribution for details.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Mike Williams
  * @author     Mike Williams <mike@mgww.net>
  */
 
 use LibreNMS\RRD\RrdDefinition;
 
-list($hardware,$version,,$serial) = explode(',', $device['sysDescr']);
+[$hardware,$version,,$serial] = explode(',', $device['sysDescr']);
 
 preg_match('/\w[\d]+\w?/', $hardware, $regexp_results);
 $hardware = $regexp_results[0];
@@ -27,7 +27,7 @@ $version = $regexp_results[0];
 preg_match('/[[\w]+-[\w]+/', $serial, $regexp_results);
 $serial = $regexp_results[0];
 
-# Get stats only if device is web proxy
+// Get stats only if device is web proxy
 if (strcmp($device['sysObjectID'], '.1.3.6.1.4.1.15497.1.2') == 0) {
     $connections = snmp_get($device, 'tcpCurrEstab.0', '-OQv', 'TCP-MIB');
 
@@ -35,13 +35,13 @@ if (strcmp($device['sysObjectID'], '.1.3.6.1.4.1.15497.1.2') == 0) {
         $rrd_name = 'asyncos_conns';
         $rrd_def = RrdDefinition::make()->addDataset('connections', 'GAUGE', 0, 50000);
 
-        $fields = array(
+        $fields = [
             'connections' => $connections,
-        );
+        ];
 
         $tags = compact('rrd_def');
         data_update($device, 'asyncos_conns', $tags, $fields);
 
-        $graphs['asyncos_conns'] = true;
+        $os->enableGraph('asyncos_conns');
     }
 }

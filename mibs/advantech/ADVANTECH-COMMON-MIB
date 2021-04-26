@@ -1,0 +1,572 @@
+-- *****************************************************************
+-- ADVANTECH-COMMON-MIB: Advantech Industrial Common MIB
+--
+-- Jan 2015, Embedded Software
+--
+-- Copyright (c) 2015 by Advantech eAutomation Group, Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+ADVANTECH-COMMON-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    enterprises, 
+    OBJECT-TYPE,
+    Integer32,
+    IpAddress, 
+    TimeTicks                     FROM SNMPv2-SMI		-- RFC2578
+    OBJECT-GROUP                  FROM SNMPv2-CONF
+    DisplayString, DateAndTime    FROM SNMPv2-TC-v1
+    SnmpAdminString               FROM SNMP-FRAMEWORK-MIB -- RFC2279
+    ;
+
+advantech        OBJECT IDENTIFIER ::= { enterprises 10297 }
+	
+advantechCommonMIB MODULE-IDENTITY
+    LAST-UPDATED    "201501060000Z"
+    ORGANIZATION    "Advantech eAutomation Group"
+    CONTACT-INFO
+            "       Advantech eAutomation Embedded Software
+                    E-mail: support@advantech.com
+					        Campion.Kang@advantech.com.tw"
+    DESCRIPTION
+        "The MIB module is for Advantech automation devices common entities.
+
+            Copyright (C) 2015 Advantech Automation Group.
+		"
+
+-- * Revision history
+	REVISION    "201305250000Z"
+	DESCRIPTION
+        "Initial version of the Advantech Common MIB. "
+	REVISION    "201308280000Z"
+	DESCRIPTION
+        "Fixed the worng id of psIRQ, psState, 
+        psModuleType and psModulePorts in pciConfigObj "            
+	REVISION    "201308290000Z"
+	DESCRIPTION
+        "Update the Size of psBaseAddress to 32."    
+	REVISION    "201309060000Z"
+	DESCRIPTION
+        "1. Update the Size of psBaseAddress to 80(8x10).
+         2. Add psLength (pciSlotEntry 15).
+         3. Fixed wrong snmpTrapVersion enumeration from enable(1),
+            disabled(2) to v1(1), v2c(2), v3(3)."
+	REVISION    "201410130000Z"
+	DESCRIPTION
+        "Add DateAndTime specification in the description of the oid
+         which is DateAndTime type."
+
+	REVISION    "201410220000Z"
+	DESCRIPTION
+        "To support ManageEngine MibBrowser Free Tool"  
+        
+	REVISION    "201501060000Z"
+	DESCRIPTION
+        "Change psDisplayName, psDescr, psManufacturer, psLocation to SnmpAdminString
+        to support UTF-8 string."                  
+    ::= { advantech 100 }
+
+atSystem         OBJECT IDENTIFIER ::= {advantechCommonMIB 1}
+atMgmt           OBJECT IDENTIFIER ::= {advantechCommonMIB 2}
+atPciConfig      OBJECT IDENTIFIER ::= {advantechCommonMIB 3}
+
+
+-- ***************************************************************************
+-- atSystem group                               
+--     a collection of objects common to all Advantech managed systems.
+--
+--     Implementation of the Advantech Common System group is mandatory 
+--     for all systems.  If an agent is not configured to have a value
+--     for any of these variables, a string of length 0 is
+--     returned.
+-- ***************************************************************************
+	sysModuleID OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The module name of the device.  This value
+			should include the full name of the hardware.  
+			It is mandatory that this only contain
+			printable ASCII characters. 
+			e.g. UNO-2184G, TPC-1840WP. etc,. "
+		::= { atSystem 1 }
+
+	sysDeviceName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"The user defined name of the device, e.g. alias name, 
+			may be its device location."
+		::= { atSystem 2 }
+
+	sysDescr OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"A textual description of the entity/device that this only contain 
+			printable ASCII characters."
+		::= { atSystem 3 }
+		
+	sysImageVersion OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (0..32))
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The release version number of the entity/device."
+		::= { atSystem 4 }
+
+	sysReleaseDate OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (0..32))
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The release date of the entity/device."
+		::= { atSystem 5 }
+		
+	sysFirstBootTime OBJECT-TYPE
+		SYNTAX  DateAndTime
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The first boot time since the entity/device was started
+			it will be reset if the device cleaned all files and registry
+			with clean boot.
+			
+	        A date-time specification.
+			field  octets  contents                  range
+			-----  ------  --------                  -----
+			  1      1-2   year                      0..65536
+			  2       3    month                     1..12
+			  3       4    day                       1..31
+			  4       5    hour                      0..23
+			  5       6    minutes                   0..59
+			  6       7    seconds                   0..60
+			               (use 60 for leap-second)
+			  7       8    deci-seconds              0..9
+			  8       9    direction from UTC        '+' / '-'
+			  9      10    hours from UTC            0..11
+			 10      11    minutes from UTC          0..59
+			If this information is not known, then this
+			variable shall have the value corresponding to
+			January 1, year 0000, 00:00:00.0, which is encoded
+			as (hex)'00 00 01 01 00 00 00 00'."
+		::= { atSystem 6 }
+
+	sysBootTime OBJECT-TYPE
+		SYNTAX  DateAndTime
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The time since the entity/device was last re-initialized.
+			
+	         A date-time specification.
+	         field  octets  contents                  range
+	         -----  ------  --------                  -----
+	           1      1-2   year                      0..65536
+	           2       3    month                     1..12
+	           3       4    day                       1..31
+	           4       5    hour                      0..23
+	           5       6    minutes                   0..59
+	           6       7    seconds                   0..60
+	                        (use 60 for leap-second)
+	           7       8    deci-seconds              0..9
+	           8       9    direction from UTC        '+' / '-'
+	           9      10    hours from UTC            0..11
+	          10      11    minutes from UTC          0..59
+			 If this information is not known, then this
+			 variable shall have the value corresponding to
+			 January 1, year 0000, 00:00:00.0, which is encoded
+			 as (hex)'00 00 01 01 00 00 00 00'."
+
+		::= { atSystem 7 }
+
+	sysBootCount OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The boot count since the entity/device was first boot."
+		::= { atSystem 8 }
+		
+-- ***************************************************************************
+-- atMgmt group                                  
+--    A collection of objects for Advantech Common Management
+--    configuration.
+-- ***************************************************************************
+
+	snmpTrapSrvObj         OBJECT IDENTIFIER ::= { atMgmt 1 }
+
+	snmpTrapSrvNumber OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The number of the snmpTrapSrvTable"
+		::= { snmpTrapSrvObj 1 }
+	
+	snmpTrapSrvTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF SnmpTrapSrvEntry
+		MAX-ACCESS not-accessible
+		STATUS     mandatory
+		DESCRIPTION
+			"The (conceptual) table listing the information of
+			the remote SNMP Trap server acting as a trap 
+			receiver."
+		::= { snmpTrapSrvObj 2 }
+
+	snmpTrapSrvEntry OBJECT-TYPE
+		SYNTAX  SnmpTrapSrvEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"SNMP Trap server entry. Contains the IP address of a SNMP Trap server"
+		INDEX   { snmpTrapSrvIndex }
+		::= { snmpTrapSrvTable 1 }
+
+	SnmpTrapSrvEntry ::= SEQUENCE {
+		snmpTrapSrvIndex             INTEGER,
+		snmpTrapSrvIP                IpAddress,
+		snmpTrapSrvPort              INTEGER,
+		snmpTrapSrvAuthentication    INTEGER,
+		snmpTrapSrvCommunity         DisplayString,
+		snmpTrapVersion              INTEGER		
+	}
+	
+	snmpTrapSrvIndex OBJECT-TYPE
+		SYNTAX  INTEGER (1..256)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"This object contains the index of the table being a unique
+			value for each entry."
+		::= { snmpTrapSrvEntry 1 }
+		
+	snmpTrapSrvIP OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This parameter specifies the IP address of the SNMP Trap Server."
+		::= { snmpTrapSrvEntry 2 }
+	
+	snmpTrapSrvPort OBJECT-TYPE
+		SYNTAX  INTEGER (0..65535)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The port number for the SNMP Trap Server."
+		::= { snmpTrapSrvEntry 3 }
+	
+	snmpTrapSrvAuthentication OBJECT-TYPE
+		SYNTAX  INTEGER { enabled(1), disabled(2) }
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This parameter enables authentication traps."
+		::= { snmpTrapSrvEntry 4 }
+		
+	snmpTrapSrvCommunity OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..256))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This parameter specifies the SNMP community."
+        ::= { snmpTrapSrvEntry 5 }
+	
+	snmpTrapVersion OBJECT-TYPE
+        SYNTAX  INTEGER { v1(1), v2c(2), v3(3) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This parameter specifies the SNMP trap version."
+        ::= { snmpTrapSrvEntry 6 }
+	
+-- ***************************************************************************
+-- atPciConfig Group
+-- 		The atPciConfig group provides a set of tables that details the
+--  	configuration information regarding the PCI configuration.
+--  	Implementation of the atPciConfig group is optional.
+--  	The atPciConfig group should be included on any system/device with
+--  	an PCI bus architecture. 
+-- ***************************************************************************
+
+	pciConfigObj         OBJECT IDENTIFIER ::= { atPciConfig 1 }
+
+	psNumber OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"The number of the psTable"
+		::= { pciConfigObj 1 }
+
+	pciSlotTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF PCISlotEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"A list of PCI device/functions entries."
+		::= {pciConfigObj 2}
+		
+	pciSlotEntry OBJECT-TYPE
+		SYNTAX PCISlotEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"PCI slot entry. Contains the information of PCI devices."  
+		INDEX {psIndex}
+		::= {pciSlotTable 1}
+	
+	PCISlotEntry ::= SEQUENCE {
+		psIndex				INTEGER,
+		psBusIndex          INTEGER,
+		psDeviceIndex       INTEGER,
+		psFunctionIndex     INTEGER,
+		psDisplayName		SnmpAdminString,
+		psDescr				SnmpAdminString,
+		psVendorID			INTEGER,
+		psDeviceID			INTEGER,
+		psSubsysVendorID	INTEGER,
+		psSubsysDeviceID	INTEGER,
+		psClassCode		    OCTET STRING,
+		psManufacturer		SnmpAdminString,
+		psLocation			SnmpAdminString,
+		psBaseAddress		OCTET STRING,
+		psLength			OCTET STRING,
+		psIRQ				INTEGER,
+		psState				INTEGER,
+		psModuleType		INTEGER,
+		psModulePorts		Integer32
+	}
+	
+	psIndex OBJECT-TYPE
+		SYNTAX  INTEGER (1..256)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"This object contains the index of the table being a unique
+			value for each entry."
+		::= { pciSlotEntry 1 }
+		
+	psBusIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The PCI Bus number"
+		::= {pciSlotEntry 2}
+	
+	psDeviceIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..31)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The PCI device or slot number that this entry describes."
+		::= {pciSlotEntry 3}
+		
+	psFunctionIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..7)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The PCI function number that this entry describes."
+		::= {pciSlotEntry 4}		
+		
+	psDisplayName OBJECT-TYPE
+		SYNTAX SnmpAdminString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Service name of the PCI device. e.g. 
+			Intel 82579LM Gigabit Network Connection"
+		::= {pciSlotEntry 5}
+		
+	psDescr OBJECT-TYPE
+		SYNTAX SnmpAdminString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"PCI device description"
+		::= {pciSlotEntry 6}
+		
+	psVendorID OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Identifies the manufacturer of the device. 65535(0xFFFF) is an 
+			invalid value for a vendor ID.
+
+                Vendor ID       Manufacturer
+              -------------     ------------
+               5118(0x13FE)     Advantech Co."
+		::= {pciSlotEntry 7}
+		
+	psDeviceID OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Identifies the particular device. This identier is allocated
+			by the vendor. The following is the Advantech PCI Device ID.
+			                   
+			
+                Device ID               Description
+               -------------       -----------------------
+               49154(0xC002)          CAN 2 Ports(I/O)
+			   49666(0xC202)          CAN 2 Ports(memory)
+			   49410(0xC102)          CANopen 2 ports(I/O)
+			   49666(0xC202)          CANopen 2 ports(memory)
+				4097(0x1001)          NVRAM 
+			   40964(0xA004)          COM950 4 Ports
+			   61952(0xF200)          PCIe 2 COM950 Ports
+			   62208(0xF300)          PCIe 4 COM950 Ports
+			   62464(0xF400)          PCIe 8 COM950 Ports
+			   43041(0xA821)          PCIe 1 COM17V25x Port
+			   43042(0xA822)          PCIe 2 COM17V25x Ports
+			   43043(0xA823)          PCIe 3 COM17V25x Ports
+			   43044(0xA824)          PCIe 4 COM17V25x Ports
+			   43048(0xA828)          PCIe 8 COM17V25x Ports
+			   43057(0xA831)          PCIe 1 COM17V35x Port
+			   43058(0xA832)          PCIe 2 COM17V35x Ports
+			   43059(0xA833)          PCIe 3 COM17V35x Ports
+			   43060(0xA834)          PCIe 4 COM17V35x Ports
+			   43064(0xA838)          PCIe 8 COM17V35x Ports
+				  "
+		::= {pciSlotEntry 8}
+	
+	psSubsysVendorID OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Identifies the manufacturer subsystem of the device. 65535(0xFFFF) is an 
+			invalid value for a vendor ID.
+
+                Subsys Vendor ID       Manufacturer
+                ----------------       ------------
+                  5118(0x13FE)         Advantech Co."
+		::= {pciSlotEntry 9}
+	
+	psSubsysDeviceID OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Identifies the particular device subsystem. This identier is allocated
+			by the vendor.
+			
+                Subsystem Device ID       Description
+                -------------------       --------------------------------------
+                  4097(0x1001)            NVRAM with KW
+				  4113(0x1011)            NVRAM without KW
+			"
+		::= {pciSlotEntry 10}
+	
+	psClassCode OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(3))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Identifies the generic function of the device.
+			
+				Base     Sub-      Prog
+				Class    Class     If.        Description
+				------   ------    ------    --------------------------------------
+				 00h                          Device was built before Class Code
+				                              definitions were finalized
+											  
+				 "
+		::= {pciSlotEntry 11}
+		
+	psManufacturer OBJECT-TYPE
+		SYNTAX SnmpAdminString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The manufacturer name of the PCI device"
+		::= {pciSlotEntry 12}
+	
+	psLocation OBJECT-TYPE
+		SYNTAX SnmpAdminString
+		ACCESS read-only                     
+		STATUS current
+		DESCRIPTION
+			"The location information consists of PCI bus number, device number, 
+			 and function.
+			e.g. PCI bus 0, device 0, funciton 0"
+		::= {pciSlotEntry 13}
+		
+	psBaseAddress OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(80))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Base address mapping registers for memory and IO. Refer 
+			to the PCI specification for the format. 
+			A memory or IO address is encoded as hex. For example: 
+			A memory start address 	0xF7E00000 will be encoded as 
+			(hex)00 00 00 00 F7 E0 00 00.
+			According to the PCI specification, The IO address bit 0 will be 1.
+			An IO address 0xE800 will be encoded as (hex)00 00 00 00 00 00 E8 01.
+			"
+			
+		::= {pciSlotEntry 14}
+
+	psLength OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(80))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The length of each PCI resource. It will be encoded as hex.
+			For example: Length 0x20000 will be encoded as (hex) 00 00 00 00 00 02 00 00"
+		::= {pciSlotEntry 15}
+
+
+	psIRQ OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"which interrupt pin the device uses."
+		::= {pciSlotEntry 16}
+
+	psState OBJECT-TYPE
+		SYNTAX INTEGER {
+				enabled (1),
+				disabled (2)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The PCI device enable status"
+		::= {pciSlotEntry 17}
+		
+	psModuleType OBJECT-TYPE
+		SYNTAX INTEGER {
+			com(1),
+			can(2),
+			amonet(3),
+			motion(4),
+			wireless(5)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The module function type"
+		::= {pciSlotEntry 18}
+		
+	psModulePorts OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The port/ring/axis total number ports of the module"
+		::= {pciSlotEntry 19}
+		
+END
+

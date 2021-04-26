@@ -1,13 +1,14 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
-$hrstorage_array = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES:NetWare-Host-Ext-MIB');
+$hrstorage_array = $os->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 
 if (is_array($hrstorage_array)) {
     echo 'hrStorage : ';
 
-    $bad_fs_types = array(
+    $bad_fs_types = [
         'hrStorageVirtualMemory',
         'hrStorageRam',
         'hrStorageOther',
@@ -21,30 +22,30 @@ if (is_array($hrstorage_array)) {
         'nwhrStorageIOEngineMemory',
         'nwhrStorageMSEngineMemory',
         'nwhrStorageUnclaimedMemory',
-    );
+    ];
 
     foreach ($hrstorage_array as $index => $storage) {
-        $fstype                   = $storage['hrStorageType'];
-        $descr                    = $storage['hrStorageDescr'];
+        $fstype = $storage['hrStorageType'];
+        $descr = $storage['hrStorageDescr'];
         $storage['hrStorageSize'] = fix_integer_value($storage['hrStorageSize']);
         $storage['hrStorageUsed'] = fix_integer_value($storage['hrStorageUsed']);
-        $size  = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
-        $used  = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
+        $size = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
+        $used = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
         $units = $storage['hrStorageAllocationUnits'];
 
         if (in_array($fstype, $bad_fs_types)) {
             continue;
         }
 
-        if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
-            $old_rrdfile = array('storage', 'hrstorage', $descr);
-            $new_rrdfile = array('mempool', 'hrstorage', $storage['hrStorageIndex']);
-            rrd_file_rename($device, $old_rrdfile, $new_rrdfile);
+        if (Str::startsWith($device['os'], 'vmware') && $descr == 'Real Memory') {
+            $old_rrdfile = ['storage', 'hrstorage', $descr];
+            $new_rrdfile = ['mempool', 'hrstorage', $storage['hrStorageIndex']];
+            \Rrd::renameFile($device, $old_rrdfile, $new_rrdfile);
             continue;
         }
 
         // Skip hrStorage if aixFsTable is available
-        if ($device['os'] == 'aix' && !empty($aix_filesystem)) {
+        if ($device['os'] == 'aix' && ! empty($aix_filesystem)) {
             continue;
         }
 

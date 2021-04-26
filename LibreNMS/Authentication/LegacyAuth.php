@@ -2,14 +2,14 @@
 
 namespace LibreNMS\Authentication;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
 class LegacyAuth
 {
     protected static $_instance;
-    private static $configToClassMap = array(
+    private static $configToClassMap = [
         'mysql' => 'LibreNMS\Authentication\MysqlAuthorizer',
         'active_directory' => 'LibreNMS\Authentication\ActiveDirectoryAuthorizer',
         'ldap' => 'LibreNMS\Authentication\LdapAuthorizer',
@@ -18,7 +18,7 @@ class LegacyAuth
         'ad-authorization' => 'LibreNMS\Authentication\ADAuthorizationAuthorizer',
         'ldap-authorization' => 'LibreNMS\Authentication\LdapAuthorizationAuthorizer',
         'sso' => 'LibreNMS\Authentication\SSOAuthorizer',
-    );
+    ];
 
     /**
      * Gets the authorizer based on the config
@@ -27,10 +27,11 @@ class LegacyAuth
      */
     public static function get()
     {
-        if (!static::$_instance) {
+        if (! static::$_instance) {
             $class = self::getClass();
             static::$_instance = new $class;
         }
+
         return static::$_instance;
     }
 
@@ -56,7 +57,7 @@ class LegacyAuth
             $type = self::getType();
         }
 
-        if (!isset(self::$configToClassMap[$type])) {
+        if (! isset(self::$configToClassMap[$type])) {
             throw new \RuntimeException($type . ' not found as auth_mechanism');
         }
 
@@ -71,6 +72,7 @@ class LegacyAuth
     public static function reset()
     {
         static::$_instance = null;
+
         return static::get();
     }
 }

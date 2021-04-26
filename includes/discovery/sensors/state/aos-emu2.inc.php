@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Ben Gibbons
  * @author     Ben Gibbons <axemann@gmail.com>
  */
@@ -28,11 +27,11 @@
 $contacts['emu2_contacts'] = snmpwalk_group($device, 'emsInputContactStatusEntry', 'PowerNet-MIB');
 
 foreach ($contacts['emu2_contacts'] as $id => $contact) {
-    $index          = $contact['emsInputContactStatusInputContactIndex'];
-    $oid            = '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.' . $index;
-    $descr          = $contact['emsInputContactStatusInputContactName'];
-    $currentstate   = $contact['emsInputContactStatusInputContactState'];
-    $normalstate    = $contact['emsInputContactStatusInputContactNormalState'];
+    $index = $contact['emsInputContactStatusInputContactIndex'];
+    $oid = '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.' . $index;
+    $descr = $contact['emsInputContactStatusInputContactName'];
+    $currentstate = $contact['emsInputContactStatusInputContactState'];
+    $normalstate = $contact['emsInputContactStatusInputContactNormalState'];
     if (is_array($contacts['emu2_contacts']) && $normalstate == '1') {
         $state_name = 'emsInputContactNormalState_NC';
         $states = [
@@ -58,11 +57,11 @@ foreach ($contacts['emu2_contacts'] as $id => $contact) {
 $relays['emu2_relays'] = snmpwalk_group($device, 'emsOutputRelayStatusEntry', 'PowerNet-MIB');
 
 foreach ($relays['emu2_relays'] as $id => $relay) {
-    $index          = $relay['emsOutputRelayStatusOutputRelayIndex'];
-    $oid            = '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.' . $index;
-    $descr          = $relay['emsOutputRelayStatusOutputRelayName'];
-    $currentstate   = $relay['emsOutputRelayStatusOutputRelayState'];
-    $normalstate    = $relay['emsOutputRelayStatusOutputRelayNormalState'];
+    $index = $relay['emsOutputRelayStatusOutputRelayIndex'];
+    $oid = '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.' . $index;
+    $descr = $relay['emsOutputRelayStatusOutputRelayName'];
+    $currentstate = $relay['emsOutputRelayStatusOutputRelayState'];
+    $normalstate = $relay['emsOutputRelayStatusOutputRelayNormalState'];
     if (is_array($relays['emu2_relays']) && $normalstate == '1') {
         $state_name = 'emsOutputRelayNormalState_NC';
         $states = [
@@ -88,11 +87,11 @@ foreach ($relays['emu2_relays'] as $id => $relay) {
 $outlets['emu2_outlets'] = snmpwalk_group($device, 'emsOutletStatusEntry', 'PowerNet-MIB');
 
 foreach ($outlets['emu2_outlets'] as $id => $outlet) {
-    $index          = $outlet['emsOutletStatusOutletIndex'];
-    $oid            = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
-    $descr          = $outlet['emsOutletStatusOutletName'];
-    $currentstate   = $outlet['emsOutletStatusOutletState'];
-    $normalstate    = $outlet['emsOutletStatusOutletNormalState'];
+    $index = $outlet['emsOutletStatusOutletIndex'];
+    $oid = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
+    $descr = $outlet['emsOutletStatusOutletName'];
+    $currentstate = $outlet['emsOutletStatusOutletState'];
+    $normalstate = $outlet['emsOutletStatusOutletNormalState'];
     if (is_array($outlets['emu2_outlets']) && $normalstate == '1') {
         $state_name = 'emsOutletNormalState_ON';
         $states = [

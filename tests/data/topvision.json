@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.32285.11.1.1.1.4.1",
                     "sysDescr": "CC8800D-E;hardware version:V2.2.4;software version:V2.3.0.54-C.BT;firm-Software version:430B3-V2.3.0.17BT;Chip version:BCM3218 2.44, 0.1.13, 0.2.2, 0.2.2",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "topvision",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "sumavision.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.32285.11.1.1.1.4.1",
-                    "sysDescr": "CC8800D-E;hardware version:V2.2.4;software version:V2.3.0.54-C.BT;firm-Software version:430B3-V2.3.0.17BT;Chip version:BCM3218 2.44, 0.1.13, 0.2.2, 0.2.2",
                     "sysContact": "<private>",
                     "version": "2.3.0.54-C.BT",
                     "hardware": "2.2.4",
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

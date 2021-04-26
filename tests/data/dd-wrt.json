@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux wap-study 3.10.108-d8 #24797 Thu Jun 6 12:07:26 CEST 2019 mips",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "dd-wrt",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "dd-wrt.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux wap-study 3.10.108-d8 #24797 Thu Jun 6 12:07:26 CEST 2019 mips",
                     "sysContact": "<private>",
                     "version": "3.10.108-d8",
                     "hardware": "Netgear WNDR4500",
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

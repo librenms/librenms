@@ -15,16 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -38,6 +38,19 @@ class Siklu extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        $data = snmp_get_multi_oid($this->getDeviceArray(), [
+            'rbSwBank1Running.0',
+            'rbSwBank1Version.0',
+            'rbSwBank2Version.0',
+            'entPhysicalSerialNum.1',
+        ], '-OQUs', 'RADIO-BRIDGE-MIB:ENTITY-MIB');
+
+        $device->version = $data['rbSwBank1Running.0'] == 'running' ? $data['rbSwBank1Version.0'] : $data['rbSwBank2Version.0'];
+        $device->hardware = $device->sysDescr;
+        $device->serial = $data['entPhysicalSerialNum.1'];
+    }
 
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
@@ -48,9 +61,10 @@ class Siklu extends OS implements
     public function discoverWirelessFrequency()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.4.1'; // RADIO-BRIDGE-MIB::rfOperationalFrequency.1
-        return array(
+
+        return [
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),
-        );
+        ];
     }
 
     /**
@@ -62,9 +76,10 @@ class Siklu extends OS implements
     public function discoverWirelessPower()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.42.1'; // RADIO-BRIDGE-MIB::rfTxPower.1
-        return array(
+
+        return [
             new WirelessSensor('power', $this->getDeviceId(), $oid, 'siklu', 1, 'Tx Power'),
-        );
+        ];
     }
 
     /**
@@ -76,9 +91,10 @@ class Siklu extends OS implements
     public function discoverWirelessRssi()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.19.1'; // RADIO-BRIDGE-MIB::rfAverageRssi.1
-        return array(
+
+        return [
             new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'siklu', 1, 'RSSI'),
-        );
+        ];
     }
 
     /**
@@ -90,8 +106,9 @@ class Siklu extends OS implements
     public function discoverWirelessSnr()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.18.1'; // RADIO-BRIDGE-MIB::rfAverageCinr.1
-        return array(
+
+        return [
             new WirelessSensor('snr', $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
-        );
+        ];
     }
 }

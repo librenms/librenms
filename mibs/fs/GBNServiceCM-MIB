@@ -27,14 +27,14 @@
         
 
     gbn8021xCmMib MODULE-IDENTITY
-        LAST-UPDATED    "2002/07/02"  -- July 2, 2002
+        LAST-UPDATED    "200207020000Z"  -- July 2, 2002
         ORGANIZATION    "admin Systems, Inc."
         CONTACT-INFO    "admin Systems, Inc.
                          E-mail: support@admin.com.cn"
 
         DESCRIPTION     "admin CM Enterprise MIB definition."
 
-        REVISION        "2002/07/02"  -- July 2, 2002
+        REVISION        "200207020000Z"  -- July 2, 2002
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnServiceAAA 1 }

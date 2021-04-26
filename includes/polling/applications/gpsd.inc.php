@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -52,8 +52,8 @@
 }
 */
 
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'gpsd';
@@ -62,13 +62,13 @@ $app_id = $app['app_id'];
 echo " $name\n";
 
 if ($app_id > 0) {
-    if (!empty($agent_data['app'][$name])) {
+    if (! empty($agent_data['app'][$name])) {
         $gpsd = $agent_data['app'][$name];
 
         $gpsd_parsed = [];
 
         foreach (explode("\n", $gpsd) as $line) {
-            list ($field, $data) = explode(':', $line);
+            [$field, $data] = explode(':', $line);
             $gpsd_parsed[$field] = $data;
         }
 
@@ -85,7 +85,7 @@ if ($app_id > 0) {
         $fields = [];
 
         foreach ($check_fields as $field) {
-            if (!empty($gpsd_parsed[$field])) {
+            if (! empty($gpsd_parsed[$field])) {
                 $fields[$field] = $gpsd_parsed[$field];
             }
         }
@@ -100,14 +100,15 @@ if ($app_id > 0) {
                 'data' => [],
             ];
 
-            list ($gpsd['data']['mode'], $gpsd['data']['hdop'], $gpsd['data']['vdop'],
+            [$gpsd['data']['mode'], $gpsd['data']['hdop'], $gpsd['data']['vdop'],
                 $gpsd['data']['latitude'], $gpsd['data']['longitude'], $gpsd['data']['altitude'],
-                $gpsd['data']['satellites'], $gpsd['data']['satellites_used']) = explode("\n", $legacy);
+                $gpsd['data']['satellites'], $gpsd['data']['satellites_used']] = explode("\n", $legacy);
         } catch (JsonAppException $e) {
             // Set Empty metrics and error message
 
             echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
             update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
+
             return;
         }
 
@@ -135,7 +136,7 @@ if ($app_id > 0) {
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);
 
-    if (!empty($agent_data['app'][$name])) {
+    if (! empty($agent_data['app'][$name])) {
         update_application($app, $gpsd, $fields);
     } else {
         update_application($app, 'OK', $fields);

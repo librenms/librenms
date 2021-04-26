@@ -15,9 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS\Authentication
  * @link       https://librenms.org
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -25,7 +24,6 @@
 
 namespace LibreNMS\Authentication;
 
-use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -33,15 +31,13 @@ use LibreNMS\Util\IP;
 
 /**
  * Some functionality in this mechanism is inspired by confluence_http_authenticator (@chauth) and graylog-plugin-auth-sso (@Graylog)
- *
  */
-
 class SSOAuthorizer extends MysqlAuthorizer
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 1;
-    protected static $CAN_UPDATE_USER = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
-    protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = true;
 
     public function authenticate($credentials)
     {
@@ -58,7 +54,7 @@ class SSOAuthorizer extends MysqlAuthorizer
         $level = $this->authSSOCalculateLevel();
 
         // User has already been approved by the authenicator so if automatic user create/update is enabled, do it
-        if (Config::get('sso.create_users') && !$this->userExists($credentials['username'])) {
+        if (Config::get('sso.create_users') && ! $this->userExists($credentials['username'])) {
             $this->addUser($credentials['username'], null, $level, $email, $realname, $can_modify_passwd, $description ? $description : 'SSO User');
         } elseif (Config::get('sso.update_users') && $this->userExists($credentials['username'])) {
             $this->updateUser($this->getUserid($credentials['username']), $realname, $level, $can_modify_passwd, $email);
@@ -151,7 +147,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Calculate the privilege level to assign to a user based on the configuration and attributes supplied by the external authenticator.
      * Returns an integer if the permission is found, or raises an AuthenticationException if the configuration is not valid.
      *
-     * @return integer
+     * @return int
      */
     public function authSSOCalculateLevel()
     {
@@ -185,14 +181,14 @@ class SSOAuthorizer extends MysqlAuthorizer
     /**
      * Map a user to a permission level based on a table mapping, 0 if no matching group is found.
      *
-     * @return integer
+     * @return int
      */
     public function authSSOParseGroups()
     {
         // Parse a delimited group list
         $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')));
 
-        $valid_groups = array();
+        $valid_groups = [];
 
         // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups
         if (Config::get('sso.group_filter')) {

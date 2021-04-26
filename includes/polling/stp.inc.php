@@ -15,7 +15,7 @@
  */
 
 // Pre-cache existing state of STP for this device from database
-$stp_db = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', array($device['device_id']));
+$stp_db = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', [$device['device_id']]);
 
 $stpprotocol = snmp_get($device, 'dot1dStpProtocolSpecification.0', '-Oqv', 'RSTP-MIB');
 
@@ -34,9 +34,9 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     }
 
     // read the 802.1D subtree
-    $stp_raw = snmpwalk_cache_oid($device, 'dot1dStp', array(), 'RSTP-MIB');
+    $stp_raw = snmpwalk_cache_oid($device, 'dot1dStp', [], 'RSTP-MIB');
     d_echo($stp_raw);
-    $stp = array(
+    $stp = [
         'protocolSpecification'   => $stp_raw[0]['dot1dStpProtocolSpecification'],
         'priority'                => $stp_raw[0]['dot1dStpPriority'],
         'topChanges'              => $stp_raw[0]['dot1dStpTopChanges'],
@@ -48,8 +48,8 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
         'forwardDelay'            => $stp_raw[0]['dot1dStpForwardDelay'] * $tm,
         'bridgeMaxAge'            => $stp_raw[0]['dot1dStpBridgeMaxAge'] * $tm,
         'bridgeHelloTime'         => $stp_raw[0]['dot1dStpBridgeHelloTime'] * $tm,
-        'bridgeForwardDelay'      => $stp_raw[0]['dot1dStpBridgeForwardDelay'] * $tm
-    );
+        'bridgeForwardDelay'      => $stp_raw[0]['dot1dStpBridgeForwardDelay'] * $tm,
+    ];
 
     // set device binding
     $stp['device_id'] = $device['device_id'];
@@ -67,7 +67,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     $stp['timeSinceTopologyChange'] = $time_since_change;
 
     // designated root is stored in format 2 octet bridge priority + MAC address, so we need to normalize it
-    $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[0]['dot1dStpDesignatedRoot']));
+    $dr = str_replace([' ', ':', '-'], '', strtolower($stp_raw[0]['dot1dStpDesignatedRoot']));
     $dr = substr($dr, -12); //remove first two octets
     $stp['designatedRoot'] = $dr;
 
@@ -75,7 +75,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     $mac_array = explode(':', $mac_raw);
     foreach ($mac_array as &$octet) {
         if (strlen($octet) < 2) {
-            $octet = "0" . $octet; // add suppressed 0
+            $octet = '0' . $octet; // add suppressed 0
         }
     }
     $stp['bridgeAddress'] = implode($mac_array);
@@ -110,37 +110,37 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             // ToDo fix log_event()
             //
             //log_event('STP topology changed after: '.formatUptime($stp['timeSinceTopologyChange']), $device, 'stp', $stp['timeSinceTopologyChange']);
-            log_event('STP topology changed after: ' . formatUptime($stp['timeSinceTopologyChange']), $device, 'stp', 4);
+            log_event('STP topology changed after: ' . \LibreNMS\Util\Time::formatInterval($stp['timeSinceTopologyChange']), $device, 'stp', 4);
         }
         // Write to db
-        dbUpdate($stp, 'stp', 'device_id = ?', array($device['device_id']));
+        dbUpdate($stp, 'stp', 'device_id = ?', [$device['device_id']]);
         echo '.';
     }
 
     // STP port related stuff
     foreach ($stp_raw as $port => $value) {
         if ($port) { // $stp_raw[0] ist not port related so we skip this one
-            $stp_port = array(
+            $stp_port = [
                 'priority'              => $stp_raw[$port]['dot1dStpPortPriority'],
                 'state'                 => $stp_raw[$port]['dot1dStpPortState'],
                 'enable'                => $stp_raw[$port]['dot1dStpPortEnable'],
                 'pathCost'              => $stp_raw[$port]['dot1dStpPortPathCost'],
                 'designatedCost'        => $stp_raw[$port]['dot1dStpPortDesignatedCost'],
                 'designatedPort'        => $stp_raw[$port]['dot1dStpPortDesignatedPort'],
-                'forwardTransitions'    => $stp_raw[$port]['dot1dStpPortForwardTransitions']
-            );
+                'forwardTransitions'    => $stp_raw[$port]['dot1dStpPortForwardTransitions'],
+            ];
 
             // set device binding
             $stp_port['device_id'] = $device['device_id'];
 
             // set port binding
-            $stp_port['port_id'] = dbFetchCell('SELECT port_id FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $stp_raw[$port]['dot1dStpPort']));
+            $stp_port['port_id'] = dbFetchCell('SELECT port_id FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $stp_raw[$port]['dot1dStpPort']]);
 
-            $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
+            $dr = str_replace([' ', ':', '-'], '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
             $dr = substr($dr, -12); //remove first two octets
             $stp_port['designatedRoot'] = $dr;
 
-            $db = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
+            $db = str_replace([' ', ':', '-'], '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
             $db = substr($db, -12); //remove first two octets
             $stp_port['designatedBridge'] = $db;
 
@@ -148,7 +148,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                 // It seems that PBN guys don't care about ieee 802.1d :-(
                 // So try to find the right port with some crazy conversations
                 $dp_value = dechex($stp_port['priority']);
-                $dp_value = $dp_value.'00';
+                $dp_value = $dp_value . '00';
                 $dp_value = hexdec($dp_value);
                 if ($stp_raw[$port]['dot1dStpPortDesignatedPort']) {
                     $dp = $stp_raw[$port]['dot1dStpPortDesignatedPort'] - $dp_value;
@@ -163,7 +163,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             //d_echo($stp_port);
 
             // Update db
-            dbUpdate($stp_port, 'ports_stp', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $stp_port['port_id']));
+            dbUpdate($stp_port, 'ports_stp', '`device_id` = ? AND `port_id` = ?', [$device['device_id'], $stp_port['port_id']]);
             echo '.';
         }
     }

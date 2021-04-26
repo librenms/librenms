@@ -33,21 +33,22 @@ var grid = $("#arp-search").bootgrid({
 
             // Select the devices only with ARP tables
 $sql = 'SELECT D.device_id AS device_id, `hostname`, `D`.`sysName` AS `sysName` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D';
+$param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
-    $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+if (! Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname`, `D`.`sysName` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $_POST['device_id']) {
         echo '" selected "+';
     }
 
-    echo '">'.format_hostname($data).'</option>"+';
+    echo '">' . format_hostname($data) . '</option>"+';
 }
 ?>
                 "</select>"+
@@ -75,7 +76,7 @@ if ($_POST['searchby'] == 'ip') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"'.$_POST['searchPhrase'].'"+';
+echo '"' . $_POST['searchPhrase'] . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Address\" />"+
@@ -89,8 +90,8 @@ echo '"'.$_POST['searchPhrase'].'"+';
         return {
             id: "arp-search",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            searchby: '<?php echo mres($_POST['searchby']); ?>',
-            searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
+            searchby: '<?php echo $_POST['searchby']; ?>',
+            searchPhrase: '<?php echo $_POST['searchPhrase']; ?>'
         };
     },
     url: "ajax_table.php"

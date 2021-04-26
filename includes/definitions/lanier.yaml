@@ -6,9 +6,10 @@ icon: lanier
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - LANIER
+    -
+        sysDescr:
+            - LANIER
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

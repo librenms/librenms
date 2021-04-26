@@ -15,16 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers;
 
+use App;
 use App\Models\Application;
 use App\Models\Callback;
 use App\Models\Device;
@@ -38,13 +38,13 @@ use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Mempool;
 use App\Models\Port;
+use App\Models\PrinterSupply;
 use App\Models\Processor;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Storage;
 use App\Models\Syslog;
-use App\Models\Toner;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
@@ -72,6 +72,8 @@ class AboutController extends Controller
             'version_local'     => $version->local(),
             'version_mysql'     => current(DB::selectOne('select version()')),
             'version_php'       => phpversion(),
+            'version_laravel'   => App::VERSION(),
+            'version_python'    => Version::python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool'   => str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
                 Config::get('rrdtool', 'rrdtool') . ' --version | head -n1'
@@ -96,7 +98,7 @@ class AboutController extends Controller
             'stat_services'   => Service::count(),
             'stat_storage'    => Storage::count(),
             'stat_syslog'     => Syslog::count(),
-            'stat_toner'      => Toner::count(),
+            'stat_toner'      => PrinterSupply::count(),
             'stat_vlans'      => Vlan::count(),
             'stat_vrf'        => Vrf::count(),
             'stat_wireless'   => WirelessSensor::count(),

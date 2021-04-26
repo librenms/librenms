@@ -6,7 +6,7 @@ path: blob/master/doc/
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 5.6.4**
+**Please note the minimum supported PHP version is @= php.version_min =@**
 
 # On the DB Server
 
@@ -36,7 +36,7 @@ chkconfig mariadb on
 service mariadb start
 ```
 
-## Gneral
+## General
 
 Now continue with the installation:
 
@@ -52,7 +52,7 @@ Enter the MySQL/MariaDB root password to enter the command-line interface.
 Create database.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
@@ -154,7 +154,7 @@ chkconfig --levels 235 httpd on
 ```
 
 In `/etc/php.ini`, ensure `date.timezone` is set to your preferred
-time zone.  See <http://php.net/manual/en/timezones.php> for a list of
+time zone.  See <https://php.net/manual/en/timezones.php> for a list of
 supported timezones.  Valid examples are: "America/New York",
 "Australia/Brisbane", "Etc/UTC". Please also ensure that
 `allow_url_fopen` is enabled. Other functions needed for LibreNMS
@@ -283,7 +283,7 @@ chown -R librenms:librenms /opt/librenms
 chmod 775 rrd
 ```
 
-If you're planing on running rrdcached, make sure that the path is
+If you're planning on running rrdcached, make sure that the path is
 also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 **SELinux**
@@ -367,7 +367,7 @@ indicate otherwise!
 Initiate the follow database with the following command:
 
 ```
-php build-base.php
+php includes/sql-schema/update.php
 ```
 
 # Create admin user
@@ -435,7 +435,7 @@ cp librenms.nonroot.cron /etc/cron.d/librenms
 > settings in config.php is possible too. The config.php file will be
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
-> <https://docs.librenms.org/Support/Configuration/#proxy-support>
+> <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 # Copy logrotate config
 
@@ -468,7 +468,7 @@ $config['update'] = 0;
 
 Please allow for 2-3 runs of the poller-wrapper for data to start
 appearing in the WebUI. If you don't see data after this, please refer
-to the [FAQ](http://docs.librenms.org/Support/FAQ/) for assistance.
+to the [FAQ](../Support/FAQ.md) for assistance.
 
 That's it!  You now should be able to log in to
 <http://librenms.example.com/>. Please note that we have not covered
@@ -478,7 +478,6 @@ have configured HTTPS and taken appropriate web server hardening
 steps.
 
 It would be great if you would consider opting into the stats system
-we have, please see [this
-page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on
+we have, please see [this page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 

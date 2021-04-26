@@ -15,17 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Providers;
 
-use App\Models\ApiToken;
 use App\Models\User;
 use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -77,7 +75,7 @@ class LegacyUserProvider implements UserProvider
         $user = new User();
         $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
 
-        if (!$user) {
+        if (! $user) {
             return null;
         }
 
@@ -100,6 +98,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
+        /** @var User $user */
         $user->setRememberToken($token);
         $timestamps = $user->timestamps;
         $user->timestamps = false;
@@ -126,7 +125,7 @@ class LegacyUserProvider implements UserProvider
                 $credentials['username'] = $authorizer->getExternalUsername();
             }
 
-            if (empty($credentials['username']) || !$authorizer->authenticate($credentials)) {
+            if (empty($credentials['username']) || ! $authorizer->authenticate($credentials)) {
                 throw new AuthenticationException('Invalid Credentials');
             }
 
@@ -140,9 +139,8 @@ class LegacyUserProvider implements UserProvider
             }
             \Toastr::error($auth_message);
 
-            if (empty($username)) {
-                $username = Session::get('username', $credentials['username']);
-            }
+            $username = $username ?? Session::get('username', $credentials['username']);
+
             DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
         } finally {
             error_reporting(-1);
@@ -190,7 +188,8 @@ class LegacyUserProvider implements UserProvider
             }
 
             if (empty($new_user)) {
-                Log::error("Auth Error ($type): No user ($auth_id) [$username]");
+                Log::error("Auth Error ($type): No user ($auth_id) [$username] from " . Request::ip());
+
                 return null;
             }
         }
@@ -199,14 +198,12 @@ class LegacyUserProvider implements UserProvider
 
         // remove null fields
         $new_user = array_filter($new_user, function ($var) {
-            return !is_null($var);
+            return ! is_null($var);
         });
 
         // always create an entry in the users table, but separate by type
         $user = User::thisAuth()->firstOrNew(['username' => $username], $new_user);
         /** @var User $user */
-
-
         $user->fill($new_user); // fill all attributes
         $user->auth_type = $type; // doing this here in case it was null (legacy)
         $user->auth_id = $auth_id;

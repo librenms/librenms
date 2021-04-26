@@ -1,14 +1,23 @@
 mib: NETGEAR-BOXSERVICES-PRIVATE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
+                free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
+                precision: 1024
+    os:
+        sysDescr_regex: '/^(?<hardware>\S+) .*, (?<version>[\d.]+),/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1
     sensors:
         pre-cache:
-                data:
-                    - oid:
+            data:
+                -
+                    oid:
                         - boxServicesNormalTempRangeMin
                         - boxServicesNormalTempRangeMax
         temperature:
-            options:
-                skip_values_lt: 0
             data:
                 -
                     oid: boxServicesTempSensorsTable

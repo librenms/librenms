@@ -15,25 +15,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja
  */
-
-$stacked_device = count(array_keys($pre_cache['hwStackMemberInfoTable']));
+$stacked_device = empty($pre_cache['hwStackMemberInfoTable']) ? false : count($pre_cache['hwStackMemberInfoTable']) > 1;
 // If we have more than 1 device in the stack, then we should alert on stack ports not up
 
-if ($stacked_device > 1) {
-    $state_name    = "hwStackPortStatus";
+if ($stacked_device) {
+    $state_name = 'hwStackPortStatus';
     $states = [
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Up'],
         ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Down'],
     ];
 } else {
-    $state_name    = "hwStackPortStatusNotStacked";
+    $state_name = 'hwStackPortStatusNotStacked';
     $states = [
         ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Up'],
         ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Down'],
@@ -42,10 +40,10 @@ if ($stacked_device > 1) {
 
 foreach ($pre_cache['hwStackPortTable'] as $index => $data) {
     $subindex = explode('.', $index);
-    $state_oid     = '.1.3.6.1.4.1.2011.5.25.183.1.21.1.5.' . $index;
-    $state_descr   = "Unit " . $subindex[0] . " stack-port " . $subindex[1] . " Status";
-    $state          = $data['hwStackPortStatus'];
-    $state_index      = $index;
+    $state_oid = '.1.3.6.1.4.1.2011.5.25.183.1.21.1.5.' . $index;
+    $state_descr = 'Unit ' . $subindex[0] . ' stack-port ' . $subindex[1] . ' Status';
+    $state = $data['hwStackPortStatus'];
+    $state_index = $index;
 
     create_state_index($state_name, $states);
 

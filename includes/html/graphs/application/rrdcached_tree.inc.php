@@ -15,29 +15,27 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'rrdcached.inc.php';
 
 $colours = 'blues';
 
-$rrd_list = array(
-    array(
+$rrd_list = [
+    [
         'ds' => 'tree_depth',
         'filename' => $rrd_filename,
         'descr' => 'Tree Depth',
-    ),
-    array(
+    ],
+    [
         'ds' => 'tree_nodes_number',
         'filename' => $rrd_filename,
         'descr' => 'Tree Nodes',
-    )
-);
+    ],
+];
 
 require 'includes/html/graphs/generic_multi.inc.php';

@@ -1,24 +1,34 @@
 mib: SL-EDFA-MIB:SL-MAIN-MIB:SL-SFP-MIB:IF-MIB
 modules:
+    os:
+        hardware:
+            - .1.3.6.1.4.1.4515.1.3.6.1.1.1.2.0 # SL-ENTITY-MIB::slEntPhysicalDescr.0
+            - .1.3.6.1.4.1.4515.1.3.6.1.1.1.4.0 # SL-ENTITY-MIB::slEntPhysicalHardwareRev.0
+        hardware_template: '{{ .1.3.6.1.4.1.4515.1.3.6.1.1.1.2.0 }} rev {{ .1.3.6.1.4.1.4515.1.3.6.1.1.1.4.0 }}'
+        serial: .1.3.6.1.4.1.4515.1.3.6.1.1.1.7.0 # SL-ENTITY-MIB::slEntPhysicalSerialNum.0
+        version: .1.3.6.1.4.1.4515.1.3.6.1.1.1.5.0 # SL-ENTITY-MIB::slEntPhysicalFirmwareRev.0
     processors:
-          data:
-              -
-                  oid: hwEntityStateEntry
-                  value: hwEntityCpuUsage
-                  num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
-                  descr: '{{ $entPhysicalName }} Processor'
-                  skip_values:
-                        -
-                            oid: hwEntityOperStatus
-                            op: '!='
-                            value: 3
+        data:
+            -
+                oid: hwEntityStateEntry
+                value: hwEntityCpuUsage
+                num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
+                descr: '{{ $entPhysicalName }} Processor'
+                skip_values:
+                    -
+                        oid: hwEntityOperStatus
+                        op: '!='
+                        value: 3
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - ifDescr
-                    - ifAlias
-                    - ifAdminStatus
+                -
+                    oid:
+                        - ifDescr
+                        - ifAlias
+                        - ifAdminStatus
+                        - sfpConfigVendorPN
+                        - sfpConfigVendorSN
         temperature:
             data:
                 -
@@ -32,9 +42,9 @@ modules:
                     oid: sfpDiagTable
                     value: sfpDiagModuleTemperature
                     num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.34.{{ $index }}'
-                    descr: '{{ $ifDescr }} {{ $ifAlias }}' 
+                    descr: '{{ $ifDescr }} {{ $ifAlias }} Temperature'
                     index: 'opt-temp-{{ $index }}'
-                    group: 'Optics'
+                    group: 'Optic {{ $sfpConfigVendorPN }}, {{ $sfpConfigVendorSN }}'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     user_func: '\LibreNMS\OS\Packetlight::offsetSfpTemperature'
@@ -44,6 +54,14 @@ modules:
                             oid: sfpDiagModuleTemperature
                             op: '='
                             value: 0
+                        -
+                            oid: sfpDiagModuleTemperature
+                            op: '='
+                            value: 32768
+                        -
+                            oid: sfpDiagModuleTemperature
+                            op: '='
+                            value: -32768
         count:
             data:
                 -
@@ -87,6 +105,48 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'edfaOperOutputPower-{{ $index }}'
                     group: '{{ $edfaFreeDescription }}'
+                -
+                    oid: sfpDiagTable
+                    value: sfpDiagTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.37.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'txout-{{ $index }}'
+                    group: 'Optic {{ $sfpConfigVendorPN }}, {{ $sfpConfigVendorSN }}'
+                    high_limit: sfpDiagHighTxPowerAlmThreshold
+                    low_limit: sfpDiagLowTxPowerAlmThreshold
+                    user_func: '\LibreNMS\OS\Packetlight::convertWattToDbm'
+                    skip_values:
+                        -
+                            oid: ifAdminStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: sfpDiagHighTxPowerAlmThreshold
+                            op: '='
+                            value: 0
+                -
+                    oid: sfpDiagTable
+                    value: sfpDiagRxInputPower
+                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.38.{{ $index }}'
+                    descr: '{{ $ifDescr }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'Rxin-{{ $index }}'
+                    group: 'Optic {{ $sfpConfigVendorPN }}, {{ $sfpConfigVendorSN }}'
+                    high_limit: sfpDiagHighRxPowerAlmThreshold
+                    low_limit: sfpDiagLowRxPowerAlmThreshold
+                    user_func: '\LibreNMS\OS\Packetlight::convertWattToDbm'
+                    skip_values:
+                        -
+                            oid: ifAdminStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: sfpDiagHighRxPowerAlmThreshold
+                            op: '='
+                            value: 0
         quality_factor:
             data:
                 -
@@ -109,75 +169,31 @@ modules:
                     divisor: 10
                     index: 'edfaOpGain-{{ $index }}'
                     group: '{{ $edfaFreeDescription }}'
-        power:
+        state:
             data:
                 -
-                    oid: sfpDiagTable
-                    value: sfpDiagTxOutputPower
-                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.37.{{ $index }}'
-                    descr: '{{ $ifDescr }} Tx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: ports
-                    divisor: 10000000
-                    index: 'txout-{{ $index }}'
-                    group: '{{ $ifDescr }} {{ $ifAlias }}'
-                    high_limit: sfpDiagHighTxPowerAlmThreshold
-                    low_limit: sfpDiagLowTxPowerAlmThreshold
-                    skip_values:
-                        -
-                            oid: ifAdminStatus
-                            op: '='
-                            value: 2
-                        -
-                            oid: sfpDiagHighTxPowerAlmThreshold
-                            op: '='
-                            value: 0
+                    oid: edfaConfigTable
+                    value: edfaRedBlueType
+                    num_oid: '.1.3.6.1.4.1.4515.1.9.1.1.1.32.{{ $index }}'
+                    descr: '{{ $ifDescr }} Red Blue Type'
+                    group: edfaFreeDescription
+                    state_name: edfaRedBlueType
+                    states:
+                        - { descr: Red, graph: 1, value: 1, generic: 0 }
+                        - { descr: Blue, graph: 1, value: 2, generic: 0 }
+                        - { descr: None, graph: 1, value: 3, generic: 0 }
                 -
-                    oid: sfpDiagTable
-                    value: sfpDiagRxInputPower
-                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.38.{{ $index }}'
-                    descr: '{{ $ifDescr }} Rx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: ports
-                    divisor: 10000000
-                    index: 'Rxin-{{ $index }}'
-                    group: '{{ $ifDescr }} {{ $ifAlias }}'
-                    high_limit: sfpDiagHighRxPowerAlmThreshold
-                    low_limit: sfpDiagLowRxPowerAlmThreshold
-                    skip_values:
-                        -
-                            oid: ifAdminStatus
-                            op: '='
-                            value: 2
-                        -
-                            oid: sfpDiagHighRxPowerAlmThreshold
-                            op: '='
-                            value: 0
-        state:
-             data:
-                -
-                     oid: edfaConfigTable
-                     value: edfaRedBlueType
-                     num_oid: '.1.3.6.1.4.1.4515.1.9.1.1.1.32.{{ $index }}'
-                     descr: '{{ $ifDescr }} Red Blue Type'
-                     group: edfaFreeDescription
-                     state_name: edfaRedBlueType
-                     states:
-                         - { descr: Red, graph: 1, value: 1, generic: 0 }
-                         - { descr: Blue, graph: 1, value: 2, generic: 0 }
-                         - { descr: None, graph: 1, value: 3, generic: 0 }
-                -
-                     oid: edfaConfigTable
-                     value: edfaRole
-                     num_oid: '.1.3.6.1.4.1.4515.1.9.1.1.1.33.{{ $index }}'
-                     descr: '{{ $ifDescr }} Role'
-                     group: edfaFreeDescription
-                     state_name: edfaRole
-                     states:
-                         - { descr: booster, graph: 1, value: 1, generic: 0 }
-                         - { descr: boosterInline, graph: 1, value: 2, generic: 0 }
-                         - { descr: preamp, graph: 1, value: 3, generic: 0 }
-                         - { descr: inline, graph: 1, value: 4, generic: 0 }
-                         - { descr: raman, graph: 1, value: 5, generic: 0 }
-                         - { descr: other, graph: 1, value: 6, generic: 0 }
+                    oid: edfaConfigTable
+                    value: edfaRole
+                    num_oid: '.1.3.6.1.4.1.4515.1.9.1.1.1.33.{{ $index }}'
+                    descr: '{{ $ifDescr }} Role'
+                    group: edfaFreeDescription
+                    state_name: edfaRole
+                    states:
+                        - { descr: booster, graph: 1, value: 1, generic: 0 }
+                        - { descr: boosterInline, graph: 1, value: 2, generic: 0 }
+                        - { descr: preamp, graph: 1, value: 3, generic: 0 }
+                        - { descr: inline, graph: 1, value: 4, generic: 0 }
+                        - { descr: raman, graph: 1, value: 5, generic: 0 }
+                        - { descr: other, graph: 1, value: 6, generic: 0 }
 

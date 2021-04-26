@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Authentication modules
 
-LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/).
+LibreNMS supports multiple authentication modules along with [Two Factor Auth](Two-Factor-Auth.md).
 Here we will provide configuration details for these modules.
 
 # Available authentication modules
@@ -29,7 +29,7 @@ longer be available to log in.**
 
 To enable a particular authentication module you need to set this up
 in config.php. Please note that only ONE module can be
-enabled. LibreNMS doesn't support multiple authentication mechanism at
+enabled. LibreNMS doesn't support multiple authentication mechanisms at
 the same time.
 
 ```php
@@ -76,14 +76,14 @@ Enable debug output to troubleshoot issues
 
 Config option: `mysql`
 
-This is default option with LibreNMS so you should have already have
-the configuration setup.
+This is default option with LibreNMS so you should have already have the configuration setup in your
+environment file (.env).
 
-```php
-$config['db_host'] = "HOSTNAME";
-$config['db_user'] = "DBUSER";
-$config['db_pass'] = "DBPASS";
-$config['db_name'] = "DBNAME";
+```dotenv
+DB_HOST=HOSTNAME
+DB_DATABASE=DBNAME
+DB_USERNAME=DBUSER
+DB_PASSWORD="DBPASS"
 ```
 
 # Active Directory Authentication
@@ -111,8 +111,8 @@ Cleanup of old accounts is done by checking the authlog. You will need
 to set the number of days when old accounts will be purged
 AUTOMATICALLY by daily.sh.
 
-Please ensure that you set the $config['authlog_purge'] value to be
-greater than $config['active_directory']['users_purge'] otherwise old
+Please ensure that you set the `$config['authlog_purge']` value to be
+greater than `$config['active_directory']['users_purge']` otherwise old
 users won't be removed.
 
 ## Sample configuration
@@ -271,8 +271,8 @@ Cleanup of old accounts is done by checking the authlog. You will need
 to set the number of days when old accounts will be purged
 AUTOMATICALLY by daily.sh.
 
-Please ensure that you set the $config['authlog_purge'] value to be
-greater than $config['radius']['users_purge'] otherwise old users
+Please ensure that you set the `$config['authlog_purge']` value to be
+greater than `$config['radius']['users_purge']` otherwise old users
 won't be removed.
 
 # HTTP Authentication
@@ -391,7 +391,7 @@ This, along with the defaults, sets up a basic Single Sign-on setup that:
 
 - Reads values from environment variables
 - Automatically creates users when they're first seen
-- Authomatically updates users with new values
+- Automatically updates users with new values
 - Gives everyone privilege level 10
 
 This happens to mimic the behaviour of [http-auth](#http-auth), so if
@@ -521,7 +521,7 @@ This filter causes the mechanism to only consider groups matching a regular expr
 ### Logout Behaviour
 
 LibreNMS has no capability to log out a user authenticated via Single
-Sign-On - that responsability falls to the Relying Party.
+Sign-On - that responsibility falls to the Relying Party.
 
 If your Relying Party has a magic URL that needs to be called to end a
 session, you can configure LibreNMS to direct the user to it:
@@ -530,7 +530,7 @@ session, you can configure LibreNMS to direct the user to it:
 $config['post_logout_action'] = '/Shibboleth.sso/Logout';
 ```
 
-This option functions independantly of the Single Sign-on mechanism.
+This option functions independently of the Single Sign-on mechanism.
 
 ## Complete Configuration
 

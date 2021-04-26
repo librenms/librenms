@@ -11,16 +11,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Mail Transport
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
@@ -50,11 +49,11 @@ class Mail extends Transport
                     'name' => 'email',
                     'descr' => 'Email address of contact',
                     'type'  => 'text',
-                ]
+                ],
             ],
             'validation' => [
-                'email' => 'required|email'
-            ]
+                'email' => 'required|email',
+            ],
         ];
     }
 }

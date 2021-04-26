@@ -12,17 +12,17 @@
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die(json_encode([
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin.'
+        'message' => 'You need to be admin.',
     ]));
 }
 
 $status = 'ok';
 $message = '';
 
-if (!is_numeric($vars['transport_id'])) {
+if (! is_numeric($vars['transport_id'])) {
     $status = 'error';
     $message = 'No transport selected';
 } else {
@@ -36,7 +36,7 @@ if (!is_numeric($vars['transport_id'])) {
     }
 }
 
-die(json_encode([
+exit(json_encode([
     'status' => $status,
-    'message'=> $message
+    'message'=> $message,
 ]));

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
@@ -27,9 +26,9 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Cnpilote extends OS implements
@@ -38,7 +37,6 @@ class Cnpilote extends OS implements
     WirelessPowerDiscovery,
     WirelessNoiseFloorDiscovery
 {
-
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -48,9 +46,10 @@ class Cnpilote extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.1.1.14.0'; //CAMBIUM-MIB::cambiumAPTotalClients.0
-        return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Clients')
-        );
+
+        return [
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Clients'),
+        ];
     }
 
     /**
@@ -63,9 +62,10 @@ class Cnpilote extends OS implements
     public function discoverWirelessSnr()
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.3.1.11.0'; //CAMBIUM-MIB::cambiumClientSNR.0
-        return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'cnpilot', 1, 'SNR')
-        );
+
+        return [
+            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'cnpilot', 1, 'SNR'),
+        ];
     }
 
     /**
@@ -77,9 +77,10 @@ class Cnpilote extends OS implements
     public function discoverWirelessPower()
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.2.1.8.0'; //CAMBIUM-MIB::cambiumRadioTransmitPower.0
-        return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Transmit Power')
-        );
+
+        return [
+            new WirelessSensor('power', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Transmit Power'),
+        ];
     }
 
     /**
@@ -91,8 +92,9 @@ class Cnpilote extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.2.1.16.0'; //CAMBIUM-MIB::cambiumRadioNoiseFloor.0
-        return array(
-            new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Radio Noise Floor')
-        );
+
+        return [
+            new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Radio Noise Floor'),
+        ];
     }
 }

@@ -1,0 +1,20 @@
+--======================================================================
+-- SPIDCOM MIB 
+--======================================================================
+
+-- File Name   : SPIDCOM-MIB.txt
+-- Date        : Tue Jul 22 00:00:00 CEST 2004
+-- Author      : Gilles Dupont
+
+SPIDCOM-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+    enterprises       FROM SNMPv2-SMI;
+    
+  spidcom OBJECT IDENTIFIER ::= { enterprises 22764 }
+
+--=========================   END OF DOCUMENT   ========================
+
+END
+
+

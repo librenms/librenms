@@ -15,15 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $netguardian_tmp = snmp_get_multi_oid($device, ['dpsRTUModel.0', 'dpsRTUFirmwareVersion.0'], '-OQs', 'DPS-MIB-V38');
-$version         = $netguardian_tmp['dpsRTUFirmwareVersion.0'];
-$hardware        = $netguardian_tmp['dpsRTUModel.0'];
+$version = $netguardian_tmp['dpsRTUFirmwareVersion.0'];
+$hardware = $netguardian_tmp['dpsRTUModel.0'];
 unset($netguardian_tmp);

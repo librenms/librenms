@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDeviceGroupsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateDeviceGroupsTable extends Migration
     {
         Schema::create('device_groups', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->default('')->unique('name');
+            $table->string('name')->default('')->unique();
             $table->string('desc')->default('');
             $table->text('pattern')->nullable();
             $table->text('params')->nullable();

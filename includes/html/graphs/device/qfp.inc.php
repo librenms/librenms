@@ -6,9 +6,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @package    LibreNMS
- * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
@@ -17,7 +15,7 @@
  * Get module's components for a device
  */
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type' => 'cisco-qfp'));
+$components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
 $components = $components[$device['device_id']];
 
 /*
@@ -25,24 +23,24 @@ $components = $components[$device['device_id']];
  */
 $i = 1;
 foreach ($components as $component_id => $tmp_component) {
-    $rrd_filename = rrd_name($device['hostname'], array('cisco-qfp', 'util', $tmp_component['entPhysicalIndex']));
+    $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'util', $tmp_component['entPhysicalIndex']]);
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         $descr = short_hrDeviceDescr($tmp_component['name']);
 
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $descr;
-        $rrd_list[$i]['ds']       = 'ProcessingLoad';
-        $rrd_list[$i]['area']     = 1;
+        $rrd_list[$i]['descr'] = $descr;
+        $rrd_list[$i]['ds'] = 'ProcessingLoad';
+        $rrd_list[$i]['area'] = 1;
         $i++;
     }
 }
 
 $unit_text = 'Util %';
 
-$units       = '';
+$units = '';
 $total_units = '%';
-$colours     = 'mixed';
+$colours = 'mixed';
 
 $scale_min = '0';
 $scale_max = '100';

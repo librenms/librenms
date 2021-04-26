@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -43,6 +42,26 @@ class PortNacController extends TableController
         return ['username', 'ip_address', 'mac_address'];
     }
 
+    protected function sortFields($request)
+    {
+        return [
+            'port_id',
+            'mac_address',
+            'ip_address',
+            'vlan',
+            'domain',
+            'host_mode',
+            'username',
+            'authz_by',
+            'timeout',
+            'time_elapsed',
+            'time_left',
+            'authc_status',
+            'authz_status',
+            'method',
+        ];
+    }
+
     /**
      * Defines the base query for this resource
      *
@@ -54,6 +73,9 @@ class PortNacController extends TableController
         return PortsNac::where('device_id', $request->device_id)->hasAccess($request->user())->with('port');
     }
 
+    /**
+     * @param PortsNac $nac
+     */
     public function formatItem($nac)
     {
         $item = $nac->toArray();

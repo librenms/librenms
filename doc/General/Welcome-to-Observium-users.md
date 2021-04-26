@@ -58,9 +58,9 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "Free Software Foundation - what is free software?"
 [7]: http://libertysys.com.au/blog/observium-and-gpl
 "Paul's blog on what the GPL offers users"
-[8]: https://docs.librenms.org/General/Contributing/
+[8]: ../General/Contributing.md
 "Contribution guidelines"
 [9]: https://community.librenms.org
 "LibreNMS issue database at GitHub"
-[10]: https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/
+[10]: ../Installation/Migrating-from-Observium.md
 "Migrating from Observium to LibreNMS"

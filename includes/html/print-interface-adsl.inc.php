@@ -5,13 +5,13 @@ use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
 $port['device_id'] = $device['device_id'];
-$port['hostname']  = $device['hostname'];
+$port['hostname'] = $device['hostname'];
 
 $if_id = $port['port_id'];
 
 $port = cleanPort($port);
 
-if (!is_integer($i / 2)) {
+if (! is_integer($i / 2)) {
     $row_colour = Config::get('list_colour.even');
 } else {
     $row_colour = Config::get('list_colour.odd');
@@ -24,11 +24,11 @@ if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
 }
 
 echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
-onclick=\"location.href='device/".$device['device_id'].'/port/'.$port['port_id']."/'\" style='cursor: pointer;'>
+onclick=\"location.href='device/" . $device['device_id'] . '/port/' . $port['port_id'] . "/'\" style='cursor: pointer;'>
  <td valign=top width=350>";
 echo '        <span class=list-large>
-              '.generate_port_link($port, $port['ifIndex'].'. '.$port['label']).'
-           </span><br /><span class=interface-desc>'.display($port['ifAlias']).'</span>';
+              ' . generate_port_link($port, $port['ifIndex'] . '. ' . $port['label']) . '
+           </span><br /><span class=interface-desc>' . \LibreNMS\Util\Clean::html($port['ifAlias'], []) . '</span>';
 
 if ($port['ifAlias']) {
     echo '<br />';
@@ -36,25 +36,25 @@ if ($port['ifAlias']) {
 
 $break = '';
 if ($port_details) {
-    foreach (dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?', array($port['port_id'])) as $ip) {
-        echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=".$ip['ipv4_address']."')\">".$ip['ipv4_address'].'/'.$ip['ipv4_prefixlen'].'</a>';
+    foreach (dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip) {
+        echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=" . $ip['ipv4_address'] . "')\">" . $ip['ipv4_address'] . '/' . $ip['ipv4_prefixlen'] . '</a>';
         $break = ',';
     }
 
-    foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', array($port['port_id'])) as $ip6) {
-        echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".IP::parse($ip6['ipv6_address'], true).'/'.$ip6['ipv6_prefixlen'].'</a>';
+    foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip6) {
+        echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=" . $ip6['ipv6_address'] . "')\">" . IP::parse($ip6['ipv6_address'], true) . '/' . $ip6['ipv6_prefixlen'] . '</a>';
         $break = ',';
     }
 }
 
 echo '</span>';
 
-$width  = '120';
+$width = '120';
 $height = '40';
 $from = Config::get('time.day');
 
 echo '</td><td width=135>';
-echo (formatRates(($port['ifInOctets_rate'] * 8))." <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i> ".formatRates(($port['ifOutOctets_rate'] * 8)));
+echo \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps') . " <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_bits';
 echo generate_port_link(
@@ -64,7 +64,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo ''.formatRates($port['adslAturChanCurrTxRate']).'/'.formatRates($port['adslAtucChanCurrTxRate']);
+echo '' . \LibreNMS\Util\Number::formatSi($port['adslAturChanCurrTxRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAtucChanCurrTxRate'], 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_adsl_speed';
 echo generate_port_link(
@@ -74,7 +74,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo ''.formatRates($port['adslAturCurrAttainableRate']).'/'.formatRates($port['adslAtucCurrAttainableRate']);
+echo '' . \LibreNMS\Util\Number::formatSi($port['adslAturCurrAttainableRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAtucCurrAttainableRate'], 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_adsl_attainable';
 echo generate_port_link(
@@ -84,7 +84,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo ''.$port['adslAturCurrAtn'].'dB/'.$port['adslAtucCurrAtn'].'dB';
+echo '' . $port['adslAturCurrAtn'] . 'dB/' . $port['adslAtucCurrAtn'] . 'dB';
 echo '<br />';
 $port['graph_type'] = 'port_adsl_attenuation';
 echo generate_port_link(
@@ -94,7 +94,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo ''.$port['adslAturCurrSnrMgn'].'dB/'.$port['adslAtucCurrSnrMgn'].'dB';
+echo '' . $port['adslAturCurrSnrMgn'] . 'dB/' . $port['adslAtucCurrSnrMgn'] . 'dB';
 echo '<br />';
 $port['graph_type'] = 'port_adsl_snr';
 echo generate_port_link(
@@ -104,7 +104,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo ''.$port['adslAturCurrOutputPwr'].'dBm/'.$port['adslAtucCurrOutputPwr'].'dBm';
+echo '' . $port['adslAturCurrOutputPwr'] . 'dBm/' . $port['adslAtucCurrOutputPwr'] . 'dBm';
 echo '<br />';
 $port['graph_type'] = 'port_adsl_power';
 echo generate_port_link(

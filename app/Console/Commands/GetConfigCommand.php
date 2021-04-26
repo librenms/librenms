@@ -2,12 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 
 class GetConfigCommand extends LnmsCommand
 {
+    use CompletesConfigArgument;
+
     protected $name = 'config:get';
 
     /**
@@ -33,22 +36,25 @@ class GetConfigCommand extends LnmsCommand
         $setting = $this->argument('setting');
         if ($this->option('json')) {
             $this->line($setting ? json_encode(Config::get($setting)) : Config::toJson());
+
             return 0;
         }
 
-        if (!$setting) {
+        if (! $setting) {
             throw new \RuntimeException('Not enough arguments (missing: "setting").');
         }
 
         if (Config::has($setting)) {
             $output = Config::get($setting);
-            if (!is_string($output)) {
-                $output = var_export($output, 1);
+            if (! is_string($output)) {
+                $output = var_export($output, true);
             }
 
             $this->line($output);
+
             return 0;
         }
+
         return 1;
     }
 }

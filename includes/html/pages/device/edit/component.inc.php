@@ -10,13 +10,13 @@
                 <th data-column-id='label'>Label</th>
                 <th data-column-id='status'>Status</th>
                 <th data-column-id='disable' data-sortable='false'>Disable</th>
-                <th data-column-id='ignore' data-sortable='false'>Ignore</th>
+                <th data-column-id='ignore' data-sortable='false'>Ignore alert tag</th>
             </tr>
         </thead>
     </table>
     <input type='hidden' name='component' value='yes'>
     <input type='hidden' name='type' value='component'>
-    <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
+    <input type='hidden' name='device' value='<?php echo $device['device_id']; ?>'>
 </form>
 <script>
     // Waiting for the document to be ready.

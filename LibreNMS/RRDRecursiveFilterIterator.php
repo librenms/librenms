@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016
  * @author
  */
@@ -28,12 +27,11 @@ namespace LibreNMS;
 /**
  * Reursive Filter Iterator to iterate directories and locate .rrd files.
  *
- * @method boolean isDir()
+ * @method bool isDir()
  *
  **/
 class RRDRecursiveFilterIterator extends \RecursiveFilterIterator
 {
-
     public function accept()
     {
         $filename = $this->current()->getFilename();

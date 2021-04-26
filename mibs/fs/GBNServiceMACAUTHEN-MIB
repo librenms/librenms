@@ -15,14 +15,14 @@
         
 
     gbnMacAuthenMib MODULE-IDENTITY
-        LAST-UPDATED    "2010/06/01"  -- Jun 01, 2010
+        LAST-UPDATED    "201006010000Z"  -- Jun 01, 2010
         ORGANIZATION    "Admin"
         CONTACT-INFO    "Admin
                          E-mail: support@Admin.com"
 
         DESCRIPTION     "gbn macauthen Enterprise MIB definition."
 
-        REVISION        "2010/06/01"  -- Jun 01, 2010
+        REVISION        "201006010000Z"  -- Jun 01, 2010
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnServiceAAA 4 }

@@ -5,8 +5,12 @@ text: FreeBSD
 processor_stacked: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery_modules:
     applications: true
 discovery:
-    - sysDescr: FreeBSD
+    -
+        sysDescr: FreeBSD
+        sysDescr_except:
+            - FreeNAS
+            - TrueNAS

@@ -1,0 +1,21 @@
+LTNET-ROOT DEFINITIONS ::= BEGIN
+
+IMPORTS
+     enterprises
+          FROM RFC1155-SMI
+;
+ltnetRoot  OBJECT IDENTIFIER ::= { enterprises 33826 }
+
+-- DESCRIPTION
+
+ltnetHFCemsTree  OBJECT IDENTIFIER  ::= { ltnetRoot 1 }
+
+-- DESCRIPTION
+
+osIdent OBJECT IDENTIFIER ::= { ltnetHFCemsTree 1}
+	
+--     DESCRIPTION
+	
+ltnetSmartDeviceTree  OBJECT IDENTIFIER  ::= { ltnetRoot 2 }
+		
+END

@@ -16,7 +16,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
 --			FROM SNMPv2-CONF
 		TEXTUAL-CONVENTION
             		FROM SNMPv2-TC
-		DisplayString, TruthValue
+		DisplayString, TruthValue, TimeStamp
 			FROM SNMPv2-TC
 		TcChassisType
 			FROM PAN-GLOBAL-TC
@@ -61,6 +61,13 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
 			Initial version of MIB module PAN-COMMON-MIB."
 
 		::= { panModules 3 }
+
+    FloatValue ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT  "d-2"
+        STATUS         current
+        DESCRIPTION
+             " This data type is used to represent Float values."
+        SYNTAX        OCTET STRING (SIZE(0..64))
 
 	panCommonConfMib OBJECT-IDENTITY
 		STATUS					current
@@ -123,6 +130,12 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION				"
             Sub-tree for common Device information."
         ::= { panCommonObjs 7 }
+
+    panSSLBroker OBJECT-IDENTITY
+        STATUS					current
+        DESCRIPTION				"
+            Sub-tree to capture ssl broker statistics."
+        ::= { panCommonObjs 8 }
 
     panGlobalCounters OBJECT-IDENTITY
         STATUS                  current
@@ -466,9 +479,9 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
 	    panVsysSessionUtilizationPct    Integer32,
     	panVsysActiveSessions           Integer32,
     	panVsysMaxSessions              Integer32,
-        panVsysActiveTcpCps             Unsigned32,    
-        panVsysActiveUdpCps             Unsigned32,    
-        panVsysActiveOtherIpCps         Unsigned32 
+        panVsysActiveTcpCps             Integer32,    
+        panVsysActiveUdpCps             Integer32,    
+        panVsysActiveOtherIpCps         Integer32 
        }
        
 	panVsysId OBJECT-TYPE
@@ -514,7 +527,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
 		::= { panVsysEntry 5 }
 
     panVsysActiveTcpCps OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -522,7 +535,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panVsysEntry 6 }
 
     panVsysActiveUdpCps OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -530,7 +543,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panVsysEntry 7 }
 
     panVsysActiveOtherIpCps OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -633,6 +646,64 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
 
 
     ---------------------------------------------------------------------------
+    -- panSSLBroker
+    panSSLBrokerStatsTable OBJECT-TYPE
+         SYNTAX                  SEQUENCE OF PanSSLBrokerStatsEntry
+         MAX-ACCESS              not-accessible
+         STATUS                  current
+         DESCRIPTION
+            "Sub-tree for capturing ssl broker statistics and status."
+         ::= { panSSLBroker 1 }
+
+    panSSLBrokerStatsEntry OBJECT-TYPE
+         SYNTAX                  PanSSLBrokerStatsEntry
+         MAX-ACCESS              not-accessible
+         STATUS                  current
+         DESCRIPTION             
+            "Entry of ssl broker statistics and status."
+         INDEX      { index }
+         ::= { panSSLBrokerStatsTable 1 }
+
+    PanSSLBrokerStatsEntry ::= SEQUENCE {
+        index           Integer32,
+        chainName       DisplayString,
+        avgLatency      Integer32,
+        sessionCount    Integer32
+    }
+
+    index OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Index of the ssl broker stats entry"
+        ::= { panSSLBrokerStatsEntry 1 }
+
+    chainName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Name of ssl broker chain object"
+        ::= { panSSLBrokerStatsEntry 2 }
+
+    avgLatency OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average latency value"
+        ::= { panSSLBrokerStatsEntry 3 }
+
+    sessionCount OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of active sessions"
+        ::= { panSSLBrokerStatsEntry 4 }
+
+    ---------------------------------------------------------------------------
     -- panDeviceLoggingLogRate
 
     panDeviceIncomingLogRate OBJECT-TYPE
@@ -683,7 +754,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panDeviceLoggingLogTypeStatEntry 1 }
     
     panDeviceLoggingDeviceIndex OBJECT-TYPE
-        SYNTAX      DisplayString
+        SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -752,7 +823,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
 
     PanDeviceLoggingLogUsageEntry ::= SEQUENCE {
         panDeviceLoggingLogUsageLogType              DisplayString,
-        panDeviceLoggingDiskUsageDiskSpacePct        FloatValue,
+        panDeviceLoggingDiskUsageDiskSpace           FloatValue,
         panDeviceLoggingDiskUsageRetention           Unsigned32,
         panDeviceLoggingDiskQuotaPct                 FloatValue,
         panDeviceLoggingDiskQuota                    FloatValue 
@@ -766,8 +837,8 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
             "Log type for Device. "
         ::= { panDeviceLoggingLogUsageEntry 1 }
 
-    panDeviceLoggingDiskUsageDiskSpacePct OBJECT-TYPE
-        SYNTAX      FloatValue
+    panDeviceLoggingDiskUsageDiskSpace OBJECT-TYPE
+        SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -783,7 +854,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panDeviceLoggingLogUsageEntry 3 }
    
     panDeviceLoggingDiskQuotaPct OBJECT-TYPE
-        SYNTAX      FloatValue
+        SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -791,7 +862,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panDeviceLoggingLogUsageEntry 4 }
 
     panDeviceLoggingDiskQuota OBJECT-TYPE
-        SYNTAX      FloatValue
+        SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -899,7 +970,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
       MAX-ACCESS  read-only
       STATUS      current
       DESCRIPTION
-          "Counter for depth of queue."
+          "Counter for average send rate over 1 minute interval."
       ::= { panDeviceLoggingExtFwdStatsEntry 6 }
 
     -------------------------------------------------------------------
@@ -963,13 +1034,6 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
             Sub-tree for the Log collection statistics."
         ::= { panLogCollector 1 }
 
-    FloatValue ::= TEXTUAL-CONVENTION
-        DISPLAY-HINT  "d-2"
-        STATUS         current
-        DESCRIPTION
-             " This data type is used to represent Float values."
-        SYNTAX        OCTET STRING (SIZE(0..64))
-
 	----------------------------------------------------------------------
 	-- LogCollector Stats
  
@@ -1014,6 +1078,14 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
             Sub-tree for the Log Usage and data retention on the Log Collector(localDB). 
             Log Disk Usage is available as MB in use."
         ::= { panLcStat 5 }
+
+    panLcDiskIOPSTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanLcDiskIOPSEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION             "
+            Sub-tree for Log Disk I/O throughput on the Log Collector and Panorama."
+        ::= { panLcStat 6 } 
 
     panLcLogDurationTraffic OBJECT-TYPE
         SYNTAX      Unsigned32
@@ -1144,7 +1216,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panLocalLogUsageEntry 1 }
 
     panLocalDiskUsageDiskSpace OBJECT-TYPE
-        SYNTAX      FloatValue
+        SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1160,21 +1232,60 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panLocalLogUsageEntry 3 }
 
     panLocalDiskQuota OBJECT-TYPE
-        SYNTAX      FloatValue 
+        SYNTAX      DisplayString 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Disk Quota (in GB) for particular log type for Log Collector. "
+            "Disk Quota (in MB) for particular log type for Log Collector. "
         ::= { panLocalLogUsageEntry 4 }
 
     panLocalDiskQuotaPct OBJECT-TYPE
-        SYNTAX      FloatValue 
+        SYNTAX      DisplayString 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             "Disk Quota Percentage for particular log type for Log Collector. "
         ::= { panLocalLogUsageEntry 5 }
 
+
+    panLcDiskIOPSEntry OBJECT-TYPE
+        SYNTAX          PanLcDiskIOPSEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when panLcDiskIOPSEntry are added to the panLcDiskIOPSTable."
+    INDEX           { panLcDiskIOPSId }
+    ::= { panLcDiskIOPSTable  1 }  
+
+    PanLcDiskIOPSEntry ::= SEQUENCE {
+        panLcDiskIOPSId          DisplayString,
+        panLcDiskIORead5min      Counter64,
+        panLcDiskIOWrite5min     Counter64
+       }
+
+    panLcDiskIOPSId  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "Disk number for Log Collector or Panorama. "
+           ::= { panLcDiskIOPSEntry 1 }
+
+    panLcDiskIORead5min  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "Disk read rate over a span of 5 minute interval."
+           ::= { panLcDiskIOPSEntry 2 }
+    
+    panLcDiskIOWrite5min  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Disk write rate over a span of 5 minute interval."
+            ::= { panLcDiskIOPSEntry 3 }
 
     panLcLogUsageEntry OBJECT-TYPE
         SYNTAX          PanLcLogUsageEntry
@@ -1201,7 +1312,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panLcLogUsageEntry 1 }
 
     panLcDiskUsageDiskSpacePct OBJECT-TYPE
-        SYNTAX      FloatValue
+        SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1218,7 +1329,7 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         ::= { panLcLogUsageEntry 3 }
     
     panLcDiskQuotaPct OBJECT-TYPE
-        SYNTAX      FloatValue
+        SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1843,6 +1954,342 @@ PAN-COMMON-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Number of entries in DOS Hardware block table"
         ::= { panGlobalCountersDOSCounters 34 } 
+    
+    panFlowDosSyncookieNotTcpSyn OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "TCP SYN cookies:TCP SYN cookie not SYN"
+        ::= { panGlobalCountersDOSCounters 35 } 
+    
+    panFlowDosSyncookieNotTcpSynAck OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "TCP SYN cookies:TCP SYN cookie not SYN-ACK"
+        ::= { panGlobalCountersDOSCounters 36 } 
+    
+    panFlowDosPfIpspoof OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-ip-spoof'"
+        ::= { panGlobalCountersDOSCounters 37 } 
+    
+    panFlowDosPfIpfrag OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-ip-frag'"
+        ::= { panGlobalCountersDOSCounters 38 } 
+    
+    panFlowDosPfPing0 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-icmp-ping-zero-id'"
+        ::= { panGlobalCountersDOSCounters 39 } 
+    
+    panFlowDosPfIcmpfrag OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-icmp-frag'"
+        ::= { panGlobalCountersDOSCounters 40 } 
+    
+    panFlowDosPfIcmplpkt OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-icmp-large-packet'"
+        ::= { panGlobalCountersDOSCounters 41 } 
+    
+    panFlowDosPfIcmperr OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-icmp-error'"
+        ::= { panGlobalCountersDOSCounters 42 } 
+    
+    panFlowDosPfNoreplyttl OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'suppress-icmp-timeexceeded'"
+        ::= { panGlobalCountersDOSCounters 43 } 
+    
+    panFlowDosPfNoreplyneedfrag OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'suppress-icmp-needfrag'"
+        ::= { panGlobalCountersDOSCounters 44 } 
+    
+    panFlowDosPfStrictsource OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-strict-source-routing'"
+        ::= { panGlobalCountersDOSCounters 45 } 
+    
+    panFlowDosPfLoosesource OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-loose-source-routing'"
+        ::= { panGlobalCountersDOSCounters 46 } 
+    
+    panFlowDosPfTimestamp OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-timestamp'"
+        ::= { panGlobalCountersDOSCounters 47 } 
+    
+    panFlowDosPfRecordroute OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-record-route'"
+        ::= { panGlobalCountersDOSCounters 48 } 
+    
+    panFlowDosPfSecurity OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-security'"
+        ::= { panGlobalCountersDOSCounters 49 } 
+    
+    panFlowDosPfSatnetid OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-stream-id'"
+        ::= { panGlobalCountersDOSCounters 50 } 
+    
+    panFlowDosPfUnknown OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-unknown-option'"
+        ::= { panGlobalCountersDOSCounters 51 } 
+    
+    panFlowDosPfBadoption OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-malformed-option'"
+        ::= { panGlobalCountersDOSCounters 52 } 
+    
+    panFlowDosPfTcpoverlappingmismatch OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-overlapping-tcp-segment-mismatch'"
+        ::= { panGlobalCountersDOSCounters 53 } 
+    
+    panFlowDosPfStrictip OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'strict-ip-check'"
+        ::= { panGlobalCountersDOSCounters 54 } 
+    
+    panFlowDosPfTcpsplithandshake OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-tcp-split-handshake'"
+        ::= { panGlobalCountersDOSCounters 55 } 
+    
+    panFlowDosPfTcpsyndata OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-tcp-syn-with-data'"
+        ::= { panGlobalCountersDOSCounters 56 } 
+    
+    panFlowDosPfTcpsynackdata OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'discard-tcp-synack-with-data'"
+        ::= { panGlobalCountersDOSCounters 57 } 
+    
+    panFlowDosIp6Route0 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-0'"
+        ::= { panGlobalCountersDOSCounters 58 } 
+    
+    panFlowDosIp6Route1 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-1'"
+        ::= { panGlobalCountersDOSCounters 59 } 
+    
+    panFlowDosIp6Route3 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-3'"
+        ::= { panGlobalCountersDOSCounters 60 } 
+    
+    panFlowDosIp6Route4to252 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-4-252'"
+        ::= { panGlobalCountersDOSCounters 61 } 
+    
+    panFlowDosIp6Route253 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-253'"
+        ::= { panGlobalCountersDOSCounters 62 } 
+    
+    panFlowDosIp6Route254 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-254'"
+        ::= { panGlobalCountersDOSCounters 63 } 
+    
+    panFlowDosIp6Route255 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-header-255'"
+        ::= { panGlobalCountersDOSCounters 64 } 
+    
+    panFlowDosIp6Ip4cmpt OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'ipv4-compatible-address'"
+        ::= { panGlobalCountersDOSCounters 65 } 
+    
+    panFlowDosIp6Acast OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'anycast-source'"
+        ::= { panGlobalCountersDOSCounters 66 } 
+    
+    panFlowDosIp6OptionsInvalidIPv6 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'options-invalid-ipv6-discard'"
+        ::= { panGlobalCountersDOSCounters 67 } 
+    
+    panFlowDosIp6Icmpv6ErrorInvalid OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'icmpv6-too-big-small-mtu-discard'"
+        ::= { panGlobalCountersDOSCounters 68 } 
+    
+    panFlowDosIp6NeedlessIpv6FragHdr OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'needless-fragment-hdr'"
+        ::= { panGlobalCountersDOSCounters 69 } 
+    
+    panFlowDosIp6RsvdSet OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'reserved-field-set-discard'"
+        ::= { panGlobalCountersDOSCounters 70 } 
+    
+    panFlowDosIPv6ExtHdrHopByHop OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'hop-by-hop-hdr'"
+        ::= { panGlobalCountersDOSCounters 71 } 
+    
+    panFlowDosip6IPv6ExtHdrRouting OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'routing-hdr'"
+        ::= { panGlobalCountersDOSCounters 72 } 
+    
+    panFlowDosIp6IPv6ExtHdrDestOpt OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Zone protection option 'dest-option-hdr'"
+        ::= { panGlobalCountersDOSCounters 73 } 
+    
+    panFlowDosPbpDrop OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Packets dropped:Dropped by packet buffer protection RED"
+        ::= { panGlobalCountersDOSCounters 74 } 
+    
+    panFlowDosCurrSessIncrFailed OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Unable to increment current session count on session create"
+        ::= { panGlobalCountersDOSCounters 75 } 
+    
+    panFlowDosCurrSessDecrFailed OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Unable to decrement current session count on session delete"
+        ::= { panGlobalCountersDOSCounters 76 } 
 
 
  -------------------------------------------------------------------------------------------------------

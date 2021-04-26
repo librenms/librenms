@@ -6,13 +6,10 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    LibreNMS
- * @subpackage snmptraps
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  * @copyright  (C) 2018 LibreNMS
  * Adapted from old snmptrap.php handler
  */
-
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 

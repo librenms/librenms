@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Lorenzo Zafra
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
@@ -27,7 +26,7 @@
 
 $mainVoltage = trim(snmp_get($device, '.1.3.6.1.4.1.7428.1.2.2.1.1.2.1', '-Oqv'), '" ');
 
-if (!empty($mainVoltage)) {
+if (! empty($mainVoltage)) {
     $divisor = 1;
     $index = '2.1';
     $descr = 'Power Supply Voltage';

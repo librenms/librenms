@@ -5,9 +5,9 @@ if (Auth::user()->hasGlobalRead()) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
-            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
+            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, $vars['name']);
             if ($service_id) {
-                $message       .= $message_break.'Service added ('.$service_id.')!';
+                $message .= $message_break . 'Service added (' . $service_id . ')!';
                 $message_break .= '<br />';
             }
         }
@@ -21,8 +21,8 @@ if (Auth::user()->hasGlobalRead()) {
         }
     }
 
-    $dev         = device_by_id_cache($device['device_id']);
-    $devicesform = "<option value='".$dev['device_id']."'>".$dev['hostname'].'</option>';
+    $dev = device_by_id_cache($device['device_id']);
+    $devicesform = "<option value='" . $dev['device_id'] . "'>" . $dev['hostname'] . '</option>';
 
     if ($updated) {
         print_message('Device Settings Saved');

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Neil Kahle <nkahle@kanren.net>
  */
@@ -46,7 +45,7 @@ class JnxLdpLspDown implements SnmptrapHandler
         $routerID = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpRtrid'));
         $reason = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpLspDownReason'));
         $instanceName = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpInstanceName'));
-        
+
         Log::event("LDP session $instanceName from $routerID to $lspForward has gone down due to $reason", $device->device_id, 'trap', 4);
     }
 }

@@ -11,12 +11,12 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'cambium-250-dataRate');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'cambium-250-dataRate');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Mbps                        Now       Ave      Max     \\n'";
-    $rrd_options .= ' DEF:receiveDataRate='.$rrdfilename.':receiveDataRate:AVERAGE ';
-    $rrd_options .= ' DEF:transmitDataRate='.$rrdfilename.':transmitDataRate:AVERAGE ';
-    $rrd_options .= ' DEF:aggregateDataRate='.$rrdfilename.':aggregateDataRate:AVERAGE ';
+    $rrd_options .= ' DEF:receiveDataRate=' . $rrdfilename . ':receiveDataRate:AVERAGE ';
+    $rrd_options .= ' DEF:transmitDataRate=' . $rrdfilename . ':transmitDataRate:AVERAGE ';
+    $rrd_options .= ' DEF:aggregateDataRate=' . $rrdfilename . ':aggregateDataRate:AVERAGE ';
     $rrd_options .= " LINE2:receiveDataRate#0000FF:'Receive Data Rate         ' ";
     $rrd_options .= ' GPRINT:receiveDataRate:LAST:%0.2lf%s ';
     $rrd_options .= ' GPRINT:receiveDataRate:MIN:%0.2lf%s ';

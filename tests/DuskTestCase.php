@@ -33,7 +33,7 @@ abstract class DuskTestCase extends BaseTestCase
             '--disable-gpu',
         ];
 
-        if (env('CHROME_HEADLESS')) {
+        if (getenv('CHROME_HEADLESS')) {
             $arguments[] = '--headless';
         }
 

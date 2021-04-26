@@ -111,6 +111,37 @@ Add the following to your LibreNMS `config.php` file to enable the Syslog extens
 $config['enable_syslog'] = 1;
 ```
 
+
+If no messages make it to the syslog tab in LibreNMS, chances are you experience an issue with SELinux. If so, create a file mycustom-librenms-rsyslog.te , with the following content:
+
+```
+module mycustom-librenms-rsyslog 1.0;
+
+require {
+        type syslogd_t;
+        type httpd_sys_rw_content_t;
+        type ping_exec_t;
+        class process execmem;
+        class dir { getattr search write };
+        class file { append getattr execute open read };
+}
+
+#============= syslogd_t ==============
+allow syslogd_t httpd_sys_rw_content_t:dir { getattr search write };
+allow syslogd_t httpd_sys_rw_content_t:file { open read append getattr };
+allow syslogd_t self:process execmem;
+allow syslogd_t ping_exec_t:file execute;
+```
+
+Then, as root, execute the following commands:
+
+```ssh
+checkmodule -M -m -o mycustom-librenms-rsyslog.mod mycustom-librenms-rsyslog.te
+semodule_package -o mycustom-librenms-rsyslog.pp -m mycustom-librenms-rsyslog.mod
+semodule -i mycustom-librenms-rsyslog.pp
+```
+
+
 ### rsyslog
 
 If you prefer rsyslog, here are some hints on how to get it working.
@@ -125,32 +156,45 @@ $ModLoad imudp
 $UDPServerRun 514
 ```
 
-Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing:
+Create a file called `/etc/rsyslog.d/30-librenms.conf`and add the following depending on your version of rsyslog.
 
-```
-# Feed syslog messages to librenms
-$ModLoad omprog
+=== "Version 8"
+    ```
+    # Feed syslog messages to librenms
+    module(load="omprog")
 
-$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n"
+    template(name="librenms"
+            type="string"
+            string= "%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n")
+            action(type="omprog"
+            binary="/opt/librenms/syslog.php"
+            template="librenms")
 
-*.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
+    & stop
+    ```
 
-& stop
+=== "Version 7"
+    ```
+    #Feed syslog messages to librenms
+    $ModLoad omprog
 
-```
+    $template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n"
 
-Ancient versions of rsyslog may require different syntax.
+    *.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
 
-This is an example for rsyslog 5 (default on Debian 7):
+    & stop
 
-```bash
-# Feed syslog messages to librenms
-$ModLoad omprog
-$template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timegenerated:8:25%||%msg%||%programname%\n"
+    ```
 
-$ActionOMProgBinary /opt/librenms/syslog.php
-*.* :omprog:;librenms
-```
+=== "Legacy"
+    ```
+    # Feed syslog messages to librenms
+    $ModLoad omprog
+    $template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY%    %timegenerated:8:25%||%msg%||%programname%\n"
+
+    $ActionOMProgBinary /opt/librenms/syslog.php
+    *.* :omprog:;librenms
+    ```
 
 If your rsyslog server is recieving messages relayed by another syslog
 server, you may try replacing `%fromhost%` with `%hostname%`, since
@@ -220,8 +264,7 @@ $config['syslog_purge'] = 30;
 
 The cleanup is run by daily.sh and any entries over X days old are
 automatically purged. Values are in days. See here for more Clean Up
-Options
-[Link](https://docs.librenms.org/Support/Cleanup-options/)
+Options [Link](../Support/Cleanup-options.md)
 
 # Client configuration
 

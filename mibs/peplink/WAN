@@ -1,0 +1,496 @@
+-- ********************************************************************
+        WAN DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, Integer32, IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+
+-- The Enterprises Number
+                peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+
+                wan-status MODULE-IDENTITY
+			LAST-UPDATED "201609060000Z"		-- 09 06, 2016 at 12:00 GMT
+			ORGANIZATION
+				"PEPLINK"
+			CONTACT-INFO
+				""
+			DESCRIPTION
+				"MIB module for WAN."
+		::= { peplink 2 }
+
+-- Local type define ----------------------------------------------------------
+PortSpeedType ::= TEXTUAL-CONVENTION
+    	STATUS       current
+    	DESCRIPTION
+        	"Describe the port speed and type."
+    	SYNTAX INTEGER {
+        	unknown(0),
+                auto(1),
+                fullDulplex10(2),
+                halfDulplex10(3),
+                fullDulplex100(4),
+                halfDulplex100(5),
+                fullDulplex1000(6),
+                halfDulplex1000(7)
+	}
+-------------------------------------------------------------------------------
+
+-- #####################################################################
+-- 
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	wanStatus OBJECT IDENTIFIER ::= { wan-status 1 }
+
+-- **********************************************************************
+-- *  
+-- **********************************************************************
+
+		wanNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of WAN network."
+			::= { wanStatus 1 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		wanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WAN Table"
+			::= { wanStatus 2 }
+
+			wanEntry OBJECT-TYPE
+			SYNTAX WanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wanTable"
+			INDEX { wanId }
+			::= { wanTable 1 }
+
+			WanEntry ::=
+			SEQUENCE {
+				wanId
+					Integer32,
+				wanName
+					OCTET STRING,
+				wanState
+					INTEGER,
+				wanHealthCheckState
+					INTEGER,
+				wanSignal
+					Integer32,
+				wanCellID
+					OCTET STRING,
+				wanPdpConnection
+					INTEGER
+			}
+
+			wanId OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN ID."
+				::= { wanEntry 1 }
+
+			wanName OBJECT-TYPE
+				SYNTAX OCTET STRING (SIZE (1..32))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN Name."
+				::= { wanEntry 2 }
+
+			wanState OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					disabled(1),
+					disconnected(2),
+					connected(3),
+					connecting(4),
+					activating(5),
+					health-check-fail(6),
+					disconnected-manually(7),
+					standby(8)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN status."
+				::= { wanEntry 3 }
+
+			wanHealthCheckState OBJECT-TYPE
+				SYNTAX INTEGER	{
+					fail(0),
+					success(1)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN health check state."
+				::= { wanEntry 4 }
+
+			wanSignal OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN signal strength in dBm unit.
+					Remark:
+					If the value equals -9999, means signal strength 
+					not applicable in this WAN."
+				::= { wanEntry 5 }
+
+			wanCellID OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN cell id.
+					Remark:
+					Only applicable for cellular WAN."
+				::= { wanEntry 6 }
+
+			wanPdpConnection OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					pdp-ip(1),
+					pdp-ppp(2),
+					pdp-ipv6(3),
+					pdp-ipv4v6(4)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN PDP connection type.
+					Remark:
+					Only applicable for cellular WAN."
+				::= { wanEntry 7 }
+-- **********************************************************************
+-- *  
+-- **********************************************************************
+
+	wanNetwork OBJECT IDENTIFIER ::= { wanStatus 3 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		wanNetworkIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WanNetworkIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WAN Network IP Table"
+			::= { wanNetwork 1 }
+
+			wanNetworkIpEntry OBJECT-TYPE
+			SYNTAX WanNetworkIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wanNetworkIpTable"
+			INDEX { wanId, wanNetworkIpId }
+			::= { wanNetworkIpTable 1 }
+
+			WanNetworkIpEntry ::=
+			SEQUENCE {
+				wanNetworkIpId
+					Integer32,
+				wanNetworkIpType
+					INTEGER,
+				wanNetworkIpAddress
+					IpAddress,
+				wanNetworkSubnetMask
+					IpAddress
+			}
+
+			wanNetworkIpId OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network IP id."
+				::= { wanNetworkIpEntry 1 }
+
+			wanNetworkIpType OBJECT-TYPE
+				SYNTAX INTEGER{
+					dhcp(0),
+					static(1),
+					pppoe(2)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network IP type."
+				::= { wanNetworkIpEntry 2 }
+
+			wanNetworkIpAddress OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network IP address."
+				::= { wanNetworkIpEntry 3 }
+
+			wanNetworkSubnetMask OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network subnet mask."
+				::= { wanNetworkIpEntry 4 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		wanNetworkDnsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WanNetworkDnsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WAN Network DNS Table"
+			::= { wanNetwork 2 }
+
+			wanNetworkDnsEntry OBJECT-TYPE
+			SYNTAX WanNetworkDnsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wanNetworkDnsTable"
+			INDEX { wanId, wanNetworkDnsId }
+			::= { wanNetworkDnsTable 1 }
+
+			WanNetworkDnsEntry ::=
+			SEQUENCE {
+				wanNetworkDnsId
+					Integer32,
+				wanNetworkDnsServer
+					IpAddress
+			}
+
+			wanNetworkDnsId OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network DNS id."
+				::= { wanNetworkDnsEntry 1 }
+
+			wanNetworkDnsServer OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network DNS server."
+				::= { wanNetworkDnsEntry 2 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		wanNetworkTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WanNetworkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WAN Network Table"
+			::= { wanNetwork 3 }
+
+			wanNetworkEntry OBJECT-TYPE
+			SYNTAX WanNetworkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wanNetworkTable"
+			INDEX { wanId }
+			::= { wanNetworkTable 1 }
+
+			WanNetworkEntry ::=
+			SEQUENCE {
+				wanNetworkGateway
+					IpAddress
+			}
+
+			wanNetworkGateway OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network subnet mask."
+				::= { wanNetworkEntry 1 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		wanDataUsageTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WanDataUsageEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WAN Network Data Usage Table"
+			::= { wanStatus 4 }
+
+			wanDataUsageEntry OBJECT-TYPE
+			SYNTAX WanDataUsageEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wanDataUsageTable"
+			INDEX { wanId, dataTypeID }
+			::= { wanDataUsageTable 1 }
+
+			WanDataUsageEntry ::=
+			SEQUENCE {
+				dataTypeID
+					INTEGER,
+				wanDataUsageTxByte
+					Counter64,
+				wanDataUsageRxByte
+					Counter64
+			}
+
+			dataTypeID OBJECT-TYPE
+				SYNTAX INTEGER{
+					daily(0),
+					monthly(1),
+					sinceLastReboot(3)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network data usage type id."
+				::= { wanDataUsageEntry 1 }
+
+			wanDataUsageTxByte OBJECT-TYPE
+				SYNTAX Counter64
+				UNITS 	"MB"
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network transmitted bytes(units: MB)."
+				::= { wanDataUsageEntry 2 }
+
+			wanDataUsageRxByte OBJECT-TYPE
+				SYNTAX Counter64
+				UNITS 	"MB"
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network received bytes(units: MB)."
+				::= { wanDataUsageEntry 3 }
+
+		portWanSpeedTable OBJECT-TYPE
+				SYNTAX		SEQUENCE OF PortWanSpeedEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"WAN port speed table."
+				::= { wanStatus 5 }
+
+			portWanSpeedEntry OBJECT-TYPE
+				SYNTAX		PortWanSpeedEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry in the portWanSpeedTable"
+				INDEX   { portWanSpeedIndex }
+				::= { portWanSpeedTable 1 }
+
+			PortWanSpeedEntry ::=
+				SEQUENCE {
+					portWanSpeedIndex
+						Integer32,
+					portWanSpeed
+						PortSpeedType
+				}
+
+			portWanSpeedIndex OBJECT-TYPE
+				SYNTAX		Integer32
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION	"WAN port speed index."
+				::= { portWanSpeedEntry 1 }
+
+			portWanSpeed OBJECT-TYPE
+				SYNTAX		PortSpeedType
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION	"WAN port speed status (Auto/10baseT-FD/
+							10baseT-HD/100baseTx-FD/100baseTx-HD/1000baseTx-FD/
+							1000baseTx-HD."
+				::= { portWanSpeedEntry 2 }
+
+	wanOverallStatus OBJECT IDENTIFIER ::= { wan-status 2 }
+
+		wanOverallDataUsageTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WanOverallDataUsageEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WAN Network Overall Data Usage Table"
+			::= { wanOverallStatus 1 }
+
+			wanOverallDataUsageEntry OBJECT-TYPE
+			SYNTAX WanOverallDataUsageEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wanOverallDataUsageTable"
+			INDEX { wanOverallDataTypeID }
+			::= { wanOverallDataUsageTable 1 }
+
+			WanOverallDataUsageEntry ::=
+			SEQUENCE {
+				wanOverallDataTypeID
+					INTEGER,
+				wanOverallDataUsageTxByte
+					Counter64,
+				wanOverallDataUsageRxByte
+					Counter64
+			}
+
+			wanOverallDataTypeID OBJECT-TYPE
+				SYNTAX INTEGER{
+					sinceLastReboot(3),
+					sinceInstallation(4)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network data usage type id."
+				::= { wanOverallDataUsageEntry 1 }
+
+			wanOverallDataUsageTxByte OBJECT-TYPE
+				SYNTAX Counter64
+				UNITS 	"MB"
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network transmitted bytes(units: MB)."
+				::= { wanOverallDataUsageEntry 2 }
+
+			wanOverallDataUsageRxByte OBJECT-TYPE
+				SYNTAX Counter64
+				UNITS 	"MB"
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN network received bytes(units: MB)."
+				::= { wanOverallDataUsageEntry 3 }
+END

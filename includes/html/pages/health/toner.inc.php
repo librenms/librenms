@@ -10,12 +10,12 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Toner";
+$pagetitle[] = 'Health :: Toner';
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
@@ -34,11 +34,11 @@ $pagetitle[] = "Health :: Toner";
             <thead>
             <tr>
                 <th data-column-id="hostname">Device</th>
-                <th data-column-id="toner_descr">Toner</th>
-                <th data-column-id="toner_type" data-searchable="false">Type</th>
+                <th data-column-id="supply_descr">Toner</th>
+                <th data-column-id="supply_type" data-searchable="false">Type</th>
                 <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
                 <th data-column-id="toner_used" data-searchable="false">Used</th>
-                <th data-column-id="toner_current" data-searchable="false">Usage</th>
+                <th data-column-id="supply_current" data-searchable="false">Usage</th>
             </tr>
             </thead>
         </table>

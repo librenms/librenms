@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     $status = 'error';
     $message = 'ERROR: You need to be admin to reload Oxidized node list';
 } else {
@@ -18,9 +18,9 @@ if (!Auth::user()->hasGlobalAdmin()) {
     $status = 'ok';
     $message = 'Oxidized node list was reloaded';
 }
-$output = array(
+$output = [
     'status'  => $status,
     'message' => $message,
-);
+];
 header('Content-type: application/json');
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

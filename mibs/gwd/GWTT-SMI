@@ -1,0 +1,14 @@
+GWTT-SMI DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		enterprises
+			FROM RFC1155-SMI;
+
+	gwtt    OBJECT IDENTIFIER ::= { enterprises 10072 }
+	
+	chips	     OBJECT IDENTIFIER ::= { gwtt 1 }  -- chip
+	devices	   OBJECT IDENTIFIER ::= { gwtt 2 }  -- device
+	cards	     OBJECT IDENTIFIER ::= { gwtt 3 }  -- card
+  snmpProxy  OBJECT IDENTIFIER ::= { gwtt 4 }  -- snmp proxy
+  
+END

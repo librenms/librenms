@@ -41,7 +41,8 @@
                     "sysDescr_regex": {"$ref": "#/definitions/regex_group"},
                     "sysDescr_regex_except": {"$ref": "#/definitions/regex_group"},
                     "snmpget": {"$ref": "#/definitions/snmpget"},
-                    "snmpget_except": {"$ref": "#/definitions/snmpget"}
+                    "snmpget_except": {"$ref": "#/definitions/snmpget"},
+                    "snmpwalk": {"$ref": "#/definitions/snmpget"}
                 },
                 "minProperties": 1,
                 "additionalProperties": false
@@ -137,6 +138,9 @@
                 "ucd-diskio": {
                     "type": "boolean"
                 },
+                "sensors": {
+                    "type": "boolean"
+                },
                 "services": {
                     "type": "boolean"
                 },
@@ -164,7 +168,7 @@
                 "mib": {
                     "type": "boolean"
                 },
-                "toner": {
+                "printer-supplies": {
                     "type": "boolean"
                 },
                 "cisco-vpdn": {
@@ -195,6 +199,9 @@
                     "type": "boolean"
                 },
                 "junose-atm-vp": {
+                    "type": "boolean"
+                },
+                "mpls": {
                     "type": "boolean"
                 },
                 "netscaler-vsvr": {
@@ -281,7 +288,7 @@
                 "arp-table": {
                     "type": "boolean"
                 },
-                "toner": {
+                "printer-supplies": {
                     "type": "boolean"
                 },
                 "ipv4-addresses": {
@@ -329,6 +336,9 @@
                 "libvirt-vminfo": {
                     "type": "boolean"
                 },
+                "mpls": {
+                    "type": "boolean"
+                },
                 "ip6-addresses": {
                     "type": "boolean"
                 }
@@ -338,7 +348,9 @@
         "ifname": {
             "type": "boolean"
         },
-        "mib_dir": {"$ref": "#/definitions/string_group"},
+        "mib_dir": {
+            "type":  "string"
+        },
         "good_if": {
             "type": "array",
             "items": {
@@ -360,9 +372,6 @@
         "empty_ifdescr": {
             "type": "boolean"
         },
-        "register_mibs": {
-            "type": "object"
-        },
         "bad_if": {
             "type": "array",
             "items": {
@@ -376,6 +385,12 @@
             }
         },
         "bad_iftype": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "bad_ifoperstatus": {
             "type": "array",
             "items": {
                 "type": "string"
@@ -412,7 +427,8 @@
     "required": [
         "os",
         "text",
-        "type"
+        "type",
+        "discovery"
     ],
     "definitions": {
         "string_group": {
@@ -518,7 +534,8 @@
                 "not_contains",
                 "not_regex",
                 "in_array",
-                "not_in_array"
+                "not_in_array",
+                "exists"
             ]
         }
     }

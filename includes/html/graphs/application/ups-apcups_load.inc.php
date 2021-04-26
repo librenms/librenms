@@ -11,23 +11,23 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 require 'includes/html/graphs/common.inc.php';
 $scale_min = 0;
-$ds        = 'load';
-$colour_area     = 'FF330011';
-$colour_line     = 'FF3300';
+$ds = 'load';
+$colour_area = 'FF330011';
+$colour_line = 'FF3300';
 $colour_area_max = 'FFEE99';
-$graph_max       = 0;
-$unit_text       = 'Percent';
-$ups_apcups  = rrd_name($device['hostname'], array('app', 'ups-apcups', $app['app_id']));
-if (rrdtool_check_rrd_exists($ups_apcups)) {
+$graph_max = 0;
+$unit_text = 'Percent';
+$ups_apcups = Rrd::name($device['hostname'], ['app', 'ups-apcups', $app['app_id']]);
+if (Rrd::checkRrdExists($ups_apcups)) {
     $rrd_filename = $ups_apcups;
 }
 require 'includes/html/graphs/generic_simplex.inc.php';

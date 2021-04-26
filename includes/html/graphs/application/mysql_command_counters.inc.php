@@ -2,53 +2,53 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
-$array = array(
-    'CDe'  => array(
+$array = [
+    'CDe'  => [
         'descr'  => 'Delete',
         'colour' => '22FF22',
-    ),
-    'CIt'  => array(
+    ],
+    'CIt'  => [
         'descr'  => 'Insert',
         'colour' => '0022FF',
-    ),
-    'CISt' => array(
+    ],
+    'CISt' => [
         'descr'  => 'Insert Select',
         'colour' => 'FF0000',
-    ),
-    'CLd'  => array(
+    ],
+    'CLd'  => [
         'descr'  => 'Load Data',
         'colour' => '00AAAA',
-    ),
-    'CRe'  => array(
+    ],
+    'CRe'  => [
         'descr'  => 'Replace',
         'colour' => 'FF00FF',
-    ),
-    'CRSt' => array(
+    ],
+    'CRSt' => [
         'descr'  => 'Replace Select',
         'colour' => 'FFA500',
-    ),
-    'CSt'  => array(
+    ],
+    'CSt'  => [
         'descr'  => 'Select',
         'colour' => 'CC0000',
-    ),
-    'CUe'  => array(
+    ],
+    'CUe'  => [
         'descr'  => 'Update',
         'colour' => '0000CC',
-    ),
-    'CUMi' => array(
+    ],
+    'CUMi' => [
         'descr'  => 'Update Multiple',
         'colour' => '0080C0',
-    ),
-);
+    ],
+];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
         // $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
@@ -56,8 +56,8 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-$colours   = 'mixed';
-$nototal   = 1;
+$colours = 'mixed';
+$nototal = 1;
 $unit_text = 'Commands';
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

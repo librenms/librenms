@@ -27,8 +27,8 @@ if ($device['os'] == 'equalogic') {
                 discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $size, $units, $used);
             } else {
                 // Trying to search the last '.' and take something after it as index
-                $arrindex = explode(".", $index);
-                $newindex = (int)(end($arrindex)) + 0;
+                $arrindex = explode('.', $index);
+                $newindex = (int) cast_number(end($arrindex));
                 if (is_int($newindex)) {
                     discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $size, $units, $used);
                 }

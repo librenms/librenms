@@ -3,12 +3,19 @@ text: ArbOS
 type: network
 icon: arbor
 group: arbor
+ifXmcbc: true
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.9694.1.4
-mib_dir:
-    - arbornet
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9694.1
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+        sysDescr:
+            - arbux
+mib_dir: arbornet

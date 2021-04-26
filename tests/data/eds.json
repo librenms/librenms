@@ -7,24 +7,6 @@
                     "sysObjectID": ".1.3.6.1.4.1.31440",
                     "sysDescr": "Presents 1-wire devices over Ethernet using HTTP and SNMP",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "eds",
-                    "type": "appliance",
-                    "serial": null,
-                    "icon": "eds.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.31440",
-                    "sysDescr": "Presents 1-wire devices over Ethernet using HTTP and SNMP",
-                    "sysContact": null,
                     "version": "2.10",
                     "hardware": "Ethernet to 1-wire Interface",
                     "features": null,
@@ -35,7 +17,8 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

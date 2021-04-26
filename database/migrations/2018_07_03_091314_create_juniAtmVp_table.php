@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateJuniAtmVpTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -14,8 +13,9 @@ class CreateJuniAtmVpTable extends Migration
     public function up()
     {
         Schema::create('juniAtmVp', function (Blueprint $table) {
+            $table->id();
             $table->unsignedInteger('juniAtmVp_id');
-            $table->unsignedInteger('port_id')->index('port_id');
+            $table->unsignedInteger('port_id')->index();
             $table->unsignedInteger('vp_id');
             $table->string('vp_descr', 32);
         });

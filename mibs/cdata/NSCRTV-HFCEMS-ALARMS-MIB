@@ -1,0 +1,94 @@
+NSCRTV-HFCEMS-ALARMS-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+          TRAP-TYPE
+               FROM RFC-1215
+          OBJECT-TYPE
+               FROM RFC-1212
+          DisplayString
+               FROM RFC1213-MIB  
+          commonPhysAddress
+               FROM NSCRTV-HFCEMS-COMMON-MIB  
+          commonNELogicalID
+               FROM NSCRTV-HFCEMS-COMMON-MIB  
+          nscrtvHFCemsTree
+               FROM NSCRTV-ROOT
+alarmsIdent
+               FROM NSCRTV-ROOT
+
+     ;     
+
+     alarmLogNumberOfEntries OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+"Replaced By LiGang"
+          ::= { alarmsIdent 1 }
+
+     alarmLogLastIndex OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+"Replaced By LiGang"
+          ::= { alarmsIdent 2 }
+
+     alarmLogTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF AlarmLogEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+"Replaced By LiGang"
+          ::= { alarmsIdent 3 }
+
+     alarmLogEntry OBJECT-TYPE
+          SYNTAX AlarmLogEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+"Replaced By LiGang"
+          INDEX { alarmLogIndex }
+          ::= { alarmLogTable 1 }
+
+     AlarmLogEntry ::=
+          SEQUENCE
+          {
+               alarmLogIndex
+                    INTEGER,
+               alarmLogInformation
+                    OCTET STRING
+          }
+
+     alarmLogIndex OBJECT-TYPE
+          SYNTAX INTEGER (1..32767)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+"Replaced By LiGang"
+          ::= { alarmLogEntry 1 }
+
+     alarmLogInformation OBJECT-TYPE
+          SYNTAX OCTET STRING ( SIZE ( 17..255 ) )
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+"Replaced By LiGang"
+          ::= { alarmLogEntry 2 }  
+
+     alarmText OBJECT-TYPE
+          SYNTAX DisplayString
+          ACCESS read-only
+          STATUS optional
+          DESCRIPTION
+"Replaced By LiGang"
+          ::= { alarmsIdent 4 }
+         
+hfcAlarmEvent TRAP-TYPE
+     ENTERPRISE nscrtvHFCemsTree
+     VARIABLES { commonPhysAddress, commonNELogicalID, alarmLogInformation, alarmText }
+     DESCRIPTION
+"Replaced By LiGang"
+     ::= 1
+
+END

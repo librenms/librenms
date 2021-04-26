@@ -394,7 +394,7 @@ function http_fallback(link) {
     return false;
 }
 
-function init_select2(selector, type, data, selected, placeholder) {
+function init_select2(selector, type, data, selected, placeholder, config) {
     var $select = $(selector);
 
     // allow function to be assigned to pass data
@@ -407,7 +407,7 @@ function init_select2(selector, type, data, selected, placeholder) {
         data_function = data;
     }
 
-    $select.select2({
+    var init = {
         theme: "bootstrap",
         dropdownAutoWidth : true,
         width: "auto",
@@ -418,7 +418,17 @@ function init_select2(selector, type, data, selected, placeholder) {
             delay: 150,
             data: data_function
         }
-    });
+    };
+
+    // override init values
+    if (typeof config === 'object') {
+        var keys = Object.keys(config);
+        for (var i = 0; i < keys.length; i++) {
+            init[keys[i]] = config[keys[i]];
+        }
+    }
+
+    $select.select2(init);
 
     if (selected) {
         console.log(selected);

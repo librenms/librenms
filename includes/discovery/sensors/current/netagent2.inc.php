@@ -15,27 +15,25 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $battery_current_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.7.0';
 $battery_current = snmp_get($device, $battery_current_oid, '-Oqv');
 
-if (!empty($battery_current) || $battery_current == 0) {
-    $type           = 'netagent2';
-    $index          = 0;
-    $limit          = 30;
-    $warnlimit      = null;
-    $lowlimit       = null;
-    $lowwarnlimit   = null;
-    $divisor        = 10;
-    $current        = $battery_current / $divisor;
-    $descr          = 'Battery Current';
+if (! empty($battery_current) || $battery_current == 0) {
+    $type = 'netagent2';
+    $index = 0;
+    $limit = 30;
+    $warnlimit = null;
+    $lowlimit = null;
+    $lowwarnlimit = null;
+    $divisor = 10;
+    $current = $battery_current / $divisor;
+    $descr = 'Battery Current';
 
     discover_sensor(
         $valid['sensor'],

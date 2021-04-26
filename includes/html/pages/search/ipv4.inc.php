@@ -30,22 +30,23 @@ var grid = $("#ipv4-search").bootgrid({
 <?php
 
 $sql = 'SELECT `devices`.`device_id`,`hostname`,`sysName` FROM `devices`';
+$param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where  .= ' WHERE `DP`.`user_id`=?';
-    $param[] = Auth::id();
+if (! Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= ' WHERE `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " $where ORDER BY `hostname`";
 
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $_POST['device_id']) {
         echo '" selected "+';
     }
 
-    echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
+    echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
 }
 ?>
                  "</select>"+
@@ -84,8 +85,8 @@ if ($_POST['interface'] == 'Vlan%') {
             id: "address-search",
             search_type: "ipv4",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            interface: '<?php echo mres($_POST['interface']); ?>',
-            address: '<?php echo mres($_POST['address']); ?>'
+            interface: '<?php echo $_POST['interface']; ?>',
+            address: '<?php echo $_POST['address']; ?>'
         };
     },
     url: "ajax_table.php"

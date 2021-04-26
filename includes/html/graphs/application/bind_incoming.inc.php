@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -24,17 +24,17 @@
  * @subpackage Graphs
  */
 
-$unitlen       = 10;
-$bigdescrlen   = 9;
+$unitlen = 10;
+$bigdescrlen = 9;
 $smalldescrlen = 9;
-$dostack       = 0;
-$printtotal    = 0;
-$unit_text    = 'query/sec';
-$colours      = 'psychedelic';
-$rrd_list     = array();
+$dostack = 0;
+$printtotal = 0;
+$unit_text = 'query/sec';
+$colours = 'psychedelic';
+$rrd_list = [];
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id']));
-$array        = array(
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id']]);
+$array = [
     'any',
     'a',
     'aaaa',
@@ -45,21 +45,21 @@ $array        = array(
     'soa',
     'srv',
     'spf',
-);
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+];
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
-        $rrd_list[]=array(
+        $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => strtoupper($ds),
             'ds' => $ds,
-        );
+        ];
     }
 } else {
     echo "file missing: $file";
 }
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'], 'incoming'));
-$array        = array(
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'incoming']);
+$array = [
     'afsdb',
     'apl',
     'caa',
@@ -92,14 +92,14 @@ $array        = array(
     'axfr',
     'ixfr',
     'opt',
-);
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+];
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
-        $rrd_list[]=array(
+        $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => strtoupper($ds),
             'ds' => $ds,
-        );
+        ];
     }
 } else {
     echo "file missing: $file";

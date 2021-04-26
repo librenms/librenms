@@ -6,36 +6,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.30155.23.1",
                     "sysDescr": "User input...",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "location": null,
-                    "os": "openbsd",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "openbsd.svg"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.30155.23.1",
-                    "sysDescr": "User input...",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "openbsd",
                     "type": "server",
                     "serial": null,
-                    "icon": "openbsd.svg"
+                    "icon": "openbsd.svg",
+                    "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

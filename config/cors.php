@@ -3,59 +3,58 @@
 return [
 
     /*
-     * A cors profile determines which origins, methods, headers are allowed for
-     * a given requests. The `DefaultProfile` reads its configuration from this
-     * config file.
-     *
-     * You can easily create your own cors profile.
-     * More info: https://github.com/spatie/laravel-cors/#creating-your-own-cors-profile
-     */
-    'cors_profile' => App\Http\Profile\CorsApiProfile::class,
+    |--------------------------------------------------------------------------
+    | Laravel CORS Options
+    |--------------------------------------------------------------------------
+    |
+    | The allowed_methods and allowed_headers options are case-insensitive.
+    |
+    | You don't need to provide both allowed_origins and allowed_origins_patterns.
+    | If one of the strings passed matches, it is considered a valid origin.
+    |
+    | If array('*') is provided to allowed_methods, allowed_origins or allowed_headers
+    | all methods / origins / headers are allowed.
+    |
+    */
 
     /*
-     * This configuration is used by `DefaultProfile`.
+     * You can enable CORS for 1 or multiple paths.
+     * Example: ['api/*']
      */
-    'default_profile' => [
+    'paths' => [],
 
-        'allow_credentials' => false,
+    /*
+    * Matches the request method. `[*]` allows all methods.
+    */
+    'allowed_methods' => ['*'],
 
-        'allow_origins' => [
-            '*',
-        ],
+    /*
+     * Matches the request origin. `[*]` allows all origins. Wildcards can be used, eg `*.mydomain.com`
+     */
+    'allowed_origins' => [],
 
-        'allow_methods' => [
-            'POST',
-            'GET',
-            'OPTIONS',
-            'PUT',
-            'PATCH',
-            'DELETE',
-        ],
+    /*
+     * Patterns that can be used with `preg_match` to match the origin.
+     */
+    'allowed_origins_patterns' => [],
 
-        'allow_headers' => [
-            'Content-Type',
-            'X-Auth-Token',
-            'Origin',
-            'Authorization',
-        ],
+    /*
+     * Sets the Access-Control-Allow-Headers response header. `[*]` allows all headers.
+     */
+    'allowed_headers' => ['*'],
 
-        'expose_headers' => [
-            'Cache-Control',
-            'Content-Language',
-            'Content-Type',
-            'Expires',
-            'Last-Modified',
-            'Pragma',
-        ],
+    /*
+     * Sets the Access-Control-Expose-Headers response header with these headers.
+     */
+    'exposed_headers' => [],
 
-        'forbidden_response' => [
-            'message' => 'Forbidden (cors).',
-            'status' => 403,
-        ],
+    /*
+     * Sets the Access-Control-Max-Age response header when > 0.
+     */
+    'max_age' => 0,
 
-        /*
-         * Preflight request will respond with value for the max age header.
-         */
-        'max_age' => 60 * 60 * 24,
-    ],
+    /*
+     * Sets the Access-Control-Allow-Credentials header.
+     */
+    'supports_credentials' => false,
 ];

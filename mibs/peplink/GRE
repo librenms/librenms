@@ -1,0 +1,184 @@
+-- ********************************************************************
+        GRE DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+		peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+		productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+		generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+		greMib OBJECT IDENTIFIER ::= { generalMib 11 }
+
+		greInfo MODULE-IDENTITY
+		   		LAST-UPDATED "201502110000Z"		-- 02 11, 2015 at 12:00 GMT
+				ORGANIZATION "PEPLINK"
+		               	CONTACT-INFO ""
+			    	DESCRIPTION
+					    "MIB module for GRE."
+			::= { greMib 1 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+		greStatusTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GreStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"GRE status table"
+			::= { greInfo 1 }
+
+			greStatusEntry OBJECT-TYPE
+				SYNTAX GreStatusEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+					"An entry in the greStatusTable"
+				INDEX { greStatusId }
+				::= { greStatusTable 1 }
+
+			GreStatusEntry ::=
+			SEQUENCE {
+				greStatusId
+					INTEGER,
+				greStatusProfileName
+					OCTET STRING,
+				greStatusConnectionState
+					INTEGER,
+				greStatusLocalIpAddress
+					IpAddress,
+				greStatusRemoteIpAddress
+					IpAddress,
+				greStatusTunnelLocalIpAddress
+					IpAddress,
+				greStatusTunnelRemoteIpAddress
+					IpAddress
+			}
+
+			greStatusId OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE ID."
+				::= { greStatusEntry 1 }
+
+			greStatusProfileName OBJECT-TYPE
+				SYNTAX OCTET STRING (SIZE (1..32))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE profile name."
+				::= { greStatusEntry 2 }
+
+			greStatusConnectionState OBJECT-TYPE
+				SYNTAX INTEGER {
+					disconnected(0),
+					connected(1),
+					connecting(2)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE connection state."
+				::= { greStatusEntry 3 }
+
+			greStatusLocalIpAddress OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE local IP."
+				::= { greStatusEntry 4 }
+
+			greStatusRemoteIpAddress OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE remote IP."
+				::= { greStatusEntry 5 }
+
+			greStatusTunnelLocalIpAddress OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE tunnel local IP."
+				::= { greStatusEntry 6 }
+
+			greStatusTunnelRemoteIpAddress OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE tunnel remote IP."
+				::= { greStatusEntry 7 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+		greStatusRemoteNetworkTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GreStatusRemoteNetworkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"GRE status remote network table"
+			::= { greInfo 2 }
+
+			greStatusRemoteNetworkEntry OBJECT-TYPE
+				SYNTAX GreStatusRemoteNetworkEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+					"An entry in the greStatusRemoteNetworkTable"
+				INDEX { greStatusId, greStatusRemoteNetworkId }
+				::= { greStatusRemoteNetworkTable 1 }
+
+			GreStatusRemoteNetworkEntry ::=
+			SEQUENCE {
+				greStatusRemoteNetworkId
+					INTEGER,
+				greStatusRemoteNetwork
+					IpAddress,
+				greStatusRemoteSubnet
+					IpAddress
+			}
+
+			greStatusRemoteNetworkId OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE remote network ID."
+				::= { greStatusRemoteNetworkEntry 1 }
+
+			greStatusRemoteNetwork OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE remote network IP."
+				::= { greStatusRemoteNetworkEntry 2 }
+
+			greStatusRemoteSubnet OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"GRE remote network subnet."
+				::= { greStatusRemoteNetworkEntry 3 }
+END

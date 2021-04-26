@@ -15,34 +15,32 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'powerdns-recursor.inc.php';
 
 $colours = 'purples';
 $unit_text = 'Entries';
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $rrd_list = array(
-        array(
+if (Rrd::checkRrdExists($rrd_filename)) {
+    $rrd_list = [
+        [
             'filename' => $rrd_filename,
             'ds' => 'cache-entries',
             'descr' => 'Query Cache',
             'colour' => '202048',
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'packetcache-entries',
             'descr' => 'Packet Cache',
             'colour' => 'CC7CCC',
-        )
-    );
+        ],
+    ];
 } else {
     echo "file missing: $rrd_filename";
 }

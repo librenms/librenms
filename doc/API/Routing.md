@@ -10,10 +10,12 @@ Route: `/api/v0/bgp`
 Input:
 
 - hostname = Either the devices hostname or id.
+- asn = The local ASN you would like to filter by
+- remote_asn = Filter by remote peer ASN
+- remote_address = Filter by remote peer address
+- local_address = Filter by local address
 
-**OR**
 
-- asn = The ASN you would like to filter by
 
 Example:
 
@@ -21,6 +23,8 @@ Example:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostname=host.example.com
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?remote_asn=1234
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
 ```
 
 Output:

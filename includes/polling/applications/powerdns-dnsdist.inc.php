@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 LibreNMS
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
@@ -32,9 +32,9 @@ d_echo($name);
 $powerdns_dnsdist = snmp_walk($device, $oid, $options);
 
 if (is_string($powerdns_dnsdist)) {
-    list($cache_hits, $cache_miss, $downstream_err, $downstream_timeout, $dynamic_block_size, $dynamic_blocked, $queries_count, $queries_recursive, $queries_empty, $queries_drop_no_policy, $queries_drop_nc, $queries_drop_nc_answer, $queries_self_answer, $queries_serv_fail, $queries_failure, $queries_acl_drop, $rule_drop, $rule_nxdomain, $rule_refused, $latency_100, $latency_1000, $latency_10000, $latency_1000000, $latency_slow, $latency_0_1, $latency_1_10, $latency_10_50, $latency_50_100, $latency_100_1000) = explode("\n", $powerdns_dnsdist);
+    [$cache_hits, $cache_miss, $downstream_err, $downstream_timeout, $dynamic_block_size, $dynamic_blocked, $queries_count, $queries_recursive, $queries_empty, $queries_drop_no_policy, $queries_drop_nc, $queries_drop_nc_answer, $queries_self_answer, $queries_serv_fail, $queries_failure, $queries_acl_drop, $rule_drop, $rule_nxdomain, $rule_refused, $latency_100, $latency_1000, $latency_10000, $latency_1000000, $latency_slow, $latency_0_1, $latency_1_10, $latency_10_50, $latency_50_100, $latency_100_1000] = explode("\n", $powerdns_dnsdist);
 
-    $rrd_name = array('app', $name, $app_id);
+    $rrd_name = ['app', $name, $app_id];
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('cache_hits', 'COUNTER', 0)
@@ -67,8 +67,7 @@ if (is_string($powerdns_dnsdist)) {
         ->addDataset('latency_50_100', 'COUNTER', 0)
         ->addDataset('latency_100_1000', 'COUNTER', 0);
 
-
-    $fields = array(
+    $fields = [
         'cache_hits' => $cache_hits,
         'cache_miss' => $cache_miss,
         'downstream_err' => $downstream_err,
@@ -98,9 +97,9 @@ if (is_string($powerdns_dnsdist)) {
         'latency_10_50' => $latency_10_50,
         'latency_50_100' => $latency_50_100,
         'latency_100_1000' => $latency_100_1000,
-    );
+    ];
 
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
     update_application($app, $powerdns_dnsdist, $fields);
 }

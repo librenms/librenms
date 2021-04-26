@@ -64,7 +64,7 @@ $config['oxidized']['default_group'] = 'default';
 
 # SELinux
 
-If you're runnng SELinux, you'll need to allow httpd to connect
+If you're running SELinux, you'll need to allow httpd to connect
 outbound to the network, otherwise Oxidized integration in the web UI
 will silently fail:
 
@@ -228,10 +228,10 @@ ensure they are used in the correct location.
 
 # Accessing configuration of a disabled/removed device
 
-When you're disabling or removing a device from LibreNMS, Oxidized
-will no longer shows it in the web interface the configuration. You
-can access directly to this information in the Git repository of
-Oxidized (if using Git to store versions).
+When you're disabling or removing a device from LibreNMS, the 
+configuration will no longer be available via the LibreNMS web interface. 
+You can gain access to these configurations directly in the Git repository of
+Oxidized (if using Git for version control).
 
 1: Check in your Oxidized where are stored your Git repositories:
 
@@ -251,4 +251,11 @@ file content:
 
 ```
 git cat-file -p <object id>
+```
+
+# Remove disabled/removed device
+If you want to purge saved config of a device that is not in LibreNMS anymore, you can run the following command: 
+
+```
+git rm --cached <object id>
 ```

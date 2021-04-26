@@ -28,7 +28,7 @@
             <table class='table table-condensed table-hover'>
                 <tr>
                     <td><b>@lang('Version')</b></td>
-                    <td><a href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
+                    <td><a target="_blank" href='https://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
                 </tr>
                 <tr>
                     <td><b>@lang('Database Schema')</b></td>
@@ -43,27 +43,35 @@
                     <td>{{ $version_php }}</td>
                 </tr>
                 <tr>
+                    <td><b>@lang('Python')</b></td>
+                    <td>{{ $version_python }}</td>
+                </tr>
+                <tr>
                     <td><b>@lang('MySQL')</b></td>
                     <td>{{ $version_mysql }}</td>
                 </tr>
                 <tr>
-                    <td><b>@lang('RRDtool')</b></td>
+                    <td><a href="https://laravel.com/"><b>@lang('Laravel')</b></a></td>
+                    <td>{{ $version_laravel }}</td>
+                </tr>
+                <tr>
+                    <td><a href="https://oss.oetiker.ch/rrdtool/"><b>@lang('RRDtool')</b></a></td>
                     <td>{{ $version_rrdtool }}</td>
                 </tr>
             </table>
 
-            <p>
-            <h3>@lang('LibreNMS is a community-based project')</h3>
+          <h3>@lang('LibreNMS is a community-based project')</h3>
+          <p>
             @lang('Please feel free to join us and contribute code, documentation, and bug reports:')
-            <br>
-              <a href="http://www.librenms.org/">@lang('Web site')</a> |
-              <a href="https://docs.librenms.org/">@lang('Docs')</a> |
-              <a href="https://github.com/librenms/">@lang('GitHub')</a> |
-              <a href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
-              <a href="https://community.librenms.org">@lang('Community Forum')</a> |
-              <a href="http://twitter.com/librenms">@lang('Twitter')</a> |
-              <a href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
-              <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
+            <br />
+            <a target="_blank" href="https://www.librenms.org/">@lang('Web site')</a> |
+            <a target="_blank" href="https://docs.librenms.org/">@lang('Docs')</a> |
+            <a target="_blank" href="https://github.com/librenms/">@lang('GitHub')</a> |
+            <a target="_blank" href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
+            <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
+            <a target="_blank" href="https://twitter.com/librenms">@lang('Twitter')</a> |
+            <a target="_blank" href="https://www.librenms.org/changelog.html">@lang('Changelog')</a> |
+            <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
           </p>
 
           <h3>@lang('Contributors')</h3>
@@ -76,7 +84,6 @@
           <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server).<br />
           <b>Erik Bosrup</b> Overlib Library.<br />
           <b>Jonathan De Graeve</b> SNMP code improvements.<br />
-          <b>Mark James</b> Silk Iconset.<br />
           <b>Observium</b> Codebase for fork.<br />
 
       </div>
@@ -94,7 +101,7 @@
                     </span>
                     <input type="checkbox" id="callback" data-size="normal" name="statistics" @if($callback_status) checked @endif>
                     <br />
-                    @lang('Online stats:') <a href='https://stats.librenms.org/'>stats.librenms.org</a>
+                    @lang('Online stats:') <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>
                 </td>
             </tr>
 
@@ -156,7 +163,7 @@
                 <td class='text-right'>{{ $stat_events }}</td>
             </tr>
             <tr>
-                <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Sensors')</b></td>
+                <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('sensors.title')</b></td>
                 <td class='text-right'>{{ $stat_sensors }}</td>
                 <td><i class='fa fa-fw fa-wifi fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Wireless Sensors')</b></td>
                 <td class='text-right'>{{ $stat_wireless }}</td>
@@ -185,7 +192,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</pre>
+along with this program.  If not, see <a target="_blank" href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>.</pre>
 
         </div>
     </div>

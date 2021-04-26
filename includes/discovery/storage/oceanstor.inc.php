@@ -15,24 +15,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 if ($device['os'] === 'oceanstor') {
     $oceanstor_tmp = snmp_get_multi_oid($device, ['usedCapacity.0', 'totalCapacity.0'], '-OUQs', 'ISM-STORAGE-SVC-MIB');
 
-    $fstype = "dsk";
-    $descr  = "File System";
-    $units  = 1024;
-    $index  = 0;
+    $fstype = 'dsk';
+    $descr = 'File System';
+    $units = 1024;
+    $index = 0;
     if (is_numeric($oceanstor_tmp['usedCapacity.0']) && is_numeric($oceanstor_tmp['totalCapacity.0'])) {
         $total = $oceanstor_tmp['totalCapacity.0'];
-        $used  = $oceanstor_tmp['usedCapacity.0'];
+        $used = $oceanstor_tmp['usedCapacity.0'];
         discover_storage($valid_storage, $device, $index, $fstype, 'oceanstor', $descr, $total, $units, $used);
     }
     unset($oceanstor_tmp);

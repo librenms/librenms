@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,10 +25,10 @@
 namespace LibreNMS\Modules;
 
 use App\Models\PortsNac;
+use App\Observers\ModuleModelObserver;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\ModuleModelObserver;
 
 class Nac implements Module
 {
@@ -55,12 +54,10 @@ class Nac implements Module
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
-            if (!PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
-                PortsNac::observe(new ModuleModelObserver());
-            }
+            ModuleModelObserver::observe(PortsNac::class);
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
-            $existing_entries = $os->getDeviceModel()->portsNac->keyBy('mac_address');
+            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address');
 
             // update existing models
             foreach ($nac_entries as $nac_entry) {
@@ -70,7 +67,7 @@ class Nac implements Module
             }
 
             // persist to DB
-            $os->getDeviceModel()->portsNac()->saveMany($nac_entries);
+            $os->getDevice()->portsNac()->saveMany($nac_entries);
 
             $delete = $existing_entries->diffKeys($nac_entries)->pluck('ports_nac_id');
             if ($delete->isNotEmpty()) {
@@ -88,6 +85,6 @@ class Nac implements Module
      */
     public function cleanup(OS $os)
     {
-        $os->getDeviceModel()->portsNac()->delete();
+        $os->getDevice()->portsNac()->delete();
     }
 }

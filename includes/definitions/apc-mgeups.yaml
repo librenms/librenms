@@ -4,8 +4,7 @@ group: ups
 type: power
 icon: apc
 rfc1628_compat: true
-mib_dir:
-    - mge
+mib_dir: eaton
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

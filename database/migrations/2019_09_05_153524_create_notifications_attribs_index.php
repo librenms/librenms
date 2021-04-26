@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateNotificationsAttribsIndex extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -14,7 +13,7 @@ class CreateNotificationsAttribsIndex extends Migration
     public function up()
     {
         Schema::table('notifications_attribs', function (Blueprint $table) {
-            $table->index(['notifications_id','user_id']);
+            $table->index(['notifications_id', 'user_id']);
         });
     }
 
@@ -26,7 +25,7 @@ class CreateNotificationsAttribsIndex extends Migration
     public function down()
     {
         Schema::table('notifications_attribs', function (Blueprint $table) {
-            $table->dropIndex(['notifications_id','user_id']);
+            $table->dropIndex(['notifications_id', 'user_id']);
         });
     }
 }

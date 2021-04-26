@@ -1,8 +1,3 @@
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
 <div class="table-responsive">
     <table id="alerts_{{ $id }}" class="table table-hover table-condensed alerts">
         <thead>
@@ -37,6 +32,7 @@
             }
         },
         url: "ajax_table.php",
+        navigation: ! {{ $hidenavigation }},
         rowCount: [50, 100, 250, -1]
     }).on("loaded.rs.jquery.bootgrid", function() {
         alerts_grid = $(this);

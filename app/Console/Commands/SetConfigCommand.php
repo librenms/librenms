@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
@@ -10,6 +11,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class SetConfigCommand extends LnmsCommand
 {
+    use CompletesConfigArgument;
+
     protected $name = 'config:set';
 
     /**
@@ -23,6 +26,7 @@ class SetConfigCommand extends LnmsCommand
 
         $this->addArgument('setting', InputArgument::REQUIRED);
         $this->addArgument('value', InputArgument::OPTIONAL);
+        $this->addOption('ignore-checks');
     }
 
     /**
@@ -34,32 +38,38 @@ class SetConfigCommand extends LnmsCommand
     {
         $setting = $this->argument('setting');
         $value = $this->argument('value');
+        $force = $this->option('ignore-checks');
 
-        if (!$definition->isValidSetting($setting)) {
-            $this->error(__('This is not a valid setting. Please check your spelling'));
+        if (! $force && ! $definition->isValidSetting($setting)) {
+            $this->error(trans('commands.config:set.errors.invalid'));
+
             return 2;
         }
 
-        if (!Eloquent::isConnected()) {
-            $this->error(__('Database is not connected'));
+        if (! Eloquent::isConnected()) {
+            $this->error(trans('commands.config:set.errors.nodb'));
+
             return 1;
         }
 
-        if (!$value) {
-            if ($this->confirm(__('Reset :setting to the default?', ['setting' => $setting]))) {
+        if (! $force && ! $value) {
+            if ($this->confirm(trans('commands.config:set.confirm', ['setting' => $setting]))) {
                 Config::erase($setting);
+
                 return 0;
             }
+
             return 3;
         }
 
         $value = $this->juggleType($value);
         $configItem = $definition->get($setting);
-        if (!$configItem->checkValue($value)) {
+        if (! $force && ! $configItem->checkValue($value)) {
             $message = ($configItem->type || $configItem->validate)
                 ? $configItem->getValidationMessage($value)
-                : __('Cannot set :setting, it is missing validation definition.', ['setting' => $setting]);
+                : trans('commands.config:set.errors.no-validation', ['setting' => $setting]);
             $this->error($message);
+
             return 2;
         }
 
@@ -67,19 +77,20 @@ class SetConfigCommand extends LnmsCommand
             return 0;
         }
 
-        $this->error(__('Failed to set :setting', ['setting' => $setting]));
+        $this->error(trans('commands.config:set.errors.failed', ['setting' => $setting]));
+
         return 1;
     }
 
     /**
      * Convert the string input into the appropriate PHP native type
      *
-     * @param $value
      * @return mixed
      */
-    private function juggleType($value)
+    private function juggleType(string $value)
     {
         $json = json_decode($value, true);
+
         return json_last_error() ? $value : $json;
     }
 }

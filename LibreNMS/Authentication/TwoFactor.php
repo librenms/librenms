@@ -15,22 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @license GPL
- * @package LibreNMS
- * @link       http://librenms.org
- * @subpackage Authentication
+ * @link       https://www.librenms.org
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @copyright  2017 Tony Murray
  */
 
 namespace LibreNMS\Authentication;
-
-use LibreNMS\Config;
-use LibreNMS\Exceptions\AuthenticationException;
-use Session;
 
 class TwoFactor
 {
@@ -56,44 +50,44 @@ class TwoFactor
      * Base32 Decoding dictionary
      */
     private static $base32 = [
-        "A" => 0,
-        "B" => 1,
-        "C" => 2,
-        "D" => 3,
-        "E" => 4,
-        "F" => 5,
-        "G" => 6,
-        "H" => 7,
-        "I" => 8,
-        "J" => 9,
-        "K" => 10,
-        "L" => 11,
-        "M" => 12,
-        "N" => 13,
-        "O" => 14,
-        "P" => 15,
-        "Q" => 16,
-        "R" => 17,
-        "S" => 18,
-        "T" => 19,
-        "U" => 20,
-        "V" => 21,
-        "W" => 22,
-        "X" => 23,
-        "Y" => 24,
-        "Z" => 25,
-        "2" => 26,
-        "3" => 27,
-        "4" => 28,
-        "5" => 29,
-        "6" => 30,
-        "7" => 31
+        'A' => 0,
+        'B' => 1,
+        'C' => 2,
+        'D' => 3,
+        'E' => 4,
+        'F' => 5,
+        'G' => 6,
+        'H' => 7,
+        'I' => 8,
+        'J' => 9,
+        'K' => 10,
+        'L' => 11,
+        'M' => 12,
+        'N' => 13,
+        'O' => 14,
+        'P' => 15,
+        'Q' => 16,
+        'R' => 17,
+        'S' => 18,
+        'T' => 19,
+        'U' => 20,
+        'V' => 21,
+        'W' => 22,
+        'X' => 23,
+        'Y' => 24,
+        'Z' => 25,
+        '2' => 26,
+        '3' => 27,
+        '4' => 28,
+        '5' => 29,
+        '6' => 30,
+        '7' => 31,
     ];
 
     /**
      * Base32 Encoding dictionary
      */
-    private static $base32_enc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    private static $base32_enc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
     /**
      * Generate Secret Key
@@ -103,24 +97,25 @@ class TwoFactor
     {
         // RFC 4226 recommends 160bits Secret Keys, that's 20 Bytes for the lazy ones.
         $crypto = false;
-        $raw = "";
+        $raw = '';
         $x = -1;
         while ($crypto == false || ++$x < 10) {
             $raw = openssl_random_pseudo_bytes(20, $crypto);
         }
         // RFC 4648 Base32 Encoding without padding
         $len = strlen($raw);
-        $bin = "";
+        $bin = '';
         $x = -1;
         while (++$x < $len) {
             $bin .= str_pad(base_convert(ord($raw[$x]), 10, 2), 8, '0', STR_PAD_LEFT);
         }
         $bin = str_split($bin, 5);
-        $ret = "";
+        $ret = '';
         $x = -1;
         while (++$x < sizeof($bin)) {
             $ret .= self::$base32_enc[base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
         }
+
         return $ret;
     }
 
@@ -129,8 +124,8 @@ class TwoFactor
      *
      * @param string $key Secret Key
      * @param int $otp OTP supplied by user
-     * @param int|boolean $counter Counter, if false timestamp is used
-     * @return boolean|int
+     * @param int|bool $counter Counter, if false timestamp is used
+     * @return bool|int
      */
     public static function verifyHOTP($key, $otp, $counter = false)
     {
@@ -151,7 +146,7 @@ class TwoFactor
             }
             while (++$initcount <= $endcount) {
                 if (self::oathHOTP($key, $initcount) == $otp) {
-                    if (!$totp) {
+                    if (! $totp) {
                         return $initcount;
                     } else {
                         return true;
@@ -159,14 +154,15 @@ class TwoFactor
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Generate HOTP (RFC 4226)
      * @param string $key Secret Key
-     * @param int|boolean $counter Optional Counter, Defaults to Timestamp
-     * @return int
+     * @param int|bool $counter Optional Counter, Defaults to Timestamp
+     * @return string
      */
     private static function oathHOTP($key, $counter = false)
     {
@@ -177,7 +173,7 @@ class TwoFactor
         $length = strlen($key);
         $x = -1;
         $y = $z = 0;
-        $kbin = "";
+        $kbin = '';
         while (++$x < $length) {
             $y <<= 5;
             $y += self::$base32[$key[$x]];
@@ -193,6 +189,7 @@ class TwoFactor
                 ((ord($hash[$offset + 1]) & 0xff) << 16) |
                 ((ord($hash[$offset + 2]) & 0xff) << 8) |
                 (ord($hash[$offset + 3]) & 0xff)) % pow(10, self::OTP_SIZE);
+
         return str_pad($truncated, self::OTP_SIZE, '0', STR_PAD_LEFT);
     }
 
@@ -205,7 +202,7 @@ class TwoFactor
      */
     public static function generateUri($username, $key, $counter = false)
     {
-        $title = "LibreNMS:" . urlencode($username);
+        $title = 'LibreNMS:' . urlencode($username);
 
         return $counter ?
             "otpauth://hotp/$title?issuer=LibreNMS&counter=1&secret=$key" : // counter based

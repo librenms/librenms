@@ -11,6 +11,7 @@ return [
     |
     */
 
+    'title' => 'Wireless',
     'ap-count' => [
         'short' => 'APs',
         'long' => 'AP Count',
@@ -64,7 +65,7 @@ return [
     'noise-floor' => [
         'short' => 'Noise Floor',
         'long' => 'Noise Floor',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
         'short' => 'Power/Signal',
@@ -121,5 +122,14 @@ return [
         'long' => 'Cross Polar Interference',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => 'Cell',
+        'long' => 'Cell',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => 'Channel',
+        'long' => 'Channel',
+        'unit' => '',
+    ],
 ];

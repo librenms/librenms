@@ -17,6 +17,7 @@
     $("#graylog-{{ $id }}").bootgrid({
         ajax: true,
         rowCount: ['{{ $limit }}', 25,50,100,250,-1],
+        navigation: ! {{ $hidenavigation }},
         formatters: {
             "browserTime": function(column, row) {
                 @config('graylog.timezone')

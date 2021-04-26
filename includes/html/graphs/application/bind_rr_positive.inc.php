@@ -1,18 +1,16 @@
 <?php
 
-$unitlen       = 13;
-$bigdescrlen   = 9;
+$unitlen = 13;
+$bigdescrlen = 9;
 $smalldescrlen = 9;
-$dostack       = 0;
-$printtotal    = 0;
-$unit_text    = 'RR sets';
-$colours      = 'psychedelic';
-$rrd_list     = array();
+$dostack = 0;
+$printtotal = 0;
+$unit_text = 'RR sets';
+$colours = 'psychedelic';
+$rrd_list = [];
 
-
-
-$rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'], 'rrpositive'));
-$array        = array(
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'rrpositive']);
+$array = [
     'any',
     'a',
     'aaaa',
@@ -56,14 +54,14 @@ $array        = array(
     'axfr',
     'ixfr',
     'opt',
-);
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+];
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
-        $rrd_list[]=array(
+        $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => strtoupper($ds),
             'ds' => $ds,
-        );
+        ];
     }
 } else {
     echo "file missing: $file";

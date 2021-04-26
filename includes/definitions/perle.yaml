@@ -5,7 +5,9 @@ icon: perle
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
-    - sysDescr:
-        - 'Perle MCR-MGT'
-    - sysObjectID:
-        - .1.3.6.1.4.1.1966
+    -
+        sysDescr:
+            - 'Perle MCR-MGT'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1966

@@ -132,6 +132,18 @@ PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 			Sub-tree for PA-3060 specific objects."
 		::= { panProductsMibs 19 }
 
+    panPA-3200 OBJECT-IDENTITY
+        STATUS					current
+        DESCRIPTION				"
+            Sub-tree for PA-3200 specific objects."
+        ::= { panProductsMibs 20 }
+
+    panPA-3250 OBJECT-IDENTITY
+        STATUS					current
+        DESCRIPTION				"
+            Sub-tree for PA-3250 specific objects."
+        ::= { panProductsMibs 21 }
+
 	panPA-5260 OBJECT-IDENTITY
 		STATUS					current
 		DESCRIPTION				"
@@ -192,7 +204,7 @@ PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION				"
 			Sub-tree for M-500 specific objects."
 		::= { panProductsMibs 35 }
-	
+		
 	panPA-820 OBJECT-IDENTITY
 		STATUS					current
 		DESCRIPTION				"
@@ -210,6 +222,47 @@ PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION				"
 			Sub-tree for PA-220 specific objects."
 		::= { panProductsMibs 38 }
+
+	panM-600 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for M-600 specific objects."
+		::= { panProductsMibs 39 }
+	
+	panM-200 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for M-200 specific objects."
+		::= { panProductsMibs 40 }
+
+	panPA-220R OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-220R specific objects."
+		::= { panProductsMibs 41 }
+		
+        panPA-5280 OBJECT-IDENTITY
+                STATUS					current
+                DESCRIPTION				"
+                       Sub-tree for PA-5280 specific objects."
+                ::= { panProductsMibs 42 }
+     panPA-3220 OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for PA-3220 specific objects."
+        ::= { panProductsMibs 43 }
+    
+    panPA-3260 OBJECT-IDENTITY
+       STATUS                  current
+       DESCRIPTION             "
+           Sub-tree for PA-3260 specific objects."
+       ::= { panProductsMibs 44 }
+
+	panWF-600 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WF-600 specific objects."
+		::= { panProductsMibs 45 }
 
 	panProcessingCards OBJECT-IDENTITY
 		STATUS					current
@@ -254,5 +307,29 @@ PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION				"
 			PA-7080 Switch management card."
 		::= { panProcessingCards 4 }
+
+	panPA-7050-SMC-B OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7050 Bennu Switch management card."
+		::= { panProcessingCards 5 }
+
+	panPA-7000-LFC OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7000 series Log Forwarding card."
+		::= { panProcessingCards 6 }
+
+	panPA-7000-100G-NPC OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7000 series 100G Network Processing card."
+		::= { panProcessingCards 7 }
+
+	panPA-7080-SMC-B OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7080 Bennu Switch management card."
+		::= { panProcessingCards 8 }
 
 END

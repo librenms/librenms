@@ -15,13 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Adva network element is in an alarm state. Gets the alarm description
  * and severity assigned by the Adva.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
  */
@@ -47,16 +46,16 @@ class AdvaNetworkElementAlmTrap implements SnmptrapHandler
     {
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmNotifCode'));
         switch ($alSeverity) {
-            case "critical":
+            case 'critical':
                 $logSeverity = 5;
                 break;
-            case "major":
+            case 'major':
                 $logSeverity = 4;
                 break;
-            case "minor":
+            case 'minor':
                 $logSeverity = 3;
                 break;
-            case "cleared":
+            case 'cleared':
                 $logSeverity = 1;
                 break;
             default:

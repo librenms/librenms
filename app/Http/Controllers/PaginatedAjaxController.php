@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,6 +32,12 @@ use Illuminate\Support\Collection;
 
 abstract class PaginatedAjaxController extends Controller
 {
+    /**
+     * Default sort, column => direction
+     * @var array
+     */
+    protected $default_sort = [];
+
     /**
      * Base rules for this controller.
      *
@@ -89,6 +94,18 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
+     * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function sortFields($request)
+    {
+        return [];
+    }
+
+    /**
      * Format an item for display.  Default is pass-through
      *
      * @param Model $model
@@ -109,7 +126,6 @@ abstract class PaginatedAjaxController extends Controller
     {
         if ($search) {
             $query->where(function ($query) use ($fields, $search) {
-                /** @var Builder $query */
                 foreach ($fields as $field) {
                     $query->orWhere($field, 'like', '%' . $search . '%');
                 }
@@ -148,9 +164,15 @@ abstract class PaginatedAjaxController extends Controller
      */
     protected function sort($request, $query)
     {
-        $sort = $request->get('sort', []);
+        $columns = $this->sortFields($request);
+
+        $sort = $request->get('sort', $this->default_sort);
+
         foreach ($sort as $column => $direction) {
-            $query->orderBy($column, $direction);
+            if (isset($columns[$column]) || in_array($column, $columns)) {
+                $name = $columns[$column] ?? $column;
+                $query->orderBy($name, $direction == 'desc' ? 'desc' : 'asc');
+            }
         }
 
         return $query;
@@ -163,13 +185,13 @@ abstract class PaginatedAjaxController extends Controller
      * @param  array $rules
      * @param  array $messages
      * @param  array $customAttributes
-     * @return void
+     * @return array
      */
     public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
     {
         $full_rules = array_replace($this->baseRules(), $rules);
 
-        parent::validate($request, $full_rules, $messages, $customAttributes);
+        return parent::validate($request, $full_rules, $messages, $customAttributes);
     }
 
     /**
@@ -182,6 +204,14 @@ abstract class PaginatedAjaxController extends Controller
      */
     protected function adjustFilterValue($field, $value)
     {
+        switch ($field) {
+            case 'device':
+            case 'device_id':
+            case 'port_id':
+                $value = (int) $value;
+                break;
+        }
+
         return $value;
     }
 }

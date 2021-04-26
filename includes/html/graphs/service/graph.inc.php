@@ -32,7 +32,7 @@ if (isset($vars['id'])) {
 }
 
 // We know our service. build the filename.
-$rrd_filename = rrd_name($device['hostname'], array('services', $services[$vars['service']]['service_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
 
 // if we have a script for this check, use it.
 $check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($services[$vars['service']]['service_type']) . '.inc.php';
@@ -45,19 +45,19 @@ if (is_file($check_script)) {
     }
 }
 
-include "includes/html/graphs/common.inc.php";
-$rrd_options .= " -l 0 -E ";
+include 'includes/html/graphs/common.inc.php';
+$rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'                      Now     Avg      Max\\n'";
-$rrd_additions = "";
+$rrd_additions = '';
 
 // Remove encoded characters
 $services[$vars['service']]['service_ds'] = htmlspecialchars_decode($services[$vars['service']]['service_ds']);
 
-if ($services[$vars['service']]['service_ds'] != "") {
+if ($services[$vars['service']]['service_ds'] != '') {
     $graphinfo = json_decode($services[$vars['service']]['service_ds'], true);
 
     // Do we have a DS set
-    if (!isset($graphinfo[$vars['ds']])) {
+    if (! isset($graphinfo[$vars['ds']])) {
         foreach ($graphinfo as $k => $v) {
             // Select a DS to display.
             $vars['ds'] = $k;
@@ -68,32 +68,32 @@ if ($services[$vars['service']]['service_ds'] != "") {
     $ds = $vars['ds'];
     $label = $graphinfo[$vars['ds']];
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         if (isset($check_graph)) {
             // We have a graph definition, use it.
             $rrd_additions .= $check_graph[$ds];
         } else {
             // Build the graph ourselves
             if (preg_match('/loss/i', $ds)) {
-                $tint = "pinks";
+                $tint = 'pinks';
             } else {
-                $tint = "blues";
+                $tint = 'blues';
             }
             $color_avg = \LibreNMS\Config::get("graph_colours.$tint.2");
             $color_max = \LibreNMS\Config::get("graph_colours.$tint.0");
 
-            $rrd_additions .= " DEF:DS=" . $rrd_filename . ":".$ds.":AVERAGE ";
-            $rrd_additions .= " DEF:DS_MAX=" . $rrd_filename . ":".$ds.":MAX ";
-            $rrd_additions .= " AREA:DS_MAX#" . $color_max . ":";
-            $rrd_additions .= " AREA:DS#" . $color_avg . ":'" . str_pad(substr(ucfirst($ds)." (".$label.")", 0, 15), 15) . "' ";
-            $rrd_additions .= " GPRINT:DS:LAST:%5.2lf%s ";
-            $rrd_additions .= " GPRINT:DS:AVERAGE:%5.2lf%s ";
-            $rrd_additions .= " GPRINT:DS_MAX:MAX:%5.2lf%s\\l ";
+            $rrd_additions .= ' DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE ';
+            $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX ';
+            $rrd_additions .= ' AREA:DS_MAX#' . $color_max . ':';
+            $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . str_pad(substr(ucfirst($ds) . ' (' . $label . ')', 0, 15), 15) . "' ";
+            $rrd_additions .= ' GPRINT:DS:LAST:%5.2lf%s ';
+            $rrd_additions .= ' GPRINT:DS:AVERAGE:%5.2lf%s ';
+            $rrd_additions .= ' GPRINT:DS_MAX:MAX:%5.2lf%s\\l ';
         }
     }
 }
 
-if ($rrd_additions == "") {
+if ($rrd_additions == '') {
     // We didn't add any data points.
 } else {
     $rrd_options .= $rrd_additions;

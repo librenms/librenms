@@ -1,6 +1,6 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Settings'))
+@section('title', __('settings.title'))
 
 @section('content')
     <div class="container">

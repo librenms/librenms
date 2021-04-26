@@ -15,12 +15,12 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 juniperMIB MODULE-IDENTITY
-    LAST-UPDATED "201410090000Z"
+    LAST-UPDATED "201912180000Z"    -- Wed Dec 18 00:00:00 2019 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
     DESCRIPTION
@@ -78,9 +78,6 @@ juniperMIB MODULE-IDENTITY
              Added jnxoptIfMibRoot branch.
              Added jnxIfOtnNotifications branch.
              Added jnxOpticsNotifications branch."
-    REVISION    "201403070000Z" -- 07-Mar-14
-    DESCRIPTION
-            "Added jnxAgentCapability branch."
     REVISION    "201311260000Z" -- 26-Nov-13
     DESCRIPTION
             " Added jnxSnmpSetMibRoot branch"
@@ -93,6 +90,33 @@ juniperMIB MODULE-IDENTITY
     REVISION    "201511190000Z" -- 19-Nov-15
     DESCRIPTION
             " Added jnxIplcNotifications branch"
+
+    REVISION    "201605310000Z" -- 31-May-16
+    DESCRIPTION
+            "Removed duplicate entries"
+    REVISION    "201703010000Z" --01-Mar-17
+    DESCRIPTION
+            "Add jnxOamMibRoot"
+
+    REVISION    "201806010000Z" --01-Jun-18
+    DESCRIPTION
+            "Add jnxWirelessWANStatusMibRoot"
+
+    REVISION    "201906010000Z" --01-Jun-19
+    DESCRIPTION
+            "Add jnxWlanWAPStatusMibRoot"
+
+    REVISION    "201910230924Z" --23-Oct-19
+    DESCRIPTION
+            "Add jnxjSysmonMibRoot"
+
+    REVISION    "201912180000Z" --18-Dec-19
+    DESCRIPTION
+            "Add jnxTLBMIBRoot"
+
+    REVISION    "202003250000Z" --25-Mar-20
+    DESCRIPTION
+            "Add jnxTLBNotifications"
     ::= { enterprises 2636 }
 
 --
@@ -262,7 +286,29 @@ jnxMibs OBJECT-IDENTITY
     -- juniper Service Redundancy Daemon mib
     jnxSRDMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 82 }
 
-jnxTraps OBJECT-IDENTITY 
+    -- juniper OAMD mib
+    jnxOamMibRoot          OBJECT IDENTIFIER ::= { jnxMibs 83 }
+
+    -- juniper Tunnel statistics mib
+    jnxTunnelStatsMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 84 }
+
+    -- juniper URL Filtering Daemon mib
+    jnxURLFMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 85 }
+
+    -- Custom OID mib root which gets added dynamically during run-time
+    jnxCustomMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 86 }
+
+    jnxWirelessWANStatusMibRoot     OBJECT IDENTIFIER ::= { jnxMibs 87 }
+
+    jnxWlanWAPStatusMibRoot     OBJECT IDENTIFIER ::= { jnxMibs 88 }
+
+    jnxUserFirewallsRoot        OBJECT IDENTIFIER ::= { jnxMibs 89 }
+
+    jnxjSysmonMibRoot           OBJECT IDENTIFIER ::= { jnxMibs 90 }
+
+    jnxTLBMIBRoot       OBJECT IDENTIFIER ::= {jnxMibs 91}
+
+jnxTraps OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
             "The root of Juniper's Trap OIDs."
@@ -306,6 +352,15 @@ jnxTraps OBJECT-IDENTITY
     jnxTwampNotificationPrefix OBJECT IDENTIFIER ::= {jnxTraps 27 }
 
     jnxIplcNotifications       OBJECT IDENTIFIER ::= { jnxTraps 28 }
+
+    jnxIlaNotifications       OBJECT IDENTIFIER ::= { jnxTraps 29 }
+
+    -- Customer will define their custom trap OID under this root
+    jnxCustomSyslogNotifications     OBJECT IDENTIFIER ::= { jnxTraps 30 }
+
+    jnxjSysmonNotifications     OBJECT IDENTIFIER ::= { jnxTraps 31 }
+
+    jnxTLBNotifications	    OBJECT IDENTIFIER ::= { jnxTraps 32 }
 
 --  This is the top-level object identifier registry used by Juniper
 --  products for SNMP modules containing experimental MIB definitions.
@@ -355,10 +410,5 @@ jnxBxMibRoot OBJECT IDENTIFIER ::= { juniperMIB 10 }
 --
 jnxAgentCapability OBJECT IDENTIFIER ::= { juniperMIB 11 }
 
---
--- This is the top-level object identifier registry used by Agent
--- Capabilities mibs.
---
-jnxAgentCapability OBJECT IDENTIFIER ::= { juniperMIB 11 }
 
 END

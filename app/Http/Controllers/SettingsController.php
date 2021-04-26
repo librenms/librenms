@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use LibreNMS\Util\DynamicConfig;
-use LibreNMS\Util\DynamicConfigItem;
 
 class SettingsController extends Controller
 {
@@ -17,17 +14,16 @@ class SettingsController extends Controller
      * @param DynamicConfig $dynamicConfig
      * @param string $tab
      * @param string $section
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
-            'groups' => $dynamicConfig->getGroups()->reduce(function ($groups, $group) {
-                /** @var Collection $groups */
-                return $groups->put($group, []);
-            }, new Collection())->forget('global'),
+            'groups' => $dynamicConfig->getGroups()->reject(function ($group) {
+                return $group == 'global';
+            })->values(),
         ];
 
         return view('settings.index', $data);
@@ -45,14 +41,14 @@ class SettingsController extends Controller
     {
         $value = $request->get('value');
 
-        if (!$config->isValidSetting($id)) {
-            return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
+        if (! $config->isValidSetting($id)) {
+            return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
         }
 
         $current = \LibreNMS\Config::get($id);
         $config_item = $config->get($id);
 
-        if (!$config_item->checkValue($value)) {
+        if (! $config_item->checkValue($value)) {
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
@@ -60,7 +56,7 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, "Successfully set $id", $value);
         }
 
-        return $this->jsonResponse($id, "Failed to update :id", $current, 400);
+        return $this->jsonResponse($id, 'Failed to update :id', $current, 400);
     }
 
     /**
@@ -72,18 +68,18 @@ class SettingsController extends Controller
      */
     public function destroy(DynamicConfig $config, $id)
     {
-        if (!$config->isValidSetting($id)) {
-            return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
+        if (! $config->isValidSetting($id)) {
+            return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
         }
 
         $dbConfig = \App\Models\Config::withChildren($id)->get();
         if ($dbConfig->isEmpty()) {
-            return $this->jsonResponse($id, ":id is not set", $config->get($id)->default, 400);
+            return $this->jsonResponse($id, ':id is not set', $config->get($id)->default, 400);
         }
 
         $dbConfig->each->delete();
 
-        return $this->jsonResponse($id, ":id reset to default", $config->get($id)->default);
+        return $this->jsonResponse($id, ':id reset to default', $config->get($id)->default);
     }
 
     /**

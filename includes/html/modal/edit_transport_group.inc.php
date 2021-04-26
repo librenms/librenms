@@ -20,7 +20,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Edit-transport">Alert Transport Groups :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
+                    <h5 class="modal-title" id="Edit-transport">Alert Transport Groups :: <a target="_blank" href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
                 </div>
                 <div class="modal-body">
                     <form method="post" role="form" id="transport-group" class="form-horizontal transport-group-form">

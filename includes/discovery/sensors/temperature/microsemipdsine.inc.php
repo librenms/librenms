@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Lorenzo Zafra
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
@@ -28,10 +27,12 @@
 $temperature_unit = trim(snmp_get($device, '.1.3.6.1.4.1.7428.1.2.2.1.1.12.1', '-Oqv'), '" ');
 $temperature = trim(snmp_get($device, '.1.3.6.1.4.1.7428.1.2.2.1.1.11.1', '-Oqv'), '" ');
 
-if (!empty($temperature_unit) && !empty($temperature)) {
-    // If fahrenheit convert to celcius
-    if ($temperature_unit == "2") {
-        $temperature = ($temperature - 32) / 1.8;
+if (! empty($temperature_unit) && ! empty($temperature)) {
+    // If fahrenheit convert to celsius
+    $function = null;
+    if ($temperature_unit == '2') {
+        $function = 'fahrenheit_to_celsius';
+        $temperature = fahrenheit_to_celsius($temperature);
     }
 
     $divisor = 1;
@@ -41,5 +42,5 @@ if (!empty($temperature_unit) && !empty($temperature)) {
     $oid = '.1.3.6.1.4.1.7428.1.2.2.1.1.11.1';
     $current_value = $temperature / $divisor;
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value, 'snmp', null, null, $function);
 }

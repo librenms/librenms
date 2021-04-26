@@ -5,4 +5,5 @@ icon: barracuda
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
-    - sysDescr: 'Barracuda Load Balancer'
+    -
+        sysDescr: 'Barracuda Load Balancer'

@@ -31,4 +31,4 @@ discovery_modules:
     wireless: false
 discovery:
     -
-      sysDescr: IBM DPI
+        sysDescr: IBM DPI

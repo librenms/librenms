@@ -1,0 +1,1377 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux ip-10-0-0-60.ec2.internal 3.10.0-1062.12.1.el7.x86_64 #1 SMP Tue Feb 4 23:02:59 UTC 2020 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-1062.12.1.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports": {
+        "discovery": {
+            "ports": [
+                {
+                    "port_descr_type": null,
+                    "port_descr_descr": null,
+                    "port_descr_circuit": null,
+                    "port_descr_speed": null,
+                    "port_descr_notes": null,
+                    "ifDescr": "lo",
+                    "ifName": "lo",
+                    "portName": null,
+                    "ifIndex": 1,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": null,
+                    "ifConnectorPresent": null,
+                    "ifPromiscuousMode": null,
+                    "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
+                    "ifOperStatus_prev": null,
+                    "ifAdminStatus": null,
+                    "ifAdminStatus_prev": null,
+                    "ifDuplex": null,
+                    "ifMtu": null,
+                    "ifType": "softwareLoopback",
+                    "ifAlias": "lo",
+                    "ifPhysAddress": null,
+                    "ifHardType": null,
+                    "ifLastChange": 0,
+                    "ifVlan": "",
+                    "ifTrunk": null,
+                    "counter_in": null,
+                    "counter_out": null,
+                    "ignore": 0,
+                    "disabled": 0,
+                    "detailed": 0,
+                    "deleted": 0,
+                    "pagpOperationMode": null,
+                    "pagpPortState": null,
+                    "pagpPartnerDeviceId": null,
+                    "pagpPartnerLearnMethod": null,
+                    "pagpPartnerIfIndex": null,
+                    "pagpPartnerGroupIfIndex": null,
+                    "pagpPartnerDeviceName": null,
+                    "pagpEthcOperationMode": null,
+                    "pagpDeviceId": null,
+                    "pagpGroupIfIndex": null,
+                    "ifInUcastPkts": null,
+                    "ifInUcastPkts_prev": null,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": null,
+                    "ifOutUcastPkts_prev": null,
+                    "ifOutUcastPkts_delta": null,
+                    "ifOutUcastPkts_rate": null,
+                    "ifInErrors": null,
+                    "ifInErrors_prev": null,
+                    "ifInErrors_delta": null,
+                    "ifInErrors_rate": null,
+                    "ifOutErrors": null,
+                    "ifOutErrors_prev": null,
+                    "ifOutErrors_delta": null,
+                    "ifOutErrors_rate": null,
+                    "ifInOctets": null,
+                    "ifInOctets_prev": null,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": null,
+                    "ifOutOctets_prev": null,
+                    "ifOutOctets_delta": null,
+                    "ifOutOctets_rate": null,
+                    "poll_prev": null,
+                    "ifInNUcastPkts": null,
+                    "ifInNUcastPkts_prev": null,
+                    "ifInNUcastPkts_delta": null,
+                    "ifInNUcastPkts_rate": null,
+                    "ifOutNUcastPkts": null,
+                    "ifOutNUcastPkts_prev": null,
+                    "ifOutNUcastPkts_delta": null,
+                    "ifOutNUcastPkts_rate": null,
+                    "ifInDiscards": null,
+                    "ifInDiscards_prev": null,
+                    "ifInDiscards_delta": null,
+                    "ifInDiscards_rate": null,
+                    "ifOutDiscards": null,
+                    "ifOutDiscards_prev": null,
+                    "ifOutDiscards_delta": null,
+                    "ifOutDiscards_rate": null,
+                    "ifInUnknownProtos": null,
+                    "ifInUnknownProtos_prev": null,
+                    "ifInUnknownProtos_delta": null,
+                    "ifInUnknownProtos_rate": null,
+                    "ifInBroadcastPkts": null,
+                    "ifInBroadcastPkts_prev": null,
+                    "ifInBroadcastPkts_delta": null,
+                    "ifInBroadcastPkts_rate": null,
+                    "ifOutBroadcastPkts": null,
+                    "ifOutBroadcastPkts_prev": null,
+                    "ifOutBroadcastPkts_delta": null,
+                    "ifOutBroadcastPkts_rate": null,
+                    "ifInMulticastPkts": null,
+                    "ifInMulticastPkts_prev": null,
+                    "ifInMulticastPkts_delta": null,
+                    "ifInMulticastPkts_rate": null,
+                    "ifOutMulticastPkts": null,
+                    "ifOutMulticastPkts_prev": null,
+                    "ifOutMulticastPkts_delta": null,
+                    "ifOutMulticastPkts_rate": null
+                },
+                {
+                    "port_descr_type": null,
+                    "port_descr_descr": null,
+                    "port_descr_circuit": null,
+                    "port_descr_speed": null,
+                    "port_descr_notes": null,
+                    "ifDescr": "eth0",
+                    "ifName": "eth0",
+                    "portName": null,
+                    "ifIndex": 2,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": null,
+                    "ifConnectorPresent": null,
+                    "ifPromiscuousMode": null,
+                    "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
+                    "ifOperStatus_prev": null,
+                    "ifAdminStatus": null,
+                    "ifAdminStatus_prev": null,
+                    "ifDuplex": null,
+                    "ifMtu": null,
+                    "ifType": "ethernetCsmacd",
+                    "ifAlias": "eth0",
+                    "ifPhysAddress": null,
+                    "ifHardType": null,
+                    "ifLastChange": 0,
+                    "ifVlan": "",
+                    "ifTrunk": null,
+                    "counter_in": null,
+                    "counter_out": null,
+                    "ignore": 0,
+                    "disabled": 0,
+                    "detailed": 0,
+                    "deleted": 0,
+                    "pagpOperationMode": null,
+                    "pagpPortState": null,
+                    "pagpPartnerDeviceId": null,
+                    "pagpPartnerLearnMethod": null,
+                    "pagpPartnerIfIndex": null,
+                    "pagpPartnerGroupIfIndex": null,
+                    "pagpPartnerDeviceName": null,
+                    "pagpEthcOperationMode": null,
+                    "pagpDeviceId": null,
+                    "pagpGroupIfIndex": null,
+                    "ifInUcastPkts": null,
+                    "ifInUcastPkts_prev": null,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": null,
+                    "ifOutUcastPkts_prev": null,
+                    "ifOutUcastPkts_delta": null,
+                    "ifOutUcastPkts_rate": null,
+                    "ifInErrors": null,
+                    "ifInErrors_prev": null,
+                    "ifInErrors_delta": null,
+                    "ifInErrors_rate": null,
+                    "ifOutErrors": null,
+                    "ifOutErrors_prev": null,
+                    "ifOutErrors_delta": null,
+                    "ifOutErrors_rate": null,
+                    "ifInOctets": null,
+                    "ifInOctets_prev": null,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": null,
+                    "ifOutOctets_prev": null,
+                    "ifOutOctets_delta": null,
+                    "ifOutOctets_rate": null,
+                    "poll_prev": null,
+                    "ifInNUcastPkts": null,
+                    "ifInNUcastPkts_prev": null,
+                    "ifInNUcastPkts_delta": null,
+                    "ifInNUcastPkts_rate": null,
+                    "ifOutNUcastPkts": null,
+                    "ifOutNUcastPkts_prev": null,
+                    "ifOutNUcastPkts_delta": null,
+                    "ifOutNUcastPkts_rate": null,
+                    "ifInDiscards": null,
+                    "ifInDiscards_prev": null,
+                    "ifInDiscards_delta": null,
+                    "ifInDiscards_rate": null,
+                    "ifOutDiscards": null,
+                    "ifOutDiscards_prev": null,
+                    "ifOutDiscards_delta": null,
+                    "ifOutDiscards_rate": null,
+                    "ifInUnknownProtos": null,
+                    "ifInUnknownProtos_prev": null,
+                    "ifInUnknownProtos_delta": null,
+                    "ifInUnknownProtos_rate": null,
+                    "ifInBroadcastPkts": null,
+                    "ifInBroadcastPkts_prev": null,
+                    "ifInBroadcastPkts_delta": null,
+                    "ifInBroadcastPkts_rate": null,
+                    "ifOutBroadcastPkts": null,
+                    "ifOutBroadcastPkts_prev": null,
+                    "ifOutBroadcastPkts_delta": null,
+                    "ifOutBroadcastPkts_rate": null,
+                    "ifInMulticastPkts": null,
+                    "ifInMulticastPkts_prev": null,
+                    "ifInMulticastPkts_delta": null,
+                    "ifInMulticastPkts_rate": null,
+                    "ifOutMulticastPkts": null,
+                    "ifOutMulticastPkts_prev": null,
+                    "ifOutMulticastPkts_delta": null,
+                    "ifOutMulticastPkts_rate": null
+                }
+            ]
+        },
+        "poller": {
+            "ports": [
+                {
+                    "port_descr_type": null,
+                    "port_descr_descr": null,
+                    "port_descr_circuit": null,
+                    "port_descr_speed": null,
+                    "port_descr_notes": null,
+                    "ifDescr": "lo",
+                    "ifName": "lo",
+                    "portName": null,
+                    "ifIndex": 1,
+                    "ifSpeed": 10000000,
+                    "ifSpeed_prev": null,
+                    "ifConnectorPresent": "false",
+                    "ifPromiscuousMode": "false",
+                    "ifHighSpeed": 10,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
+                    "ifOperStatus_prev": "up",
+                    "ifAdminStatus": "up",
+                    "ifAdminStatus_prev": null,
+                    "ifDuplex": null,
+                    "ifMtu": 65536,
+                    "ifType": "softwareLoopback",
+                    "ifAlias": "lo",
+                    "ifPhysAddress": null,
+                    "ifHardType": null,
+                    "ifLastChange": 0,
+                    "ifVlan": "",
+                    "ifTrunk": null,
+                    "counter_in": null,
+                    "counter_out": null,
+                    "ignore": 0,
+                    "disabled": 0,
+                    "detailed": 0,
+                    "deleted": 0,
+                    "pagpOperationMode": null,
+                    "pagpPortState": null,
+                    "pagpPartnerDeviceId": null,
+                    "pagpPartnerLearnMethod": null,
+                    "pagpPartnerIfIndex": null,
+                    "pagpPartnerGroupIfIndex": null,
+                    "pagpPartnerDeviceName": null,
+                    "pagpEthcOperationMode": null,
+                    "pagpDeviceId": null,
+                    "pagpGroupIfIndex": null,
+                    "ifInUcastPkts": 71049399,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 71049399,
+                    "ifOutUcastPkts_prev": 0,
+                    "ifOutUcastPkts_delta": null,
+                    "ifOutUcastPkts_rate": null,
+                    "ifInErrors": 0,
+                    "ifInErrors_prev": 0,
+                    "ifInErrors_delta": null,
+                    "ifInErrors_rate": null,
+                    "ifOutErrors": 0,
+                    "ifOutErrors_prev": 0,
+                    "ifOutErrors_delta": null,
+                    "ifOutErrors_rate": null,
+                    "ifInOctets": 14097456873,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 14097456873,
+                    "ifOutOctets_prev": 0,
+                    "ifOutOctets_delta": null,
+                    "ifOutOctets_rate": null,
+                    "poll_prev": null,
+                    "ifInNUcastPkts": 0,
+                    "ifInNUcastPkts_prev": 0,
+                    "ifInNUcastPkts_delta": null,
+                    "ifInNUcastPkts_rate": null,
+                    "ifOutNUcastPkts": 0,
+                    "ifOutNUcastPkts_prev": 0,
+                    "ifOutNUcastPkts_delta": null,
+                    "ifOutNUcastPkts_rate": null,
+                    "ifInDiscards": 0,
+                    "ifInDiscards_prev": 0,
+                    "ifInDiscards_delta": null,
+                    "ifInDiscards_rate": null,
+                    "ifOutDiscards": 0,
+                    "ifOutDiscards_prev": 0,
+                    "ifOutDiscards_delta": null,
+                    "ifOutDiscards_rate": null,
+                    "ifInUnknownProtos": 0,
+                    "ifInUnknownProtos_prev": 0,
+                    "ifInUnknownProtos_delta": null,
+                    "ifInUnknownProtos_rate": null,
+                    "ifInBroadcastPkts": 0,
+                    "ifInBroadcastPkts_prev": 0,
+                    "ifInBroadcastPkts_delta": null,
+                    "ifInBroadcastPkts_rate": null,
+                    "ifOutBroadcastPkts": 0,
+                    "ifOutBroadcastPkts_prev": 0,
+                    "ifOutBroadcastPkts_delta": null,
+                    "ifOutBroadcastPkts_rate": null,
+                    "ifInMulticastPkts": 0,
+                    "ifInMulticastPkts_prev": 0,
+                    "ifInMulticastPkts_delta": null,
+                    "ifInMulticastPkts_rate": null,
+                    "ifOutMulticastPkts": 0,
+                    "ifOutMulticastPkts_prev": 0,
+                    "ifOutMulticastPkts_delta": null,
+                    "ifOutMulticastPkts_rate": null
+                },
+                {
+                    "port_descr_type": null,
+                    "port_descr_descr": null,
+                    "port_descr_circuit": null,
+                    "port_descr_speed": null,
+                    "port_descr_notes": null,
+                    "ifDescr": "eth0",
+                    "ifName": "eth0",
+                    "portName": null,
+                    "ifIndex": 2,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
+                    "ifConnectorPresent": "true",
+                    "ifPromiscuousMode": "false",
+                    "ifHighSpeed": 0,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
+                    "ifOperStatus_prev": "up",
+                    "ifAdminStatus": "up",
+                    "ifAdminStatus_prev": null,
+                    "ifDuplex": null,
+                    "ifMtu": 9001,
+                    "ifType": "ethernetCsmacd",
+                    "ifAlias": "eth0",
+                    "ifPhysAddress": "0a1c7571a9cf",
+                    "ifHardType": null,
+                    "ifLastChange": 0,
+                    "ifVlan": "",
+                    "ifTrunk": null,
+                    "counter_in": null,
+                    "counter_out": null,
+                    "ignore": 0,
+                    "disabled": 0,
+                    "detailed": 0,
+                    "deleted": 0,
+                    "pagpOperationMode": null,
+                    "pagpPortState": null,
+                    "pagpPartnerDeviceId": null,
+                    "pagpPartnerLearnMethod": null,
+                    "pagpPartnerIfIndex": null,
+                    "pagpPartnerGroupIfIndex": null,
+                    "pagpPartnerDeviceName": null,
+                    "pagpEthcOperationMode": null,
+                    "pagpDeviceId": null,
+                    "pagpGroupIfIndex": null,
+                    "ifInUcastPkts": 219489844,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 267813994,
+                    "ifOutUcastPkts_prev": 0,
+                    "ifOutUcastPkts_delta": null,
+                    "ifOutUcastPkts_rate": null,
+                    "ifInErrors": 0,
+                    "ifInErrors_prev": 0,
+                    "ifInErrors_delta": null,
+                    "ifInErrors_rate": null,
+                    "ifOutErrors": 0,
+                    "ifOutErrors_prev": 0,
+                    "ifOutErrors_delta": null,
+                    "ifOutErrors_rate": null,
+                    "ifInOctets": 81291283713,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 103426443103,
+                    "ifOutOctets_prev": 0,
+                    "ifOutOctets_delta": null,
+                    "ifOutOctets_rate": null,
+                    "poll_prev": null,
+                    "ifInNUcastPkts": 0,
+                    "ifInNUcastPkts_prev": 0,
+                    "ifInNUcastPkts_delta": null,
+                    "ifInNUcastPkts_rate": null,
+                    "ifOutNUcastPkts": 0,
+                    "ifOutNUcastPkts_prev": 0,
+                    "ifOutNUcastPkts_delta": null,
+                    "ifOutNUcastPkts_rate": null,
+                    "ifInDiscards": 0,
+                    "ifInDiscards_prev": 0,
+                    "ifInDiscards_delta": null,
+                    "ifInDiscards_rate": null,
+                    "ifOutDiscards": 0,
+                    "ifOutDiscards_prev": 0,
+                    "ifOutDiscards_delta": null,
+                    "ifOutDiscards_rate": null,
+                    "ifInUnknownProtos": 0,
+                    "ifInUnknownProtos_prev": 0,
+                    "ifInUnknownProtos_delta": null,
+                    "ifInUnknownProtos_rate": null,
+                    "ifInBroadcastPkts": 0,
+                    "ifInBroadcastPkts_prev": 0,
+                    "ifInBroadcastPkts_delta": null,
+                    "ifInBroadcastPkts_rate": null,
+                    "ifOutBroadcastPkts": 0,
+                    "ifOutBroadcastPkts_prev": 0,
+                    "ifOutBroadcastPkts_delta": null,
+                    "ifOutBroadcastPkts_rate": null,
+                    "ifInMulticastPkts": 0,
+                    "ifInMulticastPkts_prev": 0,
+                    "ifInMulticastPkts_delta": null,
+                    "ifInMulticastPkts_rate": null,
+                    "ifOutMulticastPkts": 0,
+                    "ifOutMulticastPkts_prev": 0,
+                    "ifOutMulticastPkts_delta": null,
+                    "ifOutMulticastPkts_rate": null
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196608,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
+                    "processor_index": "196608",
+                    "processor_type": "hr",
+                    "processor_usage": 10,
+                    "processor_descr": "Intel Xeon E5-2676 v3 @ 2.40GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 38,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 726020096,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "mempool_free": 1199468544,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1925488640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 99
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "virtual",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Virtual memory",
+                    "mempool_perc": 80,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 1536348160,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
+                    "mempool_free": 389140480,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1925488640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 95
+                },
+                {
+                    "mempool_index": "6",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 0,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 0,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.6",
+                    "mempool_free": 1925488640,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1925488640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "7",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 42,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 810328064,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.7",
+                    "mempool_free": 1115160576,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1925488640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "8",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "shared",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Shared memory",
+                    "mempool_perc": 8,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 149364736,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.8",
+                    "mempool_free": 1776123904,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1925488640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "31",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/",
+                    "storage_size": 107362627584,
+                    "storage_units": 4096,
+                    "storage_used": 17852645376,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "36",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/dev/shm",
+                    "storage_size": 962744320,
+                    "storage_units": 4096,
+                    "storage_used": 39714816,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "38",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/run",
+                    "storage_size": 962744320,
+                    "storage_units": 4096,
+                    "storage_used": 101597184,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "39",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/sys/fs/cgroup",
+                    "storage_size": 962744320,
+                    "storage_units": 4096,
+                    "storage_used": 0,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "58",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/run/user/1000",
+                    "storage_size": 192548864,
+                    "storage_units": 4096,
+                    "storage_used": 0,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "31",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/",
+                    "storage_size": 107362627584,
+                    "storage_units": 4096,
+                    "storage_used": 17852645376,
+                    "storage_free": 89509982208,
+                    "storage_perc": 17,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "36",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/dev/shm",
+                    "storage_size": 962744320,
+                    "storage_units": 4096,
+                    "storage_used": 39714816,
+                    "storage_free": 923029504,
+                    "storage_perc": 4,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "38",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/run",
+                    "storage_size": 962744320,
+                    "storage_units": 4096,
+                    "storage_used": 101597184,
+                    "storage_free": 861147136,
+                    "storage_perc": 11,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "39",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/sys/fs/cgroup",
+                    "storage_size": 962744320,
+                    "storage_units": 4096,
+                    "storage_used": 0,
+                    "storage_free": 962744320,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "58",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/run/user/1000",
+                    "storage_size": 192548864,
+                    "storage_units": 4096,
+                    "storage_used": 0,
+                    "storage_free": 192548864,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "mysql",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "opensips",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "mysql",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "opensips",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "ACs",
+                    "value": 828,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "AdCs",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "BRd",
+                    "value": 6065143038,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "BSt",
+                    "value": 11399886521,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CDe",
+                    "value": 1479928,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CISt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CIt",
+                    "value": 2960016,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CLd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CRe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CRSt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "Cs",
+                    "value": 32445,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CSt",
+                    "value": 3207,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CTMPDTs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CTMPFs",
+                    "value": 57,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CTMPTs",
+                    "value": 89571,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CUe",
+                    "value": 4104395,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CUMi",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "free_memory",
+                    "value": 129527672,
+                    "value_prev": null,
+                    "app_type": "opensips"
+                },
+                {
+                    "metric": "IBCd",
+                    "value": 71383,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBFBl",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIAd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIAe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIFLg",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIFSc",
+                    "value": 34490009,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIIAo",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIIs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBILg",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBILog",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIMRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIMs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBISc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIWr",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBLFh",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBLWn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBOWs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPDBp",
+                    "value": 6983,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPFe",
+                    "value": 1024,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPMps",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPse",
+                    "value": 8015,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBRd",
+                    "value": 48418,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBSRs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBSWs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBTNx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBWr",
+                    "value": 50857958,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBLBSe",
+                    "value": 16777216,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRDd",
+                    "value": 1479923,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRId",
+                    "value": 3579464,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRRd",
+                    "value": 17273969,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRUd",
+                    "value": 4103800,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KRRs",
+                    "value": 75,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KRs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KWR",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KWs",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "load",
+                    "value": 0.2,
+                    "value_prev": null,
+                    "app_type": "opensips"
+                },
+                {
+                    "metric": "MaCs",
+                    "value": 151,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "MUCs",
+                    "value": 23,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "OdTs",
+                    "value": 94,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "OFs",
+                    "value": 43,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "openfiles",
+                    "value": 3405,
+                    "value_prev": null,
+                    "app_type": "opensips"
+                },
+                {
+                    "metric": "OTs",
+                    "value": 75,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCeFy",
+                    "value": 1031320,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCHs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCIs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCLMPs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCNCd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCQICe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCs",
+                    "value": 1048576,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SFJn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SFRJn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SlLa",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SMPs",
+                    "value": 98,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SQs",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRange",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRCk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRe",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRows",
+                    "value": 2215761,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SScan",
+                    "value": 685,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SSn",
+                    "value": 92241,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_closing_tables",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_copying_to_tmp_table",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_end",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_freeing_items",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_init",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_locked",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_login",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_none",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_preparing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_reading_from_net",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_sending_data",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_sorting_result",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_statistics",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_updating",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_writing_to_net",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TCd",
+                    "value": 11,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TLIe",
+                    "value": 318,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TLWd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TOC",
+                    "value": 2000,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "total_memory",
+                    "value": 134217728,
+                    "value_prev": null,
+                    "app_type": "opensips"
+                },
+                {
+                    "metric": "used_memory",
+                    "value": 4690056,
+                    "value_prev": null,
+                    "app_type": "opensips"
+                }
+            ]
+        }
+    }
+}

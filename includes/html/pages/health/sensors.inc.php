@@ -10,62 +10,62 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 switch ($class) {
     case 'charge':
-        $pagetitle[] = "Health :: Charge";
+        $pagetitle[] = 'Health :: Charge';
         break;
     case 'cooling':
-        $pagetitle[] = "Health :: Cooling";
+        $pagetitle[] = 'Health :: Cooling';
         break;
     case 'current':
-        $pagetitle[] = "Health :: Current";
+        $pagetitle[] = 'Health :: Current';
         break;
     case 'dbm':
-        $pagetitle[] = "Health :: dBm";
+        $pagetitle[] = 'Health :: dBm';
         break;
     case 'fanspeed':
-        $pagetitle[] = "Health :: Fanspeed";
+        $pagetitle[] = 'Health :: Fanspeed';
         break;
     case 'frequency':
-        $pagetitle[] = "Health :: Frequency";
+        $pagetitle[] = 'Health :: Frequency';
         break;
     case 'humidity':
-        $pagetitle[] = "Health :: Humidity";
+        $pagetitle[] = 'Health :: Humidity';
         break;
     case 'load':
-        $pagetitle[] = "Health :: Load";
+        $pagetitle[] = 'Health :: Load';
         break;
     case 'power':
-        $pagetitle[] = "Health :: Power";
+        $pagetitle[] = 'Health :: Power';
         break;
     case 'pressure':
-        $pagetitle[] = "Health :: Pressure";
+        $pagetitle[] = 'Health :: Pressure';
         break;
     case 'runtime':
-        $pagetitle[] = "Health :: Runtime";
+        $pagetitle[] = 'Health :: Runtime';
         break;
     case 'signal':
-        $pagetitle[] = "Health :: Signal";
+        $pagetitle[] = 'Health :: Signal';
         break;
     case 'snr':
-        $pagetitle[] = "Health :: SNR";
+        $pagetitle[] = 'Health :: SNR';
         break;
     case 'state':
-        $pagetitle[] = "Health :: State";
+        $pagetitle[] = 'Health :: State';
         break;
     case 'count':
-        $pagetitle[] = "Health :: Count";
+        $pagetitle[] = 'Health :: Count';
         break;
     case 'temperature':
-        $pagetitle[] = "Health :: Temperature";
+        $pagetitle[] = 'Health :: Temperature';
         break;
     case 'voltage':
-        $pagetitle[] = "Health :: Voltage";
+        $pagetitle[] = 'Health :: Voltage';
         break;
 }
 

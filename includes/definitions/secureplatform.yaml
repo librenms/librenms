@@ -2,8 +2,7 @@ os: secureplatform
 text: 'CheckPoint SecurePlatform'
 type: firewall
 icon: checkpoint
-mib_dir:
-    - checkpoint
+mib_dir: checkpoint
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -21,10 +20,11 @@ discovery_modules:
 poller_modules:
     ntp: false
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.8072.3.2
-      snmpget:
-        oid: CHECKPOINT-MIB::osName.0
-        mib_dir: checkpoint
-        op: 'contains'
-        value: SecurePlatform
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2
+        snmpget:
+            oid: CHECKPOINT-MIB::osName.0
+            mib_dir: checkpoint
+            op: 'contains'
+            value: SecurePlatform

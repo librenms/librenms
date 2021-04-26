@@ -14,7 +14,7 @@ class CreateStpTable extends Migration
     {
         Schema::create('stp', function (Blueprint $table) {
             $table->increments('stp_id');
-            $table->unsignedInteger('device_id')->index('stp_host');
+            $table->unsignedInteger('device_id')->index();
             $table->boolean('rootBridge');
             $table->string('bridgeAddress', 32);
             $table->string('protocolSpecification', 16);

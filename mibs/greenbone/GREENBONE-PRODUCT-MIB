@@ -1,0 +1,148 @@
+-- Copyright (c) 2010,2012,2014,2015,2017 Greenbone Networks GmbH
+-- This document is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
+GREENBONE-PRODUCT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ;
+
+greenboneProduct MODULE-IDENTITY
+    LAST-UPDATED  "201705150001Z" -- May 15, 2017
+    ORGANIZATION
+        "Greenbone Networks GmbH"
+    CONTACT-INFO
+        "Customer Support
+
+         Greenbone Networks GmbH
+         Neumarkt 12
+         49074 Osnabrueck
+         Germany
+
+         Tel: +49-541-760278-0
+         E-mail: support@greenbone.net
+         HTTPS://support.greenbone.net"
+    DESCRIPTION
+        "Information on the running Greenbone Product."
+    REVISION      "201705150001Z" -- May 15, 2017
+    DESCRIPTION
+        "Updated CONTACT-INFO"
+    REVISION      "201501060001Z" -- January 06, 2015
+    DESCRIPTION
+        "Updated CONTACT-INFO"
+    REVISION      "201412310001Z" -- December 31, 2014
+    DESCRIPTION
+        "Adjustments to IMPORTS and MODULE-IDENTITY"
+    REVISION      "201203260001Z" -- March 26, 2012
+    DESCRIPTION
+        "First Draft"
+    ::= { enterprises 35847 1 }
+
+productName           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the Greenbone Product."
+    ::= { greenboneProduct 1 }
+
+productHardware       OBJECT IDENTIFIER ::= { greenboneProduct 2 }
+productSoftware       OBJECT IDENTIFIER ::= { greenboneProduct 3 }
+productGroups         OBJECT IDENTIFIER ::= { greenboneProduct 4 }
+
+hwName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the Greenbone Product Hardware."
+    ::= { productHardware 1 }
+
+swName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the Greenbone Product Software."
+    ::= { productSoftware 1 }
+
+swVersion             OBJECT IDENTIFIER ::= { productSoftware 2 }
+
+swVersionString OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Version String for the Greenbone Product Software."
+    ::= { swVersion 1 }
+
+swVersionMajor  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Major Version of the Greenbone Product Software."
+    ::= { swVersion 2 }
+
+swVersionMinor  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minor Version of the Greenbone Product Software."
+    ::= { swVersion 3 }
+
+swVersionPatch  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Patchlevel Version of the Greenbone Product Software."
+    ::= { swVersion 4 }
+
+swVersionRevision       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Revision of the Greenbone Product Software."
+    ::= { swVersion 5 }
+
+greenboneProductGroup OBJECT-GROUP
+    OBJECTS {
+        productName, hwName, swName, swVersionString, swVersionMajor, 
+        swVersionMinor, swVersionPatch, swVersionRevision
+    }
+    STATUS      current
+    DESCRIPTION
+        "All objects relating to the Greenbone Product."
+    ::= { productGroups 1 }
+
+greenboneProductHWGroup OBJECT-GROUP
+    OBJECTS {
+        hwName
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects relating to the Greenbone Product Hardware."
+    ::= { productGroups 2 }
+
+greenboneProductSWGroup OBJECT-GROUP
+    OBJECTS {
+        swName, swVersionString, swVersionMajor, swVersionMinor, 
+        swVersionPatch, swVersionRevision
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects relating to the Greenbone Product Software."
+    ::= { productGroups 3 }
+
+END

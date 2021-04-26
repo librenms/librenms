@@ -15,17 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
 // Sinetica UPSController. Versions: App. 6.04.03,   OS 6.3,   Btldr 1.06.09,   H/w ZBBNC2 Rev 1.01.06
 
-list($os_temp, $os_ver, $btldr, $hardware_temp) = explode(',   ', $device['sysDescr']);
+[$os_temp, $os_ver, $btldr, $hardware_temp] = explode(',   ', $device['sysDescr']);
 
-list($ignore, $version) = explode('App. ', $os_temp);
+[$ignore, $version] = explode('App. ', $os_temp);
 $hardware = preg_replace('/H\/w /', '', $hardware_temp);

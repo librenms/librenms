@@ -1,0 +1,30 @@
+mib: DOCS-IF-MIB
+modules:
+    os:
+        sysDescr_regex: '/<<.* SW_REV: (?<version>.*); MODEL: (?<hardware>.*)>>/'
+    sensors:
+        tv_signal:
+            data:
+                -
+                    oid: docsIfDownstreamChannelTable
+                    value: docsIfDownChannelPower
+                    divisor: 10
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.1.1.6.{{ $index }}'
+                    descr: RX Power
+                    index: 1
+                -
+                    oid: docsIfCmStatusTable
+                    value: docsIfCmStatusTxPower
+                    divisor: 10
+                    num_oid: '.1.3.6.1.2.1.10.127.1.2.2.1.3.{{ $index }}'
+                    descr: TX Power
+                    index: 2
+        snr:
+            data:
+                -
+                    oid: docsIfSignalQualityTable
+                    value: docsIfSigQSignalNoise
+                    divisor: 10
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.4.1.5.{{ $index }}'
+                    descr: SNR
+                    index: 1

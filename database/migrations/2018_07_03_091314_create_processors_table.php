@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateProcessorsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,7 +16,7 @@ class CreateProcessorsTable extends Migration
             $table->increments('processor_id');
             $table->integer('entPhysicalIndex')->default(0);
             $table->integer('hrDeviceIndex')->nullable();
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->string('processor_oid', 128);
             $table->string('processor_index', 32);
             $table->string('processor_type', 16);

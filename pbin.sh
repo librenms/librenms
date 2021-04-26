@@ -24,7 +24,7 @@ set -e
 PROGRAM=${0##*/}
 
 # can be overriden from env
-: ${PASTE_URL='https://p.libren.ms/api/create'}
+: "${PASTE_URL=https://p.libren.ms/api/create}"
 
 # paste. take input from stdin
 pastebin() {

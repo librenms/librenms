@@ -11,7 +11,7 @@ IMPORTS
     ucdExperimental				FROM UCD-SNMP-MIB;
 
 ucdDlmodMIB MODULE-IDENTITY
-    LAST-UPDATED "9912100000Z"
+    LAST-UPDATED "200001260000Z"
     ORGANIZATION "University of California, Davis"
     CONTACT-INFO    
 	"This mib is no longer being maintained by the University of
@@ -29,6 +29,11 @@ ucdDlmodMIB MODULE-IDENTITY
     DESCRIPTION
 	"This file defines the MIB objects for dynamic 
 	 loadable MIB modules."
+
+    REVISION	 "200001260000Z"
+    DESCRIPTION
+	"Renamed MIB root object"
+
     REVISION	 "9912100000Z"
     DESCRIPTION
 	"SMIv2 version converted from older MIB definitions."

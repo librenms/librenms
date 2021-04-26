@@ -8,30 +8,30 @@ $oid_list = ['hrSystemProcesses.0', 'hrSystemNumUsers.0'];
 $hrSystem = snmp_get_multi($device, $oid_list, '-OUQs', 'HOST-RESOURCES-MIB');
 
 if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
-    $tags = array(
+    $tags = [
         'rrd_def' => RrdDefinition::make()->addDataset('procs', 'GAUGE', 0),
-    );
-    $fields = array(
+    ];
+    $fields = [
         'procs' => $hrSystem[0]['hrSystemProcesses'],
-    );
+    ];
 
     data_update($device, 'hr_processes', $tags, $fields);
 
-    $graphs['hr_processes'] = true;
+    $os->enableGraph('hr_processes');
     echo ' Processes';
 }
 
 if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
-    $tags = array(
-        'rrd_def' => RrdDefinition::make()->addDataset('users', 'GAUGE', 0)
-    );
-    $fields = array(
+    $tags = [
+        'rrd_def' => RrdDefinition::make()->addDataset('users', 'GAUGE', 0),
+    ];
+    $fields = [
         'users' => $hrSystem[0]['hrSystemNumUsers'],
-    );
+    ];
 
     data_update($device, 'hr_users', $tags, $fields);
 
-    $graphs['hr_users'] = true;
+    $os->enableGraph('hr_users');
     echo ' Users';
 }
 

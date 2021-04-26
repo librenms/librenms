@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc <doctoruve@gmail.com>
  */
@@ -42,8 +41,8 @@ class Smartax extends OS implements ProcessorDiscovery
         $proc_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.5.0';
         $descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';
 
-        $data = snmpwalk_array_num($this->getDevice(), $proc_oid);
-        $descr_data = snmpwalk_array_num($this->getDevice(), $descr_oid);
+        $data = snmpwalk_array_num($this->getDeviceArray(), $proc_oid);
+        $descr_data = snmpwalk_array_num($this->getDeviceArray(), $descr_oid);
 
         // remove first array
         $data = reset($data);
@@ -54,7 +53,7 @@ class Smartax extends OS implements ProcessorDiscovery
             if ($value != -1) {
                 $proc_desc = $descr_data[$index];
                 $processors[] = Processor::discover(
-                    "smartax",
+                    'smartax',
                     $this->getDeviceId(),
                     "$proc_oid.$index",
                     $index,

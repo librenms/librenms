@@ -8,7 +8,7 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_uptime, text: Uptime }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.20540.2.
-mib_dir:
-    - redlion
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.20540.2.
+mib_dir: redlion

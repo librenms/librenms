@@ -6,27 +6,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.27304.3.2.10",
                     "sysDescr": "This is a DKTCOMEGA CPE FTTH gateway (GbE)",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "dkt",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "dkt.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.27304.3.2.10",
-                    "sysDescr": "This is a DKTCOMEGA CPE FTTH gateway (GbE)",
                     "sysContact": "<private>",
                     "version": "DKT_F2_Firmware_v05_29",
-                    "hardware": "DKT F2_1 1",
+                    "hardware": "F2_1 1",
                     "features": null,
                     "os": "dkt",
                     "type": "network",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

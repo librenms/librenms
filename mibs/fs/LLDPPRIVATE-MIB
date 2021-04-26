@@ -9,7 +9,7 @@ LLDPPRIVATE-MIB DEFINITIONS ::= BEGIN
 
 
     lldpPrivateMIB MODULE-IDENTITY
-          LAST-UPDATED "20060727Z"  -- July 27, 2006
+          LAST-UPDATED "200607270000Z"  -- July 27, 2006
           ORGANIZATION "admin Inc."
           CONTACT-INFO
               "admin
@@ -17,7 +17,7 @@ LLDPPRIVATE-MIB DEFINITIONS ::= BEGIN
 
           DESCRIPTION "LLDP private module management."
 
-          REVISION    "20060727Z" -- July 27, 2006
+          REVISION    "200607270000Z" -- July 27, 2006
           DESCRIPTION "Initial Version"
 
           ::= { gbnL2 5 }

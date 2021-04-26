@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
@@ -27,19 +27,19 @@ $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.101.120.105.109.45.115.116.97.116.115';
 $stats = snmp_get($device, $oid, '-Oqv');
 
-echo ' '.$name;
+echo ' ' . $name;
 
-list ($frozen, $queue) = explode("\n", $stats);
+[$frozen, $queue] = explode("\n", $stats);
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('frozen', 'GAUGE', 0)
     ->addDataset('queue', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'frozen' => intval(trim($frozen, '"')),
-    'queue' => intval(trim($queue, '"'))
-);
+    'queue' => intval(trim($queue, '"')),
+];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

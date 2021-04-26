@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Toastr;
@@ -20,7 +20,7 @@ class DeviceGroupController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -39,7 +39,7 @@ class DeviceGroupController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function create()
     {
@@ -53,7 +53,7 @@ class DeviceGroupController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -82,7 +82,7 @@ class DeviceGroupController extends Controller
      * Display the specified resource.
      *
      * @param \App\Models\DeviceGroup $deviceGroup
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function show(DeviceGroup $deviceGroup)
     {
@@ -93,7 +93,7 @@ class DeviceGroupController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param \App\Models\DeviceGroup $deviceGroup
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function edit(DeviceGroup $deviceGroup)
     {
@@ -114,7 +114,7 @@ class DeviceGroupController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param \App\Models\DeviceGroup $deviceGroup
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, DeviceGroup $deviceGroup)
     {
@@ -152,11 +152,12 @@ class DeviceGroupController extends Controller
                     Toastr::success(__('Device Group :name updated', ['name' => $deviceGroup->name]));
                 } else {
                     Toastr::error(__('Failed to save'));
+
                     return redirect()->back()->withInput();
                 }
             } catch (\Illuminate\Database\QueryException $e) {
                 return redirect()->back()->withInput()->withErrors([
-                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage()
+                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
                 ]);
             }
         } else {
@@ -174,10 +175,15 @@ class DeviceGroupController extends Controller
      */
     public function destroy(DeviceGroup $deviceGroup)
     {
+        if ($deviceGroup->serviceTemplates()->exists()) {
+            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => $deviceGroup->name]);
+
+            return response($msg, 200);
+        }
         $deviceGroup->delete();
 
-        Toastr::success(__('Device Group :name deleted', ['name' => $deviceGroup->name]));
+        $msg = __('Device Group :name deleted', ['name' => $deviceGroup->name]);
 
-        return redirect()->route('device-groups.index');
+        return response($msg, 200);
     }
 }

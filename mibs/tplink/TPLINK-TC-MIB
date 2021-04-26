@@ -1,0 +1,41 @@
+TPLINK-TC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		TEXTUAL-CONVENTION FROM SNMPv2-TC;
+		
+	--TPLINK TYPE
+	TPRowStatus ::= TEXTUAL-CONVENTION
+		STATUS      current 
+		DESCRIPTION
+			"The status column has three defined values:
+			- `active(1)', which indicates that the conceptual row is
+			  available for using by the managed device;
+			
+			- `createAndGo(4)', which is supplied by a management
+			  station wishing to create a new instance of a
+			  conceptual row and to have its status automatically set
+			  to active, making it available for using by the managed
+			  device;
+		   
+			- `destroy(6)', which is supplied by a management station
+			  wishing to delete all of the instances associated with
+			  an existing conceptual row."  
+		SYNTAX 	INTEGER{
+					active(1),
+					createAndGo(4),
+					destroy(6)
+				}   
+    
+				
+	TPMacAddress ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT "1x-1x-1x-1x-1x-1x"
+		STATUS       current
+		DESCRIPTION
+				"Represents an 802 MAC address represented in the
+				`canonical' order defined by IEEE 802.1a, i.e., as if it
+				were transmitted least significant bit first, even though
+				802.5 (in contrast to other 802.x protocols) requires MAC
+				addresses to be transmitted most significant bit first."
+		SYNTAX       OCTET STRING (SIZE (6))
+
+END

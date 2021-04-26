@@ -16,35 +16,40 @@ make sure it is modified in a consistent manner.
 > testing. For OS discovery, we can mock snmpsim, but for other tests
 > you will need it installed and functioning.  We run snmpsim during
 > our integration tests, but not by default when running
-> `./scripts/pre-commit.php`.  You can install snmpsim with the
+> `lnms dev:check`.  You can install snmpsim with the
 > command `pip3 install snmpsim`.
 
 ## Capturing test data
 
+???+ warning "If test data already exists"
+
+    If test data already exists, but is for a different device/configuration with the same OS.  
+    Then you should use the `--variant (-v)` option to
+    specify a different variant of the OS,  
+    this will be tested completely separate from other variants.  
+    If there is only one variant, please do not specify one.
+
+### 1. Collect SNMP data
+
 `./scripts/collect-snmp-data.php` is provided to make it easy to
 collect data for tests.  Running collect-snmp-data.php with the
---hostname (-h) allows you to capture all data used to discover and
+`--hostname (-h)` allows you to capture all data used to discover and
 poll a device already added to LibreNMS.  Make sure to re-run the
 script if you add additional support. Check the command-line help for
 more options.
 
+
+### 2. Save test data
+
 After you have collected snmp data, run `./scripts/save-test-data.php`
-with the --os (-o) option to dump the post discovery and post poll
+with the `--os (-o)` option to dump the post discovery and post poll
 database entries to json files. This step requires snmpsim, if you are
 having issues, the maintainers may help you generate it from the
 snmprec you created in the previous step.
 
-Generally, you will only need to capture data once.  After you have
-the data you need in the snmprec file, you can just use
-save-test-data.php to update the database dump (json) after that.
+Generally, you will only need to collect data once.
+After you have the data you need in the snmprec file, you can just use save-test-data.php to update the database dump (json) after that.
 
-### OS Variants
-
-If test data already exists, but is for a different
-device/configuration then you should use the --variant (-v) option to
-specify a different variant of the os, this will be tested completely
-separate from other variants.  If there is only one variant, please do
-not specify one.
 
 ## Running tests
 
@@ -53,23 +58,26 @@ not specify one.
 directory. This will read composer.json and install any dependencies required.
 
 After you have saved your test data, you should run
-`./scripts/pre-commit.php -p -u` verify they pass.
+`lnms dev:check` verify they pass.
 
 To run the full suite of tests enable database and snmpsim reliant
-tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+tests: `lnms dev:check unit --db --snmpsim`
 
 ### Specific OS
 
-`./scripts/pre-commit.php -p -o osname`
+`lnms dev:check unit -o osname`
 
 ### Specific Module
 
-`./scripts/pre-commit.php -p -m modulename`
+`lnms dev:check unit -m modulename`
 
 ## Using snmpsim for testing
 
 You can run snmpsim to access test data by running
-`./scripts/collect-snmp-data.php --snmpsim`
+
+```bash
+lnms dev:simulate
+```
 
 You may then run snmp queries against it using the os (and variant) as
 the community and 127.1.6.1:1161 as the host.
@@ -138,7 +146,7 @@ must use a variant to store your test data (-v).
 1. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42`
 1. Run `./scripts/save-test-data.php -o example-os` to update the dumped database data.
 1. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
-1. Run `./scripts/pre-commit.php --db --snmpsim`
+1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
 ### Additional module support or test data
@@ -148,5 +156,5 @@ must use a variant to store your test data (-v).
    more data to the snmprec file
 1. Review data. If you modified the snmprec (don't modify json
    manually) run `./scripts/save-test-data.php -o example-os -m <module>`
-1. Run `./scripts/pre-commit.php --db --snmpsim`
+1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request

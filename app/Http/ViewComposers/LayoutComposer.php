@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -42,7 +41,9 @@ class LayoutComposer
     {
         // build page title
         if ($view->getFactory()->hasSection('title')) {
-            $title = str_replace('    ', ' : ', trim($view->getFactory()->getSection('title')));
+            // short sections escape the html entities, reverse that
+            $title = html_entity_decode(trim($view->getFactory()->getSection('title')), ENT_QUOTES);
+            $title = str_replace('    ', ' : ', $title);
             $title .= ' | ' . Config::get('page_title_suffix');
         } else {
             $title = Config::get('page_title_suffix');
@@ -51,11 +52,11 @@ class LayoutComposer
         Checks::postAuth();
 
         $show_menu = auth()->check();
-        if ($show_menu && Config::get('twofactor') && !session('twofactor')) {
-             $show_menu = empty(UserPref::getPref(auth()->user(), 'twofactor'));
+        if ($show_menu && Config::get('twofactor') && ! session('twofactor')) {
+            $show_menu = empty(UserPref::getPref(auth()->user(), 'twofactor'));
         }
 
         $view->with('pagetitle', $title)
-        ->with('show_menu', $show_menu);
+            ->with('show_menu', $show_menu);
     }
 }

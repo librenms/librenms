@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -26,6 +25,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
 {
@@ -34,7 +36,7 @@ class AlertRule extends BaseModel
     // ---- Query scopes ----
 
     /**
-     * @param Builder $query
+     * @param Builder<AlertRule> $query
      * @return Builder
      */
     public function scopeEnabled($query)
@@ -45,21 +47,21 @@ class AlertRule extends BaseModel
     /**
      * Scope for only alert rules that are currently in alarm
      *
-     * @param Builder $query
+     * @param Builder<AlertRule> $query
      * @return Builder
      */
     public function scopeIsActive($query)
     {
         return $query->enabled()
             ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
-            ->whereNotIn('alerts.state', [0, 2]);
+            ->whereNotIn('alerts.state', [AlertState::CLEAR, AlertState::ACKNOWLEDGED, AlertState::RECOVERED]);
     }
 
     /**
      * Scope to filter rules for devices permitted to user
      * (do not use for admin and global read-only users)
      *
-     * @param $query
+     * @param Builder<AlertRule> $query
      * @param User $user
      * @return mixed
      */
@@ -69,7 +71,7 @@ class AlertRule extends BaseModel
             return $query;
         }
 
-        if (!$this->isJoined($query, 'alerts')) {
+        if (! $this->isJoined($query, 'alerts')) {
             $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
         }
 
@@ -78,13 +80,13 @@ class AlertRule extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function alerts()
+    public function alerts(): HasMany
     {
-        return $this->hasMany('App\Models\Alert', 'rule_id');
+        return $this->hasMany(\App\Models\Alert::class, 'rule_id');
     }
 
-    public function devices()
+    public function devices(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Device::class, 'alert_device_map', 'device_id', 'device_id');
     }
 }

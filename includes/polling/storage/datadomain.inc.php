@@ -7,21 +7,21 @@
  * the source code distribution for details.
 
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 ACL
  * @author     Abel Laura <abel.laura@gmail.com>
 */
 
-if (!is_array($storage_cache['ddos-storage'])) {
+if (! is_array($storage_cache['ddos-storage'])) {
     $storage_cache['ddos-storage'] = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
     d_echo($storage_cache);
 }
 
 foreach ($storage_cache['ddos-storage'] as $fsentry) {
-    if ($fsentry['fileSystemResourceName'] == "/data: post-comp") {
-        $storage['units']       = 1073741824;
-        $storage['size']        = $fsentry['fileSystemSpaceSize'] * $storage['units'];
-        $storage['free']        = $fsentry['fileSystemSpaceAvail'] * $storage['units'];
-        $storage['used']        = $fsentry['fileSystemSpaceUsed'] * $storage['units'];
+    if ($fsentry['fileSystemResourceName'] == '/data: post-comp') {
+        $storage['units'] = 1073741824;
+        $storage['size'] = $fsentry['fileSystemSpaceSize'] * $storage['units'];
+        $storage['free'] = $fsentry['fileSystemSpaceAvail'] * $storage['units'];
+        $storage['used'] = $fsentry['fileSystemSpaceUsed'] * $storage['units'];
     }
 }

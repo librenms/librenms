@@ -15,14 +15,14 @@
         ;
         
     gbnDeviceStackMib MODULE-IDENTITY
-        LAST-UPDATED    "2013/07/09"  -- July 09, 2013
+        LAST-UPDATED    "201307090000Z" -- July 09, 2013
         ORGANIZATION    "ADMIN"
         CONTACT-INFO    "ADMIN
                          E-mail: support@admin.com"
 
         DESCRIPTION     "gbn stack Enterprise MIB definition."
 
-        REVISION        "2013/07/09"  -- July 09, 2013
+        REVISION        "201307090000Z" -- July 09, 2013
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnDevice 5 }

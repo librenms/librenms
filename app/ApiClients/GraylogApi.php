@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,7 +57,7 @@ class GraylogApi
 
     public function getStreams()
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
@@ -83,12 +82,12 @@ class GraylogApi
      */
     public function query($query = '*', $range = 0, $limit = 0, $offset = 0, $sort = null, $filter = null)
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
         $uri = Config::get('graylog.base_uri');
-        if (!$uri) {
+        if (! $uri) {
             $uri = $this->api_prefix . '/search/universal/relative';
         }
 
@@ -144,12 +143,12 @@ class GraylogApi
             $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
                 ->filter(
                     function ($address) {
-                        return $address != "127.0.0.1";
+                        return $address != '127.0.0.1';
                     }
                 ))->merge($device->ipv6->pluck('ipv6_address')
                 ->filter(
                     function ($address) {
-                        return $address != "0000:0000:0000:0000:0000:0000:0000:0001";
+                        return $address != '0000:0000:0000:0000:0000:0000:0000:0001';
                     }
                 ));
         }

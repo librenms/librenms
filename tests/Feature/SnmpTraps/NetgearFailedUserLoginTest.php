@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  */
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
@@ -31,7 +30,7 @@ class NetgearFailedUserLoginTest extends SnmpTrapTestCase
 {
     public function testManagedSeries()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
@@ -47,7 +46,7 @@ SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SWITCHING-MIB::failedUserLoginTrap";
 
     public function testSmartSeries()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:1026->[192.168.5.5]:162

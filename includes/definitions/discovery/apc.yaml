@@ -3,10 +3,11 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - airIRG2RDT2ThresholdsRackInletHighTempMetric
-                    - airIRG2RDT2ThresholdsSupplyAirHighTempMetric
-                    - airIRG2RDT2ThresholdsReturnAirHighTempMetric
+                -
+                    oid:
+                        - airIRG2RDT2ThresholdsRackInletHighTempMetric
+                        - airIRG2RDT2ThresholdsSupplyAirHighTempMetric
+                        - airIRG2RDT2ThresholdsReturnAirHighTempMetric
         state:
             data:
                 -
@@ -140,10 +141,10 @@ modules:
                         - { descr: aboveHigh, graph: 1, value: 5, generic: 1 }
                         - { descr: aboveMax, graph: 1, value: 6, generic: 2 }
                     skip_values:
-                      -
-                        oid: rPDU2SensorTempHumidityStatusTempStatus
-                        op: '='
-                        value: 1
+                        -
+                            oid: rPDU2SensorTempHumidityStatusTempStatus
+                            op: '='
+                            value: 1
 
                 -
                     oid: rPDU2SensorTempHumidityStatusTable
@@ -160,10 +161,10 @@ modules:
                         - { descr: aboveHigh, graph: 1, value: 5, generic: 1 }
                         - { descr: aboveMax, graph: 1, value: 6, generic: 2 }
                     skip_values:
-                      -
-                        oid: rPDU2SensorTempHumidityStatusHumidityStatus
-                        op: '='
-                        value: 1
+                        -
+                            oid: rPDU2SensorTempHumidityStatusHumidityStatus
+                            op: '='
+                            value: 1
                 -
                     oid: atsStatusSourceAStatus
                     value: atsStatusSourceAStatus
@@ -355,10 +356,10 @@ modules:
                     descr: 'Temperature Probe'
                     divisor: 10
                     skip_values:
-                      -
-                        oid: rPDU2SensorTempHumidityStatusType
-                        op: '='
-                        value: 4
+                        -
+                            oid: rPDU2SensorTempHumidityStatusType
+                            op: '='
+                            value: 4
         humidity:
             data:
                 -
@@ -392,14 +393,14 @@ modules:
                     index: 'rPDU2SensorTempHumidityStatusRelativeHumidity.{{ $index }}'
                     descr: 'Humidity Probe'
                     skip_values:
-                      -
-                        oid: rPDU2SensorTempHumidityStatusType
-                        op: '='
-                        value: 4
-                      - 
-                        oid: rPDU2SensorTempHumidityStatusRelativeHumidity
-                        op: '<'
-                        value: 0
+                        -
+                            oid: rPDU2SensorTempHumidityStatusType
+                            op: '='
+                            value: 4
+                        -
+                            oid: rPDU2SensorTempHumidityStatusRelativeHumidity
+                            op: '<'
+                            value: 0
         airflow:
             data:
                 -

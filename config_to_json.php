@@ -13,5 +13,8 @@ $init_modules = ['nodb'];
 require __DIR__ . '/includes/init.php';
 
 if (isCli()) {
+    // fill in db variables for legacy external scripts
+    Config::populateLegacyDbCredentials();
+
     echo Config::toJson();
 }

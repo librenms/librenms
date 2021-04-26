@@ -15,22 +15,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['sentry4_humid'] as $index => $data) {
-    $descr           = $data['st4HumidSensorName'];
-    $oid             = ".1.3.6.1.4.1.1718.4.1.10.3.1.1.$index";
-    $low_limit       = $data['st4HumidSensorLowAlarm'];
-    $low_warn_limit  = $data['st4HumidSensorLowWarning'];
-    $high_limit      = $data['st4HumidSensorHighAlarm'];
+    $descr = $data['st4HumidSensorName'];
+    $oid = ".1.3.6.1.4.1.1718.4.1.10.3.1.1.$index";
+    $low_limit = $data['st4HumidSensorLowAlarm'];
+    $low_warn_limit = $data['st4HumidSensorLowWarning'];
+    $high_limit = $data['st4HumidSensorHighAlarm'];
     $high_warn_limit = $data['st4HumidSensorHighWarning'];
-    $current         = $data['st4HumidSensorValue'];
+    $current = $data['st4HumidSensorValue'];
     if ($current >= 0) {
         discover_sensor($valid['sensor'], 'humidity', $device, $oid, "st4HumidSensorValue.$index", 'sentry4', $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }

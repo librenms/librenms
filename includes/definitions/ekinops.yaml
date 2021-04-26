@@ -1,0 +1,9 @@
+os: ekinops
+text: 'Ekinops Optical'
+type: network
+icon: ekinops
+group: ekinops
+discovery:
+   - sysObjectID:
+     - .1.3.6.1.4.1.20044
+mib_dir: ekinops

@@ -15,12 +15,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Tests Ruckus Wireless SmartZone Event trap handlers.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -35,7 +34,7 @@ class RuckusSzEventTest extends SnmpTrapTestCase
 {
     public function testSzApConf()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -61,7 +60,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID.0 \"2f860f70-6b88-11e9-a3c5-000000937916
 
     public function testSzApConnect()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -87,7 +86,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 \"AP connected after rebooting\"";
 
     public function testSzApMiscEvent()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -105,7 +104,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 \"Test AP event has occured\"";
 
         $trap = new Trap($trapText);
 
-        $message = "AP event: Test AP event has occured";
+        $message = 'AP event: Test AP event has occured';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusSZAPMiscEventTrap');
@@ -113,7 +112,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 \"Test AP event has occured\"";
 
     public function testSzApRebooted()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

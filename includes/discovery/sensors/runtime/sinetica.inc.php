@@ -15,22 +15,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $runtime_oid = '.1.3.6.1.4.1.13891.101.2.3.0';
 $runtime = snmp_get($device, $runtime_oid, '-Osqvt');
 
-if (!empty($runtime)) {
-    $type               = 'sinetcia';
-    $index              = '2.3.0';
-    $descr              = 'Runtime';
-    $low_limit          = 5;
-    $low_limit_warn     = 10;
+if (! empty($runtime)) {
+    $type = 'sinetcia';
+    $index = '2.3.0';
+    $descr = 'Runtime';
+    $low_limit = 5;
+    $low_limit_warn = 10;
     discover_sensor($valid['sensor'], 'runtime', $device, $runtime_oid, $index, $type, $descr, 1, 1, $low_limit, $low_limit_warn, null, null, $runtime);
 }

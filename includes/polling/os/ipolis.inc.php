@@ -15,18 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Priit Mustasaar
  * @author     Priit Mustasaar <priit.mustasaar@gmail.com>
-*/
-
-$oids = array(
-    'hardware' => $device['sysObjectID'].'.1.0',
-    'version' => $device['sysObjectID'].'.2.1.1.0'
-);
+ */
+$oids = [
+    'hardware' => $device['sysObjectID'] . '.1.0',
+    'version' => $device['sysObjectID'] . '.2.1.1.0',
+];
 
 $os_data = snmp_get_multi_oid($device, $oids);
 

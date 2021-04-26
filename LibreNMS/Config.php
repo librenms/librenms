@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,6 +28,7 @@ use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
 use Log;
 
@@ -44,7 +44,7 @@ class Config
     public static function load()
     {
         // don't reload the config if it is already loaded, reload() should be used for that
-        if (!is_null(self::$config)) {
+        if (! is_null(self::$config)) {
             return self::$config;
         }
 
@@ -70,6 +70,7 @@ class Config
     public static function reload()
     {
         self::$config = null;
+
         return self::load();
     }
 
@@ -111,7 +112,6 @@ class Config
         @include base_path('config.php');
     }
 
-
     /**
      * Get a config value, if non existent null (or default if set) will be returned
      *
@@ -125,7 +125,7 @@ class Config
             return self::$config[$key];
         }
 
-        if (!str_contains($key, '.')) {
+        if (! Str::contains($key, '.')) {
             return $default;
         }
 
@@ -169,7 +169,6 @@ class Config
 
     /**
      * Get a setting from the $config['os'] array using the os of the given device
-     * If that is not set, fallback to the same global config key
      *
      * @param string $os The os name
      * @param string $key period separated config variable name
@@ -179,12 +178,10 @@ class Config
     public static function getOsSetting($os, $key, $default = null)
     {
         if ($os) {
+            \LibreNMS\Util\OS::loadDefinition($os);
+
             if (isset(self::$config['os'][$os][$key])) {
                 return self::$config['os'][$os][$key];
-            }
-
-            if (!str_contains($key, '.')) {
-                return self::get($key, $default);
             }
 
             $os_key = "os.$os.$key";
@@ -193,7 +190,7 @@ class Config
             }
         }
 
-        return self::get($key, $default);
+        return $default;
     }
 
     /**
@@ -206,24 +203,24 @@ class Config
      * @param array $default optional array to return if the setting is not set
      * @return array
      */
-    public static function getCombined($os, $key, $default = array())
+    public static function getCombined($os, $key, $default = [])
     {
-        if (!self::has($key)) {
-            return self::get("os.$os.$key", $default);
+        if (! self::has($key)) {
+            return self::getOsSetting($os, $key, $default);
         }
 
-        if (!isset(self::$config['os'][$os][$key])) {
-            if (!str_contains($key, '.')) {
+        if (! isset(self::$config['os'][$os][$key])) {
+            if (! Str::contains($key, '.')) {
                 return self::get($key, $default);
             }
-            if (!self::has("os.$os.$key")) {
+            if (! self::has("os.$os.$key")) {
                 return self::get($key, $default);
             }
         }
 
         return array_unique(array_merge(
-            (array)self::get($key, $default),
-            (array)self::getOsSetting($os, $key, $default)
+            (array) self::get($key, $default),
+            (array) self::getOsSetting($os, $key, $default)
         ));
     }
 
@@ -248,14 +245,15 @@ class Config
     public static function persist($key, $value)
     {
         try {
-                \App\Models\Config::updateOrCreate(['config_name' => $key], [
-                    'config_name' => $key,
-                    'config_value' => $value,
-                ]);
-                Arr::set(self::$config, $key, $value);
+            \App\Models\Config::updateOrCreate(['config_name' => $key], [
+                'config_name' => $key,
+                'config_value' => $value,
+            ]);
+            Arr::set(self::$config, $key, $value);
 
-                // delete any children (there should not be any unless it is legacy)
-                \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+            // delete any children (there should not be any unless it is legacy)
+            \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+
             return true;
         } catch (Exception $e) {
             if (class_exists(Log::class)) {
@@ -265,6 +263,7 @@ class Config
             if ($debug) {
                 echo $e;
             }
+
             return false;
         }
     }
@@ -298,7 +297,7 @@ class Config
             return true;
         }
 
-        if (!str_contains($key, '.')) {
+        if (! Str::contains($key, '.')) {
             return false;
         }
 
@@ -330,7 +329,7 @@ class Config
      */
     private static function loadDB()
     {
-        if (!Eloquent::isConnected()) {
+        if (! Eloquent::isConnected()) {
             return;
         }
 
@@ -381,41 +380,40 @@ class Config
         Arr::set(self::$config, 'log_dir', base_path('logs'));
         Arr::set(self::$config, 'distributed_poller_name', php_uname('n'));
 
-         // set base_url from access URL
+        // set base_url from access URL
         if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
             $port = $_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '';
             // handle literal IPv6
-            $server = str_contains($_SERVER['SERVER_NAME'], ':') ? "[{$_SERVER['SERVER_NAME']}]" : $_SERVER['SERVER_NAME'];
+            $server = Str::contains($_SERVER['SERVER_NAME'], ':') ? "[{$_SERVER['SERVER_NAME']}]" : $_SERVER['SERVER_NAME'];
             Arr::set(self::$config, 'base_url', "http://$server$port/");
         }
 
         // graph color copying
         Arr::set(self::$config, 'graph_colours.mega', array_merge(
-            (array)Arr::get(self::$config, 'graph_colours.psychedelic', []),
-            (array)Arr::get(self::$config, 'graph_colours.manycolours', []),
-            (array)Arr::get(self::$config, 'graph_colours.default', []),
-            (array)Arr::get(self::$config, 'graph_colours.mixed', [])
+            (array) Arr::get(self::$config, 'graph_colours.psychedelic', []),
+            (array) Arr::get(self::$config, 'graph_colours.manycolours', []),
+            (array) Arr::get(self::$config, 'graph_colours.default', []),
+            (array) Arr::get(self::$config, 'graph_colours.mixed', [])
         ));
     }
 
     /**
      * Process the config after it has been loaded.
      * Make sure certain variables have been set properly and
-     *
      */
     private static function processConfig()
     {
         // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
+        if (
+            isset($_SERVER['HTTPS']) ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
-        // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
-            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
-        }
+        self::set('base_url', Str::finish(self::get('base_url'), '/'));
 
-        if (!self::get('email_from')) {
+        if (! self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
         }
 
@@ -437,12 +435,14 @@ class Config
         self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
         self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
+        self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
+        self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
-            if (!is_executable(self::get($bin))) {
+        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6'] as $bin) {
+            if (! is_executable(self::get($bin))) {
                 if ($persist) {
                     self::persist($bin, self::locateBinary($bin));
                 } else {
@@ -452,6 +452,9 @@ class Config
         }
 
         self::populateTime();
+
+        // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
+        self::populateLegacyDbCredentials();
     }
 
     /**
@@ -463,7 +466,7 @@ class Config
      */
     private static function setDefault($key, $value, $format_values = [])
     {
-        if (!self::has($key)) {
+        if (! self::has($key)) {
             if (is_string($value)) {
                 $format_values = array_map('self::get', $format_values);
                 self::set($key, vsprintf($value, $format_values));
@@ -476,8 +479,8 @@ class Config
     /**
      * Copy data from old variables to new ones.
      *
-     * @param $old
-     * @param $new
+     * @param string $old
+     * @param string $new
      */
     private static function deprecatedVariable($old, $new)
     {
@@ -491,50 +494,14 @@ class Config
     }
 
     /**
-     * Get just the database connection settings from config.php
-     *
-     * @return array (keys: db_host, db_port, db_name, db_user, db_pass, db_socket)
-     */
-    public static function getDatabaseSettings()
-    {
-        // Do not access global $config in this function!
-
-        $keys = $config = [
-            'db_host' => '',
-            'db_port' => '',
-            'db_name' => '',
-            'db_user' => '',
-            'db_pass' => '',
-            'db_socket' => '',
-        ];
-
-        if (is_file(__DIR__ . '/../config.php')) {
-            include __DIR__ . '/../config.php';
-        }
-
-        // Check for testing database
-        if (isset($config['test_db_name'])) {
-            putenv('DB_TEST_DATABASE=' . $config['test_db_name']);
-        }
-        if (isset($config['test_db_user'])) {
-            putenv('DB_TEST_USERNAME=' . $config['test_db_user']);
-        }
-        if (isset($config['test_db_pass'])) {
-            putenv('DB_TEST_PASSWORD=' . $config['test_db_pass']);
-        }
-
-        return array_intersect_key($config, $keys); // return only the db settings
-    }
-
-    /**
      * Locate the actual path of a binary
      *
-     * @param $binary
+     * @param string $binary
      * @return mixed
      */
     public static function locateBinary($binary)
     {
-        if (!str_contains($binary, '/')) {
+        if (! Str::contains($binary, '/')) {
             $output = `whereis -b $binary`;
             $list = trim(substr($output, strpos($output, ':') + 1));
             $targets = explode(' ', $list);
@@ -544,6 +511,7 @@ class Config
                 }
             }
         }
+
         return $binary;
     }
 
@@ -566,5 +534,17 @@ class Config
         self::set('time.sixmonth', $now - 16070400); // time() - (6 * 31 * 24 * 60 * 60);
         self::set('time.year', $now - 31536000); // time() - (365 * 24 * 60 * 60);
         self::set('time.twoyear', $now - 63072000); // time() - (2 * 365 * 24 * 60 * 60);
+    }
+
+    public static function populateLegacyDbCredentials()
+    {
+        $db = config('database.default');
+
+        self::set('db_host', config("database.connections.$db.host", 'localhost'));
+        self::set('db_name', config("database.connections.$db.database", 'librenms'));
+        self::set('db_user', config("database.connections.$db.username", 'librenms'));
+        self::set('db_pass', config("database.connections.$db.password"));
+        self::set('db_port', config("database.connections.$db.port", 3306));
+        self::set('db_socket', config("database.connections.$db.unix_socket"));
     }
 }

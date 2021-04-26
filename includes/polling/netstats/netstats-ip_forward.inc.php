@@ -1,11 +1,13 @@
 <?php
+
+use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], array('Snom', 'asa'))) {
+if (! Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' IP-FORWARD';
 
     $oid = 'ipCidrRouteNumber';
-    $fields = array();
+    $fields = [];
     $rrd_def = RrdDefinition::make()->addDataset($oid, 'GAUGE', null, 5000000);
     $data = snmp_get($device, 'IP-FORWARD-MIB::' . $oid . '.0', '-OQv');
     if (is_numeric($data)) {
@@ -13,7 +15,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
         $fields[$oid] = $value;
         $tags = compact('rrd_def');
         data_update($device, 'netstats-ip_forward', $tags, $fields);
-        $graphs['netstat_ip_forward'] = true;
+        $os->enableGraph('netstat_ip_forward');
     }
 }
 unset($oid, $rrd_def, $data, $fields, $tags);

@@ -1,0 +1,278 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+
+ -- CIENA-CES-FILE-TRANSFER-MIB.my
+
+ --
+
+
+
+ CIENA-CES-FILE-TRANSFER-MIB DEFINITIONS ::= BEGIN
+
+
+
+ IMPORTS 		                                   
+
+   NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY			
+
+	FROM SNMPv2-SMI			
+
+   DisplayString
+
+	FROM SNMPv2-TC
+
+    cienaGlobalSeverity, cienaGlobalMacAddress
+
+   		FROM CIENA-GLOBAL-MIB
+
+   cienaCesNotifications, cienaCesConfig
+
+        FROM CIENA-SMI;
+
+
+
+ cienaCesFileTransferMIB MODULE-IDENTITY
+
+	    LAST-UPDATED "201706070000Z"
+	    ORGANIZATION "Ciena Corp."
+	    CONTACT-INFO
+	    "   Mib Meister
+	        7035 Ridge Road
+	        Hanover, Maryland 21076
+	        USA
+	        Phone:  +1 800 921 1144
+	        Email:  support@ciena.com"
+
+	    DESCRIPTION
+
+		    "This module defines the file transfer objects."      
+
+	    REVISION "201706070000Z"
+	    DESCRIPTION 
+
+		    "Updated contact info."
+
+	    REVISION "201102020000Z"
+	    DESCRIPTION
+
+		    "Initial creation. "      
+
+	
+
+		    ::= { cienaCesConfig 15 }  
+
+	    						
+
+ --
+
+ -- Node definitions
+
+ --
+
+	
+
+ cienaCesFileTransferMIBObjects OBJECT IDENTIFIER ::= { cienaCesFileTransferMIB 1 }
+
+ 
+
+ --
+
+ -- System Attributes
+
+ --
+
+ cienaCesFileTransfer OBJECT IDENTIFIER ::= { cienaCesFileTransferMIBObjects 1 }
+
+ 
+
+ 
+
+ --
+
+ -- Notifications 
+
+ --
+
+
+
+ cienaCesFileTransferMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 16 }
+
+ cienaCesFileTransferMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesFileTransferMIBNotificationPrefix 0 } 
+
+
+
+
+
+ --
+
+ -- System Attributes
+
+ --
+
+	
+
+ cienaCesFTransferRemoteFilename OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+	     "The file name (including the path, if applicable) to be retrieved from the 
+
+             xFTP server. If the switch/device is downloading a file, then this should be 
+
+             the name of the file on the remote server. The length of the filename string must 
+
+             not exceed 64 alpha-numeric characters, no spaces in filenames."
+
+     ::= { cienaCesFileTransfer 1 }
+
+
+
+ cienaCesFTransferLocalFilename OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+	     "The file name (including the path, if applicable) to be written to.
+
+             If the switch/device is downloading a file, then this should be 
+
+             name of the file on the switch/device. Length of filename string must 
+
+             not exceed 64 alpha-numeric characters, no spaces in filenames. By default
+
+             it will have the same value as of cienaCesFTransferRemoteFilename."
+
+     ::= { cienaCesFileTransfer 2 }
+
+ 
+
+ cienaCesFTransferNotificationStatus OBJECT-TYPE
+
+     SYNTAX       INTEGER  {
+
+                     fileAlreadyExist(1),
+
+                     tftpServerNotFound(2),
+
+                     fileGetError(3),
+
+                     filePutError(4),  
+
+                     fileSystemError(5),
+
+                     fileContentsInvalid(6),
+
+                     flashOffline(7),
+
+                     badFileCrc(8),
+
+                     allFilesSkipped(9),
+
+                     serverIpAddrInvalid(10),
+
+                     filePathInvalid(11),
+
+                     fileNameInvalid(12),
+
+                     sourceNotFound(13),
+
+                     fileNameNeeded(14),
+
+                     notEnoughSpace(15), 
+
+                     putSuccessful(16), 
+
+                     downloadSuccess(17),
+
+                     internalError(18),
+
+                     noStatus(0)
+
+              }
+
+     MAX-ACCESS   accessible-for-notify
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "The status of the file transfer that is to be reported 
+
+             via the FileTransfer Notification."
+
+    ::= { cienaCesFileTransfer 3 }
+
+
+
+ cienaCesFTransferNotificationInfo OBJECT-TYPE
+
+     SYNTAX         DisplayString 
+
+     MAX-ACCESS     accessible-for-notify
+
+     STATUS         current
+
+     DESCRIPTION
+
+             "The string explaining the error code in detail or the additional
+
+             information for the file transfer completion. "           
+
+    ::= { cienaCesFileTransfer 4 }
+
+ 
+
+ --
+
+ -- Notifications
+
+ --
+
+
+
+ cienaCesFTransferCompletion NOTIFICATION-TYPE
+
+	OBJECTS	 {
+
+	        	cienaGlobalSeverity,  
+
+	        	cienaGlobalMacAddress, 
+
+				cienaCesFTransferRemoteFilename,
+
+                cienaCesFTransferLocalFilename,
+
+				cienaCesFTransferNotificationStatus,
+
+				cienaCesFTransferNotificationInfo
+
+		   }
+
+	STATUS	   current
+
+	DESCRIPTION
+
+		"A cienaCesFTransferCompletion notification is sent at the completion
+		of a file transfer request. The cienaCesFileTransferCompletionTrapState 
+		must be enabled to generate this notification. Variable bindings include: 
+		cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesFTransferRemoteFilename, 
+		cienaCesFTransferLocalFilename, cienaCesFTransferNotificationStatus, and 
+		cienaCesFTransferNotificationInfo."
+
+	::= { cienaCesFileTransferMIBNotifications 1 }
+
+ END
+
+ 
+

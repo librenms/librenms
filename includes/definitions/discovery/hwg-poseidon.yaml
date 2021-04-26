@@ -1,5 +1,7 @@
 mib: POSEIDON-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>Poseidon [0-9]+) .* v(?<version>[\d.]+)/'
     sensors:
         temperature:
             data:
@@ -11,10 +13,10 @@ modules:
                     descr: sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
-                    -
-                      oid: sensUnit
-                      op: '!='
-                      value: 0
+                        -
+                            oid: sensUnit
+                            op: '!='
+                            value: 0
         humidity:
             data:
                 -
@@ -25,10 +27,10 @@ modules:
                     descr: sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
-                    -
-                      oid: sensUnit
-                      op: '!='
-                      value: 3
+                        -
+                            oid: sensUnit
+                            op: '!='
+                            value: 3
         state:
             data:
                 -
