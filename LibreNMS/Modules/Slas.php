@@ -31,9 +31,9 @@ use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use Log;
 
-class SLA implements Module
+class Slas implements Module
 {
-    use SyncsModels;
+    //use SyncsModels;
 
     /**
      * Discover this module. Heavier processes can be run here
@@ -64,24 +64,19 @@ class SLA implements Module
             $sla_table[$owner . '.' . $test][$property] = $value;
         }
 
-        // TOCHANGE
         // Get existing SLAs
-        //$existing_slas = dbFetchColumn('SELECT `sla_id` FROM `slas` WHERE `device_id` = :device_id AND `deleted` = 0', ['device_id' => $device['device_id']]);
         $existing_slas = Sla::select('sla_id')
             ->where('device_id', $device['device_id'])
             ->where('deleted', 0)
             ->get();
-        foreach ($existing_slas as $existing_sla) {}
-           echo "SLA_ID TEST : " . $existing_sla;
-        }
 
         $query_data = [
             'device_id' => $device['device_id'],
         ];
 
-        // TOCHANGE
         // To ensure unity of mock sla_nr field
-        $max_sla_nr = dbFetchCell('SELECT MAX(`sla_nr`) FROM `slas` WHERE `device_id` = :device_id', $query_data);
+        $max_sla_nr = Sla::where('device_id', $device['device_id'])
+            ->max('sla_nr');
         $i = 1;
 
         foreach ($sla_table as $sla_key => $sla_config) {
@@ -90,13 +85,13 @@ class SLA implements Module
             $owner = $prop_id[0];
             $test = $prop_id[1];
 
-            $query_data = [
-                'device_id' => $device['device_id'],
-                'owner'     => $owner,
-                'tag'       => $test,
-            ];
-            // TOCHANGE
-            $sla_data = dbFetchRows('SELECT `sla_id`, `sla_nr` FROM `slas` WHERE `device_id` = :device_id AND `owner` = :owner AND `tag` = :tag', $query_data);
+
+            $sla_data = Sla::select('sla_id','sla_nr')
+            ->where('device_id', $device['device_id'])
+            ->where('owner', $owner)
+            ->where('tag', $test)
+            ->get();
+
             $sla_id = $sla_data[0]['sla_id'];
             $sla_nr = $sla_data[0]['sla_nr'];
 
@@ -114,30 +109,31 @@ class SLA implements Module
             // If it is a standard type delete ping preffix
             $data['rtt_type'] = str_replace('ping', '', $data['rtt_type']);
         
-            $data['rtt_type'] = retrieveJuniperType($data['rtt_type'])
+            // To retrieve specific Juniper PingCtlType
+            $data['rtt_type'] = $this->retrieveJuniperType($data['rtt_type']);
 
             if (! $sla_id) {
                 $data['sla_nr'] = $max_sla_nr + $i;
-                // TOCHANGE
-                $sla_id = dbInsert($data, 'slas');
+                
+                $sla_id = Sla::insert($data);
                 $i++;
                 echo '+';
             } else {
                 // Remove from the list
                 $existing_slas = array_diff($existing_slas, [$sla_id]);
     
-                // TOCHANGE
-                dbUpdate($data, 'slas', 'sla_id = ?', [$sla_id]);
+                Sla::where('sla_id', $sla_id)
+                    ->update($data);
                 echo '.';
                 //TOTRY
-                ModuleModelObserver::observe(Slas::class);
-                $this->syncModels($os->getDevice(), 'slas', $data);
+                // ModuleModelObserver::observe(Slas::class);
+                // $this->syncModels($os->getDevice(), 'slas', $data);
             }
         }
         // Mark all remaining SLAs as deleted
         foreach ($existing_slas as $existing_sla) {
-            // TOCHANGE
-            dbUpdate(['deleted' => 1], 'slas', 'sla_id = ?', [$existing_sla]);
+            Sla::where('sla_id', $existing_sla)
+                ->update(['deleted' => 1]);
             echo '-';
         }
 
@@ -155,9 +151,10 @@ class SLA implements Module
     {
         $device = $os->getDeviceArray();
 
-        // TOCHANGE
         // Gather our SLA's from the DB.
-        $slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', [$device['device_id']]);
+        $slas = Sla::where('device_id',$device['device_id'])
+            ->where('deleted', 0)
+            ->get();
 
         $slas = $os->getDevice()->slas;
 
@@ -229,7 +226,7 @@ class SLA implements Module
                 $test = $sla['tag'];
         
                 // Lets process each SLA
-                $time = fixdate($jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsTime']);
+                $time = $this->fixdate($jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsTime']);
                 $update = [];
         
                 // Use DISMAN-PING Status codes.
@@ -298,52 +295,8 @@ class SLA implements Module
                 if (count($update) > 0) {
                     $updated = dbUpdate($update, 'slas', '`sla_id` = ?', [$sla['sla_id']]);
                 }
-
-        }
-
-        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
-
-        foreach ($toner_data as $toner) {
-            echo 'Checking toner ' . $toner['supply_descr'] . '... ';
-
-            $raw_toner = $toner_snmp[$toner['supply_oid']];
-            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity']);
-            echo $tonerperc . " %\n";
-
-            $tags = [
-                'rrd_def'     => RrdDefinition::make()->addDataset('toner', 'GAUGE', 0, 20000),
-                'rrd_name'    => ['toner', $toner['supply_index']],
-                'rrd_oldname' => ['toner', $toner['supply_descr']],
-                'index'       => $toner['supply_index'],
-            ];
-            data_update($device, 't
-            oner', $tags, $tonerperc);
-
-            // Log empty supplies (but only once)
-            if ($tonerperc == 0 && $toner['supply_current'] > 0) {
-                Log::event(
-                    'Toner ' . $toner['supply_descr'] . ' is empty',
-                    $os->getDevice(),
-                    'toner',
-                    Alert::ERROR,
-                    $toner['supply_id']
-                );
             }
 
-            // Log toner swap
-            if ($tonerperc > $toner['supply_current']) {
-                Log::event(
-                    'Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)',
-                    $os->getDevice(),
-                    'toner',
-                    Alert::NOTICE,
-                    $toner['supply_id']
-                 );
-            }
-
-            $toner->supply_current = $tonerperc;
-            $toner->supply_capacity = $toner['supply_capacity'];
-            $toner->save();
         }
     }
 
@@ -363,7 +316,9 @@ class SLA implements Module
      */
     private function retrieveJuniperType($mib_location)
     {
-        $rtt_type = NULL;
+        // Return without changes if not in the list
+        $rtt_type = $mib_location;
+
         switch ($mib_location) {
             case 'enterprises.2636.3.7.2.1':
                 $rtt_type = 'IcmpTimeStamp';
@@ -386,9 +341,6 @@ class SLA implements Module
                 break;
             case 'enterprises.2636.3.7.2.6':
                 $rtt_type = 'UdpTimestamp';
-                break;
-            default:
-                $rtt_type = NULL;
                 break;
         }
         return $rtt_type;

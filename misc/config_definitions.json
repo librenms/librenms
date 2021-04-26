@@ -4885,6 +4885,10 @@
             "default": "DNS",
             "type": "text"
         },
+        "sla_type_labels.DnsQuery": {
+            "default": "DNS Query",
+            "type": "text"
+        },
         "sla_type_labels.echo": {
             "default": "ICMP ping",
             "type": "text"
@@ -4909,8 +4913,24 @@
             "default": "HTTP",
             "type": "text"
         },
+        "sla_type_labels.HttpGet": {
+            "default": "HTTP Get",
+            "type": "text"
+        },
+        "sla_type_labels.HttpGetMetadata": {
+            "default": "HTTP Get Metadata",
+            "type": "text"
+        },
+        "sla_type_labels.IcmpEcho": {
+            "default": "ICMP Echo",
+            "type": "text"
+        },
         "sla_type_labels.icmpjitter": {
             "default": "ICMP jitter",
+            "type": "text"
+        },
+        "sla_type_labels.IcmpTimeStamp": {
+            "default": "ICMP TimeStamp",
             "type": "text"
         },
         "sla_type_labels.jitter": {
@@ -4933,6 +4953,10 @@
             "default": "LSP trace",
             "type": "text"
         },
+        "sla_type_labels.NtpQuery": {
+            "default": "NTP Query",
+            "type": "text"
+        },
         "sla_type_labels.pathEcho": {
             "default": "Path ICMP ping",
             "type": "text"
@@ -4951,6 +4975,10 @@
         },
         "sla_type_labels.udpEcho": {
             "default": "UDP ping",
+            "type": "text"
+        },
+        "sla_type_labels.UdpTimestamp": {
+            "default": "UDP Timestamp",
             "type": "text"
         },
         "sla_type_labels.voip": {
