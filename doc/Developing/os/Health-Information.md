@@ -88,8 +88,9 @@ are as follows:
 - `oid` (required): This is the name of the table you want to do the snmp walk on.
 - `value` (optional): This is the key within the table that contains
   the value. If not provided willuse `oid`
-- `num_oid` (optional): If not provided, this parameter should be computed
-  automatically by discovery process. This is the numerical OID that contains
+- `num_oid` (required for PullRequests): If not provided, this parameter should be computed
+  automatically by discovery process. This parameter is still required to
+  submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
   In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
@@ -140,6 +141,10 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+When referencing an oid in another table the full index will be used to match the other table.
+If this is undesirable, you may use a single sub index by appending the sub index after a colon to 
+the variable name.  Example `{{ $ifName:2 }}`
+
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
 > from the OID, unless a target index is appended to the OID.
@@ -159,13 +164,13 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: 1
 ```
 
-> ``` op ``` can be any of the following operators :
->
+`op` can be any of the following operators :
+
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
 > not_ends, not_contains, not_regex, not_in_array, exists
->
-> Example:
+
+Example:
 
 ```yaml
                     skip_values:
@@ -181,6 +186,21 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       oid: sensorOptionalOID
                       op: 'exists'
                       value: false
+```
+
+```yaml
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
 ```
 
 If you aren't able to use yaml to perform the sensor discovery, you

@@ -39,7 +39,7 @@ class Kayako extends Transport
         $ticket_type = 1;
         $ticket_status = 1;
         $ticket_prio = 1;
-        $salt = mt_rand();
+        $salt = bin2hex(random_bytes(20));
         $signature = base64_encode(hash_hmac('sha256', $salt, $secret, true));
 
         $protocol = [
