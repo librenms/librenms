@@ -1,6 +1,6 @@
 ---
-name: Report an issue with LibreNMS
-about: Report an issue with LibreNMS
+name: Report a confirmed issue with LibreNMS
+about: Report a confirmed issue with LibreNMS
 title: ""
 labels: ""
 assignees: ""
