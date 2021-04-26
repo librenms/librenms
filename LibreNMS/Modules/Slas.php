@@ -45,6 +45,56 @@ class Slas implements Module
     {
         $device = $os->getDeviceArray();
 
+        // if $device['os'] == 'cisco'
+        // {
+        //     $this->discoverSlas($device);
+        // } else if $device['os'] == 'junos'
+        // {
+            $this->discoverRpms($device);
+        // } else if $device['os'] == 'huawei'
+        // {
+        //    $this->discoverHuaweis($device);
+        // }
+    }
+
+    /**
+     * Poll data for this module and update the DB / RRD.
+     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
+     * Run frequently (default every 5 minutes)
+     *
+     * @param OS $os
+     */
+    public function poll(OS $os)
+    {
+        // $device = $os->getDeviceArray();
+
+
+        // if $device['os'] == 'cisco'
+        // {
+        //     $this->pollSlas($device);
+        // } else if $device['os'] == 'junos'
+        // {
+            $this->pollRpms($os);
+        // } else if $device['os'] == 'huawei'
+        // {
+        //    $this->pollHuaweis($device);
+        // }
+    }
+
+    /**
+     * Remove all DB data for this module.
+     * This will be run when the module is disabled.
+     *
+     * @param OS $os
+     */
+    public function cleanup(OS $os)
+    {
+        $os->getDevice()->printerSupplies()->delete();
+    }
+
+    private function discoverRpms($device)
+    {
+
         $slas = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
         
         // Index the MIB information
@@ -87,10 +137,10 @@ class Slas implements Module
 
 
             $sla_data = Sla::select('sla_id','sla_nr')
-            ->where('device_id', $device['device_id'])
-            ->where('owner', $owner)
-            ->where('tag', $test)
-            ->get();
+                ->where('device_id', $device['device_id'])
+                ->where('owner', $owner)
+                ->where('tag', $test)
+                ->get();
 
             $sla_id = $sla_data[0]['sla_id'];
             $sla_nr = $sla_data[0]['sla_nr'];
@@ -140,17 +190,11 @@ class Slas implements Module
         echo "\n";
     }
 
-    /**
-     * Poll data for this module and update the DB / RRD.
-     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
-     * Run frequently (default every 5 minutes)
-     *
-     * @param OS $os
-     */
-    public function poll(OS $os)
+
+    private function pollRpms($os)
     {
         $device = $os->getDeviceArray();
-
+        
         // Gather our SLA's from the DB.
         $slas = Sla::where('device_id',$device['device_id'])
             ->where('deleted', 0)
@@ -300,16 +344,6 @@ class Slas implements Module
         }
     }
 
-    /**
-     * Remove all DB data for this module.
-     * This will be run when the module is disabled.
-     *
-     * @param OS $os
-     */
-    public function cleanup(OS $os)
-    {
-        $os->getDevice()->printerSupplies()->delete();
-    }
 
     /**
      * Retrieve specific Juniper PingCtlType
