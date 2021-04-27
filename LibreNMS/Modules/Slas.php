@@ -160,13 +160,14 @@ class Slas implements Module
 
             // If it is a standard type delete ping preffix
             $data['rtt_type'] = str_replace('ping', '', $data['rtt_type']);
-
             // To retrieve specific Juniper PingCtlType
             $data['rtt_type'] = $this->retrieveJuniperType($data['rtt_type']);
 
             if (! $sla_id) {
                 $data['sla_nr'] = $max_sla_nr + $i;
+
                 Sla::insert($data);
+
                 $i++;
                 echo '+';
             } else {
@@ -294,7 +295,6 @@ class Slas implements Module
 
     private function pollRpms($device)
     {
-
         // Gather our SLA's from the DB.
         $slas = Sla::where('device_id',$device['device_id'])
             ->where('deleted', 0)
