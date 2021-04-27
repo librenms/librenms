@@ -68,15 +68,14 @@ class Slas implements Module
      */
     public function poll(OS $os)
     {
-        // $device = $os->getDeviceArray();
-
+        $device = $os->getDeviceArray();
 
         if ($device['os_group'] == 'cisco')
         {
             $this->pollSlas($device);
         } else if ($device['os'] == 'junos')
         {
-            $this->pollRpms($os);
+            $this->pollRpms($device);
         }
         // } else if $device['os'] == 'huawei'
         // {
@@ -99,7 +98,7 @@ class Slas implements Module
     {
 
         $slas = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
-        
+
         // Index the MIB information
         $sla_table = [];
         foreach (explode("\n", $slas) as $sla) {
@@ -145,8 +144,8 @@ class Slas implements Module
                 ->where('tag', $test)
                 ->get();
 
-            $sla_id = $sla_data[0]['sla_id'];
-            $sla_nr = $sla_data[0]['sla_nr'];
+            $sla_id = $sla_data[0]->sla_id;
+            $sla_nr = $sla_data[0]->sla_nr;
 
             $data = [
                 'device_id' => $device['device_id'],
@@ -167,14 +166,13 @@ class Slas implements Module
 
             if (! $sla_id) {
                 $data['sla_nr'] = $max_sla_nr + $i;
-                
-                $sla_id = Sla::insert($data);
+                Sla::insert($data);
                 $i++;
                 echo '+';
             } else {
                 // Remove from the list
-                $existing_slas = array_diff($existing_slas, [$sla_id]);
-    
+                $existing_slas = $existing_slas->except([$sla_id]);
+
                 Sla::where('sla_id', $sla_id)
                     ->update($data);
                 echo '.';
@@ -183,9 +181,10 @@ class Slas implements Module
                 // $this->syncModels($os->getDevice(), 'slas', $data);
             }
         }
+
         // Mark all remaining SLAs as deleted
         foreach ($existing_slas as $existing_sla) {
-            Sla::where('sla_id', $existing_sla)
+            Sla::where('sla_id', $existing_sla->sla_id)
                 ->update(['deleted' => 1]);
             echo '-';
         }
@@ -218,7 +217,6 @@ class Slas implements Module
             $sla_table[$id][$property] = trim($value);
         }
 
-        // var_dump($sla_table);
         // Get existing SLAs
         $existing_slas = Sla::select('sla_id')
             ->where('device_id', $device['device_id'])
@@ -226,14 +224,12 @@ class Slas implements Module
             ->get();
 
         foreach ($sla_table as $sla_nr => $sla_config) {
-            $query_data = [
-                'device_id' => $device['device_id'],
-                'sla_nr'    => $sla_nr,
-            ];
-            $sla_id = Sla::select('sla_id')
+            
+            $sla_data = Sla::select('sla_id')
                 ->where('device_id', $device['device_id'])
                 ->where('sla_nr', $sla_nr)
                 ->get();
+            $sla_id = $sla_data[0]->sla_id;
 
             $data = [
                 'device_id' => $device['device_id'],
@@ -273,12 +269,11 @@ class Slas implements Module
             }//end if
 
             if (! $sla_id) {
-                $sla_id = Sla::insert($data);
-
+                Sla::insert($data);
                 echo '+';
             } else {
                 // Remove from the list
-                $existing_slas = array_diff([$existing_slas], [$sla_id]);
+                $existing_slas = $existing_slas->except([$sla_id]);
 
                 Sla::where('sla_id', $sla_id)
                     ->update($data);
@@ -288,7 +283,7 @@ class Slas implements Module
 
         // Mark all remaining SLAs as deleted
         foreach ($existing_slas as $existing_sla) {
-            Sla::where('sla_id', $existing_sla)
+            Sla::where('sla_id', $existing_sla->sla_id)
                 ->update(['deleted' => 1]);
             echo '-';
         }
@@ -297,16 +292,13 @@ class Slas implements Module
     }
 
 
-    private function pollRpms($os)
+    private function pollRpms($device)
     {
-        $device = $os->getDeviceArray();
 
         // Gather our SLA's from the DB.
         $slas = Sla::where('device_id',$device['device_id'])
             ->where('deleted', 0)
             ->get();
-
-        $slas = $os->getDevice()->slas;
 
         if (count($slas) > 0) {
         // We have SLA's, lets go!!!
@@ -418,7 +410,6 @@ class Slas implements Module
                             'MinRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMinRttUs'] / 1000,
                             'MaxRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMaxRttUs'] / 1000,
                             'StdDevRttUs' => $pingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
-                            // 'rtt_sense' => $pingResults_table[$owner . "." .$test]['jnxPingResults'],
                             'ProbeResponses' => $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
                             'ProbeLoss' => $pingResults_table[$owner . '.' . $test]['pingResultsSentProbes'] - $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
                         ];
@@ -447,7 +438,6 @@ class Slas implements Module
                     ->update($update);
                 }
             }
-
         }
     }
 
