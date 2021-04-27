@@ -42,7 +42,7 @@ class Slas implements Module
 
         if ($device['os_group'] == 'cisco') {
             $this->discoverSlas($device);
-        } else if ($device['os'] == 'junos') {
+        } elseif ($device['os'] == 'junos') {
             $this->discoverRpms($device);
         }
         // } else if $device['os'] == 'huawei'
@@ -64,7 +64,7 @@ class Slas implements Module
 
         if ($device['os_group'] == 'cisco') {
             $this->pollSlas($device);
-        } else if ($device['os'] == 'junos') {
+        } elseif ($device['os'] == 'junos') {
             $this->pollRpms($device);
         }
         // } else if $device['os'] == 'huawei'
@@ -125,7 +125,6 @@ class Slas implements Module
             $prop_id = explode('.', $sla_key);
             $owner = $prop_id[0];
             $test = $prop_id[1];
-
 
             $sla_data = Sla::select('sla_id', 'sla_nr')
                 ->where('device_id', $device['device_id'])
@@ -214,7 +213,6 @@ class Slas implements Module
             ->get();
 
         foreach ($sla_table as $sla_nr => $sla_config) {
-
             $sla_data = Sla::select('sla_id')
                 ->where('device_id', $device['device_id'])
                 ->where('sla_nr', $sla_nr)
@@ -280,7 +278,6 @@ class Slas implements Module
 
         echo "\n";
     }
-
 
     private function pollRpms($device)
     {

@@ -36,7 +36,6 @@ use App\Models\PrinterSupply;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
-use App\Models\Sla;
 use App\Models\Vrf;
 use Cache;
 
