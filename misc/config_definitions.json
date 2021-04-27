@@ -703,6 +703,9 @@
         },
         "bad_iftype": {
             "type": "array",
+            "group": "poller",
+            "section": "interface_types",
+            "order": 0,
             "default": [
                 "voiceEncap",
                 "voiceFXO",
