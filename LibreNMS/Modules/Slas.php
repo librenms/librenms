@@ -21,16 +21,10 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Sla;
-// use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Collection;
-// use Illuminate\Support\Str;
-// use LibreNMS\DB\SyncsModels;
-// use LibreNMS\Enum\Alert;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
-use Log;
 
 class Slas implements Module
 {
@@ -46,11 +40,9 @@ class Slas implements Module
     {
         $device = $os->getDeviceArray();
 
-        if ($device['os_group'] == 'cisco')
-        {
+        if ($device['os_group'] == 'cisco') {
             $this->discoverSlas($device);
-        } else if ($device['os'] == 'junos')
-        {
+        } else if ($device['os'] == 'junos') {
             $this->discoverRpms($device);
         }
         // } else if $device['os'] == 'huawei'
@@ -70,11 +62,9 @@ class Slas implements Module
     {
         $device = $os->getDeviceArray();
 
-        if ($device['os_group'] == 'cisco')
-        {
+        if ($device['os_group'] == 'cisco') {
             $this->pollSlas($device);
-        } else if ($device['os'] == 'junos')
-        {
+        } else if ($device['os'] == 'junos') {
             $this->pollRpms($device);
         }
         // } else if $device['os'] == 'huawei'
@@ -96,7 +86,6 @@ class Slas implements Module
 
     private function discoverRpms($device)
     {
-
         $slas = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
 
         // Index the MIB information
@@ -138,7 +127,7 @@ class Slas implements Module
             $test = $prop_id[1];
 
 
-            $sla_data = Sla::select('sla_id','sla_nr')
+            $sla_data = Sla::select('sla_id', 'sla_nr')
                 ->where('device_id', $device['device_id'])
                 ->where('owner', $owner)
                 ->where('tag', $test)
@@ -296,12 +285,12 @@ class Slas implements Module
     private function pollRpms($device)
     {
         // Gather our SLA's from the DB.
-        $slas = Sla::where('device_id',$device['device_id'])
+        $slas = Sla::where('device_id', $device['device_id'])
             ->where('deleted', 0)
             ->get();
 
         if (count($slas) > 0) {
-        // We have SLA's, lets go!!!
+            // We have SLA's, lets go!!!
 
             // Go get some data from the device.
             $pingCtlResults = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB', $mibdir);
@@ -444,7 +433,7 @@ class Slas implements Module
     private function pollSlas($device)
     {
         // Gather our SLA's from the DB.
-        $slas = Sla::where('device_id',$device['device_id'])
+        $slas = Sla::where('device_id', $device['device_id'])
             ->where('deleted', 0)
             ->get();
 
@@ -567,7 +556,6 @@ class Slas implements Module
                 }
             }
         }
-
     }
 
     /**
@@ -602,6 +590,7 @@ class Slas implements Module
                 $rtt_type = 'UdpTimestamp';
                 break;
         }
+
         return $rtt_type;
     }
 
