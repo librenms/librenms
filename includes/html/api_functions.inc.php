@@ -81,8 +81,7 @@ function api_get_graph(array $vars)
 {
     global $dur;        // Needed for callback within graph code
 
-    $auth = '1';
-    $base64_output = '';
+    $auth = true;
 
     // prevent ugly error for undefined graphs from being passed to the user
     [$type, $subtype] = extract_graph_type($vars['type']);
@@ -99,10 +98,10 @@ function api_get_graph(array $vars)
     ob_end_clean();
 
     if ($vars['output'] === 'base64') {
-        return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+        return api_success(['image' => $image, 'content-type' => get_image_type(Config::get('webui.graph_type'))], 'image');
     }
 
-    return response($image, 200, ['Content-Type' => get_image_type()]);
+    return response($image, 200, ['Content-Type' => get_image_type(Config::get('webui.graph_type'))]);
 }
 
 function check_bill_permission($bill_id, $callback)
