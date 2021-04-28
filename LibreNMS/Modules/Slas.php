@@ -348,6 +348,7 @@ class Slas implements Module
             $time_offset = (time() - intval($uptime) / 100);
 
             foreach ($slas as $sla) {
+                $sla_id = $sla['sla_id'];
                 $sla_nr = $sla['sla_nr'];
                 $rtt_type = $sla['rtt_type'];
                 $owner = $sla['owner'];
