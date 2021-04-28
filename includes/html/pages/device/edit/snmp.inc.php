@@ -360,10 +360,10 @@ echo "        </select>
     <select id='authalgo' name='authalgo' class='form-control'>
     <option value='MD5'>MD5</option>
     <option value='SHA' " . ($device['authalgo'] === 'SHA' ? 'selected' : '') . ">SHA</option>
-    <option value='SHA-224' " . ($device['authalgo'] === 'SHA-224' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . ">SHA-224</option>
-    <option value='SHA-256' " . ($device['authalgo'] === 'SHA-256' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . ">SHA-256</option>
-    <option value='SHA-384' " . ($device['authalgo'] === 'SHA-384' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . ">SHA-384</option>
-    <option value='SHA-512' " . ($device['authalgo'] === 'SHA-512' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . '>SHA-512</option>
+    <option value='SHA-224' " . ($device['authalgo'] === 'SHA-224' ? 'selected' : '') . ($snmpv3_sha2 ? '' : ' disabled') . ">SHA-224</option>
+    <option value='SHA-256' " . ($device['authalgo'] === 'SHA-256' ? 'selected' : '') . ($snmpv3_sha2 ? '' : ' disabled') . ">SHA-256</option>
+    <option value='SHA-384' " . ($device['authalgo'] === 'SHA-384' ? 'selected' : '') . ($snmpv3_sha2 ? '' : ' disabled') . ">SHA-384</option>
+    <option value='SHA-512' " . ($device['authalgo'] === 'SHA-512' ? 'selected' : '') . ($snmpv3_sha2 ? '' : ' disabled') . '>SHA-512</option>
     </select>
     ';
 if (! $snmpv3_sha2) {
@@ -383,12 +383,12 @@ if (! $snmpv3_sha2) {
     <div class='col-sm-4'>
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
     <option value='AES' " . ($device['cryptoalgo'] === 'AES' ? 'selected' : '') . ">AES</option>
-    <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-192</option>
-    <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-256</option>
-    <option value='AES-256-C' " . ($device['cryptoalgo'] === 'AES-256-C' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-256 Cisco</option>
-    <option value='DES'>DES</option>
+    <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_aes256 ? '' : ' disabled') . ">AES-192</option>
+    <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_aes256 ? '' : ' disabled') . ">AES-256</option>
+    <option value='AES-256-C' " . ($device['cryptoalgo'] === 'AES-256-C' ? 'selected' : '') . ($snmpv3_aes256 ? '' : ' disabled') . ">AES-256 Cisco</option>
+    <option value='DES' " . ($device['cryptoalgo'] === 'DES' ? 'selected' : '') . '>DES</option>
     </select>
-    ";
+    ';
 if (! $snmpv3_aes256) {
     echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }

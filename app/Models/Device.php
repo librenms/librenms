@@ -155,7 +155,7 @@ class Device extends BaseModel
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
-                if ($this->groups) {
+                if ($this->groups->isNotEmpty()) {
                     $query->orWhereHas('deviceGroups', function (Builder $query) {
                         $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
@@ -322,7 +322,7 @@ class Device extends BaseModel
             $deleted = (bool) $this->attribs->get($attrib_index)->delete();
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
-            $this->attribs->forget($attrib_index);
+            $this->attribs->forget((string) $attrib_index);
 
             return $deleted;
         }

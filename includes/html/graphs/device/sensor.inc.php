@@ -38,8 +38,8 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     }//end switch
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 12);
-    $rrd_file = get_sensor_rrd($device, $sensor);
-    $rrd_options .= " DEF:sensor{$sensor['sensor_id']}=$rrd_file:sensor:AVERAGE";
+    $rrd_filename = get_sensor_rrd($device, $sensor);
+    $rrd_options .= " DEF:sensor{$sensor['sensor_id']}=$rrd_filename:sensor:AVERAGE";
     $rrd_options .= " LINE1:sensor{$sensor['sensor_id']}#$colour:'$sensor_descr_fixed'";
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:LAST:%5.1lf$unit";
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MIN:%5.1lf$unit";

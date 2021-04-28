@@ -1,0 +1,1184 @@
+--- ****************************************************************************
+-- *
+-- * Description:   Implements definitions for the NECE
+-- *
+-- * Copyright 2003 by BKtel communications GmbH
+-- *
+-- *     V.0.1 28.03.03  M. Heldmann    first draft
+-- *     V.0.2 31.03.03  M. Heldmann    added GpioType
+-- *     V.0.3 23.07.03  M. Heldmann    modified descriptions for the states
+-- *     V.0.4 05.01.04  M. Heldmann    added two additional neceConfigTrapReceiver's and
+-- *                                          configurable Get and Set Communities
+-- *     V.1.0 19.03.04  M. Heldmann    added neceConfigTrapReceiverVerify..neceConfigTrapAccumulationTime (ISDN dial up things)
+-- *                                          neceDisplayTrapsSent, neceDisplayTrapsDiscarded
+-- *     V.1.1 29.04.04  M. Heldmann    added some descriptions
+-- *     V.1.2 16.09.04  M. Heldmann    added neceConfigHmsTrapsCompliance ... neceConfigFactoryInternal
+-- *     V.1.3 08.12.04  M. Heldmann    changed neceConfigFactoryInternal to neceConfigTimezone
+-- *                     M. Heldmann    added   neceConfigNtpServerIp ... neceConfigFactoryCommandLine
+-- *     V.1.4 25.10.05  M. Heldmann    changed name neceConfigNtpTimezone to neceConfigTimezone
+-- *                     M. Heldmann    added   neceConfigDaylightSavingFrom ... neceConfigDaylightSavingTo
+-- *     V.1.5 13.09.06  M. Heldmann    added   neceStatesPowerSupplyLeft ... neceStatesFanRight
+-- *           29.09.06  M. Heldmann    modified description for neceConfigCableWatchUsed
+-- *           04.10.06  M. Heldmann    NESlotWriteValue expanded due to new 2G6 platform needs
+-- *     V.1.6 27.05.08  M. Heldmann    marked neceConfigHfcInventoryFormat as read-only
+-- *           29.05.08  M. Heldmann    renamed threshold parameters in xxxxMeasuringValuesTable
+-- *     V.1.7 16.09.09  M. Heldmann    renamed type of neceConfigFactoryCommandLine from DisplayString to OCTET STRING
+-- *     V.1.8 11.07.13  M. Heldmann    adjusted syntax of "CommonEntry" to remove MIB compiler warnings
+-- *     V.1.9 05.09.14  M. Heldmann    changed CommonModuleWidth and ConfigNESlotWrite STATUS to optional
+-- ****************************************************************************
+
+BKTEL-HFC862-NECE-MIB  DEFINITIONS ::= BEGIN
+
+  IMPORTS
+    experimental, enterprises, TimeTicks, IpAddress, Counter
+               FROM RFC1155-SMI
+    OBJECT-TYPE
+               FROM RFC-1212
+    TRAP-TYPE
+               FROM RFC-1215
+    modules, DisplayString, TruthValue, PerceivedSeverityValue, NESlotValue, ModuleWidthValue
+               FROM BKTEL-HFC862-BASE-MIB
+    ;
+
+    nece                OBJECT IDENTIFIER ::= { modules 100 }
+    neceCommon          OBJECT IDENTIFIER ::= { nece 1 }
+    neceStates          OBJECT IDENTIFIER ::= { nece 2 }
+    neceConfiguration   OBJECT IDENTIFIER ::= { nece 3 }
+    neceControl         OBJECT IDENTIFIER ::= { nece 4 }
+    neceMeasuringValues OBJECT IDENTIFIER ::= { nece 5 }
+    neceDisplay         OBJECT IDENTIFIER ::= { nece 6 }
+
+--
+-- Type definitions
+--
+
+    GpioType ::= INTEGER
+    {
+        gpioTypeNotSupported(1),        -- port is not supported be this type of NEC
+        gpioTypeInputOnly(2),
+        gpioTypeInputOrOutput(3),
+        gpioTypeOutputOnly(4)
+    }
+
+    GpioMode ::= INTEGER
+    {
+        gpioModeInput(1),
+        gpioModeInputIsNotify(2),       -- only used for web interface
+        gpioModeInputIsWarning(3),
+        gpioModeInputIsAlarm(4),
+        gpioModeOutputOnAnyAlarm(5),    -- not usable for all gpio ports
+        gpioModeOutputOnAnyWarning(6)   -- not usable for all gpio ports
+    }
+
+    GpioLogicLevel ::= INTEGER
+    {
+        gpioLevelActiveHigh(1),
+        gpioLevelActiveLow(2)
+    }
+
+    HmsTrapsComplianceValue ::= INTEGER
+    {
+        fullCompliant(1),
+        minorCompliant(2)               -- Default setting until NECE Software 1.10
+    }
+
+    HfcInventoryFormatValue ::= INTEGER
+    {
+        format_DKS_T12_9(1),
+        format_T_Nova_E531i(2)          -- Default setting until NECE Software 1.10
+    }
+
+    TrapVerifyTimeoutValue ::= INTEGER (30..600)
+
+    TrapAccumulationTimeValue ::= INTEGER (0..60)
+
+    NESlotWriteValue ::= INTEGER (-1..99)
+
+
+--*****************************************************************************************
+-- neceCommon group
+
+  neceCommonNumberOfModules  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Number of modules in table."
+    ::= { neceCommon 1 }
+
+  neceCommonTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF NeceCommonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The table contains all modules of the nece-type in the NE"
+    ::= { neceCommon 2 }
+
+  neceCommonEntry OBJECT-TYPE
+    SYNTAX NeceCommonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Common-Values for a module."
+    INDEX { neceNESlot }
+    ::= { neceCommonTable 1 }
+
+-- the structure of the entry
+
+    NeceCommonEntry ::= SEQUENCE
+    {
+      neceNESlot              NESlotValue,
+      neceCommonType          DisplayString,
+      neceCommonDescr         DisplayString,
+      neceCommonFirmwareId    DisplayString,
+      neceCommonModuleWidth   ModuleWidthValue
+    }
+
+    neceNESlot OBJECT-TYPE
+      SYNTAX  NESlotValue
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION "The virtual slotID"
+    ::= { neceCommonEntry 1 }
+
+    neceCommonType OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..32))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION "Module model name"
+    ::= { neceCommonEntry 2 }
+
+    neceCommonDescr  OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION "Module alias name"
+    ::= { neceCommonEntry 3 }
+
+    neceCommonFirmwareId OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..32))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "Module firmware version"
+    ::= {  neceCommonEntry 4  }
+
+    neceCommonModuleWidth OBJECT-TYPE
+      SYNTAX ModuleWidthValue
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION "The width of the module."
+    ::= {  neceCommonEntry 5 }
+
+--*****************************************************************************************
+-- neceStates group
+
+    neceStatesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF NeceStatesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+  ::= { neceStates 1 }
+
+-- table of states entry(ro/rw)
+
+    neceStatesEntry OBJECT-TYPE
+    SYNTAX NeceStatesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Alarms for a module."
+    INDEX { neceNESlot }
+  ::= { neceStatesTable 1 }
+
+-- the structure of the entry
+
+    NeceStatesEntry ::= SEQUENCE
+    {
+        neceStatesGpInput1         PerceivedSeverityValue,
+        neceStatesGpInput2         PerceivedSeverityValue,
+        neceStatesGpInput3         PerceivedSeverityValue,
+        neceStatesGpInput4         PerceivedSeverityValue,
+        neceStatesGpInput5         PerceivedSeverityValue,
+        neceStatesGpInput6         PerceivedSeverityValue,
+        neceStatesGpInput7         PerceivedSeverityValue,
+        neceStatesGpInput8         PerceivedSeverityValue,
+        neceStatesGpInput9         PerceivedSeverityValue,
+        neceStatesGpInput10        PerceivedSeverityValue,
+        neceStatesGpInput11        PerceivedSeverityValue,
+        neceStatesGpInput12        PerceivedSeverityValue,
+        neceStatesPowerSupplyLeft  PerceivedSeverityValue,
+        neceStatesPowerSupplyRight PerceivedSeverityValue,
+        neceStatesFanLeft          PerceivedSeverityValue,
+        neceStatesFanRight         PerceivedSeverityValue
+    }
+
+    neceStatesGpInput1 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 1."
+    ::= { neceStatesEntry 1 }
+
+    neceStatesGpInput2 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 2."
+    ::= { neceStatesEntry 2 }
+
+    neceStatesGpInput3 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 3."
+    ::= { neceStatesEntry 3 }
+
+    neceStatesGpInput4 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 4."
+    ::= { neceStatesEntry 4 }
+
+    neceStatesGpInput5 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 5."
+    ::= { neceStatesEntry 5 }
+
+    neceStatesGpInput6 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 6."
+    ::= { neceStatesEntry 6 }
+
+    neceStatesGpInput7 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 7."
+    ::= { neceStatesEntry 7 }
+
+    neceStatesGpInput8 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 8."
+    ::= { neceStatesEntry 8 }
+
+    neceStatesGpInput9 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 9."
+    ::= { neceStatesEntry 9 }
+
+    neceStatesGpInput10 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 10."
+    ::= { neceStatesEntry 10 }
+
+    neceStatesGpInput11 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 11."
+    ::= { neceStatesEntry 11 }
+
+    neceStatesGpInput12 OBJECT-TYPE
+      SYNTAX PerceivedSeverityValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "State of general purpose input no. 12."
+    ::= { neceStatesEntry 12 }
+
+    neceStatesPowerSupplyLeft OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The left (looking from front side) power supply unit fails.
+        Only valid for 2G6 Systems !! Non 2G6 Systems always report clear(5)"
+    ::= { neceStatesEntry 13 }
+
+    neceStatesPowerSupplyRight OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The right (looking from front side) power supply unit fails.
+        Only valid for 2G6 Systems !! Non 2G6 Systems always report clear(5)"
+    ::= { neceStatesEntry 14 }
+
+    neceStatesFanLeft OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The left (looking from front side) fan unit fails.
+        Only valid for 2G6 Systems !! Non 2G6 Systems always report clear(5)"
+    ::= { neceStatesEntry 15 }
+
+    neceStatesFanRight OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The right (looking from front side) fan unit fails.
+        Only valid for 2G6 Systems !! Non 2G6 Systems always report clear(5)"
+    ::= { neceStatesEntry 16 }
+
+
+--*****************************************************************************************
+-- neceConfiguration group
+
+  neceConfigurationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF NeceConfigurationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+  ::= { neceConfiguration 1 }
+
+-- table of configuration entry(ro/rw)
+
+  neceConfigurationEntry OBJECT-TYPE
+    SYNTAX NeceConfigurationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    INDEX { neceNESlot  }
+  ::= { neceConfigurationTable 1 }
+
+-- the structure of the entry
+
+  NeceConfigurationEntry ::= SEQUENCE
+  {
+      neceConfigGpio1Type             GpioType,
+      neceConfigGpio1Mode             GpioMode,
+      neceConfigGpio1LogicLevel       GpioLogicLevel,
+      neceConfigGpio1Description      DisplayString,
+      neceConfigGpio2Type             GpioType,
+      neceConfigGpio2Mode             GpioMode,
+      neceConfigGpio2LogicLevel       GpioLogicLevel,
+      neceConfigGpio2Description      DisplayString,
+      neceConfigGpio3Type             GpioType,
+      neceConfigGpio3Mode             GpioMode,
+      neceConfigGpio3LogicLevel       GpioLogicLevel,
+      neceConfigGpio3Description      DisplayString,
+      neceConfigGpio4Type             GpioType,
+      neceConfigGpio4Mode             GpioMode,
+      neceConfigGpio4LogicLevel       GpioLogicLevel,
+      neceConfigGpio4Description      DisplayString,
+      neceConfigGpio5Type             GpioType,
+      neceConfigGpio5Mode             GpioMode,
+      neceConfigGpio5LogicLevel       GpioLogicLevel,
+      neceConfigGpio5Description      DisplayString,
+      neceConfigGpio6Type             GpioType,
+      neceConfigGpio6Mode             GpioMode,
+      neceConfigGpio6LogicLevel       GpioLogicLevel,
+      neceConfigGpio6Description      DisplayString,
+      neceConfigGpio7Type             GpioType,
+      neceConfigGpio7Mode             GpioMode,
+      neceConfigGpio7LogicLevel       GpioLogicLevel,
+      neceConfigGpio7Description      DisplayString,
+      neceConfigGpio8Type             GpioType,
+      neceConfigGpio8Mode             GpioMode,
+      neceConfigGpio8LogicLevel       GpioLogicLevel,
+      neceConfigGpio8Description      DisplayString,
+      neceConfigGpio9Type             GpioType,
+      neceConfigGpio9Mode             GpioMode,
+      neceConfigGpio9LogicLevel       GpioLogicLevel,
+      neceConfigGpio9Description      DisplayString,
+      neceConfigGpio10Type            GpioType,
+      neceConfigGpio10Mode            GpioMode,
+      neceConfigGpio10LogicLevel      GpioLogicLevel,
+      neceConfigGpio10Description     DisplayString,
+      neceConfigGpio11Type            GpioType,
+      neceConfigGpio11Mode            GpioMode,
+      neceConfigGpio11LogicLevel      GpioLogicLevel,
+      neceConfigGpio11Description     DisplayString,
+      neceConfigGpio12Type            GpioType,
+      neceConfigGpio12Mode            GpioMode,
+      neceConfigGpio12LogicLevel      GpioLogicLevel,
+      neceConfigGpio12Description     DisplayString,
+      neceConfigNESlotWrite            NESlotWriteValue,
+      neceConfigIpAddress              IpAddress,
+      neceConfigNetmask                IpAddress,
+      neceConfigDefaultrouter          IpAddress,
+      neceConfigTrapReceiver1HostIp    IpAddress,
+      neceConfigTrapReceiver1Community DisplayString,
+      neceConfigTrapReceiver2HostIp    IpAddress,
+      neceConfigTrapReceiver2to4Community DisplayString,
+      neceConfigTrapReceiver3HostIp    IpAddress,
+      neceConfigTrapReceiver4HostIp    IpAddress,
+      neceConfigGetCommunity           DisplayString,
+      neceConfigSetCommunity           DisplayString,
+      neceConfigTrapReceiverVerify     TruthValue,
+      neceConfigTrapVerifyReceiverIp   IpAddress,
+      neceConfigTrapVerifyTimeout      TrapVerifyTimeoutValue,
+      neceConfigTrapAccumulationTime   TrapAccumulationTimeValue,
+      neceConfigCableWatchUsed         TruthValue,
+      neceConfigHmsTrapsCompliance     HmsTrapsComplianceValue,
+      neceConfigHmsNotificationsEnable TruthValue,
+      neceConfigHfcInventoryFormat     HfcInventoryFormatValue,
+      neceConfigTimezone               INTEGER,
+      neceConfigNtpServerIp            IpAddress,
+      neceConfigFactoryCommandLine     OCTET STRING,
+      neceConfigDaylightSavingFrom     DisplayString,
+      neceConfigDaylightSavingTo       DisplayString
+  }
+
+    neceConfigGpio1Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 1"
+    ::={ neceConfigurationEntry 1 }
+
+    neceConfigGpio1Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 1"
+    ::={ neceConfigurationEntry 2 }
+
+    neceConfigGpio1LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 1"
+    ::={ neceConfigurationEntry 3 }
+
+    neceConfigGpio1Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 1"
+    ::={ neceConfigurationEntry 4 }
+
+    neceConfigGpio2Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 2"
+    ::={ neceConfigurationEntry 5 }
+
+    neceConfigGpio2Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 2"
+    ::={ neceConfigurationEntry 6 }
+
+    neceConfigGpio2LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 2"
+    ::={ neceConfigurationEntry 7 }
+
+    neceConfigGpio2Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 2"
+    ::={ neceConfigurationEntry 8 }
+
+    neceConfigGpio3Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 3"
+    ::={ neceConfigurationEntry 9 }
+
+    neceConfigGpio3Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 3"
+    ::={ neceConfigurationEntry 10 }
+
+    neceConfigGpio3LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 3"
+    ::={ neceConfigurationEntry 11 }
+
+    neceConfigGpio3Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 3"
+    ::={ neceConfigurationEntry 12 }
+
+    neceConfigGpio4Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 4"
+    ::={ neceConfigurationEntry 13 }
+
+    neceConfigGpio4Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 4"
+    ::={ neceConfigurationEntry 14 }
+
+    neceConfigGpio4LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 4"
+    ::={ neceConfigurationEntry 15 }
+
+    neceConfigGpio4Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 4"
+    ::={ neceConfigurationEntry 16 }
+
+    neceConfigGpio5Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 5"
+    ::={ neceConfigurationEntry 17 }
+
+    neceConfigGpio5Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 5"
+    ::={ neceConfigurationEntry 18 }
+
+    neceConfigGpio5LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 5"
+    ::={ neceConfigurationEntry 19 }
+
+    neceConfigGpio5Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 5"
+    ::={ neceConfigurationEntry 20 }
+
+    neceConfigGpio6Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 6"
+    ::={ neceConfigurationEntry 21 }
+
+    neceConfigGpio6Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 6"
+    ::={ neceConfigurationEntry 22 }
+
+    neceConfigGpio6LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 6"
+    ::={ neceConfigurationEntry 23 }
+
+    neceConfigGpio6Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 6"
+    ::={ neceConfigurationEntry 24 }
+
+    neceConfigGpio7Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 7"
+    ::={ neceConfigurationEntry 25 }
+
+    neceConfigGpio7Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 7"
+    ::={ neceConfigurationEntry 26 }
+
+    neceConfigGpio7LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 7"
+    ::={ neceConfigurationEntry 27 }
+
+    neceConfigGpio7Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 7"
+    ::={ neceConfigurationEntry 28 }
+
+    neceConfigGpio8Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 8"
+    ::={ neceConfigurationEntry 29 }
+
+    neceConfigGpio8Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 8"
+    ::={ neceConfigurationEntry 30 }
+
+    neceConfigGpio8LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 8"
+    ::={ neceConfigurationEntry 31 }
+
+    neceConfigGpio8Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 8"
+    ::={ neceConfigurationEntry 32 }
+
+    neceConfigGpio9Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 9"
+    ::={ neceConfigurationEntry 33 }
+
+    neceConfigGpio9Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 9"
+    ::={ neceConfigurationEntry 34 }
+
+    neceConfigGpio9LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 9"
+    ::={ neceConfigurationEntry 35 }
+
+    neceConfigGpio9Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 9"
+    ::={ neceConfigurationEntry 36 }
+
+    neceConfigGpio10Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 10"
+    ::={ neceConfigurationEntry 37 }
+
+    neceConfigGpio10Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 10"
+    ::={ neceConfigurationEntry 38 }
+
+    neceConfigGpio10LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 10"
+    ::={ neceConfigurationEntry 39 }
+
+    neceConfigGpio10Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 10"
+    ::={ neceConfigurationEntry 40 }
+
+    neceConfigGpio11Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 11"
+    ::={ neceConfigurationEntry 41 }
+
+    neceConfigGpio11Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 11"
+    ::={ neceConfigurationEntry 42 }
+
+    neceConfigGpio11LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 11"
+    ::={ neceConfigurationEntry 43 }
+
+    neceConfigGpio11Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 11"
+    ::={ neceConfigurationEntry 44 }
+
+    neceConfigGpio12Type OBJECT-TYPE
+        SYNTAX GpioType
+        ACCESS read-only               -- READONLY !!!
+        STATUS mandatory
+        DESCRIPTION
+            "The type of the general purpose port no. 12"
+    ::={ neceConfigurationEntry 45 }
+
+    neceConfigGpio12Mode OBJECT-TYPE
+        SYNTAX GpioMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The mode of the general purpose port no. 12"
+    ::={ neceConfigurationEntry 46 }
+
+    neceConfigGpio12LogicLevel OBJECT-TYPE
+        SYNTAX GpioLogicLevel
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The logic level of the general purpose port no. 12"
+    ::={ neceConfigurationEntry 47 }
+
+    neceConfigGpio12Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A description for the general purpose port no. 12"
+    ::={ neceConfigurationEntry 48 }
+
+
+    neceConfigNESlotWrite OBJECT-TYPE
+        SYNTAX NESlotWriteValue
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION "By writing this variable a slot can be assigned
+            for devices that dont support hardware slot detection.
+            Reading '-1' means that the slot position is NOT writable."
+    ::= { neceConfigurationEntry 49 }
+
+    neceConfigIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of the NEC.
+                     NOTE: The NECE executes a reset if this parameter gets changed"
+    ::= { neceConfigurationEntry 50 }
+
+    neceConfigNetmask OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The netmask of the NEC.
+                     NOTE: The NECE executes a reset if this parameter gets changed"
+    ::= { neceConfigurationEntry 51 }
+
+    neceConfigDefaultrouter OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The default router of the NEC.
+                     NOTE: The NECE executes a reset if this parameter gets changed"
+    ::= { neceConfigurationEntry 52 }
+
+    neceConfigTrapReceiver1HostIp OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of the host no.1 that should receive traps
+            Address  0.0.0.0 disables the trap. Broad- or multicast addresses
+            are not allowed"
+    ::= { neceConfigurationEntry 53 }
+
+    neceConfigTrapReceiver1Community OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(4..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The community name used for traps to host no.1"
+    ::= { neceConfigurationEntry 54 }
+
+    neceConfigTrapReceiver2HostIp OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of the host no.2 that should receive traps
+            Address  0.0.0.0 disables the trap. Broad- or multicast addresses
+            are not allowed"
+    ::= { neceConfigurationEntry 55 }
+
+    neceConfigTrapReceiver2to4Community OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(4..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The community name used for traps to hosts no.2 to no.4"
+    ::= { neceConfigurationEntry 56 }
+
+    neceConfigTrapReceiver3HostIp OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of the host no.3 that should receive traps
+            Address  0.0.0.0 disables the trap. Broad- or multicast addresses
+            are not allowed
+            NOTE: The community name 'neceConfigTrapReceiver2to4Community' is
+            used for this trap receiver no. 3"
+    ::= { neceConfigurationEntry 57 }
+
+    neceConfigTrapReceiver4HostIp OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of the host no.4 that should receive traps
+            Address  0.0.0.0 disables the trap. Broad- or multicast addresses
+            are not allowed
+            NOTE: The community name 'neceConfigTrapReceiver2to4Community' is
+            used for this trap receiver no. 4"
+    ::= { neceConfigurationEntry 58 }
+
+    neceConfigGetCommunity OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The community name that is allowed for GET requests
+                     NOTES:
+                     - By writing 'neceConfigGetCommunity' AND 'neceConfigSetCommunity'
+                       to an empty string of size 0, the default community settings
+                       are used."
+    ::= { neceConfigurationEntry 59 }
+
+    neceConfigSetCommunity OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The community name that is allowed for SET and GET requests
+                     NOTES:
+                     - By writing 'neceConfigGetCommunity' AND 'neceConfigSetCommunity'
+                       to an empty string of size 0, the default community settings
+                       are used."
+    ::= { neceConfigurationEntry 60}
+
+    neceConfigTrapReceiverVerify OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "If TRUE, the NECE verifies if the 'sysDescr' variable is readable on host
+                    with ip-address 'neceConfigTrapVerifyReceiverIp' before sending new traps.
+                    NOTE: The NECE executes a reset if this parameter gets changed"
+    ::= { neceConfigurationEntry 61 }
+
+    neceConfigTrapVerifyReceiverIp OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of the host that should receive the 'sysDescr' verify request.
+                    Broad- or multicast addresses are not allowed.
+                    !!! Only valid if neceConfigTrapReceiverVerify == true(1) !!!"
+    ::= { neceConfigurationEntry 62 }
+
+    neceConfigTrapVerifyTimeout OBJECT-TYPE
+        SYNTAX TrapVerifyTimeoutValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Timeout in seconds after which the NECE stops trying to verify 'sysDescr'.
+                    All pending traps are sent, although no verify response, after that timeout.
+                    !!! Only valid if neceConfigTrapReceiverVerify == true(1) !!!"
+    ::= { neceConfigurationEntry 63 }
+
+    neceConfigTrapAccumulationTime OBJECT-TYPE
+        SYNTAX TrapAccumulationTimeValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Time in seconds that the NECE waits before sending all pending traps.
+                    NOTE: There are two condition where the NECE sends its pending traps earlier
+                    ignoring this accumulation time (of course verifying first):
+                    1) The NECE's internal trap buffer is 3/4 full
+                    2) The NECE's SNMP agent is polled by a request from manager
+                    !!! Only valid if neceConfigTrapReceiverVerify == true(1) !!!"
+    ::= { neceConfigurationEntry 64 }
+
+    neceConfigCableWatchUsed OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "This parameter is obsolete and no more needed, always returns false(2)"
+    ::= { neceConfigurationEntry 65 }
+
+    neceConfigHmsTrapsCompliance OBJECT-TYPE
+        SYNTAX HmsTrapsComplianceValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Set the compliance mode of the SCTE HMS traps
+                     In earlier versions of NECE (<= Sw.Rel. 1.10) the trap compliance
+                     to the SCTE HMS MIBs was not fully given. See manual for details."
+    ::= { neceConfigurationEntry 66 }
+
+    neceConfigHmsNotificationsEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "With this control the user can disable all traps of type NOTIFY
+                     and there entries in the SCTE HMS tree.
+                     NOTE: The NECE executes a reset if this parameter gets changed"
+    ::= { neceConfigurationEntry 67 }
+
+    neceConfigHfcInventoryFormat OBJECT-TYPE
+        SYNTAX HfcInventoryFormatValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Selects the supported format of the hfcInventoryFabricData (T-NOVA-HFC-INVENTORY-MIB)"
+    ::= { neceConfigurationEntry 68 }
+
+    neceConfigTimezone OBJECT-TYPE
+        SYNTAX INTEGER (-24..24)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The timezone in units of half hours from GMT (Greenwich Mean Time).
+                     For example:
+                       Berlin  =>  +2 half hours means GMT+1 hour
+                       Tokio   => +18 half hours means GMT+9 hours
+                       NewYork => -10 half hours means GMT-5 hours
+                     NOTE: Not all NECE's support an NTP server."
+    ::= { neceConfigurationEntry 69 }
+
+    neceConfigNtpServerIp OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The ip address of an NTP time server.
+                     Setting the ip to 0.0.0.0 disables the time server lookup.
+                     NOTE: Not all NECE's support an NTP server."
+    ::= { neceConfigurationEntry 70 }
+
+    neceConfigFactoryCommandLine OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "A factory internal command interface"
+    ::= { neceConfigurationEntry 71}
+
+    neceConfigDaylightSavingFrom OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Daylight saving start time in a special textformat (see manual for detail)"
+    ::= { neceConfigurationEntry 72}
+
+    neceConfigDaylightSavingTo OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Daylight saving end time in a special textformat (see manual for detail)"
+    ::= { neceConfigurationEntry 73}
+
+
+--*****************************************************************************************
+-- neceControl group
+
+    neceControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF NeceControlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+  ::= { neceControl 1 }
+
+-- table of control entry(ro/rw)
+
+    neceControlEntry OBJECT-TYPE
+    SYNTAX NeceControlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Alarms for a module."
+    INDEX { neceNESlot }
+  ::= { neceControlTable 1 }
+
+-- the structure of the entry
+
+    NeceControlEntry ::= SEQUENCE
+    {
+          neceControlReset           TruthValue
+    }
+
+    neceControlReset OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Reset the module."
+    ::= { neceControlEntry 1 }
+
+
+
+--*****************************************************************************************
+-- neceMeasuringValues group
+
+-- table of measuring Values
+
+   neceMeasuringValuesTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF NeceMeasuringValuesEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION ""
+   ::= { neceMeasuringValues 1 }
+
+-- table of measuring Values entry
+
+  neceMeasuringValuesEntry OBJECT-TYPE
+    SYNTAX NeceMeasuringValuesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Common-Values for a module."
+    INDEX { neceNESlot }
+  ::= { neceMeasuringValuesTable 1 }
+
+--  the structure of the entry
+
+    NeceMeasuringValuesEntry ::= SEQUENCE
+    {
+        neceTemperatureLoLo       INTEGER,
+        neceTemperatureLo         INTEGER,
+        neceTemperatureValue      INTEGER,
+        neceTemperatureHi         INTEGER,
+        neceTemperatureHiHi       INTEGER
+    }
+
+  neceTemperatureLoLo OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "Temperature low alarm threshold in steps of 0,1°C."
+  ::= { neceMeasuringValuesEntry 1 }
+
+  neceTemperatureLo OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "Temperature low warning threshold in steps of 0,1°C."
+  ::= { neceMeasuringValuesEntry 2 }
+
+  neceTemperatureValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "Temperature in steps of 0,1°C."
+  ::= { neceMeasuringValuesEntry 3 }
+
+  neceTemperatureHi OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "Temperature high warning threshold in steps of 0,1°C."
+  ::= { neceMeasuringValuesEntry 4 }
+
+  neceTemperatureHiHi OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "Temperature high alarm threshold in steps of 0,1°C."
+  ::= { neceMeasuringValuesEntry 5 }
+
+
+--*****************************************************************************************
+-- Display group
+
+    neceDisplayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF NeceDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { neceDisplay 1 }
+
+-- table of configuration entry(ro/rw)
+
+    neceDisplayEntry OBJECT-TYPE
+        SYNTAX NeceDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { neceNESlot  }
+    ::= { neceDisplayTable 1 }
+
+-- the structure of the entry
+
+    NeceDisplayEntry ::= SEQUENCE
+    {
+        neceDisplayTrapsSent       INTEGER,
+        neceDisplayTrapsDiscarded  INTEGER
+    }
+
+    neceDisplayTrapsSent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Number of traps that the NECE has sent."
+    ::= { neceDisplayEntry 1 }
+
+    neceDisplayTrapsDiscarded OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Number of traps that the NECE has discarded.
+                     Discarded traps occur because of trap buffer overflow or timeouts."
+    ::= { neceDisplayEntry 2 }
+
+END
+--*****************************************************************************************--

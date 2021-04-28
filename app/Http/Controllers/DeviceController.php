@@ -58,7 +58,7 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
 
         if (! $device->exists) {
