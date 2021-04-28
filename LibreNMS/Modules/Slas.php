@@ -397,7 +397,7 @@ class Slas implements Module
                             'MaxRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMaxRttUs'] / 1000,
                             'StdDevRttUs' => $pingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
                             'ProbeResponses' => $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
-                            'ProbeLoss' => (int)$pingResults_table[$owner . '.' . $test]['pingResultsSentProbes'] - (int)$pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
+                            'ProbeLoss' => (int) $pingResults_table[$owner . '.' . $test]['pingResultsSentProbes'] - (int) $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
                         ];
                         $rrd_name = ['sla', $sla_nr, $rtt_type];
                         $rrd_def = RrdDefinition::make()
