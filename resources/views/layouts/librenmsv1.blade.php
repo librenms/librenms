@@ -50,13 +50,12 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-3.0.0.js') }}"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('js/jquery-migrate-3.3.2.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-switch.min.js') }}"></script>
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
-    <script src="{{ asset('js/jquery.cycle2.min.js') }}"></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('js/typeahead.bundle.min.js') }}"></script>
