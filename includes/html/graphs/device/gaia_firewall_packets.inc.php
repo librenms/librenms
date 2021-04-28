@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'gaia_firewall_packets');
+$rrd_filename = Rrd::name($device['hostname'], 'gaia_firewall_packets');
 $rrd_options .= " --vertical-label='Packets per second'";
 $rrd_options .= " --lower-limit='0'";
 
