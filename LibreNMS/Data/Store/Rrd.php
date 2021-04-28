@@ -557,7 +557,7 @@ class Rrd extends BaseDatastore
     public function graph(string $options): string
     {
         $cmd = $this->buildCommand('graph', '-', $options);
-        $process = Process::fromShellCommandline(Config::get('rrdtool') . ' ' . $cmd);
+        $process = Process::fromShellCommandline(Config::get('rrdtool') . ' ' . $cmd, $this->rrd_dir);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
         $process->run();
