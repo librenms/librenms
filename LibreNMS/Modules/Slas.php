@@ -290,9 +290,9 @@ class Slas implements Module
             // We have SLA's, lets go!!!
 
             // Go get some data from the device.
-            $pingCtlResults = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB', $mibdir);
-            $pingResults = snmp_walk($device, 'pingMIB.pingObjects.pingResultsTable.pingResultsEntry', '-OQUs', '+DISMAN-PING-MIB', $mibdir);
-            $jnxPingResults = snmp_walk($device, 'jnxPingResultsEntry', '-OQUs', '+JUNIPER-PING-MIB', $mibdir);
+            $pingCtlResults = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
+            $pingResults = snmp_walk($device, 'pingMIB.pingObjects.pingResultsTable.pingResultsEntry', '-OQUs', '+DISMAN-PING-MIB');
+            $jnxPingResults = snmp_walk($device, 'jnxPingResultsEntry', '-OQUs', '+JUNIPER-PING-MIB');
 
             // Instanciate index foreach MIB to query field more easily
             $jnxPingResults_table = [];
@@ -397,7 +397,7 @@ class Slas implements Module
                             'MaxRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMaxRttUs'] / 1000,
                             'StdDevRttUs' => $pingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
                             'ProbeResponses' => $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
-                            'ProbeLoss' => $pingResults_table[$owner . '.' . $test]['pingResultsSentProbes'] - $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
+                            'ProbeLoss' => (int)$pingResults_table[$owner . '.' . $test]['pingResultsSentProbes'] - (int)$pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
                         ];
                         $rrd_name = ['sla', $sla_nr, $rtt_type];
                         $rrd_def = RrdDefinition::make()
@@ -445,6 +445,7 @@ class Slas implements Module
             $time_offset = (time() - intval($uptime) / 100);
 
             foreach ($slas as $sla) {
+                $sla_id = $sla['sla_id'];
                 $sla_nr = $sla['sla_nr'];
                 $rtt_type = $sla['rtt_type'];
 
