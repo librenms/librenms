@@ -2342,6 +2342,38 @@
             },
             "type": "graph"
         },
+        "graph_types.device.gaia_logserver_lograte": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Log Rate"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_firewall_lograte": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Log Rate"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_connections": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Active Connections"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_firewall_packets": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Firewall Packets"
+            },
+            "type": "graph"
+        },
         "graph_types.device.hr_processes": {
             "default": {
                 "section": "system",
