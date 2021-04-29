@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
-use const false;
 
 class LegacyController extends Controller
 {

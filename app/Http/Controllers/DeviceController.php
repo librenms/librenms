@@ -14,8 +14,6 @@ use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
-use const false;
-use const true;
 
 class DeviceController extends Controller
 {

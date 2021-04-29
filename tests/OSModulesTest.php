@@ -32,8 +32,6 @@ use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Fping;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
-use const false;
-use const true;
 
 class OSModulesTest extends DBTestCase
 {
