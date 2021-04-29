@@ -555,7 +555,7 @@ class ModuleTestHelper
         $save_debug = Debug::isEnabled();
         $save_vedbug = Debug::isVerbose();
         if ($this->quiet) {
-            Debug::set();
+            Debug::setOnly();
             Debug::setVerbose();
         }
         ob_start();
@@ -564,7 +564,7 @@ class ModuleTestHelper
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            Debug::set($save_debug);
+            Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
         } else {
             ob_flush();
@@ -583,7 +583,7 @@ class ModuleTestHelper
 
         // Run the poller
         if ($this->quiet) {
-            Debug::set();
+            Debug::setOnly();
             Debug::setVerbose();
         }
         ob_start();
@@ -592,7 +592,7 @@ class ModuleTestHelper
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            Debug::set($save_debug);
+            Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
         } else {
             ob_flush();

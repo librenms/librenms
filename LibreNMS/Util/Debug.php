@@ -62,6 +62,14 @@ class Debug
         return self::$debug;
     }
 
+    /**
+     * Set debug without configuring error reporting.
+     */
+    public static function setOnly(bool $debug = true): bool
+    {
+        return self::$debug = $debug;
+    }
+
     public static function setVerbose(bool $verbose = true): void
     {
         self::$verbose = $verbose;
