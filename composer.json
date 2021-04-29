@@ -67,7 +67,7 @@
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^2.16",
         "justinrainbow/json-schema": "^5.2",
-        "laravel/dusk": "^6.7",
+        "laravel/dusk": "^6.15",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
         "nunomaduro/larastan": "^0.7.4",
