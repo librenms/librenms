@@ -1,0 +1,86 @@
+mib: BKTEL-HFC862-OA-V01-MIB
+
+modules:
+    os:
+        version: '.1.3.6.1.4.1.7501.1.1.1.16.1.3.49'
+        hardware: '.1.3.6.1.4.1.7501.1.2.116.1.2.1.2.50'
+
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - oaTemperatureLo
+                        - oaTemperatureLoLo
+                        - oaTemperatureHi
+                        - oaTemperatureHiHi
+                        - oaInputPowerLoLo
+                        - oaInputPowerLo
+                        - oaInputPowerHiHi
+                        - oaInputPowerHi
+                        - oaOutputPwrOrGainLoLo
+                        - oaOutputPwrOrGainLo
+                        - oaOutputPwrOrGainHiHi
+                        - oaOutputPwrOrGainHi
+                        - oaInputVoltageLoLo
+                        - oaInputVoltageLo
+                        - oaInputVoltageHiHi
+                        - oaInputVoltageHi
+                          
+        temperature:
+            data:
+                -
+                    oid: oaMeasuringValuesTable
+                    value: oaTemperatureValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.7501.1.2.116.5.1.1.3.{{ $index }}'
+                    descr: 'OA Temperature'
+                    group: OA Temperature
+                    high_limit: oaTemperatureHiHi
+                    low_limit: oaTemperatureLoLo  
+                    warn_limit: oaTemperatureHi
+                    low_warn_limit: oaTemperatureLo                
+
+        dbm:
+            options:
+                skip_values: 0
+            data:
+                -
+                    oid: oaMeasuringValuesTable 
+                    value: oaInputPowerValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.7501.1.2.116.5.1.1.8.{{ $index }}'
+                    descr: 'Input Power dBm'
+                    group: Input Power dBm  
+                    index: oa-in-dbm.{{ $index }}                          
+                    high_limit: oaInputPowerHiHi
+                    low_limit: oaInputPowerLoLo  
+                    warn_limit: oaInputPowerHi
+                    low_warn_limit: oaInputPowerLo             
+
+                -
+                    oid: oaMeasuringValuesTable 
+                    value: oaOutputPwrOrGainValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.7501.1.2.116.5.1.1.13.{{ $index }}'
+                    descr: 'Output Power dBm'
+                    group: Output Power dBm  
+                    index: oa-out-dbm.{{ $index }}                         
+                    high_limit: oaOutputPwrOrGainHiHi
+                    low_limit: oaOutputPwrOrGainLoLo  
+                    warn_limit: oaOutputPwrOrGainHi
+                    low_warn_limit: oaOutputPwrOrGainLo                                                   
+
+        voltage:
+            data:
+                -
+                    oid: oaMeasuringValuesTable
+                    value: oaInputVoltageValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.7501.1.2.116.5.1.1.23.{{ $index }}'
+                    descr: 'Amplifier Input voltage'
+                    group: Amplifier Input voltage         
+                    high_limit: oaInputVoltageHiHi
+                    low_limit: oaInputVoltageLoLo  
+                    warn_limit: oaInputVoltageHi
+                    low_warn_limit: oaInputVoltageLo                        

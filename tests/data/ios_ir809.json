@@ -388,7 +388,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.14",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.14",
                     "sensor_index": "14",
                     "sensor_type": "c3gGsmSimStatus",
                     "sensor_descr": "SIM status",
@@ -1464,7 +1464,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.14",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.14",
                     "sensor_index": "14",
                     "sensor_type": "c3gGsmSimStatus",
                     "sensor_descr": "SIM status",
@@ -2414,5 +2414,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.2105",
+                    "sysDescr": "Cisco IOS Software, ir800 Software (ir800-UNIVERSALK9-M), Version 15.8(3)M4, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2020 by Cisco Systems, Inc.\r\nCompiled Tue 25-Feb-20 11:11 by prod_rel_team",
+                    "sysContact": null,
+                    "version": "15.8(3)M4",
+                    "hardware": "IR809G-LTE-GA-K9",
+                    "features": "UNIVERSALK9",
+                    "os": "ios",
+                    "type": "network",
+                    "serial": "FCW224900DK",
+                    "icon": "cisco.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

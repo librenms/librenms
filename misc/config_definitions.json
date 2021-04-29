@@ -703,6 +703,9 @@
         },
         "bad_iftype": {
             "type": "array",
+            "group": "poller",
+            "section": "interface_types",
+            "order": 0,
             "default": [
                 "voiceEncap",
                 "voiceFXO",
@@ -2336,6 +2339,38 @@
                 "section": "analyzer",
                 "order": 0,
                 "descr": "Log Rate"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_logserver_lograte": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Log Rate"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_firewall_lograte": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Log Rate"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_connections": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Active Connections"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.gaia_firewall_packets": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Firewall Packets"
             },
             "type": "graph"
         },

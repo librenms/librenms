@@ -21,7 +21,6 @@ use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Process\Process;
 
@@ -1098,20 +1097,19 @@ function validate_device_id($id)
 
 function convert_delay($delay)
 {
-    $delay = preg_replace('/\s/', '', $delay);
-    if (strstr($delay, 'm', true)) {
-        $delay_sec = $delay * 60;
-    } elseif (strstr($delay, 'h', true)) {
-        $delay_sec = $delay * 3600;
-    } elseif (strstr($delay, 'd', true)) {
-        $delay_sec = $delay * 86400;
-    } elseif (is_numeric($delay)) {
-        $delay_sec = $delay;
-    } else {
-        $delay_sec = 300;
+    if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
     }
 
-    return $delay_sec;
+    return $delay === '' ? 0 : 300;
 }
 
 function normalize_snmp_ip_address($data)

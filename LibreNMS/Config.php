@@ -404,7 +404,10 @@ class Config
     private static function processConfig()
     {
         // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
+        if (
+            isset($_SERVER['HTTPS']) ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 

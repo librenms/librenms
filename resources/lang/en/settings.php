@@ -63,6 +63,7 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
+            'interface_types' => 'Interface Type by RFC 7224',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -967,6 +968,10 @@ return [
                     'description' => 'Enable user access via dynamic Device Groups',
                 ],
             ],
+        ],
+        'bad_iftype' => [
+            'description' => 'Bad Interfaces',
+            'help' => 'Network Interface Types which should be ignored',
         ],
         'ping' => [
             'description' => 'Path to ping',

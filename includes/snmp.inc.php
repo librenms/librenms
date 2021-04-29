@@ -40,7 +40,7 @@ function prep_snmp_setting($device, $setting)
 }//end prep_snmp_setting()
 
 /**
- * @param $device
+ * @param array $device
  * @return array will contain a list of mib dirs
  */
 function get_mib_dir($device)
@@ -78,13 +78,14 @@ function get_mib_dir($device)
  * If $mibdir is empty '', return an empty string
  *
  * @param string $mibdir should be the name of the directory within \LibreNMS\Config::get('mib_dir')
- * @param array $device
+ * @param array|null $device
  * @return string The option string starting with -M
  */
-function mibdir($mibdir = null, $device = [])
+function mibdir($mibdir = null, $device = null)
 {
+    $dirs = is_array($device) ? get_mib_dir($device) : [];
+
     $base = Config::get('mib_dir');
-    $dirs = get_mib_dir($device);
     $dirs[] = "$base/$mibdir";
 
     // make sure base directory is included first
@@ -779,10 +780,10 @@ function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
  * @param string $mib
  * @param string $mibdir the mib directory (relative to the LibreNMS mibs directory)
  * @param array|string $options Options to pass to snmptranslate
- * @param array $device
+ * @param array|null $device
  * @return string
  */
-function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = [])
+function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 

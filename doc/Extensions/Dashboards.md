@@ -74,8 +74,8 @@ Using the Notes Widget.
 
 Note you may need to play with the width and height and also size your widget properly.
 
-``` src="url" ``` needs to be URL to webpage your linking to.
-Also some web pages may not support html embeded or iframe.
+``` src="url" ``` needs to be URL to webpage you are linking to.
+Also some web pages may not support html embedded or iframe.
 ![Example embed webpage](/img/example-embed-website.png)
 
 ## How to create ports graph

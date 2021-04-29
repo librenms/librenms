@@ -1116,42 +1116,6 @@ function get_postgres_databases($device_id)
 }
 
 /**
- * Get all application data from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @param string  $category which category of graphs are searched
- * @return array list of entry data
- */
-function get_arrays_with_application($device, $app_id, $app_name, $category = null)
-{
-    $entries = [];
-    $separator = '-';
-
-    if ($category) {
-        $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', Rrd::dirFromHost($device['hostname']), 'app', $app_name, $app_id, $category);
-    } else {
-        $pattern = sprintf('%s/%s-%s-%s-*.rrd', Rrd::dirFromHost($device['hostname']), 'app', $app_name, $app_id);
-    }
-
-    // app_name contains a separator character? consider it
-    $offset = substr_count($app_name, $separator);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
-
-        if ($entry) {
-            array_push($entries, $entry);
-        }
-    }
-
-    return $entries;
-}
-
-/**
  * Return stacked graphs information
  *
  * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
