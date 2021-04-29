@@ -29,6 +29,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Proc;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
 
@@ -356,7 +357,6 @@ class Rrd extends BaseDatastore
      */
     private function command($command, $filename, $options)
     {
-        global $vdebug;
         $stat = Measurement::start($this->coalesceStatisticType($command));
         $output = null;
 
@@ -391,7 +391,7 @@ class Rrd extends BaseDatastore
             Log::error('rrdtool could not start');
         }
 
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             echo 'RRDtool Output: ';
             echo $output[0];
             echo $output[1];

@@ -11,6 +11,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -462,9 +463,9 @@ function generate_port_image($args)
  */
 function graph_error($text, $color = [128, 0, 0])
 {
-    global $vars, $debug;
+    global $vars;
 
-    if (! $debug) {
+    if (! Debug::isEnabled()) {
         set_image_type();
     }
 

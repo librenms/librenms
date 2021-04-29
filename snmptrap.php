@@ -10,12 +10,15 @@
  * @copyright  (C) 2018 LibreNMS
  * Adapted from old snmptrap.php handler
  */
+
+use LibreNMS\Util\Debug;
+
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
 
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
