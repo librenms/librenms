@@ -120,7 +120,6 @@ EOH;
 // If we've specified modules with -m, use them
 $module_override = parse_modules('poller', $options);
 
-
 $datastore = Datastore::init($options);
 
 echo "Starting polling run:\n\n";

@@ -42,17 +42,17 @@ class Debug
         restore_error_handler(); // disable Laravel error handler
 
         if (self::$debug) {
-            ini_set('display_errors', 1);
-            ini_set('display_startup_errors', 1);
-            ini_set('log_errors', 0);
+            ini_set('display_errors', '1');
+            ini_set('display_startup_errors', '1');
+            ini_set('log_errors', '0');
             error_reporting(E_ALL & ~E_NOTICE);
 
             self::enableCliDebugOutput();
             self::enableQueryDebug();
         } else {
-            ini_set('display_errors', 0);
-            ini_set('display_startup_errors', 0);
-            ini_set('log_errors', 1);
+            ini_set('display_errors', '0');
+            ini_set('display_startup_errors', '0');
+            ini_set('log_errors', '1');
             error_reporting($silence ? 0 : E_ERROR);
 
             self::disableCliDebugOutput();
