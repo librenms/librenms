@@ -30,9 +30,9 @@ class Debug
     private static $debug = false;
     private static $verbose = false;
 
-    public static function set(bool $debug = true, bool $silence = false): bool
+    public static function set($debug = true, bool $silence = false): bool
     {
-        self::$debug = $debug;
+        self::$debug = (bool) $debug;
 
         restore_error_handler(); // disable Laravel error handler
 
