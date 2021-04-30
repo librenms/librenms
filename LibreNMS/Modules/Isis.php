@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\OS\Junos;
 use LibreNMS\Util\IP;
+use Illuminate\Support\Arr;
 
 class Isis implements Module
 {
@@ -86,15 +87,15 @@ class Isis implements Module
 
                 if ($circuit_data['isisCircPassiveCircuit'] != '1') {
                     // Adjacency is UP
-                    if (! empty($adjacencies_poll[$circuit]) && end($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
-                        $isis_data['isisISAdjState'] = end($adjacencies_poll[$circuit]['isisISAdjState']);
-                        $isis_data['isisISAdjNeighSysID'] = end($adjacencies_poll[$circuit]['isisISAdjNeighSysID']);
-                        $isis_data['isisISAdjNeighSysType'] = end($adjacencies_poll[$circuit]['isisISAdjNeighSysType']);
-                        $isis_data['isisISAdjNeighPriority'] = end($adjacencies_poll[$circuit]['isisISAdjNeighPriority']);
-                        $isis_data['isisISAdjLastUpTime'] = end($adjacencies_poll[$circuit]['isisISAdjLastUpTime']);
-                        $isis_data['isisISAdjAreaAddress'] = end(end($adjacencies_poll[$circuit]['isisISAdjAreaAddress']));
-                        $isis_data['isisISAdjIPAddrType'] = end(end($adjacencies_poll[$circuit]['isisISAdjIPAddrType']));
-                        $isis_data['isisISAdjIPAddrAddress'] = end(end($adjacencies_poll[$circuit]['isisISAdjIPAddrAddress']));
+                    if (! empty($adjacencies_poll[$circuit]) && Arr::last($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
+                        $isis_data['isisISAdjState'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjState']);
+                        $isis_data['isisISAdjNeighSysID'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjNeighSysID']);
+                        $isis_data['isisISAdjNeighSysType'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjNeighSysType']);
+                        $isis_data['isisISAdjNeighPriority'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjNeighPriority']);
+                        $isis_data['isisISAdjLastUpTime'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjLastUpTime']);
+                        $isis_data['isisISAdjAreaAddress'] = Arr::last(Arr::last($adjacencies_poll[$circuit]['isisISAdjAreaAddress']));
+                        $isis_data['isisISAdjIPAddrType'] = Arr::last(Arr::last($adjacencies_poll[$circuit]['isisISAdjIPAddrType']));
+                        $isis_data['isisISAdjIPAddrAddress'] = Arr::last(Arr::last($adjacencies_poll[$circuit]['isisISAdjIPAddrAddress']));
 
                         // Format data
                         $isis_data['isisISAdjNeighSysID'] = str_replace(' ', '.', $isis_data['isisISAdjNeighSysID']);
