@@ -26,11 +26,11 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\IsisAdjacency;
+use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\OS\Junos;
 use LibreNMS\Util\IP;
-use Illuminate\Support\Arr;
 
 class Isis implements Module
 {
