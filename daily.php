@@ -11,6 +11,7 @@ use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Validations\Php;
 
 $init_modules = ['alerts'];
@@ -21,7 +22,7 @@ $options = getopt('df:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
-    $debug = true;
+    Debug::set();
 }
 
 if ($options['f'] === 'update') {

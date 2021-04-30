@@ -13,6 +13,7 @@
 
 use App\Models\Device;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Process\Process;
 
 Artisan::command('device:rename
@@ -107,7 +108,7 @@ Artisan::command('device:add
         include base_path('includes/init.php');
 
         if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-            set_debug();
+            Debug::set();
             if ($verbosity >= 256) {
                 global $verbose;
                 $verbose = true;

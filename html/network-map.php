@@ -9,6 +9,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $links = 1;
 
@@ -21,7 +22,7 @@ if (! Auth::check()) {
 
 $options = getopt('d::');
 
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']), false)) {
     echo "DEBUG!\n";
 }
 

@@ -27,6 +27,7 @@
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
@@ -94,7 +95,7 @@ if (empty($where)) {
     exit;
 }
 
-if (set_debug(isset($options['d'])) || isset($options['v'])) {
+if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -111,14 +112,13 @@ EOH;
 
     echo "DEBUG!\n";
     if (isset($options['v'])) {
-        $vdebug = true;
+        Debug::setVerbose();
     }
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 // If we've specified modules with -m, use them
 $module_override = parse_modules('poller', $options);
-set_debug($debug);
 
 $datastore = Datastore::init($options);
 

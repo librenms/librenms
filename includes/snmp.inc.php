@@ -18,6 +18,7 @@
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function string_to_oid($string)
@@ -707,8 +708,6 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0, $mibdir = n
 
 function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 {
-    global $debug;
-
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data = trim(external_exec($cmd));
 
@@ -719,7 +718,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
         $value = str_replace('"', '', $value);
         [$oid, $first, $second, $third] = explode('.', $oid);
 
-        if ($debug) {
+        if (Debug::isEnabled()) {
             echo "$entry || $oid || $first || $second || $third\n";
         }
 

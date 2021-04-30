@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 
 class Kernel extends ConsoleKernel
@@ -63,10 +64,9 @@ class Kernel extends ConsoleKernel
         // intercept input and check for debug
         if ($input->hasParameterOption(['-d', '--debug', '-vv', '-vvv'], true)) {
             if ($input->hasParameterOption(['-vvv'], true)) {
-                global $vdebug;
-                $vdebug = true;
+                Debug::setVerbose();
             }
-            $this->app->booted('set_debug');
+            $this->app->booted('\LibreNMS\Util\Debug::set');
         }
 
         return parent::handle($input, $output);

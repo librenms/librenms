@@ -81,7 +81,7 @@ if ($error_msg) {
         Rrd::graph($graphfile, $rrd_options);
         d_echo($rrd_cmd);
         if (is_file($graphfile)) {
-            if (! $debug) {
+            if (! \LibreNMS\Util\Debug::isEnabled()) {
                 set_image_type();
                 if ($output === 'base64') {
                     $imagedata = file_get_contents($graphfile);
