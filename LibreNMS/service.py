@@ -1,13 +1,14 @@
-import LibreNMS
-
 import json
 import logging
 import os
-import pymysql
 import subprocess
 import threading
+
+import pymysql
 import sys
 import time
+
+import LibreNMS
 
 try:
     import psutil
@@ -20,7 +21,7 @@ from logging import debug, info, warning, error, critical, exception
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
+from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD
 from uuid import uuid1
 
 try:
@@ -471,6 +472,8 @@ class Service:
             self.queue_managers["ping"] = LibreNMS.PingQueueManager(
                 self.config, self._lm
             )
+        self.apply_config()
+
         if self.config.update_enabled:
             self.daily_timer.start()
         self.stats_timer.start()
@@ -546,6 +549,11 @@ class Service:
 
     def _release_master(self):
         self._lm.unlock("dispatch.master", self.config.unique_name)
+
+    def apply_config(self):
+        self.config.load_poller_config(self._db)
+        for manager in self.queue_managers.values():
+            manager.apply_config()
 
     # ------------ Discovery ------------
     def dispatch_immediate_discovery(self, device_id, group):
@@ -809,6 +817,9 @@ class Service:
         info("Counting up time spent polling")
 
         try:
+            # fetch new config settings from the DB
+            self.apply_config()
+
             # Report on the poller instance as a whole
             self._db.query(
                 "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
