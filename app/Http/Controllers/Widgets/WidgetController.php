@@ -55,7 +55,7 @@ abstract class WidgetController extends Controller
      */
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.base');
+        return view('widgets.settings.base', $this->getSettings(true));
     }
 
     public function __invoke(Request $request)
