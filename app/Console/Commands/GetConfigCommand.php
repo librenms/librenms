@@ -36,9 +36,10 @@ class GetConfigCommand extends LnmsCommand
     {
         $setting = $this->argument('setting');
 
-        // load os definition if requested
+        // load os definition if requested, and remove special definition_loaded key
         if (preg_match('/^os\.(?<os>[^.]+)/', $setting, $matches)) {
             OS::loadDefinition($matches['os']);
+            Config::forget("os.{$matches['os']}.definition_loaded");
         }
 
         if ($this->option('json')) {
