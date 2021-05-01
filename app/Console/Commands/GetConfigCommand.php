@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use LibreNMS\Config;
+use LibreNMS\Util\OS;
 use Symfony\Component\Console\Input\InputArgument;
 
 class GetConfigCommand extends LnmsCommand
@@ -34,6 +35,12 @@ class GetConfigCommand extends LnmsCommand
     public function handle()
     {
         $setting = $this->argument('setting');
+
+        // load os definition if requested
+        if (preg_match('/^os\.(?<os>[^.]+)/', $setting, $matches)) {
+            OS::loadDefinition($matches['os']);
+        }
+
         if ($this->option('json')) {
             $this->line($setting ? json_encode(Config::get($setting)) : Config::toJson());
 
