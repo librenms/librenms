@@ -545,7 +545,6 @@ function snmpwalk_cache_oid_nobulk($device, $oid, $array, $mib = null, $mibdir =
     return $array;
 }//end snmpwalk_cache_oid()
 
-
 function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
@@ -660,7 +659,6 @@ function snmpwalk_cache_multi_oid_nobulk($device, $oid, $array, $mib = null, $mi
 
     return $cache['snmp'][$device['device_id']][$oid];
 }//end snmpwalk_cache_multi_oid_nobulk()
-
 
 function snmpwalk_cache_double_oid($device, $oid, $array, $mib = null, $mibdir = null)
 {

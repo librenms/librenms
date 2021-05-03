@@ -1,6 +1,7 @@
 <?php
+
 foreach ($pre_cache['aos7_sync_oids'] as $index => $data) {
-     if (is_array($data)) {
+    if (is_array($data)) {
         $sync_chas_oid = '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.1.1.4.' . $index;
         $sync_state = 'chasControlCertifyStatus';
         $sync_value = 'chasControlCertifyStatus.1';
@@ -26,7 +27,7 @@ unset(
     $index
 );
 foreach ($pre_cache['aos7_sync_oids'] as $index => $data) {
-   if (is_array($data)) {
+    if (is_array($data)) {
         $sync_chas_oid = '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.1.1.6.' . $index;
         $sync_state = 'chasControlSynchronizationStatus';
         $sync_value = 'chasControlSynchronizationStatus.1';
@@ -42,4 +43,3 @@ foreach ($pre_cache['aos7_sync_oids'] as $index => $data) {
         create_sensor_to_state_index($device, $sync_state, 1);
     }
 }
-
