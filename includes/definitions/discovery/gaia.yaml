@@ -9,6 +9,8 @@ modules:
             data:
                 -
                     oid:
+                        - tunnelPeerIpAddr
+                        - tunnelPeerObjName
                         - tempertureSensorName
                         - fanSpeedSensorName
                         - voltageSensorName
