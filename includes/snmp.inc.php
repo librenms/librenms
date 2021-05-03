@@ -234,9 +234,9 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
-	$output = external_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir));
-	$result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output));   
-	if ($result) {
+        $output = external_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir));
+        $result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output));   
+        if ($result) {
             $data = array_merge($data, explode("\n", $result));
         }
     }
@@ -283,7 +283,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     if (strstr($oid, ' ')) {
         throw new Exception("snmp_get called for multiple OIDs: $oid");
     }
-    
+
     $output = external_exec(gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir));
     $output = str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output);
     $data = trim($output, "\\\" \n\r");
