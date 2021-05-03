@@ -4,7 +4,6 @@ text: 'Alcatel-Lucent OS'
 type: network
 ifXmcbc: true
 ifname: true
-nobulk: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

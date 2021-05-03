@@ -18,7 +18,6 @@
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Util\Debug;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function string_to_oid($string)
@@ -142,6 +141,12 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir, $strIndexing);
 } //end gen_snmpwalk_cmd()
 
+function gen_snmpwalk_nobulk($device, $oids, $options = null, $mib = null, $mibdir = null, $strIndexing = null)
+{
+    $snmpcmd = [Config::get('snmpwalk')];
+
+    return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir, $strIndexing);
+}
 /**
  * Generate an snmp command
  *
@@ -228,8 +233,8 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
-        $output = external_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir));
-        $result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output));
+        $cmd = gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir);
+        $result = trim(external_exec($cmd));
         if ($result) {
             $data = array_merge($data, explode("\n", $result));
         }
@@ -278,9 +283,8 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
         throw new Exception("snmp_get called for multiple OIDs: $oid");
     }
 
-    $output = external_exec(gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir));
-    $output = str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output);
-    $data = trim($output, "\\\" \n\r");
+    $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd), "\\\" \n\r");
 
     recordSnmpStatistic('snmpget', $time_start);
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -415,6 +419,33 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     return $data;
 }//end snmp_walk()
 
+function snmp_walk_nobulk($device, $oid, $options = null, $mib = null, $mibdir = null)
+{
+    $time_start = microtime(true);
+
+    $cmd = gen_snmpwalk_nobulk($device, $oid, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd));
+
+    $data = str_replace('"', '', $data);
+    $data = str_replace('End of MIB', '', $data);
+
+    if (is_string($data) && preg_match('/No Such (Object|Instance)/i', $data)) {
+        d_echo('Invalid snmp_walk() data = ' . print_r($data, true));
+        $data = false;
+    } elseif (preg_match('/Wrong Type(.*)should be/', $data)) {
+        $data = preg_replace('/Wrong Type \(should be .*\): /', '', $data);
+    } else {
+        if (Str::endsWith($data, '(It is past the end of the MIB tree)')) {
+            $no_more_pattern = '/.*No more variables left in this MIB View \(It is past the end of the MIB tree\)[\n]?/';
+            $data = preg_replace($no_more_pattern, '', $data);
+        }
+    }
+
+    recordSnmpStatistic('snmpwalk', $time_start);
+
+    return $data;
+}//end snmp_walk()
+
 function snmpwalk_cache_cip($device, $oid, $array = [], $mib = 0)
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OsnQ', $mib);
@@ -490,6 +521,28 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
 
     return $array;
 }//end snmpwalk_cache_oid()
+
+function snmpwalk_cache_oid_nobulk($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUs')
+{
+    $data = snmp_walk_nobulk($device, $oid, $snmpflags, $mib, $mibdir);
+    foreach (explode("\n", $data) as $entry) {
+        if (! Str::contains($entry, ' =') && ! empty($entry) && isset($index, $oid)) {
+            $array[$index][$oid] .= "\n$entry";
+            continue;
+        }
+
+        [$oid,$value] = explode('=', $entry, 2);
+        $oid = trim($oid);
+        $value = trim($value, "\" \\\n\r");
+        [$oid, $index] = explode('.', $oid, 2);
+        if (! strstr($value, 'at this OID') && ! empty($oid)) {
+            $array[$index][$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmpwalk_cache_oid()
+
 
 function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
 {
@@ -577,6 +630,35 @@ function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = null, $mibdir = 
 
     return $cache['snmp'][$device['device_id']][$oid];
 }//end snmpwalk_cache_multi_oid()
+
+function snmpwalk_cache_multi_oid_nobulk($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUs')
+{
+    global $cache;
+
+    if (! (is_array($cache['snmp'][$device['device_id']]) && array_key_exists($oid, $cache['snmp'][$device['device_id']]))) {
+        $data = snmp_walk_nobulk($device, $oid, $snmpflags, $mib, $mibdir);
+        foreach (explode("\n", $data) as $entry) {
+            [$r_oid,$value] = explode('=', $entry, 2);
+            $r_oid = trim($r_oid);
+            $value = trim($value);
+            $oid_parts = explode('.', $r_oid);
+            $r_oid = array_shift($oid_parts);
+            $index = array_shift($oid_parts);
+            foreach ($oid_parts as $tmp_oid) {
+                $index .= '.' . $tmp_oid;
+            }
+
+            if (! strstr($value, 'at this OID') && isset($r_oid) && isset($index)) {
+                $array[$index][$r_oid] = $value;
+            }
+        }//end foreach
+
+        $cache['snmp'][$device['device_id']][$oid] = $array;
+    }//end if
+
+    return $cache['snmp'][$device['device_id']][$oid];
+}//end snmpwalk_cache_multi_oid_nobulk()
+
 
 function snmpwalk_cache_double_oid($device, $oid, $array, $mib = null, $mibdir = null)
 {
@@ -709,6 +791,8 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0, $mibdir = n
 
 function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 {
+    global $debug;
+
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data = trim(external_exec($cmd));
 
@@ -719,7 +803,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
         $value = str_replace('"', '', $value);
         [$oid, $first, $second, $third] = explode('.', $oid);
 
-        if (Debug::isEnabled()) {
+        if ($debug) {
             echo "$entry || $oid || $first || $second || $third\n";
         }
 
