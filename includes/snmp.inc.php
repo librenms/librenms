@@ -18,6 +18,7 @@
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function string_to_oid($string)
@@ -233,9 +234,9 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
-        $cmd = gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir);
-        $result = trim(external_exec($cmd));
-        if ($result) {
+	$output = external_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir));
+	$result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output));   
+	if ($result) {
             $data = array_merge($data, explode("\n", $result));
         }
     }
@@ -282,9 +283,11 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     if (strstr($oid, ' ')) {
         throw new Exception("snmp_get called for multiple OIDs: $oid");
     }
+    
+    $output = external_exec(gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir));
+    $output = str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output);
+    $data = trim($output, "\\\" \n\r");
 
-    $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\\\" \n\r");
 
     recordSnmpStatistic('snmpget', $time_start);
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -791,8 +794,6 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0, $mibdir = n
 
 function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 {
-    global $debug;
-
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data = trim(external_exec($cmd));
 
@@ -803,7 +804,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
         $value = str_replace('"', '', $value);
         [$oid, $first, $second, $third] = explode('.', $oid);
 
-        if ($debug) {
+        if (Debug::isEnabled()) {
             echo "$entry || $oid || $first || $second || $third\n";
         }
 
