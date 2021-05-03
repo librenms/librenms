@@ -235,7 +235,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
         $output = external_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir));
-        $result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output)); 
+        $result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output));
         if ($result) {
             $data = array_merge($data, explode("\n", $result));
         }
