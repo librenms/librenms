@@ -8,6 +8,7 @@
  */
 
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
 $start = microtime(true);
 
@@ -22,13 +23,13 @@ if (! Auth::check()) {
     }
 }
 
-set_debug(isset($_GET['debug']));
+Debug::set(isset($_GET['debug']));
 
 require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
 Datastore::terminate();
 
-if ($debug) {
+if (Debug::isEnabled()) {
     echo '<br />';
     printf('Runtime %.3fs', microtime(true) - $start);
     echo '<br />';

@@ -19,9 +19,9 @@
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
 
 function generate_priority_status($priority)
@@ -67,14 +67,12 @@ function graylog_severity_label($severity)
  */
 function external_exec($command)
 {
-    global $debug, $vdebug;
-
     $device = DeviceCache::getPrimary();
 
     $proc = new Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-    if ($debug && ! $vdebug) {
+    if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $patterns = [
             '/-c\' \'[\S]+\'/',
             '/-u\' \'[\S]+\'/',
@@ -98,7 +96,7 @@ function external_exec($command)
 
         $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
-    } elseif ($vdebug) {
+    } elseif (Debug::isVerbose()) {
         c_echo('SNMP[%c' . $proc->getCommandLine() . "%n]\n");
     }
 
@@ -115,11 +113,11 @@ function external_exec($command)
         d_echo($proc->getErrorOutput());
     }
 
-    if ($debug && ! $vdebug) {
+    if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
         $debug_output = preg_replace($ip_regex, '*', $output);
         d_echo($debug_output . PHP_EOL);
-    } elseif ($vdebug) {
+    } elseif (Debug::isVerbose()) {
         d_echo($output . PHP_EOL);
     }
     d_echo($proc->getErrorOutput());
@@ -425,27 +423,6 @@ function get_dev_attrib($device, $attrib_type)
 function del_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
-}
-
-/*
- * convenience function - please use this instead of 'if ($debug) { echo ...; }'
- */
-if (! function_exists('d_echo')) {
-    //TODO remove this after installs have updated, leaving it for for transition
-    function d_echo($text, $no_debug_text = null)
-    {
-        global $debug;
-
-        if (Laravel::isBooted()) {
-            \Log::debug(is_string($text) ? rtrim($text) : $text);
-        } elseif ($debug) {
-            print_r($text);
-        }
-
-        if (! $debug && $no_debug_text) {
-            echo "$no_debug_text";
-        }
-    }
 }
 
 /**

@@ -107,7 +107,7 @@ try {
     $image_data = Rrd::graph($rrd_options);
 
     // output the graph
-    if ($debug) {
+    if (\LibreNMS\Util\Debug::isEnabled()) {
         echo '<img src="data:' . get_image_type($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
         header('Content-type: ' . get_image_type(Config::get('webui.graph_type')));

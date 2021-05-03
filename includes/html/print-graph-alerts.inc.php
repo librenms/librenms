@@ -52,6 +52,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
     <?php
     $groups = [];
     $max_count = 0;
+    $data = [];
 
     foreach (dbFetchRows($query, $param) as $return_value) {
         $date = $return_value['Date'];
