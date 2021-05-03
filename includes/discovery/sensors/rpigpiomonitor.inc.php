@@ -66,7 +66,7 @@ foreach ($gpio_mon_data as $index => $entry) {
 }
 
 echo "[rpigpiomonitor] Sensor Array dump: \n";
-var_dump($sensors);
+d_echo($sensors);
 
 foreach ($sensors as $sensor_id => $sensor_data) {
     if (isset($sensor_data['name']) && isset($sensor_data['type']) && isset($sensor_data['descr'])) {
