@@ -28,10 +28,12 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
+use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
+use Symfony\Component\Process\Process;
 
 class Rrd extends BaseDatastore
 {
@@ -545,25 +547,26 @@ class Rrd extends BaseDatastore
 
     /**
      * Generates a graph file at $graph_file using $options
-     * Opens its own rrdtool pipe.
+     * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param string $graph_file
-     * @param string $options
-     * @return string|int
+     * @param  string  $options
+     * @return string
+     * @throws \LibreNMS\Exceptions\FileExistsException
+     * @throws \LibreNMS\Exceptions\RrdGraphException
      */
-    public function graph($graph_file, $options)
+    public function graph(string $options): string
     {
-        if ($this->init(false)) {
-            $cmd = $this->buildCommand('graph', $graph_file, $options);
+        $cmd = $this->buildCommand('graph', '-', $options);
+        $process = Process::fromShellCommandline(Config::get('rrdtool') . ' ' . $cmd, $this->rrd_dir);
+        $process->setTimeout(300);
+        $process->setIdleTimeout(300);
+        $process->run();
 
-            $output = implode($this->sync_process->sendCommand($cmd));
-
-            d_echo("<p>$cmd</p>\n<p>command returned ($output)</p>");
-
-            return $output;
-        } else {
-            return 0;
+        if (! $process->isSuccessful()) {
+            throw new RrdGraphException($process->getErrorOutput(), $process->getExitCode(), $process->getOutput());
         }
+
+        return $process->getOutput();
     }
 
     public function __destruct()
