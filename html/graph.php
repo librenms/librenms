@@ -10,6 +10,7 @@
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
+$auth = false;
 $start = microtime(true);
 
 $init_modules = ['web', 'graphs', 'auth'];
