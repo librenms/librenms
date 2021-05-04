@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage nfs-server
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     SvennD <svennd@svennd.be>
 */
@@ -23,6 +23,6 @@ $colour_area_max = 'FFEE99';
 $graph_max = 10000;
 $unit_text = 'net tcp connections';
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
 
 require 'includes/html/graphs/generic_simplex.inc.php';

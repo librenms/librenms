@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.25868.1",
                     "sysDescr": "Last Mile Gear CTM",
-                    "sysContact": null,
-                    "version": "245.00",
-                    "hardware": "Last Mile Gear CTM",
-                    "features": null,
-                    "os": "ctm",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "ctm.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.25868.1",
-                    "sysDescr": "Last Mile Gear CTM",
                     "sysContact": "<private>",
                     "version": "245.00",
                     "hardware": "Last Mile Gear CTM",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

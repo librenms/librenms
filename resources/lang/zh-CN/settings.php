@@ -585,10 +585,6 @@ return [
                 'help' => '起用 PeeringDB lookup (资料将于由 daily.sh 进行下载)',
             ],
         ],
-        'perf_times_purge' => [
-            'description' => '轮询器效能记录项目大于 (天)',
-            'help' => 'Cleanup done by daily.sh',
-        ],
         'ping' => [
             'description' => 'ping 路径',
         ],

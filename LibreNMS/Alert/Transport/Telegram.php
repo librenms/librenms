@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -54,8 +54,7 @@ class Telegram extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $api); //FIXME: propper debuging
+            var_dump('Telegram returned Error'); //FIXME: propper debuging
             var_dump('Return: ' . $ret); //FIXME: propper debuging
 
             return 'HTTP Status code ' . $code . ', Body ' . $ret;

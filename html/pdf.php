@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
@@ -21,7 +22,7 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-set_debug(strpos($_SERVER['PATH_INFO'], 'debug'));
+Debug::set(strpos($_SERVER['PATH_INFO'], 'debug'));
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 

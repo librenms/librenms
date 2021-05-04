@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2011.2.239.1",
                     "sysDescr": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE12800 V200R002C50SPC800) \r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd. \r\nHUAWEICE12804",
-                    "sysContact": null,
-                    "version": "8.150 (V200R002C50SPC800) [patch]",
-                    "hardware": "CE12800",
-                    "features": null,
-                    "os": "vrp",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "huawei.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2011.2.239.1",
-                    "sysDescr": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE12800 V200R002C50SPC800) \r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd. \r\nHUAWEICE12804",
                     "sysContact": "<private>",
                     "version": "8.150 (V200R002C50SPC800) [patch]",
                     "hardware": "CE12800",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -24893,13 +24876,13 @@
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "stop",
+                    "bgpPeerAdminStatus": "",
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "192.168.189.96",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "PeerDesc1",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -24945,13 +24928,13 @@
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "stop",
+                    "bgpPeerAdminStatus": "",
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "192.168.189.96",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "PeerDesc1",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,

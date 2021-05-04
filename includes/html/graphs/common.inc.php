@@ -15,10 +15,6 @@ if ($_GET['width']) {
     $width = (int) $_GET['width'];
 }
 
-if (\LibreNMS\Config::get('trim_tobias')) {
-    $width += 12;
-}
-
 if ($_GET['height']) {
     $height = (int) $_GET['height'];
 }

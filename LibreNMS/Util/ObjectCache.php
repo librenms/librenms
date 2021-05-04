@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,10 +32,10 @@ use App\Models\Device;
 use App\Models\Mpls;
 use App\Models\OspfInstance;
 use App\Models\Port;
+use App\Models\PrinterSupply;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
-use App\Models\Toner;
 use App\Models\Vrf;
 use Cache;
 
@@ -98,7 +98,7 @@ class ObjectCache
                 ];
             }
 
-            if (Toner::hasAccess(auth()->user())->exists()) {
+            if (PrinterSupply::hasAccess(auth()->user())->exists()) {
                 $sensor_menu[3] = [
                     [
                         'class' => 'toner',

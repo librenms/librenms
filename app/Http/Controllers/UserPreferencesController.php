@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,8 +27,8 @@ namespace App\Http\Controllers;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
@@ -49,7 +49,7 @@ class UserPreferencesController extends Controller
      * Display a listing of the resource.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -94,7 +94,7 @@ class UserPreferencesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {

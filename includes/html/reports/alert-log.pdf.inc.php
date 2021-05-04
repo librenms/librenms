@@ -3,6 +3,9 @@
 $pdf->AddPage('L');
 $where = '1';
 
+$param = [];
+$data = [];
+
 if (is_numeric($_GET['device_id'])) {
     $where .= ' AND E.device_id = ?';
     $param[] = $_GET['device_id'];
@@ -21,13 +24,13 @@ if (Auth::user()->hasGlobalRead()) {
 }
 
 if (isset($_GET['start']) && is_numeric($_GET['start'])) {
-    $start = mres($_GET['start']);
+    $start = $_GET['start'];
 } else {
     $start = 0;
 }
 
 if (isset($_GET['results']) && is_numeric($_GET['results'])) {
-    $numresults = mres($_GET['results']);
+    $numresults = $_GET['results'];
 } else {
     $numresults = 250;
 }
@@ -35,7 +38,7 @@ if (isset($_GET['results']) && is_numeric($_GET['results'])) {
 $full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate $query LIMIT $start,$numresults";
 
 foreach (dbFetchRows($full_query, $param) as $alert_entry) {
-    $hostname = gethostbyid(mres($alert_entry['device_id']));
+    $hostname = gethostbyid($alert_entry['device_id']);
     $alert_state = $alert_entry['state'];
 
     if ($alert_state == '0') {

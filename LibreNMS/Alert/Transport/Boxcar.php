@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Boxcar API Transport
@@ -68,6 +68,9 @@ class Boxcar extends Transport
                     $data['notification[sound]'] = $api['sound_warning'];
                 }
                 break;
+            default:
+                $severity = 'Unknown';
+                break;
         }
         switch ($obj['state']) {
             case AlertState::RECOVERED:
@@ -76,12 +79,16 @@ class Boxcar extends Transport
                     $data['notification[sound]'] = $api['sound_ok'];
                 }
                 break;
-            case AlertState::Active:
+            case AlertState::ACTIVE:
                 $title_text = $severity;
                 break;
             case AlertState::ACKNOWLEDGED:
                 $title_text = 'Acknowledged';
                 break;
+            default:
+                $title_text = $severity;
+                break;
+
         }
         $data['notification[title]'] = $title_text . ' - ' . $obj['hostname'] . ' - ' . $obj['name'];
         $message_text = 'Timestamp: ' . $obj['timestamp'];

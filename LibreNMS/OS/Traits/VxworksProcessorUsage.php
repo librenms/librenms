@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -79,7 +79,7 @@ trait VxworksProcessorUsage
      * Parse the silly cpu usage string
      * "    5 Secs ( 96.4918%)   60 Secs ( 54.2271%)  300 Secs ( 38.2591%)"
      *
-     * @param $data
+     * @param string $data
      * @return mixed
      */
     private function parseCpuUsage($data)

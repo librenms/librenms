@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.31926",
                     "sysDescr": "EH-1200TL",
-                    "sysContact": null,
-                    "version": "3.7.6.24444 2018-07-19 15:13:12",
-                    "hardware": "EH-1200TL",
-                    "features": null,
-                    "os": "siklu",
-                    "type": "wireless",
-                    "serial": "F410060602",
-                    "icon": "siklu.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.31926",
-                    "sysDescr": "EH-1200TL",
                     "sysContact": "<private>",
                     "version": "3.7.6.24444 2018-07-19 15:13:12",
                     "hardware": "EH-1200TL",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

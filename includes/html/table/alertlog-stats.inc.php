@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -83,4 +83,4 @@ $output = [
     'rows' => $response,
     'total' => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

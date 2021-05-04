@@ -11,17 +11,17 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 *
 */
 
 require 'includes/html/graphs/common.inc.php';
-$rrd_filename = rrd_name($device['hostname'], 'riverbed_datastore');
+$rrd_filename = Rrd::name($device['hostname'], 'riverbed_datastore');
 
 $scale_min = 0;
 $colours = 'mixed';
@@ -40,7 +40,7 @@ $data_sources = [
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($data_sources as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

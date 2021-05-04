@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,7 +27,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
-use LibreNMS\Alert\AlertUtil;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -53,12 +53,13 @@ class DeviceController extends TableController
             'disable_notify' => 'nullable|in:0,1',
             'group' => 'nullable|int',
             'poller_group' => 'nullable|int',
+            'device_id' => 'nullable|int',
         ];
     }
 
     protected function filterFields($request)
     {
-        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location'];
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location', 'device_id' => 'device_id'];
     }
 
     protected function searchFields($request)
@@ -76,6 +77,7 @@ class DeviceController extends TableController
             'os' => 'os',
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
+            'device_id' => 'device_id',
         ];
     }
 
@@ -88,7 +90,7 @@ class DeviceController extends TableController
     protected function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
+        $query = Device::hasAccess($request->user())->with('location')->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
         if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
@@ -140,7 +142,7 @@ class DeviceController extends TableController
         return [
             'extra' => $this->getLabel($device),
             'status' => $this->getStatus($device),
-            'maintenance' => AlertUtil::isMaintenance($device->device_id),
+            'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),
@@ -149,6 +151,7 @@ class DeviceController extends TableController
             'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
             'location' => $this->getLocation($device),
             'actions' => $this->getActions($device),
+            'device_id' => $device->device_id,
         ];
     }
 
@@ -229,9 +232,9 @@ class DeviceController extends TableController
      */
     private function getMetrics($device)
     {
-        $port_count = $device->ports()->count();
-        $sensor_count = $device->sensors()->count();
-        $wireless_count = $device->wirelessSensors()->count();
+        $port_count = $device->ports_count;
+        $sensor_count = $device->sensors_count;
+        $wireless_count = $device->wirelessSensors_count;
 
         $metrics = [];
         if ($port_count) {
@@ -253,10 +256,10 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param $device
-     * @param $count
-     * @param $tab
-     * @param $icon
+     * @param int|Device $device
+     * @param mixed $count
+     * @param mixed $tab
+     * @param mixed $icon
      * @return string
      */
     private function formatMetric($device, $count, $tab, $icon)
@@ -301,7 +304,7 @@ class DeviceController extends TableController
 
         if ($server = Config::get('gateone.server')) {
             if (Config::get('gateone.use_librenms_user')) {
-                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . \Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
             } else {
                 $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
             }

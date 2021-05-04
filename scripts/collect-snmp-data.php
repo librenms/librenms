@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -23,6 +24,7 @@ $options = getopt(
         'file:',
         'debug',
         'snmpsim',
+        'full',
         'help',
     ]
 );
@@ -31,6 +33,12 @@ if (isset($options['snmpsim'])) {
     $snmpsim = new Snmpsim();
     $snmpsim->run();
     exit;
+}
+
+if (isset($options['v'])) {
+    $variant = $options['v'];
+} elseif (isset($options['variant'])) {
+    $variant = $options['variant'];
 }
 
 // check for hostname
@@ -59,27 +67,37 @@ if (isset($hostname)) {
     }
 }
 
-if (isset($options['help']) || empty($target_os)) {
+if (isset($options['help']) || empty($target_os) || ! isset($variant)) {
     echo 'Script to collect snmp data from devices to be used for testing.
 Snmp data is saved in tests/snmpsim.
 
 Usage:
   You must specify an existing device to collect data from.
-Required
+
+Required:
   -h, --hostname     ID, IP, or hostname of the device to collect data from
+  -v, --variant      The variant of the OS to use, usually the device model
+
 Optional:
   -m, --modules      The discovery/poller module(s) to collect data for, comma delimited
   -n, --prefer-new   Prefer new snmprec data over existing data
   -o, --os           Name of the OS to save test data for (only used if device is generic)
-  -v, --variant      The variant of the OS to use, usually the device model
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
       --snmpsim      Run snmpsimd.py using the collected data for manual testing.
+      --full         Walk the whole device (default: only used OIDs)
+                     Useful when adding device support when you don\'t have access to it directly,
+                     or when discovery/poller causes errors when capturing normally.
+                     Do NOT use this to submit test data!
+
+Examples:
+  ./collect-snmp-data.php -h 192.168.0.1 -v 2960x
+  ./collect-snmp-data.php -h 127.0.0.1 -v freeradius -m applications
 ';
     exit;
 }
 
-$debug = (isset($options['d']) || isset($options['debug']));
+Debug::set(isset($options['d']) || isset($options['debug']));
 
 if (isset($options['m'])) {
     $modules_input = $options['m'];
@@ -90,13 +108,6 @@ if (isset($options['m'])) {
 } else {
     $modules_input = 'all';
     $modules = [];
-}
-
-$variant = '';
-if (isset($options['v'])) {
-    $variant = $options['v'];
-} elseif (isset($options['variant'])) {
-    $variant = $options['variant'];
 }
 
 if (Str::contains($variant, '_')) {
@@ -120,10 +131,11 @@ try {
     }
 
     $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
+    $full = isset($options['full']);
 
     echo 'Capturing Data: ';
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
-    $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
+    $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec, $full);
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;
 }

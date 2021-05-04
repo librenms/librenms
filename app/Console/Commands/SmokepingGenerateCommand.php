@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -124,6 +124,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     public function buildTargetsConfiguration($devices)
     {
         // Take the devices array and build it into a hierarchical list
+        $smokelist = [];
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
         }
@@ -222,7 +223,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Determine if a list of targets is needed, and write one if so
      *
-     * @param array $devices A list of devices to create a a config block for
+     * @param array $smokelist A list of devices to create a a config block for
      *
      * @return array
      */

@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -69,7 +69,7 @@ class Availability
      * @param object $found_outages filtered database object with all recorded outages
      * @param int $duration time period to calculate for
      * @param int $now timestamp for 'now'
-     * @return sum of all matching outages in seconds
+     * @return int sum of all matching outages in seconds
      */
     protected static function outageSummary($found_outages, $duration, $now = null)
     {

@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -34,7 +34,7 @@ class Template
     /**
      * Get the template details
      *
-     * @param null $obj
+     * @param array|null $obj
      * @return mixed
      */
     public function getTemplate($obj = null)
@@ -66,7 +66,7 @@ class Template
     /**
      * Parse Blade body
      *
-     * @param $data
+     * @param array $data
      * @return string
      */
     public function bladeBody($data)
@@ -82,7 +82,7 @@ class Template
     /**
      * Parse Blade title
      *
-     * @param $data
+     * @param array $data
      * @return string
      */
     public function bladeTitle($data)

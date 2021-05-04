@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Device;
-use App\Models\Location;
 
 require_once 'includes/html/modal/device_maintenance.inc.php';
 
@@ -16,15 +15,12 @@ if ($_POST['editing']) {
         }
 
         $override_sysLocation = (int) isset($_POST['override_sysLocation']);
-        $override_sysLocation_string = isset($_POST['sysLocation']) ? $_POST['sysLocation'] : null;
+        $override_sysLocation_string = $_POST['sysLocation'] ?? null;
 
         if ($override_sysLocation) {
-            if ($override_sysLocation_string) {
-                $location = Location::firstOrCreate(['location' => $override_sysLocation_string]);
-                $device_model->location()->associate($location);
-            } else {
-                $device_model->location()->dissociate();
-            }
+            $device_model->override_sysLocation = false;  // allow override (will be set to actual value later)
+            $device_model->setLocation($override_sysLocation_string, true);
+            optional($device_model->location)->save();
         } elseif ($device_model->override_sysLocation) {
             // no longer overridden, clear location
             $device_model->location()->dissociate();
@@ -70,9 +66,9 @@ if ($_POST['editing']) {
             }
         }
 
-        $override_sysContact_bool = mres($_POST['override_sysContact']);
+        $override_sysContact_bool = $_POST['override_sysContact'];
         if (isset($_POST['sysContact'])) {
-            $override_sysContact_string = mres($_POST['sysContact']);
+            $override_sysContact_string = $_POST['sysContact'];
         }
 
         if ($override_sysContact_bool) {
@@ -97,21 +93,25 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
 
 <h3> Device Settings </h3>
 <div class="row">
-    <div class="col-md-1 col-md-offset-2">
+    <!-- Bootstrap 3 doesn't support mediaqueries for text aligns (e.g. text-md-left), which makes these buttons stagger on sm or xs screens -->
+    <div class="col-md-2 col-md-offset-2">
         <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
             <?php echo csrf_field() ?>
             <input type="hidden" name="id" value="<?php echo $device['device_id']; ?>">
             <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
         </form>
     </div>
-    <div class="col-md-1 col-md-offset-2">
+    <div class="col-md-2 text-center">
         <?php
         if (\LibreNMS\Config::get('enable_clear_discovery') == 1 && ! $device['snmp_disable']) {
             ?>
-            <button type="submit" id="rediscover" data-device_id="<?php echo $device['device_id']; ?>" class="btn btn-primary" name="rediscover"><i class="fa fa-retweet"></i> Rediscover device</button>
+            <button type="submit" id="rediscover" data-device_id="<?php echo $device['device_id']; ?>" class="btn btn-primary" name="rediscover" title="Schedule the device for immediate rediscovery by the poller"><i class="fa fa-retweet"></i> Rediscover device</button>
             <?php
         }
         ?>
+    </div>
+    <div class="col-md-2 text-right">
+        <button type="submit" id="reset_port_state" data-device_id="<?php echo $device['device_id']; ?>" class="btn btn-info" name="reset_ports"          <button type="submit" id="reset_port_state" data-device_id="<?php echo $device['device_id']; ?>" class="btn btn-info" name="reset_ports" title="Reset interface speed, admin up/down, and link up/down history, clearing associated alarms"><i class="fa fa-recycle"></i> Reset Port State</button>
     </div>
 </div>
 <br>
@@ -121,7 +121,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo display($device['hostname']); ?> />
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo \LibreNMS\Util\Clean::html($device['hostname'], []); ?> />
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
@@ -136,7 +136,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
      <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <textarea id="descr" name="descr" class="form-control"><?php echo display($device_model->purpose); ?></textarea>
+            <textarea id="descr" name="descr" class="form-control"><?php echo \LibreNMS\Util\Clean::html($device_model->purpose, []); ?></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -185,7 +185,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
                 if (! $device_model->override_sysLocation) {
                     echo ' disabled="1"';
                 }
-                ?> value="<?php echo display($device_model->location); ?>" />
+                ?> value="<?php echo \LibreNMS\Util\Clean::html($device_model->location, []); ?>" />
         </div>
     </div>
     <div class="form-group">
@@ -216,7 +216,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group">
         <label for="parent_id" class="col-sm-2 control-label">This device depends on:</label>
         <div class="col-sm-6">
-            <select multiple name="parent_id[]" id="parent_id" class="form-control">
+            <select multiple name="parent_id[]" id="parent_id" class="form-control" style="width: 100%">
                 <?php
                 $dev_parents = dbFetchColumn('SELECT device_id from devices WHERE device_id IN (SELECT dr.parent_device_id from devices as d, device_relationships as dr WHERE d.device_id = dr.child_device_id AND d.device_id = ?)', [$device['device_id']]);
                 if (! $dev_parents) {
@@ -335,6 +335,25 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             }
         });
     });
+    $("#reset_port_state").click(function() {
+        var device_id = $(this).data("device_id");
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "reset-port-state", device_id: device_id },
+            dataType: "json",
+            success: function(data){
+                if(data['status'] == 'ok') {
+                    toastr.success(data['message']);
+                } else {
+                    toastr.error(data['message']);
+                }
+            },
+            error:function(){
+                toastr.error('An error occured while attempting to reset port state alarms');
+            }
+        });
+    });
     $('#hostname-edit-button').click(function(e) {
         e.preventDefault();
         disabled_state = document.getElementById('edit-hostname-input').disabled;
@@ -356,8 +375,8 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 </script>
 <?php
 print_optionbar_start();
-[$sizeondisk, $numrrds] = foldersize(get_rrd_dir($device['hostname']));
-echo 'Size on Disk: <b>' . formatStorage($sizeondisk) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
+[$sizeondisk, $numrrds] = foldersize(Rrd::dirFromHost($device['hostname']));
+echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 3) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
 echo ' | Last polled: <b>' . $device['last_polled'] . '</b>';
 if ($device['last_discovered']) {
     echo ' | Last discovered: <b>' . $device['last_discovered'] . '</b>';

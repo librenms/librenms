@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -70,6 +70,9 @@ class OutagesController extends TableController
             });
     }
 
+    /**
+     * @param DeviceOutage $outage
+     */
     public function formatItem($outage)
     {
         $start = $this->formatDatetime($outage->going_down);

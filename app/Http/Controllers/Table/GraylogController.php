@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -144,7 +144,7 @@ class GraylogController extends SimpleTableController
 
     /**
      * Cache device lookups so we don't lookup for every entry
-     * @param $source
+     * @param mixed $source
      * @return mixed
      */
     private function deviceFromSource($source)

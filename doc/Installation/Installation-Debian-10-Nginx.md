@@ -57,7 +57,7 @@ mysql -uroot -p
 > NOTE: Please change the 'password' below to something secure.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
@@ -84,7 +84,7 @@ service mysql restart
 ## Configure and Start PHP-FPM
 
 Ensure date.timezone is set in php.ini to your preferred time zone.
-See <http://php.net/manual/en/timezones.php> for a list of supported
+See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 
@@ -116,6 +116,11 @@ server {
  charset utf-8;
  gzip on;
  gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+
+ proxy_read_timeout 300;
+ proxy_connect_timeout 300;
+ proxy_send_timeout 300;
+
  location / {
   try_files $uri $uri/ /index.php?$query_string;
  }

@@ -15,7 +15,7 @@ $config['rrdtool_version'] = '1.5.5';
 This setting has to be the exact version of rrdtool you are running. 
 
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
-or over, in addition to your rrdcached version.
+or newer, in addition to your rrdcached version.
 
 # Distributed Poller Support Matrix
 

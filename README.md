@@ -1,6 +1,4 @@
-[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master)
-[![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.com/librenms/librenms)
+[![Test Status](https://github.com/librenms/librenms/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/librenms/librenms/actions/workflows/test.yml?query=event%3Apush+branch%3Amaster)
 
 Introduction
 ------------
@@ -55,7 +53,7 @@ License
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
-Copyright (C) 2013-2020 by individual LibreNMS contributors
+Copyright (C) 2013-2021 by individual LibreNMS contributors
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -68,7 +66,7 @@ Copyright (C) 2013-2020 by individual LibreNMS contributors
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [LICENSE.txt][14] contains a copy of the full GPLv3 licensing conditions.
 
@@ -91,7 +89,7 @@ exception):
 [7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
-[11]: http://www.librenms.org/#downloads
+[11]: https://www.librenms.org/#downloads
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: https://docs.librenms.org/General/Contributing/
@@ -138,7 +136,7 @@ Support us with a monthly donation and help us continue our activities. [[Become
 
 ## Sponsors
 
-Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/librenms#sponsor)]
+Become a sponsor and get your logo on our README on GitHub with a link to your site. [[Become a sponsor](https://opencollective.com/librenms#sponsor)]
 
 <a href="https://opencollective.com/librenms/sponsor/0/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/0/avatar.svg"></a>
 <a href="https://opencollective.com/librenms/sponsor/1/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/1/avatar.svg"></a>

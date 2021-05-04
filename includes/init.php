@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,6 +28,7 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 global $vars, $console_color;
 
@@ -55,7 +56,6 @@ if (! function_exists('module_selected')) {
 // function only files
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
-require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
@@ -91,7 +91,7 @@ if (module_selected('web', $init_modules)) {
     \LibreNMS\Util\Laravel::bootCli();
 }
 
-set_debug(false); // disable debug initially (hides legacy errors too)
+Debug::set(false); // disable debug initially (hides legacy errors too)
 
 if (! module_selected('nodb', $init_modules)) {
     \LibreNMS\DB\Eloquent::boot();

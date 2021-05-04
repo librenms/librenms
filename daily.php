@@ -11,6 +11,7 @@ use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Validations\Php;
 
 $init_modules = ['alerts'];
@@ -21,7 +22,7 @@ $options = getopt('df:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
-    $debug = true;
+    Debug::set();
 }
 
 if ($options['f'] === 'update') {
@@ -100,11 +101,6 @@ if ($options['f'] === 'eventlog') {
 
 if ($options['f'] === 'authlog') {
     $ret = lock_and_purge('authlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
-    exit($ret);
-}
-
-if ($options['f'] === 'perf_times') {
-    $ret = lock_and_purge('perf_times', 'start < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))');
     exit($ret);
 }
 

@@ -18,7 +18,9 @@ if (Config::get('enable_bgp')) {
         $vrfs_lite_cisco = [['context_name'=>'']];
     }
 
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+    if (empty($bgpLocalAs)) {
+        $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+    }
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];
@@ -76,6 +78,8 @@ if (Config::get('enable_bgp')) {
                         }
                     } elseif ($device['os_group'] === 'arista') {
                         $af_data = snmpwalk_cache_oid($device, 'aristaBgp4V2PrefixInPrefixes', $af_data, 'ARISTA-BGP4V2-MIB');
+                    } elseif ($device['os'] === 'aos7') {
+                        $af_data = snmpwalk_cache_oid($device, 'alaBgpPeerRcvdPrefixes', $af_data, 'ALCATEL-IND1-BGP-MIB');
                     }
                 }
 

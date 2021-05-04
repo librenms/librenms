@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * API Transport
@@ -143,7 +143,9 @@ class Sensu extends Transport
             'librenms-device-id' => strval($obj['device_id']),
             'librenms-rule-id' => strval($obj['rule_id']),
             'librenms-status-reason' => $obj['status_reason'],
-        ], 'strlen'); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
+        ], function (string $s): bool {
+            return (bool) strlen($s); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
+        });
     }
 
     public static function calculateStatus($state, $severity)

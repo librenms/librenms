@@ -63,6 +63,7 @@ $run_sensors = [
     'state',
     'count',
     'temperature',
+    'tv_signal',
     'voltage',
     'snr',
     'pressure',

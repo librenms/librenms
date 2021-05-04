@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.21013.1.188",
                     "sysDescr": "Xirrus XD4-130 WiFi Array",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "xirrus_aos",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "xirrus.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.21013.1.188",
-                    "sysDescr": "Xirrus XD4-130 WiFi Array",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

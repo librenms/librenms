@@ -1,7 +1,7 @@
 <?php
 
-$rrd_filename_in = rrd_name($device['hostname'], 'ucd_ssRawSwapIn');
-$rrd_filename_out = rrd_name($device['hostname'], 'ucd_ssRawSwapOut');
+$rrd_filename_in = Rrd::name($device['hostname'], 'ucd_ssRawSwapIn');
+$rrd_filename_out = Rrd::name($device['hostname'], 'ucd_ssRawSwapOut');
 $ds_in = 'value';
 $ds_out = 'value';
 

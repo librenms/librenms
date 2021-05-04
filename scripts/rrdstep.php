@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -59,7 +59,7 @@ $tmp_path = Config::get('temp_dir', '/tmp');
 if ($hostname === 'all') {
     $hostname = '*';
 }
-$files = glob(get_rrd_dir($hostname) . '/*.rrd');
+$files = glob(Rrd::dirFromHost($hostname) . '/*.rrd');
 
 $converted = 0;
 $skipped = 0;
@@ -99,8 +99,8 @@ foreach ($files as $file) {
     }
 
     echo "Converting $file: ";
-    $command = "$rrdtool dump $file > $random && 
-        sed -i 's/<step>\([0-9]*\)/<step>$step/' $random && 
+    $command = "$rrdtool dump $file > $random &&
+        sed -i 's/<step>\([0-9]*\)/<step>$step/' $random &&
         sed -i 's/<minimal_heartbeat>\([0-9]*\)/<minimal_heartbeat>$heartbeat/' $random &&
         $rrdtool restore -f $random $file &&
         rm -f $random";

@@ -12,8 +12,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+use LibreNMS\Util\Debug;
 
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
@@ -22,7 +24,7 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-set_debug($_REQUEST['debug']);
+Debug::set($_REQUEST['debug']);
 
 /**
  * Levenshtein Sort
@@ -56,7 +58,7 @@ function levsortos($base, $obj, $keys)
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
     \LibreNMS\Util\OS::loadAllDefinitions(false, true);
-    $_GET['term'] = clean($_GET['term']);
+    $_GET['term'] = strip_tags($_GET['term']);
     $sortos = levsortos($_GET['term'], \LibreNMS\Config::get('os'), ['text', 'os']);
     $sortos = array_slice($sortos, 0, 20);
     foreach ($sortos as $lev => $os) {

@@ -13,14 +13,16 @@ return [
     'config:set' => [
         'description' => 'Set configuration value (or unset)',
         'arguments' => [
-            'setting' => 'setting to set in dot notation (example: snmp.community.0)',
+            'setting' => 'setting to set in dot notation (example: snmp.community.0) To append to an array suffix with .+',
             'value' => 'value to set, unset setting if this is omitted',
         ],
         'options' => [
             'ignore-checks' => 'Ignore all safety checks',
         ],
         'confirm' => 'Reset :setting to the default?',
+        'forget_from' => 'Forget :path from :parent?',
         'errors' => [
+            'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
             'invalid' => 'This is not a valid setting. Please check your spelling',
             'nodb' => 'Database is not connected',
@@ -42,6 +44,20 @@ return [
             'quiet' => 'Hide output unless there is an error',
             'snmpsim' => 'Use snmpsim for unit tests',
         ],
+    ],
+    'dev:simulate' => [
+        'description' => 'Simulate devices using test data',
+        'arguments' => [
+            'file' => 'The file name (only base name) of the snmprec file to update or add to LibreNMS. If file not specified, no device will be added or updated.',
+        ],
+        'options' => [
+            'multiple' => 'Use community name for hostname instead of snmpsim',
+            'remove' => 'Remove the device after stopping',
+        ],
+        'added' => 'Device :hostname (:id) added',
+        'exit' => 'Ctrl-C to stop',
+        'removed' => 'Device :id removed',
+        'updated' => 'Device :hostname (:id) updated',
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',

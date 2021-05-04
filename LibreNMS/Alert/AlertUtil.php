@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -35,7 +35,7 @@ class AlertUtil
     /**
      * Get the rule_id for a specific alert
      *
-     * @param $alert_id
+     * @param int $alert_id
      * @return mixed|null
      */
     private static function getRuleId($alert_id)
@@ -48,7 +48,7 @@ class AlertUtil
     /**
      * Get the transport for a given alert_id
      *
-     * @param $alert_id
+     * @param int $alert_id
      * @return array
      */
     public static function getAlertTransports($alert_id)
@@ -221,7 +221,7 @@ class AlertUtil
      */
     public static function runMacros($rule, $x = 1)
     {
-        $macros = Config::get('alert.macros.rule', []) .
+        $macros = Config::get('alert.macros.rule', []);
         krsort($macros);
         foreach ($macros as $macro => $value) {
             if (! strstr($macro, ' ')) {

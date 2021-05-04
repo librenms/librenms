@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -182,7 +182,7 @@ class FileCategorizerTest extends TestCase
     public function testFullChecks()
     {
         $this->assertCategorized(['full-checks' => ['composer.lock']]);
-        $this->assertCategorized(['full-checks' => ['.travis.yml']], ['other', '.travis.yml']);
+        $this->assertCategorized(['full-checks' => ['.github/workflows/test.yml']], ['other', '.github/workflows/test.yml']);
 
         $this->assertCategorized([
             'os' => ['3com', 'calix', 'ptp650', 'dd-wrt', 'arista_eos'],

@@ -1,0 +1,327 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
+			count: 2
+			path: LibreNMS/Alert/Template.php
+
+		-
+			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, string\\> given\\.$#"
+			count: 2
+			path: LibreNMS/Alert/Template.php
+
+		-
+			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
+			count: 1
+			path: LibreNMS/Alerting/QueryBuilderParser.php
+
+		-
+			message: "#^Parameter \\#1 \\$ldap of function ldap_error expects resource, false given\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: "#^Parameter \\#1 \\$ldap of function ldap_error expects resource, false given\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: "#^If condition is always false\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/MysqlAuthorizer.php
+
+		-
+			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/MysqlAuthorizer.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/MysqlAuthorizer.php
+
+		-
+			message: "#^Parameter \\#2 \\$password of method LibreNMS\\\\Authentication\\\\MysqlAuthorizer\\:\\:addUser\\(\\) expects string, null given\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/SSOAuthorizer.php
+
+		-
+			message: "#^Parameter \\#1 \\$num of function base_convert expects string, int given\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/TwoFactor.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
+			count: 1
+			path: LibreNMS/Authentication/TwoFactor.php
+
+		-
+			message: "#^Call to function is_null\\(\\) with Illuminate\\\\Database\\\\Capsule\\\\Manager will always evaluate to false\\.$#"
+			count: 2
+			path: LibreNMS/DB/Eloquent.php
+
+		-
+			message: "#^Call to function is_null\\(\\) with PDO will always evaluate to false\\.$#"
+			count: 1
+			path: LibreNMS/DB/Eloquent.php
+
+		-
+			message: "#^Result of && is always false\\.$#"
+			count: 1
+			path: LibreNMS/DB/Eloquent.php
+
+		-
+			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: LibreNMS/Data/Store/OpenTSDB.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: LibreNMS/Data/Store/OpenTSDB.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
+			count: 1
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
+			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onCreate\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onDelete\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:calculateAvailable\\(\\) never returns void so it can be removed from the return typehint\\.$#"
+			count: 1
+			path: LibreNMS/Modules/Mempools.php
+
+		-
+			message: "#^Variable \\$lsps might not be defined\\.$#"
+			count: 1
+			path: LibreNMS/Modules/Mpls.php
+
+		-
+			message: "#^Variable \\$paths might not be defined\\.$#"
+			count: 2
+			path: LibreNMS/Modules/Mpls.php
+
+		-
+			message: "#^Variable \\$sdps might not be defined\\.$#"
+			count: 1
+			path: LibreNMS/Modules/Mpls.php
+
+		-
+			message: "#^Variable \\$svcs might not be defined\\.$#"
+			count: 2
+			path: LibreNMS/Modules/Mpls.php
+
+		-
+			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
+			count: 2
+			path: LibreNMS/OS/ArrisDsr4410md.php
+
+		-
+			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
+			count: 1
+			path: LibreNMS/OS/Comware.php
+
+		-
+			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
+			count: 3
+			path: LibreNMS/OS/HarmonyEnhanced.php
+
+		-
+			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
+			count: 1
+			path: LibreNMS/OS/Ios.php
+
+		-
+			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
+			count: 1
+			path: LibreNMS/OS/Routeros.php
+
+		-
+			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
+			count: 3
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: "#^Variable \\$index might not be defined\\.$#"
+			count: 2
+			path: LibreNMS/OS/SmOs.php
+
+		-
+			message: "#^Offset 'sonicCurrentConnCac…' does not exist on string\\.$#"
+			count: 1
+			path: LibreNMS/OS/Sonicwall.php
+
+		-
+			message: "#^Offset 'sonicMaxConnCacheEn…' does not exist on string\\.$#"
+			count: 1
+			path: LibreNMS/OS/Sonicwall.php
+
+		-
+			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, string given\\.$#"
+			count: 1
+			path: LibreNMS/OS/Timos.php
+
+		-
+			message: "#^Parameter \\#9 \\$divisor of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, string given\\.$#"
+			count: 1
+			path: LibreNMS/OS/Timos.php
+
+		-
+			message: "#^Variable \\$mplsTunnelARHopIndex in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 2
+			path: LibreNMS/OS/Timos.php
+
+		-
+			message: "#^Variable \\$mplsTunnelARHopListIndex in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 2
+			path: LibreNMS/OS/Timos.php
+
+		-
+			message: "#^Variable \\$sdp_oid in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 2
+			path: LibreNMS/OS/Timos.php
+
+		-
+			message: "#^Variable \\$svc_oid in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 2
+			path: LibreNMS/OS/Timos.php
+
+		-
+			message: "#^Parameter \\#5 \\$reference of static method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) expects int\\|null, string given\\.$#"
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/BgpBackwardTransition.php
+
+		-
+			message: "#^Parameter \\#5 \\$reference of static method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) expects int\\|null, string given\\.$#"
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/BgpEstablished.php
+
+		-
+			message: "#^Comparison operation \"\\>\" between int\\<1001, max\\> and 1000 is always true\\.$#"
+			count: 1
+			path: LibreNMS/Validations/Database.php
+
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
+			count: 1
+			path: app/Console/LnmsCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
+			count: 1
+			path: app/Http/Controllers/DeviceController.php
+
+		-
+			message: "#^Call to function is_null\\(\\) with PDO will always evaluate to false\\.$#"
+			count: 1
+			path: app/Http/Controllers/Install/DatabaseController.php
+
+		-
+			message: "#^Ternary operator condition is always false\\.$#"
+			count: 1
+			path: app/Http/Controllers/LegacyController.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\ServiceTemplate\\:\\:hasAccess\\(\\)\\.$#"
+			count: 1
+			path: app/Http/Controllers/Select/ServiceTemplateController.php
+
+		-
+			message: "#^Cannot call method only\\(\\) on array\\<string, string\\>\\.$#"
+			count: 1
+			path: app/Http/Controllers/ServiceController.php
+
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
+			count: 2
+			path: app/Listeners/AuthEventListener.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
+			count: 1
+			path: app/Models/DeviceRelatedModel.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: app/Providers/LegacyUserProvider.php
+
+		-
+			message: "#^Parameter \\#4 \\$transport of function addHost expects string, int given\\.$#"
+			count: 1
+			path: tests/AddHostTest.php
+
+		-
+			message: "#^Parameter \\#5 \\$poller_group of function addHost expects string, int given\\.$#"
+			count: 4
+			path: tests/AddHostTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$username of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
+			count: 1
+			path: tests/AuthHTTPTest.php
+
+		-
+			message: "#^Parameter \\#2 \\$newpassword of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
+			count: 1
+			path: tests/AuthHTTPTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
+			count: 2
+			path: tests/AuthSSOTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, null given\\.$#"
+			count: 2
+			path: tests/AuthSSOTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$username of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
+			count: 1
+			path: tests/AuthSSOTest.php
+
+		-
+			message: "#^Parameter \\#2 \\$newpassword of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
+			count: 1
+			path: tests/AuthSSOTest.php
+
+		-
+			message: "#^Parameter \\#2 \\$default of function set_null expects null, int given\\.$#"
+			count: 2
+			path: tests/CommonFunctionsTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$os of static method LibreNMS\\\\Config\\:\\:getOsSetting\\(\\) expects string, null given\\.$#"
+			count: 1
+			path: tests/ConfigTest.php
+
+		-
+			message: "#^Parameter \\#3 \\$default of static method LibreNMS\\\\Config\\:\\:getCombined\\(\\) expects array, false given\\.$#"
+			count: 2
+			path: tests/ConfigTest.php
+
+		-
+			message: "#^Parameter \\#3 \\$default of static method LibreNMS\\\\Config\\:\\:getCombined\\(\\) expects array, true given\\.$#"
+			count: 1
+			path: tests/ConfigTest.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: tests/TestCase.php
+
+		-
+			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
+			count: 1
+			path: tests/Unit/LocationTest.php
+

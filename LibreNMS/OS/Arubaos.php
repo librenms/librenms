@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -87,7 +87,7 @@ class Arubaos extends OS implements
         $sensors = [];
 
         foreach ($data as $key => $value) {
-            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On', null);
+            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On');
             $value = intval($value);
 
             $low_warn_const = 1; // Default warning threshold = 1 down AP
@@ -160,7 +160,7 @@ class Arubaos extends OS implements
 
     protected function decodeChannel($channel)
     {
-        return $channel & 255; // mask off the channel width information
+        return cast_number($channel) & 255; // mask off the channel width information
     }
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')

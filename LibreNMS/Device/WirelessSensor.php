@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -200,6 +200,12 @@ class WirelessSensor extends Sensor
             'distance' => [
                 'icon' => 'space-shuttle',
             ],
+            'cell' => [
+                'icon' => 'line-chart',
+            ],
+            'channel' => [
+                'icon' => 'line-chart',
+            ],
         ];
 
         if ($valid) {
@@ -242,7 +248,7 @@ class WirelessSensor extends Sensor
     /**
      * Convert a WiFi channel to a Frequency in MHz
      *
-     * @param $channel
+     * @param int $channel
      * @return int
      */
     public static function channelToFrequency($channel)

@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Original code:
@@ -24,7 +24,7 @@
  * @license GPL
  *
  * Modified by:
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -36,8 +36,8 @@ use LibreNMS\Alerting\QueryBuilderParser;
 class AlertDB
 {
     /**
-     * @param $rule
-     * @param $query_builder
+     * @param string $rule
+     * @param mixed $query_builder
      * @return bool|string
      */
     public static function genSQL($rule, $query_builder = false)
@@ -70,7 +70,7 @@ class AlertDB
             if (strstr($opt, '%') && strstr($opt, '.')) {
                 $tmpp = explode('.', $opt, 2);
                 $tmpp[0] = str_replace('%', '', $tmpp[0]);
-                $tables[] = mres(str_replace('(', '', $tmpp[0]));
+                $tables[] = str_replace('(', '', $tmpp[0]);
                 $rule = str_replace($opt, $tmpp[0] . '.' . $tmpp[1], $rule);
             }
         }

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @license GPL
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @copyright  2017 Tony Murray
@@ -162,7 +162,7 @@ class TwoFactor
      * Generate HOTP (RFC 4226)
      * @param string $key Secret Key
      * @param int|bool $counter Optional Counter, Defaults to Timestamp
-     * @return int
+     * @return string
      */
     private static function oathHOTP($key, $counter = false)
     {

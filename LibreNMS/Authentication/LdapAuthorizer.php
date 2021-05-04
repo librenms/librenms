@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
+use ErrorException;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
@@ -75,7 +76,7 @@ class LdapAuthorizer extends AuthorizerBase
             $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
             if ($entries['count']) {
-                return 1;
+                return true;
             }
         } catch (AuthenticationException $e) {
             if ($throw_exception) {
@@ -83,9 +84,15 @@ class LdapAuthorizer extends AuthorizerBase
             } else {
                 echo $e->getMessage() . PHP_EOL;
             }
+        } catch (ErrorException $e) {
+            if ($throw_exception) {
+                throw new AuthenticationException('Could not verify user', false, 0, $e);
+            } else {
+                echo $e->getMessage() . PHP_EOL;
+            }
         }
 
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)
@@ -227,7 +234,7 @@ class LdapAuthorizer extends AuthorizerBase
             return $user;
         }
 
-        return 0;
+        return false;
     }
 
     protected function getMembername($username)

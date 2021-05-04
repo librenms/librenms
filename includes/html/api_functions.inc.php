@@ -16,8 +16,10 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
+use App\Models\ServiceTemplate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -79,8 +81,7 @@ function api_get_graph(array $vars)
 {
     global $dur;        // Needed for callback within graph code
 
-    $auth = '1';
-    $base64_output = '';
+    $auth = true;
 
     // prevent ugly error for undefined graphs from being passed to the user
     [$type, $subtype] = extract_graph_type($vars['type']);
@@ -97,10 +98,10 @@ function api_get_graph(array $vars)
     ob_end_clean();
 
     if ($vars['output'] === 'base64') {
-        return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+        return api_success(['image' => $image, 'content-type' => get_image_type(Config::get('webui.graph_type'))], 'image');
     }
 
-    return response($image, 200, ['Content-Type' => get_image_type()]);
+    return response($image, 200, ['Content-Type' => get_image_type(Config::get('webui.graph_type'))]);
 }
 
 function check_bill_permission($bill_id, $callback)
@@ -183,12 +184,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = formatRates($in_rate);
-        $port['out_rate'] = formatRates($out_rate);
+        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($in_rate, 2, 3, 'bps');
+        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($out_rate, 2, 3, 'bps');
         $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
         $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
-        $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
+        $port['in_pps'] = \LibreNMS\Util\Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
+        $port['out_pps'] = \LibreNMS\Util\Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -967,7 +968,7 @@ function get_port_info(Illuminate\Http\Request $request)
 
     return check_port_permission($port_id, null, function ($port_id) {
         // use hostname as device_id if it's all digits
-        $port = dbFetchRows('SELECT * FROM `ports` WHERE `port_id` = ? AND `deleted` = 0', [$port_id]);
+        $port = dbFetchRows('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
 
         return api_success($port, 'port');
     });
@@ -1344,8 +1345,8 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     $devices = [];
-    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types')) . "'";
-    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os')) . "'";
+    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types', [])) . "'";
+    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os', [])) . "'";
 
     $sql = '';
     $params = [];
@@ -1383,6 +1384,8 @@ function list_oxidized(Illuminate\Http\Request $request)
 
         // We remap certain device OS' that have different names with Oxidized models
         $models = [
+            'airos-af-ltu' => 'airfiber',
+            'airos-af'   => 'airfiber',
             'arista_eos' => 'eos',
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
@@ -1455,15 +1458,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = format_si($bill['bill_cdr']) . 'bps';
-            $used = format_si($rate_data['rate_95th']) . 'bps';
+            $allowed = \LibreNMS\Util\Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
+            $used = \LibreNMS\Util\Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : format_si($overuse));
+            $overuse = (($overuse <= 0) ? '-' : \LibreNMS\Util\Number::formatSi($overuse, 2, 3, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used = format_bytes_billing($rate_data['total_data']);
@@ -1841,6 +1844,41 @@ function rename_device(Illuminate\Http\Request $request)
             return api_error(500, 'Device failed to be renamed');
         }
     }
+}
+
+function add_port_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'name' => 'required|string|unique:port_groups',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $portGroup = PortGroup::make(['name' => $data['name'], 'desc' => $data['desc']]);
+    $portGroup->save();
+
+    return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
+}
+
+function get_port_groups(Illuminate\Http\Request $request)
+{
+    $query = PortGroup::query();
+
+    $groups = $query->orderBy('name')->get();
+
+    if ($groups->isEmpty()) {
+        return api_error(404, 'No port groups found');
+    }
+
+    return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
 function add_device_group(Illuminate\Http\Request $request)
@@ -2235,18 +2273,22 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
         $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.`device_id` as `host`, `eventlog`.*'; // inject host for backward compat
         $timestamp = 'datetime';
+        $id_field = 'event_id';
     } elseif ($type === 'list_syslog') {
         $query = ' FROM syslog LEFT JOIN `devices` ON `syslog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `syslog`.*';
         $timestamp = 'timestamp';
+        $id_field = 'seq';
     } elseif ($type === 'list_alertlog') {
         $query = ' FROM alert_log LEFT JOIN `devices` ON `alert_log`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `alert_log`.*';
         $timestamp = 'time_logged';
+        $id_field = 'id';
     } elseif ($type === 'list_authlog') {
         $query = ' FROM authlog WHERE 1';
         $full_query = 'SELECT `authlog`.*';
         $timestamp = 'datetime';
+        $id_field = 'id';
     } else {
         $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.*';
@@ -2264,12 +2306,20 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     }
 
     if ($from) {
-        $query .= " AND $timestamp >= ?";
+        if (is_numeric($from)) {
+            $query .= " AND $id_field >= ?";
+        } else {
+            $query .= " AND $timestamp >= ?";
+        }
         $param[] = $from;
     }
 
     if ($to) {
-        $query .= " AND $timestamp <= ?";
+        if (is_numeric($to)) {
+            $query .= " AND $id_field <= ?";
+        } else {
+            $query .= " AND $timestamp <= ?";
+        }
         $param[] = $to;
     }
 
@@ -2316,6 +2366,57 @@ function missing_fields($required_fields, $data)
     return false;
 }
 
+function add_service_template_for_device_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'name' => 'required|string|unique:service_templates',
+        'device_group_id' => 'integer',
+        'type' => 'string',
+        'param' => 'nullable|string',
+        'ip' => 'nullable|string',
+        'desc' => 'nullable|string',
+        'changed' => 'integer',
+        'disabled' => 'integer',
+        'ignore' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    // Only use the rules if they are able to be parsed by the QueryBuilder
+    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+    if (empty($query)) {
+        return api_error(500, "We couldn't parse your rule");
+    }
+
+    $serviceTemplate = ServiceTemplate::make(['name' => $data['name'], 'device_group_id' => $data['device_group_id'], 'type' => $data['type'], 'param' => $data['param'], 'ip' => $data['ip'], 'desc' => $data['desc'], 'changed' => $data['changed'], 'disabled' => $data['disabled'], 'ignore' => $data['ignore']]);
+    $serviceTemplate->save();
+
+    return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
+}
+
+function get_service_templates(Illuminate\Http\Request $request)
+{
+    if ($request->user()->cannot('viewAny', ServiceTemplate::class)) {
+        return api_error(403, 'Insufficient permissions to access service templates');
+    }
+
+    $templates = ServiceTemplate::query()->orderBy('name')->get();
+
+    if ($templates->isEmpty()) {
+        return api_error(404, 'No service templates found');
+    }
+
+    return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
+}
+
 function add_service_for_host(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2332,7 +2433,9 @@ function add_service_for_host(Illuminate\Http\Request $request)
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore);
+    $service_disable = $data['disable'] ? true : false; // Default false
+    $service_name = $data['name'];
+    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }

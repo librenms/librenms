@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\OS;
 
 class OSDiscoveryTest extends TestCase
@@ -57,7 +58,7 @@ class OSDiscoveryTest extends TestCase
      *
      * @group os
      * @dataProvider osProvider
-     * @param $os_name
+     * @param string $os_name
      */
     public function testOS($os_name)
     {
@@ -102,9 +103,8 @@ class OSDiscoveryTest extends TestCase
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-        global $debug, $vdebug;
-        $debug = true;
-        $vdebug = true;
+        Debug::set();
+        Debug::setVerbose();
         ob_start();
         $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();

@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -44,25 +44,37 @@ class ModuleModelObserver
         }
     }
 
-    public function saving(Eloquent $model)
+    /**
+     * @param Eloquent $model
+     */
+    public function saving($model)
     {
         if (! $model->isDirty()) {
             echo '.';
         }
     }
 
-    public function updated(Eloquent $model)
+    /**
+     * @param Eloquent $model
+     */
+    public function updated($model)
     {
         d_echo('Updated data:', 'U');
         d_echo($model->getDirty());
     }
 
-    public function created(Eloquent $model)
+    /**
+     * @param Eloquent $model
+     */
+    public function created($model)
     {
         echo '+';
     }
 
-    public function deleted(Eloquent $model)
+    /**
+     * @param Eloquent $model
+     */
+    public function deleted($model)
     {
         echo '-';
     }

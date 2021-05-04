@@ -32,7 +32,7 @@
                 Public License for more details.
 
                 You should have received a copy of the GNU General Public License along
-                with this program. If not, see http://www.gnu.org/licenses/.
+                with this program. If not, see https://www.gnu.org/licenses/.
 
                 LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
 """
@@ -51,9 +51,9 @@ try:
     from optparse import OptionParser
 
 except ImportError as exc:
-    print('ERROR: missing one or more of the following python modules:')
-    print('threading, queue, sys, subprocess, time, os, json')
-    print('ERROR: %s' % exc)
+    print("ERROR: missing one or more of the following python modules:")
+    print("threading, queue, sys, subprocess, time, os, json")
+    print("ERROR: %s" % exc)
     sys.exit(2)
 
 APP_NAME = "discovery_wrapper"
@@ -68,9 +68,9 @@ def memc_alive():
     try:
         global memc
         key = str(uuid.uuid4())
-        memc.set('discovery.ping.' + key, key, 60)
-        if memc.get('discovery.ping.' + key) == key:
-            memc.delete('discovery.ping.' + key)
+        memc.set("discovery.ping." + key, key, 60)
+        if memc.get("discovery.ping." + key) == key:
+            memc.delete("discovery.ping." + key)
             return True
         else:
             return False
@@ -106,17 +106,19 @@ def printworker():
         global distdisco
         if distdisco:
             if not IsNode:
-                memc_touch('discovery.master', 30)
-                nodes = memc.get('discovery.nodes')
+                memc_touch("discovery.master", 30)
+                nodes = memc.get("discovery.nodes")
                 if nodes is None and not memc_alive():
-                    print("WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly.")
+                    print(
+                        "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
+                    )
                     distdisco = False
                     nodes = nodeso
                 if nodes is not nodeso:
                     print("INFO: %s Node(s) Total" % (nodes))
                     nodeso = nodes
             else:
-                memc_touch('discovery.nodes', 30)
+                memc_touch("discovery.nodes", 30)
             try:
                 worker_id, device_id, elapsed_time = print_queue.get(False)
             except:
@@ -136,9 +138,15 @@ def printworker():
         per_device_duration[device_id] = elapsed_time
         discovered_devices += 1
         if elapsed_time < 300:
-            print("INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
+            print(
+                "INFO: worker %s finished device %s in %s seconds"
+                % (worker_id, device_id, elapsed_time)
+            )
         else:
-            print("WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
+            print(
+                "WARNING: worker %s finished device %s in %s seconds"
+                % (worker_id, device_id, elapsed_time)
+            )
         print_queue.task_done()
 
 
@@ -152,28 +160,48 @@ def poll_worker():
     while True:
         device_id = poll_queue.get()
         # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
-        if not distdisco or memc.get('discovery.device.' + str(device_id)) is None:
+        if not distdisco or memc.get("discovery.device." + str(device_id)) is None:
             if distdisco:
-                result = memc.add('discovery.device.' + str(device_id), config['distributed_poller_name'], 300)
+                result = memc.add(
+                    "discovery.device." + str(device_id),
+                    config["distributed_poller_name"],
+                    300,
+                )
                 if not result:
-                    print("This device (%s) appears to be being discovered by another discovery node" % (device_id))
+                    print(
+                        "This device (%s) appears to be being discovered by another discovery node"
+                        % (device_id)
+                    )
                     poll_queue.task_done()
                     continue
                 if not memc_alive() and IsNode:
-                    print("Lost Memcached, Not discovering Device %s as Node. Master will discover it." % device_id)
+                    print(
+                        "Lost Memcached, Not discovering Device %s as Node. Master will discover it."
+                        % device_id
+                    )
                     poll_queue.task_done()
                     continue
             # EOC5
             try:
                 start_time = time.time()
 
-                output = "-d >> %s/discover_device_%s.log" % (log_dir, device_id) if debug else ">> /dev/null"
-                command = "/usr/bin/env php %s -h %s %s 2>&1" % (discovery_path, device_id, output)
+                output = (
+                    "-d >> %s/discover_device_%s.log" % (log_dir, device_id)
+                    if debug
+                    else ">> /dev/null"
+                )
+                command = "/usr/bin/env php %s -h %s %s 2>&1" % (
+                    discovery_path,
+                    device_id,
+                    output,
+                )
                 # TODO: Replace with command_runner
                 subprocess.check_call(command, shell=True)
 
                 elapsed_time = int(time.time() - start_time)
-                print_queue.put([threading.current_thread().name, device_id, elapsed_time])
+                print_queue.put(
+                    [threading.current_thread().name, device_id, elapsed_time]
+                )
             except (KeyboardInterrupt, SystemExit):
                 raise
             except:
@@ -181,48 +209,60 @@ def poll_worker():
         poll_queue.task_done()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
 
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    LNMS.check_for_file(install_dir + '/.env')
+    LNMS.check_for_file(install_dir + "/.env")
     config = json.loads(LNMS.get_config_data(install_dir))
 
-    discovery_path = config['install_dir'] + '/discovery.php'
-    log_dir = config['log_dir']
+    discovery_path = config["install_dir"] + "/discovery.php"
+    log_dir = config["log_dir"]
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
-    if 'distributed_poller_group' in config:
-        discovery_group = str(config['distributed_poller_group'])
+    if "distributed_poller_group" in config:
+        discovery_group = str(config["distributed_poller_group"])
     else:
         discovery_group = False
 
-    if ('distributed_poller' in config and
-        'distributed_poller_memcached_host' in config and
-        'distributed_poller_memcached_port' in config and
-        config['distributed_poller']):
+    if (
+        "distributed_poller" in config
+        and "distributed_poller_memcached_host" in config
+        and "distributed_poller_memcached_port" in config
+        and config["distributed_poller"]
+    ):
         try:
             import memcache
             import uuid
 
-            memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
-                                    str(config['distributed_poller_memcached_port'])])
-            if str(memc.get("discovery.master")) == config['distributed_poller_name']:
+            memc = memcache.Client(
+                [
+                    config["distributed_poller_memcached_host"]
+                    + ":"
+                    + str(config["distributed_poller_memcached_port"])
+                ]
+            )
+            if str(memc.get("discovery.master")) == config["distributed_poller_name"]:
                 print("This system is already joined as the discovery master.")
                 sys.exit(2)
             if memc_alive():
                 if memc.get("discovery.master") is None:
                     print("Registered as Master")
-                    memc.set("discovery.master", config['distributed_poller_name'], 30)
+                    memc.set("discovery.master", config["distributed_poller_name"], 30)
                     memc.set("discovery.nodes", 0, 3600)
                     IsNode = False
                 else:
-                    print("Registered as Node joining Master %s" % memc.get("discovery.master"))
+                    print(
+                        "Registered as Node joining Master %s"
+                        % memc.get("discovery.master")
+                    )
                     IsNode = True
                     memc.incr("discovery.nodes")
                 distdisco = True
             else:
-                print("Could not connect to memcached, disabling distributed discovery.")
+                print(
+                    "Could not connect to memcached, disabling distributed discovery."
+                )
                 distdisco = False
                 IsNode = False
         except SystemExit:
@@ -249,8 +289,13 @@ if __name__ == '__main__':
     usage = "usage: %prog [options] <workers> (Default: 1 Do not set too high)"
     description = "Spawn multiple discovery.php processes in parallel."
     parser = OptionParser(usage=usage, description=description)
-    parser.add_option('-d', '--debug', action='store_true', default=False,
-                      help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+    parser.add_option(
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
+    )
     (options, args) = parser.parse_args()
 
     debug = options.debug
@@ -269,12 +314,23 @@ if __name__ == '__main__':
     """
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
     if discovery_group is not False:
-        query = "select device_id from devices where poller_group IN(" + discovery_group + ") and disabled = 0 order by last_polled_timetaken desc"
+        query = (
+            "select device_id from devices where poller_group IN("
+            + discovery_group
+            + ") and disabled = 0 order by last_polled_timetaken desc"
+        )
     else:
         query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
     # EOC2
 
-    db = LNMS.db_open(config['db_socket'], config['db_host'], int(config['db_port']), config['db_user'], config['db_pass'], config['db_name'])
+    db = LNMS.db_open(
+        config["db_socket"],
+        config["db_host"],
+        int(config["db_port"]),
+        config["db_user"],
+        config["db_pass"],
+        config["db_name"],
+    )
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()
@@ -293,9 +349,10 @@ if __name__ == '__main__':
     poll_queue = queue.Queue()
     print_queue = queue.Queue()
 
-    print("INFO: starting the discovery at %s with %s threads, slowest devices first" % (
-        time.strftime("%Y-%m-%d %H:%M:%S"),
-        amount_of_workers))
+    print(
+        "INFO: starting the discovery at %s with %s threads, slowest devices first"
+        % (time.strftime("%Y-%m-%d %H:%M:%S"), amount_of_workers)
+    )
 
     for device_id in devices_list:
         poll_queue.put(device_id)
@@ -317,13 +374,15 @@ if __name__ == '__main__':
 
     total_time = int(time.time() - s_time)
 
-    print("INFO: discovery-wrapper polled %s devices in %s seconds with %s workers" % (
-        discovered_devices, total_time, amount_of_workers))
+    print(
+        "INFO: discovery-wrapper polled %s devices in %s seconds with %s workers"
+        % (discovered_devices, total_time, amount_of_workers)
+    )
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
     if distdisco or memc_alive():
         master = memc.get("discovery.master")
-        if master == config['distributed_poller_name'] and not IsNode:
+        if master == config["distributed_poller_name"] and not IsNode:
             print("Wait for all discovery-nodes to finish")
             nodes = memc.get("discovery.nodes")
             while nodes is not None and nodes > 0:
@@ -335,7 +394,7 @@ if __name__ == '__main__':
             print("Clearing Locks")
             x = minlocks
             while x <= maxlocks:
-                memc.delete('discovery.device.' + str(x))
+                memc.delete("discovery.device." + str(x))
                 x = x + 1
             print("%s Locks Cleared" % x)
             print("Clearing Nodes")
@@ -349,17 +408,29 @@ if __name__ == '__main__':
     show_stopper = False
 
     if total_time > 21600:
-        print("WARNING: the process took more than 6 hours to finish, you need faster hardware or more threads")
-        print("INFO: in sequential style discovery the elapsed time would have been: %s seconds" % real_duration)
+        print(
+            "WARNING: the process took more than 6 hours to finish, you need faster hardware or more threads"
+        )
+        print(
+            "INFO: in sequential style discovery the elapsed time would have been: %s seconds"
+            % real_duration
+        )
         for device in per_device_duration:
             if per_device_duration[device] > 3600:
-                print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
+                print(
+                    "WARNING: device %s is taking too long: %s seconds"
+                    % (device, per_device_duration[device])
+                )
                 show_stopper = True
         if show_stopper:
-            print("ERROR: Some devices are taking more than 3600 seconds, the script cannot recommend you what to do.")
+            print(
+                "ERROR: Some devices are taking more than 3600 seconds, the script cannot recommend you what to do."
+            )
         else:
             recommend = int(total_time / 300.0 * amount_of_workers + 1)
             print(
-                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
+                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)"
+                % recommend
+            )
 
         sys.exit(2)

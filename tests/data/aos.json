@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6486.800.1.1.2.2.4.1.2",
                     "sysDescr": "OmniStack LS 6200",
-                    "sysContact": null,
-                    "version": "1.7.0.13",
-                    "hardware": "OmniStack LS 6224P",
-                    "features": null,
-                    "os": "aos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6486.800.1.1.2.2.4.1.2",
-                    "sysDescr": "OmniStack LS 6200",
                     "sysContact": "<private>",
                     "version": "1.7.0.13",
                     "hardware": "OmniStack LS 6224P",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

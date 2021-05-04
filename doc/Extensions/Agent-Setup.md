@@ -71,6 +71,15 @@ monitor. Under the modules section, ensure that unix-agent is enabled.
 10: Wait for around 10 minutes and you should start seeing data in
 your graphs under Apps for the device.
 
+### Restrict the devices on which the agent listens: Linux systemd
+If you want to restrict which network adapter the agent listens on, do the following:
+
+1: Edit `/etc/systemd/system/check_mk.socket`
+
+2: Under the `[Socket]` section, add a new line `BindToDevice=` and the name of your network adapter.
+
+3: If the script has already been enabled in systemd, you may need to issue a `systemctl daemon-reload` and then `systemctl restart check_mk.socket`
+
 
 ## Windows
 1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows

@@ -19,6 +19,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
+    Route::resource('port-groups', 'PortGroupController');
+    Route::resource('port', 'PortController', ['only' => 'update']);
     Route::group(['prefix' => 'poller'], function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
         Route::get('log', 'PollerController@logTab')->name('poller.log');
@@ -26,6 +28,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
         Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
         Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
+    });
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::resource('templates', 'ServiceTemplateController');
+        Route::post('templates/applyAll', 'ServiceTemplateController@applyAll')->name('templates.applyAll');
+        Route::post('templates/apply/{template}', 'ServiceTemplateController@apply')->name('templates.apply');
+        Route::post('templates/remove/{template}', 'ServiceTemplateController@remove')->name('templates.remove');
     });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
@@ -90,6 +98,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
             Route::resource('widget-settings', 'WidgetSettingsController');
+            Route::post('copy-dashboard', 'CopyDashboardController@store');
         });
 
         // js select2 data controllers
@@ -100,6 +109,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('device', 'DeviceController');
             Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');
+            Route::get('port-group', 'PortGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
@@ -108,6 +118,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('service', 'ServiceController');
+            Route::get('template', 'ServiceTemplateController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
@@ -117,6 +128,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('alert-schedule', 'AlertScheduleController');
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
+            Route::post('edit-ports', 'EditPortsController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('graylog', 'GraylogController');

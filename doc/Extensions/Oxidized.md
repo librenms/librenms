@@ -64,7 +64,7 @@ $config['oxidized']['default_group'] = 'default';
 
 # SELinux
 
-If you're runnng SELinux, you'll need to allow httpd to connect
+If you're running SELinux, you'll need to allow httpd to connect
 outbound to the network, otherwise Oxidized integration in the web UI
 will silently fail:
 

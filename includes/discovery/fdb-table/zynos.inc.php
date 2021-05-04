@@ -8,7 +8,7 @@
 
  * @package    LibreNMS
  * @subpackage discovery
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 PipoCanaja <pipocanaja@gmail.com>
  * @author     PipoCanaja <pipocanaja@gmail.com>
  */

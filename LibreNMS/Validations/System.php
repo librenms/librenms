@@ -15,16 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Validations;
 
+use LibreNMS\Config;
 use LibreNMS\Validator;
 
 class System extends BaseValidation
@@ -39,8 +40,8 @@ class System extends BaseValidation
         $install_dir = $validator->getBaseDir();
 
         $lnms = `which lnms 2>/dev/null`;
-        if (empty($lnms)) {
-            $validator->warn('Global lnms shortcut not installed. lnms command must be run with full path', "sudo ln -s $install_dir/lnms /usr/local/bin/lnms");
+        if (empty($lnms) && ! Config::get('installed_from_package')) {
+            $validator->warn('Global lnms shortcut not installed. lnms command must be run with full path', "sudo ln -s $install_dir/lnms /usr/bin/lnms");
         }
 
         $bash_completion_dir = '/etc/bash_completion.d/';
@@ -50,7 +51,7 @@ class System extends BaseValidation
         }
 
         $rotation_file = '/etc/logrotate.d/librenms';
-        if (! file_exists($rotation_file)) {
+        if (! file_exists($rotation_file) && ! Config::get('installed_from_package')) {
             $validator->warn('Log rotation not enabled, could cause disk space issues', "sudo cp $install_dir/misc/librenms.logrotate $rotation_file");
         }
     }

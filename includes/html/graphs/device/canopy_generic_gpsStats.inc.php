@@ -10,8 +10,8 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-gpsStats');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-gpsStats');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Amount                Now       Ave      Max   \\n'";
     $rrd_options .= ' DEF:visible=' . $rrdfilename . ':visible:AVERAGE ';
     $rrd_options .= ' DEF:tracked=' . $rrdfilename . ':tracked:AVERAGE ';

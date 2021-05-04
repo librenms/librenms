@@ -9,7 +9,7 @@ foreach ($_GET as $key => $get_var) {
             $value = 'yes';
         }
 
-        $vars[$name] = clean($value);
+        $vars[$name] = strip_tags($value);
     }
 }
 
@@ -41,7 +41,7 @@ foreach ($segments as $pos => $segment) {
 }
 
 foreach ($_GET as $name => $value) {
-    $vars[$name] = clean($value);
+    $vars[$name] = strip_tags($value);
 }
 
 foreach ($_POST as $name => $value) {

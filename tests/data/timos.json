@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6527.6.2.1.2.6.1",
                     "sysDescr": "TiMOS-C-10.0.R4 cpm/hops Nokia SAS-R 7210 Copyright (c) 2000-2018 Nokia.\nAll rights reserved. All use subject to applicable license agreements.\r\nBuilt on Mon Apr 30 12:30:30 IST 2018 by sasbuild in /home/sasbuild/10.0B1/R4/panos/main",
-                    "sysContact": null,
-                    "version": "10.0.R4",
-                    "hardware": "7210 SAS-R6",
-                    "features": null,
-                    "os": "timos",
-                    "type": "network",
-                    "serial": "NS1806C3752",
-                    "icon": "nokia.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6527.6.2.1.2.6.1",
-                    "sysDescr": "TiMOS-C-10.0.R4 cpm/hops Nokia SAS-R 7210 Copyright (c) 2000-2018 Nokia.\nAll rights reserved. All use subject to applicable license agreements.\r\nBuilt on Mon Apr 30 12:30:30 IST 2018 by sasbuild in /home/sasbuild/10.0B1/R4/panos/main",
                     "sysContact": "<private>",
                     "version": "10.0.R4",
                     "hardware": "7210 SAS-R6",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -3570,7 +3553,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.12.1",
                     "sensor_index": "tmnxChassisCriticalLEDState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisCriticalLEDState",
                     "sensor_descr": "Critical LED",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3586,7 +3569,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisCriticalLEDState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3594,7 +3577,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.13.1",
                     "sensor_index": "tmnxChassisMajorLEDState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisMajorLEDState",
                     "sensor_descr": "Major LED",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3610,7 +3593,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisMajorLEDState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3618,7 +3601,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.14.1",
                     "sensor_index": "tmnxChassisMinorLEDState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisMinorLEDState",
                     "sensor_descr": "Minor LED",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3634,7 +3617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisMinorLEDState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3642,7 +3625,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.24.1",
                     "sensor_index": "tmnxChassisOverTempState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisOverTempState",
                     "sensor_descr": "Chassis Over Temp",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3658,7 +3641,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisOverTempState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3666,7 +3649,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.100663297",
                     "sensor_index": "tmnxHwID.1.100663297",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Fan 1 NS1746C6321 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3682,7 +3665,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3690,7 +3673,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217729",
                     "sensor_index": "tmnxHwID.1.134217729",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 1 NS1803C4073 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3706,7 +3689,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3714,7 +3697,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217730",
                     "sensor_index": "tmnxHwID.1.134217730",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 2 NS1752C2633 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3730,7 +3713,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3738,7 +3721,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217731",
                     "sensor_index": "tmnxHwID.1.134217731",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 3 NS1815C3093 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3754,7 +3737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3762,7 +3745,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217732",
                     "sensor_index": "tmnxHwID.1.134217732",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 4  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3778,7 +3761,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3786,7 +3769,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217733",
                     "sensor_index": "tmnxHwID.1.134217733",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 5  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3802,7 +3785,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3810,7 +3793,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217734",
                     "sensor_index": "tmnxHwID.1.134217734",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 6  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3826,7 +3809,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3834,7 +3817,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.150995057",
                     "sensor_index": "tmnxHwID.1.150995057",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot A NS1747C3434 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3850,7 +3833,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3858,7 +3841,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.150995073",
                     "sensor_index": "tmnxHwID.1.150995073",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot B NS1747C3432 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3874,7 +3857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3882,7 +3865,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.167772167",
                     "sensor_index": "tmnxHwID.1.167772167",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot A  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3898,7 +3881,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3906,7 +3889,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.167772168",
                     "sensor_index": "tmnxHwID.1.167772168",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot B  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3922,7 +3905,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3930,7 +3913,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.184549633",
                     "sensor_index": "tmnxHwID.1.184549633",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "MDA 1/1 NS1803C4073 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3946,7 +3929,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3954,7 +3937,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.184549889",
                     "sensor_index": "tmnxHwID.1.184549889",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "MDA 2/1 NS1752C2633 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3970,7 +3953,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3978,7 +3961,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.184550145",
                     "sensor_index": "tmnxHwID.1.184550145",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "MDA 3/1 NS1815C3093 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -3994,7 +3977,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4002,7 +3985,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328385",
                     "sensor_index": "tmnxHwID.1.201328385",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4018,7 +4001,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4026,7 +4009,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328386",
                     "sensor_index": "tmnxHwID.1.201328386",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf2:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4042,7 +4025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4050,7 +4033,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328387",
                     "sensor_index": "tmnxHwID.1.201328387",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "uf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4066,7 +4049,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4074,7 +4057,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328641",
                     "sensor_index": "tmnxHwID.1.201328641",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4090,7 +4073,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4098,7 +4081,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328642",
                     "sensor_index": "tmnxHwID.1.201328642",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf2:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4114,7 +4097,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4122,7 +4105,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328643",
                     "sensor_index": "tmnxHwID.1.201328643",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "uf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4138,7 +4121,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4146,7 +4129,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.50331649",
                     "sensor_index": "tmnxHwID.1.50331649",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Chassis 1 NS1806C3752 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4162,7 +4145,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4170,7 +4153,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.83886081",
                     "sensor_index": "tmnxHwID.1.83886081",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Power Supply 1 NS1803C7135 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4186,7 +4169,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4194,7 +4177,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.83886082",
                     "sensor_index": "tmnxHwID.1.83886082",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Power Supply 2 NS1803C7157 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4210,7 +4193,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4431,35 +4414,245 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "tmnxChassisTable",
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "NotApplicable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Off",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Red",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Amber",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Yellow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Green",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "AmberBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "YellowBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "GreenBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "RedBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "NotApplicable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Off",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Red",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Amber",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Yellow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Green",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "AmberBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "YellowBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "GreenBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "RedBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "NotApplicable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Off",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Red",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Amber",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Yellow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Green",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "AmberBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "YellowBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "GreenBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "RedBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisOverTempState",
                     "state_descr": "Ok",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "tmnxChassisTable",
+                    "state_name": "tmnxChassisOverTempState",
                     "state_descr": "OverTemp",
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "tmnxHwTable",
+                    "state_name": "tmnxHwAlarmState",
                     "state_descr": "unknown",
                     "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "tmnxHwTable",
+                    "state_name": "tmnxHwAlarmState",
                     "state_descr": "alarmActive",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "tmnxHwTable",
+                    "state_name": "tmnxHwAlarmState",
                     "state_descr": "alarmCleared",
                     "state_draw_graph": 0,
                     "state_value": 2,
@@ -4811,7 +5004,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.12.1",
                     "sensor_index": "tmnxChassisCriticalLEDState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisCriticalLEDState",
                     "sensor_descr": "Critical LED",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4827,7 +5020,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisCriticalLEDState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4835,7 +5028,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.13.1",
                     "sensor_index": "tmnxChassisMajorLEDState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisMajorLEDState",
                     "sensor_descr": "Major LED",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4851,7 +5044,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisMajorLEDState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4859,7 +5052,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.14.1",
                     "sensor_index": "tmnxChassisMinorLEDState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisMinorLEDState",
                     "sensor_descr": "Minor LED",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4875,7 +5068,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisMinorLEDState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4883,7 +5076,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.3.1.24.1",
                     "sensor_index": "tmnxChassisOverTempState.1",
-                    "sensor_type": "tmnxChassisTable",
+                    "sensor_type": "tmnxChassisOverTempState",
                     "sensor_descr": "Chassis Over Temp",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4899,7 +5092,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxChassisTable"
+                    "state_name": "tmnxChassisOverTempState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4907,7 +5100,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.100663297",
                     "sensor_index": "tmnxHwID.1.100663297",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Fan 1 NS1746C6321 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4923,7 +5116,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4931,7 +5124,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217729",
                     "sensor_index": "tmnxHwID.1.134217729",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 1 NS1803C4073 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4947,7 +5140,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4955,7 +5148,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217730",
                     "sensor_index": "tmnxHwID.1.134217730",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 2 NS1752C2633 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4971,7 +5164,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4979,7 +5172,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217731",
                     "sensor_index": "tmnxHwID.1.134217731",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 3 NS1815C3093 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -4995,7 +5188,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5003,7 +5196,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217732",
                     "sensor_index": "tmnxHwID.1.134217732",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 4  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5019,7 +5212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5027,7 +5220,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217733",
                     "sensor_index": "tmnxHwID.1.134217733",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 5  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5043,7 +5236,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5051,7 +5244,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.134217734",
                     "sensor_index": "tmnxHwID.1.134217734",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot 6  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5067,7 +5260,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5075,7 +5268,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.150995057",
                     "sensor_index": "tmnxHwID.1.150995057",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot A NS1747C3434 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5091,7 +5284,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5099,7 +5292,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.150995073",
                     "sensor_index": "tmnxHwID.1.150995073",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot B NS1747C3432 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5115,7 +5308,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5123,7 +5316,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.167772167",
                     "sensor_index": "tmnxHwID.1.167772167",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot A  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5139,7 +5332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5147,7 +5340,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.167772168",
                     "sensor_index": "tmnxHwID.1.167772168",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Slot B  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5163,7 +5356,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5171,7 +5364,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.184549633",
                     "sensor_index": "tmnxHwID.1.184549633",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "MDA 1/1 NS1803C4073 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5187,7 +5380,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5195,7 +5388,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.184549889",
                     "sensor_index": "tmnxHwID.1.184549889",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "MDA 2/1 NS1752C2633 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5211,7 +5404,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5219,7 +5412,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.184550145",
                     "sensor_index": "tmnxHwID.1.184550145",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "MDA 3/1 NS1815C3093 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5235,7 +5428,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5243,7 +5436,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328385",
                     "sensor_index": "tmnxHwID.1.201328385",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5259,7 +5452,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5267,7 +5460,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328386",
                     "sensor_index": "tmnxHwID.1.201328386",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf2:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5283,7 +5476,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5291,7 +5484,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328387",
                     "sensor_index": "tmnxHwID.1.201328387",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "uf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5307,7 +5500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5315,7 +5508,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328641",
                     "sensor_index": "tmnxHwID.1.201328641",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5331,7 +5524,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5339,7 +5532,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328642",
                     "sensor_index": "tmnxHwID.1.201328642",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "cf2:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5355,7 +5548,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5363,7 +5556,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.201328643",
                     "sensor_index": "tmnxHwID.1.201328643",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "uf1:  ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5379,7 +5572,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5387,7 +5580,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.50331649",
                     "sensor_index": "tmnxHwID.1.50331649",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Chassis 1 NS1806C3752 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5403,7 +5596,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5411,7 +5604,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.83886081",
                     "sensor_index": "tmnxHwID.1.83886081",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Power Supply 1 NS1803C7135 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5427,7 +5620,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5435,7 +5628,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.1.83886082",
                     "sensor_index": "tmnxHwID.1.83886082",
-                    "sensor_type": "tmnxHwTable",
+                    "sensor_type": "tmnxHwAlarmState",
                     "sensor_descr": "Power Supply 2 NS1803C7157 ",
                     "group": null,
                     "sensor_divisor": 1,
@@ -5451,7 +5644,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "tmnxHwTable"
+                    "state_name": "tmnxHwAlarmState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5672,35 +5865,245 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "tmnxChassisTable",
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "NotApplicable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Off",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Red",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Amber",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Yellow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "Green",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "AmberBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "YellowBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "GreenBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisCriticalLEDState",
+                    "state_descr": "RedBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "NotApplicable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Off",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Red",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Amber",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Yellow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "Green",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "AmberBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "YellowBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "GreenBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMajorLEDState",
+                    "state_descr": "RedBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "NotApplicable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Off",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Red",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Amber",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Yellow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "Green",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "AmberBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "YellowBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "GreenBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "tmnxChassisMinorLEDState",
+                    "state_descr": "RedBlink",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "tmnxChassisOverTempState",
                     "state_descr": "Ok",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "tmnxChassisTable",
+                    "state_name": "tmnxChassisOverTempState",
                     "state_descr": "OverTemp",
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "tmnxHwTable",
+                    "state_name": "tmnxHwAlarmState",
                     "state_descr": "unknown",
                     "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "tmnxHwTable",
+                    "state_name": "tmnxHwAlarmState",
                     "state_descr": "alarmActive",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "tmnxHwTable",
+                    "state_name": "tmnxHwAlarmState",
                     "state_descr": "alarmCleared",
                     "state_draw_graph": 0,
                     "state_value": 2,

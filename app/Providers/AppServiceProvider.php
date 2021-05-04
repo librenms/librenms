@@ -130,6 +130,7 @@ class AppServiceProvider extends ServiceProvider
     private function bootObservers()
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+        \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
     }
 
     private function bootCustomValidators()
@@ -145,7 +146,7 @@ class AppServiceProvider extends ServiceProvider
         }, __('The :attribute must a valid IP address/network or hostname.'));
 
         Validator::extend('is_regex', function ($attribute, $value) {
-            return @preg_match($value, null) !== false;
+            return @preg_match($value, '') !== false;
         }, __(':attribute is not a valid regular expression'));
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {

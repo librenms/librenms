@@ -9,7 +9,7 @@
  * the source code distribution for details.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Mike Williams
  * @copyright  2019 PipoCanaja
  * @author     Mike Williams <mike@mgww.net>

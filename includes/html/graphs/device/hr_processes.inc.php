@@ -2,7 +2,7 @@
 
 $scale_min = '0';
 
-$rrd_filename = rrd_name($device['hostname'], 'hr_processes');
+$rrd_filename = Rrd::name($device['hostname'], 'hr_processes');
 
 $ds = 'procs';
 

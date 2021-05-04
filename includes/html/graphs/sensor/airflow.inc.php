@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -28,7 +28,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                            Min   Max   Last\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
-$rrd_options .= " LINE1.5:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'], 21) . "'";
+$rrd_options .= " LINE1.5:sensor#cc0000:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 21) . "'";
 $rrd_options .= ' GPRINT:sensor:MIN:%4.1lf';
 $rrd_options .= ' GPRINT:sensor:MAX:%4.1lf';
 $rrd_options .= ' GPRINT:sensor:LAST:%4.1lf\l';

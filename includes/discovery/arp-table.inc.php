@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -47,7 +47,6 @@ foreach ($vrfs_lite_cisco as $vrf) {
     $ipv4_addresses = array_map(function ($data) {
         return $data['ipv4_address'];
     }, $existing_data);
-
     $arp_table = [];
     $insert_data = [];
     foreach ($arp_data as $ifIndex => $data) {
@@ -56,7 +55,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
 
         $port_arp = array_merge(
             (array) $data['ipNetToMediaPhysAddress'],
-            (array) $data['ipNetToPhysicalPhysAddress']['ipv4']
+            is_array($data['ipNetToPhysicalPhysAddress']) ? (array) $data['ipNetToPhysicalPhysAddress']['ipv4'] : []
         );
 
         echo "{$interface['ifName']}: \n";
@@ -73,7 +72,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 $old_mac = $existing_data[$index]['mac_address'];
                 if ($mac != $old_mac && $mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $mac\n");
-                    log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac) . ' -> ' . mac_clean_to_readable($mac), $device, 'interface', 4, $port_id);
+                    log_event("MAC change: $ip : " . \LibreNMS\Util\Rewrite::readableMac($old_mac) . ' -> ' . \LibreNMS\Util\Rewrite::readableMac($mac), $device, 'interface', 4, $port_id);
                     dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context]);
                 }
                 d_echo("$raw_mac => $ip\n", '.');

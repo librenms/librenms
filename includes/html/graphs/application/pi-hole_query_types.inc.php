@@ -11,11 +11,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
 * @subpackage pi-hole
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
@@ -32,7 +32,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
 $array = [
     'query_a' => ['descr' => 'A Type', 'colour' => '000000'],
@@ -43,7 +43,7 @@ $array = [
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

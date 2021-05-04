@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -82,6 +82,7 @@ class QueryBuilderParser implements \JsonSerializable
 
     protected $builder;
     protected $schema;
+    private $tables;
 
     private function __construct(array $builder)
     {
@@ -255,7 +256,7 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Parse a rule group
      *
-     * @param $rule
+     * @param array $rule
      * @param bool $expand Expand macros?
      * @param bool $wrap Wrap in parenthesis
      * @return string
@@ -284,7 +285,7 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Parse a rule
      *
-     * @param $rule
+     * @param array $rule
      * @param bool $expand Expand macros?
      * @return string
      */
@@ -322,7 +323,7 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Expand macro to sql
      *
-     * @param $subject
+     * @param string $subject
      * @param bool $tables_only Used when finding tables in query returns an array instead of sql string
      * @param int $depth_limit
      * @return string|array
@@ -457,7 +458,7 @@ class QueryBuilderParser implements \JsonSerializable
 
     /**
      * Specify data which should be serialized to JSON
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      * @since 5.4.0

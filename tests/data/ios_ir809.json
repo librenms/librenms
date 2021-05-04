@@ -1,0 +1,2439 @@
+{
+    "wireless": {
+        "discovery": {
+            "wireless_sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "snr",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "SNR: Ce0 mpls.tampnet",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 30,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.817.1.1.1.1.1.3.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "rsrp",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "RSRP: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -90,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.817.1.1.1.1.1.1.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "rsrq",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "RSRQ: Ce0 mpls.tampnet",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -7,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.817.1.1.1.1.1.2.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "rssi",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "RSSI: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -62,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "cell",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "Cell: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 33028,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.661.1.3.2.1.13.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "channel",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "ChannelRx: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 6300,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.661.1.3.4.1.1.4.14\"]"
+                }
+            ]
+        },
+        "poller": {
+            "wireless_sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "snr",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "SNR: Ce0 mpls.tampnet",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 30,
+                    "sensor_prev": 30,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.817.1.1.1.1.1.3.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "rsrp",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "RSRP: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -90,
+                    "sensor_prev": -90,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.817.1.1.1.1.1.1.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "rsrq",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "RSRQ: Ce0 mpls.tampnet",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -7,
+                    "sensor_prev": -7,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.817.1.1.1.1.1.2.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "rssi",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "RSSI: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -62,
+                    "sensor_prev": -62,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "cell",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "Cell: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 33028,
+                    "sensor_prev": 33028,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.661.1.3.2.1.13.14\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "channel",
+                    "sensor_index": "14",
+                    "sensor_type": "ios",
+                    "sensor_descr": "ChannelRx: Ce0 mpls.tampnet",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 6300,
+                    "sensor_prev": 6300,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.9.9.661.1.3.4.1.1.4.14\"]"
+                }
+            ]
+        }
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmNumberOfNearbyCell",
+                    "sensor_descr": "Modem 0 on Cellular0 - Nearby cells",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.817.1.1.1.1.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "cwceLteCurrOperatingBand",
+                    "sensor_descr": "Modem 0 on Cellular0 - Cellular operating band",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 20,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.4.1.1.3.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmCurrentBand",
+                    "sensor_descr": "Current band",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "c3gGsmCurrentBand"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmCurrentRoamingStatus",
+                    "sensor_descr": "Roaming status",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "c3gGsmCurrentRoamingStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.5.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmPacketService",
+                    "sensor_descr": "Packet service",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "c3gGsmPacketService"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmSimStatus",
+                    "sensor_descr": "SIM status",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "c3gGsmSimStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.1.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gModemStatus",
+                    "sensor_descr": "Modem status",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "c3gModemStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.117.1.1.2.1.2.3",
+                    "sensor_index": "3",
+                    "sensor_type": "cefcFRUPowerOperStatus",
+                    "sensor_descr": "Power Supply 12VDC",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "3",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "cefcFRUPowerOperStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "IR800 AC Power Supply",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.2",
+                    "sensor_index": "2",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "IR800 DC Power Supply",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "2",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.6.1",
+                    "sensor_index": "1",
+                    "sensor_type": "ciscoEnvMonTemperatureState",
+                    "sensor_descr": "Sensor 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "ciscoEnvMonTemperatureState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.1.4.0",
+                    "sensor_index": "0",
+                    "sensor_type": "cRFStatusPeerUnitState",
+                    "sensor_descr": "VSS Peer State",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "cRFStatusPeerUnitState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.1.2.0",
+                    "sensor_index": "0",
+                    "sensor_type": "cRFStatusUnitState",
+                    "sensor_descr": "VSS Device State",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "cRFStatusUnitState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "cisco",
+                    "sensor_descr": "Sensor 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 43,
+                    "sensor_limit": 93,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 33,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.1.1.12.14",
+                    "sensor_index": "14",
+                    "sensor_type": "cisco",
+                    "sensor_descr": "Modem 0 on Cellular0",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 38,
+                    "sensor_limit": 58,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 28,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.13",
+                    "sensor_index": "13",
+                    "sensor_type": "cisco-entity-sensor",
+                    "sensor_descr": " 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 43,
+                    "sensor_limit": 93,
+                    "sensor_limit_warn": 84,
+                    "sensor_limit_low": -40,
+                    "sensor_limit_low_warn": -30,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "13",
+                    "entPhysicalIndex_measured": "0",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "invalid",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "none",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm850",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm900",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm1800",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm1900",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma800",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma850",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma1900",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma2100",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "lte band",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentRoamingStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmCurrentRoamingStatus",
+                    "state_descr": "roaming",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentRoamingStatus",
+                    "state_descr": "home",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "none",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "gprs",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "edge",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "umts wcdma",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hsdpa",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hsupa",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hspa",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hspa plus",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "lte",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "ok",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "not inserted",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "removed",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "initFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "generalFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "locked",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "chv1Blocked",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "chv2Blocked",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "chv1Rejected",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "wcchv2Rejecteddma2100",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "mepLocked",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "networkRejected",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "offline",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "online",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "low power mode",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (other)",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "on",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (admin)",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (denied)",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (environmental)",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (temperature)",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (fan)",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "on (fan failed)",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (cooling)",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (connector rating)",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "on (no inline power)",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "notKnown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "initialization",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "negotiation",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyCold",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyColdConfig",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyColdFileSys",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyColdBulk",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyHot",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeFast",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeDrain",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activePreconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activePostconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "active",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeExtraload",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeHandback",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "notKnown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "initialization",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "negotiation",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyCold",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyColdConfig",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyColdFileSys",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyColdBulk",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyHot",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeFast",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeDrain",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activePreconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activePostconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "active",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeExtraload",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeHandback",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                }
+            ]
+        },
+        "poller": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmNumberOfNearbyCell",
+                    "sensor_descr": "Modem 0 on Cellular0 - Nearby cells",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.817.1.1.1.1.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "cwceLteCurrOperatingBand",
+                    "sensor_descr": "Modem 0 on Cellular0 - Cellular operating band",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 20,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.4.1.1.3.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmCurrentBand",
+                    "sensor_descr": "Current band",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 12,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "c3gGsmCurrentBand"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmCurrentRoamingStatus",
+                    "sensor_descr": "Roaming status",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "c3gGsmCurrentRoamingStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.2.1.5.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmPacketService",
+                    "sensor_descr": "Packet service",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 10,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "c3gGsmPacketService"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gGsmSimStatus",
+                    "sensor_descr": "SIM status",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "c3gGsmSimStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.3.1.1.6.14",
+                    "sensor_index": "14",
+                    "sensor_type": "c3gModemStatus",
+                    "sensor_descr": "Modem status",
+                    "group": "Modem 0 on Cellular0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "c3gModemStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.117.1.1.2.1.2.3",
+                    "sensor_index": "3",
+                    "sensor_type": "cefcFRUPowerOperStatus",
+                    "sensor_descr": "Power Supply 12VDC",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "3",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "cefcFRUPowerOperStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "IR800 AC Power Supply",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.2",
+                    "sensor_index": "2",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "IR800 DC Power Supply",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "2",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.6.1",
+                    "sensor_index": "1",
+                    "sensor_type": "ciscoEnvMonTemperatureState",
+                    "sensor_descr": "Sensor 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "ciscoEnvMonTemperatureState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.1.4.0",
+                    "sensor_index": "0",
+                    "sensor_type": "cRFStatusPeerUnitState",
+                    "sensor_descr": "VSS Peer State",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "cRFStatusPeerUnitState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.1.2.0",
+                    "sensor_index": "0",
+                    "sensor_type": "cRFStatusUnitState",
+                    "sensor_descr": "VSS Device State",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 14,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "state_name": "cRFStatusUnitState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "cisco",
+                    "sensor_descr": "Sensor 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 43,
+                    "sensor_limit": 93,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 33,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.661.1.1.1.12.14",
+                    "sensor_index": "14",
+                    "sensor_type": "cisco",
+                    "sensor_descr": "Modem 0 on Cellular0",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 38,
+                    "sensor_limit": 58,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 28,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "14",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.13",
+                    "sensor_index": "13",
+                    "sensor_type": "cisco-entity-sensor",
+                    "sensor_descr": " 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 43,
+                    "sensor_limit": 93,
+                    "sensor_limit_warn": 84,
+                    "sensor_limit_low": -40,
+                    "sensor_limit_low_warn": -30,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "13",
+                    "entPhysicalIndex_measured": "0",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "invalid",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "none",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm850",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm900",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm1800",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "gsm1900",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma800",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma850",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma1900",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "wcdma2100",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentBand",
+                    "state_descr": "lte band",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentRoamingStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmCurrentRoamingStatus",
+                    "state_descr": "roaming",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmCurrentRoamingStatus",
+                    "state_descr": "home",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "none",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "gprs",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "edge",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "umts wcdma",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hsdpa",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hsupa",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hspa",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "hspa plus",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmPacketService",
+                    "state_descr": "lte",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "ok",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "not inserted",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "removed",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "initFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "generalFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "locked",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "chv1Blocked",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "chv2Blocked",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "chv1Rejected",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "wcchv2Rejecteddma2100",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "mepLocked",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gGsmSimStatus",
+                    "state_descr": "networkRejected",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "offline",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "online",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "c3gModemStatus",
+                    "state_descr": "low power mode",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (other)",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "on",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (admin)",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (denied)",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (environmental)",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (temperature)",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (fan)",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "on (fan failed)",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (cooling)",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "off (connector rating)",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcFRUPowerOperStatus",
+                    "state_descr": "on (no inline power)",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "notKnown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "initialization",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "negotiation",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyCold",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyColdConfig",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyColdFileSys",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyColdBulk",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "standbyHot",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeFast",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeDrain",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activePreconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activePostconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "active",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeExtraload",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusPeerUnitState",
+                    "state_descr": "activeHandback",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "notKnown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "initialization",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "negotiation",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyCold",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyColdConfig",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyColdFileSys",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyColdBulk",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "standbyHot",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeFast",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeDrain",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activePreconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activePostconfig",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "active",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeExtraload",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cRFStatusUnitState",
+                    "state_descr": "activeHandback",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.2105",
+                    "sysDescr": "Cisco IOS Software, ir800 Software (ir800-UNIVERSALK9-M), Version 15.8(3)M4, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2020 by Cisco Systems, Inc.\r\nCompiled Tue 25-Feb-20 11:11 by prod_rel_team",
+                    "sysContact": null,
+                    "version": "15.8(3)M4",
+                    "hardware": "IR809G-LTE-GA-K9",
+                    "features": "UNIVERSALK9",
+                    "os": "ios",
+                    "type": "network",
+                    "serial": "FCW224900DK",
+                    "icon": "cisco.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

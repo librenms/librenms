@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -35,7 +35,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
      * Try to convert the given Exception to a FilePermissionsException
      *
      * @param \Exception $exception
-     * @return static
+     * @return static|null
      */
     public static function upgrade($exception)
     {
@@ -62,7 +62,6 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)
@@ -79,9 +78,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     }
 
     /**
-     * @param \Illuminate\Config\Repository $user
-     * @param \Illuminate\Config\Repository $group
-     * @param $log_file
+     * @param string $log_file
      * @return array
      */
     private function generateCommands($log_file): array

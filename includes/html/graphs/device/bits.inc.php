@@ -4,7 +4,13 @@
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', [$device['device_id']]) as $port) {
+$ports = dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', [$device['device_id']]);
+
+if (empty($ports)) {
+    graph_text_and_exit('No Ports');
+}
+
+foreach ($ports as $port) {
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
@@ -29,14 +35,14 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
     }
 
     $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
-    if ($ignore != 1 && rrdtool_check_rrd_exists($rrd_filename)) {
+    if ($ignore != 1 && Rrd::checkRrdExists($rrd_filename)) {
         $port = cleanPort($port);
         // Fix Labels! ARGH. This needs to be in the bloody database!
         $rrd_filenames[] = $rrd_filename;
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = shorten_interface_type($port['label']);
+        $rrd_list[$i]['descr'] = \LibreNMS\Util\Rewrite::shortenIfType($port['label']);
         $rrd_list[$i]['descr_in'] = $port['label'];
-        $rrd_list[$i]['descr_out'] = display($port['ifAlias']);
+        $rrd_list[$i]['descr_out'] = \LibreNMS\Util\Clean::html($port['ifAlias'], []);
         $rrd_list[$i]['ds_in'] = $ds_in;
         $rrd_list[$i]['ds_out'] = $ds_out;
         $i++;

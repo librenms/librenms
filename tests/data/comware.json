@@ -49764,10 +49764,10 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.25506.11.1.172",
                     "sysDescr": "HP Comware Platform Software, Software Version 7.1.045, Release 2416 HP FF 5700-40XG-2QSFP  Switch Copyright (c) 2010-2014 Hewlett-Packard Development Company, L.P.",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "sysContact": "<private>",
+                    "version": "7.1.045",
+                    "hardware": "FF 5700-40XG-2QSFP",
+                    "features": "2416",
                     "os": "comware",
                     "type": "network",
                     "serial": "DM20F3000F",
@@ -49776,24 +49776,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.25506.11.1.172",
-                    "sysDescr": "HP Comware Platform Software, Software Version 7.1.045, Release 2416 HP FF 5700-40XG-2QSFP  Switch Copyright (c) 2010-2014 Hewlett-Packard Development Company, L.P.",
-                    "sysContact": "<private>",
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "comware",
-                    "type": "network",
-                    "serial": "DM20F3000F",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

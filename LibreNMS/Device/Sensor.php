@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -241,7 +241,7 @@ class Sensor implements DiscoveryModule, PollerModule
      * Escape null values so dbFacile doesn't mess them up
      * honestly, this should be the default, but could break shit
      *
-     * @param $array
+     * @param array $array
      * @return array
      */
     private function escapeNull($array)
@@ -364,7 +364,7 @@ class Sensor implements DiscoveryModule, PollerModule
         array_walk($snmp_data, function (&$oid) {
             preg_match('/-?\d+(\.\d+)?(e-?\d+)?/i', $oid, $matches);
             if (isset($matches[0])) {
-                $oid = $matches[0] + 0;
+                $oid = cast_number($matches[0]);
             } else {
                 $oid = trim('"', $oid); // allow string only values
             }
@@ -377,8 +377,8 @@ class Sensor implements DiscoveryModule, PollerModule
      * Process the snmp data for the specified sensors
      * Returns an array sensor_id => value
      *
-     * @param $sensors
-     * @param $prefetch
+     * @param array $sensors
+     * @param array $prefetch
      * @return array
      * @internal param $device
      */
@@ -425,7 +425,7 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Get a list of unique oids from an array of sensors and break it into chunks.
      *
-     * @param $sensors
+     * @param array $sensors
      * @param int $chunk How many oids per chunk.  Default 10.
      * @return array
      */
@@ -606,9 +606,9 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Record sensor data in the database and data stores
      *
-     * @param $os
-     * @param $sensors
-     * @param $data
+     * @param OS $os
+     * @param array $sensors
+     * @param array $data
      */
     protected static function recordSensorData(OS $os, $sensors, $data)
     {

@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,7 +40,7 @@ class NetCommand extends Controller
             'query' => 'ip_or_hostname',
         ]);
 
-        ini_set('allow_url_fopen', 0);
+        ini_set('allow_url_fopen', '0');
 
         switch ($request->get('cmd')) {
             case 'whois':

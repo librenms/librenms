@@ -1,0 +1,950 @@
+ --
+ -- Copyright(C) 2016 Western Telematic, Inc.
+ --
+
+ WTI-POWER-MIB DEFINITIONS ::= BEGIN
+ IMPORTS
+ MODULE-IDENTITY, NOTIFICATION-TYPE,
+ OBJECT-TYPE, enterprises FROM SNMPv2-SMI
+ DisplayString FROM SNMPv2-TC;
+ westernTelematic OBJECT IDENTIFIER ::= { enterprises 2634 }
+ power MODULE-IDENTITY
+  LAST-UPDATED "201604011600Z" -- 01 Apr 2016
+  ORGANIZATION "Western Telematic, Inc."
+  CONTACT-INFO
+  "Western Telematic, Inc.
+  5 Sterling
+  Irvine, Ca 92618
+  Email: anthonyb@wti.com"
+  DESCRIPTION
+   "This is the MIB module for power products"
+  REVISION "201604011600Z" -- 01 Apr 2016
+  DESCRIPTION
+   "V6.00 for power products "
+ ::= { westernTelematic 3 }
+ --
+ -- System Tables
+ --
+ systemTables OBJECT IDENTIFIER ::= { power 100 }
+ --
+ -- Plug Table
+ --
+ plugTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF PlugEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "A table of plugs."
+ ::= { systemTables 200 }
+ plugEntry OBJECT-TYPE
+  SYNTAX PlugEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Row definition for the plug table."
+  INDEX { plugIndex }
+ ::= { plugTable 1 }
+ PlugEntry ::= SEQUENCE {
+  plugIndex INTEGER,
+  plugID DisplayString,
+  plugStatus INTEGER,
+  plugAction INTEGER,
+  plugName DisplayString,
+  plugCurrent INTEGER,
+  plugPower INTEGER
+ }
+ plugIndex OBJECT-TYPE
+  SYNTAX INTEGER (0..80)
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Index for the plug table."
+ ::= { plugEntry 1 }
+ plugID OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(9..11))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The ID of the plug."
+ ::= { plugEntry 2 }
+ plugStatus OBJECT-TYPE
+  SYNTAX INTEGER (0..1)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Plug status"
+ ::= { plugEntry 3 }
+ plugAction OBJECT-TYPE
+  SYNTAX INTEGER (0..8)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Plug action"
+ ::= { plugEntry 4 }
+ plugName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The Name of the plug."
+ ::= { plugEntry 5 }
+ plugCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Plug current (In tenths of amps, divide by 10 for value in amps)"
+ ::= { plugEntry 7 }
+ plugPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Plug power (Watts)"
+ ::= { plugEntry 8 }
+ --
+ -- Plug Group Table
+ --
+ plugGroupTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF PlugGroupEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "A table of plug groups."
+ ::= { systemTables 300 }
+ plugGroupEntry OBJECT-TYPE
+  SYNTAX PlugGroupEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Row definition for the plug group table."
+  INDEX { plugGroupIndex }
+ ::= { plugGroupTable 1 }
+ PlugGroupEntry ::= SEQUENCE {
+  plugGroupIndex INTEGER,
+  plugGroupName DisplayString,
+  plugGroupAction INTEGER,
+  plugGroupCurrent INTEGER,
+  plugGroupPower INTEGER
+ }
+ plugGroupIndex OBJECT-TYPE
+  SYNTAX INTEGER (0..54)
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Index for the plug group table."
+ ::= { plugGroupEntry 1 }
+ plugGroupName OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(1..24))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The name of the plug group."
+ ::= { plugGroupEntry 2 }
+ plugGroupAction OBJECT-TYPE
+  SYNTAX INTEGER (0..8)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Plug group action"
+ ::= { plugGroupEntry 3 }
+ plugGroupCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Plug group current (In tenths of amps, divide by 10 for value in amps)"
+ ::= { plugGroupEntry 4 }
+ plugGroupPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Plug group power (Watts)"
+ ::= { plugGroupEntry 5 }
+ --
+ -- User Table
+ --
+ userTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF UserEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "A table of users."
+ ::= { systemTables 400 }
+ userEntry OBJECT-TYPE
+  SYNTAX UserEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Row definition for the user table."
+  INDEX { userIndex }
+ ::= { userTable 1 }
+ UserEntry ::= SEQUENCE {
+  userIndex INTEGER,
+  userName DisplayString,
+  userPasswd DisplayString,
+  userAccessLevel INTEGER,
+  userPortAccess DisplayString,
+  userLocalAccess DisplayString,
+  userGroupAccess DisplayString,
+  userSerialAccess INTEGER,
+  userTelnetSshAccess INTEGER,
+  userWebAccess INTEGER,
+  userCurrentPowerMetering INTEGER,
+  userCallbackNum DisplayString,
+  userSubmit INTEGER
+ }
+ userIndex OBJECT-TYPE
+  SYNTAX INTEGER (0..128)
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Index for the user table."
+ ::= { userEntry 1 }
+ userName OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(0..32))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "The name of the user."
+ ::= { userEntry 2 }
+ userPasswd OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(1..16))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "The password of the user."
+ ::= { userEntry 3 }
+ userAccessLevel OBJECT-TYPE
+  SYNTAX INTEGER (0..3)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Users access level"
+ ::= { userEntry 4 }
+ userPortAccess OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(1..5))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to ports."
+ ::= { userEntry 5 }
+ userLocalAccess OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(1..20))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to LOCAL plugs."
+ ::= { userEntry 6 }
+ userGroupAccess OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(1..54))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to plug groups."
+ ::= { userEntry 10 }
+ userSerialAccess OBJECT-TYPE
+  SYNTAX INTEGER (0..1)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to serial interface."
+ ::= { userEntry 11 }
+ userTelnetSshAccess OBJECT-TYPE
+  SYNTAX INTEGER (0..1)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to Telnet/SSH interface."
+ ::= { userEntry 12 }
+ userWebAccess OBJECT-TYPE
+  SYNTAX INTEGER (0..1)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to web interface."
+ ::= { userEntry 13 }
+ userCurrentPowerMetering OBJECT-TYPE
+  SYNTAX INTEGER (0..1)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Access to Current/Power Metering."
+ ::= { userEntry 15 }
+ userCallbackNum OBJECT-TYPE
+  SYNTAX DisplayString(SIZE(0..32))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Callback number."
+ ::= { userEntry 16 }
+ userSubmit OBJECT-TYPE
+  SYNTAX INTEGER (0..1)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "Submit changes to user."
+ ::= { userEntry 31 }
+ --
+ -- Environment Tables
+ --
+ environmentTables OBJECT IDENTIFIER ::= { power 200 }
+ environmentUnitTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF EnvironmentUnitEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "A table of environment status for units."
+ ::= { environmentTables 10 }
+ environmentUnitEntry OBJECT-TYPE
+  SYNTAX EnvironmentUnitEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Row definition for the environment unit table."
+  INDEX { environmentUnitIndex }
+ ::= { environmentUnitTable 1 }
+ EnvironmentUnitEntry ::= SEQUENCE {
+  environmentUnitIndex INTEGER,
+  environmentUnitName DisplayString,
+  environmentUnitTemperature INTEGER,
+  environmentUnitCurrentA INTEGER,
+  environmentUnitVoltageA INTEGER,
+  environmentUnitPowerA INTEGER,
+  environmentUnitCurrentB INTEGER,
+  environmentUnitVoltageB INTEGER,
+  environmentUnitPowerB INTEGER,
+  environmentUnitCurrentC INTEGER,
+  environmentUnitVoltageC INTEGER,
+  environmentUnitPowerC INTEGER,
+  environmentUnitCurrentD INTEGER,
+  environmentUnitVoltageD INTEGER,
+  environmentUnitPowerD INTEGER,
+  environmentSysRAM INTEGER,
+  environmentSysFlash INTEGER,
+  environmentMacEth0 DisplayString,
+  environmentMacEth1 DisplayString,
+  environmentInputPower1 INTEGER,
+  environmentInputPower2 INTEGER,
+  environmentInputPower3 INTEGER,
+  environmentInputPower4 INTEGER
+ }
+ environmentUnitIndex OBJECT-TYPE
+  SYNTAX INTEGER (0..3)
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+   "Index for the environment unit table."
+ ::= { environmentUnitEntry 1 }
+ environmentUnitName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The name of the unit."
+ ::= { environmentUnitEntry 2 }
+ environmentUnitTemperature OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The temperature of the unit."
+ ::= { environmentUnitEntry 3 }
+ environmentUnitCurrentA OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of amps in branch A for unit (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentUnitEntry 4 }
+ environmentUnitVoltageA OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The voltage of branch A for unit."
+ ::= { environmentUnitEntry 5 }
+ environmentUnitPowerA OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of watts used by branch A for unit."
+ ::= { environmentUnitEntry 6 }
+ environmentUnitCurrentB OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of amps in branch B for unit (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentUnitEntry 7 }
+ environmentUnitVoltageB OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The voltage of branch B for unit."
+ ::= { environmentUnitEntry 8 }
+ environmentUnitPowerB OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of watts used by branch b for unit."
+ ::= { environmentUnitEntry 9 }
+ environmentUnitCurrentC OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of amps in branch C for unit (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentUnitEntry 10 }
+ environmentUnitVoltageC OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The voltage of branch C for unit."
+ ::= { environmentUnitEntry 11 }
+ environmentUnitPowerC OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of watts used by branch c for unit."
+ ::= { environmentUnitEntry 12 }
+ environmentUnitCurrentD OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of amps in branch D for unit (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentUnitEntry 13 }
+ environmentUnitVoltageD OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The voltage of branch D for unit."
+ ::= { environmentUnitEntry 14 }
+ environmentUnitPowerD OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The number of watts used by branch d for unit."
+ ::= { environmentUnitEntry 15 }
+ environmentSysRAM OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total system RAM."
+ ::= { environmentUnitEntry 18 }
+ environmentSysFlash OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total system Flash."
+ ::= { environmentUnitEntry 19 }
+ environmentMacEth0 OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "MAC Address Eth0"
+ ::= { environmentUnitEntry 20 }
+ environmentMacEth1 OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "MAC Address Eth1"
+ ::= { environmentUnitEntry 21 }
+ environmentInputPower1 OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Status of first power input."
+ ::= { environmentUnitEntry 22 }
+ environmentInputPower2 OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Status of second power input."
+ ::= { environmentUnitEntry 23 }
+ environmentInputPower3 OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Status of third power input."
+ ::= { environmentUnitEntry 24 }
+ environmentInputPower4 OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Status of fourth power input."
+ ::= { environmentUnitEntry 25 }
+ environmentBranchATotalCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Current on BRANCH A (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentTables 20 }
+ environmentBranchATotalPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Power on BRANCH A."
+ ::= { environmentTables 30 }
+ environmentBranchBTotalCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Current on BRANCH B (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentTables 40 }
+ environmentBranchBTotalPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Power on BRANCH B."
+ ::= { environmentTables 50 }
+ environmentBranchCTotalCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Current on BRANCH C (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentTables 51 }
+ environmentBranchCTotalPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Power on BRANCH C."
+ ::= { environmentTables 52 }
+ environmentBranchDTotalCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Current on BRANCH D (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentTables 53 }
+ environmentBranchDTotalPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total Power on BRANCH D."
+ ::= { environmentTables 54 }
+ environmentSystemTotalCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total current for system  (In tenths of amps, divide by 10 for value in amps)."
+ ::= { environmentTables 60 }
+ environmentSystemTotalPower OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Total power on system."
+ ::= { environmentTables 70 }
+ environmentMonthlyPowerLog OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "The monthly power usage log"
+ ::= { environmentTables 80 }
+ --
+ -- Alarm Tables
+ --
+ alarmTables OBJECT IDENTIFIER ::= { power 280 }
+ alarmOverCurrentInitial OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Over Current Initial Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 1 }
+ alarmOverCurrentCritical OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Over Current Critical Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 2 }
+ alarmOverTemperatureInitial OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Over Temperature Initial Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 3 }
+ alarmOverTemperatureCritical OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Over Temperature Critical Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 4 }
+ alarmCircuitBreakerOpen OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Circuit Breaker Open Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 5 }
+ alarmCommLoss OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Communication Loss Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 6 }
+ alarmLostVoltage OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Lost Voltage (Line Input) Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 7 }
+ alarmPingNoAnswer OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Ping No Answer Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 8 }
+ alarmInvalidAccessLockout OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Invalid Access Lockout Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 9 }
+ alarmPowerCycle OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Power Cycle Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 10 }
+ alarmAlarmInput OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Alarm Input Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 12 }
+ alarmPlugCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Plug Current Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 13 }
+ alarmLostOptoVoltage OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Lost Voltage (Line Input) Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 14 }
+ alarmEmergencyShutoff OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the Emergency Shutoff Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 15 }
+ alarmNoDialtone OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "State of the No Dialtone Alarm (0 = Inactive, 1 = Active)"
+ ::= { alarmTables 16 }
+ --
+ -- Traps
+ --
+ wtiTraps OBJECT IDENTIFIER ::= { power 300 }
+ -- Trap Info
+ trapInfo OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+   "Alarm information"
+ ::= { wtiTraps 1 }
+ -- Test Traps
+ testTraps OBJECT IDENTIFIER ::= { wtiTraps 2}
+ testTrap TRAP-TYPE
+  ENTERPRISE testTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "A test trap"
+ ::= 1
+ -- Alarm Traps
+ overCurrentInitialTraps OBJECT IDENTIFIER ::= { wtiTraps 4}
+ overCurrentInitialSetTrap TRAP-TYPE
+  ENTERPRISE overCurrentInitialTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Current Initial Alarm"
+ ::= 1
+ overCurrentInitialClearTrap TRAP-TYPE
+  ENTERPRISE overCurrentInitialTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Current Initial Alarm (Clear)"
+ ::= 2
+ overCurrentCriticalTraps OBJECT IDENTIFIER ::= { wtiTraps 5}
+ overCurrentCriticalSetTrap TRAP-TYPE
+  ENTERPRISE overCurrentCriticalTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Current Critical Alarm"
+ ::= 1
+ overCurrentCriticalClearTrap TRAP-TYPE
+  ENTERPRISE overCurrentCriticalTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Current Critical Alarm (Clear)"
+ ::= 2
+ overTemperatureInitialTraps OBJECT IDENTIFIER ::= { wtiTraps 6}
+ overTemperatureInitialSetTrap TRAP-TYPE
+  ENTERPRISE overTemperatureInitialTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Temperature Initial Alarm"
+ ::= 1
+ overTemperatureInitialClearTrap TRAP-TYPE
+  ENTERPRISE overTemperatureInitialTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Temperature Initial Alarm (Clear)"
+ ::= 2
+ overTemperatureCriticalTraps OBJECT IDENTIFIER ::= { wtiTraps 7}
+ overTemperatureCriticalSetTrap TRAP-TYPE
+  ENTERPRISE overTemperatureCriticalTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Temperature Critical Alarm"
+ ::= 1
+ overTemperatureCriticalClearTrap TRAP-TYPE
+  ENTERPRISE overTemperatureCriticalTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Over Temperature Critical Alarm (Clear)"
+ ::= 2
+ circuitBreakerOpenTraps OBJECT IDENTIFIER ::= { wtiTraps 8}
+ circuitBreakerOpenSetTrap TRAP-TYPE
+  ENTERPRISE circuitBreakerOpenTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Circuit Breaker Open Alarm"
+ ::= 1
+ circuitBreakerOpenClearTrap TRAP-TYPE
+  ENTERPRISE circuitBreakerOpenTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Circuit Breaker Open Alarm (Clear)"
+ ::= 2
+ lostCommTraps OBJECT IDENTIFIER ::= { wtiTraps 9}
+ lostCommSetTrap TRAP-TYPE
+  ENTERPRISE lostCommTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Lost Communication with AUX Unit"
+ ::= 1
+ lostCommClearTrap TRAP-TYPE
+  ENTERPRISE lostCommTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Lost Communication with AUX Unit (Clear)"
+ ::= 2
+ lostVoltageTraps OBJECT IDENTIFIER ::= { wtiTraps 10}
+ lostVoltageSetTrap TRAP-TYPE
+  ENTERPRISE lostVoltageTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Lost Voltage (Line In)"
+ ::= 1
+ lostVoltageClearTrap TRAP-TYPE
+  ENTERPRISE lostVoltageTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Lost Voltage (Line In) (Clear)"
+ ::= 2
+ pingNoAnswerTraps OBJECT IDENTIFIER ::= { wtiTraps 11}
+ pingNoAnswerSetTrap TRAP-TYPE
+  ENTERPRISE pingNoAnswerTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Ping No Answer"
+ ::= 1
+ pingNoAnswerClearTrap TRAP-TYPE
+  ENTERPRISE pingNoAnswerTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Ping No Answer (Clear)"
+ ::= 2
+ lockoutTraps OBJECT IDENTIFIER ::= { wtiTraps 12}
+ lockoutSetTrap TRAP-TYPE
+  ENTERPRISE lockoutTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Invalid Access Lockout"
+ ::= 1
+ lockoutClearTrap TRAP-TYPE
+  ENTERPRISE lockoutTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Invalid Access Lockout (Clear)"
+ ::= 2
+ powercycleTraps OBJECT IDENTIFIER ::= { wtiTraps 13}
+ powercycleSetTrap TRAP-TYPE
+  ENTERPRISE powercycleTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Power Cycle"
+ ::= 1
+ alarmInputTraps OBJECT IDENTIFIER ::= { wtiTraps 14}
+ alarmInputSetTrap TRAP-TYPE
+  ENTERPRISE alarmInputTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Alarm Input"
+ ::= 1
+ alarmInputClearTrap TRAP-TYPE
+  ENTERPRISE alarmInputTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Alarm Input (Clear)"
+ ::= 2
+ plugCurrentTraps OBJECT IDENTIFIER ::= { wtiTraps 15}
+ plugCurrentSetTrap TRAP-TYPE
+  ENTERPRISE plugCurrentTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Plug Current"
+ ::= 1
+ plugCurrentClearTrap TRAP-TYPE
+  ENTERPRISE plugCurrentTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Plug Current (Clear)"
+ ::= 2
+ lostOptoVoltageTraps OBJECT IDENTIFIER ::= { wtiTraps 16}
+ lostOptoVoltageSetTrap TRAP-TYPE
+  ENTERPRISE lostOptoVoltageTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Lost Voltage"
+ ::= 1
+ lostOptoVoltageClearTrap TRAP-TYPE
+  ENTERPRISE lostOptoVoltageTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Lost Voltage (Clear)"
+ ::= 2
+ emergencyShutoffTraps OBJECT IDENTIFIER ::= { wtiTraps 17}
+ emergencyShutoffSetTrap TRAP-TYPE
+  ENTERPRISE emergencyShutoffTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Emergency Shutoff"
+ ::= 1
+ emergencyShutoffClearTrap TRAP-TYPE
+  ENTERPRISE emergencyShutoffTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "Emergency Shutoff (Clear)"
+ ::= 2
+ noDialtoneTraps OBJECT IDENTIFIER ::= { wtiTraps 18}
+ noDialtoneSetTrap TRAP-TYPE
+  ENTERPRISE noDialtoneTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "No Dialtone"
+ ::= 1
+ noDialtoneClearTrap TRAP-TYPE
+  ENTERPRISE noDialtoneTraps
+  VARIABLES {
+  trapInfo
+  }
+  DESCRIPTION
+   "No Dialtone (Clear)"
+ ::= 2
+ END

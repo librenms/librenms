@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2015 Daniel Preussker <f0o@devilcode.org>
  * @copyright  2015 LibreNMS
  * @author     Daniel Preussker (f0o) <f0o@devilcode.org>

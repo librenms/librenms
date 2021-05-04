@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.21362.100.1.4.3.4",
                     "sysDescr": "INETPOE-4GP2GF : Switch 2 ports 1000BASE-X / 4 ports 1000BASE-T PoE",
-                    "sysContact": null,
-                    "version": "1.0.5d (Bootloader x.x.x)",
-                    "hardware": "INETPOE-4GP2GF",
-                    "features": null,
-                    "os": "ifotec",
-                    "type": "network",
-                    "serial": "0051",
-                    "icon": "ifotec.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.21362.100.1.4.3.4",
-                    "sysDescr": "INETPOE-4GP2GF : Switch 2 ports 1000BASE-X / 4 ports 1000BASE-T PoE",
                     "sysContact": "<private>",
                     "version": "1.0.5d (Bootloader x.x.x)",
                     "hardware": "INETPOE-4GP2GF",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

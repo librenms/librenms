@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -110,7 +110,7 @@ class Proc
      * process is not synchronous
      * If the command isn't terminated with a newline, add one
      *
-     * @param $command
+     * @param string $command
      * @return array
      */
     public function sendCommand($command)
@@ -176,7 +176,13 @@ class Proc
     public function close($command = null)
     {
         if (isset($command)) {
-            $this->sendInput($this->checkAddEOL($command));
+            try {
+                if (is_resource($this->_pipes[0])) {
+                    $this->sendInput($this->checkAddEOL($command));
+                }
+            } catch (\ErrorException $e) {
+                // might have closed already
+            }
         }
 
         $this->closePipes();
@@ -272,6 +278,7 @@ class Proc
 
     /**
      * If this process waits for output
+     *
      * @return bool
      */
     public function isSynchronous()
@@ -295,7 +302,7 @@ class Proc
      * Add and end of line character to a string if
      * it doesn't already end with one
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     private function checkAddEOL($string)

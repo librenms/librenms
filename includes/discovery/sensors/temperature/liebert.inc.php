@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -42,6 +42,7 @@ foreach ($lib_data as $index => $data) {
     if (is_numeric($current)) {
         $descr = $data['lgpEnvTemperatureDescrDegC'];
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
+        unset($current);
     }
 }
 

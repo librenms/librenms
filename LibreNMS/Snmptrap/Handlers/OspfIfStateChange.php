@@ -18,9 +18,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 KanREN Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -78,6 +78,9 @@ class OspfIfStateChange implements SnmptrapHandler
                 break;
             case 'loopback':
                 $severity = 4;
+                break;
+            default:
+                $severity = 0;
                 break;
         }
 

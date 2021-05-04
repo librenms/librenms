@@ -2,6 +2,7 @@
 <?php
 
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -27,8 +28,9 @@ $options = getopt(
 $init_modules = ['discovery', 'polling'];
 require $install_dir . '/includes/init.php';
 
-$debug = (isset($options['d']) || isset($options['debug']));
-$vdebug = $debug;
+Debug::setVerbose(
+    Debug::set(isset($options['d']) || isset($options['debug']))
+);
 
 if (isset($options['snmpsim'])) {
     $snmpsim = new Snmpsim();
@@ -38,20 +40,28 @@ if (isset($options['snmpsim'])) {
 
 if (isset($options['h'])
     || isset($options['help'])
+    || (isset($options['o']) || isset($options['os'])) && ! (isset($options['v']) || isset($options['variant']))
     || ! (isset($options['o']) || isset($options['os']) || isset($options['m']) || isset($options['modules']))
 ) {
     echo "Script to update test data. Database data is saved in tests/data.
 
 Usage:
-  You must specify a valid OS and/or module(s).
+  You must specify a valid OS (and variant) and/or module(s).
 
+Required:
   -o, --os           Name of the OS to save test data for
   -v, --variant      The variant of the OS to use, usually the device model
+
+Optional:
   -m, --modules      The discovery/poller module(s) to collect data for, comma delimited
   -n, --no-save      Don't save database entries, print them out instead
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
       --snmpsim      Run snmpsimd.py using the collected data for manual testing.
+
+Examples:
+  ./save-test-data.php -o ios -v 2960x
+  ./save-test-data.php -o linux -v freeradius -m applications
 ";
     exit;
 }
@@ -138,3 +148,5 @@ try {
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;
 }
+
+$snmpsim->stop();

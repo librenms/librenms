@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -41,7 +41,7 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibDirs
-     * @param $dir
+     * @param string $dir
      */
     public function testMibDirectory($dir)
     {
@@ -56,9 +56,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param $path
-     * @param $file
-     * @param $mib_name
+     * @param string $path
+     * @param string $file
+     * @param string $mib_name
      */
     public function testDuplicateMibs($path, $file, $mib_name)
     {
@@ -86,9 +86,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param $path
-     * @param $file
-     * @param $mib_name
+     * @param string $path
+     * @param string $file
+     * @param string $mib_name
      */
     public function testMibNameMatches($path, $file, $mib_name)
     {
@@ -104,9 +104,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param $path
-     * @param $file
-     * @param $mib_name
+     * @param string $path
+     * @param string $file
+     * @param string $mib_name
      */
     public function testMibContents($path, $file, $mib_name)
     {
@@ -165,7 +165,7 @@ class MibTest extends TestCase
     /**
      * Extract the mib name from a file
      *
-     * @param $file
+     * @param string $file
      * @return mixed
      * @throws Exception
      */

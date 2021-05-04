@@ -8,10 +8,11 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Service;
 use App\Models\Syslog;
+use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Widget;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use Toastr;
 
@@ -105,7 +106,15 @@ class OverviewController extends Controller
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
         $widgets = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
 
-        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets'));
+        $user_list = [];
+        if ($user->can('manage', User::class)) {
+            $user_list = User::select(['username', 'user_id'])
+                ->where('user_id', '!=', $user->user_id)
+                ->orderBy('username')
+                ->get();
+        }
+
+        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'user_list'));
     }
 
     public function simple(Request $request)

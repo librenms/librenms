@@ -6,7 +6,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
@@ -23,9 +23,9 @@ $components = $components[$device['device_id']];
  */
 $i = 1;
 foreach ($components as $component_id => $tmp_component) {
-    $rrd_filename = rrd_name($device['hostname'], ['cisco-qfp', 'util', $tmp_component['entPhysicalIndex']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'util', $tmp_component['entPhysicalIndex']]);
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         $descr = short_hrDeviceDescr($tmp_component['name']);
 
         $rrd_list[$i]['filename'] = $rrd_filename;

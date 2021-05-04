@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja
  */
@@ -164,6 +164,9 @@ class RoutesTablesController extends TableController
         return $query;
     }
 
+    /**
+     * @param Route $route_entry
+     */
     public function formatItem($route_entry)
     {
         $item = $route_entry->toArray();
@@ -181,7 +184,7 @@ class RoutesTablesController extends TableController
             try {
                 $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
                 $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
             }
         }
@@ -189,7 +192,7 @@ class RoutesTablesController extends TableController
             try {
                 $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
                 $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
             }
         }

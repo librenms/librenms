@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
  * @copyright  2017 Adam Bishop
@@ -34,10 +34,10 @@ use LibreNMS\Util\IP;
  */
 class SSOAuthorizer extends MysqlAuthorizer
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 1;
-    protected static $CAN_UPDATE_USER = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
-    protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = true;
 
     public function authenticate($credentials)
     {

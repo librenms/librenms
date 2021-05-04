@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019-2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,8 +28,8 @@ use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
-use Auth;
 use DB;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 
 class PermissionsCache
@@ -238,7 +238,7 @@ class PermissionsCache
     }
 
     /**
-     * @param $user
+     * @param mixed $user
      * @return int|null
      */
     private function getUserId($user)
@@ -247,7 +247,7 @@ class PermissionsCache
     }
 
     /**
-     * @param $device
+     * @param mixed $device
      * @return int
      */
     private function getDeviceId($device)
@@ -256,7 +256,7 @@ class PermissionsCache
     }
 
     /**
-     * @param $port
+     * @param mixed $port
      * @return int
      */
     private function getPortId($port)
@@ -265,7 +265,7 @@ class PermissionsCache
     }
 
     /**
-     * @param $bill
+     * @param mixed $bill
      * @return int
      */
     private function getBillId($bill)

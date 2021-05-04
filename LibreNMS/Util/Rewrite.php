@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -55,6 +55,29 @@ class Rewrite
         }
 
         return $type;
+    }
+
+    public static function shortenIfType($type)
+    {
+        return str_ireplace(
+            [
+                'FastEthernet',
+                'TenGigabitEthernet',
+                'GigabitEthernet',
+                'Port-Channel',
+                'Ethernet',
+                'Bundle-Ether',
+            ],
+            [
+                'Fa',
+                'Te',
+                'Gi',
+                'Po',
+                'Eth',
+                'BE',
+            ],
+            $type
+        );
     }
 
     public static function normalizeIfName($name)
@@ -114,7 +137,7 @@ class Rewrite
     /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
-     * @param $mac
+     * @param string $mac
      * @return string
      */
     public static function readableMac($mac)

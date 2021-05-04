@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Vitali Kari
  * @copyright  2019 Tony Murray
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -41,6 +41,7 @@ use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
 class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDiscovery
 {
@@ -93,9 +94,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param tmnxEnacpVal
-     * @return encapsulation string
-     * see TIMETRA-TC-MIB::TmnxEncapVal
+     * @param mixed $tmnxEncapVal
+     * @return string encapsulation
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
      */
     private function nokiaEncap($tmnxEncapVal)
     {
@@ -280,6 +281,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     public function discoverMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
         $saps = collect();
 
@@ -296,6 +298,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $traffic_id = $svcId . '.' . $sapPortId . '.' . $this->nokiaEncap($sapEncapValue);
+
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
                 'svc_oid' => $svcId,
@@ -309,6 +313,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
+                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'],
+                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'],
+                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'],
+                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'],
             ]));
         }
 
@@ -622,6 +630,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     public function pollMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
         $saps = collect();
 
@@ -641,6 +650,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $traffic_id = $svcId . '.' . $sapPortId . '.' . $this->nokiaEncap($sapEncapValue);
 
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
@@ -657,6 +667,29 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]));
+            //create SAP graphs
+            $rrd_name = \LibreNMS\Data\Store\Rrd::safeName('sap-' . $traffic_id);
+            $rrd_def = RrdDefinition::make()
+            ->addDataset('sapIngressBits', 'COUNTER', 0)
+            ->addDataset('sapEgressBits', 'COUNTER', 0)
+            ->addDataset('sapIngressDroppedBits', 'COUNTER', 0)
+            ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
+
+            $fields = [
+                'sapIngressBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] * 8,
+                'sapEgressBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] * 8,
+                'sapIngressDroppedBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] * 8,
+                'sapEgressDroppedBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] * 8,
+            ];
+
+            $tags = [
+                'traffic_id' => $traffic_id,
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def,
+            ];
+
+            data_update($this->getDeviceArray(), 'sap', $tags, $fields);
+            $this->enableGraph('sap');
         }
 
         return $saps;

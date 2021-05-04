@@ -36,7 +36,7 @@ chkconfig mariadb on
 service mariadb start
 ```
 
-## Gneral
+## General
 
 Now continue with the installation:
 
@@ -52,7 +52,7 @@ Enter the MySQL/MariaDB root password to enter the command-line interface.
 Create database.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
@@ -154,7 +154,7 @@ chkconfig --levels 235 httpd on
 ```
 
 In `/etc/php.ini`, ensure `date.timezone` is set to your preferred
-time zone.  See <http://php.net/manual/en/timezones.php> for a list of
+time zone.  See <https://php.net/manual/en/timezones.php> for a list of
 supported timezones.  Valid examples are: "America/New York",
 "Australia/Brisbane", "Etc/UTC". Please also ensure that
 `allow_url_fopen` is enabled. Other functions needed for LibreNMS
@@ -283,7 +283,7 @@ chown -R librenms:librenms /opt/librenms
 chmod 775 rrd
 ```
 
-If you're planing on running rrdcached, make sure that the path is
+If you're planning on running rrdcached, make sure that the path is
 also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 **SELinux**

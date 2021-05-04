@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -80,7 +80,7 @@ class Snmpsim
             } else {
                 echo "\nFailed to start Snmpsim. Scroll up for error.\n";
             }
-            exit;
+            exit(1);
         }
     }
 
@@ -173,7 +173,7 @@ class Snmpsim
         unset($this->proc);
     }
 
-    private function findSnmpsimd()
+    public function findSnmpsimd()
     {
         $cmd = Config::locateBinary('snmpsimd');
         if (! is_executable($cmd)) {

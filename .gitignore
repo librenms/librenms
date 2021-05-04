@@ -4,7 +4,6 @@
 !/.gitignore
 !/.editorconfig
 !/.scrutinizer.yml
-!/.travis.yml
 !/.php_cs
 !/.github/
 !/.codeclimate.yml

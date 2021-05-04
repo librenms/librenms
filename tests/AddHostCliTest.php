@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link http://librenms.org
+ * @link https://www.librenms.org
  * @copyright  2020 Lars Elgtvedt Susaas
  * @author     Lars Elgtvedt Susaas
  */
@@ -114,7 +114,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testSnmpV3PrivacyProtocol()
     {
-        $modes = ['DES', 'AES', 'AES-192', 'AES-256'];
+        $modes = ['DES', 'AES', 'AES-192', 'AES-256', 'AES-256-C'];
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
             $result = \Artisan::call('device:add ' . $host . ' -force -x ' . $mode . ' --v3');

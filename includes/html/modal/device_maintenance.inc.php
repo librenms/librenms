@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -87,7 +87,7 @@ foreach ($hour_steps as $hour) {
 <script>
     $("#maintenance-submit").click(function() {
         var device_id = $(this).data("device_id");
-        var title = '<?=display($device['hostname']); ?>';
+        var title = '<?=\LibreNMS\Util\Clean::html($device['hostname'], []); ?>';
         var notes = $('#notes').val();
         var recurring = 0;
         var start = '<?=date('Y-m-d H:i:00'); ?>';

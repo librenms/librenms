@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /*
  * API Transport
@@ -50,9 +50,7 @@ class Hipchat extends Transport
         if ($version == 2) {
             $url .= '/' . urlencode($option['room_id']) . '/notification?auth_token=' . urlencode($option['auth_token']);
         }
-        foreach ($obj as $key => $value) {
-            $api = str_replace('%' . $key, $method == 'get' ? urlencode($value) : $value, $api);
-        }
+
         $curl = curl_init();
 
         if (empty($obj['msg'])) {
@@ -100,7 +98,7 @@ class Hipchat extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200 && $code != 204) {
             var_dump("API '$url' returned Error");
-            var_dump('Params: ' . $message);
+            //var_dump('Params: ' . $message);
             var_dump('Return: ' . $ret);
 
             return 'HTTP Status code ' . $code;

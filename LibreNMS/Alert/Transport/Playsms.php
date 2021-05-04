@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * PlaySMS API Transport
@@ -53,7 +53,9 @@ class Playsms extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 202) {
-            return var_dump($ret);
+            var_dump($ret);
+
+            return;
         }
 
         return true;

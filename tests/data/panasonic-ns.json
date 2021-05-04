@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.258.601.3",
                     "sysDescr": "KX-NS1000 Ver00700128",
-                    "sysContact": null,
-                    "version": "Ver00700128",
-                    "hardware": "KX-NS1000",
-                    "features": null,
-                    "os": "panasonic-ns",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "panasonic.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.258.601.3",
-                    "sysDescr": "KX-NS1000 Ver00700128",
                     "sysContact": "<private>",
                     "version": "Ver00700128",
                     "hardware": "KX-NS1000",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -65,6 +65,9 @@ class MempoolsController extends TableController
         return $query;
     }
 
+    /**
+     * @param Device|Mempool $mempool
+     */
     public function formatItem($mempool)
     {
         if ($mempool instanceof Device) {
@@ -107,7 +110,7 @@ class MempoolsController extends TableController
 
         $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
-        return Url::overlibLink($link, Url::lazyGraphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
+        return Url::overlibLink($link, Url::graphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
     }
 
     private function barLink(Mempool $mempool)

@@ -19,29 +19,10 @@
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
-
-function generate_priority_label($priority)
-{
-    $map = [
-        'emerg'     => 'label-danger',
-        'alert'     => 'label-danger',
-        'crit'      => 'label-danger',
-        'err'       => 'label-danger',
-        'warning'   => 'label-warning',
-        'notice'    => 'label-info',
-        'info'      => 'label-info',
-        'debug'     => 'label-default',
-        ''          => 'label-info',
-    ];
-
-    $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
-
-    return '<span class="alert-status ' . $barColor . '">&nbsp;</span>';
-}
 
 function generate_priority_status($priority)
 {
@@ -86,14 +67,12 @@ function graylog_severity_label($severity)
  */
 function external_exec($command)
 {
-    global $debug, $vdebug;
-
     $device = DeviceCache::getPrimary();
 
     $proc = new Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-    if ($debug && ! $vdebug) {
+    if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $patterns = [
             '/-c\' \'[\S]+\'/',
             '/-u\' \'[\S]+\'/',
@@ -117,7 +96,7 @@ function external_exec($command)
 
         $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
-    } elseif ($vdebug) {
+    } elseif (Debug::isVerbose()) {
         c_echo('SNMP[%c' . $proc->getCommandLine() . "%n]\n");
     }
 
@@ -134,11 +113,11 @@ function external_exec($command)
         d_echo($proc->getErrorOutput());
     }
 
-    if ($debug && ! $vdebug) {
+    if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
         $debug_output = preg_replace($ip_regex, '*', $output);
         d_echo($debug_output . PHP_EOL);
-    } elseif ($vdebug) {
+    } elseif (Debug::isVerbose()) {
         d_echo($output . PHP_EOL);
     }
     d_echo($proc->getErrorOutput());
@@ -194,7 +173,7 @@ function print_message($text)
 
 function get_sensor_rrd($device, $sensor)
 {
-    return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
+    return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 }
 
 function get_sensor_rrd_name($device, $sensor)
@@ -207,14 +186,9 @@ function get_sensor_rrd_name($device, $sensor)
     }
 }
 
-function getPortRrdName($port_id, $suffix = '')
-{
-    return Rrd::portName($port_id, $suffix);
-}
-
 function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
 {
-    return rrd_name($hostname, getPortRrdName($port_id, $suffix));
+    return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
 function get_port_by_index_cache($device_id, $ifIndex)
@@ -369,20 +343,6 @@ function truncate($substring, $max = 50, $rep = '...')
     }
 }
 
-function mres($string)
-{
-    return $string; // FIXME bleh
-    // short function wrapper because the real one is stupidly long and ugly. aesthetics.
-    global $database_link;
-
-    return mysqli_real_escape_string($database_link, $string);
-}
-
-function getifhost($id)
-{
-    return dbFetchCell('SELECT `device_id` from `ports` WHERE `port_id` = ?', [$id]);
-}
-
 function gethostbyid($device_id)
 {
     return DeviceCache::get((int) $device_id)->hostname;
@@ -429,21 +389,6 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function safename($name)
-{
-    return \LibreNMS\Data\Store\Rrd::safeName($name);
-}
-
-/**
- * Function format the rrdtool description text correctly.
- * @param $descr
- * @return mixed
- */
-function safedescr($descr)
-{
-    return \LibreNMS\Data\Store\Rrd::safeDescr($descr);
-}
-
 function zeropad($num, $length = 2)
 {
     return str_pad($num, $length, '0', STR_PAD_LEFT);
@@ -478,59 +423,6 @@ function get_dev_attrib($device, $attrib_type)
 function del_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
-}
-
-function formatRates($value, $round = '2', $sf = '3')
-{
-    $value = format_si($value, $round, $sf) . 'bps';
-
-    return $value;
-}
-
-function formatStorage($value, $round = '2', $sf = '3')
-{
-    return \LibreNMS\Util\Number::formatBi($value, $round, $sf);
-}
-
-function format_si($value, $round = 2, $sf = 3)
-{
-    return \LibreNMS\Util\Number::formatSi($value, $round, $sf, '');
-}
-
-function format_bi($value, $round = 2, $sf = 3)
-{
-    return \LibreNMS\Util\Number::formatBi($value, $round, $sf, '');
-}
-
-function format_number($value, $base = 1000, $round = 2, $sf = 3)
-{
-    return \LibreNMS\Util\Number::formatBase($value, $base, $round, $sf, '');
-}
-
-function is_valid_hostname($hostname)
-{
-    return \LibreNMS\Util\Validate::hostname($hostname);
-}
-
-/*
- * convenience function - please use this instead of 'if ($debug) { echo ...; }'
- */
-if (! function_exists('d_echo')) {
-    //TODO remove this after installs have updated, leaving it for for transition
-    function d_echo($text, $no_debug_text = null)
-    {
-        global $debug;
-
-        if (Laravel::isBooted()) {
-            \Log::debug(is_string($text) ? rtrim($text) : $text);
-        } elseif ($debug) {
-            print_r($text);
-        }
-
-        if (! $debug && $no_debug_text) {
-            echo "$no_debug_text";
-        }
-    }
 }
 
 /**
@@ -700,21 +592,6 @@ function can_ping_device($attribs)
     }
 } // end can_ping_device
 
-/*
- * @return true if every string in $arr begins with $str
- */
-function begins_with($str, $arr)
-{
-    foreach ($arr as $s) {
-        $pos = strpos($s, $str);
-        if ($pos === false || $pos > 0) {
-            return false;
-        }
-    }
-
-    return true;
-} // begins_with
-
 function search_phrase_column($c)
 {
     global $searchPhrase;
@@ -738,7 +615,7 @@ function ceph_rrd($gtype)
         $var = $vars['pool'];
     }
 
-    return rrd_name($device['hostname'], ['app', 'ceph', $vars['id'], $gtype, $var]);
+    return Rrd::name($device['hostname'], ['app', 'ceph', $vars['id'], $gtype, $var]);
 } // ceph_rrd
 
 /**
@@ -799,15 +676,20 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * @return bool
+ * Checks SNMPv3 capabilities
+ *
+ * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
+ * AES-192, AES-256 for Privacy Algorithms
  */
-function snmpv3_sha2_capable()
+function snmpv3_capabilities(): array
 {
     $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
     $process->run();
 
-    return Str::contains($process->getErrorOutput(), 'SHA-512');
+    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
+    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
+
+    return $ret;
 }
 
 /**
@@ -815,7 +697,7 @@ function snmpv3_sha2_capable()
  * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
  */
-// Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+// Fuction is from https://php.net/manual/en/function.inet-ntop.php
 function inet6_ntop($ip)
 {
     $l = strlen($ip);
@@ -839,7 +721,7 @@ function format_hostname($device, $hostname = null)
     }
 
     if (Config::get('force_hostname_to_sysname') && ! empty($device['sysName'])) {
-        if (is_valid_hostname($hostname) && ! IP::isValid($hostname)) {
+        if (\LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
             return $device['sysName'];
         }
     }
@@ -1092,30 +974,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 }
 
 /**
- * @param $value
- * @param bool $strip_tags
- * @return string
- */
-function clean($value, $strip_tags = true)
-{
-    if ($strip_tags === true) {
-        return strip_tags(mres($value));
-    } else {
-        return mres($value);
-    }
-}
-
-/**
- * @param $value
- * @param array $purifier_config (key, value pair)
- * @return string
- */
-function display($value, $purifier_config = [])
-{
-    return \LibreNMS\Util\Clean::html($value, $purifier_config);
-}
-
-/**
  * Load the os definition for the device and set type and os_group
  * $device['os'] must be set
  *
@@ -1272,23 +1130,6 @@ function str_to_class($name, $namespace = null)
     }, $class);
 
     return $namespace . $class;
-}
-
-/**
- * Checks file permissions against a minimum permissions mask.
- * This only check that bits are enabled, not disabled.
- * The mask is in the same format as posix permissions. For example, 600 means user read and write.
- *
- * @param string $file the name of the file to check
- * @param $mask
- * @return bool
- */
-function check_file_permissions($file, $mask)
-{
-    $perms = fileperms($file);
-    $mask = octdec($mask);
-
-    return ($perms & $mask) === $mask;
 }
 
 /**

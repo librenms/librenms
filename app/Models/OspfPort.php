@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OspfPort extends PortRelatedModel
 {
@@ -65,7 +66,7 @@ class OspfPort extends PortRelatedModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id');
     }

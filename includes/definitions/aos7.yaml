@@ -4,6 +4,7 @@ text: 'Alcatel-Lucent OS'
 type: network
 ifXmcbc: true
 ifname: true
+nobulk: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -14,3 +15,7 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.6486.801. #aos7
 mib_dir: nokia/aos7
+discovery_modules:
+    bgp-peers: true
+poller_modules:
+    bgp-peers: true

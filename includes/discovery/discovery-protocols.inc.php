@@ -54,8 +54,8 @@ foreach ($cdp_array as $key => $cdp_if_array) {
         $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
 
         if (! $remote_device_id &&
-            ! can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform'] &&
-            Config::get('autodiscovery.xdp') === true)
+            ! can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform']) &&
+            Config::get('autodiscovery.xdp') === true
         ) {
             $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
 
@@ -86,6 +86,11 @@ if (($device['os'] == 'routeros')) {
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (! empty($lldp_array)) {
+        // workaround for routeros returning the incorrect index
+        if (! empty($lldp_array[0][0])) {
+            $lldp_array = $lldp_array[0][0];
+        }
+
         $lldp_ports = snmpwalk_group($device, 'mtxrInterfaceStatsName', 'MIKROTIK-MIB');
         $lldp_ports_num = snmpwalk_group($device, 'mtxrNeighborInterfaceID', 'MIKROTIK-MIB');
 
@@ -100,7 +105,7 @@ if (($device['os'] == 'routeros')) {
             $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
 
             if (! $remote_device_id &&
-                is_valid_hostname($lldp['lldpRemSysName']) &&
+                \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
                 ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc']) &&
                 Config::get('autodiscovery.xdp') === true) {
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
@@ -133,7 +138,7 @@ if (($device['os'] == 'routeros')) {
         $remote_device_id = find_device_id($lldp['lldpRemSysName']);
 
         if (! $remote_device_id &&
-            is_valid_hostname($lldp['lldpRemSysName']) &&
+            \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
             ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
             Config::get('autodiscovery.xdp') === true)
         ) {
@@ -167,7 +172,7 @@ if (($device['os'] == 'routeros')) {
         $remote_device_id = find_device_id($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex]);
 
         if (! $remote_device_id &&
-            is_valid_hostname($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex]) &&
+            \LibreNMS\Util\Validate::hostname($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex]) &&
             ! can_skip_discovery($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex], $lldp['tmnxLldpRemSysDesc'][$ifIndex][$MacIndex][$RemIndex]) &&
             Config::get('autodiscovery.xdp') === true
         ) {

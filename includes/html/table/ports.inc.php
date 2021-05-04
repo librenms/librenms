@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -160,12 +160,12 @@ foreach (dbFetchRows($query, $param) as $port) {
 
     if ($vars['deleted'] !== 'yes') {
         $actions .= '<div class="col-xs-1"><a href="';
-        $actions .= generate_device_url($device, ['tab' => 'alerts']);
+        $actions .= \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], ['tab' => 'alerts']);
         $actions .= '" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>';
 
         if (Auth::user()->hasGlobalAdmin()) {
             $actions .= '<div class="col-xs-1"><a href="';
-            $actions .= generate_device_url($device, ['tab' => 'edit', 'section' => 'ports']);
+            $actions .= \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], ['tab' => 'edit', 'section' => 'ports']);
             $actions .= '" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>';
         }
     }
@@ -190,9 +190,9 @@ foreach (dbFetchRows($query, $param) as $port) {
         'ifOutOctets_rate' => $port['ifOutOctets_rate'] * 8,
         'ifInUcastPkts_rate' => $port['ifInUcastPkts_rate'],
         'ifOutUcastPkts_rate' => $port['ifOutUcastPkts_rate'],
-        'ifInErrors' => $port['ifInErrors'],
-        'ifOutErrors' => $port['ifOutErrors'],
-        'ifType' => humanmedia($port['ifType']),
+        'ifInErrors' => $port['poll_period'] ? \LibreNMS\Util\Number::formatSi($port['ifInErrors_delta'] / $port['poll_period'], 2, 3, 'EPS') : '',
+        'ifOutErrors' => $port['poll_period'] ? \LibreNMS\Util\Number::formatSi($port['ifOutErrors_delta'] / $port['poll_period'], 2, 3, 'EPS') : '',
+        'ifType' => \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']),
         'ifAlias' => $port['ifAlias'],
         'actions' => $actions,
     ];
@@ -205,4 +205,4 @@ $output = [
     'total' => $total,
 ];
 
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

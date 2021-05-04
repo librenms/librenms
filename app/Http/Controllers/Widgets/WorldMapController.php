@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -68,7 +68,9 @@ class WorldMapController extends WidgetController
                 }
 
                 // add extra data
+                /** @phpstan-ignore-next-line */
                 $device->markerIcon = 'greenMarker';
+                /** @phpstan-ignore-next-line */
                 $device->zOffset = 0;
 
                 if ($device->status == 0) {

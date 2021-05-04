@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Vminfo;
-use Auth;
 use Carbon\Carbon;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
 
@@ -58,7 +59,7 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
 
         if (! $device->exists) {
@@ -110,7 +111,7 @@ class DeviceController extends Controller
     {
         ob_start();
         $device = $device->toArray();
-        set_debug(false);
+        Debug::set(false);
         chdir(base_path());
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');

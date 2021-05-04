@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +33,7 @@ if (! Auth::user()->hasGlobalRead()) {
 
 if (! empty($_REQUEST['search'])) {
     $where[] = '(`hostname` LIKE ? OR `sysName` LIKE ?)';
-    $search = '%' . mres($_REQUEST['search']) . '%';
+    $search = '%' . $_REQUEST['search'] . '%';
     $params[] = $search;
     $params[] = $search;
 }

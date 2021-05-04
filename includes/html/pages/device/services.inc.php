@@ -10,7 +10,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -83,7 +83,7 @@ if (count($services) > '0') {
         echo '<tr id="row_' . $service['service_id'] . '">';
         echo '<td class="col-sm-12">';
         echo '<div class="col-sm-1">' . $status . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . formatUptime(time() - $service['service_changed']) . '</div>';
+        echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
         echo '<div class="col-sm-2 text-muted">' . $service['service_desc'] . '</div>';
         echo '<div class="col-sm-5">' . nl2br(trim($service['service_message'])) . '</div>';
         echo '<div class="col-sm-2">';

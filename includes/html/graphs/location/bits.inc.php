@@ -25,12 +25,12 @@ foreach ($devices as $device) {
         }
 
         $rrd_file = get_port_rrdfile_path($device['hostname'], $int['port_id']);
-        if (rrdtool_check_rrd_exists($rrd_file) && $ignore != 1) {
+        if (Rrd::checkRrdExists($rrd_file) && $ignore != 1) {
             $rrd_filename = $rrd_file; // FIXME: Can this be unified without side-effects?
             $rrd_list[$i]['filename'] = $rrd_filename;
             $rrd_list[$i]['descr'] = $port['label'];
             $rrd_list[$i]['descr_in'] = $device['hostname'];
-            $rrd_list[$i]['descr_out'] = display($port['ifAlias']);
+            $rrd_list[$i]['descr_out'] = \LibreNMS\Util\Clean::html($port['ifAlias'], []);
             $rrd_list[$i]['ds_in'] = $ds_in;
             $rrd_list[$i]['ds_out'] = $ds_out;
             $i++;

@@ -120,7 +120,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                     // Check whether the Virtual Machine is already known for this host.
                     $result = dbFetchRow("SELECT * FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND `vm_type` = 'libvirt'", [$device['device_id'], $dom_id]);
                     if (count($result['device_id']) == 0) {
-                        $inserted_id = dbInsert(['device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)], 'vminfo');
+                        $inserted_id = dbInsert(['device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id, 'vmwVmDisplayName' => $vmwVmDisplayName, 'vmwVmGuestOS' => $vmwVmGuestOS, 'vmwVmMemSize' => $vmwVmMemSize, 'vmwVmCpus' => $vmwVmCpus, 'vmwVmState' => $vmwVmState], 'vminfo');
                         echo '+';
                         log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', 3, $inserted_id);
                     } else {
@@ -130,7 +130,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                             || $result['vmwVmGuestOS'] != $vmwVmGuestOS
                             || $result['vmwVmMemSize'] != $vmwVmMemSize
                         ) {
-                            dbUpdate(['vmwVmState' => mres($vmwVmState), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus)], 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", [$device['device_id'], $dom_id]);
+                            dbUpdate(['vmwVmState' => $vmwVmState, 'vmwVmGuestOS' => $vmwVmGuestOS, 'vmwVmDisplayName' => $vmwVmDisplayName, 'vmwVmMemSize' => $vmwVmMemSize, 'vmwVmCpus' => $vmwVmCpus], 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", [$device['device_id'], $dom_id]);
                             echo 'U';
                         // FIXME eventlog
                         } else {

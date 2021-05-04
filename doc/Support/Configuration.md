@@ -824,7 +824,6 @@ These options rely on daily.sh running from cron as per the installation instruc
 $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
-$config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 7;
 $config['alert_log_purge']                                = 365;
 $config['port_fdb_purge']                                 = 10;

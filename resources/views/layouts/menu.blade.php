@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu">
                             <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu scrollable-menu">
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
                                 @endforeach
@@ -234,8 +234,12 @@
                                                      aria-hidden="true"></i> <span
                                 class="hidden-sm">@lang('Services')</span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg"
-                                                                   aria-hidden="true"></i> @lang('All Services')</a>
+                            <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> @lang('All Services')</a>
+                            </li>
+                            <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
+                                  <i class="fa fa-square fa-stack-2x"></i>
+                                  <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
+                                </span> @lang('Services Templates')</a>
                             </li>
                             @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>
@@ -331,7 +335,11 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> @lang('Manage Groups')
+                            </a></li>
 
+                            <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
                                 <li><a href="{{ url('ports/alerted=yes') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"

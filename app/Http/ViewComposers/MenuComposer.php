@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,7 +36,7 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;

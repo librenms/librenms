@@ -15,11 +15,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Trap sent when a Juniper transciever lambda reaches an alert level threshold.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -50,7 +50,7 @@ class JnxDomLaneAlarmCleared implements SnmptrapHandler
         $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         if (! $port) {
-            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
 
             return;
         }

@@ -15,14 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use Database\Seeders\DefaultWidgetSeeder;
+
 if (! isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = [];

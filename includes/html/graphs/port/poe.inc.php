@@ -10,7 +10,7 @@ $oids = [
 $i = 0;
 $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe');
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($oids as $oid) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = substr($oid, 4);

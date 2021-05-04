@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.7367",
                     "sysDescr": "DrayTek Corporation, Router Model: Vigor2920 Series, Version: 3.8.8.2, Build Date/Time:May 21 2018 16:45:55",
-                    "sysContact": null,
-                    "version": "3.8.8.2",
-                    "hardware": "Vigor2920 Series",
-                    "features": null,
-                    "os": "draytek",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "draytek.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.7367",
-                    "sysDescr": "DrayTek Corporation, Router Model: Vigor2920 Series, Version: 3.8.8.2, Build Date/Time:May 21 2018 16:45:55",
                     "sysContact": "<private>",
                     "version": "3.8.8.2",
                     "hardware": "Vigor2920 Series",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

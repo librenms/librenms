@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -625,6 +625,6 @@ class Ironware extends Foundry
             'snICX725048HPOERouter' => 'FastIron ICX 7250 48-port PoE+ Router',
         ];
 
-        $this->getDevice()->hardware = array_str_replace($rewrite_ironware_hardware, $this->getDevice()->hardware);
+        $this->getDevice()->hardware = str_replace(array_keys($rewrite_ironware_hardware), array_values($rewrite_ironware_hardware), $this->getDevice()->hardware);
     }
 }

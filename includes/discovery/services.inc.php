@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\ServiceTemplateController;
 use LibreNMS\Config;
 
+if (Config::get('discover_services_templates')) {
+    (new ServiceTemplateController())->applyAll(); // FIXME applyAll() should not be on a controller
+}
 if (Config::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = [

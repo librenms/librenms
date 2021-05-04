@@ -27,9 +27,11 @@ if (is_numeric($service_id) && $service_id > 0) {
         'desc'      => $service[0]['service_desc'],
         'param'     => $service[0]['service_param'],
         'ignore'    => $service[0]['service_ignore'],
-        'disabled'   => $service[0]['service_disabled'],
+        'disabled'  => $service[0]['service_disabled'],
+        'template_id' => $service[0]['service_template_id'],
+        'name'      => $service[0]['service_name'],
     ];
 
     header('Content-Type: application/json');
-    echo _json_encode($output);
+    echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }
