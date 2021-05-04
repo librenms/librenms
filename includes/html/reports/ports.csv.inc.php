@@ -36,19 +36,19 @@ foreach ($vars as $var => $value) {
                 break;
 
             case 'deleted':
-                if ($value == 1 || $value == "yes") {
+                if ($value == 1 || $value == 'yes') {
                     $where .= ' AND I.deleted = 1';
                 }
                 break;
 
             case 'disabled':
-                if ($value == 1 || $value == "yes") {
+                if ($value == 1 || $value == 'yes') {
                     $where .= ' AND I.disabled = 1';
                 }
                 break;
 
             case 'ignore':
-                if ($value == 1 || $value == "yes") {
+                if ($value == 1 || $value == 'yes') {
                     $where .= ' AND (I.ignore = 1 OR D.ignore = 1)';
                 }
                 break;
@@ -73,7 +73,7 @@ foreach ($vars as $var => $value) {
                 break;
 
             case 'errors':
-                if ($value == 1 || $value = "yes") {
+                if ($value == 1 || $value = 'yes') {
                     $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
                 }
                 break;
@@ -84,7 +84,7 @@ foreach ($vars as $var => $value) {
                     $param[] = 'up';
                     $param[] = 'down';
                 } elseif ($value == 'up') {
-                    $where .= " AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = 0 AND D.ignore = 0 AND I.deleted = 0";
+                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = 0 AND D.ignore = 0 AND I.deleted = 0';
                     $param[] = 'up';
                     $param[] = 'up';
                 } elseif ($value == 'admindown') {
