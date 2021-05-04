@@ -2,7 +2,6 @@
 
 use LibreNMS\Config;
 Config::set('os.aos7.nobulk', true);
-
 $oids = snmpwalk_cache_oid($device, 'chasControlCertifyStatus', [], 'ALCATEL-IND1-CHASSIS-MIB', 'nokia/aos7', '-OQUse');
 foreach ($oids as $index => $data) {
     if (is_array($data)) {
