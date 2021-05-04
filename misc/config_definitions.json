@@ -1039,7 +1039,7 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.sla": {
+        "discovery_modules.slas": {
             "order": 80,
             "group": "discovery",
             "section": "discovery_modules",
@@ -1517,10 +1517,6 @@
         },
         "enable_pseudowires": {
             "default": true,
-            "type": "boolean"
-        },
-        "enable_sla": {
-            "default": false,
             "type": "boolean"
         },
         "enable_syslog": {
@@ -4311,7 +4307,7 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.sla": {
+        "poller_modules.slas": {
             "order": 140,
             "group": "poller",
             "section": "poller_modules",
