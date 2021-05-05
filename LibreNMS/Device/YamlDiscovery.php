@@ -303,7 +303,7 @@ class YamlDiscovery
                                 }
                                 $snmp_flag[] = '-Ih';
 
-                                # disable bulk request for specific data
+                                // disable bulk request for specific data
                                 if (! empty($data['nobulk'])) {
                                     Config::set('os.' . $os->getName() . '.nobulk', true);
                                 }
