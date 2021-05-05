@@ -189,13 +189,13 @@ class ModuleTestHelper
         // Run discovery
         ob_start();
         $save_debug = Debug::isEnabled();
-        $save_vedbug = Debug::isEnabled();
+        $save_vdebug = Debug::isVerbose();
         Debug::set();
-        Debug::setVerbose();
+        Debug::setVerbose(false);
         discover_device($device, $this->parseArgs('discovery'));
         poll_device($device, $this->parseArgs('poller'));
         Debug::set($save_debug);
-        Debug::setVerbose($save_vedbug);
+        Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
         ob_end_clean();
 
