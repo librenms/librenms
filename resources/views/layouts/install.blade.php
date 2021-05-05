@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('css/bootstrap4.min.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css"/>
-    <script src="{{ asset('js/jquery-1.12.4.js') }}"></script>
-    <script src="{{ asset('js/jquery-migrate-1.4.1.js') }}"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-migrate-3.3.2.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
-    <style type="text/css">
+    <style>
         body {
             background-color: #046C8B;
         }
@@ -138,7 +138,7 @@
     var step = '{{ $step }}';
     function checkStepStatus(callback) {
         $.ajax('{{ route('install.action.steps') }}')
-            .success(function (data) {
+            .done(function (data) {
                 var primary;
                 Object.keys(data).forEach(function (key) {
                     var classes = 'btn btn-circle';
