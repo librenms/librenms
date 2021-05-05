@@ -26,7 +26,6 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
-use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
