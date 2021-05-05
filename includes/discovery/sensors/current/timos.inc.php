@@ -21,7 +21,6 @@
  * @copyright  2021 Nick Peelman
  * @author     Nick Peelman <nick@peelman.us>
  */
-
 $multiplier = 1;
 $divisor = 50000;
 foreach ($pre_cache['timos_oids'] as $index => $entry) {
@@ -56,7 +55,7 @@ foreach ($pre_cache['timos_lanes_oids'] as $index => $entry) {
         $limit = $entry['tmnxDDMLaneTxBiasCurrentHiAlarm'] / $divisor;
         $warn_limit = $entry['tmnxDDMLaneTxBiasCurrentHiWarn'] / $divisor;
 
-        $port_descr = get_port_by_index_cache($device['device_id'], str_replace(['1.','.1','.2','.3','.4'], '', $index));
+        $port_descr = get_port_by_index_cache($device['device_id'], str_replace(['1.', '.1', '.2', '.3', '.4'], '', $index));
         $descr = $port_descr['ifName'] . '/' . end(explode('.', $index)) . ' Tx Current';
 
         discover_sensor($valid['sensor'], 'current', $device, $oid, 'biascurrent-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);

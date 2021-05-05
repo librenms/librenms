@@ -21,7 +21,6 @@
  * @copyright  2021 Nick Peelman
  * @author     Nick Peelman <nick@peelman.us>
  */
-
 $multiplier = 1;
 $divisor = 100;
 foreach ($pre_cache['timos_oids'] as $index => $entry) {
