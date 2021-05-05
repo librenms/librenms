@@ -8,7 +8,6 @@
     <link href="{{ asset('css/bootstrap4.min.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css"/>
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-migrate-3.3.2.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
