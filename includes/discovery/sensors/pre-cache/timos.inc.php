@@ -11,3 +11,4 @@
  */
 
 $pre_cache['timos_oids'] = snmpwalk_cache_multi_oid($device, 'tmnxDigitalDiagMonitorEntry', [], 'TIMETRA-PORT-MIB', 'timos');
+$pre_cache['timos_lanes_oids'] = snmpwalk_cache_multi_oid($device, 'tmnxDDMLaneTable', [], 'TIMETRA-PORT-MIB', 'timos');
