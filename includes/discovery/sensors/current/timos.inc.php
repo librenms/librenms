@@ -58,6 +58,6 @@ foreach ($pre_cache['timos_lanes_oids'] as $index => $entry) {
         $port_descr = get_port_by_index_cache($device['device_id'], str_replace(['1.', '.1', '.2', '.3', '.4'], '', $index));
         $descr = $port_descr['ifName'] . '/' . end(explode('.', $index)) . ' Tx Current';
 
-        discover_sensor($valid['sensor'], 'current', $device, $oid, 'biascurrent-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor($valid['sensor'], 'current', $device, $oid, 'biascurrent-' . $index, 'timos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }
