@@ -45,7 +45,7 @@ class Slas implements Module
         } elseif ($device['os'] == 'junos') {
             $this->discoverRpms($device);
         }
-        // } else if $device['os'] == 'huawei'
+        // } else if ($device['os'] == 'huawei')
         // {
         //    $this->discoverHuaweis($device);
         // }
@@ -67,7 +67,7 @@ class Slas implements Module
         } elseif ($device['os'] == 'junos') {
             $this->pollRpms($device);
         }
-        // } else if $device['os'] == 'huawei'
+        // } else if ($device['os'] == 'huawei')
         // {
         //    $this->pollHuaweis($device);
         // }
@@ -110,10 +110,6 @@ class Slas implements Module
             ->where('device_id', $device['device_id'])
             ->where('deleted', 0)
             ->get();
-
-        $query_data = [
-            'device_id' => $device['device_id'],
-        ];
 
         // To ensure unity of mock sla_nr field
         $max_sla_nr = Sla::where('device_id', $device['device_id'])
@@ -344,9 +340,6 @@ class Slas implements Module
             }
 
             // Get the needed informations
-            $uptime = snmp_get($device, 'sysUpTime.0', '-Otv', 'SNMPv2-MIB');
-            $time_offset = (time() - intval($uptime) / 100);
-
             foreach ($slas as $sla) {
                 $sla_id = $sla['sla_id'];
                 $sla_nr = $sla['sla_nr'];
