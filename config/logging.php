@@ -96,6 +96,16 @@ return [
             'level' => 'debug',
         ],
 
+        'stdout' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'with' => [
+                'stream' => 'php://output',
+            ],
+            'level' => 'debug',
+        ],
+
         'syslog' => [
             'driver' => 'syslog',
             'level' => env('LOG_LEVEL', 'debug'),
