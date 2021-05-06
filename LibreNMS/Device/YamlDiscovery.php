@@ -294,9 +294,9 @@ class YamlDiscovery
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (Str::contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUS'];
+                                    $snmp_flag = ['-OtbeQUS'];
                                 } else {
-                                    $snmp_flag = ['-OteQUs'];
+                                    $snmp_flag = ['-OtbeQUs'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
