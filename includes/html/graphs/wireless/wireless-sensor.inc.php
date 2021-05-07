@@ -77,4 +77,4 @@ if ($vars['width'] > 300) {
 
 $rrd_options .= " GPRINT:$output_def:LAST:'$num$unit'";
 $rrd_options .= " GPRINT:$output_def:MIN:'$num$unit'";
-$rrd_options .= " GPRINT:$output_def:MAX:'$num$unit'\\\\l";
+$rrd_options .= " GPRINT:$output_def:MAX:'$num$unit'" . '\\\\l';
