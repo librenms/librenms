@@ -134,7 +134,7 @@ if ($format == 'octets' || $format == 'bytes') {
     $format = 'bits';
 }
 
-$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . Config::get('percentile_value') . "th %\\n'";
+$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . Config::get('percentile_value') . 'th %\\n\'';
 
 $rrd_options .= ' AREA:in' . $format . '_max#D7FFC7' . $stacked['transparency'] . ':';
 $rrd_options .= ' AREA:in' . $format . '#90B040' . $stacked['transparency'] . ':';
@@ -142,7 +142,7 @@ $rrd_options .= ' LINE:in' . $format . "#608720:'In '";
 $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:in' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
-$rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\n';
+$rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\\\n';
 
 $rrd_options .= ' AREA:dout' . $format . '_max#E0E0FF' . $stacked['transparency'] . ':';
 $rrd_options .= ' AREA:dout' . $format . '#8080C0' . $stacked['transparency'] . ':';
@@ -150,7 +150,7 @@ $rrd_options .= ' LINE:dout' . $format . "#606090:'Out'";
 $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:out' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
-$rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
+$rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\\\n';
 
 if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' HRULE:percentilehigh#FF0000:"Highest"';
@@ -181,11 +181,11 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' LINE1.25:in' . $format . "X#333300:'Prev In '\t";
     $rrd_options .= ' GPRINT:in' . $format . 'X:AVERAGE:%6.' . $float_precision . 'lf%s';
     $rrd_options .= ' GPRINT:in' . $format . '_maxX:MAX:%6.' . $float_precision . 'lf%s';
-    $rrd_options .= ' GPRINT:percentile_inX:%6.' . $float_precision . 'lf%s\\n';
+    $rrd_options .= ' GPRINT:percentile_inX:%6.' . $float_precision . 'lf%s\\\\n';
     $rrd_options .= ' LINE1.25:dout' . $format . "X#000099:'Prev Out '\t";
     $rrd_options .= ' GPRINT:out' . $format . 'X:AVERAGE:%6.' . $float_precision . 'lf%s';
     $rrd_options .= ' GPRINT:out' . $format . '_maxX:MAX:%6.' . $float_precision . 'lf%s';
-    $rrd_options .= ' GPRINT:percentile_outX:%6.' . $float_precision . 'lf%s\\n';
+    $rrd_options .= ' GPRINT:percentile_outX:%6.' . $float_precision . 'lf%s\\\\n';
     $rrd_options .= " GPRINT:totX:'Total %6." . $float_precision . "lf%sB'";
     $rrd_options .= " GPRINT:totinX:'(In %6." . $float_precision . "lf%sB'";
     $rrd_options .= " GPRINT:totoutX:'Out %6." . $float_precision . "lf%sB)\\l'";
