@@ -85,7 +85,7 @@ if (\LibreNMS\Config::get('old_graphs')) {
         $rrd_options .= '      ' . $percentile . 'th %';
     }
 
-    $rrd_options .= "\\\\n'";
+    $rrd_options .= "\\n'";
     $rrd_options .= ' LINE1.25:' . $ds . '#' . $colour_line . ":'" . $line_text . "'";
     $rrd_options .= ' GPRINT:' . $ds . ':LAST:%6.' . $float_precision . 'lf%s';
     $rrd_options .= ' GPRINT:' . $ds . ':AVERAGE:%6.' . $float_precision . 'lf%s';
