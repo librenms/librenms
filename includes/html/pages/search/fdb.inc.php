@@ -7,6 +7,7 @@
             <tr>
                 <th data-column-id="device">Device</th>
                 <th data-column-id="mac_address" data-width="150px">MAC Address</th>
+                <th data-column-id="mac_oui" data-width="150px" data-visible="false">Vendor</th>
                 <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan" data-width="60px">Vlan</th>

@@ -33,6 +33,7 @@ use Illuminate\Http\Request;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
+use Cache;
 
 class FdbTablesController extends TableController
 {
@@ -157,6 +158,7 @@ class FdbTablesController extends TableController
         $item = [
             'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
             'mac_address' => Rewrite::readableMac($fdb_entry->mac_address),
+            'mac_oui' => 'unknown',
             'ipv4_address' => $ip_info['ips']->implode(', '),
             'interface' => '',
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
@@ -185,6 +187,7 @@ class FdbTablesController extends TableController
                 $item['interface'] .= ' <i class="fa fa-star fa-lg" style="color:green" aria-hidden="true" title="' . __('This indicates the most likely endpoint switchport') . '"></i>';
             }
         }
+        $item['mac_oui'] = $this->getOUI($fdb_entry->mac_address);
 
         return $item;
     }
@@ -293,5 +296,15 @@ class FdbTablesController extends TableController
         }
 
         return $this->macCountCache[$port->port_id];
+    }
+
+    /**
+     * @param String $mac
+     * @return string
+     */
+    protected function getOUI($mac)
+    {
+        $key = "OUIDB-" . (substr($mac, 0, 6));
+        return Cache::get($key, "Unknown");
     }
 }

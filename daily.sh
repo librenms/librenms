@@ -369,6 +369,7 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
+                status_run 'Caching Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             cleanup)
                 # Cleanups
@@ -404,6 +405,9 @@ main () {
                 options=("peeringdb")
                 call_daily_php "${options[@]}"
             ;;
+            mac_oui)
+                options=("mac_oui")
+                call_daily_php "${options[@]}"
         esac
     fi
 }
