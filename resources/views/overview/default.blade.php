@@ -166,7 +166,7 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="js/jquery.gridster.min.js"></script>
+<script src="{{ asset('js/jquery.gridster.min.js?ver=05072021') }}"></script>
 @endsection
 
 @push('scripts')

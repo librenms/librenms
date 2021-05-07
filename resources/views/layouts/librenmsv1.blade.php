@@ -49,15 +49,15 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-switch.min.js') }}"></script>
+    <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap-switch.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
-    <script src="{{ asset('js/typeahead.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/tagmanager.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-datetimepicker.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/typeahead.bundle.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/tagmanager.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/mktree.js') }}"></script>
     <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
@@ -72,7 +72,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=20200501') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=05072021') }}"></script>
     <script type="text/javascript">
         <!-- Begin
         function popUp(URL)
@@ -84,7 +84,7 @@
         // End -->
     </script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/toastr.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
     @yield('javascript')
 </head>
