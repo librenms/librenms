@@ -28,7 +28,6 @@ use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortsFdb;
 use App\Models\Vlan;
-use Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LibreNMS\Util\IP;
@@ -187,7 +186,7 @@ class FdbTablesController extends TableController
                 $item['interface'] .= ' <i class="fa fa-star fa-lg" style="color:green" aria-hidden="true" title="' . __('This indicates the most likely endpoint switchport') . '"></i>';
             }
         }
-        $item['mac_oui'] = Rewrite::getOUI($fdb_entry->mac_address);
+        $item['mac_oui'] = Rewrite::readableOUI($fdb_entry->mac_address);
 
         return $item;
     }

@@ -152,7 +152,7 @@ class Rewrite
      * @param string $mac
      * @return string
      */
-    public static function getOUI($mac)
+    public static function readableOUI($mac)
     {
         $key = 'OUIDB-' . (substr($mac, 0, 6));
 

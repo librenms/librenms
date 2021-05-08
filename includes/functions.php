@@ -1868,7 +1868,13 @@ function cache_mac_oui()
 
     $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
 
-    if (Config::get('mac_oui.enabled') === true && $lock->get()) {
+    if (Config::get('mac_oui.enabled') !== true) {
+        echo 'Mac OUI integration disabled' . PHP_EOL;
+
+        return 0;
+    }
+
+    if ($lock->get()) {
         echo 'Caching Mac OUI' . PHP_EOL;
         try {
             $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
@@ -1885,13 +1891,14 @@ function cache_mac_oui()
                 }
             }
         } catch (Exception $e) {
-            echo 'Error processing Mac OUI' . PHP_EOL;
+            echo 'Error processing Mac OUI :' . PHP_EOL;
+            echo 'Exception: ' . get_class($e) . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;
+
             $lock->release(); // we did not succeed so we'll try again next time
 
             return 1;
         }
-    } else {
-        echo 'Mac OUI integration disabled' . PHP_EOL;
     }
 
     return 0;

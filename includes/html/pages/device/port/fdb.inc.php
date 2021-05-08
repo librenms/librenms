@@ -2,7 +2,7 @@
 $no_refresh = true;
 $mac_oui_visibility = ' data-visible="false" ';
 if (Config::get('mac_oui.enabled') === true) {
-    $mac_oui_visibility = "";
+    $mac_oui_visibility = '';
 }
 
 ?>
