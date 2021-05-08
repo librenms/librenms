@@ -28,12 +28,12 @@ use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortsFdb;
 use App\Models\Vlan;
+use Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
-use Cache;
 
 class FdbTablesController extends TableController
 {
@@ -299,12 +299,13 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param String $mac
+     * @param string $mac
      * @return string
      */
     protected function getOUI($mac)
     {
-        $key = "OUIDB-" . (substr($mac, 0, 6));
-        return Cache::get($key, "Unknown");
+        $key = 'OUIDB-' . (substr($mac, 0, 6));
+
+        return Cache::get($key, 'Unknown');
     }
 }

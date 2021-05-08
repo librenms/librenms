@@ -1865,31 +1865,36 @@ function cache_mac_oui()
 {
     $mac_oui_refresh_int_min = 216000; // 2.5 days
     $mac_oui_cache_time = 604800; // 7 days
+
     $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
+
     if (Config::get('mac_oui.enabled') === true && $lock->get()) {
         echo 'Caching Mac OUI' . PHP_EOL;
         try {
-            $mac_oui_url = "https://macaddress.io/database/macaddress.io-db.json";
-            // We cache for 71h
-            echo '  -> Downloading ...' . PHP_EOL;;
+            $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
+            echo '  -> Downloading ...' . PHP_EOL;
             $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
             echo '  -> Processing ...' . PHP_EOL;
             $json_data = $get->body;
-            foreach(explode("\n", $json_data) as $json_line) {
+            foreach (explode("\n", $json_data) as $json_line) {
                 $entry = json_decode($json_line);
-                if ($entry && $entry->{'assignmentBlockSize'} == "MA-L") { 
+                if ($entry && $entry->{'assignmentBlockSize'} == 'MA-L') {
                     $oui = strtolower(str_replace(':', '', $entry->{'oui'}));
-                    $key="OUIDB-".$oui;
+                    $key = 'OUIDB-' . $oui;
                     Cache::put($key, $entry->{'companyName'}, $mac_oui_cache_time);
                 }
             }
         } catch (Exception $e) {
             echo 'Error processing Mac OUI' . PHP_EOL;
             $lock->release(); // we did not succeed so we'll try again next time
+
+            return 1;
         }
     } else {
-            echo 'Mac OUI integration disabled' . PHP_EOL;
+        echo 'Mac OUI integration disabled' . PHP_EOL;
     }
+
+    return 0;
 }
 
 /**
