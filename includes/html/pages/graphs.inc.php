@@ -92,8 +92,8 @@ if (! $auth) {
         $link_array['page'] = 'graphs';
         $link = \LibreNMS\Util\Url::generate($link_array);
 
-        echo '<td align=center>';
-        echo '<b>' . $text . '</b><br>';
+        echo '<td style="text-align: center;">';
+        echo '<b>' . $text . '</b>';
         echo '<a href="' . $link . '">';
         echo \LibreNMS\Util\Url::lazyGraphTag($graph_array);
         echo '</a>';

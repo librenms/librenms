@@ -93,6 +93,8 @@ return [
         'SNMPv2-MIB::authenticationFailure' => \LibreNMS\Snmptrap\Handlers\AuthenticationFailure::class,
         'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
         'SNMPv2-MIB::warmStart' => \LibreNMS\Snmptrap\Handlers\WarmBoot::class,
+        'TRIPPLITE-PRODUCTS::tlpNotificationsAlarmEntryAdded' => \LibreNMS\Snmptrap\Handlers\TrippliteAlarmAdded::class,
+        'TRIPPLITE-PRODUCTS::tlpNotificationsAlarmEntryRemoved' => \LibreNMS\Snmptrap\Handlers\TrippliteAlarmRemoved::class,
         'VMWARE-VMINFO-MIB::vmwVmHBDetected' => \LibreNMS\Snmptrap\Handlers\VmwVmHBDetected::class,
         'VMWARE-VMINFO-MIB::vmwVmHBLost' => \LibreNMS\Snmptrap\Handlers\VmwVmHBLost::class,
         'VMWARE-VMINFO-MIB::vmwVmPoweredOn' => \LibreNMS\Snmptrap\Handlers\VmwVmPoweredOn::class,
