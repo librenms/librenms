@@ -76,7 +76,8 @@ if ($device['os'] === 'vrp') {
             "tooltip": function (column, row) {
                 var value = row[column.id];
                 return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
-            },            "nac_authz": function (column, row) {
+            },
+            "nac_authz": function (column, row) {
                 var value = row[column.id];
 
                 if (value === 'authorizationSuccess' || value === 'sussess') { 

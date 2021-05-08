@@ -28,6 +28,12 @@ var grid = $("#ports-fdb").bootgrid({
             dns: $("#ports-fdb").bootgrid("getColumnSettings")[5].visible
         };
     },
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
     url: "<?php echo url('/ajax/table/fdb-tables') ?>"
 });
 </script>

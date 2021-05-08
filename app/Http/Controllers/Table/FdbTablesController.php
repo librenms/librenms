@@ -187,7 +187,7 @@ class FdbTablesController extends TableController
                 $item['interface'] .= ' <i class="fa fa-star fa-lg" style="color:green" aria-hidden="true" title="' . __('This indicates the most likely endpoint switchport') . '"></i>';
             }
         }
-        $item['mac_oui'] = $this->getOUI($fdb_entry->mac_address);
+        $item['mac_oui'] = Rewrite::getOUI($fdb_entry->mac_address);
 
         return $item;
     }
@@ -296,16 +296,5 @@ class FdbTablesController extends TableController
         }
 
         return $this->macCountCache[$port->port_id];
-    }
-
-    /**
-     * @param string $mac
-     * @return string
-     */
-    protected function getOUI($mac)
-    {
-        $key = 'OUIDB-' . (substr($mac, 0, 6));
-
-        return Cache::get($key, 'Unknown');
     }
 }

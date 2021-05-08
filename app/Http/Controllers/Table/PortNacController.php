@@ -47,6 +47,7 @@ class PortNacController extends TableController
         return [
             'port_id',
             'mac_address',
+            'mac_oui',
             'ip_address',
             'vlan',
             'domain',
@@ -81,7 +82,7 @@ class PortNacController extends TableController
         $item = $nac->toArray();
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
         $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
-
+        $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
         return $item;
     }
 }
