@@ -47,14 +47,6 @@ function var_get($v)
     return false;
 }
 
-function data_uri($file, $mime)
-{
-    $contents = file_get_contents($file);
-    $base64 = base64_encode($contents);
-
-    return 'data:' . $mime . ';base64,' . $base64;
-}//end data_uri()
-
 function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Colors::percentage(100 - $percent, null);
@@ -465,19 +457,30 @@ function graph_error($text, $color = [128, 0, 0])
 {
     global $vars;
 
+    $type = Config::get('webui.graph_type');
     if (! Debug::isEnabled()) {
-        set_image_type();
+        header('Content-type: ' . get_image_type($type));
     }
 
-    $width = $vars['width'] ?? 150;
-    $height = $vars['height'] ?? 60;
+    $width = (int) ($vars['width'] ?? 150);
+    $height = (int) ($vars['height'] ?? 60);
 
-    if (Config::get('webui.graph_type') === 'svg') {
+    if ($type === 'svg') {
         $rgb = implode(', ', $color);
-        $font_size = 20;
-        $svg_x = 100;
-        $svg_y = min($font_size, $width ? (($height / $width) * $svg_x) : 1);
-        echo "<svg viewBox=\"0 0 $svg_x $svg_y\" xmlns=\"http://www.w3.org/2000/svg\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" style=\"font-family: sans-serif; fill: rgb($rgb);\">$text</text></svg>";
+        echo <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xhtml="http://www.w3.org/1999/xhtml"
+viewBox="0 0 $width $height"
+preserveAspectRatio="xMinYMin">
+<foreignObject x="0" y="0" width="$width" height="$height" transform="translate(0,0)">
+      <xhtml:div style="display:table; width:{$width}px; height:{$height}px; overflow:hidden;">
+         <xhtml:div style="display:table-cell; vertical-align:middle;">
+            <xhtml:div style="color:rgb($rgb); text-align:center; font-family:sans-serif; font-size:0.6em;">$text</xhtml:div>
+         </xhtml:div>
+      </xhtml:div>
+   </foreignObject>
+</svg>
+SVG;
     } else {
         $img = imagecreate($width, $height);
         imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
@@ -1020,18 +1023,14 @@ function eventlog_severity($eventlog_severity)
     }
 } // end eventlog_severity
 
-function set_image_type()
+/**
+ * Get the http content type of the image
+ * @param  string  $type svg or png
+ * @return string
+ */
+function get_image_type(string $type)
 {
-    header('Content-type: ' . get_image_type());
-}
-
-function get_image_type()
-{
-    if (Config::get('webui.graph_type') === 'svg') {
-        return 'image/svg+xml';
-    } else {
-        return 'image/png';
-    }
+    return $type === 'svg' ? 'image/svg+xml' : 'image/png';
 }
 
 function get_oxidized_nodes_list()

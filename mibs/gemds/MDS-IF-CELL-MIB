@@ -1,0 +1,499 @@
+MDS-IF-CELL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex
+        FROM IF-MIB
+    mdsInterfaces
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsIfCellMIB MODULE-IDENTITY
+    LAST-UPDATED "201805160000Z" -- May 16, 2018
+    ORGANIZATION
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The MIB module to describe the cellular interface."
+    REVISION      "201912230000Z"
+    DESCRIPTION
+        "Added fwRequired mIfCellModemState."
+    REVISION      "201910110000Z"
+    DESCRIPTION
+        "Added 4Gd-lte modem types."
+    REVISION      "201805160000Z"
+    DESCRIPTION
+        "Updated conformance statments based on smilint."
+    REVISION      "201802280000Z"
+    DESCRIPTION
+        "Added 4Gy/z modem types and firmware status table."
+    REVISION      "201610110000Z"
+    DESCRIPTION
+        "Added EZ1 (band 31) modem type."
+    REVISION      "201602250000Z"
+    DESCRIPTION
+        "Added more status parameters."
+    REVISION      "201509150000Z"
+    DESCRIPTION
+        "Reordered sim state enum."
+    REVISION      "201508030000Z"
+    DESCRIPTION
+        "Added unknown sim state."
+    REVISION      "201507230000Z"
+    DESCRIPTION
+        "Add 4GP (band 26) modem type. Also, added LTE RSRP/RSRQ."
+    REVISION      "201501290000Z"
+    DESCRIPTION
+        "Add sprint modem type."
+    REVISION      "201411250000Z"
+    DESCRIPTION
+        "Add modem type and firmware package information."
+    REVISION      "201410200000Z"
+    DESCRIPTION
+        "Removed hyphens from enumerations."
+    REVISION      "201304220000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { mdsInterfaces 1 }
+
+mIfCellMIBObjects OBJECT IDENTIFIER
+    ::= { mdsIfCellMIB 1 }
+
+mIfCellConfig OBJECT IDENTIFIER
+    ::= { mIfCellMIBObjects 1 }
+
+mIfCellStatus OBJECT IDENTIFIER
+    ::= { mIfCellMIBObjects 2 }
+
+mIfCellFwStatus OBJECT IDENTIFIER
+    ::= { mIfCellMIBObjects 3 }
+
+-- Textual Conventions
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+SimSlotState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SIM slot state"
+    SYNTAX      INTEGER {notInserted(0),inserted(1)}
+
+-- Cell Status Objects
+mIfCellStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MIfCellStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains status of cellular interfaces. This table has
+         a sparse dependent relationship on the ifTable. For each entry in
+         this table, there exists an entry in the ifTable."
+    ::= { mIfCellStatus 1 }
+
+mIfCellStatusEntry OBJECT-TYPE
+    SYNTAX      MIfCellStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry contains status of a cellular interface."
+    INDEX   { ifIndex }
+    ::= { mIfCellStatusTable 1 }
+
+MIfCellStatusEntry ::=
+    SEQUENCE {
+        mIfCellImsi DisplayString,
+        mIfCellImei DisplayString,
+        mIfCellIccid DisplayString,
+        mIfCellMdn DisplayString,
+        mIfCellApn DisplayString,
+        mIfCellAppSwVersion DisplayString,
+        mIfCellModemSwVersion DisplayString,
+        mIfCellSimState INTEGER,
+        mIfCellModemState INTEGER,
+        mIfCellRoamingState INTEGER,
+        mIfCellServiceState INTEGER,
+        mIfCellRssi INTEGER,
+        mIfCellRsrp INTEGER,
+        mIfCellRsrq INTEGER,
+        mIfCellSnr INTEGER,
+        mIfCellEcio INTEGER,
+        mIfCellModemType INTEGER,
+        mIfCellModemPackageVersion DisplayString,
+        mIfCellTac INTEGER,
+        mIfCellGlobalCellId Unsigned32,
+        mIfCellPhysicalCellId INTEGER,
+        mIfCellBand INTEGER,
+        mIfCellBandwidth INTEGER,
+        mIfCellTxChan INTEGER,
+        mIfCellRxChan INTEGER,
+        mIfCellEmmState INTEGER,
+        mIfCellRrcState INTEGER,
+        mIfCellActiveSimSlot INTEGER,
+        mIfCellSimASlotState SimSlotState,
+        mIfCellSimBSlotState SimSlotState
+    }
+
+mIfCellImsi OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The International Mobile Subscriber Identity."
+    ::= { mIfCellStatusEntry 1 }
+
+mIfCellImei OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "International mobile equipment identity"
+    ::= { mIfCellStatusEntry 2 }
+
+mIfCellIccid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unique serial number of the SIM card"
+    ::= { mIfCellStatusEntry 3 }
+
+mIfCellMdn OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Mobile directory number"
+    ::= { mIfCellStatusEntry 4 }
+
+mIfCellApn OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Access Point Name"
+    ::= { mIfCellStatusEntry 5 }
+
+mIfCellAppSwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Application software version"
+    ::= { mIfCellStatusEntry 6 }
+
+mIfCellModemSwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem software version"
+    ::= { mIfCellStatusEntry 7 }
+
+mIfCellSimState OBJECT-TYPE
+    SYNTAX      INTEGER {notInserted(0),locked(1),ready(2),failed(3),unknown(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SIM state of cellular modem"
+    DEFVAL { notInserted }
+    ::= { mIfCellStatusEntry 8 }
+
+mIfCellModemState OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),notRegistered(1), searching(2),registrationDenied(3),idle(4),connected(5),fwRequired(6)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device state of cellular modem"
+    DEFVAL { unknown }
+    ::= { mIfCellStatusEntry 9 }
+
+mIfCellRoamingState OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),home(1),roaming(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Roaming state of cellular modem"
+    DEFVAL { unknown }
+    ::= { mIfCellStatusEntry 10 }
+
+mIfCellServiceState OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),gprs(1),edge(2),umts(3),hsdpa(4),hsupa(5),hspaPlus(6),is95a(7),is95b(8),onexRtt(9),evdoRev0(10),evdoReva(11),evdoRevb(12),evdoEhrpd(13),lte(14)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service state of cellular modem"
+    DEFVAL { none }
+    ::= { mIfCellStatusEntry 11 }
+
+mIfCellRssi OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received signal strength indicator (dBm). Indicates total received power including signal, interference and noise"
+    ::= { mIfCellStatusEntry 12 }
+
+mIfCellRsrp OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received signal reference power (dBm). Indicates power of LTE reference signals"
+    ::= { mIfCellStatusEntry 13 }
+
+mIfCellRsrq OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received signal receive quality (dB). Indicates LTE signal quality"
+    ::= { mIfCellStatusEntry 14 }
+
+
+mIfCellSnr OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received signal to noise ratio (dB). Indicates received signal quality."
+    ::= { mIfCellStatusEntry 15 }
+
+
+mIfCellEcio OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ec/Io (dBm). Indicates received signal quality for CDMA/UMTS."
+    ::= { mIfCellStatusEntry 16 }
+
+mIfCellModemType OBJECT-TYPE
+    SYNTAX      INTEGER {typeUnknown(0),typeE4VLteNaVerizon(1),type3G1GsmGlobal(2),typeE4xLteEmea(3),
+                        type4GxLteNa(4),type4GPLteNa(5),typeEZ1LteEmea(6),type4GyLteNaEu(7),
+                        type4GzLteApac(8),type4GaLteGlobal(9),type4GbLteAmericas(10),type4GcLteEu(11),
+                        type4GdLteGlobal(12)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type of cellular modem"
+    DEFVAL { typeUnknown }
+    ::= { mIfCellStatusEntry 17 }
+
+mIfCellModemPackageVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem package version"
+    ::= { mIfCellStatusEntry 18 }
+
+mIfCellTac OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tracking Area Code"
+    ::= { mIfCellStatusEntry 19 }
+
+mIfCellGlobalCellId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Global Cell ID (0xFFFFFFFF = not available)"
+    ::= { mIfCellStatusEntry 20 }
+
+mIfCellPhysicalCellId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Physical Cell ID (Normal Range: 0-503, 0xFFFF = not available)"
+    ::= { mIfCellStatusEntry 21 }
+
+mIfCellBand OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "LTE Band (0xFF = invalid)"
+    ::= { mIfCellStatusEntry 22 }
+
+mIfCellBandwidth OBJECT-TYPE
+    SYNTAX      INTEGER {bwUnknown(0),bw1dot4Mhz(1),bw3Mhz(2),bw5Mhz(3),bw10Mhz(4),bw15Mhz(5),bw20Mhz(6)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "LTE Bandwidth"
+    ::= { mIfCellStatusEntry 23 }
+
+mIfCellTxChan OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TX channel (0xFFFF = not available)"
+    ::= { mIfCellStatusEntry 24 }
+
+mIfCellRxChan OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RX channel (0xFFFF = not available)"
+    ::= { mIfCellStatusEntry 25 }
+
+mIfCellEmmState OBJECT-TYPE
+    SYNTAX      INTEGER {emmUnknown(0),emmDeregistered(1),emmRegInitiated(2),emmRegistered(3),emmTauInitiated(4),emmSrInitiated(5),emmDeregInitiated(6),emmInvalid(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EPS mobility management (EMM) state"
+    ::= { mIfCellStatusEntry 26 }
+
+mIfCellRrcState OBJECT-TYPE
+    SYNTAX      INTEGER {rrcUnknown(0),rrcIdle(1),rrcWaiting(2),rrcConnected(3),rrcReleasing(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio Resource Control (RRC) state"
+    ::= { mIfCellStatusEntry 27 }
+
+mIfCellActiveSimSlot OBJECT-TYPE
+    SYNTAX      INTEGER {simA(0),simB(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Active SIM slot"
+    DEFVAL { simA }
+    ::= { mIfCellStatusEntry 28 }
+
+mIfCellSimASlotState OBJECT-TYPE
+    SYNTAX      SimSlotState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SIM A slot state"
+    DEFVAL { notInserted }
+    ::= { mIfCellStatusEntry 29 }
+
+mIfCellSimBSlotState OBJECT-TYPE
+    SYNTAX      SimSlotState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SIM B slot state"
+    DEFVAL { notInserted }
+    ::= { mIfCellStatusEntry 30 }
+
+-- Cell Firmware Status Objects
+mIfCellFwStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MIfCellFwStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains firmware status of cellular interfaces. This table has
+         a sparse dependent relationship on the ifTable. For each entry in
+         this table, there exists an entry in the ifTable."
+    ::= { mIfCellFwStatus 1 }
+
+mIfCellFwStatusEntry OBJECT-TYPE
+    SYNTAX      MIfCellFwStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry contains firmware status of a cellular interface."
+    INDEX   { ifIndex,  mIfCellFwId }
+    ::= { mIfCellFwStatusTable 1 }
+
+MIfCellFwStatusEntry ::=
+    SEQUENCE {
+        mIfCellFwId UnsignedByte,
+        mIfCellFwVersion DisplayString,
+        mIfCellFwActive TruthValue
+    }
+
+mIfCellFwId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The storage location of this modem firmware image."
+    ::= { mIfCellFwStatusEntry 1 }
+
+mIfCellFwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The version of modem firmware stored at this location."
+    ::= { mIfCellFwStatusEntry 2 }
+
+mIfCellFwActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether this is the currently running modem firmware."
+    ::= { mIfCellFwStatusEntry 3 }
+
+-- conformance information
+mdsIfCellMIBConformance   OBJECT IDENTIFIER ::= { mdsIfCellMIB 3 }
+mdsIfCellMIBCompliances OBJECT IDENTIFIER ::= { mdsIfCellMIBConformance 1 }
+mdsIfCellMIBGroups      OBJECT IDENTIFIER ::= { mdsIfCellMIBConformance 2 }
+
+-- compliance statements
+mIfCellCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that
+            implement the MDS-IF-CELL-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mIfCellStatusGroup,
+            mIfCellFwStatusGroup
+        }
+    ::= { mdsIfCellMIBCompliances 1 }
+
+-- units of conformance
+mIfCellStatusGroup OBJECT-GROUP
+    OBJECTS {
+        mIfCellImsi,
+        mIfCellImei,
+        mIfCellIccid,
+        mIfCellMdn,
+        mIfCellApn,
+        mIfCellAppSwVersion,
+        mIfCellModemSwVersion,
+        mIfCellSimState,
+        mIfCellModemState,
+        mIfCellRoamingState,
+        mIfCellServiceState,
+        mIfCellRssi,
+        mIfCellRsrp,
+        mIfCellRsrq,
+        mIfCellSnr,
+        mIfCellEcio,
+        mIfCellModemType,
+        mIfCellModemPackageVersion,
+        mIfCellTac,
+        mIfCellGlobalCellId,
+        mIfCellPhysicalCellId,
+        mIfCellBand,
+        mIfCellBandwidth,
+        mIfCellTxChan,
+        mIfCellRxChan,
+        mIfCellEmmState,
+        mIfCellRrcState,
+        mIfCellActiveSimSlot,
+        mIfCellSimASlotState,
+        mIfCellSimBSlotState
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        cellular interface status."
+    ::= { mdsIfCellMIBGroups 1 }
+
+-- units of conformance
+mIfCellFwStatusGroup OBJECT-GROUP
+    OBJECTS {
+        mIfCellFwId,
+        mIfCellFwVersion,
+        mIfCellFwActive
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        cellular interface firmware status."
+    ::= { mdsIfCellMIBGroups 2 }
+
+END
