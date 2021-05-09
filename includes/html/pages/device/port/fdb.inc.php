@@ -10,7 +10,7 @@ if (Config::get('mac_oui.enabled') === true) {
     <thead>
         <tr>
             <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
-            <th data-column-id="mac_oui" data-width="150px" <?php echo $mac_oui_visibility ?> data-formatter="tooltip">Vendor</th>
+            <th data-column-id="mac_oui" data-sortable="false" data-width="150px" <?php echo $mac_oui_visibility ?> data-formatter="tooltip">Vendor</th>
             <th data-column-id="ipv4_address" data-sortable="false" data-formatter="tooltip">IPv4 Address</th>
             <th data-column-id="interface">Port</th>
             <th data-column-id="vlan" data-width="60px">Vlan</th>
