@@ -102,7 +102,7 @@ if (! empty($free_indexes)) {
         $legend_sections[1] .= ' GPRINT:mempoolfree:MIN:%3.0lf%%';
         $legend_sections[1] .= ' GPRINT:mempoolfree:LAST:%3.0lf%%';
         $legend_sections[1] .= ' GPRINT:mempoolfree:MAX:%3.0lf%%';
-        $legend_sections[1] .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%siB\\l';
+        $legend_sections[1] .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%siB\\\\l';
 
         if ($available === null) {
             $rrd_options .= " CDEF:mempoolavailablebytes=mempoolfree{$free_indexes[0]}";
@@ -116,7 +116,7 @@ if (! empty($free_indexes)) {
         $legend_sections[1] .= ' GPRINT:mempoolavailable:MIN:%3.0lf%%';
         $legend_sections[1] .= ' GPRINT:mempoolavailable:LAST:%3.0lf%%';
         $legend_sections[1] .= ' GPRINT:mempoolavailable:MAX:%3.0lf%%';
-        $legend_sections[1] .= ' GPRINT:mempoolavailablebytes:LAST:%6.2lf%siB\\l';
+        $legend_sections[1] .= ' GPRINT:mempoolavailablebytes:LAST:%6.2lf%siB\\\\l';
     }
 }
 
