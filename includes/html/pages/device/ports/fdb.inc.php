@@ -5,7 +5,11 @@ $no_refresh = true;
     <thead>
         <tr>
             <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
-            <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>
+<?php
+if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+    echo '            <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
+}
+?>
             <th data-column-id="ipv4_address" data-sortable="false" data-formatter="tooltip">IPv4 Address</th>
             <th data-column-id="interface">Port</th>
             <th data-column-id="description" data-formatter="tooltip">Description</th>
@@ -25,7 +29,7 @@ var grid = $("#ports-fdb").bootgrid({
     {
         return {
             device_id: "<?php echo $device['device_id']; ?>",
-            dns: $("#ports-fdb").bootgrid("getColumnSettings")[6].visible
+            dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
         };
     },
     formatters: {
