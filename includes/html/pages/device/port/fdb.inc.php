@@ -35,6 +35,10 @@ var grid = $("#port-fdb").bootgrid({
     formatters: {
         "tooltip": function (column, row) {
                 var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'mac_address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
                 return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
             },
     },

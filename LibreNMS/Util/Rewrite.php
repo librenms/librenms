@@ -156,7 +156,7 @@ class Rewrite
     {
         $key = 'OUIDB-' . (substr($mac, 0, 6));
 
-        return Cache::get($key, 'Unknown');
+        return Cache::get($key, '');
     }
 
     /**
