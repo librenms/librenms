@@ -1863,8 +1863,9 @@ function update_device_logo(&$device)
  */
 function cache_mac_oui()
 {
-    $mac_oui_refresh_int_min = 216000; // 2.5 days
-    $mac_oui_cache_time = 604800; // 7 days
+    // timers:
+    $mac_oui_refresh_int_min = 86400 * rand(7, 11); // 7 days + a random number between 0 and 4 days
+    $mac_oui_cache_time = 1296000; // we keep data during 15 days maximum
 
     $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
 
