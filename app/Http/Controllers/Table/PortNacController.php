@@ -81,8 +81,9 @@ class PortNacController extends TableController
     {
         $item = $nac->toArray();
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
-        $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
         $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
+        $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
+        $item['port'] = null; //free some unused data to be sent to the browser
 
         return $item;
     }
