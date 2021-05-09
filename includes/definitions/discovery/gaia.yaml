@@ -325,3 +325,74 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.3.{{ $index }}'
                     descr: voltageSensorName
                     index: 'voltageSensorValue.{{ $index }}'
+        count:
+            data:
+#Connections
+                -
+                    oid: fwNumConn
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.25.3.{{ $index }}'
+                    index: 'fwNumConn.{{ $index }}'
+                    descr: 'Number of concurrent connections'
+                    group: Connections
+                -
+                    oid: fwPeakNumConn
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.25.4.{{ $index }}'
+                    index: 'fwPeakNumConn.{{ $index }}'
+                    descr: 'Peak number of concurrent connections'
+                    group: Connections
+                -
+                    oid: fwConnTableLimit
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.25.10.{{ $index }}'
+                    index: 'fwConnTableLimit.{{ $index }}'
+                    descr: 'Limit of Connections table'
+                    group: Connections
+                -
+                    oid: fwConnectionsStatConnectionRate
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.26.11.6.{{ $index }}'
+                    index: 'fwConnectionsStatConnectionRate.{{ $index }}'
+                    descr: 'Connections rate'
+                    group: Connections
+                -
+                    oid: fwSXLConnsExisting
+                    num_oid: '.1.3.6.1.4.1.2620.1.36.1.2.{{ $index }}'
+                    index: 'fwSXLConnsExisting.{{ $index }}'
+                    descr: 'Number of connections handled by SecureXL'
+                    group: Connections
+#VPN
+                -
+                    oid: cpvIKECurrSAs
+                    num_oid: '.1.3.6.1.4.1.2620.1.2.9.1.1.{{ $index }}'
+                    index: 'cpvIKECurrSAs.{{ $index }}'
+                    descr: 'Number of IKE current SAs'
+                    group: VPN
+                -
+                    oid: cpvCurrEspSAsIn
+                    num_oid: '.1.3.6.1.4.1.2620.1.2.5.2.1.{{ $index }}'
+                    index: 'cpvCurrEspSAsIn.{{ $index }}'
+                    descr: 'Number of IPsec current Inbound ESP SAs'
+                    group: VPN
+                -
+                    oid: cpvCurrEspSAsOut
+                    num_oid: '.1.3.6.1.4.1.2620.1.2.5.2.3.{{ $index }}'
+                    index: 'cpvCurrEspSAsOut.{{ $index }}'
+                    descr: 'Number of IPsec current Outbound ESP SAs'
+                    group: VPN
+#Logging
+                -
+                    oid: mgLSLogReceiveRate
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.14.1.{{ $index }}'
+                    index: 'mgLSLogReceiveRate.{{ $index }}'
+                    descr: 'Log Receive Rate'
+                    group: Logging
+                -
+                    oid: mgLSLogReceiveRatePeak
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.14.2.{{ $index }}'
+                    index: 'mgLSLogReceiveRatePeak.{{ $index }}'
+                    descr: 'Log Receive Rate Peak'
+                    group: Logging
+                -
+                    oid: fwLoggingHandlingRate
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.7.{{ $index }}'
+                    index: 'fwLoggingHandlingRate.{{ $index }}'
+                    descr: 'Log Rate'
+                    group: Logging
