@@ -160,7 +160,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'tx-bias-{{ $index }}'
-                    divisor: 50000
+                    divisor: 500000
                     high_limit: tmnxDDMTxBiasCurrentHiAlarm
                     warn_limit: tmnxDDMTxBiasCurrentHiWarning
                     low_limit: tmnxDDMTxBiasCurrentLowAlarm
@@ -182,7 +182,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'tx-bias-{{ $index }}'
-                    divisor: 50000
+                    divisor: 500000
                     high_limit: tmnxDDMLaneTxBiasCurrentHiAlarm
                     warn_limit: tmnxDDMLaneTxBiasCurrentHiWarning
                     low_limit: tmnxDDMLaneTxBiasCurrentLowAlarm
