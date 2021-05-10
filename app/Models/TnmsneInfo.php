@@ -19,10 +19,11 @@ class TnmsneInfo extends DeviceRelatedModel
         'neOpMode',
         'neOpState',
     ];
-}
-   // ---- Define Relationships ----
+
+    // ---- Define Relationships ----
 
     public function alarms()
     {
         return $this->hasMany('App\Models\TnmsAlarm', 'tnmsne_info_id');
     }
+}
