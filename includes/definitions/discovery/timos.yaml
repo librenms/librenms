@@ -149,7 +149,7 @@ modules:
                     warn_limit: tmnxDDMTempHiWarning
                     low_limit: tmnxDDMTempLowAlarm
                     low_warn_limit: tmnxDDMTempLowWarning
-                    divisor: 100
+                    divisor: 256
         current:
             data:
                 -
