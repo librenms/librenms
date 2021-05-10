@@ -231,6 +231,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'tx-{{ $index }}'
+                    divisor: 10
                     high_limit: tmnxDDMTxOutputPowerHiAlarm
                     warn_limit: tmnxDDMTxOutputPowerHiWarning
                     low_limit: tmnxDDMTxOutputPowerLowAlarm
