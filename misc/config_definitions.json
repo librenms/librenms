@@ -3729,6 +3729,13 @@
             "order": 4,
             "type": "text"
         },
+        "mac_oui.enabled": {
+            "default": true,
+            "group": "external",
+            "section": "mac_oui",
+            "order": 0,
+            "type": "boolean"
+        },
         "map.engine": {
             "default": "leaflet",
             "type": "select",
@@ -4533,8 +4540,9 @@
             "group": "system",
             "section": "cleanup",
             "order": 9,
-            "default": false,
-            "type": "boolean"
+            "units": "days",
+            "default": "10",
+            "type": "integer"
         },
         "project_home": {
             "default": "https://www.librenms.org/",

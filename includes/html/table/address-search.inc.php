@@ -87,6 +87,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
         $address = (string) IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
     } elseif ($vars['search_type'] == 'mac') {
         $address = \LibreNMS\Util\Rewrite::readableMac($interface['ifPhysAddress']);
+        $mac_oui = \LibreNMS\Util\Rewrite::readableOUI($interface['ifPhysAddress']);
     } else {
         $address = (string) IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }
@@ -99,12 +100,16 @@ foreach (dbFetchRows($sql, $param) as $interface) {
 
     if (port_permitted($interface['port_id'])) {
         $interface = cleanPort($interface, $interface);
-        $response[] = [
+        $row = [
             'hostname'    => generate_device_link($interface),
             'interface'   => generate_port_link($interface) . ' ' . $error_img,
             'address'     => $address,
             'description' => $interface['ifAlias'],
         ];
+        if ($vars['search_type'] == 'mac') {
+            $row['mac_oui'] = $mac_oui;
+        }
+        $response[] = $row;
     }
 }//end foreach
 

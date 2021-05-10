@@ -25,6 +25,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Cache;
 use LibreNMS\Config;
 
 class Rewrite
@@ -143,6 +144,19 @@ class Rewrite
     public static function readableMac($mac)
     {
         return rtrim(chunk_split($mac, 2, ':'), ':');
+    }
+
+    /**
+     * Extract the OUI and match it against cached values
+     *
+     * @param string $mac
+     * @return string
+     */
+    public static function readableOUI($mac)
+    {
+        $key = 'OUIDB-' . (substr($mac, 0, 6));
+
+        return Cache::get($key, '');
     }
 
     /**

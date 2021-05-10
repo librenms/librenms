@@ -95,6 +95,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
 
         $response[] = [
             'mac_address'      => \LibreNMS\Util\Rewrite::readableMac($entry['mac_address']),
+            'mac_oui'          => \LibreNMS\Util\Rewrite::readableOUI($entry['mac_address']),
             'ipv4_address'     => $entry['ipv4_address'],
             'hostname'         => generate_device_link($entry),
             'interface'        => generate_port_link($entry, makeshortif($entry['label'])) . ' ' . $error_img,

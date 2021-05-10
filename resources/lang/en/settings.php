@@ -46,6 +46,7 @@ return [
             'location' => 'Location Settings',
             'graylog' => 'Graylog Integration',
             'oxidized' => 'Oxidized Integration',
+            'mac_oui' => 'Mac OUI Lookup Integration',
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
@@ -845,6 +846,12 @@ return [
         'login_message' => [
             'description' => 'Logon Message',
             'help' => 'Displayed on the login page',
+        ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => 'Enable MAC OUI lookup',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
         ],
         'mono_font' => [
             'description' => 'Monospaced Font',
