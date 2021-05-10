@@ -29,7 +29,7 @@ var grid = $("#port-fdb").bootgrid({
     {
         return {
             port_id: "<?php echo $port['port_id']; ?>",
-            dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
+            dns: $("#port-fdb").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
         };
     },
     formatters: {

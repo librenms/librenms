@@ -29,7 +29,7 @@ var grid = $("#ports-fdb").bootgrid({
     {
         return {
             device_id: "<?php echo $device['device_id']; ?>",
-            dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
+            dns: $("#ports-fdb").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
         };
     },
     formatters: {
