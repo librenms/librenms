@@ -96,10 +96,10 @@ if (\LibreNMS\Config::get('old_graphs')) {
     }
 
     $rrd_options .= '\\\\n';
-    $rrd_options .= ' COMMENT:\\n';
+    $rrd_options .= ' COMMENT:\\\\n';
 
     if ($print_total) {
-        $rrd_options .= ' GPRINT:' . $ds . '_tot:Total\ %6.' . $float_precision . 'lf%s\)\l';
+        $rrd_options .= ' GPRINT:' . $ds . '_tot:Total\ %6.' . $float_precision . 'lf%s\)\\\\l';
     }
 
     if ($percentile) {

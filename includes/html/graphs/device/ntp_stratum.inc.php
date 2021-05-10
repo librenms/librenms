@@ -36,7 +36,7 @@ foreach ($components as $id => $array) {
         $rrd_additions .= ' LINE1.25:DS' . $count . '#' . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;
         $rrd_additions .= ' GPRINT:DS' . $count . ':LAST:%5.0lf ';
         $rrd_additions .= ' GPRINT:DS' . $count . ':MIN:%7.0lf ';
-        $rrd_additions .= ' GPRINT:DS' . $count . ':MAX:%7.0lf\\l ';
+        $rrd_additions .= ' GPRINT:DS' . $count . ':MAX:%7.0lf\\\\l ';
         $count++;
     }
 }
