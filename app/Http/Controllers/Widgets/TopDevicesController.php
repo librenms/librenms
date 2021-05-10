@@ -304,7 +304,7 @@ class TopDevicesController extends WidgetController
                 'to' => Carbon::now()->timestamp,
                 'from' => Carbon::now()->subDay()->timestamp,
                 'id' => $storage->storage_id,
-                'type' => 'device_storage',
+                'type' => 'storage_usage',
                 'legend' => 'no',
             ];
             $overlib_content = Url::overlibContent($graph_array, $device->displayName() . ' - ' . $storage->storage_descr);
