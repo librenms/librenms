@@ -3730,7 +3730,7 @@
             "type": "text"
         },
         "mac_oui.enabled": {
-            "default": false,
+            "default": true,
             "group": "external",
             "section": "mac_oui",
             "order": 0,
