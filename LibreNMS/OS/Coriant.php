@@ -43,6 +43,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
          */
 
         $c_list = [];
+        ModuleModelObserver::observe('\App\Models\MplsLsp\TnmsneInfo');
 
         foreach (snmpwalk_cache_multi_oid($this->getDeviceArray(), 'enmsNETable', [], 'TNMS-NBI-MIB') as $index => $ne) {
             $ne = TnmsneInfo::firstOrNew(['device_id' => $this->getDeviceId(), 'neID' => $index], [
