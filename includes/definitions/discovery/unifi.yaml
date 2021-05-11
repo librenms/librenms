@@ -5,3 +5,8 @@ modules:
                 total: FROGFOOT-RESOURCES-MIB::memTotal
                 free: FROGFOOT-RESOURCES-MIB::memFree
                 precision: 1024
+    processors:
+        data:
+            -
+                oid: .1.3.6.1.2.1.25.3.3.1.2
+                num_oid: '.1.3.6.1.2.1.25.3.3.1.2.{{ $index }}'
