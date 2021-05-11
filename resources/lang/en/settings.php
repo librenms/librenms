@@ -949,8 +949,20 @@ return [
             'group_support' => [
                 'description' => 'Enable the return of groups to Oxidized',
             ],
+            'ignore_os' => [
+                'description' => 'Do not backup these OS',
+                'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces).  Only allows existing OS.',
+            ],
+            'ignore_types' => [
+                'description' => 'Do not backup these device types',
+                'help' => 'Do not backup the listed device types with Oxidized. Only allows existing types.',
+            ],
             'reload_nodes' => [
                 'description' => 'Reload Oxidized nodes list, each time a device is added',
+            ],
+            'maps' => [
+                'description' => 'Variable Mapping',
+                'help' => 'Used to set group or other variables or map OS names that differ.',
             ],
             'url' => [
                 'description' => 'URL to your Oxidized API',

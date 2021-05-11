@@ -40,8 +40,8 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20191124" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20210421" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach
