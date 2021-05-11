@@ -17,7 +17,7 @@ modules:
             -
                 oid: oacSysCpuUsedValue
                 num_oid: '.1.3.6.1.4.1.13191.10.3.3.1.2.3.1.3.{{ $index }}'
-                descr: 'CPU Core {{ $oacSysIMSysMainCPU }} {{ $index }}'
+                descr: ONEACCESS-SYS-MIB::oacSysIMSysMainCPU
     sensors:
         state:
             data:
