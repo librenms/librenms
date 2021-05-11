@@ -172,7 +172,7 @@ $('#create-service').on('show.bs.modal', function (e) {
 });
 
 // on-submit
-$('#service-submit').click('', function(e) {
+$('#service-submit').on("click", function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",

@@ -72,8 +72,8 @@ if ($percentile) {
     $rrd_options .= ' GPRINT:' . $ds . '_percentile:%6.' . $float_precision . 'lf%s';
 }
 
-$rrd_options .= '\\n';
-$rrd_options .= ' COMMENT:\\n';
+$rrd_options .= '\\\\n';
+$rrd_options .= ' COMMENT:\\\\n';
 
 if ($print_total) {
     $rrd_options .= ' GPRINT:' . $ds . '_total:Total" %6.' . $float_precision . 'lf%s"\\l';

@@ -1,6 +1,6 @@
 <?php
 
-$mdadm_arrays = get_arrays_with_application($device, $app['app_id'], 'mdadm');
+$mdadm_arrays = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'mdadm');
 
 print_optionbar_start();
 

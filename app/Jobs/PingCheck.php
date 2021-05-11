@@ -36,6 +36,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -151,8 +152,6 @@ class PingCheck implements ShouldQueue
             return $this->devices;
         }
 
-        global $vdebug;
-
         /** @var Builder $query */
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
@@ -174,7 +173,7 @@ class PingCheck implements ShouldQueue
         $this->current_tier = 1;
         $this->current = $this->tiered->get($this->current_tier, collect());
 
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             $this->tiered->each(function (Collection $tier, $index) {
                 echo "Tier $index (" . $tier->count() . '): ';
                 echo $tier->implode('hostname', ', ');
@@ -191,8 +190,6 @@ class PingCheck implements ShouldQueue
      */
     private function processTier()
     {
-        global $vdebug;
-
         if ($this->current->isNotEmpty()) {
             return;
         }
@@ -204,7 +201,7 @@ class PingCheck implements ShouldQueue
             return;
         }
 
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             echo "Out of devices at this tier, moving to tier $this->current_tier\n";
         }
 
@@ -227,9 +224,7 @@ class PingCheck implements ShouldQueue
      */
     private function recordData(array $data)
     {
-        global $vdebug;
-
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             echo "Attempting to record data for {$data['hostname']}... ";
         }
 
@@ -238,7 +233,7 @@ class PingCheck implements ShouldQueue
 
         // process the data if this is a standalone device or in the current tier
         if ($device->max_depth === 0 || $this->current->has($device->hostname)) {
-            if ($vdebug) {
+            if (Debug::isVerbose()) {
                 echo "Success\n";
             }
 
@@ -269,7 +264,7 @@ class PingCheck implements ShouldQueue
             $this->complete($device->hostname);
             d_echo("Recorded data for $device->hostname (tier $device->max_depth)\n");
         } else {
-            if ($vdebug) {
+            if (Debug::isVerbose()) {
                 echo "Deferred\n";
             }
 

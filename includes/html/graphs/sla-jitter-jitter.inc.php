@@ -24,11 +24,11 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " LINE1.25:SD#0000ee:'Src to Dst              ' ";
     $rrd_options .= ' GPRINT:SD:LAST:%3.0lf ';
     $rrd_options .= ' GPRINT:SD:MIN:%3.0lf ';
-    $rrd_options .= " GPRINT:SD:MAX:%3.0lf\\\l ";
+    $rrd_options .= ' GPRINT:SD:MAX:%3.0lf\\\\l ';
 
     $rrd_options .= ' DEF:DS=' . $rrd_filename . ':AvgDSJ:AVERAGE ';
     $rrd_options .= " LINE1.25:DS#008C00:'Dst to Src              ' ";
     $rrd_options .= ' GPRINT:DS:LAST:%3.0lf ';
     $rrd_options .= ' GPRINT:DS:MIN:%3.0lf ';
-    $rrd_options .= " GPRINT:DS:MAX:%3.0lf\\\l ";
+    $rrd_options .= ' GPRINT:DS:MAX:%3.0lf\\\\l ';
 }

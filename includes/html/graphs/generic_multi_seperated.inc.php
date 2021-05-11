@@ -60,7 +60,7 @@ if ($width > '500') {
 }
 
 if ($_GET['previous']) {
-    $rrd_options .= sprintf(" COMMENT:'\t'", '');
+    $rrd_options .= sprintf(" COMMENT:'\\t'", '');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Avg');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Max');
     if (! $args['nototal']) {
@@ -95,8 +95,8 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' CDEF:bits' . $i . '=inbits' . $i . ',outbits' . $i . ',+';
 
     if ($_GET['previous']) {
-        $rrd_options .= ' DEF:inB' . $i . 'X=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
-        $rrd_options .= ' DEF:outB' . $i . 'X=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' DEF:inB' . $i . 'X=' . $rrd['filename'] . ':' . $rrd['ds_in'] . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' DEF:outB' . $i . 'X=' . $rrd['filename'] . ':' . $rrd['ds_out'] . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' CDEF:octets' . $i . 'X=inB' . $i . 'X,outB' . $i . 'X,+';
         $rrd_options .= ' CDEF:inbits' . $i . 'X=inB' . $i . 'X' . ",$multiplier,* ";
         $rrd_options .= ' CDEF:outbits' . $i . 'X=outB' . $i . 'X' . ",$multiplier,*";
@@ -147,7 +147,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= " COMMENT:' \t'";
+        $rrd_options .= " COMMENT:' \\t'";
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:MAX:%6.' . $float_precision . "lf%s$units";
         if (! $args['nototal']) {
@@ -167,7 +167,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= " COMMENT:' \t'";
+        $rrd_options .= " COMMENT:' \\t'";
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:MAX:%6.' . $float_precision . "lf%s$units";
         if (! $args['nototal']) {
@@ -238,7 +238,7 @@ if (! $args['nototal']) {
     $rrd_options .= ' GPRINT:inbits:MAX:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:totin:%6.' . $float_precision . "lf%s$total_units";
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= " COMMENT:' \t'";
+        $rrd_options .= " COMMENT:' \\t'";
         $rrd_options .= ' GPRINT:inbitsX:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:inbitsX:MAX:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:totinX:%6.' . $float_precision . "lf%s$total_units";
@@ -251,7 +251,7 @@ if (! $args['nototal']) {
     $rrd_options .= ' GPRINT:outbits:MAX:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:totout:%6.' . $float_precision . "lf%s$total_units";
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= " COMMENT:' \t'";
+        $rrd_options .= " COMMENT:' \\t'";
         $rrd_options .= ' GPRINT:outbitsX:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:outbitsX:MAX:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:totoutX:%6.' . $float_precision . "lf%s$total_units";
@@ -264,7 +264,7 @@ if (! $args['nototal']) {
     $rrd_options .= ' GPRINT:bits:MAX:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:tot:%6.' . $float_precision . "lf%s$total_units";
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= " COMMENT:' \t'";
+        $rrd_options .= " COMMENT:' \\t'";
         $rrd_options .= ' GPRINT:bitsX:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:bitsX:MAX:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:totX:%6.' . $float_precision . "lf%s$total_units";

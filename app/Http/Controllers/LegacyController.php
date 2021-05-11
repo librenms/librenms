@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 class LegacyController extends Controller
 {
@@ -20,7 +21,7 @@ class LegacyController extends Controller
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
 
-        set_debug(Str::contains($request->path(), 'debug'));
+        Debug::set(Str::contains($request->path(), 'debug'));
 
         ob_start(); // protect against bad plugins that output during start
         \LibreNMS\Plugins::start();

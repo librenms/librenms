@@ -19,49 +19,11 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Process\Process;
-
-if (! function_exists('set_debug')) {
-    /**
-     * Set debugging output
-     *
-     * @param bool $state If debug is enabled or not
-     * @param bool $silence When not debugging, silence every php error
-     * @return bool
-     */
-    function set_debug($state = true, $silence = false)
-    {
-        global $debug;
-
-        $debug = $state; // set to global
-
-        restore_error_handler(); // disable Laravel error handler
-
-        if (isset($debug) && $debug) {
-            ini_set('display_errors', 1);
-            ini_set('display_startup_errors', 1);
-            ini_set('log_errors', 0);
-            error_reporting(E_ALL & ~E_NOTICE);
-
-            \LibreNMS\Util\Laravel::enableCliDebugOutput();
-            \LibreNMS\Util\Laravel::enableQueryDebug();
-        } else {
-            ini_set('display_errors', 0);
-            ini_set('display_startup_errors', 0);
-            ini_set('log_errors', 1);
-            error_reporting($silence ? 0 : E_ERROR);
-
-            \LibreNMS\Util\Laravel::disableCliDebugOutput();
-            \LibreNMS\Util\Laravel::disableQueryDebug();
-        }
-
-        return $debug;
-    }
-}//end set_debug()
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -334,8 +296,6 @@ function device_discovery_trigger($id)
 
 function delete_device($id)
 {
-    global $debug;
-
     if (isCli() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
@@ -378,7 +338,7 @@ function delete_device($id)
         foreach (dbFetch('SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?', [$db_name, $field]) as $table) {
             $table = $table['TABLE_NAME'];
             $entries = (int) dbDelete($table, "`$field` =  ?", [$id]);
-            if ($entries > 0 && $debug === true) {
+            if ($entries > 0 && Debug::isEnabled()) {
                 $ret .= "$field@$table = #$entries\n";
             }
         }
@@ -1098,20 +1058,19 @@ function validate_device_id($id)
 
 function convert_delay($delay)
 {
-    $delay = preg_replace('/\s/', '', $delay);
-    if (strstr($delay, 'm', true)) {
-        $delay_sec = $delay * 60;
-    } elseif (strstr($delay, 'h', true)) {
-        $delay_sec = $delay * 3600;
-    } elseif (strstr($delay, 'd', true)) {
-        $delay_sec = $delay * 86400;
-    } elseif (is_numeric($delay)) {
-        $delay_sec = $delay;
-    } else {
-        $delay_sec = 300;
+    if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
     }
 
-    return $delay_sec;
+    return $delay === '' ? 0 : 300;
 }
 
 function normalize_snmp_ip_address($data)
@@ -1897,6 +1856,53 @@ function update_device_logo(&$device)
         dbUpdate(['icon' => $icon], 'devices', 'device_id=?', [$device['device_id']]);
         echo "Changed Icon! : $icon\n";
     }
+}
+
+/**
+ * Function to generate Mac OUI Cache
+ */
+function cache_mac_oui()
+{
+    // timers:
+    $mac_oui_refresh_int_min = 86400 * rand(7, 11); // 7 days + a random number between 0 and 4 days
+    $mac_oui_cache_time = 1296000; // we keep data during 15 days maximum
+
+    $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
+
+    if (Config::get('mac_oui.enabled') !== true) {
+        echo 'Mac OUI integration disabled' . PHP_EOL;
+
+        return 0;
+    }
+
+    if ($lock->get()) {
+        echo 'Caching Mac OUI' . PHP_EOL;
+        try {
+            $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
+            echo '  -> Downloading ...' . PHP_EOL;
+            $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
+            echo '  -> Processing ...' . PHP_EOL;
+            $json_data = $get->body;
+            foreach (explode("\n", $json_data) as $json_line) {
+                $entry = json_decode($json_line);
+                if ($entry && $entry->{'assignmentBlockSize'} == 'MA-L') {
+                    $oui = strtolower(str_replace(':', '', $entry->{'oui'}));
+                    $key = 'OUIDB-' . $oui;
+                    Cache::put($key, $entry->{'companyName'}, $mac_oui_cache_time);
+                }
+            }
+        } catch (Exception $e) {
+            echo 'Error processing Mac OUI :' . PHP_EOL;
+            echo 'Exception: ' . get_class($e) . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;
+
+            $lock->release(); // we did not succeed so we'll try again next time
+
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 /**

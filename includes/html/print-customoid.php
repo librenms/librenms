@@ -127,13 +127,13 @@ $("[data-toggle='modal'], [data-toggle='popover']").popover({
 function updateResults(rows) {
     $('#num_of_rows').val(rows.value);
     $('#page_num').val(1);
-    $('#oid_form').submit();
+    $('#oid_form').trigger( "submit" );
 }
 
 function changePage(page,e) {
     e.preventDefault();
     $('#page_num').val(page);
-    $('#oid_form').submit();
+    $('#oid_form').trigger( "submit" );
 }
 
 </script>

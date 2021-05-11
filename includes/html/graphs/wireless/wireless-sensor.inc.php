@@ -33,7 +33,7 @@ if ($unit_long == $sensor['sensor_descr']) {
 $col_w = 7 + strlen($unit);
 $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 28);
 
-$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
+$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . 'Max\\n\'';
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 
 $num = '%5.2lf'; // default: float
@@ -77,4 +77,4 @@ if ($vars['width'] > 300) {
 
 $rrd_options .= " GPRINT:$output_def:LAST:'$num$unit'";
 $rrd_options .= " GPRINT:$output_def:MIN:'$num$unit'";
-$rrd_options .= " GPRINT:$output_def:MAX:'$num$unit'\\l";
+$rrd_options .= " GPRINT:$output_def:MAX:'$num$unit'" . '\\\\l';

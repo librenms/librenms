@@ -30,6 +30,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Util\Debug;
 use Log;
 use Request;
 use Session;
@@ -131,10 +132,8 @@ class LegacyUserProvider implements UserProvider
 
             return true;
         } catch (AuthenticationException $ae) {
-            global $debug;
-
             $auth_message = $ae->getMessage();
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 $auth_message .= '<br /> ' . $ae->getFile() . ': ' . $ae->getLine();
             }
             \Toastr::error($auth_message);

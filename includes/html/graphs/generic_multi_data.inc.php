@@ -109,12 +109,12 @@ if ($i) {
         $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:in' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
-        $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\n';
+        $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\\\n';
         $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':Out';
         $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:out' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
-        $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
+        $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\\\n';
         $rrd_options .= " GPRINT:tot:'Total %6." . $float_precision . "lf%sB'";
         $rrd_options .= " GPRINT:totin:'(In %6." . $float_precision . "lf%sB'";
         $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%sB)\\l'";

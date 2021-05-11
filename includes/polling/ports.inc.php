@@ -4,6 +4,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
 $data_oids = [
@@ -664,7 +665,7 @@ foreach ($ports as $port) {
             if ($port[$oid] != $this_port[$oid] && ! isset($this_port[$oid])) {
                 $port['update'][$oid] = ['NULL'];
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
-                if ($debug) {
+                if (Debug::isEnabled()) {
                     d_echo($oid . ': ' . $port[$oid] . ' -> NULL ');
                 } else {
                     echo $oid . ' ';
@@ -692,7 +693,7 @@ foreach ($ports as $port) {
                 }
 
                 log_event($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid], $device, 'interface', 3, $port['port_id']);
-                if ($debug) {
+                if (Debug::isEnabled()) {
                     d_echo($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid] . ' ');
                 } else {
                     echo $oid . ' ';

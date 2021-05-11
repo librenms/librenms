@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
 
@@ -110,7 +111,7 @@ class DeviceController extends Controller
     {
         ob_start();
         $device = $device->toArray();
-        set_debug(false);
+        Debug::set(false);
         chdir(base_path());
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');

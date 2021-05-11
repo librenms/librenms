@@ -1,0 +1,61 @@
+MDS-ORBIT-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    mdsRoot
+        FROM MDS-REG-MIB;
+
+mdsOrbit MODULE-IDENTITY
+    LAST-UPDATED "201304220000Z" -- Apr 22, 2013
+    ORGANIZATION 
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The structure of Management Information for the GE MDS."
+    REVISION      "201304220000Z"
+    DESCRIPTION
+            "Initial version."
+    ::= { mdsRoot 10 }
+
+mdsSystem OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "mdsSystem provides root Object Identifier for Management
+         Information Base for system related configuration like
+         NTP, DNS etc"
+    ::= { mdsOrbit 1 }
+
+mdsInterfaces OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "mdsInterfaces provides root Object Identifier for Management
+         Information Base for extended information about various
+         wired/wireless/virtual interfaces on MDS products."
+    ::= { mdsOrbit 2 }
+
+mdsServices OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "mdsServices provides root Object Identifier for Management
+         Information Base for various network and application services
+         on MDS products."
+    ::= { mdsOrbit 3 }
+
+mdsLogging OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "mdsLogging provides root Object Identifier for Management
+         Information Base for logging functionality on MDS products."
+    ::= { mdsOrbit 4 }
+
+END
