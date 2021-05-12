@@ -28,7 +28,7 @@ Debug::set(isset($options['d']));
 Datastore::init();
 
 // Wait for schema update, as running during update can break update
-if (get_db_schema() < 107) {
+if (\LibreNMS\DB\Schema::getLegacySchema() < 107) {
     logfile('BILLING: Cannot continue until the database schema update to >= 107 is complete');
     exit(1);
 }

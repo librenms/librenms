@@ -24,6 +24,7 @@
 
 namespace LibreNMS\Util;
 
+use App;
 use LibreNMS\Config;
 use LibreNMS\Proc;
 
@@ -60,7 +61,7 @@ class Snmpsim
 
         $cmd = $this->getCmd();
 
-        if (isCli()) {
+        if (App::runningInConsole()) {
             echo "Starting snmpsim listening on {$this->ip}:{$this->port}... \n";
             d_echo($cmd);
         }
@@ -71,7 +72,7 @@ class Snmpsim
             sleep($wait);
         }
 
-        if (isCli() && ! $this->proc->isRunning()) {
+        if (App::runningInConsole() && ! $this->proc->isRunning()) {
             // if starting failed, run snmpsim again and output to the console and validate the data
             passthru($this->getCmd(false) . ' --validate-data');
 

@@ -30,6 +30,8 @@ use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\InstallerStep;
+use LibreNMS\ValidationResult;
+use LibreNMS\Validator;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DatabaseController extends InstallationController implements InstallerStep
@@ -70,6 +72,19 @@ class DatabaseController extends InstallationController implements InstallerStep
         try {
             $conn = Eloquent::DB('setup');
             $ok = $conn && ! is_null($conn->getPdo());
+
+            // validate Database
+            $validator = new Validator();
+            $validator->validate(['database']);
+            $results = $validator->getResults('database');
+
+            /** @var \LibreNMS\ValidationResult $result */
+            foreach ($results as $result) {
+                if ($result->getStatus() == ValidationResult::FAILURE) {
+                    $ok = false;
+                    $message .= PHP_EOL . $result->getMessage();
+                }
+            }
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
