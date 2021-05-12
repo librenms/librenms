@@ -169,58 +169,54 @@ class RoutesTablesController extends TableController
      */
     public function formatItem($route_entry)
     {
-        if ($route_entry->updated_at) {
-            $item['updated_at'] = $route_entry->updated_at->diffForHumans();
+        $item['updated_at'] = $route_entry->updated_at ? $route_entry->updated_at->diffForHumans() : $route_entry->updated_at;
+        $item['created_at'] = $route_entry->created_at ? $route_entry->created_at->toDateTimeString() : $route_entry->created_at;
+        $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : $route_entry->inetCidrRouteIfIndex;
+        $item['inetCidrRouteMetric1'] = $route_entry->inetCidrRouteMetric1;
+        $item['inetCidrRoutePfxLen'] = $route_entry->inetCidrRoutePfxLen;
+        $item['inetCidrRouteDestType'] = $route_entry->inetCidrRouteDestType;
+
+        try {
+            $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
+            $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
+        } catch (\Exception $e) {
+            $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
         }
-        if ($route_entry->created_at) {
-            $item['created_at'] = $route_entry->created_at->toDateTimeString();
-        }
-        if ($route_entry->inetCidrRouteIfIndex == 0) {
-            $item['inetCidrRouteIfIndex'] = 'Undefined';
-        }
-        if ($route_entry->inetCidrRouteNextHop) {
-            try {
-                $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
-                $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
-            } catch (\Exception $e) {
-                $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
-            }
-        }
-        if ($route_entry->inetCidrRouteDest) {
-            try {
-                $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
-                $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
-            } catch (\Exception $e) {
-                $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
-            }
-        }
-        $item['inetCidrRouteIfIndex'] = 'ifIndex ' . $route_entry->inetCidrRouteIfIndex;
+
+        $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : 'IfIndex ' . $route_entry->inetCidrRouteIfIndex;
         if ($port = $route_entry->port()->first()) {
             $item['inetCidrRouteIfIndex'] = Url::portLink($port, htmlspecialchars($port->getShortLabel()));
         }
+
+        try {
+            $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
+            $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
+        } catch (\Exception $e) {
+            $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
+        }
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
-        $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
         if ($device) {
             if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
                 $item['inetCidrRouteNextHop'] = Url::deviceLink($device, 'localhost');
             } else {
-                $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop . '<br>(' . Url::deviceLink($device) . ')';
+                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Url::deviceLink($device) . ')';
             }
         }
+
         $item['inetCidrRouteProto'] = $route_entry->inetCidrRouteProto;
         if ($route_entry->inetCidrRouteProto && $route_entry::$translateProto[$route_entry->inetCidrRouteProto]) {
             $item['inetCidrRouteProto'] = $route_entry::$translateProto[$route_entry->inetCidrRouteProto];
         }
+
         $item['inetCidrRouteType'] = $route_entry->inetCidrRouteType;
         if ($route_entry->inetCidrRouteType && $route_entry::$translateType[$route_entry->inetCidrRouteType]) {
             $item['inetCidrRouteType'] = $route_entry::$translateType[$route_entry->inetCidrRouteType];
         }
+
         $item['context_name'] = '[global]';
         if ($route_entry->context_name != '') {
             $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars($route_entry->context_name) . '</a>';
         }
-        $item['inetCidrRouteMetric1'] = $route_entry->inetCidrRouteMetric1;
-        $item['inetCidrRoutePfxLen'] = $route_entry->inetCidrRoutePfxLen;
 
         return $item;
     }
