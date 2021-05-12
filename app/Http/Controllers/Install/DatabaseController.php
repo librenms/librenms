@@ -68,7 +68,7 @@ class DatabaseController extends InstallationController implements InstallerStep
         session()->forget('install.database'); // reset db complete status
 
         $ok = false;
-        $message = '';
+        $messages = [];
         try {
             $conn = Eloquent::DB('setup');
             $ok = $conn && ! is_null($conn->getPdo());
@@ -82,16 +82,16 @@ class DatabaseController extends InstallationController implements InstallerStep
             foreach ($results as $result) {
                 if ($result->getStatus() == ValidationResult::FAILURE) {
                     $ok = false;
-                    $message .= PHP_EOL . $result->getMessage();
+                    $messages[] = $result->getMessage();
                 }
             }
         } catch (\Exception $e) {
-            $message = $e->getMessage();
+            $messages[] = $e->getMessage();
         }
 
         return response()->json([
             'result' => $ok ? 'ok' : 'fail',
-            'message' => $message,
+            'message' => implode('<br />', $messages),
         ]);
     }
 
