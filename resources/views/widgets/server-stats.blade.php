@@ -1,4 +1,5 @@
 <div class="col-sm-{{ $columns }}">
+    <div class="JustGage_Title">@lang('CPU Usage')</div>
     <div
         id="cpu-{{ $id }}"
         class="guage-{{ $id }}"
@@ -11,6 +12,7 @@
 
 @foreach($mempools as $key => $mem)
     <div class="col-sm-{{ $columns }}">
+        <div class="JustGage_Title">{{ $mem['mempool_descr'] }} @lang('Usage')</div>
         <div
             id="mem-{{ $key }}-{{ $id }}"
             class="guage-{{ $id }}"
@@ -24,6 +26,7 @@
 
 @foreach($disks as $key => $disk)
     <div class="col-sm-{{ $columns }}">
+        <div class="JustGage_Title">{{ $disk['storage_descr'] }} @lang('Usage')</div>
         <div
             id="disk-{{ $key }}-{{ $id }}"
             class="guage-{{ $id }}"
@@ -36,15 +39,20 @@
 @endforeach
 
 <script type='text/javascript'>
-    loadjs('js/raphael.min.js', function() {
-        loadjs('js/justgage.js', function() {
-            $('.guage-{{ $id }}').each(function() {
-                new JustGage({
-                    id: this.id,
-                    min: 0,
-                    valueFontSize: '2px'
-                });
-            });
+    $('.guage-{{ $id }}').each(function() {
+        new JustGage({
+            id: this.id,
+            min: 0,
+            valueFontSize: '2px'
         });
     });
 </script>
+
+<style>
+    .JustGage_Title
+    {
+        text-align:center;
+        font-family: Arial; font-size: 20px; font-weight: bold;
+        color:#999999;
+    }
+</style>

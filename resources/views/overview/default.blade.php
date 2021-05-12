@@ -167,6 +167,8 @@
 
 @section('javascript')
 <script src="{{ asset('js/jquery.gridster.min.js?ver=05072021') }}"></script>
+<script src="{{ asset('js/raphael.min.js?ver=05072021') }}"></script>
+<script src="{{ asset('js/justgage.min.js?ver=05072021') }}"></script>
 @endsection
 
 @push('scripts')
