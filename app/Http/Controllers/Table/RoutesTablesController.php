@@ -221,8 +221,6 @@ class RoutesTablesController extends TableController
         }
         $item['inetCidrRouteMetric1'] = $route_entry->inetCidrRouteMetric1;
         $item['inetCidrRoutePfxLen'] = $route_entry->inetCidrRoutePfxLen;
-        $item['updated_at'] = $route_entry->updated_at;
-        $item['created_at'] = $route_entry->created_at;
 
         return $item;
     }
