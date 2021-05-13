@@ -46,7 +46,7 @@ class Database extends BaseValidation
 
     public function validate(Validator $validator)
     {
-        if (! dbIsConnected()) {
+        if (! Eloquent::isConnected()) {
             return;
         }
 
@@ -56,7 +56,7 @@ class Database extends BaseValidation
         $this->checkMysqlEngine($validator);
 
         // check database schema version
-        $current = get_db_schema();
+        $current = \LibreNMS\DB\Schema::getLegacySchema();
         $latest = 1000;
 
         if ($current === 0 || $current === $latest) {
@@ -96,16 +96,16 @@ class Database extends BaseValidation
             if (version_compare($version[0], self::MARIADB_MIN_VERSION, '<=')) {
                 $validator->fail(
                     'MariaDB version ' . self::MARIADB_MIN_VERSION . ' is the minimum supported version as of ' .
-                    self::MARIADB_MIN_VERSION_DATE . '. We recommend you update MariaDB to a supported version ' .
-                    self::MARIADB_RECOMMENDED_VERSION . ' suggested). Failure to update MariaDB will eventually cause issues.'
+                    self::MARIADB_MIN_VERSION_DATE . '. Update MariaDB to a supported version ' .
+                    self::MARIADB_RECOMMENDED_VERSION . ' suggested).'
                 );
             }
         } else {
             if (version_compare($version[0], self::MYSQL_MIN_VERSION, '<=')) {
                 $validator->fail(
                     'MySQL version ' . self::MYSQL_MIN_VERSION . ' is the minimum supported version as of ' .
-                    self::MYSQL_MIN_VERSION_DATE . '. We recommend you update MySQL to a supported version (' .
-                    self::MYSQL_RECOMMENDED_VERSION . ' suggested). Failure to update MySQL will eventually cause issues.'
+                    self::MYSQL_MIN_VERSION_DATE . '. Update MySQL to a supported version (' .
+                    self::MYSQL_RECOMMENDED_VERSION . ' suggested).'
                 );
             }
         }
@@ -131,7 +131,7 @@ class Database extends BaseValidation
     private function checkMode(Validator $validator)
     {
         // Test for lower case table name support
-        $lc_mode = dbFetchCell('SELECT @@global.lower_case_table_names');
+        $lc_mode = Eloquent::DB()->selectOne('SELECT @@global.lower_case_table_names as mode')->mode;
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
@@ -144,7 +144,7 @@ class Database extends BaseValidation
     {
         $db = \config('database.connections.' . \config('database.default') . '.database');
         $query = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA` = '$db' && `ENGINE` != 'InnoDB'";
-        $tables = dbFetchRows($query);
+        $tables = Eloquent::DB()->select($query);
         if (! empty($tables)) {
             $validator->result(
                 ValidationResult::warn('Some tables are not using the recommended InnoDB engine, this may cause you issues.')
@@ -155,14 +155,14 @@ class Database extends BaseValidation
 
     private function checkCollation(Validator $validator)
     {
-        $db_name = dbFetchCell('SELECT DATABASE()');
+        $db_name = Eloquent::DB()->selectOne('SELECT DATABASE() as name')->name;
 
         // Test for correct character set and collation
         $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
             FROM information_schema.SCHEMATA S
             WHERE schema_name = '$db_name' AND
             ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')";
-        $collation = dbFetchRows($db_collation_sql);
+        $collation = Eloquent::DB()->select($db_collation_sql);
         if (empty($collation) !== true) {
             $validator->fail(
                 'MySQL Database collation is wrong: ' . implode(' ', $collation[0]),
@@ -174,7 +174,7 @@ class Database extends BaseValidation
             FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C
             WHERE C.collation_name = T.table_collation AND T.table_schema = '$db_name' AND
              ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );";
-        $collation_tables = dbFetchRows($table_collation_sql);
+        $collation_tables = Eloquent::DB()->select($table_collation_sql);
         if (empty($collation_tables) !== true) {
             $result = ValidationResult::fail('MySQL tables collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
@@ -185,7 +185,7 @@ class Database extends BaseValidation
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
             FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$db_name' AND
             ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );";
-        $collation_columns = dbFetchRows($column_collation_sql);
+        $collation_columns = Eloquent::DB()->select($column_collation_sql);
         if (empty($collation_columns) !== true) {
             $result = ValidationResult::fail('MySQL column collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')

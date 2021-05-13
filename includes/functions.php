@@ -279,7 +279,7 @@ function renamehost($id, $new, $source = 'console')
 
 function device_discovery_trigger($id)
 {
-    if (isCli() === false) {
+    if (App::runningInConsole() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
@@ -296,7 +296,7 @@ function device_discovery_trigger($id)
 
 function delete_device($id)
 {
-    if (isCli() === false) {
+    if (App::runningInConsole() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
@@ -2015,27 +2015,6 @@ function get_schema_list()
     ksort($files); // fix dbSchema 1000 order
 
     return $files;
-}
-
-/**
- * Get the current database schema, will return 0 if there is no schema.
- *
- * @return int
- */
-function get_db_schema()
-{
-    try {
-        $db = \LibreNMS\DB\Eloquent::DB();
-        if ($db) {
-            return (int) $db->table('dbSchema')
-                ->orderBy('version', 'DESC')
-                ->value('version');
-        }
-    } catch (PDOException $e) {
-        // return default
-    }
-
-    return 0;
 }
 
 /**
