@@ -80,7 +80,7 @@ foreach ($components as $id => $array) {
                 $rrd_additions .= ' AREA:MOD' . $count . '#' . $colour . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;
                 $rrd_additions .= ' GPRINT:MOD' . $count . ':LAST:%6.2lf%s ';
                 $rrd_additions .= ' GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s ';
-                $rrd_additions .= ' GPRINT:MOD' . $count . ':MAX:%6.2lf%s\\\\l ';
+                $rrd_additions .= ' GPRINT:MOD' . $count . ":MAX:%6.2lf%s\\\l ";
 
                 $count++;
             } // End if file exists
