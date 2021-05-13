@@ -15,7 +15,7 @@ $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
 $rrd_options .= " LINE1.5:sensor#cc0000:'" . $sensor['sensor_descr_fixed'] . "'";
 $rrd_options .= " GPRINT:sensor_min$current_id:MIN:%2.2le";
 $rrd_options .= ' GPRINT:sensor:LAST:%2.2le';
-$rrd_options .= ' GPRINT:sensor_max:MAX:%2.2le\\\\l';
+$rrd_options .= ' GPRINT:sensor_max:MAX:%2.2le\\l';
 
 if (is_numeric($sensor['sensor_limit'])) {
     $rrd_options .= ' HRULE:' . $sensor['sensor_limit'] . '#999999::dashes';
