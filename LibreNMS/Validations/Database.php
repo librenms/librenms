@@ -50,12 +50,24 @@ class Database extends BaseValidation
             return;
         }
 
+        $this->validateSystem($validator);
+
+        if ($this->checkSchemaVersion($validator)) {
+            $this->checkSchema($validator);
+            $this->checkCollation($validator);
+        }
+    }
+
+    public function validateSystem(Validator $validator)
+    {
         $this->checkVersion($validator);
         $this->checkMode($validator);
         $this->checkTime($validator);
         $this->checkMysqlEngine($validator);
+    }
 
-        // check database schema version
+    private function checkSchemaVersion(Validator $validator): bool
+    {
         $current = \LibreNMS\DB\Schema::getLegacySchema();
         $latest = 1000;
 
@@ -64,13 +76,13 @@ class Database extends BaseValidation
             if (! Schema::isCurrent()) {
                 $validator->fail('Your database is out of date!', './lnms migrate');
 
-                return;
+                return false;
             }
 
             $migrations = Schema::getUnexpectedMigrations();
             if ($migrations->isNotEmpty()) {
                 $validator->warn('Your database schema has extra migrations (' . $migrations->implode(', ') .
-                '). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.');
+                    '). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.');
             }
         } elseif ($current < $latest) {
             $validator->fail(
@@ -78,13 +90,12 @@ class Database extends BaseValidation
                 'Manually run ./daily.sh, and check for any errors.'
             );
 
-            return;
+            return false;
         } elseif ($current > $latest) {
             $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
         }
 
-        $this->checkCollation($validator);
-        $this->checkSchema($validator);
+        return true;
     }
 
     private function checkVersion(Validator $validator)
