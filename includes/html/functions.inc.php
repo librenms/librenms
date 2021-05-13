@@ -329,7 +329,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array = [];
 
     if (! $text) {
-        $text = Rewrite::normalizeIfName($port['label']);
+        $text = Rewrite::normalizeIfName($port['label'] ?? $port['ifName']);
     }
 
     if ($type) {
