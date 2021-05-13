@@ -6,6 +6,13 @@ mib_dir: hwg
 over:
     - { graph: device_state, text: States }
 nobulk: true
+poller_modules:
+    stp: false
+    ucd-mib: false
+    ports: false
+discovery_modules:
+    stp: false
+    ports: false
 discovery:
     -
         sysObjectID:
