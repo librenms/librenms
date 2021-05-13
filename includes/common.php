@@ -22,6 +22,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
 
 function generate_priority_status($priority)
@@ -146,7 +147,7 @@ function shorthost($hostname, $len = 12)
 
 function print_error($text)
 {
-    if (App::runningInConsole()) {
+    if (Laravel::isCli()) {
         c_echo('%r' . $text . "%n\n");
     } else {
         echo '<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> ' . $text . '</div>';
@@ -155,7 +156,7 @@ function print_error($text)
 
 function print_message($text)
 {
-    if (App::runningInConsole()) {
+    if (Laravel::isCli()) {
         c_echo('%g' . $text . "%n\n");
     } else {
         echo '<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> ' . $text . '</div>';
@@ -429,7 +430,7 @@ function c_echo($string, $enabled = true)
         return;
     }
 
-    if (App::runningInConsole()) {
+    if (Laravel::isCli()) {
         global $console_color;
         if ($console_color) {
             echo $console_color->convert($string);
