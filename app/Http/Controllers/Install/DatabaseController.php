@@ -31,6 +31,7 @@ use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\InstallerStep;
 use LibreNMS\ValidationResult;
+use LibreNMS\Validations\Database;
 use LibreNMS\Validator;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -75,7 +76,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
             // validate Database
             $validator = new Validator();
-            $validator->validate(['database']);
+            (new Database())->validateSystem($validator);
             $results = $validator->getResults('database');
 
             /** @var \LibreNMS\ValidationResult $result */
