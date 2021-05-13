@@ -80,6 +80,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
         }
 
         if ($arp_host) {
+            $arp_host = cleanPort($arp_host);
             $arp_if = generate_port_link($arp_host);
         } else {
             unset($arp_if);
