@@ -4,14 +4,14 @@ $fabosSfpRxPower = snmpwalk_array_num($device, '.1.3.6.1.4.1.1588.2.1.1.1.28.1.1
 $fabosSfpTxPower = snmpwalk_array_num($device, '.1.3.6.1.4.1.1588.2.1.1.1.28.1.1.5'); // FA-EXT-MIB::swSfpTxPower
 if (! empty($fabosSfpRxPower) || ! empty($fabosSfpTxPower)) {
     $ifDescr = snmpwalk_group($device, 'ifDescr', 'IF-MIB', 0)['ifDescr'] ?? [];
+    $ifAdminStatus = snmpwalk_group($device, 'ifAdminStatus', 'IF-MIB', 0)['ifAdminStatus'] ?? [];
 }
 
 foreach ($fabosSfpRxPower as $oid => $entry) {
     foreach ($entry as $index => $current) {
         if (is_numeric($current)) {
             $ifIndex = $index + 1073741823;
-            $ifAdminStatus = dbFetchCell("SELECT `ifAdminStatus` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$ifIndex, $device['device_id']]);
-            if ($ifAdminStatus == 'up') {
+            if ($ifAdminStatus[$ifIndex] == '1') {
                 discover_sensor(
                     $valid['sensor'],
                     'dbm',
@@ -42,8 +42,7 @@ foreach ($fabosSfpTxPower as $oid => $entry) {
     foreach ($entry as $index => $current) {
         if (is_numeric($current)) {
             $ifIndex = $index + 1073741823;
-            $ifAdminStatus = dbFetchCell("SELECT `ifAdminStatus` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$ifIndex, $device['device_id']]);
-            if ($ifAdminStatus == 'up') {
+            if ($ifAdminStatus[$ifIndex] == '1') {
                 discover_sensor(
                     $valid['sensor'],
                     'dbm',
