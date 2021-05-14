@@ -44,7 +44,7 @@ class Validator
     /**
      * Validator constructor.
      *
-     * @var bool|null $quiet  Default is to only print if running in CLI
+     * @param  bool|null  $quiet  Default is to only print if running in CLI
      */
     public function __construct($quiet = null)
     {
