@@ -34,6 +34,8 @@ class Validator
 {
     private $validation_groups = [];
     private $results = [];
+    private $runtimes = [];
+    private $quiet;
 
     // data cache
     private $username;
@@ -41,9 +43,13 @@ class Validator
 
     /**
      * Validator constructor.
+     *
+     * @var bool|null $quiet  Default is to only print if running in CLI
      */
-    public function __construct()
+    public function __construct($quiet = null)
     {
+        $this->quiet = $quiet === null ? (! Laravel::isCli()) : $quiet;
+
         // load all validations
         $pattern = $this->getBaseDir() . '/LibreNMS/Validations/*.php';
 
@@ -75,17 +81,19 @@ class Validator
             }
 
             if ((empty($validation_groups) && $group->isDefault()) || in_array($group_name, $validation_groups)) {
-                if ($print_group_status && Laravel::isCli()) {
+                if ($print_group_status && ! $this->quiet) {
                     echo "Checking $group_name:";
                 }
 
                 /** @var ValidationGroup $group */
+                $start = microtime(true);
                 $group->validate($this);
+                $this->runtimes[$group_name] = microtime(true) - $start;
 
-                if (Laravel::isCli()) {
+                if (! $this->quiet) {
                     if ($print_group_status) {
                         $status = ValidationResult::getStatusText($this->getGroupStatus($group_name));
-                        c_echo(" $status\n");
+                        c_echo(sprintf(" %s in %.2fs\n", $status, $this->getRuntime($group_name)));
                     }
 
                     $this->printResults($group_name);
@@ -119,7 +127,7 @@ class Validator
      * Get the ValidationResults for a specific validation group.
      *
      * @param  string  $validation_group
-     * @return ValidationResult[]
+     * @return \LibreNMS\ValidationResult[]
      */
     public function getResults($validation_group = null)
     {
@@ -132,6 +140,17 @@ class Validator
         }
 
         return array_reduce($this->results, 'array_merge', []);
+    }
+
+    /**
+     * Get the runtime of specific validation group or all validation groups
+     *
+     * @param  string  $validation_group
+     * @return float
+     */
+    public function getRuntime($validation_group = null): float
+    {
+        return $this->runtimes[$validation_group] ?? array_sum($this->runtimes);
     }
 
     /**
