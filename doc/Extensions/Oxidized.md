@@ -33,16 +33,16 @@ working Oxidized setup which is already taking config snapshots for
 your devices. When you have that, you only need the following config
 to enable the display of device configs within the device page itself:
 
-```php
-$config['oxidized']['enabled']         = TRUE;
-$config['oxidized']['url']             = 'http://127.0.0.1:8888';
+```bash
+lnms config:set oxidized.enabled true
+lnms config:set oxidized.url http://127.0.0.1:8888
 ```
 
 LibreNMS supports config versioning if Oxidized does.  This is known
 to work with the git output module.
 
-```php
-$config['oxidized']['features']['versioning'] = true;
+```bash
+lnms config:set oxidized.features.versioning true
 ```
 
 Oxidized supports various ways to utilise credentials to login to
@@ -52,14 +52,14 @@ supports sending groups back to Oxidized so that you can then define
 group credentials within Oxidized. To enable this support please
 switch on 'Enable the return of groups to Oxidized':
 
-```php
-$config['oxidized']['group_support'] = true;
+```bash
+lnms config:set oxidized.group_support true
 ```
 
 You can set a default group that devices will fall back to with:
 
-```php
-$config['oxidized']['default_group'] = 'default';
+```bash
+lnms config:set oxidized.default_group default
 ```
 
 # SELinux
@@ -101,11 +101,10 @@ time.
 LibreNMS is able to reload the Oxidized list of nodes, each time a
 device is added to LibreNMS. To do so, edit the option in Global
 Settings>External Settings>Oxidized Integration or add the following
-to your config.php.
+to your config.
 
-```php
-$config['oxidized']['reload_nodes'] = true;
-
+```bash
+lnms config:set oxidized.reload_nodes true
 ```
 
 # Creating overrides
@@ -121,38 +120,56 @@ Matching of hosts can be done using `hostname`, `sysname`, `os`,
 key and value, or a 'regex' key and value. The order of matching is:
 
 - `hostname`
-- `sysname`
+- `sysName`
 - `sysDescr`
 - `hardware`
 - `os`
 - `location`
 - `ip`
 
-To match on the device hostnames or sysnames that contain 'lon-sw' or
-if the location contains 'London' then you would place the following
-within config.php:
+To match on the device hostnames or sysNames that contain 'lon-sw' or
+if the location contains 'London' then you would set the following:
 
-```php
-$config['oxidized']['maps']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
-$config['oxidized']['maps']['group']['sysname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
-$config['oxidized']['maps']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
+```bash
+lnms config:set oxidized.maps.group.hostname.+ '{"regex": "/^lon-sw/", "value": "london-switches"}'
+lnms config:set oxidized.maps.group.sysName.+ '{"regex": "/^lon-sw/", "value": "london-switches"}'
+lnms config:set oxidized.maps.group.location.+ '{"regex": "/london/", "value": "london-switches"}'
 ```
 
 To match on a device os of edgeos then please use the following:
 
-```php
-$config['oxidized']['maps']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
+```bash
+lnms config:set oxidized.maps.group.os.+ '{"match": "edgeos", "value": "wireless"}'
 ```
 
-Matching on OS requires system name of the OS. For example, 'match' =>
-'RouterOS' will not work, while 'match' => 'routeros' will.
+Matching on OS requires system name of the OS. For example, "match": "RouterOS"
+will not work, while "match": "routeros" will.
 
-To override the IP Oxidized uses to poll the device, you can add the
-following within config.php:
+To edit an existing map, you must use the index to override it.
 
-```php
-$config['oxidized']['maps']['ip']['sysname'][] = array('regex' => '/^my.node/', 'ip' => '192.168.1.10');
-$config['oxidized']['maps']['ip']['sysname'][] = array('match' => 'my-other.node', 'ip' => '192.168.1.20');
+```bash
+lnms config:get oxidized.maps.os.os
+array (
+  0 => 
+  array (
+    'match' => 'airos-af-ltu',
+    'value' => 'airfiber',
+  ),
+  1 => 
+  array (
+    'match' => 'airos-af',
+    'value' => 'airfiber',
+  ),
+)
+
+lnms config:set oxidized.maps.os.os.1 '{"match": "airos-af", "value": "something-else"}'
+```
+
+To override the IP Oxidized uses to poll the device, set the following:
+
+```bash
+lnms config:set oxidized.maps.ip.sysName.+ '{"regex": "/^my.node/", "value": "192.168.1.10"}'
+lnms config:set oxidized.maps.ip.sysName.+ '{"match": "my-other.node", "value": "192.168.1.20"}'
 ```
 
 This allows extending the configuration further by providing a
@@ -160,16 +177,16 @@ completely flexible model for custom flags and settings, for example,
 below shows the ability to add an ssh_proxy host within Oxidized
 simply by adding the below to your configuration:
 
-```php
-$config['oxidized']['maps']['ssh_proxy']['sysname'][] = array('regex' => '/^my.node/', 'ssh_proxy' => 'my-ssh-gateway.node');
+```bash
+lnms config:set oxidized.maps.ssh_proxy.sysName.+ '{"regex": "/^my.node/", "value": "my-ssh-gateway.node"}'
 ```
 
 Or of course, any custom value that could be needed or wanted can be
 applied, for example, setting a "myAttribute" to "Super cool value"
 for any configured and enabled "routeros" device.
 
-```php
-$config['oxidized']['maps']['myAttribute']['os'][] = array('match' => 'routeros', 'myAttribute' => 'Super cool value');
+```bash
+lnms config:set oxidized.maps.myAttribute.os.+ '{"match": "routeros", "value": "Super cool value"}'
 ```
 
 Verify the return of groups by querying the API:
@@ -195,11 +212,11 @@ you can edit those devices in Device -> Edit -> Misc and enable
 "Exclude from Oxidized?"
 
 It's also possible to exclude certain device types and OS' from being
-output via the API. This is currently only possible via config.php:
+output via the API.
 
-```php
-$config['oxidized']['ignore_types'] = array('server','power');
-$config['oxidized']['ignore_os'] = array('linux','windows');
+```bash
+lnms config:set oxidized.ignore_types '["server", "power"]'
+lnms config:set oxidized.ignore_os '["linux", "windows"]'
 ```
 
 # Trigger configuration backups

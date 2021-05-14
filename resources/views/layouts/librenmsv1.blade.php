@@ -26,7 +26,6 @@
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/jquery.bootgrid.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/tagmanager.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/mktree.css') }}" rel="stylesheet" type="text/css" />
@@ -41,8 +40,8 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20191124" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20210421" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach
@@ -50,17 +49,15 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-switch.min.js') }}"></script>
+    <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap-switch.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
-    <script src="{{ asset('js/jquery.cycle2.min.js') }}"></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
-    <script src="{{ asset('js/typeahead.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('js/tagmanager.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-datetimepicker.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/typeahead.bundle.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/tagmanager.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/mktree.js') }}"></script>
     <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
@@ -75,7 +72,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=20200501') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=05072021') }}"></script>
     <script type="text/javascript">
         <!-- Begin
         function popUp(URL)
@@ -87,7 +84,7 @@
         // End -->
     </script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/toastr.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
     @yield('javascript')
 </head>

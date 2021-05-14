@@ -143,11 +143,24 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
 
             return IP::isValid($ip) || Validate::hostname($value);
-        }, __('The :attribute must a valid IP address/network or hostname.'));
+        });
 
         Validator::extend('is_regex', function ($attribute, $value) {
             return @preg_match($value, '') !== false;
-        }, __(':attribute is not a valid regular expression'));
+        });
+
+        Validator::extend('keys_in', function ($attribute, $value, $parameters, $validator) {
+            $extra_keys = is_array($value) ? array_diff(array_keys($value), $parameters) : [];
+
+            $validator->addReplacer('keys_in', function ($message, $attribute, $rule, $parameters) use ($extra_keys) {
+                return str_replace(
+                    [':extra', ':values'],
+                    [implode(',', $extra_keys), implode(',', $parameters)],
+                    $message);
+            });
+
+            return is_array($value) && empty($extra_keys);
+        });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
             if ($value === 0) {
@@ -157,6 +170,6 @@ class AppServiceProvider extends ServiceProvider
             $validator = Validator::make([$attribute => $value], [$attribute => 'exists:' . implode(',', $parameters)]);
 
             return $validator->passes();
-        }, __('validation.exists'));
+        }, trans('validation.exists'));
     }
 }

@@ -105,7 +105,7 @@
         }
     });
 
-    $('.device-group-form').submit(function (eventObj) {
+    $('.device-group-form').on("submit", function (eventObj) {
         if ($('#type').val() === 'static') {
             return true;
         }

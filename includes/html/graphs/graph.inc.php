@@ -73,7 +73,7 @@ if (! empty($command_only)) {
     echo "<div class='infobox'>";
     echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
     echo "<pre class='rrd-pre'>";
-    echo 'rrdtool ' . Rrd::buildCommand('graph', '-', $rrd_options);
+    echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
     echo '</pre>';
     try {
         Rrd::graph($rrd_options);

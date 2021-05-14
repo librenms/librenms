@@ -12,7 +12,7 @@ use LibreNMS\Config;
 $init_modules = ['nodb'];
 require __DIR__ . '/includes/init.php';
 
-if (isCli()) {
+if (App::runningInConsole()) {
     // fill in db variables for legacy external scripts
     Config::populateLegacyDbCredentials();
 

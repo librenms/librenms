@@ -466,7 +466,7 @@ if ($count < 1) {
 $("[data-toggle='modal'], [data-toggle='popover']").popover({
     trigger: 'hover'
 });
-$('#ack-alert').click('', function(e) {
+$('#ack-alert').on("click", function(e) {
     event.preventDefault();
     var alert_id = $(this).data("alert_id");
     $.ajax({
@@ -538,12 +538,12 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
 function updateResults(results) {
     $('#results_amount').val(results.value);
     $('#page_number').val(1);
-    $('#result_form').submit();
+    $('#result_form').trigger( "submit" );
 }
 
 function changePage(page,e) {
     e.preventDefault();
     $('#page_number').val(page);
-    $('#result_form').submit();
+    $('#result_form').trigger( "submit" );
 }
 </script>

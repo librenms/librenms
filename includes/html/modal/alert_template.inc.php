@@ -137,7 +137,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#convert-template').hide();
 });
 
-$('#create-template').click('', function(e) {
+$('#create-template').on("click", function(e) {
     e.preventDefault();
 
     var rules_items = $('#rules_list').select2('data');
@@ -151,7 +151,7 @@ $('#create-template').click('', function(e) {
 });
 
 //FIXME remove Deprecated template
-$('#convert-template').click('', function(e) {
+$('#convert-template').on("click", function(e) {
     e.preventDefault();
     var template = $("#template").val();
     var title    = $("#title").val();
