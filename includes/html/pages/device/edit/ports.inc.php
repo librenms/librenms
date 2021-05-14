@@ -142,7 +142,7 @@
             // select ignore buttons for all ports which are down
             event.preventDefault();
             $('[id^="operstatus_"]').each(function () {
-                var name = $(this).attr('name');
+                var name = $(this).attr('id');
                 var text = $(this).text();
                 if (name && text == 'down') {
                     // get the interface number from the object name
