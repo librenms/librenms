@@ -10,27 +10,30 @@ foreach ($fabosSfpRxPower as $oid => $entry) {
     foreach ($entry as $index => $current) {
         if (is_numeric($current)) {
             $ifIndex = $index + 1073741823;
-            discover_sensor(
-                $valid['sensor'],
-                'dbm',
-                $device,
-                ".$oid.$index",
-                'swSfpRxPower.' . $index,
-                'brocade',
-                makeshortif($ifDescr[$ifIndex]) . ' RX',
-                1,
-                1,
-                -35,
-                -30,
-                -3,
-                0,
-                $current,
-                'snmp',
-                $ifIndex,
-                'ports',
-                null,
-                'Receive Power'
-            );
+            $ifAdminStatus = dbFetchCell("SELECT `ifAdminStatus` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$ifIndex, $device['device_id']]);
+            if ($ifAdminStatus == 'up') {
+                discover_sensor(
+                    $valid['sensor'],
+                    'dbm',
+                    $device,
+                    ".$oid.$index",
+                    'swSfpRxPower.' . $index,
+                    'brocade',
+                    makeshortif($ifDescr[$ifIndex]) . ' RX',
+                    1,
+                    1,
+                    -5,
+                    null,
+                    null,
+                    0,
+                    $current,
+                    'snmp',
+                    $ifIndex,
+                    'ports',
+                    null,
+                    'Receive Power'
+                );
+            }
         }
     }
 }
@@ -39,26 +42,30 @@ foreach ($fabosSfpTxPower as $oid => $entry) {
     foreach ($entry as $index => $current) {
         if (is_numeric($current)) {
             $ifIndex = $index + 1073741823;
-            discover_sensor(
-                $valid['sensor'],
-                'dbm',
-                $device,
-                ".$oid.$index",
-                'swSfpTxPower.' . $index,
-                'brocade',
-                makeshortif($ifDescr[$ifIndex]) . ' TX',
-                1,
-                1,
-                -5,
-                null,
-                null,
-                0,
-                $current,
-                'snmp',
-                $ifIndex,
-                'ports',
-                null,
-                'Transmit Power');
+            $ifAdminStatus = dbFetchCell("SELECT `ifAdminStatus` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$ifIndex, $device['device_id']]);
+            if ($ifAdminStatus == 'up') {
+                discover_sensor(
+                    $valid['sensor'],
+                    'dbm',
+                    $device,
+                    ".$oid.$index",
+                    'swSfpTxPower.' . $index,
+                    'brocade',
+                    makeshortif($ifDescr[$ifIndex]) . ' TX',
+                    1,
+                    1,
+                    -5,
+                    null,
+                    null,
+                    0,
+                    $current,
+                    'snmp',
+                    $ifIndex,
+                    'ports',
+                    null,
+                    'Transmit Power'
+                );
+            }
         }
     }
 }
