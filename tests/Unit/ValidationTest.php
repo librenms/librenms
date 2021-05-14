@@ -137,9 +137,8 @@ class ValidationTest extends TestCase
         Http::fake([
             Config::get('github_api') . 'commits/master' => Http::response([
                 'sha' => 'incorrect sha',
-            ])
+            ]),
         ]);
-
 
         $results = $this->validateGroup('updates');
 
@@ -150,6 +149,7 @@ class ValidationTest extends TestCase
             $this->assertEquals(ValidationResult::WARNING, $result->getStatus());
         }
     }
+
     public function testUserValidation()
     {
         $results = $this->validateGroup('user');
@@ -158,11 +158,11 @@ class ValidationTest extends TestCase
         $this->assertLessThan(2, count($results));
     }
 
-
     private function validateGroup($group)
     {
         $validator = new Validator(true);
         $validator->validate([$group]);
+
         return $validator->getResults($group);
     }
 }
