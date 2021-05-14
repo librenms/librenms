@@ -26,7 +26,6 @@ namespace LibreNMS\Validations;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use DB;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
@@ -100,7 +99,7 @@ class Database extends BaseValidation
 
     private function checkVersion(Validator $validator)
     {
-        $version = DB::selectOne('SELECT VERSION() as version')->version;
+        $version = Eloquent::DB()->selectOne('SELECT VERSION() as version')->version;
         $version = explode('-', $version);
 
         if (isset($version[1]) && $version[1] == 'MariaDB') {
@@ -124,7 +123,7 @@ class Database extends BaseValidation
 
     private function checkTime(Validator $validator)
     {
-        $raw_time = Eloquent::DB()->selectOne(Eloquent::DB()->raw('SELECT NOW() as time'))->time;
+        $raw_time = Eloquent::DB()->selectOne('SELECT NOW() as time')->time;
         $db_time = new Carbon($raw_time);
         $php_time = Carbon::now();
 
@@ -159,7 +158,7 @@ class Database extends BaseValidation
         if (! empty($tables)) {
             $validator->result(
                 ValidationResult::warn('Some tables are not using the recommended InnoDB engine, this may cause you issues.')
-                    ->setList('Tables', $tables)
+                    ->setList('Tables', array_column($tables, 'TABLE_NAME'))
             );
         }
     }
@@ -173,10 +172,10 @@ class Database extends BaseValidation
             FROM information_schema.SCHEMATA S
             WHERE schema_name = '$db_name' AND
             ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')";
-        $collation = Eloquent::DB()->select($db_collation_sql);
+        $collation = Eloquent::DB()->selectOne($db_collation_sql);
         if (empty($collation) !== true) {
             $validator->fail(
-                'MySQL Database collation is wrong: ' . implode(' ', $collation[0]),
+                "MySQL Database collation is wrong: $collation->DEFAULT_CHARACTER_SET_NAME $collation->DEFAULT_COLLATION_NAME",
                 'Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.'
             );
         }
@@ -189,7 +188,9 @@ class Database extends BaseValidation
         if (empty($collation_tables) !== true) {
             $result = ValidationResult::fail('MySQL tables collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
-                ->setList('Tables', $collation_tables);
+                ->setList('Tables', array_map(function ($row) {
+                    return "$row->TABLE_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME";
+                }, $collation_tables));
             $validator->result($result);
         }
 
@@ -200,7 +201,9 @@ class Database extends BaseValidation
         if (empty($collation_columns) !== true) {
             $result = ValidationResult::fail('MySQL column collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
-                ->setList('Columns', $collation_columns);
+                ->setList('Columns', array_map(function ($row) {
+                    return "$row->TABLE_NAME: $row->COLUMN_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME";
+                }, $collation_columns));
             $validator->result($result);
         }
     }
