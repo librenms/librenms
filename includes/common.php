@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Http\Client\ConnectionException;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -641,11 +642,15 @@ function version_info($remote = false)
     ];
     if (Git::repoPresent() && Git::binaryExists()) {
         if ($remote === true && Config::get('update_channel') == 'master') {
-            $response = Http::timeout(10)
-                ->withHeaders(['User-Agent' => 'LibreNMS'])
-                ->withOptions(['proxy' => get_proxy()])
-                ->get(Config::get('github_api') . 'commits/master');
-            $output['github'] = $response->json();
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders(['User-Agent' => 'LibreNMS'])
+                    ->withOptions(['proxy' => get_proxy()])
+                    ->get(Config::get('github_api') . 'commits/master');
+                $output['github'] = $response->json();
+            } catch (ConnectionException $e) {
+                $output['github'] = []; // failed to fetch
+            }
         }
         [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
         $output['local_sha'] = $local_sha;
