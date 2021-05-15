@@ -242,7 +242,7 @@ if (($device['os'] == 'routeros')) {
 
             $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
             if (($device['os'] == 'aos7')) {
-                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND (`ifName`= ? OR `ifDescr` = ?)', [($device['device_id'], $ifName, $ifName)]);
+                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND (`ifName`= ? OR `ifDescr` = ?)', array($device['device_id'], $ifName, $ifName));
             } else {
                 $interface = get_port_by_id($local_port_id); 
             }
