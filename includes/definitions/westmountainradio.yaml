@@ -13,46 +13,7 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.15117.1
 poller_modules:
-    applications: false
-    bgp-peers: false
-    entity-physical: false
-    hr-mib: false
-    ipSystemStats: false
-    ipmi: false
-    mempools: false
-    mpls: false
-    netstats: false
-    ntp: false
     os: true
-    ospf: false
-    ports: false
-    processors: false
     sensors: true
-    storage: false
-    stp: false
-    ucd-diskio: false
-    ucd-mib: false
-    wireless: false
 discovery_modules:
-    arp-table: false
-    bgp-peers: false
-    cisco-vrf-lite: false
-    discovery-protocols: false
-    entity-physical: false
-    fdb-table: false
-    hr-device: false
-    ipv4-addresses: false
-    ipv6-addresses: false
-    mempools: false
-    mpls: false
-    ntp: false
-    ports-stack: false
-    ports: false
-    processors: false
     sensors: true
-    services: false
-    storage: false
-    stp: false
-    ucd-diskio: false
-    vlans: false
-    wireless: false
