@@ -221,13 +221,13 @@ if (($device['os'] == 'routeros')) {
                 }
             }
         }
-	     if (($device['os'] == 'aos7')) {
+             if (($device['os'] == 'aos7')) {
                  $lldp_local = snmpwalk_cache_oid($device, 'lldpLocPortEntry', [], 'LLDP-MIB');
                  $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
-	     } else {
+             } else {
                  $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
                  $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
-	     }
+             }
     }
 
     foreach ($lldp_array as $key => $lldp_if_array) {
