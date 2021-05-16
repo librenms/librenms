@@ -4,6 +4,8 @@ type: power
 mib_dir: westmountainradio
 icon: westmountainradio
 nobulk: true
+bad_snmpEngineTime: true
+bad_hrSystemUptime: true
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
