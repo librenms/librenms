@@ -57,7 +57,7 @@ class Slas implements Module
 
             if (! $sla_id) {
                 // If not Cisco, set mock sla_nr to ensure unicity
-                if (($os->getDevice()['os'] != 'ios') && ($os->getDevice()['os'] != 'iosxe') && ($os->getDevice()['os'] != 'iosxr')){
+                if (($os->getDevice()['os'] != 'ios') && ($os->getDevice()['os'] != 'iosxe') && ($os->getDevice()['os'] != 'iosxr')) {
                     $sla['sla_nr'] = $max_sla_nr + $i;
                     $i++;
                 }

@@ -524,7 +524,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     break;
             }
 
-            return array($fields, $update);
+            return [$fields, $update];
         }
     }
 
