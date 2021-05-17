@@ -24,7 +24,6 @@ use App\Models\Sla;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\IP;
 
 class Slas implements Module
 {
@@ -42,7 +41,6 @@ class Slas implements Module
         ->where('deleted', 0)
         ->get();
 
-
         $slas = $os->discoverSlas();
 
         // To ensure unity of mock sla_nr field
@@ -59,7 +57,7 @@ class Slas implements Module
 
             if (! $sla_id) {
                 // If not Cisco, set mock sla_nr to ensure unicity
-                if (($os->getDevice()['os'] != "ios") && ($os->getDevice()['os'] != "iosxe") && ($os->getDevice()['os'] != "iosxr")){
+                if (($os->getDevice()['os'] != 'ios') && ($os->getDevice()['os'] != 'iosxe') && ($os->getDevice()['os'] != 'iosxr')){
                     $sla['sla_nr'] = $max_sla_nr + $i;
                     $i++;
                 }
@@ -111,7 +109,7 @@ class Slas implements Module
                 $rrd_name = ['sla', $sla['sla_nr']];
                 $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
                 $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-                data_update($os->getDeviceArray(), 'sla', $tags, array($fields['rtt']));
+                data_update($os->getDeviceArray(), 'sla', $tags, [$fields['rtt']]);
             }
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");

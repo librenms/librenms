@@ -371,6 +371,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
             }//end if
             $slas->push($data);
         }
+
         return $slas;
     }
 
@@ -429,7 +430,6 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
         $uptime = snmp_get($device, 'sysUpTime.0', '-Otv');
         $time_offset = (time() - intval($uptime) / 100);
 
-        echo "\nSLAS COUNT ==> " . count($slas) . "\n";
         foreach ($slas as $sla) {
             $sla_id = $sla['sla_id'];
             $sla_nr = $sla['sla_nr'];

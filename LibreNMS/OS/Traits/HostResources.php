@@ -230,12 +230,13 @@ trait HostResources
             $data['rtt_type'] = str_replace('ping', '', $data['rtt_type']);
 
             // To retrieve specific Juniper PingCtlType
-            if ($device['os'] == "junos") {
+            if ($device['os'] == 'junos') {
                 $data['rtt_type'] = $this->retrieveJuniperType($data['rtt_type']);
             }
 
             $slas->push($data);
         }
+
         return $slas;
     }
 

@@ -186,7 +186,7 @@ class Junos extends \LibreNMS\OS implements OSPolling
                 case 'UdpTimestamp':
                     break;
             }
-            return array($fields, $update);
+            return [$fields, $update];
         }
     }
 
@@ -225,6 +225,7 @@ class Junos extends \LibreNMS\OS implements OSPolling
 
         return $rtt_type;
     }
+    
     /**
      * Function to fix the 0 missing before digit on a date from the MIB
      */
