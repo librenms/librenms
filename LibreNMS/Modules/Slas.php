@@ -104,12 +104,16 @@ class Slas implements Module
             $fields = $data[0];
             $update = $data[1];
 
+            $tmp_rtt = [
+                'rtt' => $fields['rtt'],
+            ];
+
             foreach ($slas as $sla) {
                 // The base RRD
                 $rrd_name = ['sla', $sla['sla_nr']];
                 $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
                 $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-                data_update($os->getDeviceArray(), 'sla', $tags, [$fields['rtt']]);
+                data_update($os->getDeviceArray(), 'sla', $tags, $tmp_rtt);
             }
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
