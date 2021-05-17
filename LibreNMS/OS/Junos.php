@@ -156,6 +156,12 @@ class Junos extends \LibreNMS\OS implements OSPolling
                 'rtt' => $rtt,
             ];
 
+            // The base RRD
+            $rrd_name = ['sla', $sla['sla_nr']];
+            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
+            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
+            data_update($device, 'sla', $tags, $fields);
+
             // Let's gather some per-type fields.
             switch ($rtt_type) {
                 case 'DnsQuery':
@@ -187,7 +193,14 @@ class Junos extends \LibreNMS\OS implements OSPolling
                     break;
             }
 
-            return [$fields, $update];
+            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
+            d_echo($fields);
+
+            // Update the DB if necessary
+            if (count($update) > 0) {
+                Sla::where('sla_id', $sla_id)
+                ->update($update);
+            }
         }
     }
 

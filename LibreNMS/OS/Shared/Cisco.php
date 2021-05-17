@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
 class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling
@@ -460,6 +461,12 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                 'rtt' => $rtt,
             ];
 
+            // The base RRD
+            $rrd_name = ['sla', $sla['sla_nr']];
+            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
+            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
+            data_update($device, 'sla', $tags, $fields);
+
             // Let's gather some per-type fields.
             switch ($rtt_type) {
                 case 'jitter':
@@ -524,7 +531,14 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     break;
             }
 
-            return [$fields, $update];
+            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
+            d_echo($fields);
+
+            // Update the DB if necessary
+            if (count($update) > 0) {
+                Sla::where('sla_id', $sla_id)
+                ->update($update);
+            }
         }
     }
 

@@ -101,29 +101,6 @@ class Slas implements Module
         if (count($slas) > 0) {
             // We have SLA's, lets go!!!
             $data = $os->pollSlas($slas);
-            $fields = $data[0];
-            $update = $data[1];
-
-            $tmp_rtt = [
-                'rtt' => $fields['rtt'],
-            ];
-
-            foreach ($slas as $sla) {
-                // The base RRD
-                $rrd_name = ['sla', $sla['sla_nr']];
-                $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-                $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-                data_update($os->getDeviceArray(), 'sla', $tags, $tmp_rtt);
-            }
-
-            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
-
-            // Update the DB if necessary
-            if (count($update) > 0) {
-                Sla::where('sla_id', $sla_id)
-                ->update($update);
-            }
         }
     }
 
