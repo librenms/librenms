@@ -23,7 +23,6 @@ namespace LibreNMS\Modules;
 use App\Models\Sla;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\RRD\RrdDefinition;
 
 class Slas implements Module
 {
