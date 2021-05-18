@@ -42,7 +42,40 @@ class Isis implements Module
      */
     public function discover(OS $os)
     {
-        // not implemented
+        $device_id = $os->getDeviceId();
+        $options = [
+            'filter' => [
+                'device_id' => ['=', $device_id],
+                'type' => ['=', 'ISIS'],
+            ],
+        ];
+
+        $component = new LibreNMS\Component();
+        $components = $component->getComponents($device_id, $options);
+
+        // Check if the device has any ISIS enabled interfaces
+        $circuits_poll = snmpwalk_group($device_array, 'ISIS-MIB::isisCirc', 'ISIS-MIB');
+
+        // No ISIS enabled interfaces -> delete the module
+        if (empty($circuits_poll)) {
+            if (isset($components[$device_id])) {
+                foreach ($components[$device_id] as $component_id => $_unused) {
+                    $component->deleteComponent($component_id);
+                }
+                echo "\nISIS components deleted"
+            }
+
+        // ISIS enabled interfaces found -> create the module
+        } else {
+            if (isset($components[$device_id])) {
+                $isis_component = $components[$device_id];
+            } else {
+                $isis_component = $component->createComponent($device_id, 'ISIS');
+            }
+
+        $component->setComponentPrefs($device_id, $isis_component);
+        echo "\nISIS component created"
+
     }
 
     /**
