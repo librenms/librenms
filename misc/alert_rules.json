@@ -429,7 +429,7 @@
     "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
     "name": "IRCD Connections From"
   },
- {
+  {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID over limit"
   },
@@ -518,5 +518,9 @@
   {
     "rule": "eventlog.message ~ \"Deleted\" && eventlog.datetime >= `DATE_SUB(NOW(),INTERVAL 12 Hour)`",
     "name": "A Device sensor has been deleted"
-  }
+  },
+  {
+    "rule": "devices.last_polled >= `DATE_SUB(NOW(),INTERVAL 15 MINUTE)`",
+    "name": "Unpolled Devices for more than 15 minutes"
+   }
 ]
