@@ -67,7 +67,7 @@ class Isis implements Module
                 echo "\nISIS components deleted";
             }
 
-        // ISIS enabled interfaces found -> create the component
+            // ISIS enabled interfaces found -> create the component
         } else {
             if (isset($components[$device_id])) {
                 $isis_component = $components[$device_id];
@@ -75,8 +75,8 @@ class Isis implements Module
                 $isis_component = $component->createComponent($device_id, 'ISIS');
             }
 
-        $component->setComponentPrefs($device_id, $isis_component);
-        echo "\nISIS component updated";
+            $component->setComponentPrefs($device_id, $isis_component);
+            echo "\nISIS component updated";
         }
     }
 
@@ -201,7 +201,6 @@ class Isis implements Module
                 ->where(['device_id' => $device['device_id']])
                 ->whereNotIn('ifIndex', $adjacencies->pluck('ifIndex'))->delete();
         }
-
     }
 
     /**
