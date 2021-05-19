@@ -78,7 +78,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
         $existing_ne = $existing_ne->keyBy('neID');
         $ne_alarm_oids = snmpwalk_cache_multi_oid($device, 'enmsAlarmtable', [], 'TNMS-NBI-MIB', null, '-OQUsb');
         $existing_alarms = \App\Models\TnmsAlarm::where('device_id', $device['device_id'])->get();
-        $remove_alarms = $existing_alarms->keyBy('id');
+        $remove_alarms = $existing_alarms->keyBy('alarm_num');
         $existing_alarms = $existing_alarms->keyBy('alarm_num');
 
         echo 'NE Alarms: ';
