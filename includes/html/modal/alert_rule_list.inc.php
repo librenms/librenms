@@ -92,8 +92,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                                     success: function (data) {
                                         if (data.status == 'ok') {
                                             $("#search_alert_rule_modal").one('hidden.bs.modal', function(event) {
-                                                loadRule(data);
                                                 $('#create-alert').modal('show');
+                                                loadRule(data);
                                             });
                                             $("#search_alert_rule_modal").modal('hide');
                                         } else {
