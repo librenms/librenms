@@ -2,7 +2,9 @@ mib: UPS-MIB
 modules:
   os:
           version: UPS-MIB::upsIdentUPSSoftwareVersion.0
-          version_regex: '/^(?<version>[^.]+\.\w{2})/'
+          version_regex: '/^(?<version>.*\w)|\.+$/'
+          hardware: UPS-MIB::upsIdentModel.0
+          hardware_regex: '/^(?<hardware>.*\w)|\.+$/'
   sensors:
     runtime:
        data:
