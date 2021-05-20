@@ -73,7 +73,7 @@ class Url
 
         $class = self::deviceLinkDisplayClass($device);
         $graphs = Graph::getOverviewGraphsForDevice($device);
-        $url = Url::deviceUrl($device, $vars);
+        $url = self::deviceUrl($device, $vars);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
         $contents = '<div><span class="list-large">' . $device->displayName() . '</span>';
@@ -104,8 +104,8 @@ class Url
             $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
-            $contents .= Url::minigraphImage($device, $start, $end, $graph);
-            $contents .= Url::minigraphImage($device, Carbon::now()->subWeek()->timestamp, $end, $graph);
+            $contents .= self::minigraphImage($device, $start, $end, $graph);
+            $contents .= self::minigraphImage($device, Carbon::now()->subWeek()->timestamp, $end, $graph);
             $contents .= '</div>';
         }
 
@@ -225,13 +225,7 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [is_numeric($device) ? $device : $device->device_id];
-        if (isset($vars['tab'])) {
-            $routeParams[] = $vars['tab'];
-            unset($vars['tab']);
-        }
-
-        return route('device', $routeParams) . self::urlParams($vars);
+        return self::generate(['page' => 'device', 'device' => is_int($device) ? $device : $device->device_id], $vars);
     }
 
     public static function portUrl($port, $vars = [])
@@ -366,9 +360,9 @@ class Url
         $contents = "<div class=\'overlib-contents\'>" . $contents . '</div>';
         $contents = str_replace('"', "\'", $contents);
         if ($class === null) {
-            $output = '<a href="' . $url . '"';
+            $output = '<a href="' . url($url) . '"';
         } else {
-            $output = '<a class="' . $class . '" href="' . $url . '"';
+            $output = '<a class="' . $class . '" href="' . url($url) . '"';
         }
 
         if (Config::get('web_mouseover', true)) {
@@ -418,7 +412,7 @@ class Url
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
 
-        return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
+        return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url(Config::get('base_url', true) . 'graph.php') . '?' . implode($sep, $vars) . '">';
     }
 
     /**
