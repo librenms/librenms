@@ -1,5 +1,3 @@
--- This file was automatically generated from ciena-6500-amps.yang. Do not edit.
-
 CIENA-6500-AMPS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
