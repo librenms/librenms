@@ -1,4 +1,3 @@
-mib:  
 modules:
     os:
         hardware: 'SNMPv2-MIB::sysDescr.0' 

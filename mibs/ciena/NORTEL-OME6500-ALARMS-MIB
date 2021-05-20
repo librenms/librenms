@@ -1,0 +1,80 @@
+NORTEL-OME6500-ALARMS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       ome6500            FROM NORTEL-OPTICAL-OME6500-MIB
+
+       DateAndTime        FROM SNMPv2-TC
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme6500Alarms MODULE-IDENTITY
+        LAST-UPDATED "200906150000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This Module will be used to identify alarms mainly
+              for 40G equipments and facilities but other alarms
+              shall be reported."
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 5.1"
+	
+	REVISION "200802070000Z"
+        DESCRIPTION "Updating row formatting OME6500 REL 5.11"	
+
+	REVISION     "200906150000Z"
+	DESCRIPTION  "MIB description enhancement"       
+        ::= { ome6500 4 }
+
+
+nnOme6500AlarmCounts  OBJECT IDENTIFIER  ::= { nnOme6500Alarms 1 }
+
+
+critical OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of Critical Alarms raised on the shelf"
+	::= { nnOme6500AlarmCounts 1 }
+
+major OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of Major Alarms raised on the shelf"
+	::= { nnOme6500AlarmCounts 2 }
+
+minor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of Minor Alarms raised on the shelf"
+	::= { nnOme6500AlarmCounts 3 }
+
+warnings OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of Warnings raised on the shelf."
+	::= { nnOme6500AlarmCounts 4 }
+
+lastAlarmTimeStamp OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+        DESCRIPTION "The timestamp of the last alarm. If there has been no alarm since the last
+	re-initialization of the local network management subsystem, then this object contains a zero value."
+	::= { nnOme6500AlarmCounts 5 }
+
+END
+

@@ -1,0 +1,229 @@
+   NORTEL-OME6500-SHELF-PARAMS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       ome6500             FROM NORTEL-OPTICAL-OME6500-MIB
+       DisplayString       FROM RFC1213-MIB
+       IpAddress,
+       OBJECT-TYPE,
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme6500ShelfParams MODULE-IDENTITY
+        LAST-UPDATED "200805010000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free:+1- 800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (OME)
+              This Module will be used to retrieve  shelf information from the NE."
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 5.1"         
+
+	REVISION "200805010000Z"
+        DESCRIPTION "updated the shelfSoftwareVersion object's DESCRIPTION"      
+        ::= { ome6500 1 }
+
+nnOme6500ShelfParamsProv  OBJECT IDENTIFIER  ::= { nnOme6500ShelfParams 1 }
+
+ErrorCodes ::= INTEGER {
+    eNil(0),
+    eMSG-SENT(1), -- Only for TL1 use, applications don't need to concern
+    ePRTL(2),     -- Partially completed
+    eCOMPLD(3),   -- Completed
+    eDENY(4),     --  Only for TL1 use, applications don't need to concern
+    eENEQ(5),     -- Equipage, Not EQuipped
+    eENEX(6),     -- Equipage, Not equipped with EXercise capability
+    eENPS(7),     -- Equipage, Not equipped with Protection Switching 
+    eIBEX(8),     -- Input, Block EXtra
+    eIBMS(9),     -- Input, Block MiSsing
+    eICNV(10),    -- Input, Command Not Valid
+    eIDNV(11),    -- Input, Data Not Valid
+    eIDRG(12),    -- Input, Data, RanGe error
+    eIEAE(13),    -- Input, Entity Already Exists 
+    eIENE(14),    -- Input, Entity Not Exists
+    eIIAC(15),    -- Input, Invalid ACcess identifier
+    eIICT(16),    -- Input, Invalid Correlation Tag
+    eIIPG(17),    -- Input, Invalid Parameter Grouping
+    eIITA(18),    -- Input, Invalid TArget identifier
+    eINUP(19),    -- Input, Non-null Unimplemented Parameter
+    eIPEX(20),    -- Input, Parameter EXtra
+    eIPMS(21),    -- Input, Parameter MiSsing
+    eIPNV(22),    -- Input, Parameter Not Valid
+    ePICC(23),    -- Privilege, Invalid Command Code
+    ePIUC(24),    -- Privilege, Illegal User Code
+    ePIUI(25),    -- Privilege, Illegal User Identity
+    ePLNA(26),    -- Privilege, Login Not Active
+    eSAAL(27),    -- Status, Already ALlowed
+    eSAAS(28),    -- Status, Already ASsigned
+    eSABT(29),    -- Status, ABorTed
+    eSAIN(30),    -- Status, Already INhibited
+    eSAIS(31),    -- Status, Already In Service
+    eSAMS(32),    -- Status, Already in Maintenance State
+    eSANP(33),    -- Status, Alignment Not Provisioned
+    eSAOP(34),    -- Status, Already OPerated
+    eSAPR(35),    -- Status, Already in PRotection state
+    eSARB(36),    -- Status, All Resources Busy
+    eSARL(37),    -- Status, Already ReLeased
+    eSDNC(38),    -- Status, Data Not Consistent
+    eSDNR(39),    -- Status, Data Not Ready
+    eSLEM(40),    -- Status, List Exceeds Maximum
+    eSNSR(41),    -- Status, No Switch Request outstanding
+    eSNVS(42),    -- Status, Not in Valid State
+    eSPFA(43),    -- Status, Protection unit FAiled
+    eSPLD(44),    -- Status, Protection unit LockeD
+    eSPUA(45),    -- Status, Path UnAligned
+    eSRCI(46),    -- Status, Requested Command Inhibited
+    eSROF(47),    -- Status, Requested Operation Failed
+    eSSRD(48),    -- Status, Switch Request Denied
+    eSSRE(49),    -- Status, System Resources Exceeded
+    eSSTP(50),    -- Status, SToPped
+    eSWFA(51),    -- Status, Working unit FAiled
+    eSWLD(52),    -- Status, Working unit LockeD
+    eSRPR(53),    -- Status, switch Request PReempted
+    eEQWT(54),    -- EQuipage, Wrong Type
+    eICNS(55),    -- Input, Command Not Supported
+    eODNV(56),    -- Output, Data Not Valid
+    eIATA(57),    -- Input, Ambiguous TID
+    eICNI(58),    -- Input, Command Not Implemented yet
+    eTL1SNA(59),  -- TL1 session Not Available
+    eMERR(60),    -- Status, Multiple ERRors 
+    eSFTPC-OK(61),
+    eSFTPC-ERR(62),
+    eLOST(63),    -- TIDC LOST member AO report
+    eCANC(64),  
+    --eIDNC       (4),
+    --eIENA       (8),
+    --eIISP       (13),
+    --ePRNO       (24),
+    --ePLMM       (39),
+    --eTIMM       (40),
+    --eUSRO       (41)
+    eMAX(65)
+}
+
+
+shelfId OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This is an integer id between 1 to 64"
+	::= { nnOme6500ShelfParamsProv  1 }
+
+shelfSubId OBJECT-TYPE
+	SYNTAX INTEGER(0..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "If it is part of OM5K ring, it will be in the range of 1..64. 
+	             If it is not part of the ring, the API will return 0"
+	::= { nnOme6500ShelfParamsProv  2 }
+
+shelfTid OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This is the shelf's TID"
+	::= { nnOme6500ShelfParamsProv  3 }
+
+shelfIpAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This is the shelf's IP address"
+	::= { nnOme6500ShelfParamsProv  4 }
+
+shelfSoftwareVersion OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This object gives the shelf's current Software Version
+	             when it is retrieved."
+	::= { nnOme6500ShelfParamsProv  5 }
+
+shelfSiteId OBJECT-TYPE
+	SYNTAX INTEGER(0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Value of 0 indicates unprovisioned"
+	::= { nnOme6500ShelfParamsProv  6 }
+
+shelfSiteName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOme6500ShelfParamsProv  7 }
+
+shelfSnmpVersion OBJECT-TYPE
+	SYNTAX INTEGER {
+		v1v2c(1),
+		v1v2cv3(2),
+		v3(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This value specifies the supported SNMP versions: v1v2c, v1v2cv3, or v3"
+	::= { nnOme6500ShelfParamsProv  8 }
+
+shelfMode OBJECT-TYPE
+	SYNTAX INTEGER {
+		sonet(1),
+		sdh(2),
+		jsdh(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SONET, SDH, J-SDH"
+	::= { nnOme6500ShelfParamsProv  9 }
+
+shelfIsGne OBJECT-TYPE
+	SYNTAX INTEGER {
+		false(0),
+		true(1)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Set to true if the current shelf is a GNE.
+                 If this variable is set to TRUE, query the
+                 shelfIfGneIpAddress for the GNE IP."
+	::= { nnOme6500ShelfParamsProv  10 }
+
+shelfGneIpAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "If the shelf is a GNE, this variable shall
+                 contain a valid IP address which could be
+                 different from the shelf IP and serves as a
+                 GNE IP."
+	::= { nnOme6500ShelfParamsProv  11 }
+
+
+lastErrorRc OBJECT-TYPE
+	SYNTAX ErrorCodes
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This contains a reference to the 4-letter error code
+                 returned by TL1 after the last set operation."
+	::= { nnOme6500ShelfParamsProv  12 }
+
+lastErrorDescription OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Some TL1 commands may have additional descriptions
+                 beyond the 4-letter code. For those commands, this
+                 additional info shall be available through this variable.
+                 Otherwise, this is empty."
+	::= { nnOme6500ShelfParamsProv  13 }
+
+
+END
+

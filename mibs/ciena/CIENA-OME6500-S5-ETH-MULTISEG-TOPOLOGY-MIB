@@ -1,0 +1,774 @@
+CIENA-OME6500-S5-ETH-MULTISEG-TOPOLOGY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, TimeTicks
+            FROM SNMPv2-SMI
+	SnpxChassisType, SnpxBackplaneType
+		FROM SYNOPTICS-ROOT-MIB
+	InetAddress, InetAddressType
+		FROM INET-ADDRESS-MIB
+	DisplayString
+		FROM RFC1213-MIB
+	cienaS5EnMsTop
+		FROM CIENA-OME6500-S5-ROOT-MIB
+	MacAddress
+		FROM SNMPv2-TC;
+
+ome6500S5EthMultisegTopologyMib MODULE-IDENTITY
+       LAST-UPDATED    "201510200000Z"
+       ORGANIZATION    "Ciena Corp"
+       CONTACT-INFO    "Ciena Corp"
+       DESCRIPTION
+           "5000 CIENA Ethernet Multi-segment MIB
+            Created for Rel11.10.
+            This MIB contains objects extended from Nortel S5-ETH-MULTISEG-TOPOLOGY MIB."
+
+       REVISION "201510200000Z" 
+       DESCRIPTION "Created for Rel11.10 to enhance support for ipv6 address and LLDP fields."
+
+       ::= { cienaS5EnMsTop 0 }
+
+-- Groups
+
+ome6500S5EnMsTopInfo		OBJECT IDENTIFIER ::= { cienaS5EnMsTop 1 }
+
+ome6500S5EnMsTopNmm		OBJECT IDENTIFIER ::= { cienaS5EnMsTop 2 }
+
+ome6500S5EnMsTopBdg		OBJECT IDENTIFIER ::= { cienaS5EnMsTop 3 }
+
+ome6500S5EnMsTopSrcMac		OBJECT IDENTIFIER ::= { cienaS5EnMsTop 4 }
+
+-- SECTION 2: MIB Objects
+
+-- Topology Status and Configuration Information
+
+ome6500S5EnMsTopIpAddr OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"An IP address of the agent. This is used to fill
+		in the IP address field of transmitted SONMP packets.
+		The agent should be reachable through this IP address."
+	::= { ome6500S5EnMsTopInfo 1 }
+
+ome6500S5EnMsTopStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		  topOn(1),
+		  topOff(2)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Indicates if the agent is participating in
+		multi-segment topology. The values are:
+		  topOn(1)....topology is on
+		  topOff(2)...topology is off
+		When the value is topOff(2) the status of 	
+		topology table entries is undefined.  However, the
+		agent should make its best attempt when the value is
+		changed to topOff(2) to remove all existing instances
+		of topology MIB objects. The agent must save the
+		setting of this object in nonvolatile memory (i.e.,
+		save across reboots)."
+	DEFVAL	{ topOn }
+	::= { ome6500S5EnMsTopInfo 2 }
+
+ome6500S5EnMsTopNmmLstChg OBJECT-TYPE
+	SYNTAX	TimeTicks
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The value of sysUpTime the last time an entry in the
+		NMM topology table was added, deleted, or modified.  If
+		the NMM topology table has not changed since cold/warm
+		start of the agent, then the value is zero."
+	::= { ome6500S5EnMsTopInfo 3 }
+
+ome6500S5EnMsTopBdgLstChg OBJECT-TYPE
+	SYNTAX	TimeTicks
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The value of sysUpTime the last time an entry in the
+		bridge topology table was added, deleted, or modified.
+		If the bridge topology table has not changed since
+		cold/warm start of the agent, then the value is zero."
+	::= { ome6500S5EnMsTopInfo 4 }
+
+ome6500S5EnMsTopNmmMaxNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The maximum number of entries in the NMM topology
+		table."
+	::= { ome6500S5EnMsTopInfo 5 }
+
+ome6500S5EnMsTopNmmCurNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The current number of entries in the NMM topology
+		table."
+	::= { ome6500S5EnMsTopInfo 6 }
+
+ome6500S5EnMsTopBdgMaxNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The maximum number of entries in the bridge topology
+		table."
+	::= { ome6500S5EnMsTopInfo 7 }
+
+ome6500S5EnMsTopBdgCurNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The current number of entries in the bridge topology
+		table."
+	::= { ome6500S5EnMsTopInfo 8 }
+
+ome6500S5EnMsTopInetAddressType OBJECT-TYPE
+	SYNTAX	InetAddressType
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The address type of shelf.Currently only unknown and ipv6 values are expected.
+		Value unknown will be returned if no ipv6 address is provisioned."
+	::= { ome6500S5EnMsTopInfo 9 }
+
+ome6500S5EnMsTopInetAddress OBJECT-TYPE
+	SYNTAX	InetAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This is Shelf's network address. Its value depends on the value of ome6500S5EnMsTopInetAddressType
+		NULL value will be returned in case no ipv6 address is provisioned."
+	::= { ome6500S5EnMsTopInfo 10 }
+
+-- Network Management Module (NMM) Topology Table
+
+ome6500S5EnMsTopNmmTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Ome6500S5EnMsTopNmmEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table of topology information from each topology
+		agent that sends out NMM topology messages, and that
+		has been heard by the reporting topology agent.  The
+		number of entries is determined by the number of
+		distinct topology messages received.  A topology
+		message is identified by a combination of the IP
+		address and segment-identifier contained in the
+		message, and the slot-port on which it is received.
+		Entries in the table are created by reception of a
+		'new' NMM topology message.  An entry is removed from
+		the table after no messages are received from the
+		corresponding topology agent in the required time
+		interval.
+
+		NOTE: there is an entry for the reporting agent with
+		the values of slot and port set to zero."
+	::= { ome6500S5EnMsTopNmm 1 }
+
+ome6500S5EnMsTopNmmEntry OBJECT-TYPE
+	SYNTAX	Ome6500S5EnMsTopNmmEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the NMM topology table. Entries in the table
+		can not be created or deleted via SNMP."
+	INDEX	{ ome6500S5EnMsTopNmmSlot,
+		  ome6500S5EnMsTopNmmPort,
+		  ome6500S5EnMsTopNmmIpAddr,
+		  ome6500S5EnMsTopNmmSegId }
+	::= { ome6500S5EnMsTopNmmTable 1 }
+
+Ome6500S5EnMsTopNmmEntry ::= SEQUENCE {
+	ome6500S5EnMsTopNmmSlot INTEGER,
+	ome6500S5EnMsTopNmmPort INTEGER,
+	ome6500S5EnMsTopNmmIpAddr IpAddress,
+	ome6500S5EnMsTopNmmSegId INTEGER,
+	ome6500S5EnMsTopNmmMacAddr  MacAddress, 
+	ome6500S5EnMsTopNmmChassisType SnpxChassisType,
+	ome6500S5EnMsTopNmmBkplType SnpxBackplaneType,
+	ome6500S5EnMsTopNmmLocalSeg INTEGER,
+	ome6500S5EnMsTopNmmCurState INTEGER,
+	ome6500S5EnMsTopNmmInetAddressType InetAddressType,
+	ome6500S5EnMsTopNmmInetAddress InetAddress,
+	ome6500S5EnMsTopNmmSystemDescr DisplayString,
+	ome6500S5EnMsTopNmmPortString DisplayString,
+	ome6500S5EnMsTopNmmRxActualData DisplayString
+	}
+
+ome6500S5EnMsTopNmmSlot OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The slot on which the topology message
+		was received.
+
+		NOTE: There is an artificial 'row' for the reporting
+		agent with slot and port equal to zero.
+
+		NOTE: Non-modular devices that do not have multiple
+		slots should set this value to 1."
+	::= { ome6500S5EnMsTopNmmEntry 1 }
+
+ome6500S5EnMsTopNmmPort OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The port on which the topology message 
+		was received.
+
+		NOTE: there is an artificial 'row' for the reporting
+		agent with slot and port equal to zero."
+	::= { ome6500S5EnMsTopNmmEntry 2 }
+
+ome6500S5EnMsTopNmmIpAddr OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The IP address of the sender of the topology message."
+	::= { ome6500S5EnMsTopNmmEntry 3 }
+
+ome6500S5EnMsTopNmmSegId OBJECT-TYPE
+	SYNTAX	INTEGER (0..'FFFFFF'H)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The 'segment identifier' of the segment from which
+		the remote agent sent the topology message.  The value
+		is extracted from the received topology message.
+		Different devices may use different methods for
+		representing the segment identifier.  For example,
+		system 5000 NMMs that run multi-segment autotopology use
+		the SrcIndx of the segment as the segment identifier;
+                switches use a computed a value equal to '(256 * s) + p'
+                where 's' is the board, card or slot number and 'p' is
+                the port number on and as seen by the switch sending the 
+                topology message;
+		system 3000 NMMs use the lower three bytes of the MAC
+		address of the NMM as the segment identifier.  In any
+		case, the 'segment identifier' uniquely identifies the
+		network segment in the remote device from which
+		the topology message was sent."
+	::= { ome6500S5EnMsTopNmmEntry 4 }
+
+ome6500S5EnMsTopNmmMacAddr OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The MAC address of the sender of the topology message."
+	::= { ome6500S5EnMsTopNmmEntry 5 }
+
+ome6500S5EnMsTopNmmChassisType OBJECT-TYPE
+	SYNTAX	SnpxChassisType
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The chassis type of the device that sent the topology
+		message."
+	::= { ome6500S5EnMsTopNmmEntry 6 }
+
+ome6500S5EnMsTopNmmBkplType OBJECT-TYPE
+	SYNTAX	SnpxBackplaneType
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The backplane type of the device that sent the
+		topology message."
+	::= { ome6500S5EnMsTopNmmEntry 7 }
+
+ome6500S5EnMsTopNmmLocalSeg OBJECT-TYPE
+	SYNTAX	INTEGER {
+		true(1),
+		false(2)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Indicates if the sender of the topology message is on
+		the same Ethernet segment (i.e., NOT across a bridge)
+		as the reporting agent."
+	::= { ome6500S5EnMsTopNmmEntry 8 }
+
+ome6500S5EnMsTopNmmCurState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		topChanged(1),
+		heartbeat(2),
+		new(3)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The current state of sender of the
+		topology message. The values are:
+		  topChanged(1)...topology information has
+		                    recently changed
+		  heartbeat(2)....topology information unchanged
+		  new(3)..........sending agent is in new state."
+	::= { ome6500S5EnMsTopNmmEntry 9 }
+
+ome6500S5EnMsTopNmmInetAddressType OBJECT-TYPE
+	SYNTAX	InetAddressType
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The address type of shelf.Currently only unknown and ipv6 values are expected.
+		Value unknown will be returned if no ipv6 address is provisioned."
+	::= { ome6500S5EnMsTopNmmEntry 10 }
+
+ome6500S5EnMsTopNmmInetAddress OBJECT-TYPE
+	SYNTAX	InetAddress
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This is Shelf's network address. Its value depends on the value of object
+		ome6500S5EnMsTopNmmInetAddressType."
+	::= { ome6500S5EnMsTopNmmEntry 11 }
+
+ome6500S5EnMsTopNmmSystemDescr OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This is system_description string. Its max length shall be always
+		40 characters."
+	::= { ome6500S5EnMsTopNmmEntry 12 }
+
+ome6500S5EnMsTopNmmPortString OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This is Port String value from LLDP data. Its max length shall be 12
+		characters."
+	::= { ome6500S5EnMsTopNmmEntry 13 }
+
+ome6500S5EnMsTopNmmRxActualData OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This is the String containing LLDP information received in Rx_Actual field.
+		This will contain the complete information for LLDP output."
+	::= { ome6500S5EnMsTopNmmEntry 14 }
+
+-- Encoded Octet Strings for NMM Topology Table
+
+ome6500S5EnMsTopNmmEosSize OBJECT-TYPE
+	SYNTAX	INTEGER (0..1440)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The current size of a 'row' in the table
+		ome6500S5EnMsTopNmmEosTable.  This allows applications
+		to be able to break apart 'rows' in the table."
+	::= { ome6500S5EnMsTopNmm 2 }
+
+ome6500S5EnMsTopNmmEosTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Ome6500S5EnMsTopNmmEosEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table of encoded octet strings of
+		entries in table ome6500S5EnMsTopNmmTable.
+		The number of entries is determined by
+		packing of 'rows' from ome6500S5EnMsTopNmmTable."
+	::= { ome6500S5EnMsTopNmm 3 }
+
+ome6500S5EnMsTopNmmEosEntry OBJECT-TYPE
+	SYNTAX	Ome6500S5EnMsTopNmmEosEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the table of encoded octet
+		strings for table ome6500S5EnMsTopNmmTable.
+		Instance returned in Response PDU:
+		  On GETs: instance specified is the
+		           instance returned.
+		  On GET-NEXTs: instance returned is the
+		                instance of the last record
+		                contained in the octet string.
+
+		Entries in the table can not be created
+		or deleted via SNMP."
+	INDEX	{ ome6500S5EnMsTopNmmSlot,
+		  ome6500S5EnMsTopNmmPort,
+		  ome6500S5EnMsTopNmmIpAddr,
+		  ome6500S5EnMsTopNmmSegId }
+	::= { ome6500S5EnMsTopNmmEosTable 1 }
+
+Ome6500S5EnMsTopNmmEosEntry ::= SEQUENCE {
+	ome6500S5EnMsTopNmmEos OCTET STRING
+	}
+
+ome6500S5EnMsTopNmmEos OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(0..1400))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"An encoded octet string. On reads it contains
+		an integral number of 'rows' from table
+		ome6500S5EnMsTopNmmTable. All 'rows' are the same size
+		which is defined by object ome6500S5EnMsTopNmmEosSize."
+	::= { ome6500S5EnMsTopNmmEosEntry 1 }
+
+-- Bridge Topology Table
+
+ome6500S5EnMsTopBdgTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Ome6500S5EnMsTopBdgEntry
+	MAX-ACCESS	not-accessible
+	STATUS	deprecated
+	DESCRIPTION
+		"A table of topology information from each Bridge in
+		the network that is sending bridge topology messages
+		that have been heard by the reporting agent.  The
+		number of entries is determined by the number of
+		detected (and active) bridges.  Entries in the table
+		are created by reception of a topology message from a
+		'new' bridge.  An entry is removed from the table
+		after no messages are received from the corresponding
+		bridge in the required time interval."
+	::= { ome6500S5EnMsTopBdg 1 }
+
+ome6500S5EnMsTopBdgEntry OBJECT-TYPE
+	SYNTAX	Ome6500S5EnMsTopBdgEntry
+	MAX-ACCESS	not-accessible
+	STATUS	deprecated
+	DESCRIPTION
+		"A row in the bridge topology table.  Entries in the
+		table can not be created or deleted via SNMP."
+	INDEX	{ ome6500S5EnMsTopBdgSlotNum,
+		  ome6500S5EnMsTopBdgPortNum,
+		  ome6500S5EnMsTopBdgIpAddr }
+	::= { ome6500S5EnMsTopBdgTable 1 }
+
+Ome6500S5EnMsTopBdgEntry ::= SEQUENCE {
+	ome6500S5EnMsTopBdgSlotNum INTEGER,
+	ome6500S5EnMsTopBdgPortNum INTEGER,
+	ome6500S5EnMsTopBdgIpAddr IpAddress,
+	ome6500S5EnMsTopBdgNumber INTEGER,
+	ome6500S5EnMsTopBdgMacAddr MacAddress,
+	ome6500S5EnMsTopBdgType INTEGER,
+	ome6500S5EnMsTopBdgStatus INTEGER,
+	ome6500S5EnMsTopBdgNumPorts Integer32,
+	ome6500S5EnMsTopBdgHelloPortNum INTEGER,
+	ome6500S5EnMsTopBdgHelloPortType INTEGER,
+	ome6500S5EnMsTopBdgHelloPortStatus INTEGER,
+	ome6500S5EnMsTopBdgCompBdgMac1 MacAddress,
+	ome6500S5EnMsTopBdgCompBdgMac2 MacAddress
+	}
+
+ome6500S5EnMsTopBdgSlotNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The slot on which the topology message was
+		received.
+
+		NOTE: Non-modular devices that do not have multiple
+		slots should set this value to 1."
+	::= { ome6500S5EnMsTopBdgEntry 1 }
+
+ome6500S5EnMsTopBdgPortNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The port on which the topology message was received."
+	::= { ome6500S5EnMsTopBdgEntry 2 }
+
+ome6500S5EnMsTopBdgIpAddr OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The IP address of the bridge that sent the
+		topology message."
+	::= { ome6500S5EnMsTopBdgEntry 3 }
+
+ome6500S5EnMsTopBdgNumber OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The 'Bridge Number' of the bridge that sent
+		the topology message.  This is the IEEE 802.1
+		bridge number."
+	::= { ome6500S5EnMsTopBdgEntry 4 }
+
+ome6500S5EnMsTopBdgMacAddr OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The MAC Address of the bridge that sent the
+		topology message."
+	::= { ome6500S5EnMsTopBdgEntry 5 }
+
+ome6500S5EnMsTopBdgType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		localSyn(2),
+		remoteSyn(3),
+		kalpana(4)
+		}
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The 'kind of bridge' that sent the topology
+		message. The values are:
+		  other(1).....unknown or other type
+		  locSyn(2)....local SynOptics bridge
+		  remSyn(3)....remote SynOptics bridge
+		  kalpana(4)...Kalpana bridge(switch)
+		"
+	::= { ome6500S5EnMsTopBdgEntry 6 }
+
+ome6500S5EnMsTopBdgNumPorts OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The number of ports on the bridge."
+	::= { ome6500S5EnMsTopBdgEntry 7 }
+
+ome6500S5EnMsTopBdgStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		active(2),
+		standby(3)
+		}
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The current operational status from the bridge
+		that sent the topology message.  The values are:
+		  other(1).....unknown or other
+		  active(2)....bridge is active
+		  standby(3)...bridge is in standby
+
+		A value of standby(3) means that at least ONE port
+		is in standby mode.  A value of active(2) means NO
+		port is in standby mode."
+	::= { ome6500S5EnMsTopBdgEntry 8 }
+
+ome6500S5EnMsTopBdgHelloPortNum OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The port number used by the bridge to
+		send the topology message.  This port may
+		or may not be in standby mode."
+	::= { ome6500S5EnMsTopBdgEntry 9 }
+
+ome6500S5EnMsTopBdgHelloPortType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		eth(2),
+		tok4(3),
+		tok16(4),
+		fddi(5),
+		t1(6)
+		}
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The type of the port used by the bridge to
+		send the topology message.  The values are:
+		  other(1)...other or unknown type
+		  eth(2).....ethernet
+		  tok4(3)....4 Mbit token ring
+		  tok16(4)...16 Mbit token ring
+		  fddi(5)....fddi
+		  t1(6)......t1
+
+		Note: These enumerations were done for
+		'completeness'. No other value than eth(2)
+		should ever be received by an ethernet agent."
+	::= { ome6500S5EnMsTopBdgEntry 10 }
+
+ome6500S5EnMsTopBdgHelloPortStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		active(2),
+		standby(3)
+		}
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The status of the port used by the bridge
+		to send the topology message. The values are:
+		  other(1).....unknown or other
+		  active(2)....port is active
+		  standby(3)...port is in standby"
+	::= { ome6500S5EnMsTopBdgEntry 11 }
+
+ome6500S5EnMsTopBdgCompBdgMac1 OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The first MAC address of a companion bridge
+		of the bridge that sent the topology message.
+		The value is 00:00:00:00:00:00 for local
+		bridges (since there is no companion bridge)
+		and also when the companion MAC address
+		is unknown for remote bridges."
+	::= { ome6500S5EnMsTopBdgEntry 12 }
+
+ome6500S5EnMsTopBdgCompBdgMac2 OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The second MAC address of a companion bridge
+		of the bridge that sent the topology message.
+		The value is 00:00:00:00:00:00 for local
+		bridges (since there is no companion bridge)
+		and also when the companion MAC address
+		is unknown for remote bridges."
+	::= { ome6500S5EnMsTopBdgEntry 13 }
+
+-- Encoded Octet Strings for Bridge Topology Table
+
+ome6500S5EnMsTopBdgEosSize OBJECT-TYPE
+	SYNTAX	INTEGER (0..1440)
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The current size of a 'row' in the table
+		ome6500S5EnMsTopBdgEosTable.  This allows applications
+		to be able to break apart 'rows' in the table."
+	::= { ome6500S5EnMsTopBdg 2 }
+
+ome6500S5EnMsTopBdgEosTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Ome6500S5EnMsTopBdgEosEntry
+	MAX-ACCESS	not-accessible
+	STATUS	deprecated
+	DESCRIPTION
+		"A table of encoded octet strings of
+		entries in table ome6500S5EnMsTopBdgTable.
+		The number of entries is determined by
+		packing of 'rows' from ome6500S5EnMsTopBdgTable."
+	::= { ome6500S5EnMsTopBdg 3 }
+
+ome6500S5EnMsTopBdgEosEntry OBJECT-TYPE
+	SYNTAX	Ome6500S5EnMsTopBdgEosEntry
+	MAX-ACCESS	not-accessible
+	STATUS	deprecated
+	DESCRIPTION
+		"A row in the table of encoded octet
+		strings for table ome6500S5EnMsTopBdgTable.
+		Instance returned in Response PDU:
+		  On GETs: instance specified is the
+		             instance returned.
+		  On GET-NEXTs: instance returned is the
+		                  instance of the last record
+		                  contained in the octet string.
+
+		Entries in the table can not be created
+		or deleted via SNMP."
+	INDEX	{ ome6500S5EnMsTopBdgSlotNum,
+		  ome6500S5EnMsTopBdgPortNum,
+		  ome6500S5EnMsTopBdgIpAddr }
+	::= { ome6500S5EnMsTopBdgEosTable 1 }
+
+Ome6500S5EnMsTopBdgEosEntry ::= SEQUENCE {
+	ome6500S5EnMsTopBdgEos OCTET STRING
+	}
+
+ome6500S5EnMsTopBdgEos OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(0..1400))
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"An encoded octet string. On reads it contains
+		an integral number of 'rows' from table
+		ome6500S5EnMsTopBdgTable.  All 'rows' are the same size
+		which is defined by object ome6500S5EnMsTopBdgEosSize."
+	::= { ome6500S5EnMsTopBdgEosEntry 1 }
+
+-- MAC Address-to-Segment Mapping Table
+
+-- Implementation of this group is optional. It is supported by those
+-- devices that use different source MAC addresses to transmit
+-- topology messages on different segments.
+
+ome6500S5EnMsTopSrcMacAddrTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Ome6500S5EnMsTopSrcMacAddrEntry
+	MAX-ACCESS	not-accessible
+	STATUS	deprecated
+	DESCRIPTION
+		"A table describing the source MAC addresses that the
+		agent uses to transmit topology messages on different
+		segments in the device.  The MAC addresses are
+		preallocated and remain unchanged for the agent.
+		However, the mapping between a MAC address and segment
+		may change, since it can depend on the current
+		physical and/or logical configuration of the device.
+
+		Implementation of this group is required for those
+		devices that use different source MAC addresses to
+		transmit topology messages on different segments.
+		Implementation of this group is optional otherwise."
+	::= { ome6500S5EnMsTopSrcMac 1 }
+
+ome6500S5EnMsTopSrcMacAddrEntry OBJECT-TYPE
+	SYNTAX	Ome6500S5EnMsTopSrcMacAddrEntry
+	MAX-ACCESS	not-accessible
+	STATUS	deprecated
+	DESCRIPTION
+		"A row in the table of MAC address-to-segment mappings. 
+		Entries in the table can not be created or deleted
+		via SNMP."
+	INDEX	{ ome6500S5EnMsTopSrcMacAddr }
+	::= { ome6500S5EnMsTopSrcMacAddrTable 1 }
+
+Ome6500S5EnMsTopSrcMacAddrEntry ::= SEQUENCE {
+	ome6500S5EnMsTopSrcMacAddr   MacAddress,
+	ome6500S5EnMsTopSrcMacSegId  INTEGER
+	}
+
+ome6500S5EnMsTopSrcMacAddr OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The MAC address used to transmit topology messages."
+	::= { ome6500S5EnMsTopSrcMacAddrEntry 1 }
+
+ome6500S5EnMsTopSrcMacSegId OBJECT-TYPE
+	SYNTAX	INTEGER (0..16777215) 
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The 'segment-identifier' of the segment 
+		on which topology messages were transmitted."
+	::= { ome6500S5EnMsTopSrcMacAddrEntry 2 }
+
+ome6500S5EnMsTopSrcMacAddrLstChg OBJECT-TYPE
+	SYNTAX	TimeTicks
+	MAX-ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The value of sysUpTime when an entry in the 
+		table ome6500S5EnMsTopSrcMacAddrTable was last changed.
+		If no changes have been done since cold/warm start
+		of the agent, then the value is zero."
+	::= { ome6500S5EnMsTopSrcMac 2 }
+
+END

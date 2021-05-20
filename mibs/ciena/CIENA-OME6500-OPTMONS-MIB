@@ -1,0 +1,270 @@
+CIENA-OME6500-OPTMONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex     
+        FROM IF-MIB
+    DisplayString
+        FROM RFC1213-MIB
+    cienaGenericMIBs
+        FROM CIENA-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, mib-2
+        FROM SNMPv2-SMI;
+
+cienaOme6500OptmonsMIB MODULE-IDENTITY
+    LAST-UPDATED "201806200000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com"
+    DESCRIPTION "This modules describes Ciena's optmons object for the 6500 platform"
+
+    --Revision history
+    REVISION "201712130000Z"
+    DESCRIPTION "6500 Release 12.30"
+
+    REVISION "201804230000Z"
+    DESCRIPTION "cienaOme6500OptmonsIfIndex syntax change to InterfaceIndex from INTEGER in Rel 12.30."
+
+    REVISION "201806200000Z"
+    DESCRIPTION "Added cienaOme6500OptmonsProtNswSwStatus, cienaOme6500OptmonsProtNswSwEnd and cienaOme6500OptmonsProtNswSwReason in the cienaOme6500OptmonsTable."
+
+    ::= { cienaGenericMIBs 7 }
+
+cienaOme6500OptmonsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaOme6500OptmonsEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaOme6500OptmonsMIB 1 }
+
+cienaOme6500OptmonsEntry OBJECT-TYPE
+    SYNTAX CienaOme6500OptmonsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cienaOme6500OptmonsTable."
+    INDEX { cienaOme6500OptmonsIfIndex }
+    ::= { cienaOme6500OptmonsTable 1 }
+
+CienaOme6500OptmonsEntry ::= SEQUENCE { 
+    cienaOme6500OptmonsIfIndex InterfaceIndex,
+    cienaOme6500OptmonsIfDescr DisplayString,
+    cienaOme6500OptmonsSst DisplayString,
+    cienaOme6500OptmonsPst INTEGER,
+    cienaOme6500OptmonsAinsTimeLeft DisplayString,
+    cienaOme6500OptmonsLosThres DisplayString,
+    cienaOme6500OptmonsPortLabel DisplayString,
+    cienaOme6500OptmonsAlsoDisabled DisplayString,
+    cienaOme6500OptmonsProtNswSwStatus DisplayString,
+    cienaOme6500OptmonsProtNswSwEnd DisplayString,
+    cienaOme6500OptmonsProtNswSwReason DisplayString
+}
+
+cienaOme6500OptmonsIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 1 }
+
+cienaOme6500OptmonsIfDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "AID in format OPTMON-shelf-slot-port, OPTMON-shelf-slot-portSsubport, OPTMON-shelf-slotSsubslot-port, OPTMON-shelf-slotSsubslot-portSsubport, OPTMON-shelf-ALL, OPTMON-shelf-slot-ALL, OPTMON-shelf-slotSsubslot-ALL, OPTMON-shelf-slot-port-ALL, SHELF-shelf-ALL"
+    ::= { cienaOme6500OptmonsEntry 2 }
+
+cienaOme6500OptmonsSst OBJECT-TYPE
+    SYNTAX DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Identify the secondary state"
+    ::= { cienaOme6500OptmonsEntry 3 }
+
+cienaOme6500OptmonsPst OBJECT-TYPE
+    SYNTAX INTEGER { is(0), oosMa(1), isAnr(2), oosAu(3), oosAuma(4), oosMaanr(5) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Identify the primary state"
+    ::= { cienaOme6500OptmonsEntry 4 }
+
+cienaOme6500OptmonsAinsTimeLeft OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 5 }
+
+cienaOme6500OptmonsLosThres OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 6 }
+
+cienaOme6500OptmonsPortLabel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 7 }
+
+cienaOme6500OptmonsAlsoDisabled OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 8 }
+
+cienaOme6500OptmonsProtNswSwStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 9 }
+
+cienaOme6500OptmonsProtNswSwEnd OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 10 }
+
+cienaOme6500OptmonsProtNswSwReason OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsEntry 11 }
+
+cienaOme6500OptmonsProtGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CienaOme6500OptmonsProtGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaOme6500OptmonsMIB 2 }
+
+cienaOme6500OptmonsProtGroupEntry OBJECT-TYPE
+    SYNTAX CienaOme6500OptmonsProtGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cienaOme6500OptmonsProtGroupTable."
+    INDEX { cienaOme6500OptmonsProtGroupWrkgIfIndex, cienaOme6500OptmonsProtGroupProtIfIndex }
+    ::= { cienaOme6500OptmonsProtGroupTable 1 }
+
+CienaOme6500OptmonsProtGroupEntry ::= SEQUENCE { 
+    cienaOme6500OptmonsProtGroupWrkgIfIndex InterfaceIndex,
+    cienaOme6500OptmonsProtGroupWrkgIfDescr DisplayString,
+    cienaOme6500OptmonsProtGroupWrkgSst DisplayString,
+    cienaOme6500OptmonsProtGroupProtIfIndex InterfaceIndex,
+    cienaOme6500OptmonsProtGroupProtIfDescr DisplayString,
+    cienaOme6500OptmonsProtGroupProtSst DisplayString,
+    cienaOme6500OptmonsProtGroupProtScheme DisplayString,
+    cienaOme6500OptmonsProtGroupWaitToRestore DisplayString,
+    cienaOme6500OptmonsProtGroupDetectGuardTime DisplayString,
+    cienaOme6500OptmonsProtGroupRevertive DisplayString,
+    cienaOme6500OptmonsProtGroupRemStandard DisplayString,
+    cienaOme6500OptmonsProtGroupLossPwr INTEGER,
+    cienaOme6500OptmonsProtGroupTtops INTEGER,
+    cienaOme6500OptmonsProtGroupPsDirn INTEGER
+}
+cienaOme6500OptmonsProtGroupWrkgIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsProtGroupEntry 1 }
+
+cienaOme6500OptmonsProtGroupWrkgIfDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "AID in format OPTMON-shelf-slot-port, OPTMON-shelf-ALL"
+    ::= { cienaOme6500OptmonsProtGroupEntry 2 }
+
+cienaOme6500OptmonsProtGroupWrkgSst OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Identify the secondary state"
+    ::= { cienaOme6500OptmonsProtGroupEntry 3 }
+
+cienaOme6500OptmonsProtGroupProtIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { cienaOme6500OptmonsProtGroupEntry 4 }
+
+cienaOme6500OptmonsProtGroupProtIfDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "AID in format OPTMON-shelf-slot-port, OPTMON-shelf-ALL"
+    ::= { cienaOme6500OptmonsProtGroupEntry 5 }
+
+cienaOme6500OptmonsProtGroupProtSst OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Identify the secondary state"
+    ::= { cienaOme6500OptmonsProtGroupEntry 6 }
+
+
+cienaOme6500OptmonsProtGroupProtScheme OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Indicates the protection scheme to be used."
+    ::= { cienaOme6500OptmonsProtGroupEntry 7 }
+
+cienaOme6500OptmonsProtGroupWaitToRestore OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Wait-to-restore period in minutes"
+    ::= { cienaOme6500OptmonsProtGroupEntry 8 }
+
+cienaOme6500OptmonsProtGroupDetectGuardTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Detection Guard DisplayString (supported on SDHJ only) "
+    ::= { cienaOme6500OptmonsProtGroupEntry 9 }
+
+cienaOme6500OptmonsProtGroupRevertive OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Revertive switching mode enabled?"
+    ::= { cienaOme6500OptmonsProtGroupEntry 10 }
+
+cienaOme6500OptmonsProtGroupRemStandard OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Standard used on the remote equipment"
+    ::= { cienaOme6500OptmonsProtGroupEntry 11 }
+
+cienaOme6500OptmonsProtGroupLossPwr OBJECT-TYPE
+    SYNTAX INTEGER { n(0), y(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Loss of Power Supply mode"
+    ::= { cienaOme6500OptmonsProtGroupEntry 12 }
+
+cienaOme6500OptmonsProtGroupTtops OBJECT-TYPE
+    SYNTAX INTEGER { n(0), y(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transponder Triggered Switching Mode Enabled"
+    ::= { cienaOme6500OptmonsProtGroupEntry 13 }
+
+cienaOme6500OptmonsProtGroupPsDirn OBJECT-TYPE
+    SYNTAX INTEGER { uni(0), bi(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Protection Switch Direction.Default=UNI."
+    ::= { cienaOme6500OptmonsProtGroupEntry 14 }
+
+
+END -- End module

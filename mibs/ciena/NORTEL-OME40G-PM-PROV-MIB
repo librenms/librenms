@@ -1,0 +1,361 @@
+NORTEL-OME40G-PM-PROV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       nnOme40G            FROM NORTEL-OME40G-MIB
+       DisplayString       FROM RFC1213-MIB
+       ifIndex             FROM IF-MIB
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme40GPmProv MODULE-IDENTITY
+        LAST-UPDATED "200902020000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "On Optical Multiservice Edge (OME),
+               this module is used to initialize 40G PM registers and 
+	       OM Counts. It is also used to set Threshold Level and 
+	       HccsReference Values, and change Profiles for 40G facilities."
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 4.0"  
+
+	REVISION "200802070000Z"
+        DESCRIPTION "Updating row formatting OME6500 REL 5.1"	  
+
+        REVISION "200802210000Z"
+        DESCRIPTION 
+	     "- Updated the monType enum list for OME6500 REL 5.1
+	      - Changed SYNTAX for initShelfEthOmCounts and init40GOmCounts 
+	        from Binning to Boolean.
+	      - Changed MAX-ACCESS from read-write to not-accessible for monType,
+	        endpoint,direction and accumTimePeriod."        
+
+	REVISION "200803030000Z"
+        DESCRIPTION 
+	     "- MonType Enum List Updated:
+	         This ENUM list has all supported MonType for
+		 OC192, OC768, OTM2. OMT3, ETH10G and WAN
+	     - unknown(0) to nill (0)"  
+
+	REVISION "200805010000Z"
+        DESCRIPTION 
+	     " - Changed the DESCRIPTION of nnOme40GPmProv, initShelf40GPmRegisters and 
+	         initShelfEthOmCounts objects"  
+		    
+	REVISION "200808200000Z"
+        DESCRIPTION 
+	     " - Added new MonTypes for OME 6500 R5.2 " 	
+
+	REVISION "200902020000Z"
+        DESCRIPTION 
+	     " Changed the SYNTAX of threshLevel attribute from Integer32 
+	       to DisplayString support the scientific notation type input.
+	       E.g.: 5E-10" 	
+	             
+        ::= { nnOme40G 4 }
+
+Boolean ::= INTEGER {
+    false(0),
+    true(1)
+}
+
+Montype ::= INTEGER {
+    eNILL(0),
+    eBRS-W(1),
+    eCV-L(2),
+    eCV-ODU(3),
+    eCV-OTU(4),
+    eCV-PCS(5),
+    eCV-S(6),
+    eDFR-E(7),
+    eDFR-W(8),
+    eES-E(9),
+    eES-L(10),
+    eES-ODU(11),
+    eES-OTU(12),
+    eES-PCS(13),
+    eES-S(14),
+    eES-W(15),
+    eFC-L(16),
+    eFC-ODU(17),
+    eFCSERR-E(18),
+    eFEC-OTU(19),
+    eHCCS-OTU(20),
+    eINFRAMEDISCDS-E(21),
+    eINFRAMESDISCDS-E(22),
+    eINFRAMES-E(23),
+    eINFRAMESERR-E(24),
+    eINFRAMESERR-W(25),
+    eINFRAMES-W(26),
+    eLDS-W(27),
+    eLKDS-E(28),
+    eLNKDS-W(29),
+    eLSDS-W(30),
+    eLUAS-W(31),
+    eOPRN-OCH(32),
+    eOPR-OCH(33),
+    eOPTN-OCH(34),
+    eOPT-OCH(35),
+    eOUTFRAMESDISCDS-E(36),
+    eOUTFRAMES-E(37),
+    eOUTFRAMESERR-E(38),
+    eOUTFRAMES-W(39),
+    ePFBERE-OTU(40),
+    ePRFBER-OTU(41),
+    ePSCP-L(42),
+    ePSCP-ODU(43),
+    ePSCW-L(44),
+    ePSCW-ODU(45),
+    ePSD-L(46),
+    ePSD-ODU(47),
+    eSBRS-W(48),
+    eSEFS-OTU(49),
+    eSEFS-S(50),
+    eSES-E(51),
+    eSES-L(52),
+    eSES-ODU(53),
+    eSES-OTU(54),
+    eSES-PCS(55),
+    eSES-S(56),
+    eSES-W(57),
+    eUAS-E(58),
+    eUAS-L(59),
+    eUAS-ODU(60),
+    eUAS-PCS(61),
+    eUAS-W(62),
+    eUTLMX-W(63),
+    eUTL-W(64),
+    eINDFR-E(65),
+    eOUTDFR-E(66),
+    eDGDAVG-OCH(67),
+    eDGDMAX-OCH(68),
+    eALL(69),
+    eMAX(70)
+}
+
+Endpoint ::= INTEGER {
+    nill(0),
+    near-end(1), 
+    far-end(2),
+    all(3)
+}
+
+Direction ::= INTEGER {
+    nill(0),
+    trmt(1),
+    rcv(2),
+    all(3)
+}
+
+Binning ::= INTEGER {
+    nill(0),
+    fifteen-min(1),
+    one-day(2),
+    one-unt(3),
+    baseline(4),
+    all(5)
+}
+
+Profiles ::= INTEGER {
+    nill(0),
+    profile1(1), 
+    profile2(2), 
+    profile3(3), 
+    profile4(4), 
+    dflt(5), 
+    alloff(6), 
+    factorydflt(7)
+}
+
+nnOme40GMonConfig  OBJECT IDENTIFIER  ::= { nnOme40GPmProv 1 }
+
+initShelf40GPmRegisters OBJECT-TYPE
+	SYNTAX Binning
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Initializes PM registers for 40G facilities on the shelf."
+	::= { nnOme40GPmProv 2 }
+
+initShelfEthOmCounts OBJECT-TYPE
+	SYNTAX Boolean
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Initiliazes Ethernet OM Counts for 40G facilities on the shelf."
+	::= { nnOme40GPmProv 3 }
+
+nnMonConfigTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnMonConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOme40GMonConfig 1 }
+
+nnMonConfigEntry OBJECT-TYPE
+	SYNTAX NnMonConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { ifIndex }
+	::= { nnMonConfigTable 1 }
+
+NnMonConfigEntry ::= 
+	SEQUENCE {
+	   hccsReference
+	      DisplayString,
+	   init40GPmRegisters
+	      Binning,
+	   init40GOmCounts
+	      Boolean
+	}
+
+hccsReference OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "High Correction Count Seconds. Applies for OTM2/3 only. 
+	             Floating point between -1.00 and 4.00; 
+                 Not supported by SMI-OM5K"
+	::= { nnMonConfigEntry 1 }
+
+init40GPmRegisters OBJECT-TYPE
+	SYNTAX  Binning
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Initializes the counts for all montypes on the facility, 
+                 if ifIndex contains ifType.
+	             If IfIndex contains only slot info, 
+                 all 40G facilities on the card get reset. 
+		         If the slot and port are available only, 
+                 then all 40G facilities on the port shall be targetted."
+	::= { nnMonConfigEntry 2 }
+
+init40GOmCounts OBJECT-TYPE
+	SYNTAX  Boolean
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Initializes the counts for all montypes on the facility, 
+                 if ifIndex contains ifType.
+	             If IfIndex contains only slot info, 
+                 all 40G facilities on the card get reset. 
+		         If the slot and port are available only, 
+                 then all 40G facilities on the port shall be targetted."
+	::= { nnMonConfigEntry 3 }
+
+nnMonTypeInstanceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnMonTypeInstanceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOme40GMonConfig 2 }
+
+nnMonTypeInstanceEntry OBJECT-TYPE
+	SYNTAX NnMonTypeInstanceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { ifIndex, monType, endpoint, direction, accumTimePeriod }
+	::= { nnMonTypeInstanceTable 1 }
+
+NnMonTypeInstanceEntry ::= 
+	SEQUENCE {
+		monType
+			Montype,
+		endpoint
+			Endpoint,
+		direction
+			Direction, 
+		accumTimePeriod
+			Binning,
+		monVal
+			Integer32, 
+		threshLevel
+			DisplayString,
+		srcProfileId
+			Profiles,
+		dstProfileId
+			Profiles,
+		initRegisters
+			Boolean
+	}
+
+
+monType OBJECT-TYPE
+	SYNTAX Montype
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Monitored parm type; group of values acceptable; should
+                     act more like a bitmask"
+	::= { nnMonTypeInstanceEntry 1 }
+
+endpoint OBJECT-TYPE
+	SYNTAX  Endpoint
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { nnMonTypeInstanceEntry 2 }
+
+direction OBJECT-TYPE
+    SYNTAX  Direction
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { nnMonTypeInstanceEntry 3 }
+
+accumTimePeriod OBJECT-TYPE
+	SYNTAX  Binning
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Accumulation time period, group of values acceptable"
+	::= { nnMonTypeInstanceEntry 4 }
+
+monVal OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Zero to reset or MONTYPE"
+	::= { nnMonTypeInstanceEntry 5 }
+
+
+threshLevel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Few Montype require scientific notation type input. 
+		    e.g.:5E-10. So, this threshLevel value must be in string 
+		    to support various input."
+	::= { nnMonTypeInstanceEntry 6 }
+
+srcProfileId OBJECT-TYPE
+	SYNTAX  Profiles
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnMonTypeInstanceEntry 7 }
+
+dstProfileId OBJECT-TYPE
+	SYNTAX  Profiles
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnMonTypeInstanceEntry 8 }
+
+initRegisters OBJECT-TYPE
+	SYNTAX  Boolean
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnMonTypeInstanceEntry 9 }
+
+END
+

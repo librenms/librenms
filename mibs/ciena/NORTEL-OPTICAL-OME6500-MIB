@@ -1,0 +1,35 @@
+NORTEL-OPTICAL-OME6500-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       opterametro       FROM NORTEL-MIB	
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+ome6500 MODULE-IDENTITY
+        LAST-UPDATED "200802070000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This Module will be used to identify the top level for
+              Nortel OME6500 Product MIBS"
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 4.0"
+	
+	REVISION "200802070000Z"
+        DESCRIPTION "Updating formatting OME6500 REL 5.1"               
+        ::= { opterametro 11 }
+
+nnOme40G  OBJECT IDENTIFIER ::= { ome6500 3 }
+        
+
+END
