@@ -2,7 +2,6 @@ os: ciena-saos
 text: 'Ciena SAOS'
 type: network
 icon: ciena
-mibs_dir: ciena
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
