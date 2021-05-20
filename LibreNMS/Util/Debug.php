@@ -35,6 +35,13 @@ class Debug
     private static $debug = false;
     private static $verbose = false;
 
+    /**
+     * Enable/disable debug output
+     *
+     * @param  bool  $debug whether to enable or disable debug output
+     * @param  bool  $silence Silence error output or output all errors except notices
+     * @return bool  returns $debug
+     */
     public static function set($debug = true, bool $silence = false): bool
     {
         self::$debug = (bool) $debug;

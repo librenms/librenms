@@ -263,7 +263,7 @@ $(document).ready(function(){
     $("#leaflet-map").on("click", function(event) {
         map.scrollWheelZoom.enable();
     });
-    $("#leaflet-map").mouseleave(function(event) {
+    $("#leaflet-map").on("mouseleave", function(event) {
         map.scrollWheelZoom.disable();
     });
 });

@@ -24,6 +24,7 @@
 
 namespace LibreNMS\Util;
 
+use App;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
@@ -71,6 +72,18 @@ class Laravel
     public static function isBooted()
     {
         return function_exists('app') && ! empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
+    }
+
+    /**
+     * Check if running in the command line.
+     * Safe for code without Laravel running and in Laravel console application.
+     * @return bool
+     */
+    public static function isCli(): bool
+    {
+        return Laravel::isBooted()
+            ? App::runningInConsole()
+            : (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']));
     }
 
     /**

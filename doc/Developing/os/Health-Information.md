@@ -85,9 +85,9 @@ For `data:` you have the following options:
 The only sensor we have defined here is airflow. The available options
 are as follows:
 
-- `oid` (required): This is the name of the table you want to do the snmp walk on.
+- `oid` (required): This is the name of the table you want to snmp walk for data.
 - `value` (optional): This is the key within the table that contains
-  the value. If not provided willuse `oid`
+  the value. If not provided will use `oid`
 - `num_oid` (required for PullRequests): If not provided, this parameter should be computed
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
