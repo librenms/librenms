@@ -106,12 +106,9 @@ class Junos extends \LibreNMS\OS implements OSPolling
             $owner = $prop_id[1];
             $test = $prop_id[2];
 
-            if ($property == 'pingResultsProbeResponses')
-            {
+            if ($property == 'pingResultsProbeResponses') {
                 $pingResultsProbeResponses[$owner.".".$test] = $value;
-            }
-            else if ($property == 'pingResultsSentProbes')
-            {
+            } else if ($property == 'pingResultsSentProbes') {
                 $pingResultsSentProbes[$owner.".".$test] = $value;
             }
         }
@@ -130,8 +127,7 @@ class Junos extends \LibreNMS\OS implements OSPolling
             $owner = $prop_id[1];
             $test = $prop_id[2];
 
-            if ($property == 'pingCtlRowStatus')
-            {
+            if ($property == 'pingCtlRowStatus') {
                 $pingCtlRowStatuses[$owner.".".$test] = $value;
             }
         }
