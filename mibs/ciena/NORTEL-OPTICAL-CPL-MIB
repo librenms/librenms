@@ -1,0 +1,32 @@
+   NORTEL-OPTICAL-CPL-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       opterametro            FROM NORTEL-OPTICAL-GENERIC-MIB
+
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+cpl MODULE-IDENTITY
+        LAST-UPDATED "200702020000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+
+        DESCRIPTION
+              "Common Photonic Layer (cpl)
+              This Module will be used to identify the top level for
+              Nortel CPL Product MIBS"
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for CPL REL 4.0"               
+        ::= { opterametro 12 }
+        
+
+END

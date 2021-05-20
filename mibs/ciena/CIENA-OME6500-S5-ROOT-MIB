@@ -1,0 +1,33 @@
+CIENA-OME6500-S5-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	cienaSeries5000
+		FROM CIENA-OME6500-SYNOPTICS-ROOT-MIB;
+
+cienaS5RootMib MODULE-IDENTITY
+	LAST-UPDATED "201510200000Z"
+	ORGANIZATION 
+		"Ciena Corp"
+	CONTACT-INFO 
+		"Ciena Corp"
+	DESCRIPTION 
+		"5000 CIENA Root MIB
+		  Created for Rel11.10.
+          This MIB content has been derived from S5-ROOT MIB."
+
+
+	REVISION "201510200000Z"
+	DESCRIPTION 
+		"Created for Rel11.10 to enhance support for ipv6 address and LLDP fields"
+::= { cienaSeries5000 0 }
+
+
+-- Branches under "cienaSeries5000"
+-- branch for registration of values for objects
+--   with syntax of OBJECT IDENTIFIER
+
+cienaS5EnMsTop                OBJECT IDENTIFIER ::= { cienaSeries5000 13 }
+
+END

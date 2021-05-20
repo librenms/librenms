@@ -1,0 +1,253 @@
+NORTEL-OME40G-PRTN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       nnOme40G            FROM NORTEL-OME40G-MIB
+       DisplayString       FROM RFC1213-MIB
+       RowStatus           FROM SNMPv2-TC
+       ifIndex             FROM IF-MIB
+       InterfaceIndex      FROM IF-MIB
+       entPhysicalIndex    FROM ENTITY-MIB
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme40GProtection MODULE-IDENTITY
+        LAST-UPDATED "200802070000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This Module is for 40G protection"
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 5.1"
+	
+	REVISION "200802070000Z"
+        DESCRIPTION "Updating row formatting OME6500 REL 5.11"	       
+        ::= { nnOme40G 3 }
+
+nnOme40Gotm3Protection OBJECT IDENTIFIER ::= { nnOme40GProtection 1 }
+
+nnOTM3protectionGroupTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnOTM3protectionGroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOme40Gotm3Protection 1 }
+
+nnOTM3protectionGroupEntry OBJECT-TYPE
+	SYNTAX NnOTM3protectionGroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { workingIfIndex, protectionIfIndex }
+	::= { nnOTM3protectionGroupTable 1 }
+
+NnOTM3protectionGroupEntry ::=
+	SEQUENCE {
+		workingIfIndex
+			InterfaceIndex,
+		protectionIfIndex
+			InterfaceIndex,
+		ptRowStatus 
+			RowStatus,
+		protectionSwitchDir
+			INTEGER,
+		protectionScheme
+			INTEGER,
+		waitToRestore
+			INTEGER,
+		revertive
+			INTEGER,
+		remoteStandardMode
+			INTEGER,
+		routeDiversity
+			INTEGER
+	}
+
+workingIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "working interface type"
+	::= { nnOTM3protectionGroupEntry 1 }
+
+protectionIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 2 }
+
+ptRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write 
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 3 }
+
+protectionSwitchDir OBJECT-TYPE
+	SYNTAX INTEGER {
+		bidirectional(1),
+		unidirectional(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 4 }
+
+
+protectionScheme OBJECT-TYPE
+	SYNTAX INTEGER {
+		one-plus-one(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 5 }
+
+
+waitToRestore OBJECT-TYPE
+	SYNTAX INTEGER {
+		one-minute(1), 
+		two-minutes(2), 
+		three-minutes(3),  
+		four-minutes(4), 
+		five-minutes(5), 
+		six-minutes(6), 
+		seven-minutes(7), 
+		eight-minutes(8), 
+		nine-minutes(9), 
+		ten-minutes(10), 
+		eleven-minutes(11), 
+		twelve-minutes(12) 
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 6 }
+
+
+revertive OBJECT-TYPE
+	SYNTAX INTEGER {
+		yes(1),
+		no(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 7 }
+
+
+remoteStandardMode OBJECT-TYPE
+	SYNTAX INTEGER {
+		otn-g-873-1(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 8 }
+
+
+routeDiversity OBJECT-TYPE
+	SYNTAX INTEGER {
+		off(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionGroupEntry 9 }
+
+
+
+nnOTM3protectionSwitchTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnOTM3protectionSwitchEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOme40Gotm3Protection 2 }
+
+nnOTM3protectionSwitchEntry OBJECT-TYPE
+	SYNTAX NnOTM3protectionSwitchEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { ifIndex }
+	::= { nnOTM3protectionSwitchTable 1 }
+
+NnOTM3protectionSwitchEntry ::=
+	SEQUENCE {
+		switchCommand
+			INTEGER,
+		switchStatus
+			INTEGER,
+		endInitiatingSwitch
+			INTEGER,
+		reasonForAutoSwitch
+			INTEGER
+	}
+
+switchCommand OBJECT-TYPE
+	SYNTAX INTEGER {
+		man(1),
+		frcd(2),
+		lockout(3),
+		release(4)
+	}
+
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionSwitchEntry 1 }
+
+switchStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		idle(1),
+		auto(2),
+		man(3),
+		frcd(4),
+		lockout(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionSwitchEntry 2 }
+
+endInitiatingSwitch OBJECT-TYPE
+	SYNTAX INTEGER {
+		remote(1),
+		local(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionSwitchEntry 3 }
+
+reasonForAutoSwitch OBJECT-TYPE
+	SYNTAX INTEGER {
+		sigok(1),
+		sf(2),
+		sd(3),
+		eber(4),
+		eqpfl(5),
+		facoos(6),
+		eqpoos(7),
+		osc(8),
+		wr(9)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTM3protectionSwitchEntry 4 }
+
+END
+

@@ -1,0 +1,38 @@
+CIENA-OME6500-SYNOPTICS-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	cienaOme6500
+		FROM CIENA-OME6500-OPTICAL-MIB;
+
+cienaSynoptics MODULE-IDENTITY
+	LAST-UPDATED "200510110000Z"
+	ORGANIZATION 
+		"Ciena Corp."
+	CONTACT-INFO 
+		"Ciena Corp."
+	DESCRIPTION 
+		"SynOptics Root MIB
+		
+		            The MIB content has been derived from Synoptics Root MIB."
+
+	REVISION "200510110000Z"
+	DESCRIPTION 
+		"Created for R11.1 to enhance the MIB functionlity for ipv6 addresses
+		and added the LLDP remaining fields."
+
+::= { cienaOme6500 2 }
+
+-- This type is used to specify a concentrator chassis.
+-- Top Branches under "synoptics"
+
+cienaSynopticProducts             OBJECT IDENTIFIER ::= { cienaSynoptics 1 }
+
+-- Branches under "cienaSynopticProducts"
+
+cienaSeries5000           OBJECT IDENTIFIER ::= { cienaSynopticProducts 6 }
+
+END

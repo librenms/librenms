@@ -1,0 +1,284 @@
+NORTEL-OME40G-OM-COUNTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       nnOme40G            FROM NORTEL-OME40G-MIB
+       DisplayString       FROM RFC1213-MIB
+       ifIndex             FROM IF-MIB
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme40GOmCounts MODULE-IDENTITY
+        LAST-UPDATED "200802210000Z"    
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This Module will be used for 40G Generic and Enet OM counts."
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 5.11"  
+
+        ::= { nnOme40G 5 }
+
+generic OBJECT IDENTIFIER ::= { nnOme40GOmCounts 1 }
+enet OBJECT IDENTIFIER ::= { nnOme40GOmCounts 2 }
+
+wanCountsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF WanCountsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { generic 1 }
+
+wanCountsEntry OBJECT-TYPE
+	SYNTAX WanCountsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { ifIndex }
+	::= { wanCountsTable 1 }
+
+WanCountsEntry ::= 
+	SEQUENCE {
+        wanINFRAMES
+            Counter64,
+        wanINFRAMESERR
+            Counter64,
+        wanINDFR
+            Counter64
+	}
+
+wanINFRAMES OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { wanCountsEntry 1 }
+
+wanINFRAMESERR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { wanCountsEntry 2 }
+
+wanINDFR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { wanCountsEntry 3 }
+
+
+ethCountsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EthCountsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { generic 2 }
+
+ethCountsEntry OBJECT-TYPE
+	SYNTAX EthCountsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { ifIndex }
+	::= { ethCountsTable 1 }
+
+EthCountsEntry ::= 
+	SEQUENCE {
+        ethINFRAMES 
+            Counter64,
+        ethINFRAMESERR 
+            Counter64,
+        ethINDFR 
+            Counter64,
+        ethINFRAMESDISCS 
+            Counter64,
+        ethOUTFRAMES 
+            Counter64,
+        ethOUTFRAMESERR 
+            Counter64,
+        ethINOCTETS 
+            Counter64,
+        ethOUTOCTETS 
+            Counter64,
+        ethOUTDFR 
+            Counter64,
+        ethOUTFRAMESDISCDS
+            Counter64
+	}
+
+ethINFRAMES OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 1 }
+
+ethINFRAMESERR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 2 }
+
+ethINDFR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 3 }
+
+ethINFRAMESDISCS OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 4 }
+
+ethOUTFRAMES OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 5 }
+
+ethOUTFRAMESERR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 6 }
+
+ethINOCTETS OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 7 }
+
+ethOUTOCTETS OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 8 }
+
+ethOUTDFR  OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 9 }
+
+ethOUTFRAMESDISCDS  OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { ethCountsEntry 10 }
+
+enetCountsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EnetCountsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::= { enet 1 }
+
+enetCountsEntry OBJECT-TYPE
+	SYNTAX EnetCountsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { ifIndex }
+	::= { enetCountsTable 1 }
+
+EnetCountsEntry ::= 
+	SEQUENCE {
+         ethFCSERR 
+            Counter64,
+         ethJAB 
+            Counter64,
+         ethFRAG 
+            Counter64,
+         ethFRTOOLONGS 
+            Counter64,
+         ethFRTOOSHORTS 
+            Counter64,
+         ethSYMBOLERR 
+            Counter64,
+         ethINPAUSEFR 
+            Counter64,
+         ethOUTPAUSEFR
+            Counter64
+	}
+
+ethFCSERR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 1 }
+
+ethJAB OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 2 }
+
+ethFRAG OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 3 }
+
+ethFRTOOLONGS OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 4 }
+
+ethFRTOOSHORTS OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 5 }
+
+ethSYMBOLERR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 6 }
+
+ethINPAUSEFR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 7 }
+
+ethOUTPAUSEFR OBJECT-TYPE
+	SYNTAX  Counter64 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { enetCountsEntry 8 }
+
+END
+

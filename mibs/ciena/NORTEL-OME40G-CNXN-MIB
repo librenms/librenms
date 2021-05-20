@@ -1,0 +1,117 @@
+   NORTEL-OME40G-CNXN-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       nnOme40G            FROM NORTEL-OME40G-MIB
+       DisplayString       FROM RFC1213-MIB
+       RowStatus           FROM SNMPv2-TC
+       InterfaceIndex      FROM IF-MIB
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme40GConnections MODULE-IDENTITY
+        LAST-UPDATED "200802070000Z"
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This module shall contain information on 40G channel assignments."
+   
+        --Revision history
+        REVISION "200702020000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 5.1"               
+
+	REVISION "200802070000Z"
+        DESCRIPTION "Updating row formatting OME6500 REL 5.11"
+        ::= { nnOme40G 2 }
+
+nnCrossConnects      OBJECT IDENTIFIER ::= { nnOme40GConnections 1 }
+
+nnCrossConnectsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnCrossConnectsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "This table contains all the channel/port assignments"
+	::= { nnCrossConnects 1 }
+
+nnCrossConnectsEntry OBJECT-TYPE
+	SYNTAX NnCrossConnectsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	INDEX { fromIfIndex, toIfIndex }
+	::= { nnCrossConnectsTable 1 }
+
+NnCrossConnectsEntry ::= 
+	SEQUENCE {
+		fromIfIndex
+			InterfaceIndex,
+		toIfIndex
+			InterfaceIndex,
+		payloadIndex
+			INTEGER,
+		xcRowStatus
+			RowStatus,
+		crossConnectType
+			INTEGER,
+		crossConnectName
+			DisplayString
+	}
+
+fromIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION ""
+	::= { nnCrossConnectsEntry 1 } 
+
+
+toIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION ""
+	::= { nnCrossConnectsEntry 2 } 
+
+
+payloadIndex OBJECT-TYPE
+	SYNTAX INTEGER(1..4)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { nnCrossConnectsEntry 3 } 
+
+xcRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnCrossConnectsEntry 4 } 
+
+crossConnectType OBJECT-TYPE
+	SYNTAX INTEGER {
+		one-way(1),
+		two-way(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnCrossConnectsEntry 5 } 
+
+crossConnectName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnCrossConnectsEntry 6 } 
+
+END
+

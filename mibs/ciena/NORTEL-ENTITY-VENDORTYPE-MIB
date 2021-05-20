@@ -1,0 +1,111 @@
+NORTEL-ENTITY-VENDORTYPE-MIB DEFINITIONS ::= BEGIN 
+    
+   IMPORTS 
+        nortelGenericMIBs FROM NORTEL-GENERIC-MIB 
+        MODULE-IDENTITY FROM SNMPv2-SMI;
+
+        nnEntityVendorType MODULE-IDENTITY 
+        LAST-UPDATED "200812020000Z" 
+        ORGANIZATION "Nortel Networks" 
+        CONTACT-INFO 
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+ 
+      DESCRIPTION 
+               "This MIB describes Nortel Network's vendor type identifiers 
+               for use with the Entity MIB's entPhysicalVendorType."  
+               
+       REVISION "200812020000Z" 
+       DESCRIPTION   
+                " Updated to include PEC code based values"   
+       REVISION "200006280000Z" 
+       DESCRIPTION        
+                " Initial version of this MIB. " 
+
+       ::= { nortelGenericMIBs 5 } 
+        
+  nnEntityVendorTypeOther OBJECT IDENTIFIER ::= {nnEntityVendorType 1 } 
+  nnEntityVendorTypeUnknown OBJECT IDENTIFIER ::= {nnEntityVendorType 2 } 
+  nnEntityVendorTypeChassis OBJECT IDENTIFIER ::= {nnEntityVendorType 3 } 
+  nnEntityVendorTypeBackplane OBJECT IDENTIFIER ::= {nnEntityVendorType 4 } 
+  nnEntityVendorTypeContainer OBJECT IDENTIFIER ::= {nnEntityVendorType 5 } 
+  nnEntityVendorTypePowerSupply OBJECT IDENTIFIER ::= {nnEntityVendorType 6 } 
+  nnEntityVendorTypeFan OBJECT IDENTIFIER ::= {nnEntityVendorType 7 } 
+  nnEntityVendorTypeSensor OBJECT IDENTIFIER ::= {nnEntityVendorType 8 } 
+  nnEntityVendorTypeModule OBJECT IDENTIFIER ::= {nnEntityVendorType 9 } 
+  nnEntityVendorTypePort OBJECT IDENTIFIER ::= {nnEntityVendorType 10 } 
+  nnEntityVendorTypeStack OBJECT IDENTIFIER ::= {nnEntityVendorType 11 } 
+  nnEntityVendorTypePecCodes OBJECT IDENTIFIER ::= {nnEntityVendorType 12 } 
+
+--
+-- Unknown Values
+--      
+-- These OIDs MUST be used when the insufficient information is available to
+-- determine specific component type determination
+
+-- Chassis 
+
+   nnEntityVendorTypeChassisUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeChassis 1 } 
+   
+-- Backplane 
+
+   nnEntityVendorTypeBackplaneUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeBackplane 1 } 
+
+-- Container 
+
+   nnEntityVendorTypeContainerUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeContainer 1 } 
+
+-- Power Supply   
+
+   nnEntityVendorTypePowerSupplyUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypePowerSupply 1 } 
+
+-- Fan  
+
+   nnEntityVendorTypeFanUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeFan 1 } 
+
+
+
+-- Sensor  
+
+   nnEntityVendorTypeSensorUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeSensor 1 } 
+
+-- Module 
+
+   nnEntityVendorTypeModuleUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeModule 1 } 
+
+-- Port 
+
+   nnEntityVendorTypePortUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypePort 1 } 
+
+-- Stack 
+
+   nnEntityVendorTypeStackUnknown OBJECT IDENTIFIER ::= {nnEntityVendorTypeStack 1 } 
+
+
+-- Note that that physical components that don't have PEC codes
+-- will use use OIDs defined in product specific MIBs or the Unknown values'
+-- defined above.
+  
+--  
+-- PEC Codes
+
+-- OIDs under the PEC code arc are auto-generated from PEC codes using
+-- the following algorithm:
+--    1. Each character in the PEC code represents one layer of hierarchy.
+--    2. Revision and other information after a "-" in the PEC code is
+--       not included.
+--    3. The alpha-numeric character is mapped to a numeric OID by first
+--       converting to lower case and then using the decimal ASCII value. 
+--
+--    For example , ntaz00aa, including a subtree of 1.3.6.1.4.1.562.29.5.12
+--    becomes 1.3.6.1.4.1.562.29.5.12.110.116.97.122.48.48.97.97
+--          
+ 
+
+END 
+

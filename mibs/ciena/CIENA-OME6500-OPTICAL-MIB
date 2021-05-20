@@ -1,0 +1,27 @@
+CIENA-OME6500-OPTICAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       cienaOpterametro       FROM CIENA-SMI	
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+cienaOme6500 MODULE-IDENTITY
+        LAST-UPDATED "201507150000Z"    
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+       	   "  Mib Meister
+               115 North Sullivan Road
+               Spokane Valley, WA 99037
+               USA            
+               Phone:  +1 509 242 9000
+               Email:  support@ciena.com"  
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This Module will be used to identify the top level for
+              Ciena OME6500 Product MIBS."
+   
+        ::= { cienaOpterametro 11 }
+
+
+END
+

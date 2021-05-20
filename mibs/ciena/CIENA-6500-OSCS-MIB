@@ -1,0 +1,240 @@
+-- This file was automatically generated from ciena-6500-oscs.yang. Do not edit.
+
+CIENA-6500-OSCS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    PstfacRtrv, Sstfac
+        FROM CIENA-6500-ENUMS-MIB
+    Aid, Decimal, Int, String
+        FROM CIENA-6500-TYPES-MIB
+    cienaGenericMIBs
+        FROM CIENA-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI;
+
+ciena6500OscsMIB MODULE-IDENTITY
+    LAST-UPDATED "210001010000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com"
+    DESCRIPTION "This modules describes Ciena's oscs object for the 6500 platform"
+    REVISION "201812310000Z"
+    DESCRIPTION "Initial Draft"
+    REVISION "210001010000Z"
+    DESCRIPTION "6500 Release  
+  container oscs
+    list osc
+      leaf dm-enable
+      - Added default: YES 
+      leaf comm-state
+      - Added default: ON 
+      leaf dmdistance
+      - Changed type from ciena-6500-types:DECIMAL to ciena-6500-types:STRING"
+    ::= { cienaGenericMIBs 202 }
+
+c6500OscsOscsOscTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF C6500OscsOscsOscEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { ciena6500OscsMIB 3 }
+
+c6500OscsOscsOscEntry OBJECT-TYPE
+    SYNTAX C6500OscsOscsOscEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for c6500OscsOscsOscTable."
+    INDEX { c6500OscsOscsOscOsc }
+    ::= { c6500OscsOscsOscTable 1 }
+
+C6500OscsOscsOscEntry ::= SEQUENCE { 
+    c6500OscsOscsOscOsc OCTET STRING,
+    c6500OscsOscsOscRxPathLoss Decimal,
+    c6500OscsOscsOscSdTh Int,
+    c6500OscsOscsOscDmEnable INTEGER,
+    c6500OscsOscsOscCommState INTEGER,
+    c6500OscsOscsOscTxPow Decimal,
+    c6500OscsOscsOscTxWavelength Decimal,
+    c6500OscsOscsOscSpanLoss Decimal,
+    c6500OscsOscsOscEstBer String,
+    c6500OscsOscsOscReceivePow String,
+    c6500OscsOscsOscDmcount String,
+    c6500OscsOscsOscDmdistance String,
+    c6500OscsOscsOscPst PstfacRtrv 
+}
+
+c6500OscsOscsOscOsc OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..80))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "AID in format OSC-shelf-slot-port, OSC-shelf-ALL, OSC-shelf-slot-ALL, SHELF-shelf-ALL"
+    ::= { c6500OscsOscsOscEntry 1 }
+
+c6500OscsOscsOscRxPathLoss OBJECT-TYPE
+    SYNTAX Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Received Span Loss in dB."
+    ::= { c6500OscsOscsOscEntry 2 }
+
+c6500OscsOscsOscSdTh OBJECT-TYPE
+    SYNTAX Int
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "None"
+    ::= { c6500OscsOscsOscEntry 3 }
+
+c6500OscsOscsOscDmEnable OBJECT-TYPE
+    SYNTAX INTEGER { yes(0), no(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Specify if delay measurement is enable."
+    ::= { c6500OscsOscsOscEntry 4 }
+
+c6500OscsOscsOscCommState OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1), unknown(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Specify if communication state is on or off."
+    ::= { c6500OscsOscsOscEntry 5 }
+
+c6500OscsOscsOscTxPow OBJECT-TYPE
+    SYNTAX Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OSC Tx launch power in dBm."
+    ::= { c6500OscsOscsOscEntry 6 }
+
+c6500OscsOscsOscTxWavelength OBJECT-TYPE
+    SYNTAX Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The OSC wavelength in nm."
+    ::= { c6500OscsOscsOscEntry 7 }
+
+c6500OscsOscsOscSpanLoss OBJECT-TYPE
+    SYNTAX Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The OSC Span Loss in dB."
+    ::= { c6500OscsOscsOscEntry 8 }
+
+c6500OscsOscsOscEstBer OBJECT-TYPE
+    SYNTAX String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Estimated BER ."
+    ::= { c6500OscsOscsOscEntry 9 }
+
+c6500OscsOscsOscReceivePow OBJECT-TYPE
+    SYNTAX String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The OSC receive power in dB."
+    ::= { c6500OscsOscsOscEntry 10 }
+
+c6500OscsOscsOscDmcount OBJECT-TYPE
+    SYNTAX String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Value of delay measurement in micro seconds."
+    ::= { c6500OscsOscsOscEntry 11 }
+
+c6500OscsOscsOscDmdistance OBJECT-TYPE
+    SYNTAX String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The estimated one way distance in kilometers."
+    ::= { c6500OscsOscsOscEntry 12 }
+
+c6500OscsOscsOscPst OBJECT-TYPE
+    SYNTAX PstfacRtrv
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Identify the primary state"
+    ::= { c6500OscsOscsOscEntry 13 }
+
+c6500OscsOscsOscSstTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF C6500OscsOscsOscSstEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Identify the secondary state"
+    ::= { ciena6500OscsMIB 4 }
+
+c6500OscsOscsOscSstEntry OBJECT-TYPE
+    SYNTAX C6500OscsOscsOscSstEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for c6500OscsOscsOscSstTable."
+    INDEX { c6500OscsOscsOscSstOscOsc, c6500OscsOscsOscSstTableSnmpKey }
+    ::= { c6500OscsOscsOscSstTable 1 }
+
+C6500OscsOscsOscSstEntry ::= SEQUENCE { 
+    c6500OscsOscsOscSstOscOsc OCTET STRING,
+    c6500OscsOscsOscSstTableSnmpKey Integer32,
+    c6500OscsOscsOscSst Sstfac 
+}
+
+c6500OscsOscsOscSstOscOsc OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..80))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "AID in format OSC-shelf-slot-port, OSC-shelf-ALL, OSC-shelf-slot-ALL, SHELF-shelf-ALL"
+    ::= { c6500OscsOscsOscSstEntry 1 }
+
+c6500OscsOscsOscSstTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for c6500OscsOscsOscSst"
+    ::= { c6500OscsOscsOscSstEntry 2 }
+
+c6500OscsOscsOscSst OBJECT-TYPE
+    SYNTAX Sstfac
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Identify the secondary state"
+    ::= { c6500OscsOscsOscSstEntry 3 }
+
+
+
+-- Conformance statements
+ciena6500OscsObjects OBJECT IDENTIFIER
+    ::= { ciena6500OscsMIB 1 }
+
+ciena6500OscsConformance OBJECT IDENTIFIER
+    ::= { ciena6500OscsMIB 2 }
+
+ciena6500OscsGroups OBJECT IDENTIFIER
+    ::= { ciena6500OscsConformance 1 }
+
+ciena6500OscsGroup OBJECT-GROUP
+    OBJECTS { 
+        c6500OscsOscsOscRxPathLoss,
+        c6500OscsOscsOscSdTh,
+        c6500OscsOscsOscDmEnable,
+        c6500OscsOscsOscCommState,
+        c6500OscsOscsOscTxPow,
+        c6500OscsOscsOscTxWavelength,
+        c6500OscsOscsOscSpanLoss,
+        c6500OscsOscsOscEstBer,
+        c6500OscsOscsOscReceivePow,
+        c6500OscsOscsOscDmcount,
+        c6500OscsOscsOscDmdistance,
+        c6500OscsOscsOscPst
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { ciena6500OscsGroups 1 }
+
+ciena6500OscsCompliances OBJECT IDENTIFIER
+    ::= { ciena6500OscsConformance 2 }
+
+ciena6500OscsCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { ciena6500OscsGroup }
+    ::= { ciena6500OscsCompliances 1 }
+
+END -- End module

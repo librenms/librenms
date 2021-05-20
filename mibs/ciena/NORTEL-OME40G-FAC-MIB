@@ -1,0 +1,1406 @@
+   NORTEL-OME40G-FAC-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       nnOme40G            FROM NORTEL-OME40G-MIB
+       DisplayString       FROM RFC1213-MIB
+       RowStatus           FROM SNMPv2-TC
+       ifIndex             FROM IF-MIB
+
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOme40GFacilities MODULE-IDENTITY
+        LAST-UPDATED "201408180000Z"
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "Optical Multiservice Edge (ome)
+              This Module will be used to identify the facility attributes for
+              Nortel OME6500 40G facilities"
+   
+        --Revision history
+        REVISION "200708100000Z"
+        DESCRIPTION "Initial Version - created for OME6500 REL 5.1" 
+        
+        REVISION "200905200000Z"
+        DESCRIPTION 
+	        "String length were changed from 32 to 64 for the following attributes:
+	         otuTxTTI,oduTxTTI, otuRxExpTTI,oduRxExpTTI in  OME6500 REL 6.0"  
+
+        REVISION "201408180000Z"
+        DESCRIPTION 
+	        "Added new enums gfp-mactr192(5), gfp-std192(6), gfp-mactr64(7), gfp-std64(8),
+                gfp-macostr(9), gfp-macostr192(10), gfp-macostr64(11), ull(12)for ethMapping 
+                in OME6500 REL 10.1"
+              
+	::= { nnOme40G 1 }
+
+nnOCn        OBJECT IDENTIFIER ::= { nnOme40GFacilities 1 }
+nnOTMn       OBJECT IDENTIFIER ::= { nnOme40GFacilities 2 }
+nnEth        OBJECT IDENTIFIER ::= { nnOme40GFacilities 3 }
+nnWAN        OBJECT IDENTIFIER ::= { nnOme40GFacilities 4 }
+
+
+GccValues ::= INTEGER {
+	    unknown(0),
+        none(1),
+		gcc0(2),
+		gcc1(3),
+		gcc2(4)
+}
+
+
+-- The Admin State and Primary States 
+-- are doubly defined in the 40G Fac
+-- module and the OME6500 Equipment
+-- module. Ultimately, they need to 
+-- be merged. In the meantime, they
+-- need to be concurrently updated.
+AdminState ::= INTEGER  {
+    unknown(0),
+    is(1),
+    oos(2)
+}
+
+PrimaryState ::= INTEGER {
+    unknown(0),
+    is(1),
+    is-anr(2),
+    oos-au(3),
+    oos-ma(4),
+    oos-auma(5),
+    oos-maanr(6)
+}
+
+LoopbackType ::= INTEGER {
+    unknown(0),
+    none(1),
+    facility(2),
+    terminal(3),
+    efmremote(4)
+}
+
+Status ::= INTEGER {
+    unknown(0),
+    enabled(1),
+    disabled(2)
+}
+
+FecFormat ::= INTEGER {
+    unknown(0),
+    off(1),
+    rs8(2),
+    scfec(3),
+    bch20(4),
+    pfec(5)
+}
+
+
+nnOCnTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NnOCnEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION  "Contains entries for OC192 and OC768 facilities"
+	::= { nnOCn 1 }
+
+nnOCnEntry OBJECT-TYPE
+	SYNTAX NnOCnEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "This entry shall contain all the necessary attributes
+                     for the OC768 and OC192 facilities in the 40G card"
+	INDEX { ifIndex }
+    ::= { nnOCnTable 1 }
+
+NnOCnEntry ::= 
+    SEQUENCE {
+		ocnRowStatus
+			RowStatus,
+		stFormat
+			INTEGER,
+		expSTrc
+			DisplayString,
+		stfMode
+			INTEGER,
+		eBerTh
+			Integer32,
+		ocnPortMode
+			INTEGER,
+		ocnLaserOffFarEndFail
+			Status,
+		oChTxActOcnPwr
+			DisplayString,
+		oChTxMinOcnPwr
+			DisplayString,
+		oChTxMaxOcnPwr
+			DisplayString,
+		oChRxActOcnPwr
+			DisplayString,
+		oChRxMinOcnPwr
+			DisplayString,
+		oChRxMaxOcnPwr
+			DisplayString,
+		expSectionTraceMsg
+			DisplayString,
+		incSectionTraceMsg
+			DisplayString,
+		ocnLoopbackType
+			LoopbackType,
+		ocnPrimaryState
+			PrimaryState,
+		ocnSecondaryState
+			DisplayString,
+		ocnAdminState
+			AdminState,
+		ocnAID
+			DisplayString
+	}
+
+
+ocnRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This attribute is used to manage rows in the 
+	             facility entry"
+	::= { nnOCnEntry 1 }
+
+stFormat OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		num(1),
+		string(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Section trace format"
+	::= { nnOCnEntry 2 }
+
+expSTrc OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Expected section trace"
+	::= { nnOCnEntry 3 }
+
+stfMode OBJECT-TYPE
+	SYNTAX INTEGER {
+        unknown(0),
+		off(1),
+		almonly(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Section trace alarming mode"
+	::= { nnOCnEntry 4 }
+
+eBerTh OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Excessive Bit rate threshold"
+	::= { nnOCnEntry 5 }
+
+ocnPortMode OBJECT-TYPE
+	SYNTAX INTEGER {
+        unknown(0),
+		sonet(1),
+		sdh(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Port mode can eithter be SONET or SDH"
+	::= { nnOCnEntry 6 }
+
+ocnLaserOffFarEndFail OBJECT-TYPE
+    SYNTAX Status
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "It can either be Enabled or Disabled."
+	::= { nnOCnEntry 7 }
+
+oChTxActOcnPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Actual Optical Channel transmit power. 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOCnEntry 8 }
+
+oChTxMinOcnPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Minimum Optical Channel transmit power"
+	::= { nnOCnEntry 9 }
+
+oChTxMaxOcnPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Maximum Optical Channel transmit power"
+	::= { nnOCnEntry 10 }
+
+oChRxActOcnPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Actual Optical Channel receive power. 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOCnEntry 11 }
+
+oChRxMinOcnPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Minimum Optical Channel receive power."
+	::= { nnOCnEntry 12 }
+
+oChRxMaxOcnPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Maximum Optical Channel receive power."
+	::= { nnOCnEntry 13 }
+
+
+expSectionTraceMsg OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Expected section trace message. 
+                 This variable contains data during GET
+                 operations only. GET-NEXT returns No Assigned Value"
+	::= { nnOCnEntry 14 }
+
+incSectionTraceMsg OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Incoming section trace message
+                 This variable contains data during GET
+                 operations only. GET-NEXT returns No Assigned Value"
+	::= { nnOCnEntry 15 }
+
+ocnLoopbackType OBJECT-TYPE
+	SYNTAX LoopbackType
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Nothing is returned if Loopback is not active; 
+	             otherwise the facility is returned."
+	::= { nnOCnEntry 16 }
+
+ocnPrimaryState OBJECT-TYPE
+	SYNTAX PrimaryState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Primary State of the faciltiy. Can only be modified
+                 by changing the admin state."
+	::= { nnOCnEntry 17 }
+
+ocnSecondaryState OBJECT-TYPE
+	SYNTAX DisplayString
+    MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Secondary state for the facility. A facility can have
+                 more than one secondary state as different combinations
+                 of the individual secondary state. It is represented 
+                 as a string to capture all the combinations. Those
+                 combinations along with the Primary state are used 
+                 to compute the admin state.  Can be any combination of 
+                 flt, sgeo, lpbk, discd, ts, wrkrx, wrktx."
+	::= { nnOCnEntry 18 }
+
+ocnAdminState OBJECT-TYPE
+	SYNTAX AdminState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is a write-only variable. The user can restore
+                 or remove facilities using this command. You restore
+                 a facility by setting this variable to IS and remove
+                 it by setting it to OOS. During Row-create, a user can 
+                 use this variable to set the initial state of the facility.
+
+                 Because this is a write-only variable, the user is expected
+                 to read the Primary and Secondary state of the facility
+                 to determine the state of the facility. "
+	::= { nnOCnEntry 19 }
+
+ocnAID OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Facility AID as received from TL1. This should include
+                 the FAC type, shelf id, slot, and port."
+	::= { nnOCnEntry 20 }
+
+nnOTMnTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NnOTMnEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION  "Contains entries for the OTM2/3 facilities"
+	::= { nnOTMn 1 }
+
+nnOTMnEntry OBJECT-TYPE
+	SYNTAX NnOTMnEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "An Entry for the OTM2/3 facilities"
+	INDEX { ifIndex }
+	::= { nnOTMnTable 1 }
+
+NnOTMnEntry ::= 
+	SEQUENCE {
+		otmRowStatus
+			RowStatus,
+		osid
+			DisplayString,
+		otuTxFecFmt
+			FecFormat,
+		otuRxFecFmt
+			FecFormat,
+		oduTerm
+			INTEGER,
+		otuTxTTI
+			DisplayString,
+		oduTxTTI
+			DisplayString,
+		otuRxExpTTI
+			DisplayString,
+		oduRxExpTTI
+			DisplayString,
+		txPathId
+			INTEGER,
+		oChTxPwr
+			DisplayString,
+		oChTxActOtmPwr
+			DisplayString,
+		oChTxMinOtmPwr
+			DisplayString,
+		oChTxMaxOtmPwr
+			DisplayString,
+		oChRxActOtmPwr
+			DisplayString,
+		oChRxMinOtmPwr
+			DisplayString,
+		oChRxMaxOtmPwr
+			DisplayString,
+		oChTxWvlngthProv
+			DisplayString,
+		oChTxWvlngthMin
+			DisplayString,
+		oChTxWvlngthMax
+			DisplayString,
+		oChTxWvlngthSpacing
+			DisplayString,
+		oChRxActDisp
+			DisplayString,
+		oChRxActPmd
+			DisplayString,
+		oChRxPmdMax
+			DisplayString,
+		oChRxEchoTrace
+			DisplayString,
+		oChTxTrace
+			DisplayString,
+		oChTxTrace
+			DisplayString,
+		oChTxAssocFarEndRx
+			DisplayString,
+		otmPortMode
+			INTEGER,
+		tfMode
+			INTEGER,
+		oduTfMode
+			INTEGER,
+		otmLaserOffFarEndFail 
+			Status,
+		preFecSigFailThreshLevel
+			DisplayString,
+		otuSignalDegradeThreshLevel
+			Integer32,
+		oduMonitorEnabled
+			INTEGER,
+		lineRate
+			INTEGER,
+		otuExpTTI
+			DisplayString,
+		otuRxIncTTI
+			DisplayString,
+		oduRxIncTTI
+			DisplayString,
+		oduMonitorMsg
+			DisplayString,
+		otmLoopbackType
+			LoopbackType,
+		opu2reserved
+			INTEGER,
+		expectedPayloadType
+			DisplayString,
+		transmittedPayloadType
+			DisplayString,
+		receivedPayloadType
+			DisplayString,
+		otmPrimaryState
+			PrimaryState,
+		otmSecondaryState
+			DisplayString,
+		otmAdminState
+			AdminState,
+		otmAID
+			DisplayString,
+        otmGCC
+            GccValues, 
+        ospfCircuit
+			DisplayString,
+        oChDifferentialEncoding 
+            INTEGER
+	}
+
+otmRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Used to create/delete, put in service and out of
+                     service, and edit."
+	::= { nnOTMnEntry 1 }
+
+osid OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Optical Service ID"
+	::= { nnOTMnEntry 2 }
+
+otuTxFecFmt OBJECT-TYPE
+	SYNTAX FecFormat
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "OTU transmit FEC format"
+	::= { nnOTMnEntry 3 }
+
+otuRxFecFmt OBJECT-TYPE
+	SYNTAX FecFormat
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "OTU receive FEC format"
+	::= { nnOTMnEntry 4 }
+
+oduTerm OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		yes(1),
+		no(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Indicates whether or not ODU TTI is terminated
+                     on this OTMn facility. Possible values are
+                     ODUTTITERM for OTM2 or ODUTERM for OTM3."
+	::= { nnOTMnEntry 5 }
+
+otuTxTTI OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..64))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "OTU transmit trail trace identifier."
+	::= { nnOTMnEntry 6 }
+
+oduTxTTI OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..64))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "ODU transmit trail trace identifier."
+	::= { nnOTMnEntry 7 }
+
+otuRxExpTTI OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..64))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "OTU receive trail trace identifier."
+	::= { nnOTMnEntry 8 }
+
+oduRxExpTTI OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..64))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "ODU receive trail trace identifer."
+	::= { nnOTMnEntry 9 }
+
+txPathId OBJECT-TYPE
+	SYNTAX INTEGER(1..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Transmit path identifier"
+	::= { nnOTMnEntry 10 }
+
+oChTxPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Provisioned output power"
+	::= { nnOTMnEntry 11 }
+
+oChTxActOtmPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Actual optical channel transmit power. 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOTMnEntry 12 }
+
+oChTxMinOtmPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Minimum transmit power."
+	::= { nnOTMnEntry 13 }
+
+oChTxMaxOtmPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Maximum transmit power."
+	::= { nnOTMnEntry 14 }
+
+oChRxActOtmPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Actual receive power 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOTMnEntry 15 }
+
+oChRxMinOtmPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Minimum receive power"
+	::= { nnOTMnEntry 16 }
+
+oChRxMaxOtmPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Maximum receive power"
+	::= { nnOTMnEntry 17 }
+
+oChTxWvlngthProv OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Provisioned transmit wavelength"
+	::= { nnOTMnEntry 18 }
+
+oChTxWvlngthMin OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Minimum transmit wavelength"
+	::= { nnOTMnEntry 19 }
+
+oChTxWvlngthMax OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Maximum Transmit wavelength"
+	::= { nnOTMnEntry 20 }
+
+oChTxWvlngthSpacing OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Transmit wavelength spacing"
+	::= { nnOTMnEntry 21 }
+
+oChRxActDisp OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Actual receive dispersion. 
+                 Data for this variable is only available from
+                 the subtending card. This data is retrieved from
+                 the SP with GET-NEXT. When there is no real-hardware
+                 the GET request will get no data and GET-NEXT will
+                 return SP data (most likely UNKNOWN). When there is
+                 hardware, the GET-NEXT will still return SP data but
+                 the GET will get the actual reading from the hardware.
+                 This approach is necessary to make sure table views
+                 and index discoveries are not stalled on queries to
+                 the subtending cards."
+	::= { nnOTMnEntry 22 }
+
+oChRxActPmd OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Actual receive polarization mode dispersion (PMD) 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOTMnEntry 23 }
+
+oChRxPmdMax OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Maximum receive PMD"
+	::= { nnOTMnEntry 24 }
+
+oChRxEchoTrace OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Data for this variable is only available from
+                 the subtending card. This data is retrieved from
+                 the SP with GET-NEXT. When there is no real-hardware
+                 the GET request will get no data and GET-NEXT will
+                 return SP data (most likely UNKNOWN). When there is
+                 hardware, the GET-NEXT will still return SP data but
+                 the GET will get the actual reading from the hardware.
+                 This approach is necessary to make sure table views
+                 and index discoveries are not stalled on queries to
+                 the subtending cards."
+	::= { nnOTMnEntry 25 }
+
+oChTxTrace OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Data for this variable is only available from
+                 the subtending card. This data is retrieved from
+                 the SP with GET-NEXT. When there is no real-hardware
+                 the GET request will get no data and GET-NEXT will
+                 return SP data (most likely UNKNOWN). When there is
+                 hardware, the GET-NEXT will still return SP data but
+                 the GET will get the actual reading from the hardware.
+                 This approach is necessary to make sure table views
+                 and index discoveries are not stalled on queries to
+                 the subtending cards."
+	::= { nnOTMnEntry 26 }
+
+oChTxAssocFarEndRx OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Data for this variable is only available from
+                 the subtending card. This data is retrieved from
+                 the SP with GET-NEXT. When there is no real-hardware
+                 the GET request will get no data and GET-NEXT will
+                 return SP data (most likely UNKNOWN). When there is
+                 hardware, the GET-NEXT will still return SP data but
+                 the GET will get the actual reading from the hardware.
+                 This approach is necessary to make sure table views
+                 and index discoveries are not stalled on queries to
+                 the subtending cards."
+	::= { nnOTMnEntry 27 }
+
+
+otmPortMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		sonet(1),
+		sdh(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTMnEntry 28 }
+
+tfMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		off(1),
+		almonly(2),
+		linefail(3)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Trace alarm mode"
+	::= { nnOTMnEntry 29 }
+
+oduTfMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		off(1),
+		almonly(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "ODU trace alarm enable/disable"
+	::= { nnOTMnEntry 30 }
+
+otmLaserOffFarEndFail OBJECT-TYPE
+    SYNTAX Status
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Always enabled in Release 5.1"
+	::= { nnOTMnEntry 31 }
+
+preFecSigFailThreshLevel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Pre FEC Signal Fail Threshold Level"
+	::= { nnOTMnEntry 32 }
+
+otuSignalDegradeThreshLevel OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "OTU Signal Degrade Threshold Level"
+	::= { nnOTMnEntry 33 }
+
+oduMonitorEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		yes(1),
+		no(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Beware of overloading ODUMONITOR in RTRV-TTI and
+                     RTRV-OTM3"
+	::= { nnOTMnEntry 34 }
+
+lineRate OBJECT-TYPE
+	SYNTAX INTEGER {
+	    rate-uknown(0),
+		rate-44G5(1),
+		rate-9G95(2),
+		rate-10G709(3),
+		rate-11G05(4),
+		rate-11G09(5)
+	}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "Line Rate to be specified at create time only."
+	::= { nnOTMnEntry 35 }
+
+otuExpTTI OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Expected incoming OTU TTI message.
+                 This variable is not available during table view,
+                 walk, or any get-next operation. It only has data
+                 on specific GET requsets to the facility."
+	::= { nnOTMnEntry 36 }
+
+otuRxIncTTI OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Receive OTU TTI message
+                 This variable is not available during table view,
+                 walk, or any get-next operation. It only has data
+                 on specific GET requsets to the facility."
+	::= { nnOTMnEntry 37 }
+
+oduRxIncTTI OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Receive ODU TTI message
+                 This variable is not available during table view,
+                 walk, or any get-next operation. It only has data
+                 on specific GET requsets to the facility."
+	::= { nnOTMnEntry 38 }
+
+oduMonitorMsg OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "ODU monitoring message
+                 This variable is not available during table view,
+                 walk, or any get-next operation. It only has data
+                 on specific GET requsets to the facility."
+	::= { nnOTMnEntry 39 }
+
+otmLoopbackType OBJECT-TYPE
+	SYNTAX LoopbackType
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Facility if loopback is active; otherwise, nothing is
+                     returned for this attribute"
+	::= { nnOTMnEntry 40 }
+
+opu2reserved OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		yes(1),
+		no(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "YES/NO to using 7 overhead bytes for payload"
+	::= { nnOTMnEntry 41 }
+
+expectedPayloadType OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(1..2))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is received as a HEX value from TL1. The 
+                 ranges are 0..FF. Since HEX can not be represented
+                 in ASN.1, a string is used. For SET operations, the 
+                 user can enter any valid HEX value from the range 0x0
+                 to 0xFF. The values can be entered with or without a
+                 preceding zero: i.e. 0 and 00 are equivalent. The agent
+                 shall only verify the length of the input string 
+                 is 1 or 2. Values like WX are valid strings but not valid
+                 HEX and shall be rejected by the NE TL1 command not the
+                 agent. 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOTMnEntry 42 }
+
+transmittedPayloadType OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(1..2))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is received as a HEX value from TL1. The 
+                 ranges are 0..FF. Since HEX can not be represented
+                 in ASN.1, a string is used. For SET operations, the 
+                 user can enter any valid HEX value from the range 0x0
+                 to 0xFF. The values can be entered with or without a
+                 preceding zero: i.e. 0 and 00 are equivalent. The agent
+                 shall only verify the length of the input string 
+                 is 1 or 2. Values like WX are valid strings but not valid
+                 HEX and shall be rejected by the NE TL1 command not the
+                 agent. 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOTMnEntry 43 }
+
+receivedPayloadType  OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(1..2))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This is received as a HEX value from TL1. The 
+                 ranges are 0..FF. Since HEX can not be represented
+                 in ASN.1, a string is used. 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnOTMnEntry 44 }
+
+otmPrimaryState OBJECT-TYPE
+	SYNTAX PrimaryState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Primary State of the faciltiy. Can only be modified
+                 by changing the admin state."
+	::= { nnOTMnEntry 45 }
+
+otmSecondaryState OBJECT-TYPE
+	SYNTAX DisplayString
+    MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Secondary state for the facility. A facility can have
+                 more than one secondary state as different combinations
+                 of the individual secondary state. It is represented 
+                 as a string to capture all the combinations. Those
+                 combinations along with the Primary state are used 
+                 to compute the admin state. Can be any combination of 
+                 flt, sgeo, lpbk, discd, ts, wrkrx, wrktx."
+	::= { nnOTMnEntry 46 }
+
+otmAdminState OBJECT-TYPE
+	SYNTAX AdminState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is a write-only variable. The user can restore
+                 or remove facilities using this command. You restore
+                 a facility by setting this variable to IS and remove
+                 it by setting it to OOS. During Row-create, a user can 
+                 use this variable to set the initial state of the facility.
+
+                 Because this is a write-only variable, the user is expected
+                 to read the Primary and Secondary state of the facility
+                 to determine the state of the facility. "
+	::= { nnOTMnEntry 47 }
+
+otmAID OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Facility AID as received from TL1. This should include
+                 the FAC type, shelf id, slot, and port."
+	::= { nnOTMnEntry 48 }
+
+otmGCC OBJECT-TYPE
+    SYNTAX GccValues
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "A Get operation on this variable retrieves the 
+                 LLSDCC Carrier GCC value. Setting this variable to NONE
+                 removes OSPF circuit and LLSDCC carrier info. It is 
+                 a NO-op if the GCC is initially NONE. Setting the 
+                 variable to any other value would create LLSDCC COMMS 
+                 with that GCC value.
+                 unknonw is not a valid value for any set operation.
+                 An unknown value for a get may indicate problems 
+                 retrieving the GCC from the facility. Avoid issuing
+                 set commands when an unknonw value is retrieved.
+                 This variable is available upon GET-EXACT only. No
+                 value is shown for GET-NEXT operations."
+	::= { nnOTMnEntry 49 }
+
+ospfCircuit OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "With GET operations, this variable shall return the
+                 configured parameters of the OSPF circuit. In this
+                 release only the NETAREA is supported. With SET 
+                 operations, the NETAREA is to be supplied in the
+                 format x.x.x.x. If no value is given, the default
+                 (0.0.0.0) shall be used. All SET operations, whether
+                 create or modify, will make sure that existing
+                 OSPF circuits are deleted before creating or modifying
+                 the new one with the new paramters (NETAREA). To delete
+                 an OSPF circuit, set the GCC to none using the otmGCC
+                 MIB variable.
+                 This variable is available upon GET-EXACT only. No value
+                 is shown for GET-NEXT operations."
+	::= { nnOTMnEntry 50 }
+
+
+oChDifferentialEncoding OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+        none(1),
+		hard(2),
+		soft(3)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnOTMnEntry 51 }
+
+nnEthTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NnEthEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION  "Contains entries for ethernet 10G facilities"
+	::= { nnEth 1 }
+
+nnEthEntry OBJECT-TYPE
+	SYNTAX NnEthEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "This entry shall contain all the necessary attributes
+                     for the ethernet 10G facilities in the 40G card"
+	INDEX { ifIndex }
+    ::= { nnEthTable 1 }
+
+NnEthEntry ::= 
+    SEQUENCE {
+		ethRowStatus
+			RowStatus,
+		ethLaserOffFarEndFail
+			Status,
+		oChTxActEthPwr
+			DisplayString,
+		oChTxMinEthPwr
+			DisplayString,
+		oChTxMaxEthPwr
+			DisplayString,
+		oChRxActEthPwr
+			DisplayString,
+		oChRxMinEthPwr
+			DisplayString,
+		oChRxMaxEthPwr
+			DisplayString,
+		maxTransUnit
+			INTEGER,
+		flowControl
+			INTEGER,
+		equipment
+			INTEGER,
+		ethMapping
+			INTEGER,
+		ethLoopbackType
+			LoopbackType,
+		ethPrimaryState
+			PrimaryState,
+		ethSecondaryState
+			DisplayString,
+		ethAdminState
+			AdminState,
+		ethAID
+			DisplayString
+	}
+
+ethRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Create, delete, put in service, out of service, and edit"
+	::= { nnEthEntry 1 }
+
+ethLaserOffFarEndFail OBJECT-TYPE
+    SYNTAX Status
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "To turn off Tx laser under certain failure scenarios"
+	::= { nnEthEntry 2 }
+
+oChTxActEthPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The target will be of the format xx.x and dBm will be 
+                     assumed for powers within design/accuracy range.
+                     Powers outside the accuracy/design range will be clamped
+                     at: OOR-HI or OOR-LO (out of range high and low 
+                     respectively) 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnEthEntry 3 }
+
+oChTxMinEthPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The target will be of the format xx.x and dBm will 
+                     be assumed"
+	::= { nnEthEntry 4 }
+
+oChTxMaxEthPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The target will be of the format xx.x and dBm will 
+	             be assumed"
+	::= { nnEthEntry 5 }
+
+oChRxActEthPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The target will be of the format xx.x and dBm will be 
+                     assumed for powers within design/accuracy range.
+                     Powers outside the accuracy/design range will be clamped
+                     at: OOR-HI or OOR-LO (out of range high and low 
+                     respectively) 
+                 This variable is available upon GET-EXACT operations. No
+                 value is returned with GET-NEXT."
+	::= { nnEthEntry 6 }
+
+oChRxMinEthPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The target will be of the format xx.x and dBm will 
+                     be assumed"
+	::= { nnEthEntry 7 }
+
+oChRxMaxEthPwr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The target will be of the format xx.x and dBm will 
+                     be assumed"
+	::= { nnEthEntry 8 }
+
+maxTransUnit OBJECT-TYPE
+	SYNTAX INTEGER {
+	    mtu-unknown(0), 
+		mtu-1600(1),
+		mtu-9600(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Maximum transmission unit"
+	::= { nnEthEntry 9 }
+
+flowControl OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		none(1),
+		asymmetric(2),
+		symmetric(3),
+		preeemptive(4)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnEthEntry 10 }
+
+equipment OBJECT-TYPE
+	SYNTAX INTEGER {
+	    xge-unknown(0),
+		xge-lan(1),
+		xge-wan(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { nnEthEntry 11 }
+
+ethMapping OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		prop237(1),
+		prop238(2),
+		gfp-mactr(3),
+		gfp-std(4),
+                gfp-mactr192(5),
+                gfp-std192(6),
+                gfp-mactr64(7),
+                gfp-std64(8),
+                gfp-macostr(9),
+                gfp-macostr192(10),
+                gfp-macostr64(11),
+                ull(12)
+	}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "Sets the non-client OTM2 OTU rate and client mapping"
+	::= { nnEthEntry 12 }
+
+ethLoopbackType OBJECT-TYPE
+	SYNTAX LoopbackType
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Facility if loopback is active; otherwise nothing is
+                     returned for this attribute."
+	::= { nnEthEntry 13 }
+
+ethPrimaryState OBJECT-TYPE
+	SYNTAX PrimaryState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Primary State of the faciltiy. Can only be modified
+                 by changing the admin state."
+	::= { nnEthEntry 14 }
+
+ethSecondaryState OBJECT-TYPE
+	SYNTAX DisplayString 	
+    MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Secondary state for the facility. A facility can have
+                 more than one secondary state as different combinations
+                 of the individual secondary state. It is represented 
+                 as a string to capture all the combinations. Those
+                 combinations along with the Primary state are used 
+                 to compute the admin state.Can be any combination of 
+                 flt, sgeo, lpbk, discd, ts, wrkrx, wrktx."
+	::= { nnEthEntry 15 }
+
+ethAdminState OBJECT-TYPE
+	SYNTAX AdminState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is a write-only variable. The user can restore
+                 or remove facilities using this command. You restore
+                 a facility by setting this variable to IS and remove
+                 it by setting it to OOS. During Row-create, a user can 
+                 use this variable to set the initial state of the facility.
+
+                 Because this is a write-only variable, the user is expected
+                 to read the Primary and Secondary state of the facility
+                 to determine the state of the facility. "
+		::= { nnEthEntry 16 }
+
+ethAID OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Facility AID as received from TL1. This should include
+                 the FAC type, shelf id, slot, and port."
+	::= { nnEthEntry 17 }
+
+nnWanTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NnWanEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION  "Contains entries for ethernet 10G facilities"
+	::= { nnWAN 1 }
+
+nnWanEntry OBJECT-TYPE
+	SYNTAX NnWanEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "This entry shall contain all the necessary attributes
+                     for the ethernet 10G facilities in the 40G card"
+	INDEX { ifIndex }
+    ::= { nnWanTable 1 }
+
+NnWanEntry ::= 
+    SEQUENCE {
+		frameChecksum
+			INTEGER,
+		wanMapping
+			INTEGER,
+		gfpRfi
+			INTEGER,
+		gfpRtDelay
+			INTEGER,
+		condType
+			INTEGER,
+		preamble
+			INTEGER,
+		fcsErrFrames
+			INTEGER,
+		transmittedUPI
+			DisplayString,
+		wanPrimaryState
+			PrimaryState,
+		wanSecondaryState
+			DisplayString,
+		wanAdminState
+			AdminState,
+		wanAID
+			DisplayString
+	}
+
+frameChecksum OBJECT-TYPE
+	SYNTAX INTEGER(0|16|32)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "For mapping=GFP-F, value can be 0 or 32"
+	::= { nnWanEntry 1 }
+
+wanMapping OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		gfp-f(1),
+		gfp-t(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "GFP-F is only supported value"
+	::= { nnWanEntry 2 }
+
+gfpRfi OBJECT-TYPE
+	SYNTAX INTEGER {
+        unknown(0),
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Enable/Disable"
+	::= { nnWanEntry 3 }
+
+gfpRtDelay OBJECT-TYPE
+	SYNTAX INTEGER {
+        unknown(0),
+		enable(1),
+        disable(2)
+    }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Enable/Disable"
+	::= { nnWanEntry 4 }
+
+condType OBJECT-TYPE
+	SYNTAX INTEGER {
+	    unknown(0),
+		gfpcmf(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "GFP CMF is the only supported value."
+	::= { nnWanEntry 5 }
+
+preamble OBJECT-TYPE
+	SYNTAX INTEGER {
+        unknown(0),
+		keep(1),
+		discard(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "KEEP/DISCARD ethernet preamble"
+	::= { nnWanEntry 6 }
+
+fcsErrFrames OBJECT-TYPE
+	SYNTAX INTEGER {
+        unknown(0),
+		keep(1),
+		discard(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "KEEP/DISCARD FCS-errored frames end-to-end."
+	::= { nnWanEntry 7 }
+
+transmittedUPI OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(1..2))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is received as a HEX value from TL1. The 
+                 ranges are 0..FF. Since HEX can not be represented
+                 in ASN.1, a string is used. For SET operations, the 
+                 user can enter any valid HEX value from the range 0x0
+                 to 0xFF. The values can be entered with or without a
+                 preceding zero: i.e. 0 and 00 are equivalent. The agent
+                 shall only verify the length of the input string 
+                 is 1 or 2. Values like WX are valid strings but not valid
+                 HEX and shall be rejected by the NE TL1 command not the
+                 agent. 
+                 
+                 Editable when the mapped non-client OTM2 attribute
+                 opu2resvd=YES."
+	::= { nnWanEntry 8 }
+
+wanPrimaryState OBJECT-TYPE
+	SYNTAX PrimaryState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Primary State of the faciltiy. Can only be modified
+                 by changing the admin state."
+	::= { nnWanEntry 9 }
+
+wanSecondaryState OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Secondary state for the facility. A facility can have
+                 more than one secondary state as different combinations
+                 of the individual secondary state. It is represented 
+                 as a string to capture all the combinations. Those
+                 combinations along with the Primary state are used 
+                 to compute the admin state.Can be any combination of 
+                 flt, sgeo, lpbk, discd, ts, wrkrx, wrktx."
+	::= { nnWanEntry 10 }
+
+wanAdminState OBJECT-TYPE
+	SYNTAX AdminState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This is a write-only variable. The user can restore
+                 or remove facilities using this command. You restore
+                 a facility by setting this variable to IS and remove
+                 it by setting it to OOS. During Row-create, a user can 
+                 use this variable to set the initial state of the facility.
+
+                 Because this is a write-only variable, the user is expected
+                 to read the Primary and Secondary state of the facility
+                 to determine the state of the facility. "
+	::= { nnWanEntry 11 }
+
+wanAID OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Facility AID as received from TL1. This should include
+                 the FAC type, shelf id, slot, and port."
+	::= { nnWanEntry 12 }
+
+END
+

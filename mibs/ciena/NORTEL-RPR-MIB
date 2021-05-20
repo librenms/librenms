@@ -1,0 +1,1216 @@
+NORTEL-RPR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, Counter64
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	InterfaceIndex
+		FROM IF-MIB
+	nortelGenericMIBs
+		FROM NORTEL-GENERIC-MIB;
+
+nnRPRMIB MODULE-IDENTITY
+	LAST-UPDATED "200511181200Z"
+	ORGANIZATION 
+		"Nortel"
+	CONTACT-INFO 
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+	DESCRIPTION 
+		"Nortel proprietary resilient packet ring MIB for IEEE 802.17. "
+
+	REVISION "200511181541Z"
+	DESCRIPTION 
+		"Initial Draft - for OME 6500 Release 3.0"
+::= { nortelGenericMIBs 2 }
+
+
+-- 
+--   Textual Conventions used in this MIB
+-- 
+
+NnRPRSpan ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the span interface of the RPR MAC. Each RPR 
+		        span is connected to both ringlet0 and ringlet1.
+		        The east span receives from ringlet1 and transmits through 
+		        ringlet0.
+		        The west span receives from ringlet0 and transmits through
+		        ringlet1."
+	SYNTAX  INTEGER {
+		east (1),
+		west (2)
+	}
+
+nnRPRObjects         OBJECT IDENTIFIER ::= { nnRPRMIB 2 }
+nnRPRSpanCounters    OBJECT IDENTIFIER ::= { nnRPRObjects 1 }
+nnRPRSpanPassThruCounters  OBJECT IDENTIFIER ::= { nnRPRObjects 2 }
+nnRPRSpanErrorCounters  OBJECT IDENTIFIER ::= { nnRPRObjects 3 }
+nnRPRClientCounters  OBJECT IDENTIFIER ::= { nnRPRObjects 4 }
+nnRPRClientCtrlCounters  OBJECT IDENTIFIER ::= { nnRPRObjects 5 }
+
+-- 
+-- RPR ring interface continuously running counters
+-- 
+
+nnRPRSpanCountersStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnRPRSpanCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The RPR Mac Span interface total counters table.
+		
+		        The DiscontinuityTime for this table is indicated by 
+		        ifCounterDiscontinuityTime defined in ifXTable.
+		
+		        All attributes in this table are volatile,
+		        i.e. will be cleared on system reset."
+	::= { nnRPRSpanCounters 1 }
+
+nnRPRSpanCountersStatsEntry  OBJECT-TYPE
+	SYNTAX 	NnRPRSpanCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry in the span stats table."
+	INDEX { nnRPRSpanStatsIfIndex, 
+		nnRPRSpanStatsSpan }
+	::= { nnRPRSpanCountersStatsTable 1 }
+
+NnRPRSpanCountersStatsEntry ::= SEQUENCE {
+	nnRPRSpanStatsIfIndex
+		InterfaceIndex,
+	nnRPRSpanStatsSpan
+		NnRPRSpan,
+	nnRPRSpanStatsInClassAFrames
+		Counter64,
+	nnRPRSpanStatsInClassAOctets
+		Counter64,
+	nnRPRSpanStatsInClassBCirFrames
+		Counter64,
+	nnRPRSpanStatsInClassBCirOctets
+		Counter64,
+	nnRPRSpanStatsInClassBEirFrames
+		Counter64,
+	nnRPRSpanStatsInClassBEirOctets
+		Counter64,
+	nnRPRSpanStatsInClassCFrames
+		Counter64,
+	nnRPRSpanStatsInClassCOctets
+		Counter64,
+	nnRPRSpanStatsOutClassAFrames
+		Counter64,
+	nnRPRSpanStatsOutClassAOctets
+		Counter64,
+	nnRPRSpanStatsOutClassBCirFrames
+		Counter64,
+	nnRPRSpanStatsOutClassBCirOctets
+		Counter64,
+	nnRPRSpanStatsOutClassBEirFrames
+		Counter64,
+	nnRPRSpanStatsOutClassBEirOctets
+		Counter64,
+	nnRPRSpanStatsOutClassCFrames
+		Counter64,
+	nnRPRSpanStatsOutClassCOctets
+		Counter64
+}
+
+nnRPRSpanStatsIfIndex  OBJECT-TYPE
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The ifIndex of this RPR interface."
+	::= { nnRPRSpanCountersStatsEntry 1 }
+
+nnRPRSpanStatsSpan  OBJECT-TYPE
+	SYNTAX     NnRPRSpan
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An indication of the span of the interface for which this 
+		         row contains information."
+	::= { nnRPRSpanCountersStatsEntry 2 }
+
+nnRPRSpanStatsInClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classA anycast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassAFrames"
+	::= { nnRPRSpanCountersStatsEntry 3 }
+
+nnRPRSpanStatsInClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classA anycast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassABytes"
+	::= { nnRPRSpanCountersStatsEntry 4 }
+
+nnRPRSpanStatsInClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classB CIR anycast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassBCirFrames"
+	::= { nnRPRSpanCountersStatsEntry 5 }
+
+nnRPRSpanStatsInClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classB CIR anycast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassBCirBytes"
+	::= { nnRPRSpanCountersStatsEntry 6 }
+
+nnRPRSpanStatsInClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classB EIR anycast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassBEirFrames"
+	::= { nnRPRSpanCountersStatsEntry 7 }
+
+nnRPRSpanStatsInClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classB EIR anycast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassBEirBytes"
+	::= { nnRPRSpanCountersStatsEntry 8 }
+
+nnRPRSpanStatsInClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classC anycast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassCFrames"
+	::= { nnRPRSpanCountersStatsEntry 9 }
+
+nnRPRSpanStatsInClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) classC anycast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, rxUcastClassCBytes"
+	::= { nnRPRSpanCountersStatsEntry 10 }
+
+nnRPRSpanStatsOutClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classA anycast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassAFrames"
+	::= { nnRPRSpanCountersStatsEntry 11 }
+
+nnRPRSpanStatsOutClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classA anycast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassABytes"
+	::= { nnRPRSpanCountersStatsEntry 12 }
+
+nnRPRSpanStatsOutClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classB CIR anycast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassBCirFrames"
+	::= { nnRPRSpanCountersStatsEntry 13 }
+
+nnRPRSpanStatsOutClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classB CIR anycast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassBCirBytes"
+	::= { nnRPRSpanCountersStatsEntry 14 }
+
+nnRPRSpanStatsOutClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classB EIR anycast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassBEirFrames"
+	::= { nnRPRSpanCountersStatsEntry 15 }
+
+nnRPRSpanStatsOutClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classB EIR anycast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassBEirBytes"
+	::= { nnRPRSpanCountersStatsEntry 16 }
+
+nnRPRSpanStatsOutClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classC anycast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassCFrames"
+	::= { nnRPRSpanCountersStatsEntry 17 }
+
+nnRPRSpanStatsOutClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of transmitted (MAC to PHY) classC anycast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, txUcastClassCBytes"
+	::= { nnRPRSpanCountersStatsEntry 18 }
+
+nnRPRSpanPassThruCountersStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnRPRSpanPassThruCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"nnRPRPassThruTable for the OME 6500"
+	::= { nnRPRSpanPassThruCounters 1 }
+
+nnRPRSpanPassThruCountersStatsEntry  OBJECT-TYPE
+	SYNTAX 	NnRPRSpanPassThruCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"rpr pass thru mib table entry"
+	INDEX { nnRPRSpanStatsPtIfIndex, 
+		nnRPRSpanPtSpan }
+	::= { nnRPRSpanPassThruCountersStatsTable 1 }
+
+NnRPRSpanPassThruCountersStatsEntry ::= SEQUENCE {
+	nnRPRSpanStatsPtIfIndex
+		InterfaceIndex,
+	nnRPRSpanPtSpan
+		NnRPRSpan,
+	nnRPRSpanStatsPtClassAFrames
+		Counter64,
+	nnRPRSpanStatsPtClassAOctets
+		Counter64,
+	nnRPRSpanStatsPtClassBCirFrames
+		Counter64,
+	nnRPRSpanStatsPtClassBCirOctets
+		Counter64,
+	nnRPRSpanStatsPtClassBEirFrames
+		Counter64,
+	nnRPRSpanStatsPtClassBEirOctets
+		Counter64,
+	nnRPRSpanStatsPtClassCFrames
+		Counter64,
+	nnRPRSpanStatsPtClassCOctets
+		Counter64,
+	nnRPRSpanStatsPtClassAFramesDiscards
+		Counter64,
+	nnRPRSpanStatsPtClassBCirFramesDiscards
+		Counter64,
+	nnRPRSpanStatsPtClassBEirFramesDiscards
+		Counter64,
+	nnRPRSpanStatsPtClassCFramesDiscards
+		Counter64
+}
+
+nnRPRSpanStatsPtIfIndex  OBJECT-TYPE
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 1 }
+
+nnRPRSpanPtSpan  OBJECT-TYPE
+	SYNTAX     NnRPRSpan
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 2 }
+
+nnRPRSpanStatsPtClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 3 }
+
+nnRPRSpanStatsPtClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 4 }
+
+nnRPRSpanStatsPtClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 5 }
+
+nnRPRSpanStatsPtClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 6 }
+
+nnRPRSpanStatsPtClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 7 }
+
+nnRPRSpanStatsPtClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 8 }
+
+nnRPRSpanStatsPtClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 9 }
+
+nnRPRSpanStatsPtClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 10 }
+
+nnRPRSpanStatsPtClassAFramesDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 11 }
+
+nnRPRSpanStatsPtClassBCirFramesDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 12 }
+
+nnRPRSpanStatsPtClassBEirFramesDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 13 }
+
+nnRPRSpanStatsPtClassCFramesDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRSpanPassThruCountersStatsEntry 14 }
+
+-- 
+-- RPR error total continuously running counters table
+-- 
+
+nnRPRSpanErrorCountersStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnRPRSpanErrorCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The RPR Errors total counters table.
+		
+		         The DiscontinuityTime for this table is indicated by 
+		         ifCounterDiscontinuityTime defined in ifXTable.
+		
+		         All attributes in this table are volatile,
+		         i.e. will be cleared on system reset."
+	::= { nnRPRSpanErrorCounters 1 }
+
+nnRPRSpanErrorCountersStatsEntry  OBJECT-TYPE
+	SYNTAX 	NnRPRSpanErrorCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry in the span error counter table."
+	INDEX { nnRPRSpanErrorStatsIfIndex, 
+		nnRPRSpanErrorStatsSpan }
+	::= { nnRPRSpanErrorCountersStatsTable 1 }
+
+NnRPRSpanErrorCountersStatsEntry ::= SEQUENCE {
+	nnRPRSpanErrorStatsIfIndex
+		InterfaceIndex,
+	nnRPRSpanErrorStatsSpan
+		NnRPRSpan,
+	nnRPRSpanErrorStatsTtlExpFrames
+		Counter64,
+	nnRPRSpanErrorStatsTooLongFrames
+		Counter64,
+	nnRPRSpanErrorStatsTooShortFrames
+		Counter64,
+	nnRPRSpanErrorStatsBadHecFrames
+		Counter64,
+	nnRPRSpanErrorStatsBadFcsFrames
+		Counter64,
+	nnRPRSpanErrorStatsSelfSrcUcastFrames
+		Counter64,
+	nnRPRSpanErrorStatsPmdAbortFrames
+		Counter64,
+	nnRPRSpanErrorStatsBadAddrFrames
+		Counter64,
+	nnRPRSpanErrorStatsBadParityFrames
+		Counter64,
+	nnRPRSpanErrorStatsScffErrors
+		Counter64
+}
+
+nnRPRSpanErrorStatsIfIndex  OBJECT-TYPE
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The ifIndex of this RPR interface."
+	::= { nnRPRSpanErrorCountersStatsEntry 1 }
+
+nnRPRSpanErrorStatsSpan  OBJECT-TYPE
+	SYNTAX     NnRPRSpan
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An indication of the span of the interface for which this
+		         row contains information."
+	::= { nnRPRSpanErrorCountersStatsEntry 2 }
+
+nnRPRSpanErrorStatsTtlExpFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames that were dropped 
+		         due to zero Time To Live (TTL)."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, ttlExpiredFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 3 }
+
+nnRPRSpanErrorStatsTooLongFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames that exceed the 
+		         maximum permitted frame size."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, tooLongFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 4 }
+
+nnRPRSpanErrorStatsTooShortFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames shortest than the
+		         minimum permitted frame size."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, tooShortFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 5 }
+
+nnRPRSpanErrorStatsBadHecFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames with HEC error."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, badHecFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 6 }
+
+nnRPRSpanErrorStatsBadFcsFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) data and control frames
+		       where the fcs value did not match the expected fcs value.
+		
+		       This includes data frames passed to the client as a result of
+		       rprIfMacOperModes being not set to dropBadFcs."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, badFcsFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 7 }
+
+nnRPRSpanErrorStatsSelfSrcUcastFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) unicast frames that were 
+		         transmitted by the station itself i.e. 
+		         the source MAC is equal to the interface MAC."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.8.2, selfSourcedFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 8 }
+
+nnRPRSpanErrorStatsPmdAbortFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames that 
+		       were aborted by the PMD"
+	REFERENCE 
+		"IEEE 802.17 Subclause 8.2.2, STATUS"
+	::= { nnRPRSpanErrorCountersStatsEntry 9 }
+
+nnRPRSpanErrorStatsBadAddrFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames 
+		       with invalid SA value."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, badAddressFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 10 }
+
+nnRPRSpanErrorStatsBadParityFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) frames 
+		       parity value not matching the expected parity value"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.6.3.6.2, badParityFrames"
+	::= { nnRPRSpanErrorCountersStatsEntry 11 }
+
+nnRPRSpanErrorStatsScffErrors  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of received (PHY to MAC) errored SCFF,
+		       with bad parity, bad FCS, or both."
+	REFERENCE 
+		"IEEE 802.17 Subclause 12.5.1.2, scffErrors"
+	::= { nnRPRSpanErrorCountersStatsEntry 12 }
+
+-- 
+-- RPR client interface continuously running counters table
+-- 
+
+nnRPRClientCountersStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnRPRClientCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The local station traffic total counters table.
+		
+		         The DiscontinuityTime for this table is indicated by 
+		         ifCounterDiscontinuityTime defined in ifXTable.
+		
+		         All attributes in this table are volatile,
+		         i.e. will be cleared on system reset."
+	::= { nnRPRClientCounters 1 }
+
+nnRPRClientCountersStatsEntry  OBJECT-TYPE
+	SYNTAX 	NnRPRClientCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry in the span stats table."
+	INDEX { nnRPRClientStatsIfIndex }
+	::= { nnRPRClientCountersStatsTable 1 }
+
+NnRPRClientCountersStatsEntry ::= SEQUENCE {
+	nnRPRClientStatsIfIndex
+		InterfaceIndex,
+	nnRPRClientStatsInUcastClassAFrames
+		Counter64,
+	nnRPRClientStatsInUcastClassAOctets
+		Counter64,
+	nnRPRClientStatsInUcastClassBCirFrames
+		Counter64,
+	nnRPRClientStatsInUcastClassBCirOctets
+		Counter64,
+	nnRPRClientStatsInUcastClassBEirFrames
+		Counter64,
+	nnRPRClientStatsInUcastClassBEirOctets
+		Counter64,
+	nnRPRClientStatsInUcastClassCFrames
+		Counter64,
+	nnRPRClientStatsInUcastClassCOctets
+		Counter64,
+	nnRPRClientStatsInMcastClassAFrames
+		Counter64,
+	nnRPRClientStatsInMcastClassAOctets
+		Counter64,
+	nnRPRClientStatsInMcastClassBCirFrames
+		Counter64,
+	nnRPRClientStatsInMcastClassBCirOctets
+		Counter64,
+	nnRPRClientStatsInMcastClassBEirFrames
+		Counter64,
+	nnRPRClientStatsInMcastClassBEirOctets
+		Counter64,
+	nnRPRClientStatsInMcastClassCFrames
+		Counter64,
+	nnRPRClientStatsInMcastClassCOctets
+		Counter64,
+	nnRPRClientStatsOutUcastClassAFrames
+		Counter64,
+	nnRPRClientStatsOutUcastClassAOctets
+		Counter64,
+	nnRPRClientStatsOutUcastClassBCirFrames
+		Counter64,
+	nnRPRClientStatsOutUcastClassBCirOctets
+		Counter64,
+	nnRPRClientStatsOutUcastClassBEirFrames
+		Counter64,
+	nnRPRClientStatsOutUcastClassBEirOctets
+		Counter64,
+	nnRPRClientStatsOutUcastClassCFrames
+		Counter64,
+	nnRPRClientStatsOutUcastClassCOctets
+		Counter64,
+	nnRPRClientStatsOutMcastClassAFrames
+		Counter64,
+	nnRPRClientStatsOutMcastClassAOctets
+		Counter64,
+	nnRPRClientStatsOutMcastClassBCirFrames
+		Counter64,
+	nnRPRClientStatsOutMcastClassBCirOctets
+		Counter64,
+	nnRPRClientStatsOutMcastClassBEirFrames
+		Counter64,
+	nnRPRClientStatsOutMcastClassBEirOctets
+		Counter64,
+	nnRPRClientStatsOutMcastClassCFrames
+		Counter64,
+	nnRPRClientStatsOutMcastClassCOctets
+		Counter64
+}
+
+nnRPRClientStatsIfIndex  OBJECT-TYPE
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The ifIndex of this RPR interface."
+	::= { nnRPRClientCountersStatsEntry 1 }
+
+nnRPRClientStatsInUcastClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classA unicast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassAFrames"
+	::= { nnRPRClientCountersStatsEntry 2 }
+
+nnRPRClientStatsInUcastClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classA unicast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassABytes"
+	::= { nnRPRClientCountersStatsEntry 3 }
+
+nnRPRClientStatsInUcastClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB CIR unicast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassBCirAFrames"
+	::= { nnRPRClientCountersStatsEntry 4 }
+
+nnRPRClientStatsInUcastClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB CIR unicast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassBCirBytes"
+	::= { nnRPRClientCountersStatsEntry 5 }
+
+nnRPRClientStatsInUcastClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB EIR unicast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassBEirFrames"
+	::= { nnRPRClientCountersStatsEntry 6 }
+
+nnRPRClientStatsInUcastClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB EIR unicast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassBEirBytes"
+	::= { nnRPRClientCountersStatsEntry 7 }
+
+nnRPRClientStatsInUcastClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classC unicast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassCFrames"
+	::= { nnRPRClientCountersStatsEntry 8 }
+
+nnRPRClientStatsInUcastClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classC unicast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientUcastClassCBytes"
+	::= { nnRPRClientCountersStatsEntry 9 }
+
+nnRPRClientStatsInMcastClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classA multicast and broadcast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassAFrames"
+	::= { nnRPRClientCountersStatsEntry 10 }
+
+nnRPRClientStatsInMcastClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classA multicast and broadcast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassABytes"
+	::= { nnRPRClientCountersStatsEntry 11 }
+
+nnRPRClientStatsInMcastClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB CIR multicast 
+		       and broadcast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassBCirFrames"
+	::= { nnRPRClientCountersStatsEntry 12 }
+
+nnRPRClientStatsInMcastClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB CIR multicast 
+		       and broadcast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassBCirBytes"
+	::= { nnRPRClientCountersStatsEntry 13 }
+
+nnRPRClientStatsInMcastClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB EIR multicast 
+		       and broadcast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassBEirFrames"
+	::= { nnRPRClientCountersStatsEntry 14 }
+
+nnRPRClientStatsInMcastClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classB EIR multicast 
+		       and broadcast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassBEirBytes"
+	::= { nnRPRClientCountersStatsEntry 15 }
+
+nnRPRClientStatsInMcastClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classC multicast and broadcast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassCFrames"
+	::= { nnRPRClientCountersStatsEntry 16 }
+
+nnRPRClientStatsInMcastClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of MAC to client classC multicast and broadcast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, toClientMcastClassCBytes"
+	::= { nnRPRClientCountersStatsEntry 17 }
+
+nnRPRClientStatsOutUcastClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classA unicast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassAFrames"
+	::= { nnRPRClientCountersStatsEntry 18 }
+
+nnRPRClientStatsOutUcastClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classA unicast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassABytes"
+	::= { nnRPRClientCountersStatsEntry 19 }
+
+nnRPRClientStatsOutUcastClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB CIR unicast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassBCirFrames"
+	::= { nnRPRClientCountersStatsEntry 20 }
+
+nnRPRClientStatsOutUcastClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB CIR unicast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassBCirBytes"
+	::= { nnRPRClientCountersStatsEntry 21 }
+
+nnRPRClientStatsOutUcastClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB EIR unicast 
+		       frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassBEirFrames"
+	::= { nnRPRClientCountersStatsEntry 22 }
+
+nnRPRClientStatsOutUcastClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB EIR unicast 
+		       octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassBEirBytes"
+	::= { nnRPRClientCountersStatsEntry 23 }
+
+nnRPRClientStatsOutUcastClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classC unicast frames"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassCFrames"
+	::= { nnRPRClientCountersStatsEntry 24 }
+
+nnRPRClientStatsOutUcastClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classC unicast octets"
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientUcastClassCBytes"
+	::= { nnRPRClientCountersStatsEntry 25 }
+
+nnRPRClientStatsOutMcastClassAFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classA multicast and broadcast 
+		       frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassAFrames"
+	::= { nnRPRClientCountersStatsEntry 26 }
+
+nnRPRClientStatsOutMcastClassAOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classA multicast and broadcast 
+		       octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassABytes"
+	::= { nnRPRClientCountersStatsEntry 27 }
+
+nnRPRClientStatsOutMcastClassBCirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB CIR
+		       multicast and broadcast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassBCirFrames"
+	::= { nnRPRClientCountersStatsEntry 28 }
+
+nnRPRClientStatsOutMcastClassBCirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB CIR
+		       multicast and broadcast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassBCirBytes"
+	::= { nnRPRClientCountersStatsEntry 29 }
+
+nnRPRClientStatsOutMcastClassBEirFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB EIR
+		       multicast and broadcast frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassBEirFrames"
+	::= { nnRPRClientCountersStatsEntry 30 }
+
+nnRPRClientStatsOutMcastClassBEirOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classB EIR
+		       multicast and broadcast octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassBEirBytes"
+	::= { nnRPRClientCountersStatsEntry 31 }
+
+nnRPRClientStatsOutMcastClassCFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classC multicast and broadcast
+		       frames."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassCFrames"
+	::= { nnRPRClientCountersStatsEntry 32 }
+
+nnRPRClientStatsOutMcastClassCOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of client to MAC classC multicast and broadcast
+		       octets."
+	REFERENCE 
+		"IEEE 802.17 Subclause 7.2.5, fromClientMcastClassCBytes"
+	::= { nnRPRClientCountersStatsEntry 33 }
+
+nnRPRClientCtrlCountersStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnRPRClientCtrlCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCounters 1 }
+
+nnRPRClientCtrlCountersStatsEntry  OBJECT-TYPE
+	SYNTAX 	NnRPRClientCtrlCountersStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { nnRPRClientCtrlStatsIfIndex }
+	::= { nnRPRClientCtrlCountersStatsTable 1 }
+
+NnRPRClientCtrlCountersStatsEntry ::= SEQUENCE {
+	nnRPRClientCtrlStatsIfIndex
+		InterfaceIndex,
+	nnRPRClientCtrlStatsInCtrlFrames
+		Counter64,
+	nnRPRClientCtrlStatsInOamEchoFrames
+		Counter64,
+	nnRPRClientCtrlStatsInOamOrgFrames
+		Counter64,
+	nnRPRClientCtrlStatsInTopoAtdFrames
+		Counter64,
+	nnRPRClientCtrlStatsInTopoTpFrames
+		Counter64,
+	nnRPRClientCtrlStatsOutCtrlFrames
+		Counter64,
+	nnRPRClientCtrlStatsOutOamEchoFrames
+		Counter64,
+	nnRPRClientCtrlStatsOutOamOrgFrames
+		Counter64,
+	nnRPRClientCtrlStatsOutTopoAtdFrames
+		Counter64,
+	nnRPRClientCtrlStatsOutTopoTpFrames
+		Counter64
+}
+
+nnRPRClientCtrlStatsIfIndex  OBJECT-TYPE
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 1 }
+
+nnRPRClientCtrlStatsInCtrlFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 2 }
+
+nnRPRClientCtrlStatsInOamEchoFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 3 }
+
+nnRPRClientCtrlStatsInOamOrgFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 4 }
+
+nnRPRClientCtrlStatsInTopoAtdFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 5 }
+
+nnRPRClientCtrlStatsInTopoTpFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 6 }
+
+nnRPRClientCtrlStatsOutCtrlFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 7 }
+
+nnRPRClientCtrlStatsOutOamEchoFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 8 }
+
+nnRPRClientCtrlStatsOutOamOrgFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 9 }
+
+nnRPRClientCtrlStatsOutTopoAtdFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 10 }
+
+nnRPRClientCtrlStatsOutTopoTpFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnRPRClientCtrlCountersStatsEntry 11 }
+END

@@ -1,0 +1,247 @@
+
+NORTEL-TM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, Gauge32, 
+	Counter64
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	InterfaceIndex
+		FROM IF-MIB
+	nortelGenericMIBs
+		FROM NORTEL-GENERIC-MIB;
+
+nnTMMIB MODULE-IDENTITY
+	LAST-UPDATED "200807301012Z"
+	ORGANIZATION 
+		"Nortel"
+	CONTACT-INFO 
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+	DESCRIPTION 
+		"This module contains objects for Nortel Traffic Management."
+
+	REVISION "200511151522Z"
+	DESCRIPTION 
+		"Initial Version - created for OME 6500 Release 3.0"
+	REVISION "200807301012Z"
+	DESCRIPTION 
+		"- Added new qGroupIndex to support OME6500 R5.2
+		 - Added new class of service for cosNetwork 
+		 - COSNT = cosNetworkNT(old)  and  COSNW =  cosNetworkNW (new)"
+::= { nortelGenericMIBs 3 }
+
+
+NnTMClassOfService ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"This TC contains the Class of Services that are possible per Interface."
+	SYNTAX  INTEGER {
+		cosStandard (0),
+		cosBronze (1),
+		cosSilver (2),
+		cosGold (3),
+		cosPlatinum (4),
+		cosPremium (5),
+		cosNetworkNT (6), -- This is the old CosNetwork Class of Service keeping to support previous releases.
+		cosCritical (7),
+		cosNetworkNW (8), -- This is the new CosNetwork Class of Service introduced in R5.2.
+		cosUnknown (15)
+	}
+
+NnTMQueueGroup ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"This TC contains the QueueGroup ID which is a new object that specifies 
+		which scheduler profile, drop profiles, and scalars to use."
+	SYNTAX  INTEGER {
+		eQGRPUNKNOWN (0),
+		eQGRPNA (1),
+		eQGRP1 (2),
+		eQGRP2 (3)
+	}
+
+nnTMObjects          OBJECT IDENTIFIER ::= { nnTMMIB 1 }
+
+nnTMStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NnTMStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the Traffic Management Statistics."
+	::= { nnTMObjects 1 }
+
+nnTMStatsEntry  OBJECT-TYPE
+	SYNTAX 	NnTMStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each entry in this table is indexed by the interface ifIndex and a class of service."
+	INDEX { trafficMgmtIfIndex, 
+		queueGroupIndex,
+		cosIndex }
+	::= { nnTMStatsTable 1 }
+
+NnTMStatsEntry ::= SEQUENCE {
+	trafficMgmtIfIndex
+		InterfaceIndex,
+	queueGroupIndex
+		NnTMQueueGroup,
+	cosIndex
+		NnTMClassOfService,
+	nnTMStatsInFrames
+		Counter64,
+	nnTMStatsInOctets
+		Counter64,
+	nnTMStatsInFramesDiscards
+		Counter64,
+	nnTMStatsInFramesDiscardsOctets
+		Counter64,
+	nnTMStatsInFramesNonConforming
+		Counter64,
+	nnTMStatsOutFrames
+		Counter64,
+	nnTMStatsOutOctets
+		Counter64,
+	nnTMStatsOutFramesDiscards
+		Counter64,
+	nnTMStatsOutFramesDiscardsOctets
+		Counter64,
+	nnTMStatsOutFramesConformingDiscards
+		Counter64,
+	nnTMStatsTxQueueUtilization
+		Gauge32,
+	nnTMStatsTxQueueUtilizationMaxPeak
+		Gauge32
+}
+
+trafficMgmtIfIndex  OBJECT-TYPE
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nnTMStatsEntry 1 }
+
+queueGroupIndex  OBJECT-TYPE
+	SYNTAX     NnTMQueueGroup
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This index represents the Queue Group of the entry."
+	::= { nnTMStatsEntry 2 }
+
+cosIndex  OBJECT-TYPE
+	SYNTAX     NnTMClassOfService
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This index represents the class of service of the entry."
+	::= { nnTMStatsEntry 3 }
+
+nnTMStatsInFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total frames received."
+	::= { nnTMStatsEntry 4 }
+
+nnTMStatsInOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Count of bytes contained in nnTMStatsInFrames."
+	::= { nnTMStatsEntry 5 }
+
+nnTMStatsInFramesDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total incoming frames discarded for all reasons."
+	::= { nnTMStatsEntry 6 }
+
+nnTMStatsInFramesDiscardsOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total of bytes in nnTMStatsInFramesDiscards."
+	::= { nnTMStatsEntry 7 }
+
+nnTMStatsInFramesNonConforming  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total non-conforming frames received."
+	::= { nnTMStatsEntry 8 }
+
+nnTMStatsOutFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total frames transmitted."
+	::= { nnTMStatsEntry 9 }
+
+nnTMStatsOutOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total bytes in nnTMStatsOutFrames."
+	::= { nnTMStatsEntry 10 }
+
+nnTMStatsOutFramesDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total transmit frames discarded."
+	::= { nnTMStatsEntry 11 }
+
+nnTMStatsOutFramesDiscardsOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total bytes in nnTMStatsOutFramesDiscards."
+	::= { nnTMStatsEntry 12 }
+
+nnTMStatsOutFramesConformingDiscards  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total outgoing conforming frames discarded."
+	::= { nnTMStatsEntry 13 }
+
+nnTMStatsTxQueueUtilization  OBJECT-TYPE
+	SYNTAX     Gauge32 (0..100)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Average percentage (%) Tx Queue utilization."
+	::= { nnTMStatsEntry 14 }
+
+nnTMStatsTxQueueUtilizationMaxPeak  OBJECT-TYPE
+	SYNTAX     Gauge32 (0..100)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Maximum peak percentage (%) Tx queue utilization."
+	::= { nnTMStatsEntry 15 }
+END
+
+
+-- This MIB was created using NuDesign Team's Visual MIBuilder (Ver 4.4).
+

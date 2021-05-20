@@ -1,0 +1,1241 @@
+-- MIB Revision 12
+
+NORTEL-ALARM-EXT-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       nortelGenericMIBs   FROM NORTEL-GENERIC-MIB
+
+       ResourceId                    FROM ALARM-MIB
+
+       nlmLogName, nlmLogIndex       FROM NOTIFICATION-LOG-MIB
+
+       TEXTUAL-CONVENTION,
+       DateAndTime         FROM SNMPv2-TC
+        
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY,
+       OBJECT-TYPE,
+       NOTIFICATION-TYPE,
+       Integer32           FROM SNMPv2-SMI
+
+       SnmpAdminString     FROM SNMP-FRAMEWORK-MIB;
+
+nnExtAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED "201905140000Z"
+    ORGANIZATION "Nortel Networks" 
+    CONTACT-INFO 
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+
+     DESCRIPTION  "This module contains objects that extend the IETF Alarm MIB"
+     
+     -- Revision history
+     REVISION     "200401270000Z"
+     DESCRIPTION  "Initial Version - modified and condensed for CPL Rel 1.0"
+     REVISION     "200504130000Z"
+     DESCRIPTION  "CPL R1 MIB modified to add new PC#s for CPL R2.0 & OME R1.5"
+     REVISION     "200510110000Z"
+     DESCRIPTION  "Generalized names of EventType & Probable Cause TCs"
+     REVISION     "200510200000Z"
+     DESCRIPTION  "Add new PC#s for OME R2.0"
+     REVISION     "200604130000Z"
+     DESCRIPTION  "Change alarm... elements to nnAlarm... elements & fixed ResourceId for OME R2.5"
+     REVISION     "200604190000Z"
+     DESCRIPTION  "Added nnExtNotificationPrefix 306 and related OBJECT-TYPEs for OME R3.0"
+     REVISION     "200607170000Z"
+     DESCRIPTION  "Add new PC#s for CPL R3.0 & OME R4.0"
+     REVISION     "200611210000Z"
+     DESCRIPTION  "Add additional new PC#s for CPL R3.0 & OME R4.0"
+     REVISION     "200702010000Z"
+     DESCRIPTION  "Removed redundant definition"
+     REVISION     "200709240000Z"
+     DESCRIPTION  "Add additional new PC#s for OME R5.0"
+     REVISION     "200803280000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated."
+     REVISION     "200808200000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R5.2.(6364-6374)"
+     REVISION     "200811070000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R5.21"
+     REVISION     "200906150000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R5.9(6380-6410)"
+     REVISION     "201006010000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R7.0(6410-6424)"
+     REVISION     "201102170000Z"
+     DESCRIPTION  "Re-added thresholdCrossing (48) into NnExtAlarmProbableCause enum list for OME6500 R8.0"
+     REVISION     "201111080000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R8.0(6425-6428)"
+     REVISION     "201301150000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R9.2(6430-6437)"
+     REVISION     "201304050000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R10.0(6438)"
+     REVISION     "201307170000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R10.0(6439-6441)"
+     REVISION     "201405060000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R10.1(6443-6446)"
+     REVISION     "201406160000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R10.1(6447-6448)"
+     REVISION     "201412300000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R10.2(6449-6450)"
+     REVISION     "201708010000Z"
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R12.1(7008-7028)"
+     REVISION     "201711130000Z" 
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R12.3(7029-7030)"
+     REVISION     "201803280000Z" 
+     DESCRIPTION  "NnExtAlarmProbableCause enum list was updated for OME6500 R12.6(7030-7031)"
+     REVISION     "201905140000Z"
+     DESCRIPTION "Ome6500ExtAlarmProbableCause  enum list was updated for OME6500 REL12.6(7032 - 7033)."
+
+     ::= { nortelGenericMIBs 6 }
+
+nnExtAlarmObjects    OBJECT IDENTIFIER ::= { nnExtAlarmMIB 1 }
+nnAlarmObjects       OBJECT IDENTIFIER ::= { nnExtAlarmMIB 2 }
+
+
+-- Textual Conventions
+
+NnExtAlarmEventType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "Nortel version of IANA Event Type"
+    SYNTAX       INTEGER
+          {
+          other  (1),
+          communicationsAlarm  (2),
+          qualityOfServiceAlarm  (3),
+          processingErrorAlarm  (4),
+          equipmentAlarm  (5),
+          environmentalAlarm  (6),
+          integrityViolation  (7),
+          operationalViolation  (8),
+          physicalViolation  (9),
+          securityServiceOrMechanismViolation  (10),
+          timeDomainViolation (11)
+          }
+
+NnExtAlarmProbableCause ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "Nortel version of IANA Probable Cause"
+    SYNTAX       INTEGER
+          {
+           indeterminate (0),
+           aIS (1),
+           callSetUpFailure (2),
+           degradedSignal (3),
+           farEndReceiverFailure (4),
+           framingError (5),
+           lossOfFrame (6),
+           lossOfPointer (7),
+           lossOfSignal (8),
+           payloadTypeMismatch (9),
+           transmissionError (10),
+           remoteAlarmInterface (11),
+           excessiveBER (12),
+           pathTraceMismatch (13),
+           unavailable (14),
+           signalLabelMismatch (15),
+           lossOfMultiFrame (16),
+           receiveFailure (17),
+           transmitFailure (18),
+           modulationFailure (19),
+           demodulationFailure (20),
+           broadcastChannelFailure (21),
+           connectionEstablishmentError (22),
+           invalidMessageReceived (23),
+           localNodeTransmissionError (24),
+           remoteNodeTransmissionError (25),
+           routingFailure (26),
+	   thresholdCrossing (48),
+           backplaneFailure (51),
+           dataSetProblem (52),
+           equipmentIdentifierDuplication (53),
+           externalIFDeviceProblem (54),
+           lineCardProblem (55),
+           multiplexerProblem (56),
+           nEIdentifierDuplication (57),
+           powerProblem (58),
+           processorProblem (59),
+           protectionPathFailure (60),
+           receiverFailure (61),
+           replaceableUnitMissing (62),
+           replaceableUnitTypeMismatch (63),
+           synchronizationSourceMismatch (64),
+           terminalProblem (65),
+           timingProblem (66),
+           transmitterFailure (67),
+           trunkCardProblem (68),
+           replaceableUnitProblem (69),
+           realTimeClockFailure (70),
+           antennaFailure (71),
+           batteryChargingFailure (72),
+           diskFailure (73),
+           frequencyHoppingFailure (74),
+           iODeviceError (75),
+           lossOfSynchronisation (76),
+           lossOfRedundancy (77),
+           powerSupplyFailure (78),
+           signalQualityEvaluationFailure (79),
+           tranceiverFailure (80),
+           airCompressorFailure (101),
+           airConditioningFailure (102),
+           airDryerFailure (103),
+           batteryDischarging (104),
+           batteryFailure (105),
+           commercialPowerFailure (106),
+           coolingFanFailure (107),
+           engineFailure (108),
+           fireDetectorFailure (109),
+           fuseFailure (110),
+           generatorFailure (111),
+           lowBatteryThreshold (112),
+           pumpFailure (113),
+           rectifierFailure (114),
+           rectifierHighVoltage (115),
+           rectifierLowFVoltage (116),
+           ventilationsSystemFailure (117),
+           enclosureDoorOpen (118),
+           explosiveGas (119),
+           fire (120),
+           flood (121),
+           highHumidity (122),
+           highTemperature (123),
+           highWind (124),
+           iceBuildUp (125),
+           intrusionDetection (126),
+           lowFuel (127),
+           lowHumidity (128),
+           lowCablePressure (129),
+           lowTemperature (130),
+           lowWater (131),
+           smoke (132),
+           toxicGas (133),
+           coolingSystemFailure (134),
+           externalEquipmentFailure (135),
+           externalPointFailure (136),
+           storageCapacityProblem (151),
+           memoryMismatch (152),
+           corruptData (153),
+           outOfCPUCycles (154),
+           sfwrEnvironmentProblem (155),
+           sfwrDownloadFailure (156),
+           lossOfRealTime (157),
+           reinitialized (158),
+           applicationSubsystemFailure (159),
+           configurationOrCustomisationError (160),
+           databaseInconsistency (161),
+           fileError (162),
+           outOfMemory (163),
+           softwareError (164),
+           timeoutExpired (165),
+           underlayingResourceUnavailable (166),
+           versionMismatch (167),
+           bandwidthReduced (201),
+           congestion (202),
+           excessiveErrorRate (203),
+           excessiveResponseTime (204),
+           excessiveRetransmissionRate (205),
+           reducedLoggingCapability (206),
+           systemResourcesOverload (207),
+           adapterError (500),
+           callEstablishmentError (503),
+           communicationsProtocolError (504),
+           communicationsSubsystemFailure (505),
+           cpuCyclesLimitExceeded (509),
+           datasetOrModemError (510),
+           dTE-DCEInterfaceError (512),
+           equipmentMalfunction (514),
+           excessiveVibration (515),
+           heatingOrVentilationOrCoolingSystemProblem (519),
+           humidityUnacceptable (520),
+           inputOutputDeviceError (521),
+           inputDeviceError (522),
+           iANError (523),
+           leakDetected (524),
+           materialSupplyExhausted (528),
+           outputDeviceError (531),
+           performanceDegraded (532),
+           pressureUnacceptable (534),
+           queueSizeExceeded (537),
+           resourceAtOrNearingCapacity (541),
+           responseTimeExcessive (542),
+           retransmissionRateExcessive (543),
+           softwareProgramAbnormallyTerminated (545),
+           softwareProgramError (546),
+           temperatureUnacceptable (548),
+           thresholdCrossed (549),
+           toxicLeakDetected (551),
+           underlyingResourceUnavailable (554),
+           authenticationFailure (600),
+           breachOfConfidentiality (601),
+           cableTamper (602),
+           delayedInformation (603),
+           denialOfService (604),
+           duplicateInformation (605),
+           informationMissing (606),
+           informationModificationDetected (607),
+           informationOutOfSequence (608),
+           keyExpired (609),
+           nonRepudiationFailure (610),
+           outOfHoursActivity (611),
+           outOfService (612),
+           proceduralError (613),
+           unauthorizedAccessAttempt (614),
+           unexpectedInformation (615),
+           bufferOverUnderFlow (1000),
+           realigningFrame (1001),
+           loopbackApplied (1002),
+           farEndReceiveError (1003),
+           farEndBitError (1004),
+           signalLabelUnequipped (1005),
+           protectionSchemeMismatch (1006),
+           protectionschemeSignalFail (1007),
+           protectionChannelIdMismatchFail (1008),
+           unexpectedSignal (1009),
+           testingInProgress (1010),
+           thresholdCrossing24H (1011),
+           thresholdCrossing15M (1012),
+           thresholdCrossingFarEnd24H (1013),
+           thresholdCrossingFarEnd15M (1014),
+           rxCVThresholdCrossed15M (1015),
+           rxCVThresholdCrossed24H (1016), 	 	
+           rxESThresholdCrossed15M (1017),
+           rxESThresholdCrossed24H (1018),
+           rxSESThresholdCrossed15M (1019),
+           rxSESThresholdCrossed24H (1020),
+           rxSEFSThresholdCrossed15M (1021),
+           rxSEFSThresholdCrossed24H (1022),
+           controlSignalDegraded (1023),
+           controlSignalPortFail (1024),
+           dataCommsChannelLOS (1025),
+           dataCommsChannelDEG (1026),
+           dataCommsChannelPortFail (1027),
+           signalOutsideVideoQuality (1028),
+           pathTraceMisalignment (1029),
+           provisioningMismatch (1030),
+           portSwitchLossOfTraffic (1031),
+           txCVThresholdCrossed-15M (1032),
+           txCVThresholdCrossed-24H (1033),
+           txESThreshodCrossed-15M (1034),
+           txESThreshodCrossed-24H (1035),
+           txSESThresholdCrossed-15M (1036),
+           txSESThresholdCrossed-24H (1037),
+           txUASThresholdCrossed-15M (1038),
+           txUASThresholdCrossed-24H (1039),
+           rxBCVThresholdCrossed-15M (1040),
+           rxBCVThresholdCrossed-24H (1041),
+           rxBESThresholdCrossed-15M (1042),
+           rxBESThresholdCrossed-24H (1043),
+           rxBSESThresholdCrossed-15M (1044),
+           rxBSESThresholdCrossed-24H (1045),
+           timingRefManualSwitchReq (1046),
+           timingRefManualSwitchFail (1047),
+           timingRefForcedSwitchReq (1048),
+           timingRefForcedSwitchComplete (1049),
+           timingRefLockoutReq (1050),
+           interRingProtSwFail (1051),
+           interRingForcedSwitchActive (1052),
+           interRingProtSwitchComp (1053),
+           interRingBothFeedsFail (1054),
+           interRingPrimaryPathFail (1055),
+           interRingSecondaryPathFail (1056),
+           interRingLockoutReq (1057),
+           interRingManualSwReq (1058),
+           lowSignalErrorRate (1059),
+           txPPJEThresholdCrossed-15M (1060),
+           txPPJEThresholdCrossed-24H (1061),
+           txNPJEThresholdCrossed-15M (1062),
+           txNPJEThresholdCrossed-24H (1063),
+           feCVThresholdCrossed-15M (1064),
+           feCVThresholdCrossed-24H (1065),
+           feESThresholdCrossed-15M (1066),
+           feESThresholdCrossed-24H (1067),
+           feSESThresholdCrossed-15M (1068),
+           feSESThresholdCrossed-24H (1069),
+           feUASThresholdCrossed-24H (1070),
+           timingRefSwitchFail (1073),
+           ringProtSwitchFail (1074),
+           ringProtSwitchActive (1075),
+           ringLockoutActive (1076),
+           ringForcedSwitchActive (1077),
+           ringManualSwitchActive (1078),
+           ringProtPathFail (1079),
+           rxUASThresholdCrossed-15M (1080),
+           rxUASThresholdCrossed-24H (1081),
+           rxFECThresholdCrossed-15M (1082),
+           rxFECThresholdCrossed-24H (1083),
+           opticalRxPowerThresholdCrossed (1084),
+           laserBiasCurrentThresholdCrossed (1085),
+           opticalTxPowerThresholdCrossed (1086),
+           lanConnectionLOS (1087),
+           protectionSchemeSignalDefault (1088),
+           ringProtectionSwitchComplete (1089),
+           neighbourProtSchemeInvalid (1090),
+           inter-ringConnectionMismatch (1091),
+           portSwitchMessageSuppressed (1092),
+           line-sectionThresholdCrossed-1M (1093),
+           line-sectionThresholdCrossed-15M (1094),
+           line-sectionThresholdCrossed-24H (1095),
+           pathThresholdCrossed-15M (1096),
+           pathThresholdCrossed-24H (1097),
+           opticalPowerThresholdCrossed (1098),
+           spanProtSwitchFail (1099),
+           spanProtSwitchReq (1100),
+           spanLockoutActive (1101),
+           spanForcedSwitchActive (1102),
+           spanManualSwitchActive (1103),
+           spanProtPathFail (1104),
+           spanProtSwitchComplete (1105),
+           feUASThresholdCrossed-15M (1106),
+           opticalPowerOutsideLimit (2000),
+           degradedLaserPerformance (2001),
+           laserShutdown (2002),
+           laserShutdownDisabled (2003),
+           laserTempOutsideLimit (2004),
+           laserTest (2005),
+           equipCommsFail (2006),
+           lossOfControlSignal (2007),
+           backPlaneConfigMismatch (2008),
+           nPlusOneProtSwitchComplete (2009),
+           syncSelectionProblem (2010),
+           primarySyncRefFail (2011),
+           syncExternalLos (2012),
+           syncUnexpectedSignal (2013),
+           timingRefHoldoverMode (2014),
+           syncFrequencyOOL (2015),
+           syncOscillationFail (2016),
+           syncUnreliableTrib (2017),
+           mfsPulseFail (2018),
+           lanConnectionFail (2019),
+           accessEnableVolatileRAM (2020),
+           clockLossOneSec (2021),
+           detachedNE (2022),
+           duplicateNeName (2023),
+           duplicateNeNumber (2024),
+           hardwarePortFailure (2025),
+           secondarySyncRefFail (2026),
+           interfaceCardMissing (2027),
+           synchronizationInProgress (2028),
+           upgradeDowngradeInProgress (2029),
+           circuitPackReset (2030),
+           equipmentForcedSwitchActive (2031),
+           equipmentManualSwitchReq (2032),
+           equipmentLockoutReq (2033),
+           equipmentProtSwitchComplete (2034),
+           equipmentProtSwitchFail (2035),
+           au4ParityError (2036),
+           extraTrafficEnabled (2037),
+           controlSignalHardwarePortFail (2039),
+           sdhDCCLOS (2041),
+           sdhCCDeg (2042),
+           sdhDccprovisioningIncorrect (2043),
+           sdhDcchardwareFail (2044),
+           intercardDatalinkFail (2045),
+           intercardClockFail (2046),
+           intercardControlLinkFail (2047),
+           equipmentClockLoss (2048),
+           lanHardwarePortFail (2049),
+           lanProvisioningMismatch (2050),
+           protSwitchLossOfTraffic (2051),
+           lanConnectionDegraded (2052),
+           serialOverheadLinkFail (2053),
+           testAlarm (2054),
+           lossOfExtraTraffic (2055),
+           secondarySyncRefDeg (2057),
+           primaryTimingRefDeg (2058),
+           maintenanceBusAccessFail (2059),
+           linearToRingUpgradeFail (2060),
+           hardwareReset (2061),
+           timingRefFreerunMode (2062),
+           opticalParityError (2063),
+           lockoutProtectionFail (2064),
+           timingRefAquireMode (2065),
+           intercardLinkFail (2066),
+           continuousSwitchToggling (2067),
+           systemInRecoveryMode (2068),
+           protectionOscillationControlActivated (2069),
+           circuitPackUnseated (2070),
+           elementControllerAlarmsActive (2071),
+           timingRefNormalMode (2072),
+           maxNeNumExceeded (2073),
+           ramFailure (3000),
+           softwareCorrupt (3001),
+           configDataBankCorrupt (3002),
+           configSwVersionMismatch (3003),
+           configStandbySwUnstable (3004),
+           configFlashMemoryCorrupt (3005),
+           writeJumperFitted (3006),
+           invalidNeighbour (3007),
+           protschemeMismatch (3009),
+           protExerciserFail (3010),
+           ne-Insecure (4000),
+           diskCapacityReached75Percent (5000),
+           diskCapacityReached90Percent (5001),
+           loginFailAlarm (5002),
+           commsFailAlarm (5003),
+           alarmsBufferOverflow (5004),
+           unprovisionedNEs (5005),
+           linkFail (6000),
+           linkEndEndMismatch (6001),
+           lossOfAlignment (6002),
+           squelch (6003),
+           txAis (6004),
+           bandwidthIncompatible (6005),
+           loopbackTerminal (6009),
+           insufficientLinkCapacity (6010),
+           protectionSwitchComplete (6020),
+           manualProtectionSwitchActive (6021),
+           lockoutOfProtectionActive (6022),
+           forcedProtectionSwitchActive (6023),
+           protectionSwitchFail (6024),
+           protectionExercisorComplete (6025),
+           autoProtectionSwitchAcknowledgeTimeOut (6026),
+           protectionByteFail (6027),
+           protectionModeMismatch (6028),
+           autoProtectionSwitchActive-Path (6029),
+           operatorProtectionSwitchActive-Line (6030),
+           autoProtectionSwitchActive-Line (6031),
+           operatorProtectionSwitchActive-Path (6032),
+           timingGenerationSwitchFail (6039),
+           timingGenerationLossOfReference (6040),
+           timingGenerationDegradedSSM (6041),
+           timingGenerationForcedSwitch (6042),
+           timingGenerationLockout (6043),
+           timingGenerationQlChanged (6044),
+           timingGenerationEntryToFreerun (6045),
+           timingGenerationFailureToLock (6046),
+           timingGenerationEntryToHoldover (6047),
+           timingGenerationReferenceSwitchComplete (6048),
+           timingDistributionLossOfReference (6049),
+           timingDistributionDegradedSSM (6050),
+           timingDistributionForcedSwitch (6051),
+           timingDistributionLockout (6052),
+           timingDistributionQlChanged (6053),
+           timingSyncHwFault (6055),
+           timingSyncHwAutoSwitchComplete (6056),
+           passwordExpiryWarning (6060),
+           databaseRestoreInProgress (6073),
+           databaseRestoreFailed (6074),
+           databaseSaveInProgress (6075),
+           timeOfDayProtocolFail (6077),
+           lineDCCPortFail (6080),
+           sectionDCCPortFail (6081),
+           primarySecurityServerUnavailable (6083),
+           secondarySecurityServerUnavailable (6084),
+           noSecurityServerAvailable (6085),
+           engineOperating (6086),
+           highWater (6087),
+           thresholdCrossingT1 (6088),
+           thresholdCrossingT2 (6089),
+           timingGenerationDegradedSignal (6090),
+           timingGenerationInvalidSSM (6091),
+           timingGenerationUnstableSSM (6092),
+           txDegradedSignal (6093),
+           serviceAffectingRDI (6094),
+           batteryFailureA (6101),
+           batteryFailureA1 (6102),
+           batteryFailureA2 (6103),
+           batteryFailureA3 (6104),
+           batteryFailureA4 (6105),
+           batteryFailureA5 (6106),
+           batteryFailureB (6107),
+           batteryFailureB1 (6108),
+           batteryFailureB2 (6109),
+           batteryFailureB3 (6110),
+           batteryFailureB4 (6111),
+           batteryFailureB5 (6112),
+           breakerTripped1 (6113),
+           breakerTripped2 (6114),
+           breakerTripped3 (6115),
+           breakerTripped4 (6116),
+           breakerTripped5 (6117),
+           breakerTripped6 (6118),
+           breakerTripped7 (6119),
+           breakerTripped8 (6120),
+           databaseRebuilt (6122),
+           softwareAutoLoad (6123),
+           fpgaLoad (6124),
+           provisioningDataMissing (6125),
+           provisioningDataMismatch (6126),
+           blocked (6127),
+           routingDisabled (6128),
+           callUnrecoverable (6130),
+           protectionBusy (6131),
+           protectionFail (6132),
+           tunnelLossOfSignal (6133),
+           serverUnreachable (6134),
+           serverNotProvisioned (6135),
+           rejectDHCPaddr (6136),
+           docDomainInvalid (6137),
+           topologyReconfigInProgress (6138),
+           commandFailed (6139),
+           docNotOptimized (6140),
+           adjacencyInvalid (6141),
+           adjacencyMismatch (6142),
+           replaceableUnitFailure (6143),
+           tODServerUnavailable (6144),
+           duplicateAddress (6145),
+           docAddCommandFailed (6146),
+           docDeleteCommandFailed (6147),
+           docResetCommandFailed (6148),
+           docMonitorActionFailed (6149),
+           docOptimizeActionFailed (6150),
+           reconfigInProgress (6151),
+           reversionFail (6152),
+           oSPFAreaExceeded (6153),
+           packetRateLimitExceeded (6154),
+           backwardDefectIndication (6155),
+           freqOutOfRange (6157),
+           txFreqOutOfRange (6158),
+           loopbackFacility (6161),
+           replaceableUnitUnknown (6163),
+           provisioningIncompatible (6166),
+           aDMSingleNode (6168),
+           fECProvMismatch (6169),
+           lossOfDatabaseRedundancy (6170),
+           ringProtExerciserFail (6171),
+           slatMode (6172),
+           spanProtExerciserFail (6173),
+           dCCPortFail (6174),
+           provisioningFail (6175),
+           testAccessActive (6176),
+           cnvMismatch (6177),
+           pSMMismatch (6178),
+           iOMismatch (6179),
+           cnvMissing (6180),
+           pSMMissing (6181),
+           iOMissing (6182),
+           cnvUnknown (6183),
+           pSMUnknown (6184),
+           iOUnknown (6185),
+           lossOfDatabase (6186),
+           breakerTripped (6190),
+           noPower (6192),
+           restart (6193),
+           replaceableUnitInserted (6194),
+           authenticationSuccess (6195),
+           userLogout (6196),
+           bandwidthThresholdCrossed (6197),
+           equipOOSIS (6198),
+           craftSwMissing  (6199),
+           inconsistentSequenceNumberLCAS (6200),
+           memberExcessDifferentialDelayLCAS (6201),
+           txPartialLossOfCapacityLCAS (6202),
+           txTotalLossOfCapacityLCAS (6203),
+           partialLossOfCapacityLCAS (6204),
+           totalLossOfCapacityLCAS (6205),
+           cRCErrorLCAS (6206),
+           unexpectedMemberStatusLCAS (6207),
+           statusMismatchLCAS (6208),
+           diskCapacityReached100Percent (6209),
+           protectionIdMismatch (6210),
+           lineProtSwitchFail (6211),
+           dataSyncLOS (6212),
+           protectionIdMissing (6213),
+           mateMismatch (6214),
+           intManagmentCommsSuspected (6215),
+           lockoutOfWorkingActive (6216),
+           softwareMissing (6217),
+           secondarySETSLockingToPrimary (6218),
+           tODSynchronizationFail (6219),
+           tODServerNoResponse (6220),
+           replaceableUnitUnexpected  (6221),
+           operationsProcessorAlarms  (6222),
+           tunUnrecoverable (6223),
+           testSignal (6224),
+           testSignalOutOfSync (6225),
+           testSignalErrorReceived (6226),
+           excessivePointerAdjustments (6227),
+           txLOS (6228),
+           dCCnetworkAccessViolation (6229),
+           channelPropagationFail (6230),
+           channelPropagationMismatch (6231),
+           powerPropagationFail (6232),
+           shutdownInProgress (6233),
+           frameFormatMismatch (6234),
+           idleSignalDetected (6235),
+           yellowSignalReceived (6236),
+           connectionMismatch (6237),
+           oAMNotAvailable (6238),
+           databaseSaveRestoreDisabled (6239),
+           databaseSaveFailed (6240),
+           connectionsDisowned (6241),
+           bandwidthStranded (6242),
+           coldRestartRequired (6243),
+           pmFTPComplete (6244),
+           pmFTPFailed (6245),
+           pmFTPInProgress (6246),
+           replaceableUnitMinorMismatch (6247),
+           farEndSignalMismatch (6248),
+           channelMonitorCountThreshold (6249),
+           lowOrderBandwidthThresholdCrossed  (6250),
+           replaceableUnitIncompatible (6251),
+           trControlInitInProgress (6252),
+           trControlISOptInProgress (6253),
+           trControlEchoTraceMismatch (6254),
+           trControlDisabled (6255),
+           txTuningInProgress (6256),
+           bdi (6257),
+           rxPowerOutOfRange (6258),
+           gcc0LinkFail (6259),
+           localFault (6260),
+           remoteFault (6261),
+           txTotalLossOfCapacity (6262),
+           rxTotalLossOfCapacity (6263),
+           protectionLocked (6264),
+           payloadFail (6265),
+           txPayloadFail (6266),
+           payloadConsequentFail (6267),
+           txPayloadConsequentFail (6268),
+           alarmEventThrottlingActive (6269),
+           pmTCAThrottlingActive (6270),
+           farEndClientRxSignalFailure (6271),
+           remotePowerFail (6272),
+           farEndClientLinkDown (6273),
+           remoteCriticalEvent (6274),
+           remoteLoopbackActive (6275),
+           remoteLoopbackFail (6276),
+           subtendedUnitDiscoveryFail (6277),
+           adjacencyProvError (6278),
+           docChannelMismatch (6279),
+           lossControllerFail (6280),
+           duplicatePrimaryInfo (6281),
+           duplicateMemberInfo (6282),
+           primaryUnreachable (6283),
+           memberUnreachable (6284),
+           memberMismatch (6285),
+           memberUnknown (6286),
+           memberCommsFail (6287),
+           memberCommsUp (6288),
+           memberTL1Fail (6289),
+           memberTL1Up (6290),
+           serverUnavailable (6291),
+           testAccessInProgressMonitorE (6292),
+           testAccessInProgressMonitorF (6293),
+           testAccessInProgressMonitorEF (6294),
+           testAccessInProgressSplitA (6295),
+           testAccessInProgressSplitB (6296),
+           testAccessInProgressSplitE (6297),
+           testAccessInProgressSplitF (6298),
+           testAccessInProgressSplitEF (6299),
+           ioModuleMismatch (6300),
+           ioModuleMissing (6301),
+           ioModuleUnknown (6302),
+           ringFailure (6303),
+           ringletFailure (6304),
+           maxNodeExceeded (6305),
+           topologyFailure (6306),
+           topologyInstability (6307),
+           isolatedStation (6308),
+           npuLockup (6309),
+           bandwidthNotFullyProtected (6310),
+           unreachableStation (6311),
+           manualAreaAddressDropped (6312),
+           maxLevel1NEsExceeded (6313),
+           remoteInvalidConfiguration (6314),
+           manprovRequired (6315),
+           tuningInProgress (6316),
+           rxIdle (6317),
+           gfpExtendedHdrMismatch (6318),
+           autoNegFailed (6319),
+           lossOfLCASCapability (6320),
+           mismatchFirmwareSoftware (6321),
+           docVersionMismatch (6322),
+           linkIntegrity (6323),
+           gcc1LinkFail (6324),
+           gcc2LinkFail (6325),
+           docDetectedFault  (6326),
+           docConsecutiveReoptimizations  (6327),
+           docChAddInProgress  (6328),
+           docChDelInProgress  (6329),
+           wlMeasWarning  (6330),
+           wlMeasError  (6331),
+           measuredLossDiscrepancy  (6332),
+           docChAddCompleted (6333),
+           docChDelCompleted (6334),
+           docPreChkPass (6335),
+           docPreChkFail (6336),
+           docRstTcaComp (6337),
+           groupIdentifierMismatchLCAS (6338),
+           saveReleaseInProgress (6339),
+           fiberTypeUnknown (6340),
+           globalSynchronizationPulseInProgress (6341),
+           reconfigFailed (6342),
+           sumPayloadProtectionSwitchComplete (6343),
+           shelfTraceMismatch (6344),
+           unpairedSSHKey (6345),
+           fDBMACThresholdCrossed (6346),
+           fDBMACFlapping (6347),
+           ipSecErrorThresholdCrossed (6348),
+           ikeErrorThresholdCrossed (6349),
+           autoShutoffDisabled (6350),
+           lockedMaintenanceSignal (6351),
+           openConnectionIndication (6352),
+           databaseSyncFailed (6353),
+           lanOSPFFail (6354),
+           oscOSPFFail (6355),
+           adjacencyUnreliable (6356),
+           databaseSyncInProgress (6357),
+           docRstTcaFail(6358),
+           multiplexedRateMismatch(6359),
+           dccOSPFFail(6360),
+           gccOSPFFail(6361),
+           releaseSyncInProgress(6362),
+           releaseSyncFailed(6363),
+           logCollectionInProgress (6364),
+           natTcpConnectionLimitExceeded (6365),
+           natUdpConnectionLimitExceeded (6366),
+           equipmentSpecificationsExceeded (6367),
+           lacpFailed (6369),
+           vTSTSBandwidthThresholdCrossed (6370),
+           duplicateAdjacency (6371),
+           cardSpecificDataUnavailable (6372),
+           remotePortOOS (6373),
+           rolloverInProgress (6374),
+           remoteReplaceableUnitMissing (6375),
+           remoteReplaceableUnitTypeMismatch (6376),
+           remoteReplaceableUnitProblem (6377),
+           remoteOpticalRxPowerThresholdCrossed (6378),
+           remoteReinitialized (6379),
+           laserTECCurrentHighThresholdCrossed (6380),
+           laserTECCurrentLowThresholdCrossed (6381),
+           wlMeasHighThresholdCrossed  (6382),
+           wlMeasLowThresholdCrossed (6383),
+           replaceableUnitRemoved  (6384),
+           routingTableThresholdCrossed  (6385),
+           debugPortInUse (6386),
+           ringAPSTimeOut (6387),
+           invalidLicense (6388),
+           temporaryLicense (6389),
+           cfmLossOfContinuity (6390),
+           cfmUnexpectedMAID (6391),
+           cfmUnexpectedMEPID (6392),
+           cfmUnexpectedPeriod (6393),
+           cfmLoopDetection (6394),
+           cfmRDI (6395),
+           portMirroring (6396),
+           cciSessionFail (6397),
+           ospfFail (6398),
+           rsvpFail (6399),
+           cpsCallCreateFailed (6400),
+           cpsCallFailed (6401),
+           cpsConFailed (6402),
+           ethernetRingProtectionEastStatus (6405),
+           ethernetRingProtectionWestStatus (6406),
+           ethernetRingProtectionRingletStatus (6407),
+           topologyChangeDetected (6408),
+           cpu2Unreachable (6409),
+           docDisabled(6410),
+           ccmError (6411),
+           macStatusError (6412),
+           cpsLocked (6413),
+           cciSessionOutOfSync (6414),
+           loopbackTraffic  (6415),
+           databaseCommitFailed (6416),
+           disownFailure (6417),
+           takeoverFailure (6418),
+           callSegFailure (6419),
+           callSegRestoration (6420),
+           callSegRestorationFailure (6421),
+           callSegLockoutOfRestoration (6422), 
+           callSegLockoutOfRestorationFailure (6423),
+           callSegUnrecoverable (6424),
+           reconfigRequired (6425),
+           delayMeasurementError (6426),
+           warmRestartRequired (6427),
+           manuallyDisabled (6428),
+           docFailed (6430),
+           auditStarted (6431),
+           auditComplete (6432),
+           auditFailed (6433),
+           serviceFail (6434),
+           ftpFailed (6435),
+           ftpCompleted (6436),
+           traceFailed (6437),
+           routingBlocked (6438),
+           pathMissing (6439),
+           bandwidthLocked (6440),
+           oscillatingFault (6441),
+           hardwareTamper (6443),
+           autoConnValidationDisabled (6444),
+           reversionInhibited (6445),
+           reversionfailed (6446),
+           trafficRestore (6447),
+           encryptionFailure (6448),
+           txPowerReductionState (6449),
+           channelContention (6450),
+           lossOfControlInfrastructure (7008),
+           oscSLDDAdjFail (7009),
+           lanSLDDAdjFail (7010),
+           certificateExpired (7011),
+           certificateAboutToExpire (7012),
+           lanOSPFNetAreaDown (7013),
+           oscOSPFNetAreaDown (7014),
+           gccOSPFNetAreaDown (7015),
+           lanOSPFNetAreaUp (7017),
+           oscOSPFNetAreaUp (7018),
+           gccOSPFNetAreaUp (7019),
+           timingGenerationManualSwitch (7021),
+           timingDistributionManualSwitch (7022),
+           lossSyncMessageChannel (7023),
+           laserFreqOutOfRange (7024),
+           skewOutOfRange (7025),
+           deskewFailure (7026),
+           lossOfAlignmentMarker (7027),
+           lossOfOPUMultiframIdent (7028),
+           timeOfDayNotSynchronized (7029),
+           equipmentPoweredDown (7030),
+           rxValueChanged (7031),
+           rxDispersionOutOfRange (7032),
+           dispSearchScanInProgress (7033) 
+          }
+
+-- Nortel Extended Active Alarm Table
+
+nnExtAlarmActiveTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF NnExtAlarmActiveEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+       "Nortel Active Alarm Table Extension"
+  ::= { nnExtAlarmObjects 1 }
+
+nnExtAlarmActiveEntry OBJECT-TYPE
+  SYNTAX      NnExtAlarmActiveEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+       "Nortel Active Alarm Table Extension Entry"
+--  AUGMENTS { alarmActiveEntry }
+  INDEX { nnExtAlarmActiveEventType }
+  ::= { nnExtAlarmActiveTable 1 }
+
+NnExtAlarmActiveEntry ::= SEQUENCE {
+  nnExtAlarmActiveEventType                     NnExtAlarmEventType,
+  nnExtAlarmActiveProbableCause                 NnExtAlarmProbableCause,
+  nnExtAlarmActiveAdditionalText                SnmpAdminString,
+  nnExtAlarmActiveDocumentationPointer          SnmpAdminString,
+  nnExtAlarmActiveResourceDescription           SnmpAdminString,
+  nnExtAlarmActiveManualClear                   INTEGER,
+  nnExtAlarmActiveSequenceNumber                Integer32
+  }
+  
+
+nnExtAlarmActiveEventType OBJECT-TYPE
+  SYNTAX       NnExtAlarmEventType
+  MAX-ACCESS   read-write
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Event Type"
+  ::= { nnExtAlarmActiveEntry 1 }
+
+
+nnExtAlarmActiveProbableCause OBJECT-TYPE
+  SYNTAX       NnExtAlarmProbableCause
+  MAX-ACCESS   read-write
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Probable Cause"
+  ::= { nnExtAlarmActiveEntry 2 }
+
+nnExtAlarmActiveAdditionalText OBJECT-TYPE
+  SYNTAX       SnmpAdminString
+  MAX-ACCESS   read-write
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Additional Text"
+  ::= { nnExtAlarmActiveEntry 3 }
+
+nnExtAlarmActiveDocumentationPointer OBJECT-TYPE
+  SYNTAX       SnmpAdminString
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Documentation Pointer"
+  ::= { nnExtAlarmActiveEntry 4 }
+
+nnExtAlarmActiveResourceDescription OBJECT-TYPE
+  SYNTAX       SnmpAdminString
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Resource Description"
+  ::= { nnExtAlarmActiveEntry 5 }
+
+nnExtAlarmActiveManualClear OBJECT-TYPE
+  SYNTAX       INTEGER  {
+                        other (1),
+                        forbidden (2),
+                        required (3),
+                        optional (4)
+                        }
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Manual Clear Indicator"
+  ::= { nnExtAlarmActiveEntry 6 }
+
+nnExtAlarmActiveSequenceNumber OBJECT-TYPE
+  SYNTAX       Integer32
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+        "Nortel Active Alarm Table Extension Sequence Number"
+  DEFVAL  { 0 }
+  ::= { nnExtAlarmActiveEntry 7 }
+
+-- Definition Objects from Active Alarm Table in ALARM-MIB
+
+nnAlarmActiveResourceId OBJECT-TYPE
+  SYNTAX       ResourceId
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+        "Nortel Alarm Active Resource Id"
+  ::= { nnAlarmObjects 1 }
+
+nnAlarmActiveDateAndTime OBJECT-TYPE
+  SYNTAX       DateAndTime
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+        "Nortel Alarm Active Date & Time"
+  ::= { nnAlarmObjects 2 }
+
+nnAlarmActiveDescription OBJECT-TYPE
+  SYNTAX       SnmpAdminString
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+           "Nortel Alarm Active Description"
+  ::= { nnAlarmObjects 3 }
+
+
+nnExtNotificationPrefix OBJECT-IDENTITY
+  STATUS       current
+  DESCRIPTION
+        "Nortel NE alarm notifications prefix"
+  ::= { nnExtAlarmObjects 0 }
+
+  -- Table of Information related to Messages
+  
+     nnExtAlarmMessageTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF NnExtAlarmMessageEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A table of information on messages. Entries are
+          added to this table when their corresponding 
+          notifications have been sent. Entires will be
+          removed from this table as outlined in the
+          Notification Log MIB [RFC3014]. Implementations
+          that do not support the Notification Log MIB should
+          provide behaviour for nlmLogName, nlmLogIndex and
+          this table as if they did."
+      ::= { nnExtAlarmObjects 3 }
+
+  nnExtAlarmMessageEntry OBJECT-TYPE
+      SYNTAX      NnExtAlarmMessageEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An alarm message entry."               
+      INDEX       { nlmLogName, nlmLogIndex }
+      ::= { nnExtAlarmMessageTable 1 } 
+      
+   NnExtAlarmMessageEntry ::= SEQUENCE {   
+       nnExtAlarmMessageResource             ResourceId, 
+       nnExtAlarmMessageResourceDescription  SnmpAdminString,
+       nnExtAlarmMessageDateAndTime          DateAndTime,      
+       nnExtAlarmMessageDocumentationPointer SnmpAdminString,
+       nnExtAlarmMessageInfo                 SnmpAdminString
+    }        
+    
+    nnExtAlarmMessageResource    OBJECT-TYPE
+      SYNTAX      ResourceId
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "This object identifies the resource that this message pertains to
+
+         If there is no corresponding resource, then
+         the value of this object MUST be 0.0."
+      ::= { nnExtAlarmMessageEntry 1 }    
+      
+     nnExtAlarmMessageResourceDescription OBJECT-TYPE
+      SYNTAX      SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS       current
+      DESCRIPTION
+           "This is a textual description of the resource this message
+           pertains to.
+                          
+            The format of the string is as follows:
+		       NEtype=NEname;componentType=componentInstanceId;subcompType=subcompInstanceId;....
+
+ 	        With NE as the root, the entire containment with the list of Relative 
+ 	        Distinguished Names (RDNs) is presented upto the 
+            point where the messaging component is clearly identified. 
+            Semicolon is the delimiter between a 'category=value' pair.
+            The string can only contain alphanumeric characters and 
+            underscores. No commas, spaces, slashes, hyphens, or
+            dollar signs are allowed
+               "
+       ::= { nnExtAlarmMessageEntry 2 }
+
+
+
+   nnExtAlarmMessageDateAndTime OBJECT-TYPE
+      SYNTAX      DateAndTime
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The local date and time when the message originated.
+
+          Implementations MUST include the offset from UTC,
+          if available.  Implementation in environments in which
+          the UTC offset is not available is NOT RECOMMENDED."
+      ::= { nnExtAlarmMessageEntry 3 }
+
+    nnExtAlarmMessageDocumentationPointer OBJECT-TYPE
+      SYNTAX      SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS       current
+      DESCRIPTION
+               "This object servces as a pointer to documentation related to this
+               problem.
+               
+               If there is no specific document pointer for this alarm, this object
+               is a null length string."
+       ::= { nnExtAlarmMessageEntry 4 }
+    
+   nnExtAlarmMessageInfo OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual discription of the event that has occurred,
+            suitable to display to an operator. "
+    ::= { nnExtAlarmMessageEntry 5 }
+          
+    
+  -- all notification OIDs would be prefixed with a zero OID to 
+  -- facilitate  snmp v1<->v2 conversion
+
+-- Alarm Notifications
+
+        nnExtAlarmClear NOTIFICATION-TYPE
+                        OBJECTS { nnAlarmActiveResourceId,
+                                  nnAlarmActiveDateAndTime,
+                                  nnAlarmActiveDescription,
+                                  nnExtAlarmActiveEventType,
+                                  nnExtAlarmActiveProbableCause,
+                                  nnExtAlarmActiveAdditionalText,
+                                  nnExtAlarmActiveDocumentationPointer,
+                                  nnExtAlarmActiveResourceDescription,
+                                  nnExtAlarmActiveSequenceNumber
+                                 }
+           STATUS current
+           DESCRIPTION
+             "Nortel notification for an NE alarm clearing"
+        
+           ::= { nnExtNotificationPrefix 301 }
+
+
+        nnExtAlarmWarning NOTIFICATION-TYPE
+                        OBJECTS { nnAlarmActiveResourceId,
+                                  nnAlarmActiveDateAndTime,
+                                  nnAlarmActiveDescription,
+                                  nnExtAlarmActiveEventType,
+                                  nnExtAlarmActiveProbableCause,
+                                  nnExtAlarmActiveAdditionalText,
+                                  nnExtAlarmActiveDocumentationPointer,
+                                  nnExtAlarmActiveResourceDescription,
+                                  nnExtAlarmActiveManualClear,
+                                  nnExtAlarmActiveSequenceNumber
+                                 }
+           STATUS current
+           DESCRIPTION
+             "Nortel notification for an NE alarm of warning severity"
+        
+           ::= { nnExtNotificationPrefix 302 }
+
+
+        nnExtAlarmMinor NOTIFICATION-TYPE
+                        OBJECTS { nnAlarmActiveResourceId,
+                                  nnAlarmActiveDateAndTime,
+                                  nnAlarmActiveDescription,
+                                  nnExtAlarmActiveEventType,
+                                  nnExtAlarmActiveProbableCause,
+                                  nnExtAlarmActiveAdditionalText,
+                                  nnExtAlarmActiveDocumentationPointer,
+                                  nnExtAlarmActiveResourceDescription,
+                                  nnExtAlarmActiveManualClear,
+                                  nnExtAlarmActiveSequenceNumber
+                                 }
+           STATUS current
+           DESCRIPTION
+             "Nortel notification for an NE alarm of minor severity"
+        
+           ::= { nnExtNotificationPrefix 303 }
+
+
+        nnExtAlarmMajor NOTIFICATION-TYPE
+                        OBJECTS { nnAlarmActiveResourceId,
+                                  nnAlarmActiveDateAndTime,
+                                  nnAlarmActiveDescription,
+                                  nnExtAlarmActiveEventType,
+                                  nnExtAlarmActiveProbableCause,
+                                  nnExtAlarmActiveAdditionalText,
+                                  nnExtAlarmActiveDocumentationPointer,
+                                  nnExtAlarmActiveResourceDescription,
+                                  nnExtAlarmActiveManualClear,
+                                  nnExtAlarmActiveSequenceNumber
+                                 }
+           STATUS current
+           DESCRIPTION
+             "Nortel notification for an NE alarm of major severity"
+        
+           ::= { nnExtNotificationPrefix 304 }
+
+
+        nnExtAlarmCritical NOTIFICATION-TYPE
+                        OBJECTS { nnAlarmActiveResourceId,
+                                  nnAlarmActiveDateAndTime,
+                                  nnAlarmActiveDescription,
+                                  nnExtAlarmActiveEventType,
+                                  nnExtAlarmActiveProbableCause,
+                                  nnExtAlarmActiveAdditionalText,
+                                  nnExtAlarmActiveDocumentationPointer,
+                                  nnExtAlarmActiveResourceDescription,
+                                  nnExtAlarmActiveManualClear,
+                                  nnExtAlarmActiveSequenceNumber
+                                 }
+           STATUS current
+           DESCRIPTION
+             "Nortel notification for an NE alarm of critical severity"
+           ::= { nnExtNotificationPrefix 305 }
+
+        nnExtAlarmMessage NOTIFICATION-TYPE
+                        OBJECTS { nnExtAlarmMessageResource, 
+                                  nnExtAlarmMessageResourceDescription, 
+                                  nnExtAlarmMessageDateAndTime,
+                                  nnExtAlarmMessageDocumentationPointer,
+                                  nnExtAlarmMessageInfo                  
+                                  }
+          STATUS  current
+          DESCRIPTION
+            "An informational message. This notification does not
+            correspond to an alarm so would not be stored in the
+            active alarm table and it does not have a corresponing
+            clear."
+           ::= { nnExtNotificationPrefix 306 }
+
+
+END
+
+

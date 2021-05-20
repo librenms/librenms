@@ -1,0 +1,2520 @@
+-- This file was automatically generated from ciena-6500-enums.yang. Do not edit.
+
+CIENA-6500-ENUMS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaGenericMIBs
+        FROM CIENA-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+ciena6500EnumsMIB MODULE-IDENTITY
+    LAST-UPDATED "210001010000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com"
+    DESCRIPTION "This modules describes Ciena's enumerated types for the 6500 platform"
+    REVISION "201812310000Z"
+    DESCRIPTION "Initial Draft"
+    REVISION "210001010000Z"
+    DESCRIPTION "6500 Release  
+- Removed typedef: EttpMapping_WLAI
+- Removed typedef: EnumDTLEXCL_SNCG
+- Added typedef: tuningMode
+- Added typedef: equipmentAttributeType
+- Added typedef: ptpCondType
+- Added typedef: ochTuningMode
+- Added typedef: rxCondTrig
+- Added typedef: tcmMode
+- Added typedef: tcmCondType
+- Added typedef: ltcActMode
+- Added typedef: ltcAlmMode
+- Added typedef: facgrpServiceType
+- Added typedef: PKTIWF_OMTYPE
+- Added typedef: PDH_MONTYPE
+- Added typedef: PDH_MONTYPE_resp
+- Added typedef: PDH_TH_MONTYPE
+- Added typedef: PATH_MONTYPE
+- Added typedef: PATH_MONTYPE_resp
+- Added typedef: PATH_TH_MONTYPE
+- Added typedef: PKTIWF_MONTYPE
+- Added typedef: PKTIWF_MONTYPE_resp
+- Added typedef: PKTIWF_TH_MONTYPE
+- Added typedef: ProtStandardPots
+- Added typedef: syncOptions
+- Added typedef: minSyncEQL
+- Added typedef: syncPortState
+- Added typedef: sync1588AnnRate
+- Added typedef: sync1588Rate
+  typedef LPBKSTATUS
+    type enumeration
+    - Added enum: FAIL-TXSPLIMGMTOFF
+  typedef ALMPRVAIDTYPE
+    type enumeration
+    - Added enum: PDH
+    - Added enum: PATH
+    - Added enum: PKTIWF
+    - Added enum: FACGRP
+  typedef SecureOH
+    type enumeration
+    - Removed enum: ON
+    - Added enum: MODE1
+    - Added enum: MODE2
+  typedef ptpServiceType
+    type enumeration
+    - Added enum: EC1
+    - Added enum: ETH10M
+  typedef ptpTransMode
+    type enumeration
+    - Removed enum: 56GBAUD_100G_2
+    - Removed enum: 56GBAUD_200G_2
+    - Removed enum: 56GBAUD_250G_2
+    - Removed enum: 56GBAUD_400G_2
+    - Added enum: 28GBAUD_100G
+    - Added enum: 32GBAUD_100G
+    - Added enum: 32GBAUD_200G
+  typedef ptpReachClass
+    type enumeration
+    - Added enum: TER2P1
+    - Added enum: TER3
+    - Added enum: TER4
+  typedef PtpMod
+    type enumeration
+    - Added enum: 16QAM
+  typedef OTU_FECFrmt
+    type enumeration
+    - Added enum: EFEC
+    - Added enum: LDPCFEC
+  typedef SttpRate
+    type enumeration
+    - Added enum: EC1
+  typedef EthRate
+    type enumeration
+    - Added enum: ETH10M
+  typedef OduTtpRate
+    type enumeration
+    - Added enum: CN
+  typedef OduCtpRate
+    type enumeration
+    - Added enum: CN
+  typedef ALL_MONTYPE
+    type enumeration
+    - Added enum: CV-P
+    - Added enum: ES-P
+    - Added enum: SES-P
+    - Added enum: UAS-P
+    - Added enum: FC-P
+    - Added enum: CV-V
+    - Added enum: ES-V
+    - Added enum: SES-V
+    - Added enum: UAS-V
+    - Added enum: FC-V
+    - Added enum: SAS-P
+    - Added enum: SEFS-P
+    - Added enum: CSS-P
+    - Added enum: CVC-P
+    - Added enum: ESC-P
+    - Added enum: SESC-P
+    - Added enum: UASC-P
+    - Added enum: FCC-P
+    - Added enum: ES-CES
+    - Added enum: SES-CES
+    - Added enum: UAS-CES
+  typedef PMAIDTYPE
+    type enumeration
+    - Added enum: PKTIWF
+    - Added enum: PDH
+    - Added enum: PATH
+  typedef ALL_MONTYPE_resp
+    type enumeration
+    - Added enum: CV-P
+    - Added enum: ES-P
+    - Added enum: SES-P
+    - Added enum: UAS-P
+    - Added enum: FC-P
+    - Added enum: CV-V
+    - Added enum: ES-V
+    - Added enum: SES-V
+    - Added enum: UAS-V
+    - Added enum: FC-V
+    - Added enum: SAS-P
+    - Added enum: SEFS-P
+    - Added enum: CSS-P
+    - Added enum: CVC-P
+    - Added enum: ESC-P
+    - Added enum: SESC-P
+    - Added enum: UASC-P
+    - Added enum: FCC-P
+    - Added enum: ES-CES
+    - Added enum: SES-CES
+    - Added enum: UAS-CES
+  typedef ALL_TH_MONTYPE_resp
+    type enumeration
+    - Added enum: FC-P
+    - Added enum: FC-V
+    - Added enum: FCC-P
+    - Added enum: ES-CES
+    - Added enum: SES-CES
+    - Added enum: UAS-CES
+  typedef OSC_TH_MONTYPE
+    type enumeration
+    - Removed enum: OPRN-OCH
+  typedef OTM3_TH_MONTYPE_resp
+    type enumeration
+    - Removed enum: FEC-OTU
+    - Removed enum: OPTNLOW-OCH
+    - Removed enum: OPTNHIGH-OCH
+  typedef OTM_TH_MONTYPE_resp
+    type enumeration
+    - Removed enum: FEC-OTU
+    - Removed enum: OPTNLOW-OCH
+    - Removed enum: OPTNHIGH-OCH
+  typedef OTM3_SET_MONTYPE
+    type enumeration
+    - Removed enum: OPTNLOW-OCH
+    - Removed enum: OPTNHIGH-OCH
+  typedef OTM_SET_MONTYPE
+    type enumeration
+    - Removed enum: OPTNLOW-OCH
+    - Removed enum: OPTNHIGH-OCH
+  typedef PTP_MONTYPE
+    type enumeration
+    - Added enum: CV-L
+    - Added enum: ES-L
+    - Added enum: SES-L
+  typedef PTP_MONTYPE_resp
+    type enumeration
+    - Added enum: CV-L
+    - Added enum: ES-L
+    - Added enum: SES-L
+  typedef PTP_TH_MONTYPE
+    type enumeration
+    - Added enum: CV-L
+    - Added enum: ES-L
+    - Added enum: SES-L
+  typedef PG_PS_RTRV
+    type enumeration
+    - Added enum: 1PLUS1PATH
+  typedef provcurrentinfo
+    type enumeration
+    - Added enum: 25
+    - Added enum: 35
+  typedef TSTSIG_Pattern
+    type enumeration
+    - Removed enum: O150PRBS11
+    - Removed enum: O150INVPRBS11
+    - Removed enum: O151PRBS15
+    - Removed enum: O151INVPRBS15
+    - Removed enum: O153PRBS20
+    - Removed enum: O153INVPRBS20
+    - Removed enum: O151PRBS20
+    - Removed enum: O151INVPRBS20
+    - Removed enum: O151PRBS23
+    - Removed enum: O151INVPRBS23
+    - Removed enum: O150PRBS31
+    - Removed enum: O150INVPRBS31
+    - Added enum: PRBS11
+    - Added enum: INVPRBS11
+    - Added enum: PRBS15
+    - Added enum: INVPRBS15
+    - Added enum: PRBS20_O153
+    - Added enum: INVPRBS20_O153
+    - Added enum: PRBS20_O151
+    - Added enum: INVPRBS20_O151
+    - Added enum: PRBS23
+    - Added enum: INVPRBS23
+    - Added enum: PRBS31
+    - Added enum: INVPRBS31"
+    ::= { cienaGenericMIBs 100 }
+
+AdLayer ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { line(0), sect(1), phys(2), l1otn(3), l2phys(4), l2mon(5), otu(6), subport(7), ptp(8), peer(9) }
+
+AdMechanism ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { iih(0), derived(1), sonmp(2), cvm(3), ndp(4), lldp(5) }
+
+AdReliability ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), reliable(1), unreliable(2), manual(3) }
+
+AddrForm ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { null(0), tidPrt(1), tidSlPrt(2), tidSlSbslPrt(3), tidShPrt(4), tidShSbshPrt(5), tidShSlPrt(6), tidShSlSbslPrt(7), tidShSbshSlPrt(8), tidShSbshSlSbslPrt(9), tidBayShlSlPrt(10), tidShSlPrtSbprt(11), tidShSlSbslPrtSbprt(12), nodenameSlPrt(13), shnameSlPrt(14), tidShSlPrtlbl(15), tidShSlPrtInstance(16) }
+
+AdjFiber ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), ndsf(1), twc(2), ls(3), dsf(4), twrs(5), twp(6), leaf(7), eleaf(8), fl(9), aw(10), twreach(11), teralight(12), psc(13), other(14), ndsflwp(15), tewavull(16), ex2000(17) }
+
+AdjRate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), e2Point5g(1), e10Point0g(2), e10Point7g(3), e11Point1g(4), e11Point3g(5), e4Point0g(6), e40Point0g(7), e100Point0g(8), e50Point0g(9), e200Point0g(10), e150Point0g(11), e250Point0g(12), e300Point0g(13), e350Point0g(14), e400Point0g(15) }
+
+AdjSpanlosssource ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), osc(1), tg(2) }
+
+AdjType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { line(0), tx(1), rx(2), cmd(3), lim(4), wss(5), opm(6), osc(7), bmd(8), dscm(9), dra(10), txrx(11), smd(12), omd(13), omx(14), tcc(15), voa(16), bypass(17), bs(18), oscf(19), fga(20), omdf(21), ops(22), iss(23), fim(24), amp(25), otdr(26), obb(27), ucs(28), unknown(29) }
+
+Adjtxmodclass ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), undefined(1), e2g5(2), e10g(3), e10gngm(4), e40g(5), custom1(6), custom2(7), custom3(8), custom4(9), custom5(10), custom6(11), e100g(12), e40gulh(13), e100gwl3(14), e100gwl3bpsk(15), e100gwl38qam(16), e100gwl316qam(17), e100gwl34ask(18), e35gbaud100g(19), e35gbaud150g(20), e35gbaud200g(21), e35gbaud250g(22), e56gbaud100g(23), e56gbaud150g(24), e56gbaud200g(25), e56gbaud250g(26), e56gbaud300g(27), e56gbaud350g(28), e56gbaud400g(29), slic(30) }
+
+Aidtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optmon(0), voa(1), amp(2), otdrcfg(3), doc(4), disp(5), adj(6), swt(7), nct(8), gmd(9), dosc(10), cmd4(11), lim(12), secu(13), eqpt(14), com(15), osc(16), oc3(17), oc12(18), oc48(19), oc192(20), oc768(21), sts1(22), sts3c(23), sts12c(24), sts24c(25), sts48c(26), sts192c(27), vt1(28), vt2(29), eth(30), wan(31), e1(32), t1(33), t3(34), ec1(35), stm1e(36), dsm(37), otm(38), otm2(39), otm3(40), lag(41), e3(42), rpr(43), eth10g(44), eth100(45), fc(46), adjpeer(47) }
+
+Alarminfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { dsbl(0), crdtyp(1), wvlngth(2), fic(3), sbntnm(4), physshlf(5), bynmbr(6), label(7), clfi(8), nm(9) }
+
+AllMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), cvP(9), esP(10), sesP(11), uasP(12), fcP(13), cvV(14), esV(15), sesV(16), uasV(17), fcV(18), sasP(19), sefsP(20), cssP(21), cvcP(22), escP(23), sescP(24), uascP(25), fccP(26), esCes(27), sesCes(28), uasCes(29), pscwL(30), pscpL(31), psdL(32), oprOch(33), optOch(34), optminOch(35), optmaxOch(36), optavgOch(37), oprnOch(38), oprminOch(39), oprmaxOch(40), opravgOch(41), optnOch(42), oprlowOch(43), oprnlowOch(44), oprhighOch(45), oprnhighOch(46), optlowOch(47), optnlowOch(48), opthighOch(49), optnhighOch(50), spanlossOch(51), spanlossminOch(52), spanlossmaxOch(53), spanlossavgOch(54), oprOts(55), oprnOts(56), cvOtu(57), esOtu(58), sesOtu(59), sefsOtu(60), fecOtu(61), hccsOtu(62), pfbereOtu(63), prfberOtu(64), prfbermaxOtu(65), qminOtu(66), qmaxOtu(67), qavgOtu(68), qstdevOtu(69), uncfecblkOtu(70), iaeOtu(71), cvOdu(72), esOdu(73), sesOdu(74), uasOdu(75), fcOdu(76), dmminOdu(77), dmmaxOdu(78), dmavgOdu(79), psdOdu(80), pscpOdu(81), pscwOdu(82), cvTcm(83), esTcm(84), sesTcm(85), uasTcm(86), fcTcm(87), psdTcm(88), pscwTcm(89), pscpTcm(90), dmminTcm(91), dmmaxTcm(92), dmavgTcm(93), iaeTcm(94), cvPcs(95), esPcs(96), sesPcs(97), uasPcs(98), esE(99), sesE(100), uasE(101), inframesE(102), outframesE(103), inframeserrE(104), outframeserrE(105), inframesdiscdsE(106), outframesdiscdsE(107), dfrE(108), fcserrE(109), fecPma(110), fecccwPma(111), fecunccwPma(112), hccsPma(113), prfberPma(114), prfbermaxPma(115), remoteinframesE(116), remoteoutframesE(117), remoteinframeserrE(118), remoteoutframesdiscdsE(119), remotefcserrE(120), grpoptOts(121), grpoptminOts(122), grpoptmaxOts(123), grpoptavgOts(124), oproscOts(125), oproscminOts(126), oproscmaxOts(127), oproscavgOts(128), orlinOts(129), orlinminOts(130), orlinmaxOts(131), orlinavgOts(132), orloutOts(133), orloutminOts(134), orloutmaxOts(135), orloutavgOts(136), oprminOts(137), oprmaxOts(138), opravgOts(139), optOts(140), optminOts(141), optmaxOts(142), optavgOts(143), orlOts(144), orlminOts(145), orlmaxOts(146), orlavgOts(147), opinOts(148), opinminOts(149), opinmaxOts(150), opinavgOts(151), opoutOts(152), opoutminOts(153), opoutmaxOts(154), opoutavgOts(155), grpgainOts(156), grpgainminOts(157), grpgainmaxOts(158), grpgainavgOts(159), grpopinOts(160), grpopinminOts(161), grpopinmaxOts(162), grpopinavgOts(163), grpopoutOts(164), grpopoutminOts(165), grpopoutmaxOts(166), grpopoutavgOts(167), dropgainOts(168), dropgainminOts(169), dropgainmaxOts(170), dropgainavgOts(171), psdOts(172), pscwOts(173), pscpOts(174), evcshOts(175), evcshmaxOts(176), evclgOts(177), evclgmaxOts(178), maxevldisshOts(179), maxevldisshmaxOts(180), maxevldislgOts(181), maxevldislgmaxOts(182), maxevrdisshOts(183), maxevrdisshmaxOts(184), maxevrdislgOts(185), maxevrdislgmaxOts(186), maxevlshOts(187), maxevlshmaxOts(188), maxevllgOts(189), maxevllgmaxOts(190), maxevrshOts(191), maxevrshmaxOts(192), maxevrlgOts(193), maxevrlgmaxOts(194), cumevlshOts(195), cumevlshmaxOts(196), cumevllgOts(197), cumevllgmaxOts(198), cumevrshOts(199), cumevrshmaxOts(200), cumevrlgOts(201), cumevrlgmaxOts(202), dmminL(203), dmmaxL(204), dmavgL(205), esW(206), sesW(207), uasW(208), inframesW(209), inframeserrW(210), outframesW(211), dgdavgOch(212), dgdmaxOch(213), ldsW(214), lsdsW(215), luasW(216), dfrW(217), utlW(218), utlmxW(219), outframeserrW(220), oprOtsi(221), optOtsi(222), oprnOtsi(223), optnOtsi(224), opravgOtsi(225), oprminOtsi(226), oprmaxOtsi(227), optavgOtsi(228), optminOtsi(229), optmaxOtsi(230), dgdavgOtsi(231), dgdmaxOtsi(232), pdlavgOtsi(233), pdlmaxOtsi(234), hccsOtsi(235), fecOtsi(236), prfberOtsi(237), prfbermaxOtsi(238), qminOtsi(239), qmaxOtsi(240), qavgOtsi(241), qstdevOtsi(242), uncfecblkOtsi(243), osnrminOtsi(244), osnrmaxOtsi(245), osnravgOtsi(246), esnrminOtsi(247), esnrmaxOtsi(248), esnravgOtsi(249), cdminOtsi(250), cdmaxOtsi(251), cdavgOtsi(252), fecPcs(253), fecccwPcs(254), fecunccwPcs(255), hccsPcs(256), prfberPcs(257), prfbermaxPcs(258), all(259) }
+
+AllMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), cvP(9), esP(10), sesP(11), uasP(12), fcP(13), cvV(14), esV(15), sesV(16), uasV(17), fcV(18), sasP(19), sefsP(20), cssP(21), cvcP(22), escP(23), sescP(24), uascP(25), fccP(26), esCes(27), sesCes(28), uasCes(29), pscwL(30), pscpL(31), psdL(32), oprOch(33), optOch(34), optminOch(35), optmaxOch(36), optavgOch(37), oprnOch(38), oprminOch(39), oprmaxOch(40), opravgOch(41), optnOch(42), oprlowOch(43), oprnlowOch(44), oprhighOch(45), oprnhighOch(46), optlowOch(47), optnlowOch(48), opthighOch(49), optnhighOch(50), spanlossOch(51), spanlossminOch(52), spanlossmaxOch(53), spanlossavgOch(54), oprOts(55), oprnOts(56), cvOtu(57), esOtu(58), sesOtu(59), sefsOtu(60), fecOtu(61), hccsOtu(62), pfbereOtu(63), prfberOtu(64), prfbermaxOtu(65), qminOtu(66), qmaxOtu(67), qavgOtu(68), qstdevOtu(69), uncfecblkOtu(70), iaeOtu(71), cvOdu(72), esOdu(73), sesOdu(74), uasOdu(75), fcOdu(76), dmminOdu(77), dmmaxOdu(78), dmavgOdu(79), psdOdu(80), pscpOdu(81), pscwOdu(82), cvTcm(83), esTcm(84), sesTcm(85), uasTcm(86), fcTcm(87), psdTcm(88), pscwTcm(89), pscpTcm(90), dmminTcm(91), dmmaxTcm(92), dmavgTcm(93), iaeTcm(94), dmminL(95), dmmaxL(96), dmavgL(97), cvPcs(98), esPcs(99), sesPcs(100), uasPcs(101), esE(102), sesE(103), uasE(104), inframesE(105), outframesE(106), inframeserrE(107), outframeserrE(108), inframesdiscdsE(109), outframesdiscdsE(110), dfrE(111), fcserrE(112), fecPma(113), fecccwPma(114), fecunccwPma(115), hccsPma(116), prfberPma(117), prfbermaxPma(118), remoteinframesE(119), remoteoutframesE(120), remoteinframeserrE(121), remoteoutframesdiscdsE(122), remotefcserrE(123), grpoptOts(124), grpoptminOts(125), grpoptmaxOts(126), grpoptavgOts(127), oproscOts(128), oproscminOts(129), oproscmaxOts(130), oproscavgOts(131), orlinOts(132), orlinminOts(133), orlinmaxOts(134), orlinavgOts(135), orloutOts(136), orloutminOts(137), orloutmaxOts(138), orloutavgOts(139), oprminOts(140), oprmaxOts(141), opravgOts(142), optOts(143), optminOts(144), optmaxOts(145), optavgOts(146), orlOts(147), orlminOts(148), orlmaxOts(149), orlavgOts(150), opinOts(151), opinminOts(152), opinmaxOts(153), opinavgOts(154), opoutOts(155), opoutminOts(156), opoutmaxOts(157), opoutavgOts(158), grpgainOts(159), grpgainminOts(160), grpgainmaxOts(161), grpgainavgOts(162), grpopinOts(163), grpopinminOts(164), grpopinmaxOts(165), grpopinavgOts(166), grpopoutOts(167), grpopoutminOts(168), grpopoutmaxOts(169), grpopoutavgOts(170), dropgainOts(171), dropgainminOts(172), dropgainmaxOts(173), dropgainavgOts(174), psdOts(175), pscwOts(176), pscpOts(177), evcshOts(178), evcshmaxOts(179), evclgOts(180), evclgmaxOts(181), maxevldisshOts(182), maxevldisshmaxOts(183), maxevldislgOts(184), maxevldislgmaxOts(185), maxevrdisshOts(186), maxevrdisshmaxOts(187), maxevrdislgOts(188), maxevrdislgmaxOts(189), maxevlshOts(190), maxevlshmaxOts(191), maxevllgOts(192), maxevllgmaxOts(193), maxevrshOts(194), maxevrshmaxOts(195), maxevrlgOts(196), maxevrlgmaxOts(197), cumevlshOts(198), cumevlshmaxOts(199), cumevllgOts(200), cumevllgmaxOts(201), cumevrshOts(202), cumevrshmaxOts(203), cumevrlgOts(204), cumevrlgmaxOts(205), esW(206), sesW(207), uasW(208), inframesW(209), inframeserrW(210), outframesW(211), dgdavgOch(212), dgdmaxOch(213), ldsW(214), lsdsW(215), luasW(216), dfrW(217), utlW(218), utlmxW(219), outframeserrW(220), oprOtsi(221), optOtsi(222), oprnOtsi(223), optnOtsi(224), opravgOtsi(225), oprminOtsi(226), oprmaxOtsi(227), optavgOtsi(228), optminOtsi(229), optmaxOtsi(230), dgdavgOtsi(231), dgdmaxOtsi(232), pdlavgOtsi(233), pdlmaxOtsi(234), hccsOtsi(235), fecOtsi(236), prfberOtsi(237), prfbermaxOtsi(238), qminOtsi(239), qmaxOtsi(240), qavgOtsi(241), qstdevOtsi(242), uncfecblkOtsi(243), osnrminOtsi(244), osnrmaxOtsi(245), osnravgOtsi(246), esnrminOtsi(247), esnrmaxOtsi(248), esnravgOtsi(249), cdminOtsi(250), cdmaxOtsi(251), cdavgOtsi(252), fecPcs(253), fecccwPcs(254), fecunccwPcs(255), hccsPcs(256), prfberPcs(257), prfbermaxPcs(258) }
+
+AllThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), cvP(8), bbeP(9), esP(10), sesP(11), sasP(12), sefsP(13), cssP(14), uasP(15), cvcP(16), escP(17), sescP(18), uascP(19), cvV(20), esV(21), sesV(22), uasV(23), bbePpi(24), esPpi(25), sesPpi(26), oprOch(27), optOch(28), oprnOch(29), oprlowOch(30), oprnlowOch(31), oprhighOch(32), oprnhighOch(33), optlowOch(34), optnlowOch(35), opthighOch(36), optnhighOch(37), spanlossOch(38), oprOts(39), oprnOts(40), optOts(41), maxevlshOts(42), maxevllgOts(43), maxevrshOts(44), maxevrlgOts(45), cumevlshOts(46), cumevllgOts(47), cumevrshOts(48), cumevrlgOts(49), cvOtu(50), esOtu(51), sesOtu(52), sefsOtu(53), hccsOtu(54), pfbereOtu(55), prfberOtu(56), prfbermaxOtu(57), qminOtu(58), qmaxOtu(59), qavgOtu(60), qstdevOtu(61), uncfecblkOtu(62), iaeOtu(63), cvOdu(64), esOdu(65), sesOdu(66), uasOdu(67), dmminOdu(68), dmmaxOdu(69), dmavgOdu(70), cvTcm(71), esTcm(72), sesTcm(73), uasTcm(74), dmminTcm(75), dmmaxTcm(76), dmavgTcm(77), iaeTcm(78), esPcs(79), sesPcs(80), uasPcs(81), esE(82), sesE(83), uasE(84), hccsPma(85), prfberPma(86), prfbermaxPma(87), inframesE(88), inframeserrE(89), inframesdiscdsE(90), dfrE(91), outframesE(92), fcserrE(93), utlminE(94), utlmaxE(95), utlavgE(96), esW(97), sesW(98), uasW(99), inframesW(100), inframeserrW(101), outframesW(102), ldsW(103), lsdsW(104), luasW(105), utlW(106), utlmxW(107), dgdavgOch(108), dgdmaxOch(109), orlOts(110), opinOts(111), opoutOts(112), grpgainOts(113), grpopinOts(114), grpopoutOts(115), dropgainOts(116), grpoptOts(117), oproscOts(118), orlinOts(119), orloutOts(120), dmminL(121), dmmaxL(122), dmavgL(123), oprOtsi(124), optOtsi(125), oprnOtsi(126), dgdavgOtsi(127), dgdmaxOtsi(128), pdlavgOtsi(129), pdlmaxOtsi(130), hccsOtsi(131), prfberOtsi(132), prfbermaxOtsi(133), qminOtsi(134), qmaxOtsi(135), qavgOtsi(136), qstdevOtsi(137), uncfecblkOtsi(138), osnrminOtsi(139), osnrmaxOtsi(140), osnravgOtsi(141), esnrminOtsi(142), esnrmaxOtsi(143), esnravgOtsi(144), fcP(145), fcV(146), fccP(147), esCes(148), sesCes(149), uasCes(150), cdminOtsi(151), cdmaxOtsi(152), cdavgOtsi(153), hccsPcs(154), prfberPcs(155), prfbermaxPcs(156) }
+
+Almcorr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), on(1), custom(2) }
+
+Almdirn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { rcv(0), trmt(1), na(2) }
+
+Almprofile ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { profile0(0), profile1(1), profile2(2), profile3(3), profile4(4), profile5(5) }
+
+Almprvaidtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optmon(0), voa(1), amp(2), doc(3), raman(4), adj(5), osc(6), secu(7), eqpt(8), com(9), oc3(10), oc12(11), oc48(12), oc192(13), oc768(14), sts1(15), sts3c(16), sts12c(17), sts24c(18), sts48c(19), sts192c(20), vt1(21), vt2(22), eth(23), wan(24), e1(25), t1(26), stm1e(27), dsm(28), otm(29), otm2(30), otm3(31), lag(32), e3(33), rpr(34), eth10g(35), eth100(36), ethn(37), fc(38), ptp(39), otuttp(40), ettp(41), sttp(42), oduttp(43), oductp(44), tcm(45), snc(46), osrpnode(47), osrplink(48), osrpline(49), rls(50), ma(51), idler(52), telemetry(53), crsnc(54), slotseq(55), tidslotseq(56), ampmon(57), vt6(58), ots(59), flex(60), otc(61), protgrp(62), oc1(63), odu(64), chc(65), nmcc(66), otdrcfg(67), sncg(68), cbrttp(69), adjpeer(70), pdh(71), path(72), pktiwf(73), facgrp(74), all(75), t3(76), ec1(77) }
+
+Alrmstat ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1), notmonitored(2) }
+
+Alternatesecuritydomains ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { challenge(0), local(1) }
+
+AmpPmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { all(0) }
+
+AmpPmMontypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), orlminOts(1), orlmaxOts(2), orlavgOts(3), opinOts(4), opinminOts(5), opinmaxOts(6), opinavgOts(7), opoutOts(8), opoutminOts(9), opoutmaxOts(10), opoutavgOts(11), grpgainOts(12), grpgainminOts(13), grpgainmaxOts(14), grpgainavgOts(15), grpopinOts(16), grpopinminOts(17), grpopinmaxOts(18), grpopinavgOts(19), grpopoutOts(20), grpopoutminOts(21), grpopoutmaxOts(22), grpopoutavgOts(23), dropgainOts(24), dropgainminOts(25), dropgainmaxOts(26), dropgainavgOts(27), all(28) }
+
+AmpPmMontypeRtrvResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), orlminOts(1), orlmaxOts(2), orlavgOts(3), opinOts(4), opinminOts(5), opinmaxOts(6), opinavgOts(7), opoutOts(8), opoutminOts(9), opoutmaxOts(10), opoutavgOts(11), grpgainOts(12), grpgainminOts(13), grpgainmaxOts(14), grpgainavgOts(15), grpopinOts(16), grpopinminOts(17), grpopinmaxOts(18), grpopinavgOts(19), grpopoutOts(20), grpopoutminOts(21), grpopoutmaxOts(22), grpopoutavgOts(23), dropgainOts(24), dropgainminOts(25), dropgainmaxOts(26), dropgainavgOts(27) }
+
+AmpThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), opinOts(1), opoutOts(2), grpgainOts(3), grpopinOts(4), grpopoutOts(5), dropgainOts(6) }
+
+AmpThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), opinOts(1), opoutOts(2), grpgainOts(3), grpopinOts(4), grpopoutOts(5), dropgainOts(6), all(7) }
+
+Ampmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { gain(0), power(1), gainclamp(2) }
+
+Amppkmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1) }
+
+Anctrl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { auto(0), master(1), slave(2) }
+
+AutoNegotiation ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), on(1) }
+
+Autotxrxprov ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { auto(0), manual(1) }
+
+Baseho ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odu2(0), odu3(1), odu4(2), oduc1(3), oduc2(4), oduc3(5), oduc4(6), oduc5(7), oduc6(8), oduc7(9), oduc8(10) }
+
+BlockedUnblocked ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { blocked(0), unblocked(1) }
+
+BoolOnOff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1) }
+
+BoolOnOffDefaultoff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1) }
+
+BoolTrueDefaultfalse ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { true(0), false(1) }
+
+BoolTrueFalse ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { true(0), false(1) }
+
+BoolYN ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { y(0), n(1) }
+
+BoolYNDefaultn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { y(0), n(1) }
+
+BoolYesNo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+BoolYesNoDefaultno ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+BoolYesNoDefaultyes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+BwprfCirEirUnits ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0(0), e64000(1), e1000000(2), e10000000(3), e100000000(4) }
+
+BwprfPolicer ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e2697(0), e2698(1), e4115(2) }
+
+Bwthrmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { auto(0), manual(1), advAll(2) }
+
+Capacitychangemode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mode1(0), mode2(1), mode3(2) }
+
+Carrier ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { section(0), line(1), gcc0(2), gcc1(3), gcc2(4), ext(5) }
+
+Cbrfecfrmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), rs10(1) }
+
+Cbrmapping ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { bmp(0), pttbmp(1) }
+
+CbrttpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), fecPcs(4), fecccwPcs(5), fecunccwPcs(6), hccsPcs(7), prfberPcs(8), prfbermaxPcs(9), all(10) }
+
+CbrttpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), fecPcs(4), fecccwPcs(5), fecunccwPcs(6), hccsPcs(7), prfberPcs(8), prfbermaxPcs(9) }
+
+CbrttpOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframeserr(1), inoctets(2), outframes(3), outframeserr(4), outoctets(5), fcserr(6), jab(7), frag(8), frtoolongs(9), frtooshorts(10), inpausefr(11), symbolerr(12), outpausefr(13), allIf(14), allEth(15), all(16) }
+
+CbrttpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), hccsPcs(3), prfberPcs(4), prfbermaxPcs(5) }
+
+Cbrttpcondtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nos(0) }
+
+Cbrttpprotocol ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { fc(0), ficon(1) }
+
+Ccda ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1), unknown(2) }
+
+Cct ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1way(0), e1waypr(1), e2way(2), e2waypr(3), e2waydpr(4) }
+
+CctCrsodu ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e2way(0), e2waypr(1) }
+
+CctDefault2way ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1way(0), e1waypr(1), e2way(2), e2waypr(3), e2waydpr(4) }
+
+CctOdu ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e2way(0) }
+
+CctOtm2 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1way(0), e2way(1) }
+
+Chcmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { loss(0), power(1), openlooploss(2) }
+
+ChmonMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { all(0) }
+
+ChmonPmMontypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0), optminOch(1), optmaxOch(2), optavgOch(3), all(4) }
+
+ChmonPmMontypeRtrvResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0), optminOch(1), optmaxOch(2), optavgOch(3) }
+
+ChmonThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0) }
+
+ChmonThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0), all(1) }
+
+Chstatusvalues ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { notAvailable(0), unmanaged(1), adding(2), deleting(3), managed(4), failed(5), notApplicable(6) }
+
+ClassOfService ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nw(0), pr(1), gd(2), sl(3), st(4) }
+
+ClassOfServiceDomain ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { st(0), br(1), sl(2), gd(3), pl(4), pr(5), nt(6), nw(7), cr(8) }
+
+Clienttypectp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { eth(0), e2g5Ib(1), e5gIb(2), e10gIb(3), e20gIb(4), e30gIb(5), e40gIb(6), e60gIb(7), e80gIb(8), fc400(9), fc800(10), fc1600(11), fc3200(12), e3gsdiNtsc(13), e3gsdiPal(14), e10gsdiNtsc(15), e10gsdiPal(16), cpril4(17), cpril5(18), cpril6(19), cpril7(20), other(21) }
+
+Clienttypettp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { otn(0), eth(1) }
+
+CompleteIncomplete ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { complete(0), incomplete(1) }
+
+Conditioning ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), gfpcmf(1), gfpcmfuser(2), gfp10berr(3), uneq(4), niltr(5), ais(6), gfpcsf(7) }
+
+ConditioningT12 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { gfpcmf(0) }
+
+Conditioningoverride ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), sc(1), profile(2) }
+
+Controlcpbl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e50(0), e12Point5(1), unknown(2) }
+
+Controlmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e50(0), e12Point5(1) }
+
+CosMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cngsTm(0), ovfsTm(1), utlTm(2), utlmxTm(3) }
+
+CosOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframesdiscds(1), inoctets(2), infrnc(3), frtoolongs(4), indfr(5), indoct(6), outframes(7), outoctets(8), outdfr(9), outdfrcnf(10), outdoct(11), utl(12), utlmx(13), all(14) }
+
+CrsRate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { vt1(0), vt2(1), sts1(2), sts3c(3), sts12c(4), sts24c(5), sts48c(6), sts192c(7), all(8) }
+
+CsaQuerymode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { roundRobin(0), primaryFirst(1) }
+
+Ctptype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), otm2(1), odu0(2), odu1(3), oduflex(4), odu2(5), odu3(6), odu4(7), oc192(8), eth10g(9), flex(10), sts192c(11), sdh64(12) }
+
+Ctrltype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nil(0), txrx(1), signal(2) }
+
+DbSyncState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { insync(0), oosync(1) }
+
+Devtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { rptr(0), teq(1), bu(2), supvtx(3), supvrx(4), budcsw(5) }
+
+Dfltsetting ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { alc1(0), alc2(1), alc3(2), alc4(3), setting0(4), setting1(5), setting2(6), setting3(7), setting4(8), setting5(9), setting6(10), setting7(11), setting8(12), setting9(13), setting10(14), setting11(15), setting12(16), setting13(17), setting14(18), setting15(19), configuration1(20), configuration2(21), configuration3(22), configuration4(23), configuration5(24), configuration6(25), configuration7(26), configuration8(27), configuration9(28), configuration10(29), configuration11(30), configuration12(31), configuration13(32), configuration14(33), configuration15(34), configuration16(35), responselevel1(36), responselevel2(37), responselevel3(38), responselevel4(39), responselevel5(40), responselevel6(41), responselevel7(42), responselevel8(43), mainab(44), mainbc(45), mainca(46) }
+
+Direction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { x(0), y(1), down(2), up(3), ab(4), ac(5), ba(6), bc(7), ca(8), cb(9), abac(10), babc(11), cacb(12), cbab(13) }
+
+DirnInput ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { rcv(0), trmt(1), all(2) }
+
+DirnInputPht ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { na(0), rcv(1), trmt(2), all(3) }
+
+DirnResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { rcv(0), trmt(1) }
+
+DirnRespPht ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { na(0), rcv(1), trmt(2) }
+
+DisableEnable ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { disable(0), enable(1) }
+
+Dispscaninfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Divtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { link(0), pbid(1), node(2) }
+
+DscmMods ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { other(0), mod5(1), mod10(2), mod20(3), mod30(4), mod40(5), mod50(6), mod60(7), mod70(8), mod80(9), mod90(10), mod100(11), mod110(12), mod120(13), mod130(14), mod140(15), mod150(16), mod160(17), mod200(18), mod240(19), mod280(20), mod320(21), mod12Point5(22), mod25(23), mod75(24), mod125(25), e01db(26), e02db(27), e03db(28), e04db(29), e05db(30), e06db(31), e07db(32), e08db(33), e09db(34), e10db(35), e11db(36), e12db(37), e13db(38), e14db(39), e15db(40), e16db(41), e17db(42), mod180(43), mod170(44) }
+
+DscmTypes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { other(0), type1(1), type2(2), type3(3), type4(4), type5(5), type6(6) }
+
+Edalmprofile ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { profile3(0), profile4(1), profile5(2) }
+
+Edalrmstat ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1) }
+
+Edpmprofile ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { profile1(0), profile2(1), profile3(2), profile4(3), dflt(4) }
+
+EnableDisable ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enable(0), disable(1) }
+
+EnabledDefaultdisabled ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1) }
+
+EnabledDisabled ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1) }
+
+Encrbyte ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { r2c1(0), r2c2(1), r4c9(2), r4c10(3), r4c11(4), r4c12(5), r4c13(6), r4c14(7), r1c13(8), r1c14(9), r3c13(10), r3c14(11) }
+
+Enumcostcriteria ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { delay(0), adminweight(1) }
+
+Enumcostcriteriasetting ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mandatory(0), besteffort(1), disable(2) }
+
+EnumdtlexclCrsnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { disable(0), working(1), workingprotect(2), preferred(3) }
+
+EnumdtlexclSnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { no(0), yes(1), disable(2), working(3), workingprotect(4), preferred(5) }
+
+EnumendptsizeCrsnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odu0(0), odu1(1), odu2(2), odu2e(3), odu3(4), odu4(5), oduflex(6) }
+
+EnumendptsizeSnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sts1(0), sts3c(1), sts12c(2), sts24c(3), sts48c(4), sts192c(5), odu0(6), odu1(7), odu2(8), odu2e(9), odu3(10), odu4(11), oduflex(12) }
+
+Enumhppreempt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { disabled(0), reserved(1) }
+
+EnumosrplinkState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { primaryOpr(0), primaryStdby(1), secondaryOpr(2), notUsed(3) }
+
+Enumpriority ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { low(0), high(1) }
+
+EnumprttCrsnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unprotectedHigh(0), unprotectedLow(1) }
+
+EnumprttSnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { apsVlsrProtected(0), apsVlsrUnprotected(1), unprotected(2), unprotectedHigh(3), unprotectedLow(4), unprotectedProtect(5) }
+
+EnumprttSncg ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unprotectedHigh(0), unprotectedLow(1) }
+
+EnumrmteptypeCrsnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ctp(0), vcp(1), gep(2) }
+
+EnumrmteptypeSnc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ctp(0), vcp(1), vep(2), gep(3), osrplag(4) }
+
+Enumrmtinterop ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { other(0), e2g5motr(1) }
+
+Enumrmtpathprotection ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), highOrder(1), lowOrder(2) }
+
+Enumrteopr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { manswitch(0), regroom(1), resize(2), revert(3) }
+
+Enumrvrtt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sncNoRevert(0), sncDelay(1), sncTimeofday(2) }
+
+Enumrvrttype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { wtr(0), todr(1) }
+
+Enumsnctype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { dynamic(0), perm(1) }
+
+Enumvcptype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odu0(0), odu1(1), odu2(2), odu3(3), odu2e(4), odu4(5), oduflex(6) }
+
+Envalm ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { aircompr(0), aircond(1), airdryr(2), batdschrg(3), battery(4), clfan(5), engine(6), engoprg(7), explgs(8), firdetr(9), fire(10), flood(11), fuse(12), gen(13), hiair(14), hihum(15), hitemp(16), hiwtr(17), intruder(18), lwbatvg(19), lwfuel(20), lwhum(21), lwpres(22), lwtemp(23), lwwtr(24), misc(25), opendr(26), pump(27), power(28), pwr48(29), rect(30), recthi(31), rectlo(32), smoke(33), toxicgas(34), ventn(35) }
+
+Eqptprofile1 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { gfpT(0), gfpF(1), ho(2), lo(3), l2ssUnknown(4), l2ssNonpdh(5), l2ssPdh(6), oc192(7), oc768(8), interop(9), otnmotr(10), e40gnni(11), e40guni(12), e40g(13), e4x10g(14), e10g(15), none(16), eth100gProprietary(17), eth100gGmp(18), otu4(19), l2standard(20), l2extended(21), l2standardExtOm(22), otr(23), ull(24), e2xbpsk100g(25), dcqpsk100g(26), e16qam200g(27), e2x16qam400g(28), qpsk100g(29), odu3e2(30), fixedgrid(31), flexiblegrid(32), e4ask100g(33), e2x8qam300g(34), e100gservice(35), multiservice(36) }
+
+Eqptprofile2 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e40g(0), e4x10g(1), none(2), e10g(3), eth100gGmp(4), otu4(5) }
+
+Eqptprotprio ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { hi(0), lo(1) }
+
+Eqptprotscheme ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1forn(0), e1plus1(1) }
+
+Equipmentattributetype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { transmode(0) }
+
+Eth100Montype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esE(0), sesE(1), uasE(2), inframesE(3), inframeserrE(4), outframesE(5), outframeserrE(6), dfrE(7), inframesdiscdsE(8), outframesdiscdsE(9), cvPcs(10), esPcs(11), sesPcs(12), uasPcs(13), oprOch(14), oprminOch(15), oprmaxOch(16), opravgOch(17), oprnOch(18), optOch(19), optminOch(20), optmaxOch(21), optavgOch(22), optnOch(23), all(24) }
+
+Eth100MontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esE(0), sesE(1), uasE(2), inframesE(3), inframeserrE(4), inframesdiscdsE(5), outframesE(6), outframeserrE(7), outframesdiscdsE(8), dfrE(9), cvPcs(10), esPcs(11), sesPcs(12), uasPcs(13), oprOch(14), oprminOch(15), oprmaxOch(16), opravgOch(17), oprnOch(18), optOch(19), optminOch(20), optmaxOch(21), optavgOch(22), optnOch(23) }
+
+Eth100Omtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { alignerr(0), singlecollfr(1), multicollfr(2), sqetesterr(3), defertrans(4), latecoll(5), excesscoll(6), carsenerr(7), inframes(8), inframeserr(9), inoctets(10), inoctetserr(11), inframesdiscds(12), indfr(13), inpausefr(14), incfr(15), frtooshorts(16), frtoolongs(17), fcserr(18), frag(19), jab(20), symbolerr(21), outframes(22), outframeserr(23), outoctets(24), outoctetserr(25), outframesdiscds(26), outpausefr(27), outdfr(28), infrnc(29), indoct(30), outdfrcnf(31), outdoct(32), utl(33), utlmx(34), autonegcycles(35), internalmacrxerr(36), internalmactxerr(37), allIf(38), allEth(39), all(40) }
+
+Eth10gMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), inframesE(4), inframeserrE(5), outframesE(6), fcserrE(7), oprOch(8), oprminOch(9), oprmaxOch(10), opravgOch(11), optOch(12), optminOch(13), optmaxOch(14), optavgOch(15), oprnOch(16), optnOch(17), esE(18), sesE(19), uasE(20), outframeserrE(21), dfrE(22), inframesdiscdsE(23), outframesdiscdsE(24), utlminE(25), utlmaxE(26), utlavgE(27), all(28) }
+
+Eth10gMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), inframesE(4), inframeserrE(5), outframesE(6), fcserrE(7), oprOch(8), oprminOch(9), oprmaxOch(10), opravgOch(11), optOch(12), optminOch(13), optmaxOch(14), optavgOch(15), oprnOch(16), optnOch(17), esE(18), sesE(19), uasE(20), outframeserrE(21), dfrE(22), inframesdiscdsE(23), outframesdiscdsE(24), utlminE(25), utlmaxE(26), utlavgE(27) }
+
+Eth10gThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), oprOch(3), optOch(4), oprnOch(5), esE(6), sesE(7), uasE(8), utlminE(9), utlmaxE(10), utlavgE(11) }
+
+EthMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), esE(4), sesE(5), uasE(6), inframesE(7), inframeserrE(8), outframesE(9), outframeserrE(10), dfrE(11), inframesdiscdsE(12), outframesdiscdsE(13), remoteinframesE(14), remoteoutframesE(15), remoteinframeserrE(16), remoteoutframesdiscdsE(17), remotefcserrE(18), psdE(19), pscwE(20), pscpE(21), oprminOch(22), oprmaxOch(23), opravgOch(24), optminOch(25), optmaxOch(26), optavgOch(27), oprOch(28), oprnOch(29), optOch(30), optnOch(31), all(32) }
+
+EthMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { es(0), ses(1), uas(2), inframes(3), inframeserr(4), inframesdiscds(5), outframes(6), frtoolongs(7), frtooshort(8), inmaccontrolfr(9) }
+
+EthOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframeserr(1), inoctets(2), inoctetserr(3), inframesdiscds(4), indfr(5), inpausefr(6), incfr(7), frtooshorts(8), frtoolongs(9), fcserr(10), frag(11), jab(12), symbolerr(13), outframes(14), outframeserr(15), outoctets(16), outoctetserr(17), outframesdiscds(18), outpausefr(19), outdfr(20), autonegcycles(21), internalmacrxerr(22), internalmactxerr(23), allIf(24), allEth(25), alignerr(26), singlecollfr(27), multicollfr(28), sqetesterr(29), defertrans(30), latecoll(31), excesscoll(32), carsenerr(33), inmaccontrolfr(34), hecdfr(35), all(36) }
+
+EthSetMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esE(0), sesE(1), uasE(2), esPcs(3), sesPcs(4), uasPcs(5), oprOch(6), oprnOch(7), optOch(8) }
+
+Ethloopback ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { facility(0), terminal(1), efmremote(2) }
+
+EthnMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), fecPma(4), fecccwPma(5), fecunccwPma(6), hccsPma(7), prfberPma(8), prfbermaxPma(9), esE(10), sesE(11), uasE(12), inframesE(13), inframeserrE(14), inframesdiscdsE(15), dfrE(16), outframesE(17), outframeserrE(18), outframesdiscdsE(19), fcserrE(20), oprOch(21), oprminOch(22), oprmaxOch(23), opravgOch(24), oprnOch(25), optOch(26), optminOch(27), optmaxOch(28), optavgOch(29), optnOch(30), oprlowOch(31), oprnlowOch(32), oprhighOch(33), oprnhighOch(34), optlowOch(35), optnlowOch(36), opthighOch(37), optnhighOch(38), utlminE(39), utlmaxE(40), utlavgE(41), all(42) }
+
+EthnMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), fecPma(4), fecccwPma(5), fecunccwPma(6), hccsPma(7), prfberPma(8), prfbermaxPma(9), esE(10), sesE(11), uasE(12), inframesE(13), inframeserrE(14), inframesdiscdsE(15), dfrE(16), outframesE(17), outframeserrE(18), outframesdiscdsE(19), fcserrE(20), oprOch(21), oprminOch(22), oprmaxOch(23), opravgOch(24), oprnOch(25), optOch(26), optminOch(27), optmaxOch(28), optavgOch(29), optnOch(30), oprlowOch(31), oprnlowOch(32), oprhighOch(33), oprnhighOch(34), optlowOch(35), optnlowOch(36), opthighOch(37), optnhighOch(38), utlminE(39), utlmaxE(40), utlavgE(41) }
+
+EthnOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { fcserr(0), frtooshorts(1), frtoolongs(2), symbolerr(3), inpausefr(4), outpausefr(5), inframes(6), inframeserr(7), inframesdiscds(8), indfr(9), inoctets(10), outframes(11), outframeserr(12), outframesdiscds(13), outoctets(14), outdfr(15), frag(16), jab(17), allIf(18), allEth(19), all(20) }
+
+EthnThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), hccsPma(3), prfberPma(4), prfbermaxPma(5), esE(6), sesE(7), uasE(8), oprOch(9), oprnOch(10), optOch(11), oprlowOch(12), oprnlowOch(13), oprhighOch(14), oprnhighOch(15), optlowOch(16), opthighOch(17), utlminE(18), utlmaxE(19), utlavgE(20) }
+
+Ethrate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { eth100m(0), eth1g(1), eth10g(2), eth40g(3), eth100g(4), ethflex(5), eth2g5(6), eth10m(7), eth25g(8), eth200g(9), eth400g(10) }
+
+EttpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), esE(4), sesE(5), uasE(6), fecPma(7), fecccwPma(8), fecunccwPma(9), hccsPma(10), prfberPma(11), prfbermaxPma(12), inframesE(13), inframeserrE(14), inframesdiscdsE(15), dfrE(16), outframesE(17), outframeserrE(18), outframesdiscdsE(19), fcserrE(20), all(21) }
+
+EttpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), esE(4), sesE(5), uasE(6), fecPma(7), fecccwPma(8), fecunccwPma(9), hccsPma(10), prfberPma(11), prfbermaxPma(12), inframesE(13), inframeserrE(14), inframesdiscdsE(15), dfrE(16), outframesE(17), outframeserrE(18), outframesdiscdsE(19), fcserrE(20) }
+
+EttpOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { fcserr(0), frtooshorts(1), frtoolongs(2), symbolerr(3), inpausefr(4), outpausefr(5), inframes(6), inframeserr(7), inframesdiscds(8), indfr(9), inoctets(10), outframes(11), outframeserr(12), outframesdiscds(13), outoctets(14), outdfr(15), frag(16), jab(17), allIf(18), allEth(19), all(20) }
+
+EttpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), esE(3), sesE(4), uasE(5), hccsPma(6), prfberPma(7), prfbermaxPma(8) }
+
+Ettpcondtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e8b10b(0), k307(1), lfRf(2), ethIdle(3), lnkfltc1c2(4), none(5) }
+
+Ettpmapping ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), gfpstd(1), gfpmactr(2), gfpmacostr(3), prop237(4), gmp(5), bmp(6), imp(7) }
+
+Exinvl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1Day(0), e2Day(1), e3Day(2), e4Day(3), e5Day(4), e6Day(5), e7Day(6), e1Hr(7), e2Hr(8), e3Hr(9), e4Hr(10), e5Hr(11), e6Hr(12), e7Hr(13), e8Hr(14), e9Hr(15), e10Hr(16), e11Hr(17), e12Hr(18), e13Hr(19), e14Hr(20), e15Hr(21), e16Hr(22), e17Hr(23), e18Hr(24), e19Hr(25), e20Hr(26), e21Hr(27), e22Hr(28), e23Hr(29), e5Min(30), e6Min(31), e7Min(32), e8Min(33), e9Min(34), e10Min(35), e11Min(36), e12Min(37), e13Min(38), e14Min(39), e15Min(40), e16Min(41), e17Min(42), e18Min(43), e19Min(44), e20Min(45), e21Min(46), e22Min(47), e23Min(48), e24Min(49), e25Min(50), e26Min(51), e27Min(52), e28Min(53), e29Min(54), e30Min(55), e31Min(56), e32Min(57), e33Min(58), e34Min(59), e35Min(60), e36Min(61), e37Min(62), e38Min(63), e39Min(64), e40Min(65), e41Min(66), e42Min(67), e43Min(68), e44Min(69), e45Min(70), e46Min(71), e47Min(72), e48Min(73), e49Min(74), e50Min(75), e51Min(76), e52Min(77), e53Min(78), e54Min(79), e55Min(80) }
+
+Exresult ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { pass(0), noex(1), failW(2), failP(3) }
+
+Extcontrol ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { aircond(0), engine(1), fan(2), gen(3), heat(4), light(5), misc(6), spklr(7) }
+
+Facgrpservicetype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e16gfcgrp(0), e32gfcgrp(1) }
+
+FcMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), oprOch(4), optOch(5), oprnOch(6), optnOch(7), all(8) }
+
+FcMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), oprOch(4), optOch(5), oprnOch(6), optnOch(7) }
+
+FcThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), oprOch(3), optOch(4), oprnOch(5), all(6) }
+
+FcThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), oprOch(3), optOch(4), oprnOch(5) }
+
+Fec ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { rs8(0), efec(1), off(2) }
+
+Flatmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nOra(0), mode1(1), mode2(2) }
+
+FlexMapping ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { flexcbr(0), amp(1), bmp(2), gmp(3), tttgmp(4), tttbmp(5), llmp(6), enhcbr(7), tcodegfpt(8), tcodegfptstd(9) }
+
+FlexMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), esE(4), sesE(5), uasE(6), inframesE(7), inframeserrE(8), outframesE(9), outframeserrE(10), dfrE(11), inframesdiscdsE(12), outframesdiscdsE(13), fcserrE(14), oprOch(15), oprminOch(16), oprmaxOch(17), opravgOch(18), oprnOch(19), optOch(20), optminOch(21), optmaxOch(22), optavgOch(23), optnOch(24), psdE(25), pscwE(26), pscpE(27), all(28) }
+
+FlexMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvPcs(0), esPcs(1), sesPcs(2), uasPcs(3), esE(4), sesE(5), uasE(6), inframesE(7), inframeserrE(8), outframesE(9), outframeserrE(10), dfrE(11), inframesdiscdsE(12), outframesdiscdsE(13), fcserrE(14), oprOch(15), oprminOch(16), oprmaxOch(17), opravgOch(18), oprnOch(19), optOch(20), optminOch(21), optmaxOch(22), optavgOch(23), optnOch(24), psdE(25), pscwE(26), pscpE(27) }
+
+FlexOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframeserr(1), inoctets(2), inframesdiscds(3), indfr(4), inpausefr(5), frtooshorts(6), frtoolongs(7), fcserr(8), frag(9), jab(10), symbolerr(11), outframes(12), outframeserr(13), outoctets(14), outframesdiscds(15), outpausefr(16), outdfr(17), allIf(18), allEth(19), all(20) }
+
+FlexThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), esE(3), sesE(4), uasE(5), oprOch(6), oprnOch(7), optOch(8), all(9) }
+
+FlexThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esPcs(0), sesPcs(1), uasPcs(2), esE(3), sesE(4), uasE(5), oprOch(6), oprnOch(7), optOch(8) }
+
+Flexloopback ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { facility(0), terminal(1) }
+
+Flextype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { gfpF(0), cbr(1) }
+
+Flowctrl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), asym(1), pree(2), sym(3) }
+
+Forcedshutoff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1) }
+
+Ftracetype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { exptrc(0), inctrc(1), trc(2) }
+
+Gainmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { low(0), high(1), na(2) }
+
+GrpcEncoding ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ascii(0), proto(1), json(2) }
+
+Gwstatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { forwarding(0), pending(1), rejected(2) }
+
+Index ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0(0), e1(1), e2(2), e3(3), e4(4), e5(5), e6(6), e7(7), e8(8), e9(9), e10(10), e11(11), e12(12), e13(13), e14(14), e15(15), e16(16), e17(17), e18(18), e19(19), e20(20), e21(21), e22(22), e23(23), e24(24), e25(25), e26(26), e27(27), e28(28), e29(29), e30(30), e31(31), e32(32), all(33) }
+
+Intersectingslotseqstatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { notApplicable(0), unresolved(1), resolved(2) }
+
+Iocarrier ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e12portsfp(0), none(1) }
+
+IprtgOwner ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { local(0), static(1), ospf(2), iisis(3), bgp(4) }
+
+LagOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframeserr(1), indfr(2), outdfr(3), inoctets(4), inoctetserr(5), outframes(6), outoctets(7), all(8), allIf(9) }
+
+LanNetdomain ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mcn(0), pktn(1) }
+
+Lasercentering ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), on(1), standby(2), unknown(3) }
+
+Laserofffarendfail ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { enabled(0), disabled(1) }
+
+Lcasaidtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sts1(0), sts3c(1), vt1(2), vt2(3), ds1(4), e1(5) }
+
+LedStates ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ledOff(0), ledRed(1), ledYellow(2), ledGreen(3), ledBlue(4), ledWhite(5), ledRedFlash(6), ledYellowFlash(7), ledGreenFlash(8), ledBlueFlash(9), ledUnknown(10) }
+
+Linetype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { coloured(0), colourless(1), contentionless(2), cscoloured(3), cscolourless(4), unknown(5) }
+
+Linkoptmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { lnkstdmode(0), lnksnrmode(1), lnktrackingmode(2), lnkspectralmode(3), lnklatencymode(4), lnknrbwchmode(5), lnknonlchmode(6), lnkflinemode(7), lnkrsvmode1(8), lnkrsvmode2(9), lnkrsvmode3(10), custom(11), unknown(12) }
+
+Locctrlmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), e12Point5(1), e50(2) }
+
+Locn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nend(0), fend(1) }
+
+LocnAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nend(0), fend(1), all(2) }
+
+LocnWithDflt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nend(0), fend(1) }
+
+Locpst ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { is(0), oosMa(1), oosAu(2), oosAuma(3) }
+
+Locsst ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sgeo(0) }
+
+Loctype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { locnil(0), txmux(1), rxdemux(2), locadd(3), locdrop(4), wssmux(5), wssdemux(6) }
+
+Loopback ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { facility(0), terminal(1), efmremote(2) }
+
+LoopbackNgm ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { facility(0) }
+
+Lpbkstatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), pass(1), fail(2), failchoutflExceeds1Db(3), failttiMismatch(4), failttiFail(5), failTxtuning(6), failChinlos(7), failchinflExceeds1Db(8), failChoutlos(9), failNotready(10), failRxlos(11), failRxlof(12), failRxloch(13), failRxloc(14), failRxlom(15), failRxsd(16), failprefecSf(17), failCmdcmnouthfl(18), failCmdcmnoutlos(19), failCmdcmninhfl(20), failCmdcmninlos(21), failCmdopmhfl(22), failTxsplimgmtoff(23), manualvalidationRequired(24) }
+
+Ltcactmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1), autoon(2) }
+
+Ltcalmmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1) }
+
+Mapmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { au3Vt15(0), au4Vt2(1), au3Vt2(2), au4Vt15(3) }
+
+Mcpomode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), psd(1), pwrperport(2) }
+
+MepOmtypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { outfrlbm(0), infrlbm(1), outfrlbr(2), infrlbr(3), outfrltm(4), infrltm(5), outfrltr(6), infrltr(7), outfrccm(8), infrccm(9), infrccmxcon(10), infrccmerr(11), infrccmstatus(12), infrccmrdi(13), outfrais(14), infrais(15), all(16) }
+
+Minsynceql ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { prs(0), stu(1), st2(2), tnc(3), st3e(4), st3(5), prc(6), ssua(7), ssub(8), sec(9) }
+
+MipOmtypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { infrlbm(0), outfrlbr(1), outfrltm(2), infrltm(3), outfrltr(4), all(5) }
+
+Mode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sonet(0), sdh(1), none(2), sdhj(3) }
+
+Monlev ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Up(0), e1Up(1), e0AdjUp(2) }
+
+Mtu ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e174(0), e462(1), e1470(2), e1522(3), e1600(4), e9100(5), e9018(6), e9216(7), e9600(8) }
+
+MxControlMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { n(0), y(1) }
+
+Netdomain ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mcn(0), sonetcp(1), otncp(2), encryp(3), wsc(4) }
+
+Nmccpst ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { is(0), oosAu(1) }
+
+Nmccsst ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sgeo(0), lpbk(1), faf(2) }
+
+NmcmonMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { all(0) }
+
+NmcmonPmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0), optminOch(1), optmaxOch(2), optavgOch(3), all(4) }
+
+NmcmonPmMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0), optminOch(1), optmaxOch(2), optavgOch(3) }
+
+NmcmonThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0) }
+
+NmcmonThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOch(0), all(1) }
+
+Ntfcncde ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cr(0), mj(1), mn(2) }
+
+NtfcncdeAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cr(0), mj(1), mn(2), all(3) }
+
+NtfcncdeNa ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cr(0), mj(1), mn(2), na(3) }
+
+NtfcncdeNap ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cr(0), mj(1), mn(2), na(3), nap(4) }
+
+Ochcarriercenteringmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mode1(0), mode2(1), mode3(2), unknown(3) }
+
+Ochenm ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mode1(0), mode2(1), auto(2), unknown(3) }
+
+Ochtuningmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { normal(0), accelerated(1), fast(2), unknown(3) }
+
+Ochtxwvlngthspacing ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0(0), e50(1), e100(2), e200(3), flexgrid(4), unknown(5) }
+
+OcnMontypeAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), oprOch(9), oprminOch(10), oprmaxOch(11), opravgOch(12), optOch(13), optavgOch(14), optminOch(15), optmaxOch(16), oprnOch(17), optnOch(18), pscwL(19), pscpL(20), psdL(21), all(22) }
+
+OcnMontypeRespAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), oprOch(9), oprminOch(10), oprmaxOch(11), opravgOch(12), optOch(13), optavgOch(14), optminOch(15), optmaxOch(16), oprnOch(17), optnOch(18), pscwL(19), pscpL(20), psdL(21) }
+
+OcnThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), oprOch(8), optOch(9), oprnOch(10) }
+
+OduMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), fcOdu(4), pscwOdu(5), pscpOdu(6), psdOdu(7), all(8) }
+
+OduMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), fcOdu(4), pscwOdu(5), pscpOdu(6), psdOdu(7) }
+
+OduSigtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { pm(0) }
+
+OduThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3) }
+
+OductpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), fcOdu(4), dmminOdu(5), dmmaxOdu(6), dmavgOdu(7), pscwOdu(8), pscpOdu(9), psdOdu(10), all(11) }
+
+OductpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), fcOdu(4), dmminOdu(5), dmmaxOdu(6), dmavgOdu(7), pscwOdu(8), pscpOdu(9), psdOdu(10) }
+
+OductpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), dmminOdu(4), dmmaxOdu(5), dmavgOdu(6) }
+
+Oductpcondtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), opukAis(1), opukCsf(2), odukAis(3) }
+
+Oductprate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odu0(0), odu1(1), odu2(2), odu2e(3), odu3(4), odu4(5), oduflex(6), oduc2(7), oduc4(8), oduc1(9), oduc3(10), oduc5(11), oduc6(12), oduc7(13), oduc8(14), cn(15) }
+
+Odutti ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odurxinctti(0), odutxtti(1), oduexsapi(2), odurxsapi(3), odutxsapi(4), oduexdapi(5), odurxdapi(6), odutxdapi(7), odurxexptti(8) }
+
+OduttpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), fcOdu(4), dmminOdu(5), dmmaxOdu(6), dmavgOdu(7), pscwOdu(8), pscpOdu(9), psdOdu(10), all(11) }
+
+OduttpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), fcOdu(4), dmminOdu(5), dmmaxOdu(6), dmavgOdu(7), pscwOdu(8), pscpOdu(9), psdOdu(10) }
+
+OduttpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOdu(0), esOdu(1), sesOdu(2), uasOdu(3), dmminOdu(4), dmmaxOdu(5), dmavgOdu(6) }
+
+Oduttprate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odu0(0), odu1(1), odu2(2), odu2e(3), odu3(4), odu3e2(5), odu4(6), oduflex(7), oduc1(8), oduc2(9), oduc3(10), oduc4(11), oduc5(12), oduc6(13), oduc7(14), oduc8(15), cn(16) }
+
+OffOnUnknown ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), on(1), unknown(2) }
+
+Omtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), outframes(1), fcserr(2), frtoolongs(3), frtooshorts(4), allIf(5), allEth(6), all(7), alignerr(8), singlecollfr(9), multicollfr(10), sqetesterr(11), defertrans(12), latecoll(13), excesscoll(14), carsenerr(15), inframeserr(16), inoctets(17), inframesdiscds(18), indfr(19), inpausefr(20), incfr(21), frag(22), jab(23), symbolerr(24), outframeserr(25), outoctets(26), outoctetserr(27), outframesdiscds(28), outpausefr(29), outdfr(30), autonegcycles(31), internalmacrxerr(32), internalmactxerr(33) }
+
+Optimizemode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optimizationmode1(0), optimizationmode2(1), optimizationmode3(2), optimizationmode4(3), optimizationmode5(4), optimizationmode6(5), optimizationmode7(6), optimizationmode8(7), optimizationmode9(8), optimizationmode10(9), optimizationmode11(10), optimizationmode12(11), optimizationmode13(12), optimizationmode14(13) }
+
+OptmonPmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { psdOts(0), pscwOts(1), pscpOts(2), oprOts(3), oprminOts(4), oprmaxOts(5), opravgOts(6), optOts(7), optminOts(8), optmaxOts(9), optavgOts(10), all(11) }
+
+OptmonPmMontypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOts(0), oprminOts(1), oprmaxOts(2), opravgOts(3), optOts(4), optminOts(5), optmaxOts(6), optavgOts(7), psdOts(8), pscwOts(9), pscpOts(10), all(11) }
+
+OptmonPmMontypeRtrvResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOts(0), oprminOts(1), oprmaxOts(2), opravgOts(3), optOts(4), optminOts(5), optmaxOts(6), optavgOts(7), psdOts(8), pscwOts(9), pscpOts(10) }
+
+OptmonThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOts(0), optOts(1), grpoptOts(2) }
+
+OptmonThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOts(0), optOts(1), all(2) }
+
+OscMontypeAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), oprOch(9), optOch(10), oprminOch(11), oprmaxOch(12), opravgOch(13), optavgOch(14), optminOch(15), optmaxOch(16), spanlossOch(17), spanlossminOch(18), spanlossmaxOch(19), spanlossavgOch(20), dmminL(21), dmmaxL(22), dmavgL(23), all(24) }
+
+OscMontypeRespAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), oprOch(9), optOch(10), oprminOch(11), oprmaxOch(12), opravgOch(13), optavgOch(14), optminOch(15), optmaxOch(16), spanlossOch(17), spanlossminOch(18), spanlossmaxOch(19), spanlossavgOch(20), dmminL(21), dmmaxL(22), dmavgL(23) }
+
+OscThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), oprOch(8), optOch(9), spanlossOch(10), dmminL(11), dmmaxL(12), dmavgL(13) }
+
+Oscmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ospf(0), disabled(1) }
+
+OsrpRmtttpmux ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { odtu01Pt20(0), odtu12Pt20(1), odtu12Pt21(2), odtu13Pt21(3), odtu23Pt20(4), odtu23Pt21(5), odtu34Pt21(6), odtu24Pt21(7), odtu14Pt21(8), odtukTs(9), otuk(10), none(11) }
+
+OtdrcfgPmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { evcshOts(0), evcshmaxOts(1), evclgOts(2), evclgmaxOts(3), maxevldisshOts(4), maxevldisshmaxOts(5), maxevldislgOts(6), maxevldislgmaxOts(7), maxevrdisshOts(8), maxevrdisshmaxOts(9), maxevrdislgOts(10), maxevrdislgmaxOts(11), maxevlshOts(12), maxevlshmaxOts(13), maxevllgOts(14), maxevllgmaxOts(15), maxevrshOts(16), maxevrshmaxOts(17), maxevrlgOts(18), maxevrlgmaxOts(19), cumevlshOts(20), cumevlshmaxOts(21), cumevllgOts(22), cumevllgmaxOts(23), cumevrshOts(24), cumevrshmaxOts(25), cumevrlgOts(26), cumevrlgmaxOts(27), all(28) }
+
+OtdrcfgPmMontypeRtrvResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { evcshOts(0), evcshmaxOts(1), evclgOts(2), evclgmaxOts(3), maxevldisshOts(4), maxevldisshmaxOts(5), maxevldislgOts(6), maxevldislgmaxOts(7), maxevrdisshOts(8), maxevrdisshmaxOts(9), maxevrdislgOts(10), maxevrdislgmaxOts(11), maxevlshOts(12), maxevlshmaxOts(13), maxevllgOts(14), maxevllgmaxOts(15), maxevrshOts(16), maxevrshmaxOts(17), maxevrlgOts(18), maxevrlgmaxOts(19), cumevlshOts(20), cumevlshmaxOts(21), cumevllgOts(22), cumevllgmaxOts(23), cumevrshOts(24), cumevrshmaxOts(25), cumevrlgOts(26), cumevrlgmaxOts(27) }
+
+OtdrcfgThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { maxevlshOts(0), maxevllgOts(1), maxevrshOts(2), maxevrlgOts(3), cumevlshOts(4), cumevllgOts(5), cumevrshOts(6), cumevrlgOts(7), all(8) }
+
+OtdrcfgThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { maxevlshOts(0), maxevllgOts(1), maxevrshOts(2), maxevrlgOts(3), cumevlshOts(4), cumevllgOts(5), cumevrshOts(6), cumevrlgOts(7), all(8) }
+
+Otdrtracestatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { idle(0), pending(1), running(2), queued(3), activeLong(4), activeShort(5), activeOffice(6), activeAuto(7), activeGonogo(8) }
+
+Otm2Montype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), cvOdu(6), esOdu(7), sesOdu(8), uasOdu(9), fcOdu(10), dmminOdu(11), dmmaxOdu(12), dmavgOdu(13), oprOch(14), oprminOch(15), oprmaxOch(16), opravgOch(17), optOch(18), optminOch(19), optmaxOch(20), optavgOch(21), oprnOch(22), optnOch(23), pfbereOtu(24), prfberOtu(25), prfbermaxOtu(26), pscwOdu(27), pscpOdu(28), psdOdu(29), qminOtu(30), qmaxOtu(31), qavgOtu(32), qstdevOtu(33), all(34) }
+
+Otm2MontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), cvOdu(9), esOdu(10), sesOdu(11), uasOdu(12), fcOdu(13), dmminOdu(14), dmmaxOdu(15), dmavgOdu(16), oprOch(17), oprminOch(18), oprmaxOch(19), opravgOch(20), optOch(21), optminOch(22), optmaxOch(23), optavgOch(24), oprnOch(25), optnOch(26), pscwOdu(27), pscpOdu(28), psdOdu(29), qminOtu(30), qmaxOtu(31), qavgOtu(32), qstdevOtu(33) }
+
+Otm2ThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), hccsOtu(4), pfbereOtu(5), prfberOtu(6), prfbermaxOtu(7), cvOdu(8), esOdu(9), sesOdu(10), uasOdu(11), dmminOdu(12), dmmaxOdu(13), dmavgOdu(14), oprOch(15), optOch(16), oprnOch(17) }
+
+Otm2ThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), hccsOtu(4), pfbereOtu(5), prfberOtu(6), prfbermaxOtu(7), cvOdu(8), esOdu(9), sesOdu(10), uasOdu(11), dmminOdu(12), dmmaxOdu(13), dmavgOdu(14), oprOch(15), optOch(16), oprnOch(17) }
+
+Otm3Montype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), cvOdu(9), esOdu(10), sesOdu(11), uasOdu(12), fcOdu(13), dmminOdu(14), dmmaxOdu(15), dmavgOdu(16), oprOch(17), oprminOch(18), oprmaxOch(19), opravgOch(20), optOch(21), optminOch(22), optmaxOch(23), optavgOch(24), oprnOch(25), optnOch(26), oprlowOch(27), oprnlowOch(28), oprhighOch(29), oprnhighOch(30), optlowOch(31), optnlowOch(32), opthighOch(33), optnhighOch(34), oprOts(35), oprminOts(36), oprmaxOts(37), opravgOts(38), oprnOts(39), pscwOdu(40), pscpOdu(41), psdOdu(42), dgdavgOch(43), dgdmaxOch(44), qminOtu(45), qmaxOtu(46), qavgOtu(47), qstdevOtu(48), all(49) }
+
+Otm3MontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), cvOdu(9), esOdu(10), sesOdu(11), uasOdu(12), fcOdu(13), dmminOdu(14), dmmaxOdu(15), dmavgOdu(16), oprOch(17), oprminOch(18), oprmaxOch(19), opravgOch(20), optOch(21), optminOch(22), optmaxOch(23), optavgOch(24), oprnOch(25), optnOch(26), oprlowOch(27), oprnlowOch(28), oprhighOch(29), oprnhighOch(30), optlowOch(31), optnlowOch(32), opthighOch(33), optnhighOch(34), oprOts(35), oprminOts(36), oprmaxOts(37), opravgOts(38), oprnOts(39), pscwOdu(40), pscpOdu(41), psdOdu(42), dgdavgOch(43), dgdmaxOch(44), qminOtu(45), qmaxOtu(46), qavgOtu(47), qstdevOtu(48) }
+
+Otm3SetMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), hccsOtu(4), pfbereOtu(5), prfberOtu(6), prfbermaxOtu(7), cvOdu(8), esOdu(9), sesOdu(10), uasOdu(11), dmminOdu(12), dmmaxOdu(13), dmavgOdu(14), oprOch(15), optOch(16), oprnOch(17), oprlowOch(18), oprnlowOch(19), oprhighOch(20), oprnhighOch(21), optlowOch(22), opthighOch(23), oprOts(24), oprnOts(25), dgdavgOch(26), dgdmaxOch(27) }
+
+Otm3ThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), hccsOtu(4), pfbereOtu(5), prfberOtu(6), prfbermaxOtu(7), cvOdu(8), esOdu(9), sesOdu(10), uasOdu(11), dmminOdu(12), dmmaxOdu(13), dmavgOdu(14), oprOch(15), optOch(16), oprnOch(17), oprlowOch(18), oprnlowOch(19), oprhighOch(20), oprnhighOch(21), optlowOch(22), opthighOch(23), oprOts(24), oprnOts(25), dgdavgOch(26), dgdmaxOch(27) }
+
+OtmCondtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), opukAis(1), odukAis(2), opukCsf(3) }
+
+OtmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), cvOdu(9), esOdu(10), sesOdu(11), uasOdu(12), fcOdu(13), dmminOdu(14), dmmaxOdu(15), dmavgOdu(16), pscwOdu(17), pscpOdu(18), psdOdu(19), oprOch(20), oprminOch(21), oprmaxOch(22), opravgOch(23), optOch(24), optminOch(25), optmaxOch(26), optavgOch(27), oprnOch(28), optnOch(29), oprlowOch(30), oprnlowOch(31), oprhighOch(32), oprnhighOch(33), optlowOch(34), optnlowOch(35), opthighOch(36), optnhighOch(37), oprOts(38), oprminOts(39), oprmaxOts(40), opravgOts(41), oprnOts(42), dgdavgOch(43), dgdmaxOch(44), qminOtu(45), qmaxOtu(46), qavgOtu(47), qstdevOtu(48), uncfecblkOtu(49), all(50) }
+
+OtmMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), cvOdu(9), esOdu(10), sesOdu(11), uasOdu(12), fcOdu(13), dmminOdu(14), dmmaxOdu(15), dmavgOdu(16), pscwOdu(17), pscpOdu(18), psdOdu(19), oprOch(20), oprminOch(21), oprmaxOch(22), opravgOch(23), optOch(24), optminOch(25), optmaxOch(26), optavgOch(27), oprnOch(28), optnOch(29), oprlowOch(30), oprnlowOch(31), oprhighOch(32), oprnhighOch(33), optlowOch(34), optnlowOch(35), opthighOch(36), optnhighOch(37), oprOts(38), oprminOts(39), oprmaxOts(40), opravgOts(41), oprnOts(42), dgdavgOch(43), dgdmaxOch(44), qminOtu(45), qmaxOtu(46), qavgOtu(47), qstdevOtu(48), uncfecblkOtu(49) }
+
+OtmSetMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), hccsOtu(4), pfbereOtu(5), prfberOtu(6), prfbermaxOtu(7), cvOdu(8), esOdu(9), sesOdu(10), uasOdu(11), dmminOdu(12), dmmaxOdu(13), dmavgOdu(14), oprOch(15), optOch(16), oprnOch(17), oprlowOch(18), oprnlowOch(19), oprhighOch(20), oprnhighOch(21), optlowOch(22), opthighOch(23), oprOts(24), oprnOts(25), dgdavgOch(26), dgdmaxOch(27) }
+
+OtmThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOch(0), optOch(1), oprnOch(2), cvOtu(3), esOtu(4), sesOtu(5), sefsOtu(6), hccsOtu(7), pfbereOtu(8), prfberOtu(9), prfbermaxOtu(10), cvOdu(11), esOdu(12), sesOdu(13), uasOdu(14), dmminOdu(15), dmmaxOdu(16), dmavgOdu(17), oprOts(18), oprnOts(19), oprlowOch(20), oprnlowOch(21), oprhighOch(22), oprnhighOch(23), optlowOch(24), opthighOch(25), dgdavgOch(26), dgdmaxOch(27) }
+
+Otntfmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), almonly(1), linefail(2) }
+
+Otscfgtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { amp(0), cha(1) }
+
+OtssubtypeEnt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { amp(0), roadm(1), toadm(2), dioadm(3), coadm(4), passive(5) }
+
+OtssubtypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { amp(0), roadm(1), toadm(2), dioadm(3), coadm(4), passive(5) }
+
+OtuFecfrmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), pfec(1), rs8(2), scfec(3), ufec(4), qfec(5), efec(6), ldpcfec(7) }
+
+Otuactrate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), otuc1(1), otuc2(2), otuc3(3), otuc4(4), otuc5(5), otuc6(6), otuc7(7), otuc8(8) }
+
+Oturate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { otu1(0), otu1e(1), otu2(2), otu2e(3), otu3(4), otu3e2(5), otu4(6), otuc2To40(7), otuc2To30(8), otuc4To80(9), otuc4To60(10), otu2regen(11), otu2eregen(12), otuc1(13), otuc2(14), otuc3(15), otuc4(16), otuc5(17), otuc6(18), otuc7(19), otuc8(20) }
+
+OtuttpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), iaeOtu(9), qminOtu(10), qmaxOtu(11), qavgOtu(12), qstdevOtu(13), uncfecblkOtu(14), all(15) }
+
+OtuttpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), fecOtu(4), hccsOtu(5), pfbereOtu(6), prfberOtu(7), prfbermaxOtu(8), iaeOtu(9), qminOtu(10), qmaxOtu(11), qavgOtu(12), qstdevOtu(13), uncfecblkOtu(14) }
+
+OtuttpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvOtu(0), esOtu(1), sesOtu(2), sefsOtu(3), hccsOtu(4), pfbereOtu(5), prfberOtu(6), prfbermaxOtu(7), iaeOtu(8), uncfecblkOtu(9) }
+
+Owner ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { osrpline(0), sncslm(1), sncp(2), user(3), osrp(4), parent(5), parentOsrp(6), autocreatedtcm(7), encryption(8) }
+
+PathMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvP(0), cvV(1), esP(2), esV(3), sesP(4), sesV(5), uasP(6), uasV(7), fcP(8), fcV(9), all(10) }
+
+PathMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvP(0), cvV(1), esP(2), esV(3), sesP(4), sesV(5), uasP(6), uasV(7), fcP(8), fcV(9) }
+
+PathThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvP(0), cvV(1), esP(2), esV(3), sesP(4), sesV(5), uasP(6), uasV(7) }
+
+Pathrdiaisinsert ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ais(0), lop(1), tim(2), plm(3), uneq(4), lom(5) }
+
+PdhMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvP(0), cvcP(1), esP(2), escP(3), sesP(4), sescP(5), sefsP(6), sasP(7), cssP(8), uasP(9), uascP(10), fcP(11), fccP(12), all(13) }
+
+PdhMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvP(0), cvcP(1), esP(2), escP(3), sesP(4), sescP(5), sefsP(6), sasP(7), cssP(8), uasP(9), uascP(10), fcP(11), fccP(12) }
+
+PdhThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvP(0), cvcP(1), esP(2), escP(3), sesP(4), sescP(5), sefsP(6), sasP(7), cssP(8), uasP(9), uascP(10) }
+
+PdhtypeList ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nonpdh(0), t1(1), e1(2), t3(3), e3(4) }
+
+PgPsDefault1plus1 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1plus1(0), e1plus1ptpt(1) }
+
+PgPsRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1plus1(0), e1plus1ptpt(1), aSncp(2), sncp(3), e1plus1path(4) }
+
+PgPsdirnDefaultuni ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { uni(0), bi(1) }
+
+PgRvrtvDefaultn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { y(0), n(1) }
+
+PgSigtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { pm(0), tcmlevel1(1), tcmlevel2(2), tcmlevel3(3), tcmlevel4(4), tcmlevel5(5), tcmlevel6(6) }
+
+PgSst ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { act(0), idle(1), flt(2) }
+
+PgWtrDefault5min ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Min(0), e1Min(1), e2Min(2), e3Min(3), e4Min(4), e5Min(5), e6Min(6), e7Min(7), e8Min(8), e9Min(9), e10Min(10), e11Min(11), e12Min(12), e15Min(13), e30Min(14), e45Min(15), e60Min(16) }
+
+PktiwfMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esCes(0), sesCes(1), uasCes(2), fcCes(3), all(4) }
+
+PktiwfMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esCes(0), sesCes(1), uasCes(2), fcCes(3) }
+
+PktiwfOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { outframeserr(0), outoctets(1), inframes(2), inoctets(3), inframesdiscds(4), inframesmalformed(5), inframesreordered(6), inframeslost(7), inframesoutofseq(8), inframesoam(9), inframesstray(10), inframesduplicated(11), outframeslbit(12), outframesrbit(13), inframeslbit(14), inframesrbit(15), inframesjitbufoverrun(16), inframesjitbufunderrun(17), inlopstransitions(18), inframesenttotdm(19), outframesmbit(20), inframesmbit(21), outframesnbit(22), outframespbit(23), inframesnbit(24), inframespbit(25), all(26) }
+
+PktiwfThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esCes(0), sesCes(1), uasCes(2) }
+
+Pmaidtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { raman(0), optmon(1), amp(2), chmon(3), sdmon(4), otdrcfg(5), voa(6), nmcmon(7), vt1(8), vt2(9), sts1(10), sts3c(11), sts12c(12), sts24c(13), sts48c(14), sts192c(15), e1(16), e3(17), t1(18), t3(19), ec1(20), stm1e(21), osc(22), oc1(23), oc3(24), oc12(25), oc48(26), oc192(27), oc768(28), eth100(29), eth(30), eth10g(31), ethn(32), wan(33), otm2(34), otm3(35), otm(36), odu(37), flex(38), fc(39), ptp(40), otuttp(41), ettp(42), cbrttp(43), sttp(44), oduttp(45), oductp(46), tcm(47), pktiwf(48), pdh(49), path(50) }
+
+Pmprofile ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { profile1(0), profile2(1), profile3(2), profile4(3), dflt(4), alloff(5), factorydflt(6) }
+
+Portmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), sonet(1), sdh(2), jsdh(3) }
+
+Protocol ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { fc100(0), ficon(1), fc200(2), ficonexpress(3), fc400(4), ficon4g(5), fc800(6), ficon8g(7), fc1200(8), isc3p1g(9), isc3p2g(10), osc(11), oc3(12), oc12(13), oc48(14), oc3ste(15), oc12ste(16), oc48ste(17), stm1(18), stm4(19), stm16(20), stm1ste(21), stm4ste(22), stm16ste(23), srm125g(24), srm250g(25), esrm250g(26), psifb2g5(27), psifb(28), ib1xsdr(29), ib1xddr(30), ib1xqdr(31), escon(32), dvbasi270m(33), sdsdi270mtransp(34), hdsdi1483mtransp(35), hdsdi1485mtransp(36), e3gsdi2967mtransp(37), e3gsdi2970mtransp(38), cpri1(39), cpri2(40), cpri3(41), cpri4(42), cpri5(43), cpri6(44), serf9g8(45), cpri8(46), gen8b10b(47), gentransp(48), e1000basex(49), e1000baset(50), e100basex(51), eth40glane(52), e100baset(53) }
+
+Protstandardotmn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { g8731(0) }
+
+Protstandardpots ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { g841(0), gr253(1) }
+
+Provcurrentinfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e4(0), e5(1), e7(2), e10(3), e15(4), e18(5), e20(6), e30(7), e40(8), e50(9), e60(10), e80(11), e100(12), e120(13), e150(14), e180(15), e3x40(16), e3x50(17), e3x60(18), e2x40(19), e2x50(20), e2x60(21), e2x80(22), e2x100(23), e4x40(24), e4x50(25), e4x60(26), e1x51x5(27), e1x52x5(28), e1x53x5(29), e2x52x5(30), e2x120(31), e3x80(32), e3x100(33), e3x120(34), e6x40(35), e6x50(36), e6x60(37), e3x125(38), e3x150(39), e3x160(40), e6x70(41), e6x80(42), e25(43), e35(44) }
+
+PstSncg ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { is(0), isAnr(1), oosMa(2), oosAu(3) }
+
+Pstfac ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { is(0), oosMa(1) }
+
+PstfacNoanr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { is(0), oosMa(1), oosAu(2), oosAuma(3) }
+
+PstfacRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { is(0), isAnr(1), oosMa(2), oosAu(3), oosAuma(4), oosMaanr(5) }
+
+PtpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOch(0), optOch(1), oprnOch(2), optnOch(3), optavgOch(4), optminOch(5), optmaxOch(6), dgdavgOch(7), dgdmaxOch(8), oprlowOch(9), optlowOch(10), oprnlowOch(11), optnlowOch(12), oprhighOch(13), opthighOch(14), oprnhighOch(15), optnhighOch(16), oprminOch(17), oprmaxOch(18), opravgOch(19), oprOts(20), oprnOts(21), oprminOts(22), oprmaxOts(23), opravgOts(24), oprOtsi(25), optOtsi(26), oprnOtsi(27), optnOtsi(28), opravgOtsi(29), oprminOtsi(30), oprmaxOtsi(31), optavgOtsi(32), optminOtsi(33), optmaxOtsi(34), dgdavgOtsi(35), dgdmaxOtsi(36), pdlavgOtsi(37), pdlmaxOtsi(38), hccsOtsi(39), fecOtsi(40), prfberOtsi(41), prfbermaxOtsi(42), qminOtsi(43), qmaxOtsi(44), qavgOtsi(45), qstdevOtsi(46), uncfecblkOtsi(47), osnrminOtsi(48), osnrmaxOtsi(49), osnravgOtsi(50), esnrminOtsi(51), esnrmaxOtsi(52), esnravgOtsi(53), cdminOtsi(54), cdmaxOtsi(55), cdavgOtsi(56), pscwOts(57), pscpOts(58), psdOts(59), cvL(60), esL(61), sesL(62), all(63) }
+
+PtpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOch(0), optOch(1), oprnOch(2), optnOch(3), optavgOch(4), optminOch(5), optmaxOch(6), dgdavgOch(7), dgdmaxOch(8), oprlowOch(9), optlowOch(10), oprnlowOch(11), optnlowOch(12), oprhighOch(13), opthighOch(14), oprnhighOch(15), optnhighOch(16), oprminOch(17), oprmaxOch(18), opravgOch(19), oprOts(20), oprnOts(21), oprminOts(22), oprmaxOts(23), opravgOts(24), oprOtsi(25), optOtsi(26), oprnOtsi(27), optnOtsi(28), opravgOtsi(29), oprminOtsi(30), oprmaxOtsi(31), optavgOtsi(32), optminOtsi(33), optmaxOtsi(34), dgdavgOtsi(35), dgdmaxOtsi(36), pdlavgOtsi(37), pdlmaxOtsi(38), hccsOtsi(39), fecOtsi(40), prfberOtsi(41), prfbermaxOtsi(42), qminOtsi(43), qmaxOtsi(44), qavgOtsi(45), qstdevOtsi(46), uncfecblkOtsi(47), osnrminOtsi(48), osnrmaxOtsi(49), osnravgOtsi(50), esnrminOtsi(51), esnrmaxOtsi(52), esnravgOtsi(53), cdminOtsi(54), cdmaxOtsi(55), cdavgOtsi(56), pscwOts(57), pscpOts(58), psdOts(59), cvL(60), esL(61), sesL(62) }
+
+PtpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oprOch(0), optOch(1), oprnOch(2), optavgOch(3), optminOch(4), optmaxOch(5), dgdavgOch(6), dgdmaxOch(7), oprlowOch(8), optlowOch(9), oprnlowOch(10), oprhighOch(11), opthighOch(12), oprnhighOch(13), opravgOch(14), oprminOch(15), oprmaxOch(16), oprOts(17), oprnOts(18), oprOtsi(19), optOtsi(20), oprnOtsi(21), dgdavgOtsi(22), dgdmaxOtsi(23), pdlavgOtsi(24), pdlmaxOtsi(25), hccsOtsi(26), prfberOtsi(27), prfbermaxOtsi(28), qminOtsi(29), qmaxOtsi(30), qavgOtsi(31), qstdevOtsi(32), uncfecblkOtsi(33), osnrminOtsi(34), osnrmaxOtsi(35), osnravgOtsi(36), esnrminOtsi(37), esnrmaxOtsi(38), esnravgOtsi(39), cdminOtsi(40), cdmaxOtsi(41), cdavgOtsi(42), cvL(43), esL(44), sesL(45) }
+
+Ptpbaud ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e35g(0), e56g(1) }
+
+Ptpcondtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), laseroff(1), txoff(2) }
+
+Ptplaseroffmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mode1(0), mode2(1) }
+
+Ptplnkcustom1 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { default(0) }
+
+Ptplnkcustom2 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { default(0) }
+
+Ptplnkoptmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { lnkstdmode(0), lnksnrmode(1), lnktrackingmode(2), lnkspectralmode(3), lnklatencymode(4), lnknrbwchmode(5), lnknonlchmode(6), lnkflinemode(7), lnkrsvmode1(8), lnkrsvmode2(9), lnkrsvmode3(10), custom(11), unknown(12), e35gbaudTest(13) }
+
+Ptpmod ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { qpsk(0), e4ask(1), e16qam(2) }
+
+Ptpmodemclass ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { terrestrial(0), submarine(1) }
+
+Ptprate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e150g(0), e200g(1), e300g(2), e400g(3), e100g(4), e250g(5), e350g(6) }
+
+Ptpreachclass ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { terbase(0), ter2(1), ter5(2), ter8(3), subbase(4), sub9(5), sub14(6), ter1p5(7), ter2p1(8), ter3(9), ter4(10) }
+
+Ptpreachtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { reachcd1(0), reachcd2(1), reachcd3(2), reachcd4(3), reachcd5(4), reachcdrsv1(5), reachcdrsv2(6), reachcdrsv3(7), custom(8) }
+
+Ptprole ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { prime(0), member(1) }
+
+Ptpservicetype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { otu4(0), otu3e2(1), otu3(2), otu2(3), otu2e(4), otu1(5), oc768(6), stm256(7), oc192(8), stm64(9), oc48(10), stm16(11), oc12(12), stm4(13), oc3(14), stm1(15), eth100m(16), eth1g(17), eth10g(18), eth40g(19), eth100g(20), eth100mpkt(21), eth1gpkt(22), eth10gpkt(23), eth40gpkt(24), eth100gpkt(25), eth10gflex(26), eth40gflex(27), eth100gflex(28), otuc2To40(29), otuc2To30(30), otuc4To80(31), otuc4To60(32), otu2regen(33), otu2eregen(34), unknown(35), ec1(36), eth10m(37) }
+
+Ptptransmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), e35gbaud100g(1), e35gbaud150g(2), e35gbaud200g(3), e35gbaud250g(4), e35gbaudTest(5), e56gbaud100g(6), e56gbaud150g(7), e56gbaud200g(8), e56gbaud250g(9), e56gbaud300g(10), e56gbaud350g(11), e56gbaud400g(12), rsv1(13), rsv2(14), rsv3(15), custom(16), e28gbaud100g(17), e32gbaud100g(18), e32gbaud200g(19) }
+
+RamanPmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { all(0) }
+
+RamanPmMontypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { all(0), opinOts(1), opinminOts(2), opinmaxOts(3), opinavgOts(4), opoutOts(5), opoutminOts(6), opoutmaxOts(7), opoutavgOts(8), oproscOts(9), oproscminOts(10), oproscmaxOts(11), oproscavgOts(12), orlinOts(13), orlinminOts(14), orlinmaxOts(15), orlinavgOts(16), orloutOts(17), orloutminOts(18), orloutmaxOts(19), orloutavgOts(20) }
+
+RamanPmMontypeRtrvResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { opinOts(0), opinminOts(1), opinmaxOts(2), opinavgOts(3), opoutOts(4), opoutminOts(5), opoutmaxOts(6), opoutavgOts(7), oproscOts(8), oproscminOts(9), oproscmaxOts(10), oproscavgOts(11), orlinOts(12), orlinminOts(13), orlinmaxOts(14), orlinavgOts(15), orloutOts(16), orloutminOts(17), orloutmaxOts(18), orloutavgOts(19) }
+
+RamanThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { opinOts(0), opoutOts(1), orlinOts(2), orloutOts(3) }
+
+RamanThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { opinOts(0), opoutOts(1), orlinOts(2), orloutOts(3), all(4) }
+
+Rdtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { internal(0), external(1) }
+
+Recircoper ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), start(1), stop(2) }
+
+Redistribut ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), ospfv3(1) }
+
+Refbw ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { nOra(0), e12Point5ghz(1), e50ghzitu(2), portbw(3) }
+
+RleOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sourcefim(0), sourcerim(1), sourceok(2), receivefim(3), receiverim(4), receiveok(5), receivemyfim(6), receivemyrim(7), receivemyok(8), relayfim(9), relayrim(10), relayok(11), unkrid(12), unkvid(13), nwkloop(14), invdrq(15), invdctrlframe(16), smallpdu(17), all(18) }
+
+Rmvsstmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mt(0) }
+
+Rotation ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { disabled(0), enabled(1) }
+
+RprOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframeserr(1), indfr(2), inoctets(3), outframes(4), outoctets(5), outdfr(6), incfr(7), inechfr(8), inorgfr(9), inatdfr(10), intpfr(11), outcfr(12), outechfr(13), outorgfr(14), outatdfr(15), outtpfr(16), all(17), allIf(18), allRpr(19) }
+
+RtrvStsnIncsglblParm ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { y(0), n(1) }
+
+Rtrvpmprofile ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { profile1(0), profile2(1), profile3(2), profile4(3), dflt(4), alloff(5), factorydflt(6), allprofiles(7) }
+
+Rvrtstate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { na(0), idle(1), pendingTodr(2), pendingNa(3), pendingHb(4), pendingSd(5), pendingOther(6) }
+
+Rxcondtrig ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), portOos(1), clientFault(2), eqptFail(3) }
+
+Rxtsmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), almOnly(1), condOnly(2), almCond(3) }
+
+Scanstate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { start(0), stop(1), complete(2) }
+
+SdmonMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { optOts(0), all(1) }
+
+Secureoh ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), mode1(1), mode2(2) }
+
+Service ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ficon(0), fc(1) }
+
+SlddSst ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { act(0), adjdn(1), lnkdn(2), unprov(3) }
+
+Slotcfgmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { derived(0), provisioned(1), check(2) }
+
+Splimanaged ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Splimgmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1) }
+
+Srveff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sa(0), nsa(1) }
+
+SrveffNap ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sa(0), nsa(1) }
+
+Ssbitmde ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sdh(0), sdhj(1), sonet(2) }
+
+Ssmtransmit ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { eec1(0), eec2(1), disable(2) }
+
+Sstains ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ains(0), ainsDea(1) }
+
+Sstainsmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ains(0), ainsDea(1), mt(2) }
+
+Sstfac ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ains(0), ainsDea(1), bridged(2), switched(3), roll(4), act(5), idle(6), stbys(7), wrk(8), erranl(9), psi(10), flt(11), mea(12), tstf(13), ueq(14), sgeo(15), discd(16), lpbk(17), ts(18), faf(19), stbyh(20), wrkrx(21), wrktx(22), prtcl(23), uas(24), nosite(25), noam(26), mon(27), msc(28), protected(29), mt(30), dsbld(31), inhip(32), l2dsbld(33), tsgen(34), tsmon(35), tsrecirc(36) }
+
+Sstodu ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ains(0), ainsDea(1), act(2), idle(3), stbys(4), wrk(5), flt(6), mea(7), ueq(8), sgeo(9), discd(10), lpbk(11), ts(12), stbyh(13), wrkrx(14), wrktx(15), uas(16), protected(17), mt(18), dsbld(19) }
+
+Ssttaains ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ains(0), ainsDea(1), ts(2), tsDea(3) }
+
+Ssttaainsmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { ains(0), ainsDea(1), ts(2), tsDea(3), mt(4) }
+
+Statsinfodefno ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { no(0), yes(1) }
+
+Statsinfodefyes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { no(0), yes(1) }
+
+Stdbytx ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { idle(0), dup(1), off(2) }
+
+SttpMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8), all(9) }
+
+SttpMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7), fcL(8) }
+
+SttpThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvS(0), esS(1), sesS(2), sefsS(3), cvL(4), esL(5), sesL(6), uasL(7) }
+
+Sttpmapping ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { bmp(0), gmp(1), amp(2) }
+
+Sttpportmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sonet(0), sdh(1) }
+
+Sttprate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { oc768(0), stm256(1), oc192(2), stm64(3), oc48(4), stm16(5), oc12(6), stm4(7), oc3(8), stm1(9), ec1(10) }
+
+Swcr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { idle(0), sd(1), eber(2), none(3) }
+
+Switchcommandoc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { man(0), frcd(1), lockout(2) }
+
+Switchcommandotmn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { man(0), frcd(1), lockout(2) }
+
+SwitchcommandpgDefaultman ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { man(0), frcd(1), lockout(2) }
+
+Switchendpg ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { local(0), remote(1) }
+
+SwitchreasonEqpt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), dbsync(1), eqpfl(2), eqpoos(3), wtr(4), notrdy(5) }
+
+SwitchreasonOcn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), sf(1), sd(2), eber(3), eqpfl(4), facoos(5), eqpoos(6), osc(7), wtr(8) }
+
+Switchreasonlag ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), sf(1), eqpfl(2), facoos(3), eqpoos(4) }
+
+Switchreasonops ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), sf(1), facoos(2), wtr(3), trflt(4) }
+
+Switchreasonotmn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), sf(1), sd(2), eber(3), eqpfl(4), facoos(5), eqpoos(6), wtr(7) }
+
+Switchreasonpg ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), sf(1), sd(2), wtr(3), ais(4), oci(5), lck(6), plm(7), tim(8), lof(9), nhp(10), todr(11), todrhb(12), trflt(13) }
+
+Switchreasonrpr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { sigok(0), sf(1), sd(2), faoos(3), wtr(4) }
+
+Switchstatusblsr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { idle(0), auto(1), man(2), frcd(3), lockout(4), lockoutProt(5), lockoutWrkg(6) }
+
+Switchstatusotmn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { idle(0), auto(1), man(2), frcd(3), lockout(4) }
+
+Switchstatuspg ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { idle(0), auto(1), pending(2), man(3), frcd(4), lockout(5), ttops(6) }
+
+Switchstatusrpr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { man(0), frcd(1) }
+
+Swmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { eqpt(0), l2(1), l3(2), lacp(3) }
+
+SwmodeLag ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { l3(0), lacp(1) }
+
+Sync1588annrate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1pkt16s(0), e1pkt8s(1), e1pkt4s(2), e1pkt2s(3), e1pkt1s(4), e2pkt1s(5), e4pkt1s(6), e8pkt1s(7), ee(8) }
+
+Sync1588rate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1pkt16s(0), e1pkt8s(1), e1pkt4s(2), e1pkt2s(3), e1pkt1s(4), e2pkt1s(5), e4pkt1s(6), e8pkt1s(7), e16pkt1s(8), e32pkt1s(9), e64pkt1s(10), e128pkt1s(11), ee(12) }
+
+Syncoptions ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { opt1(0), opt2(1), opt1Ssub(2), opt2St3e(3) }
+
+Syncportstate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { initializing(0), faulty(1), disabled(2), listening(3), preMaster(4), master(5), passive(6), uncalibrated(7), slave(8) }
+
+TaccMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mone(0), monf(1), monef(2), splte(3), spltf(4), spltef(5), splta(6), spltb(7) }
+
+TaccMode1 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { mone(0), monf(1), monef(2) }
+
+TcmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvTcm(0), esTcm(1), sesTcm(2), uasTcm(3), fcTcm(4), pscwTcm(5), pscpTcm(6), psdTcm(7), dmminTcm(8), dmmaxTcm(9), dmavgTcm(10), iaeTcm(11), all(12) }
+
+TcmMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvTcm(0), esTcm(1), sesTcm(2), uasTcm(3), fcTcm(4), pscwTcm(5), pscpTcm(6), psdTcm(7), dmminTcm(8), dmmaxTcm(9), dmavgTcm(10), iaeTcm(11), all(12) }
+
+TcmThMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cvTcm(0), esTcm(1), sesTcm(2), uasTcm(3), dmminTcm(4), dmmaxTcm(5), dmavgTcm(6), iaeTcm(7) }
+
+Tcmcondtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), mode1(1) }
+
+Tcmmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { monitor(0), terminated(1) }
+
+TdgDefault0sec ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Msec(0), e50Msec(1), e100Msec(2), e500Msec(3), e1Sec(4), e2Sec(5), e3Sec(6), e4Sec(7), e5Sec(8) }
+
+TdgOtmDefault0sec ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Msec(0), e5Msec(1), e10Msec(2), e15Msec(3), e20Msec(4), e25Msec(5), e30Msec(6), e35Msec(7), e40Msec(8), e45Msec(9), e50Msec(10), e100Msec(11), e200Msec(12), e300Msec(13), e400Msec(14), e500Msec(15), e600Msec(16), e700Msec(17), e800Msec(18), e900Msec(19), e1Sec(20), e2Sec(21), e3Sec(22), e4Sec(23), e5Sec(24), e6Sec(25), e7Sec(26), e8Sec(27), e9Sec(28), e10Sec(29) }
+
+Tfmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { off(0), almonly(1), linefail(2) }
+
+Timen ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { timSapiOnly(0), timDapiOnly(1), timSapiDapi(2), timOperSpec(3) }
+
+Tmper ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e15Min(0), e1Day(1), e1Unt(2), basln(3) }
+
+TmperAll ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e15Min(0), e1Day(1), e1Unt(2), basln(3), all(4) }
+
+TmperMin ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e15Min(0), e1Day(1), e1Unt(2) }
+
+TmperThPht ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1Unt(0), all(1) }
+
+Tmpr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e15Min(0), e1Day(1), e1Unt(2), all(3) }
+
+Todrassign ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrfrien ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrmonen ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrmultiday ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrprfen ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrsaten ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrsunen ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrthuen ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrtueen ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+Todrweden ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { yes(0), no(1) }
+
+TraceType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { long(0), short(1), office(2) }
+
+Trapif ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { auto(0), colanA(1), colanX(2), shelfIp(3) }
+
+Trexfrmt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { gzip(0) }
+
+TrgOtmDefault0msec ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Msec(0), e5Msec(1), e10Msec(2), e15Msec(3), e20Msec(4), e25Msec(5), e30Msec(6), e35Msec(7), e40Msec(8), e45Msec(9), e50Msec(10), e100Msec(11), e200Msec(12), e300Msec(13), e400Msec(14), e500Msec(15), e600Msec(16), e700Msec(17), e800Msec(18), e900Msec(19), e1Sec(20), e2Sec(21), e3Sec(22), e4Sec(23), e5Sec(24), e6Sec(25), e7Sec(26), e8Sec(27), e9Sec(28), e10Sec(29) }
+
+TrueFalseUnknownDefaultfalse ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { true(0), false(1), unknown(2) }
+
+Tsprov ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { auto(0), manual(1) }
+
+TstsigPattern ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e100getestpattern(0), opu4prbs31pattern(1), opu4invprbs31pattern(2), opu4100ge(3), e40getestpattern(4), opu340ge(5), opu3oc768prbs31(6), opu3oc768invprbs31(7), oc768prbs31(8), oc768invprbs31(9), e10getestpattern1(10), e10getestpattern2(11), opu210ge1(12), opu210ge2(13), opu2prbs23(14), opu2prbs31(15), opu2oc192prbs23(16), opu2oc192prbs31(17), oc192prbs23(18), oc192prbs31(19), opu0prbs31(20), opu0invprbs31(21), opu1prbs31(22), opu1invprbs31(23), opu2invprbs31(24), opu2eprbs31(25), opu2einvprbs31(26), opu3prbs31(27), opu3invprbs31(28), opuflexprbs31(29), opuflexinvprbs31(30), e10getestpattern4(31), ethpacketpttrn1(32), ethpacketpttrn2(33), ethpacketpttrn3(34), e16gficontestpattern(35), e16gfctestpattern(36), e32gfctestpattern(37), e32gficontestpattern(38), prbs11(39), invprbs11(40), prbs15(41), invprbs15(42), prbs20O153(43), invprbs20O153(44), prbs20O151(45), invprbs20O151(46), prbs23(47), invprbs23(48), prbs31(49), invprbs31(50), pttrn1(51), pttrn2(52), pttrn3(53), pttrn4(54), pttrn5(55), pttrn6(56), pttrn7(57), nopattern(58) }
+
+Tuningmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { performanceOptimized(0), accelerated(1), fast(2), unknown(3) }
+
+Txb ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1), unknown(2) }
+
+Txclass ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0(0), e1(1), e2(2), e3(3), e4(4), noise(5), ase(6), e5(7), e7(8), slic(9) }
+
+Txctrl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { no(0), yes(1), unknown(2) }
+
+Txdispmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { automatic(0), fixedtx(1), unknown(2) }
+
+Txmode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { manual(0), automatic(1), custom1(2), off(3), offsetauto(4), extendedmanual(5), fixedtx(6), expert(7), unknown(8), search(9) }
+
+Txrxmodclass ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { custom1(0), custom2(1), custom3(2), custom4(3), custom5(4), custom6(5), qpsk(6), bpsk(7), e8qam(8), e16qam(9), e4ask(10), unknown(11) }
+
+Upc ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1(0), e2(1), e3(2), e4(3), e5(4) }
+
+ValidationOffOn ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { on(0), off(1) }
+
+Vldty ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { compl(0), prtl(1), adj(2), na(3) }
+
+VoaPmMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { all(0) }
+
+VoaPmMontypeRtrv ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), orlminOts(1), orlmaxOts(2), orlavgOts(3), opinOts(4), opinminOts(5), opinmaxOts(6), opinavgOts(7), opoutOts(8), opoutminOts(9), opoutmaxOts(10), opoutavgOts(11), grpopoutOts(12), grpopoutminOts(13), grpopoutmaxOts(14), grpopoutavgOts(15), all(16) }
+
+VoaPmMontypeRtrvResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), orlminOts(1), orlmaxOts(2), orlavgOts(3), opinOts(4), opinminOts(5), opinmaxOts(6), opinavgOts(7), opoutOts(8), opoutminOts(9), opoutmaxOts(10), opoutavgOts(11), grpopoutOts(12), grpopoutminOts(13), grpopoutmaxOts(14), grpopoutavgOts(15) }
+
+VoaThMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), opinOts(1), opoutOts(2), grpopoutOts(3) }
+
+VoaThMontypeSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { orlOts(0), opinOts(1), opoutOts(2), grpopoutOts(3), all(4) }
+
+WanMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esW(0), sesW(1), uasW(2), inframesW(3), inframeserrW(4), outframesW(5), outframeserrW(6), dfrW(7), utlW(8), utlmxW(9), ldsW(10), lsdsW(11), luasW(12), all(13) }
+
+WanMontypeResp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esW(0), sesW(1), uasW(2), inframesW(3), inframeserrW(4), outframesW(5), outframeserrW(6), dfrW(7), utlW(8), utlmxW(9), ldsW(10), lsdsW(11), luasW(12) }
+
+WanOmtype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { inframes(0), inframeserr(1), indfr(2), outdfr(3), inoctets(4), inoctetserr(5), outframes(6), outoctets(7), ttldfr(8), frtooshorts(9), frtoolongs(10), hecdfr(11), fcserr(12), ssudfr(13), pmdafr(14), badfr(15), bpdfr(16), scfffr(17), infiltfr(18), outfiltfr(19), inpeercfr(20), intuncfr(21), indcfr(22), infrcnf(23), infrnc(24), inoctnc(25), inoctcnf(26), infrgrnc(27), inoctgrnc(28), internalerrdfr(29), inmacdadfr(30), outframeserr(31), allRpr(32), all(33), allIf(34) }
+
+WanSetMontype ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { esW(0), sesW(1), uasW(2), utlW(3), utlmxW(4), ldsW(5), lsdsW(6), luasW(7) }
+
+Wanconfig ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e8hi56locap(0), e64medcap(1), e128locap(2) }
+
+Wlrules ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), passthrough(1), add(2), drop(3), blocked(4) }
+
+WtrDefault5min ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Min(0), e1Min(1), e2Min(2), e3Min(3), e4Min(4), e5Min(5), e6Min(6), e7Min(7), e8Min(8), e9Min(9), e10Min(10), e11Min(11), e12Min(12), e15Min(13), e30Min(14), e45Min(15), e60Min(16), infinite(17), e30Sec(18) }
+
+WtrEthDefault5min ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1Min(0), e2Min(1), e3Min(2), e4Min(3), e5Min(4), e6Min(5), e7Min(6), e8Min(7), e9Min(8), e10Min(9), e11Min(10), e12Min(11) }
+
+WtrOpsDefault5min ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1Min(0), e2Min(1), e3Min(2), e4Min(3), e5Min(4), e6Min(5), e7Min(6), e8Min(7), e9Min(8), e10Min(9), e11Min(10), e12Min(11), e15Min(12), e30Min(13), e45Min(14), e60Min(15) }
+
+WtrOtmnDefault5min ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e1Min(0), e2Min(1), e3Min(2), e4Min(3), e5Min(4), e6Min(5), e7Min(6), e8Min(7), e9Min(8), e10Min(9), e11Min(10), e12Min(11), e15Min(12), e30Min(13), e45Min(14), e60Min(15) }
+
+WtrSync ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { e0Min(0), e1Min(1), e2Min(2), e3Min(3), e4Min(4), e5Min(5), e6Min(6), e7Min(7), e8Min(8), e9Min(9), e10Min(10), e11Min(11), e12Min(12) }
+
+
+
+END -- End module
