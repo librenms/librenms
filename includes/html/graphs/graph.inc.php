@@ -31,7 +31,6 @@ $prev_from = ($from - $period);
 
 $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
 $rrd_options = '';
-$auth = false;
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
@@ -74,7 +73,7 @@ if (! empty($command_only)) {
     echo "<div class='infobox'>";
     echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
     echo "<pre class='rrd-pre'>";
-    echo 'rrdtool ' . Rrd::buildCommand('graph', '-', $rrd_options);
+    echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
     echo '</pre>';
     try {
         Rrd::graph($rrd_options);

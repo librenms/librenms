@@ -112,65 +112,59 @@
         });
     });
     $(document).ready(function() {
-        $('#disable-toggle').click(function (event) {
+        $('#disable-toggle').on("click", function (event) {
             // invert selection on all disable buttons
             event.preventDefault();
             $('input[name^="disabled_"]').trigger('click');
         });
-        $('#ignore-toggle').click(function (event) {
+        $('#ignore-toggle').on("click", function (event) {
             // invert selection on all ignore buttons
             event.preventDefault();
             $('input[name^="ignore_"]').trigger('click');
         });
-        $('#disable-select').click(function (event) {
+        $('#disable-select').on("click", function (event) {
             // select all disable buttons
             event.preventDefault();
-            $('.disable-check').prop('checked', true);
-            //TODO: find a better solution for 'select-all' button refresh
-            $('.disable-check').trigger('click');
-            $('.disable-check').trigger('click');
+            $('.disable-check').bootstrapSwitch('state', true);
         });
-        $('#ignore-select').click(function (event) {
+        $('#ignore-select').on("click", function (event) {
             // select all ignore buttons
             event.preventDefault();
-            $('.ignore-check').prop('checked', true);
-            //TODO: find a better solution for 'select-all' button refresh
-            $('.ignore-check').trigger('click');
-            $('.ignore-check').trigger('click');
+            $('.ignore-check').bootstrapSwitch('state', true);
         });
-        $('#down-select').click(function (event) {
+        $('#down-select').on("click", function (event) {
             // select ignore buttons for all ports which are down
             event.preventDefault();
             $('[id^="operstatus_"]').each(function () {
-                var name = $(this).attr('name');
+                var name = $(this).attr('id');
                 var text = $(this).text();
-                if (name && text == 'down') {
+                if (name && text === 'down') {
                     // get the interface number from the object name
                     var port_id = name.split('_')[1];
-                    // find its corresponding checkbox and toggle it
-                    $('input[name="ignore_' + port_id + '"]').trigger('click');
+                    // find its corresponding checkbox and enable it
+                    $('input[name="ignore_' + port_id + '"]').bootstrapSwitch('state', true);
                 }
             });
         });
-        $('#alerted-toggle').click(function (event) {
+        $('#alerted-toggle').on("click", function (event) {
             // toggle ignore buttons for all ports which are in class red
             event.preventDefault();
             $('.red').each(function () {
-                var name = $(this).attr('name');
+                var name = $(this).attr('id');
                 if (name) {
                     // get the interface number from the object name
                     var port_id = name.split('_')[1];
-                    // find its corresponding checkbox and toggle it
-                    $('input[name="ignore_' + port_id + '"]').trigger('click');
+                    // find its corresponding checkbox and enable it
+                    $('input[name="ignore_' + port_id + '"]').bootstrapSwitch('state', true);
                 }
             });
         });
-        $('#form-reset').click(function (event) {
+        $('#form-reset').on("click", function (event) {
             // reset objects in the form to their previous values
             event.preventDefault();
             $('#ignoreport')[0].reset();
         });
-        $('#save-form').click(function (event) {
+        $('#save-form').on("click", function (event) {
             // reset objects in the form to their previous values
             event.preventDefault();
             $.ajax({
@@ -191,7 +185,7 @@
             });
         });
 
-        $('form#ignoreport').submit(function (event) {
+        $('form#ignoreport').on("submit", function (event) {
             event.preventDefault();
         });
     });

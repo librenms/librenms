@@ -3,8 +3,8 @@ text: Cyberpower
 type: power
 icon: cyberpower
 over:
-    - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
 discovery:
     -
         sysObjectID:

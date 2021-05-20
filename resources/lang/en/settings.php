@@ -46,6 +46,7 @@ return [
             'location' => 'Location Settings',
             'graylog' => 'Graylog Integration',
             'oxidized' => 'Oxidized Integration',
+            'mac_oui' => 'Mac OUI Lookup Integration',
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
@@ -846,6 +847,12 @@ return [
             'description' => 'Logon Message',
             'help' => 'Displayed on the login page',
         ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => 'Enable MAC OUI lookup',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
+        ],
         'mono_font' => [
             'description' => 'Monospaced Font',
         ],
@@ -942,8 +949,20 @@ return [
             'group_support' => [
                 'description' => 'Enable the return of groups to Oxidized',
             ],
+            'ignore_os' => [
+                'description' => 'Do not backup these OS',
+                'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces).  Only allows existing OS.',
+            ],
+            'ignore_types' => [
+                'description' => 'Do not backup these device types',
+                'help' => 'Do not backup the listed device types with Oxidized. Only allows existing types.',
+            ],
             'reload_nodes' => [
                 'description' => 'Reload Oxidized nodes list, each time a device is added',
+            ],
+            'maps' => [
+                'description' => 'Variable Mapping',
+                'help' => 'Used to set group or other variables or map OS names that differ.',
             ],
             'url' => [
                 'description' => 'URL to your Oxidized API',

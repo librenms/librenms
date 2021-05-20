@@ -36,7 +36,7 @@
         }).on('keyup', function (e) {
             // on enter go to the first selection
             if (e.which === 13) {
-                $('.tt-selectable').first().click();
+                $('.tt-selectable').first().trigger( "click" );
             }
         });
     </script>
