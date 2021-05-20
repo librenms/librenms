@@ -91,7 +91,9 @@ class Junos extends \LibreNMS\OS implements OSPolling
             $jnxPingResults_table[$owner . '.' . $test][$property] = $value;
         }
 
-        $pingResults_table = [];
+        // Getting only ProbeResponses and SentProbes
+        $pingResultsProbeResponses = [];
+        $pingResultsSentProbes = [];
         foreach (explode("\n", $pingResults) as $line) {
             $key_val = explode(' ', $line, 3);
 
@@ -104,10 +106,18 @@ class Junos extends \LibreNMS\OS implements OSPolling
             $owner = $prop_id[1];
             $test = $prop_id[2];
 
-            $pingResults_table[$owner . '.' . $test][$property] = $value;
+            if ($property == 'pingResultsProbeResponses')
+            {
+                $pingResultsProbeResponses[$owner.".".$test] = $value;
+            }
+            else if ($property == 'pingResultsSentProbes')
+            {
+                $pingResultsSentProbes[$owner.".".$test] = $value;
+            }
         }
 
-        $pingCtlResults_table = [];
+        // Getting only pingCtlRowStatuses
+        $pingCtlRowStatuses = [];
         foreach (explode("\n", $pingCtlResults) as $line) {
             $key_val = explode(' ', $line, 3);
 
@@ -120,7 +130,10 @@ class Junos extends \LibreNMS\OS implements OSPolling
             $owner = $prop_id[1];
             $test = $prop_id[2];
 
-            $pingCtlResults_table[$owner . '.' . $test][$property] = $value;
+            if ($property == 'pingCtlRowStatus')
+            {
+                $pingCtlRowStatuses[$owner.".".$test] = $value;
+            }
         }
 
         // Get the needed informations
@@ -136,7 +149,7 @@ class Junos extends \LibreNMS\OS implements OSPolling
             $update = [];
 
             // Use DISMAN-PING Status codes.
-            $opstatus = $pingCtlResults_table[$owner . '.' . $test]['pingCtlRowStatus'];
+            $opstatus = $pingCtlRowStatuses[$owner . '.' . $test];
 
             if ($opstatus == 'active') {
                 $opstatus = 0;        // 0=Good
@@ -174,8 +187,8 @@ class Junos extends \LibreNMS\OS implements OSPolling
                         'MinRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMinRttUs'] / 1000,
                         'MaxRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMaxRttUs'] / 1000,
                         'StdDevRttUs' => $pingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
-                        'ProbeResponses' => $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
-                        'ProbeLoss' => (int) $pingResults_table[$owner . '.' . $test]['pingResultsSentProbes'] - (int) $pingResults_table[$owner . '.' . $test]['pingResultsProbeResponses'],
+                        'ProbeResponses' => $pingResultsProbeResponses[$owner . '.' . $test],
+                        'ProbeLoss' => (int) $pingResultsSentProbes[$owner . '.' . $test] - (int) $pingResultsProbeResponses[$owner . '.' . $test],
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
