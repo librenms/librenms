@@ -1,5 +1,3 @@
--- This file was automatically generated from ciena-6500-enums.yang. Do not edit.
-
 CIENA-6500-ENUMS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
