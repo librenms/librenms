@@ -2,21 +2,23 @@
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\IPMI\IPMIClient;
 
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo 'IPMI : ';
 
+    $ipmi['tool'] = Config::get('ipmitool', 'ipmitool');
     $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
-
-    $cmd = [Config::get('ipmitool', 'ipmitool')];
-    if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
-        array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
+    if (Config::get('own_hostname') == $device['hostname']) {
+        $ipmi['host'] = 'localhost';
     }
 
+    $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password']);
     foreach (Config::get('ipmi.type', []) as $ipmi_type) {
-        $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
+        $client->setInterface($ipmi_type);
+        $results = $client->getSensors();
 
         $results = array_values(array_filter($results, function ($line) {
             return !Str::contains($line, 'discrete');
