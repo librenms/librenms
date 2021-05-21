@@ -3,8 +3,8 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\IPMI\IPMIClient;
+use LibreNMS\IPMI\NodeManager;
 
-// IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo 'IPMI : ';
 
@@ -57,6 +57,24 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
                 $high_limit == 'na' ? null : $high_limit,
                 $current,
                 'ipmi'
+            );
+        }
+    }
+
+    $nmClient = new NodeManager($client);
+    if ($nmClient->isPlatformSupported()) {
+        foreach ($nmClient->getAvailablePowerReadings() as $nmSensor) {
+            discover_sensor(
+                $valid['sensor'],
+                Config::get("Watts"),
+                $device,
+                $nmSensor[0],
+                ++$index,
+                'ipmi',
+                $nmSensor[1],
+                '1',
+                '1',
+                $poller_type = 'ipmi'
             );
         }
     }
