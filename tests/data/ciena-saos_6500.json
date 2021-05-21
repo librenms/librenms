@@ -7,12 +7,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.562.68.11",
                     "sysDescr": "6500 7-SLOT OPTICAL SW:1271 BN:AH (c) Ciena (R) Corporation",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": "6500 7-SLOT OPTICAL SW:1271 BN:AH (c) Ciena (R) Corporation",
+                    "version": "1271",
+                    "hardware": "6500 7-SLOT OPTICAL ",
                     "features": null,
                     "os": "ciena-saos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "NNTMRT0J1X6P",
                     "icon": "ciena.svg",
                     "location": "<private>"
                 }
