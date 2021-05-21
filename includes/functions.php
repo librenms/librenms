@@ -2062,7 +2062,7 @@ function lock_and_purge($table, $sql, int $count = 1000)
             }
             while (true) {
                 // Deletes are done in blocks to avoid a single very large operation.
-                if ( ! dbDelete($table, $sql, [$purge_days]) > 0 ) {
+                if (! dbDelete($table, $sql, [$purge_days]) > 0) {
                     break;
                 }
             }
@@ -2088,7 +2088,7 @@ function lock_and_purge_query($table, $sql, $msg)
 {
     $purge_name = $table . '_purge';
 
-    $purge_duration = Config::get($purge_name); 
+    $purge_duration = Config::get($purge_name);
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
