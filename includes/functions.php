@@ -2049,6 +2049,7 @@ function get_device_oid_limit($device)
  */
 function lock_and_purge($table, $sql)
 {
+    // TODO: add block delete statements
     $purge_name = $table . '_purge';
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
