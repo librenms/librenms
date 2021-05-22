@@ -34,7 +34,7 @@ class IPMIClient
     private $host;
     private $user;
     private $password;
-    private $port = NULL;
+    private $port = null;
 
     private $privLvl = 'USER';
     private $interface = 'lanplus';
@@ -119,10 +119,11 @@ class IPMIClient
             if ($this->port) {
                 array_push($cmd, '-p', $this->port);
             }
+
+            array_push($cmd, '-I', $this->interface);
         }
 
-        array_push($cmd, '-I', $this->interface);
-        $cmd = array_merge($cmd, explode(" ", $command));
+        $cmd = array_merge($cmd, explode(' ', $command));
 
         return external_exec($cmd);
     }
