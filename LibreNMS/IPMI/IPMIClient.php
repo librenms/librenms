@@ -25,6 +25,9 @@
 
 namespace LibreNMS\IPMI;
 
+/**
+ * Represents an IPMI connection with a host machine.
+ */
 class IPMIClient
 {
     private $ipmiToolPath;
@@ -36,6 +39,13 @@ class IPMIClient
     private $privLvl = 'USER';
     private $interface = 'lanplus';
 
+    /**
+     * Creates a new instance of the IPMIClient class.
+     * @param string $ipmiToolPath The absolute path to ipmitool.
+     * @param string $host The hostname or IP of the endpoint. Set to 'localhost' to connect via in-band driver.
+     * @param string $user
+     * @param string $password
+     */
     public function __construct(string $ipmiToolPath, string $host, string $user, string $password)
     {
         $this->ipmiToolPath = $ipmiToolPath;
@@ -47,12 +57,12 @@ class IPMIClient
     /**
      * Gets the IPMI interface used by the client.
      */
-    public function getInterface(string $interface): ?string
+    public function getInterface(): ?string
     {
         return $this->interface;
     }
 
-    public function setInterface($interface)
+    public function setInterface(string $interface)
     {
         $this->interface = $interface;
     }
@@ -75,7 +85,7 @@ class IPMIClient
     }
 
     /**
-     * Gets sensor data as reported by ipmitool.
+     * Gets a list of sensors and threshold values reported by ipmitool.
      */
     public function getSensors()
     {
