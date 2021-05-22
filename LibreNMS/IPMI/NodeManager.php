@@ -37,7 +37,7 @@ final class NodeManager
      */
     public function getPowerReadings()
     {
-        $slaveAndChannel = $this->resolveSlaveAndChannel();
+        $this->slaveChannelPrefix = $this->resolveSlaveAndChannel();
         // Available in 2.0
         $result['memory'] = NodeManager::parsePowerReadings($this->sendToManagementEngine('nm statistics power domain memory'));
         // Available in 2.0
@@ -81,10 +81,11 @@ final class NodeManager
 
     private function resolveSlaveAndChannel(): string
     {
-        // TODO: determine whether slave address is constant for all platforms.
+        // Slave address is not constant for all platforms.
         // TODO: determine channel.
         // $dump = $this->client->sendCommand('sdr dump');
-        return '-c 0 -t 0x2c';
+        // -t 0x88 on v1.5
+        return '-b 0 -t 0x2c';
     }
 
     private function sendToManagementEngine(string $command)
