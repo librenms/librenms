@@ -2,6 +2,7 @@
 
 use LibreNMS\Config;
 use LibreNMS\IPMI\IPMIClient;
+use LibreNMS\IPMI\NodeManager;
 use LibreNMS\RRD\RrdDefinition;
 
 $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi'", [$device['device_id']]);
@@ -49,6 +50,13 @@ if (is_array($ipmi_rows)) {
 
             $ipmi_sensor[$desc][$ipmi_unit_type]['value'] = $value;
             $ipmi_sensor[$desc][$ipmi_unit_type]['unit'] = $type;
+        }
+
+        $nmClient = new NodeManager($client);
+        if ($nmClient->isPlatformSupported()) {
+            foreach ($nmClient->getAvailablePowerReadings() as $nmSensor) {
+                d_echo($nmSensor);
+            }
         }
 
         foreach ($ipmi_rows as $ipmisensors) {
