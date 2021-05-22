@@ -282,7 +282,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View Devicesfor Location" target="_blank">' . $location_map['location'] . '</a><br>';
+            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View Devices for Location" target="_blank">' . $location_map['location'] . '</a><br>';
         }
     }
 
@@ -291,7 +291,7 @@ foreach ($rule_list as $rule) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= $except_device_or_group . '<a href="' . url('device-groups' . '/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . ' data-content="' . $group_map['name'] . '" title="' . $groups_msg . '" target="_blank">' . $group_map['name'] . '</a><br>';
+            $groups .= $except_device_or_group . '<a href="' . url('device-groups/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . ' data-content="' . $group_map['name'] . '" title="' . $groups_msg . '" target="_blank">' . $group_map['name'] . '</a><br>';
         }
     }
 
