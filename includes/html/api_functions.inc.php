@@ -2319,6 +2319,12 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
         $param[] = $to;
     }
 
+    $msg = $request->get('msg');
+    if ($msg) {
+        $query .= " AND `msg` LIKE '%" . $msg . "%'";
+        $param[] = $msg;
+    }
+    
     $count_query = $count_query . $query;
     $count = dbFetchCell($count_query, $param);
     $full_query = $full_query . $query . " ORDER BY $timestamp ASC LIMIT $start,$limit";
