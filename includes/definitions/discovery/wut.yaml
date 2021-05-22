@@ -20,7 +20,7 @@ modules:
                     oid: wtWebGraphThermoHygro
                     value: wtWebGraphThermoHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
-                    descr: 'Temperature'
+                    descr: 'Temperatur'
                     index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
                         -
@@ -46,7 +46,7 @@ modules:
                     oid: wtWebGraphThermoHygro
                     value: wtWebGraphThermoHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
-                    descr: 'rel. Humidity'
+                    descr: 'rel. Feuchte'
                     index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
                         -
