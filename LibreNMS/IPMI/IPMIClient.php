@@ -54,6 +54,11 @@ class IPMIClient
         $this->password = $password;
     }
 
+    public function getHost(): string
+    {
+        return $this->host;
+    }
+
     /**
      * Gets the IPMI interface used by the client.
      */
@@ -82,6 +87,23 @@ class IPMIClient
     public function setPort(string $port)
     {
         $this->port = $port;
+    }
+
+    /**
+     * Gets a binary representation of the cached SDR record for this host.
+     */
+    public function getSDR()
+    {
+        $path = "/tmp/librenms/ipmi/SDR";
+        $this->assertSDR($path);
+
+        $filename = "$path/$this->host";
+        $sdrFile = fopen($filename, 'r');
+        try {
+            return fread($sdrFile, filesize($filename));
+        } finally {
+            fclose($sdrFile);
+        }
     }
 
     /**
@@ -126,5 +148,15 @@ class IPMIClient
         $cmd = array_merge($cmd, explode(' ', $command));
 
         return external_exec($cmd);
+    }
+
+    private function assertSDR(string $path)
+    {
+        if (! is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+        if (!file_exists("$path/$this->host")) {
+            $this->sendCommand("sdr dump $path/$this->host");
+        }
     }
 }
