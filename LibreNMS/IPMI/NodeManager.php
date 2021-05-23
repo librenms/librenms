@@ -2,8 +2,6 @@
 
 namespace LibreNMS\IPMI;
 
-use Exception;
-
 /**
  * Represents an interface to query Intel Node Manager data.
  *
