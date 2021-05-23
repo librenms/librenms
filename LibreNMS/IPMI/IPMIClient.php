@@ -115,7 +115,8 @@ class IPMIClient
     }
 
     /**
-     * Gets a comma-separated list of sensor values.
+     * Gets a comma-separated list of sensor values from the 
+     * Sensor Data Repository (SDR).
      */
     public function getSensorDataRepository()
     {
