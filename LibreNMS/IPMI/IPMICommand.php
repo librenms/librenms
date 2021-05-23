@@ -55,7 +55,7 @@ final class IPMICommand
     public function execute()
     {
         if ($this->proc != null) {
-            throw new Exception("The command has already been executed.");
+            throw new Exception('The command has already been executed.');
         }
         
         $this->printInput($this->command);
@@ -73,12 +73,13 @@ final class IPMICommand
      */
     public function hasError(): bool
     {
-        return !$this->proc->isRunning() && $this->proc->getExitCode() > 0;
+        return ! $this->proc->isRunning() 
+            && $this->proc->getExitCode() > 0;
     }
 
     private static function printInput(array $input)
     {
-        if (!(Debug::isVerbose() || Debug::isEnabled())) {
+        if (! (Debug::isVerbose() || Debug::isEnabled())) {
             return;
         }
 
@@ -93,7 +94,7 @@ final class IPMICommand
             '-H HOSTNAME',
         ];
 
-        $filtered = preg_replace($patterns, $replacements, join(' ',  $input));
+        $filtered = preg_replace($patterns, $replacements, join(' ', $input));
         c_echo('IPMI[%c' . $filtered . "%n]\n");
     }
 
