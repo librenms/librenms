@@ -52,7 +52,7 @@ if (is_array($ipmi_rows)) {
 
         $nmClient = new NodeManager($client);
         if ($nmClient->isPlatformSupported()) {
-            $ipmi_unit_type = Config::get('pmi_unit.Watts');
+            $ipmi_unit_type = Config::get('ipmi_unit.Watts');
             foreach ($nmClient->getPowerReadings() as $nmSensorKey => $nmSensorValue) {
                 $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['value'] = $nmSensorValue;
                 $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['unit'] = 'Watts';
