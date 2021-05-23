@@ -6,7 +6,7 @@ use Exception;
 
 /**
  * Represents an interface to query Intel Node Manager data.
- * 
+ *
  * Intel Intelligent Power Node Manager is an IPMI OEM extension
  * which allows for power and thermal monitoring on supported platforms.
  * See spec. v1.5 sect. 1.3 for more information.
@@ -46,6 +46,7 @@ final class NodeManager
     public function isPlatformSupported(): bool
     {
         $this->discoverNodeManager();
+
         return $this->nmVersion != null;
     }
 
@@ -112,6 +113,7 @@ final class NodeManager
         $sdr = bin2hex($this->client->getSDR());
         if (! $sdr) {
             d_echo('SDR is empty!!');
+
             return;
         }
 
@@ -140,7 +142,7 @@ final class NodeManager
     /**
      * Decodes the Intel Node Manager SDR record
      * from a binary SDR dump.
-     * 
+     *
      * Slave channel is 7-bit I2C Slave Address of NM controller on channel.
      */
     private static function decodeNMSDRRecord($sdrHex)
@@ -194,6 +196,7 @@ final class NodeManager
     private function sendRawCommand(string $key, bool $useAdmin = false)
     {
         $result = $this->client->sendCommand($this->slaveChannelPrefix . ' ' . NodeManager::IPMI_NM_RAW_CMD[$key], $useAdmin);
+
         return explode(' ', trim($result));
     }
 }
