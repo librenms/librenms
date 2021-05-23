@@ -20,15 +20,22 @@ final class NodeManager
      * spec. v3.0: https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intel-power-node-manager-v3-spec.pdf
      */
 
-    private static $INTEL_MANUFACTURER_ID = '570100'; // 000157h
-    private static $IPMI_NM_RAW_CMD = [
+    private const INTEL_MANUFACTURER_ID = '570100'; // 000157h
+    private const IPMI_NM_RAW_CMD = [
         'get_nm_version' => 'raw 0x2e 0xca 0x57 0x01 0x00',
+        'platform_global_power' => 'raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x00 0x00',
+        'cpu_global_power' => 'raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x01 0x00',
+        'memory_global_power' => 'raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x02 0x00',
     ];
 
     private IPMIClient $client;
     private string $slaveChannelPrefix = '';
     private ?float $nmVersion = null;
 
+    /**
+     * Creates a new instance of the Intel Node Manager class.
+     * @param IPMIClient $client The IPMI client for the host.
+     */
     public function __construct(IPMIClient $client)
     {
         $this->client = $client;
@@ -39,8 +46,8 @@ final class NodeManager
      */
     public function isPlatformSupported(): bool
     {
-        // TODO: determine whether the platform is supported based on get_device_id.
-        return true;
+        $this->discoverNodeManager();
+        return $this->nmVersion != null;
     }
 
     /**
@@ -51,46 +58,83 @@ final class NodeManager
         $this->discoverNodeManager();
         if ($this->nmVersion == null) {
             return [];
-        } 
+        }
 
         $result = [];
         if ($this->nmVersion >= 2.0) {
-            $result['memory'] = NodeManager::parsePowerReadings($this->slaveChannelPrefix . " " . $this->client->sendCommand('nm statistics power domain memory'));
-            $result['cpu'] = NodeManager::parsePowerReadings($this->slaveChannelPrefix . " " . $this->client->sendCommand('nm statistics power domain cpu'));
-        } elseif ($this->nmVersion >= 1.5) {
-            $result['platform'] = NodeManager::parsePowerReadings($this->slaveChannelPrefix . " " . $this->client->sendCommand('nm statistics power domain platform'));
+            if ($power = NodeManager::decodePowerReadings($this->sendRawCommand('memory_global_power'))) {
+                $result['Intel ME Memory'] = $power;
+            }
+
+            if ($cpu = NodeManager::decodePowerReadings($this->sendRawCommand('cpu_global_power'))) {
+                $result['Intel ME CPU'] = $cpu;
+            }
         }
+
+        if ($this->nmVersion >= 1.5) {
+            if ($platform = NodeManager::decodePowerReadings($this->sendRawCommand('platform_global_power'))) {
+                $result['Intel ME Platform'] = $platform;
+            }
+        }
+
         return $result;
     }
 
     /**
      * Gets a list of available power reading sensors.
      */
-    public function getAvailablePowerReadings(): array
+    public function getAvailablePowerSensors(): array
     {
         $this->discoverNodeManager();
         if ($this->nmVersion == null) {
             return [];
-        } 
+        }
 
+        // TODO: cross check with Get Node Manager Capabilities command (0xc9)
         $result = [];
         if ($this->nmVersion >= 2.0) {
             array_push($result, ['memory', 'Intel ME Memory']);
             array_push($result, ['cpu', 'Intel ME CPU']);
-        } elseif ($this->nmVersion >= 1.5) {
+        }
+        if ($this->nmVersion >= 1.5) {
             array_push($result, ['platform', 'Intel ME Platform']);
         }
 
         return $result;
     }
 
-    private static function parsePowerReadings($value)
+    private function discoverNodeManager()
     {
-        if (preg_match('/Instantaneous reading:\s+(?<watts>[0-9]+) Watts/', $value, $matches)) {
-            return intval($matches['watts']);
+        if ($this->nmVersion != null) {
+            return;
         }
 
-        return 0;
+        // See spec. v3 sect. 4.5 BMC requirements for Intel® NM Discovery
+        $sdr = bin2hex($this->client->getSDR());
+        if (!$sdr) {
+            d_echo('SDR is empty!!');
+            return;
+        }
+
+        $decoded = NodeManager::decodeNMSDRRecord($sdr);
+        if (!$decoded['supported']) {
+            return;
+        }
+
+        $this->slaveChannelPrefix = "-b 0x0" . $decoded['channel'] . " -t 0x" . $decoded['slaveAddress'];
+        $this->nmVersion = NodeManager::decodeVersion($this->sendRawCommand('get_nm_version'));
+        d_echo("Node manager version: $this->nmVersion");
+    }
+
+    private static function decodePowerReadings(array $raw): ?int
+    {
+        if (sizeof($raw) < 20) {
+            return null;
+        }
+
+        // Raw value is little endian
+        $current = join('', array_reverse(array_slice($raw, 3, 2)));
+        return hexdec($current);
     }
 
     /**
@@ -102,7 +146,7 @@ final class NodeManager
     private static function decodeNMSDRRecord($sdrHex)
     {
         // See NM spec. v3 sect 4.5 table 4-13.
-        $headerOffset = strpos($sdrHex, NodeManager::$INTEL_MANUFACTURER_ID);
+        $headerOffset = strpos($sdrHex, NodeManager::INTEL_MANUFACTURER_ID);
         if (!$headerOffset) {
             d_echo("Intel Node Manager not supported.\n");
             return [
@@ -121,18 +165,8 @@ final class NodeManager
         ];
     }
 
-    /**
-     * Gets the domains that are supported by NM.
-     */
-    private static function enumerateSupportedDomains()
-    {
-        // Domain 0 (Platform) is supported in v1.5
-        // 2.0 adds 
-    }
-
     private static function decodeVersion(array $raw): ?string
     {
-        d_echo($raw);
         if (sizeof($raw) < 8) {
             return null;
         }
@@ -155,24 +189,9 @@ final class NodeManager
         }
     }
 
-    private function discoverNodeManager()
-    {
-        // See spec. v3 sect. 4.5 BMC requirements for Intel® NM Discovery
-        $sdr = bin2hex($this->client->getSDR());
-        if (!$sdr) {
-            d_echo('SDR is empty!!');
-            return;
-        }
-        d_echo("SDR: $sdr\n\n");
-        $decoded = NodeManager::decodeNMSDRRecord($sdr);
-        $this->slaveChannelPrefix = "-b 0x0" . $decoded['channel'] . " -t 0x" . $decoded['slaveAddress'];
-        $this->nmVersion = NodeManager::decodeVersion($this->sendRawCommand('get_nm_version'));
-        d_echo("Node manager version: $this->nmVersion");
-    }
-
     private function sendRawCommand(string $key, bool $useAdmin = false)
     {
-        $result = $this->client->sendCommand($this->slaveChannelPrefix . " " . NodeManager::$IPMI_NM_RAW_CMD[$key], $useAdmin);
+        $result = $this->client->sendCommand($this->slaveChannelPrefix . " " . NodeManager::IPMI_NM_RAW_CMD[$key], $useAdmin);
         return explode(' ', trim($result));
     }
 }
