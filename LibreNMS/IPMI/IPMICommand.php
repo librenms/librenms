@@ -26,9 +26,8 @@
 namespace LibreNMS\IPMI;
 
 use Exception;
-use LibreNMS\Config;
-use LibreNMS\Util\Debug;
 use LibreNMS\Proc;
+use LibreNMS\Util\Debug;
 
 /**
  * Represents an executable IPMICommand.
@@ -57,12 +56,12 @@ final class IPMICommand
         if ($this->proc != null) {
             throw new Exception('The command has already been executed.');
         }
-        
+
         $this->printInput($this->command);
 
         $this->proc = new Proc($this->command);
         $out = $this->proc->getOutput();
-        
+
         $this->printOutput($out);
 
         return $this->proc->getExitCode() > 0 ? null : $out[0];
@@ -73,7 +72,7 @@ final class IPMICommand
      */
     public function hasError(): bool
     {
-        return ! $this->proc->isRunning() 
+        return ! $this->proc->isRunning()
             && $this->proc->getExitCode() > 0;
     }
 
