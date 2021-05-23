@@ -82,29 +82,18 @@ final class IPMICommand
             return;
         }
 
-        $inputString = join(' ', $input);
         $patterns = [
-            '/-c\' \'[\S]+\'/',
-            '/-u\' \'[\S]+\'/',
-            '/-U\' \'[\S]+\'/',
-            '/-A\' \'[\S]+\'/',
-            '/-X\' \'[\S]+\'/',
-            '/-P\' \'[\S]+\'/',
-            '/-H\' \'[\S]+\'/',
-            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
+            '/-U [\S]+/',
+            '/-P [\S]+/',
+            '/-H [\S]+/',
         ];
         $replacements = [
-            '-c\' \'COMMUNITY\'',
-            '-u\' \'USER\'',
-            '-U\' \'USER\'',
-            '-A\' \'PASSWORD\'',
-            '-X\' \'PASSWORD\'',
-            '-P\' \'PASSWORD\'',
-            '-H\' \'HOSTNAME\'',
-            '\1:HOSTNAME:\3',
+            '-U USER',
+            '-P PASSWORD',
+            '-H HOSTNAME',
         ];
 
-        $filtered = preg_replace($patterns, $replacements, $inputString);
+        $filtered = preg_replace($patterns, $replacements, join(' ',  $input));
         c_echo('IPMI[%c' . $filtered . "%n]\n");
     }
 
