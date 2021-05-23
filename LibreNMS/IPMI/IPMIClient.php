@@ -30,14 +30,14 @@ namespace LibreNMS\IPMI;
  */
 class IPMIClient
 {
-    private string $ipmiToolPath;
-    private string $host;
-    private string $user;
-    private string $password;
-    private ?string $port = null;
+    private $ipmiToolPath;
+    private $host;
+    private $user;
+    private $password;
+    private $port = null;
 
-    private string $privLvl = 'USER';
-    private string $interface = 'lanplus';
+    private $privLvl = 'USER';
+    private $interface = 'lanplus';
 
     /**
      * Creates a new instance of the IPMIClient class.
