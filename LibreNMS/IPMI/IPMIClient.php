@@ -25,6 +25,8 @@
 
 namespace LibreNMS\IPMI;
 
+use LibreNMS\Config;
+
 /**
  * Represents an IPMI connection with a host machine.
  */
@@ -98,16 +100,17 @@ class IPMIClient
      */
     public function getSDR()
     {
-        $path = '/tmp/librenms/ipmi/SDR';
-        $this->assertSDR($path);
-
-        $filename = "$path/$this->host";
-        $sdrFile = fopen($filename, 'r');
-        try {
-            return fread($sdrFile, filesize($filename));
-        } finally {
-            fclose($sdrFile);
+        $basePath = Config::get('install_dir') . '/cache/ipmi';
+        $filePath = "$basePath/$this->host.sdr.cache";
+        if (! is_dir($basePath)) {
+            mkdir($basePath, 0777, true);
         }
+
+        if (! file_exists($filePath)) {
+            $this->sendCommand("sdr dump $filePath");
+        }
+        
+        return file_get_contents($filePath);
     }
 
     /**
@@ -154,15 +157,5 @@ class IPMIClient
         $cmd = array_merge($cmd, explode(' ', $command));
 
         return external_exec($cmd);
-    }
-
-    private function assertSDR(string $path)
-    {
-        if (! is_dir($path)) {
-            mkdir($path, 0777, true);
-        }
-        if (! file_exists("$path/$this->host")) {
-            $this->sendCommand("sdr dump $path/$this->host");
-        }
     }
 }
