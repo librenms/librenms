@@ -39,14 +39,13 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         $values = array_map('trim', explode('|', $sensor));
         [$desc, $current, $unit, $state, $low_nonrecoverable, $low_limit, $low_warn, $high_warn, $high_limit, $high_nonrecoverable] = $values;
 
-        $index++;
         if ($current != 'na' && Config::has("ipmi_unit.$unit")) {
             discover_sensor(
                 $valid['sensor'],
                 Config::get("ipmi_unit.$unit"),
                 $device,
                 $desc,
-                $index,
+                ++$index,
                 'ipmi',
                 $desc,
                 '1',
@@ -63,16 +62,14 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
     $nmClient = new NodeManager($client);
     if ($nmClient->isPlatformSupported()) {
-        $index++;
         $ipmi_unit_type = Config::get('ipmi_unit.Watts');
         foreach ($nmClient->getAvailablePowerSensors() as $nmSensor) {
-            $index++;
             discover_sensor(
                 $valid['sensor'],
                 $ipmi_unit_type,
                 $device,
                 $nmSensor[0],
-                $index,
+                ++$index,
                 'ipmi',
                 $nmSensor[1],
                 '1',
