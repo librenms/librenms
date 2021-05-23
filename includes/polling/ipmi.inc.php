@@ -26,8 +26,6 @@ if (is_array($ipmi_rows)) {
 
         // Check to see if we know which IPMI interface to use
         // so we dont use wrong arguments for ipmitool
-        // --
-        // What is expected behavior when interface not known???
         if ($ipmi['type'] != '') {
             $client->setInterface($ipmi['type']);
             $results = $client->getSensorDataRepository();
@@ -54,8 +52,10 @@ if (is_array($ipmi_rows)) {
 
         $nmClient = new NodeManager($client);
         if ($nmClient->isPlatformSupported()) {
-            foreach ($nmClient->getAvailablePowerReadings() as $nmSensor) {
-                d_echo($nmSensor);
+            $ipmi_unit_type = Config::get("ipmi_unit.Watts");
+            foreach ($nmClient->getPowerReadings() as $nmSensorKey => $nmSensorValue) {
+                $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['value'] = $nmSensorValue;
+                $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['unit'] = 'Watts';
             }
         }
 
