@@ -27,7 +27,7 @@ if (is_array($ipmi_rows)) {
         // Check to see if we know which IPMI interface to use
         // so we dont use wrong arguments for ipmitool
         if ($ipmi['type'] != '') {
-            $client->setInterface($ipmi['type']);
+            $client->setDriver($ipmi['type']);
             $results = $client->getSensorDataRepository();
             d_echo($results);
             echo " done.\n";

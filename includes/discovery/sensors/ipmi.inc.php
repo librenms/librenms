@@ -17,7 +17,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
     $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password']);
     foreach (Config::get('ipmi.type', []) as $ipmi_type) {
-        $client->setInterface($ipmi_type);
+        $client->setDriver($ipmi_type);
         $results = $client->getSensors();
 
         $results = array_values(array_filter($results, function ($line) {

@@ -30,14 +30,14 @@ namespace LibreNMS\IPMI;
  */
 class IPMIClient
 {
-    private $ipmiToolPath;
-    private $host;
-    private $user;
-    private $password;
-    private $port = null;
+    private string $ipmiToolPath;
+    private string $host;
+    private string $user;
+    private string $password;
+    private ?string $port = null;
 
-    private $privLvl = 'USER';
-    private $interface = 'lanplus';
+    private string $privLvl = 'USER';
+    private string $interface = 'lanplus';
 
     /**
      * Creates a new instance of the IPMIClient class.
@@ -60,14 +60,17 @@ class IPMIClient
     }
 
     /**
-     * Gets the IPMI interface used by the client.
+     * Gets the IPMI interface driver used by the client.
      */
-    public function getInterface(): ?string
+    public function getDriver(): string
     {
         return $this->interface;
     }
 
-    public function setInterface(string $interface)
+    /**
+     * Sets the IPMI interface driver.
+     */
+    public function setDriver(string $interface)
     {
         $this->interface = $interface;
     }
@@ -84,13 +87,14 @@ class IPMIClient
     /**
      * Set the port used by the client.
      */
-    public function setPort(string $port)
+    public function setPort(?string $port)
     {
         $this->port = $port;
     }
 
     /**
      * Gets a binary representation of the cached SDR record for this host.
+     * @return string|false The SDR binary or false on failure.
      */
     public function getSDR()
     {
@@ -109,7 +113,7 @@ class IPMIClient
     /**
      * Gets a list of sensors and threshold values reported by ipmitool.
      */
-    public function getSensors()
+    public function getSensors(): array
     {
         return explode(PHP_EOL, $this->send('sensor'));
     }
@@ -118,7 +122,7 @@ class IPMIClient
      * Gets a comma-separated list of sensor values from the
      * Sensor Data Repository (SDR).
      */
-    public function getSensorDataRepository()
+    public function getSensorDataRepository(): array
     {
         return explode(PHP_EOL, $this->send('-c sdr'));
     }
@@ -127,13 +131,14 @@ class IPMIClient
      * Sends an ipmitool command with specified parameters.
      * @param string $command the command to send.
      * @param bool $escalatePrivileges a boolean indicating whether to use 'USER' or 'ADMINISTRATOR' privilege.
+     * @return null|string The stdout of the command as reported by ipmitool.
      */
-    public function sendCommand(string $command, bool $escalatePrivileges = false)
+    public function sendCommand(string $command, bool $escalatePrivileges = false): ?string
     {
         return $this->send($command, $escalatePrivileges);
     }
 
-    private function send($command, $escalate = false)
+    private function send(string $command, bool $escalate = false)
     {
         $cmd = [$this->ipmiToolPath];
         if ($this->host != 'localhost') {

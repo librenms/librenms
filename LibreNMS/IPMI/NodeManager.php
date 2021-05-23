@@ -73,8 +73,9 @@ final class NodeManager
 
     /**
      * Gets power readings for this device.
+     * @return array An array of power reading values with sensor descriptions as the key.
      */
-    public function getPowerReadings()
+    public function getPowerReadings(): array
     {
         $this->discoverNodeManager();
         if ($this->nmVersion == null) {
@@ -103,6 +104,7 @@ final class NodeManager
 
     /**
      * Gets a list of available power reading sensors.
+     * @return array A 2-dim array of available sensors. First index is the name, second index is description.
      */
     public function getAvailablePowerSensors(): array
     {
@@ -124,7 +126,7 @@ final class NodeManager
         return $result;
     }
 
-    private function discoverNodeManager()
+    private function discoverNodeManager(): void
     {
         if ($this->nmVersion != null) {
             return;
@@ -166,7 +168,7 @@ final class NodeManager
      *
      * Slave channel is 7-bit I2C Slave Address of NM controller on channel.
      */
-    private static function decodeNMSDRRecord($sdrHex)
+    private static function decodeNMSDRRecord($sdrHex): array
     {
         // See NM spec. v3 sect 4.5 table 4-13.
         $headerOffset = strpos($sdrHex, NodeManager::INTEL_MANUFACTURER_ID);
@@ -190,7 +192,7 @@ final class NodeManager
         ];
     }
 
-    private static function decodeVersion(array $raw): ?string
+    private static function decodeVersion(array $raw): ?float
     {
         if (sizeof($raw) < 8) {
             return null;
@@ -214,7 +216,7 @@ final class NodeManager
         }
     }
 
-    private function sendRawCommand(string $key, bool $useAdmin = false)
+    private function sendRawCommand(string $key, bool $useAdmin = false): array
     {
         $result = $this->client->sendCommand($this->slaveChannelPrefix . ' ' . NodeManager::IPMI_NM_RAW_CMD[$key], $useAdmin);
 
