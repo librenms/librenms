@@ -18,7 +18,7 @@ if (is_array($ipmi_rows)) {
         if (Config::get('own_hostname') == $device['hostname']) {
             $ipmi['host'] = 'localhost';
         }
-        
+
         $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password']);
         $client->setPort(filter_var($attribs['ipmi_port'], FILTER_VALIDATE_INT) ? $attribs['ipmi_port'] : '623');
 
@@ -52,7 +52,7 @@ if (is_array($ipmi_rows)) {
 
         $nmClient = new NodeManager($client);
         if ($nmClient->isPlatformSupported()) {
-            $ipmi_unit_type = Config::get("ipmi_unit.Watts");
+            $ipmi_unit_type = Config::get('pmi_unit.Watts');
             foreach ($nmClient->getPowerReadings() as $nmSensorKey => $nmSensorValue) {
                 $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['value'] = $nmSensorValue;
                 $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['unit'] = 'Watts';

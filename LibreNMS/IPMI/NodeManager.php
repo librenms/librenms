@@ -13,13 +13,12 @@ use Exception;
  */
 final class NodeManager
 {
-    /**
+    /*
      * Relevant documentation:
      * spec. v1.5: https://www.intel.com/content/dam/doc/technical-specification/intelligent-power-node-manager-1-5-specification.pdf
      * spec. v2.0: https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intelligent-power-node-manager-specification.pdf
      * spec. v3.0: https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intel-power-node-manager-v3-spec.pdf
      */
-
     private const INTEL_MANUFACTURER_ID = '570100'; // 000157h
     private const IPMI_NM_RAW_CMD = [
         'get_nm_version' => 'raw 0x2e 0xca 0x57 0x01 0x00',
@@ -111,17 +110,17 @@ final class NodeManager
 
         // See spec. v3 sect. 4.5 BMC requirements for Intel® NM Discovery
         $sdr = bin2hex($this->client->getSDR());
-        if (!$sdr) {
+        if (! $sdr) {
             d_echo('SDR is empty!!');
             return;
         }
 
         $decoded = NodeManager::decodeNMSDRRecord($sdr);
-        if (!$decoded['supported']) {
+        if (! $decoded['supported']) {
             return;
         }
 
-        $this->slaveChannelPrefix = "-b 0x0" . $decoded['channel'] . " -t 0x" . $decoded['slaveAddress'];
+        $this->slaveChannelPrefix = '-b 0x0' . $decoded['channel'] . ' -t 0x' . $decoded['slaveAddress'];
         $this->nmVersion = NodeManager::decodeVersion($this->sendRawCommand('get_nm_version'));
         d_echo("Node manager version: $this->nmVersion");
     }
@@ -134,6 +133,7 @@ final class NodeManager
 
         // Raw value is little endian
         $current = join('', array_reverse(array_slice($raw, 3, 2)));
+
         return hexdec($current);
     }
 
@@ -147,8 +147,9 @@ final class NodeManager
     {
         // See NM spec. v3 sect 4.5 table 4-13.
         $headerOffset = strpos($sdrHex, NodeManager::INTEL_MANUFACTURER_ID);
-        if (!$headerOffset) {
+        if (! $headerOffset) {
             d_echo("Intel Node Manager not supported.\n");
+
             return [
                 'supported' => false,
             ];
@@ -158,6 +159,7 @@ final class NodeManager
         $slaveAddress = substr($header, 10, 2); // byte #5
         $channel = substr($header, 12, 1); // byte #6 first nibble
         d_echo("Intel Node Manager supported.\nSlave address: $slaveAddress\nChannel: $channel");
+
         return [
             'channel' => $channel,
             'slaveAddress' => $slaveAddress,
@@ -191,7 +193,7 @@ final class NodeManager
 
     private function sendRawCommand(string $key, bool $useAdmin = false)
     {
-        $result = $this->client->sendCommand($this->slaveChannelPrefix . " " . NodeManager::IPMI_NM_RAW_CMD[$key], $useAdmin);
+        $result = $this->client->sendCommand($this->slaveChannelPrefix . ' ' . NodeManager::IPMI_NM_RAW_CMD[$key], $useAdmin);
         return explode(' ', trim($result));
     }
 }

@@ -21,10 +21,10 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         $results = $client->getSensors();
 
         $results = array_values(array_filter($results, function ($line) {
-            return !Str::contains($line, 'discrete');
+            return ! Str::contains($line, 'discrete');
         }));
 
-        if (!empty($results)) {
+        if (! empty($results)) {
             set_dev_attrib($device, 'ipmi_type', $ipmi_type);
             echo "$ipmi_type ";
             break;

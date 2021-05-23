@@ -94,7 +94,7 @@ class IPMIClient
      */
     public function getSDR()
     {
-        $path = "/tmp/librenms/ipmi/SDR";
+        $path = '/tmp/librenms/ipmi/SDR';
         $this->assertSDR($path);
 
         $filename = "$path/$this->host";
@@ -156,7 +156,7 @@ class IPMIClient
         if (! is_dir($path)) {
             mkdir($path, 0777, true);
         }
-        if (!file_exists("$path/$this->host")) {
+        if (! file_exists("$path/$this->host")) {
             $this->sendCommand("sdr dump $path/$this->host");
         }
     }
