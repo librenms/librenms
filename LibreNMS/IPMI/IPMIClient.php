@@ -109,7 +109,7 @@ class IPMIClient
         if (! file_exists($filePath)) {
             $this->sendCommand("sdr dump $filePath");
         }
-        
+
         return file_get_contents($filePath);
     }
 
@@ -155,7 +155,8 @@ class IPMIClient
         }
 
         $cmd = array_merge($cmd, explode(' ', $command));
+        $proc = new IPMICommand($cmd);
 
-        return external_exec($cmd);
+        return $proc->execute();
     }
 }
