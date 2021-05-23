@@ -138,7 +138,7 @@ class IPMIClient
         $cmd = [$this->ipmiToolPath];
         if ($this->host != 'localhost') {
             array_push($cmd, '-H', $this->host, '-U', $this->user, '-P', $this->password);
-            array_push($cmd, '-L', $escalate ? $this->privLvl : 'ADMINISTRATOR');
+            array_push($cmd, '-L', $escalate ? 'ADMINISTRATOR' : $this->privLvl);
             if ($this->port) {
                 array_push($cmd, '-p', $this->port);
             }
