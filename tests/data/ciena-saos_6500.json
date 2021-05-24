@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "ciena-saos",
                     "type": "network",
-                    "serial": "NNTMRT0J1X6P",
+                    "serial": null,
                     "icon": "ciena.svg",
                     "location": "<private>"
                 }
