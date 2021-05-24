@@ -25,6 +25,7 @@
 
 namespace LibreNMS\IPMI;
 
+use ErrorException;
 use LibreNMS\Config;
 
 /**
@@ -107,10 +108,17 @@ class IPMIClient
         }
 
         if (! file_exists($filePath)) {
-            $this->sendCommand("sdr dump $filePath");
+            if (! $this->sendCommand("sdr dump $filePath")) {
+                return false;
+            }
         }
 
-        return file_get_contents($filePath);
+        try {
+            return file_get_contents($filePath);
+        } catch (ErrorException $e) {
+            echo 'Failed to read SDR: ', $e->getMessage(), "\n";
+            return false;
+        }
     }
 
     /**
