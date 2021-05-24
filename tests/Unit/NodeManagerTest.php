@@ -36,6 +36,7 @@ class NodeManagerTest extends TestCase
     private const DATA_DIR = 'tests/data/IPMI/NodeManager/';
     private const DATA = [
         '-1' => ['version_unsupported.sdr.bin', 'version_unsupported.json'],
+        'corrupt' => ['empty.sdr.bin', 'version_unsupported.json'],
         '1.5' => ['version_1_5.sdr.bin', 'version_1_5.json'],
         // '2.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
         // '2.5' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
@@ -49,6 +50,18 @@ class NodeManagerTest extends TestCase
     {
         $expected = false;
         $client = $this->getMock('-1');
+
+        $sut = new NodeManager($client);
+        $actual = $sut->isPlatformSupported();
+
+        $this->assertEquals($expected, $actual, 'Expected the platform to be unsupported, but returned true.');
+    }
+
+    public function testIsPlatformSupported_SDRMissing_IsFalse()
+    {
+        $expected = false;
+        $client = $this->getMock('corrupt');
+        $this->sdr = false;
 
         $sut = new NodeManager($client);
         $actual = $sut->isPlatformSupported();
@@ -145,15 +158,16 @@ class NodeManagerTest extends TestCase
     {
         switch ($version) {
             case '-1':
+            case 'corrupt':
             case '1.5':
-            case '3.0':
                 $this->sdr = NodeManagerTest::loadData(NodeManagerTest::DATA[$version][0]);
                 $this->schema = json_decode(NodeManagerTest::loadData(NodeManagerTest::DATA[$version][1]), true);
 
                 return $this->createIPMIMock();
 
-            case '2.0':
-            case '2.5':
+                case '2.0':
+                case '2.5':
+                case '3.0':
                 throw new Exception("Test data missing for version $version");
             default:
                 throw new Exception('Version is not known');
