@@ -55,7 +55,7 @@ class NodeManagerTest extends TestCase
         $sut = new NodeManager($client);
         $actual = $sut->isPlatformSupported();
 
-        $this->assertEquals($expected, $actual, "Expected the platform to be unsupported, but returned true.");
+        $this->assertEquals($expected, $actual, 'Expected the platform to be unsupported, but returned true.');
     }
 
     public function testIsPlatformSupported_SDRContainsIntelRecord_IsTrue()
@@ -66,7 +66,7 @@ class NodeManagerTest extends TestCase
         $sut = new NodeManager($client);
         $actual = $sut->isPlatformSupported();
 
-        $this->assertEquals($expected, $actual, "Expected the platform to be supported, but returned false.");
+        $this->assertEquals($expected, $actual, 'Expected the platform to be supported, but returned false.');
     }
 
     public function testGetPowerReadings_PlatformNotSupported_EmptyArray()
@@ -77,7 +77,7 @@ class NodeManagerTest extends TestCase
         $sut = new NodeManager($client);
         $actual = $sut->getPowerReadings();
 
-        $this->assertEquals(0, sizeof($actual), "Expected power readings to be an empty array, but was not empty.");
+        $this->assertEquals(0, sizeof($actual), 'Expected power readings to be an empty array, but was not empty.');
         $this->assertEquals($expected, $actual);
     }
 
@@ -90,8 +90,8 @@ class NodeManagerTest extends TestCase
         $response = $sut->getPowerReadings();
         $actualKeys = array_keys($response);
 
-        $this->assertEquals(sizeof($expectedKey), sizeof($actualKeys), "Expected one sensor to be returned.");
-        $this->assertEquals($expectedKey[0], $actualKeys[0], "Expected only platform sensor to be returned.");
+        $this->assertEquals(sizeof($expectedKey), sizeof($actualKeys), 'Expected one sensor to be returned.');
+        $this->assertEquals($expectedKey[0], $actualKeys[0], 'Expected only platform sensor to be returned.');
     }
 
     public function testGetPowerReadings_Version15_PlatformReadingCorrect()
@@ -114,8 +114,8 @@ class NodeManagerTest extends TestCase
         $sut = new NodeManager($client);
         $actual = $sut->getAvailablePowerSensors();
 
-        $this->assertEquals(0, sizeof($actual), "Expected no available sensors to be returned.");
-        $this->assertEquals($expected, $actual, "Expected no available sensors to be returned.");
+        $this->assertEquals(0, sizeof($actual), 'Expected no available sensors to be returned.');
+        $this->assertEquals($expected, $actual, 'Expected no available sensors to be returned.');
     }
 
     public function testGetAvailablePowerSensors_Version15_PlatformSensorOnly()
@@ -126,8 +126,8 @@ class NodeManagerTest extends TestCase
         $sut = new NodeManager($client);
         $response = $sut->getAvailablePowerSensors();
 
-        $this->assertEquals(1, sizeof($response), "Expected one sensor to be returned.");
-        $this->assertEquals($expectedOid, $response[0][0], "Expected platform sensor to be the only available sensor.");
+        $this->assertEquals(1, sizeof($response), 'Expected one sensor to be returned.');
+        $this->assertEquals($expectedOid, $response[0][0], 'Expected platform sensor to be the only available sensor.');
     }
 
     protected function tearDown(): void
@@ -157,7 +157,7 @@ class NodeManagerTest extends TestCase
                 throw new Exception("Test data missing for version $version");
 
             default:
-                throw new Exception("Version is not known");
+                throw new Exception('Version is not known');
         }
     }
 
@@ -184,11 +184,11 @@ class NodeManagerTest extends TestCase
     private static function validateSlaveAndChannel($schema, $command)
     {
         if (!preg_match('/-t ' . $schema['slave'] . '/', $command)) {
-            throw new Exception("IPMI command has an incorrect slave address.");
+            throw new Exception('IPMI command has an incorrect slave address.');
         }
 
         if (!preg_match('/-b ' . $schema['channel'] . '/', $command)) {
-            throw new Exception("IPMI command has an incorrect channel.");
+            throw new Exception('IPMI command has an incorrect channel.');
         }
     }
 }
