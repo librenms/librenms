@@ -2057,9 +2057,7 @@ function lock_and_purge($table, $sql, int $count = 1000)
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
-            if (is_numeric($count)) {
-                $sql = $sql . " LIMIT $count";
-            }
+            $sql = $sql . " LIMIT $count";
             while (true) {
                 // Deletes are done in blocks to avoid a single very large operation.
                 if (! dbDelete($table, $sql, [$purge_days]) > 0) {
