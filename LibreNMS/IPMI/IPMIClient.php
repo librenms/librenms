@@ -117,6 +117,7 @@ class IPMIClient
             return file_get_contents($filePath);
         } catch (ErrorException $e) {
             echo 'Failed to read SDR: ', $e->getMessage(), "\n";
+
             return false;
         }
     }
