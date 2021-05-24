@@ -1,0 +1,26 @@
+{
+    "get_nm_version": {
+        "slave": "0x88",
+        "channel": "0x00",
+        "requestPattern": "/raw 0x2e 0xca 0x57 0x01 0x00/",
+        "response": "57 01 00 02 01 00 01 12",
+        "expected": 1.5
+    },
+    "platform_global_power": {
+        "slave": "0x88",
+        "channel": "0x00",
+        "requestPattern": "/raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x00 0x00/",
+        "response": "57 01 00 9f 00 96 00 05 01 a1 00 28 99 ab 60 01 00 00 00 40",
+        "expected": 159
+    },
+    "cpu_global_power": {
+        "requestPattern": "raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x01 0x00",
+        "response": null,
+        "expected": null
+    },
+    "memory_global_power": {
+        "requestPattern": "raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x02 0x00",
+        "response": null,
+        "expected": null
+    }
+}
