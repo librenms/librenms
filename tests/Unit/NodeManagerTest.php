@@ -38,9 +38,9 @@ class NodeManagerTest extends TestCase
     private const DATA = [
         '-1' => ['version_unsupported.sdr.bin', 'version_unsupported.json'],
         '1.5' => ['version_1_5.sdr.bin', 'version_1_5.json'],
-        // '2.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment. 
-        // '2.5' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment. 
-        // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment. 
+        // '2.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
+        // '2.5' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
+        // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
 
 
