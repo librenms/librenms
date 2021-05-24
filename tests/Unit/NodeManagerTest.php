@@ -30,7 +30,6 @@ use LibreNMS\Config;
 use LibreNMS\IPMI\IPMIClient;
 use LibreNMS\IPMI\NodeManager;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Debug;
 
 class NodeManagerTest extends TestCase
 {
@@ -42,7 +41,6 @@ class NodeManagerTest extends TestCase
         // '2.5' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
         // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
-
 
     private $sdr;
     private $schema;
@@ -139,6 +137,7 @@ class NodeManagerTest extends TestCase
     private static function loadData($name)
     {
         $path = Config::get('install_dir') . '/' . NodeManagerTest::DATA_DIR . $name;
+
         return file_get_contents($path);
     }
 
@@ -150,12 +149,12 @@ class NodeManagerTest extends TestCase
             case '3.0':
                 $this->sdr = NodeManagerTest::loadData(NodeManagerTest::DATA[$version][0]);
                 $this->schema = json_decode(NodeManagerTest::loadData(NodeManagerTest::DATA[$version][1]), true);
+
                 return $this->createIPMIMock();
 
             case '2.0':
             case '2.5':
                 throw new Exception("Test data missing for version $version");
-
             default:
                 throw new Exception('Version is not known');
         }
@@ -169,6 +168,7 @@ class NodeManagerTest extends TestCase
             foreach ($this->schema as $key => $value) {
                 if (preg_match($value['requestPattern'], $command)) {
                     NodeManagerTest::validateSlaveAndChannel($value, $command);
+
                     return $value['response'];
                 }
             }
@@ -183,11 +183,11 @@ class NodeManagerTest extends TestCase
 
     private static function validateSlaveAndChannel($schema, $command)
     {
-        if (!preg_match('/-t ' . $schema['slave'] . '/', $command)) {
+        if (! preg_match('/-t ' . $schema['slave'] . '/', $command)) {
             throw new Exception('IPMI command has an incorrect slave address.');
         }
 
-        if (!preg_match('/-b ' . $schema['channel'] . '/', $command)) {
+        if (! preg_match('/-b ' . $schema['channel'] . '/', $command)) {
             throw new Exception('IPMI command has an incorrect channel.');
         }
     }
