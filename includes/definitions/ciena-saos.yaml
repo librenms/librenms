@@ -1,0 +1,9 @@
+os: ciena-saos
+text: 'Ciena SAOS'
+type: network
+icon: ciena
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.562.68.11
