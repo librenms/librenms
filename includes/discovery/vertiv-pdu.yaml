@@ -1,0 +1,38 @@
+mib: VERTIV-V5-MIB
+modules:
+    os:
+        hardware: VERTIV-V5-MIB::productModelNumber.0
+        serial: VERTIV-V5-MIB::productSerialNumber.0
+        version: VERTIV-V5-MIB::productVersion.0
+    sensors:
+        current:
+            data:
+                -
+                   oid: pduLineTable
+                   value: pduLineCurrent
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.4.1.4.{{ $index }}'
+                   index: 'pduLineCurrent.{{ $index }}'
+                   descr: pduLineName
+                   divisor: 100
+                -
+                   oid: pduBreakerTable
+                   value: pduBreakerCurrent
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.3.1.4.{{ $index }}'
+                   index: 'pduBreakerCurrent.{{ $index }}'
+                   descr: pduBreakerLabel
+                   divisor: 100
+                -
+                   oid: pduPhaseTable
+                   value: pduPhaseCurrent
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.2.1.8.{{ $index }}'
+                   index: 'pduPhaseCurrent.{{ $index }}'
+                   descr: pduPhaseName
+                   divisor: 100
+        voltage:
+            data:
+                -
+                   oid: pduPhaseTable
+                   value: pduPhaseVoltage
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.2.1.4.{{ $index }}'
+                   descr: pduPhaseName
+                   divisor: 100
