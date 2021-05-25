@@ -9,6 +9,8 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.3808
+        sysDescr_except:
+            - 'Power Management Card'
 poller_modules:
     ports: false
 discovery_modules:
