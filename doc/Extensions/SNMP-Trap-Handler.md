@@ -58,7 +58,7 @@ devices (community, etc.)
 ### Option 2
 > Tested on Ubuntu 18
 
-Just setup your service like:
+Just set up your service like:
 
 ```
 [Unit]

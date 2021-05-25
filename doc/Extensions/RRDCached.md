@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Setting up RRDCached
 
-This document will explain how to setup RRDCached for LibreNMS.
+This document will explain how to set up RRDCached for LibreNMS.
 
 Since version 1.5, rrdtool / rrdcached now supports creating rrd files
 over rrdcached. If you have rrdcached 1.5.5 or above, you can also
