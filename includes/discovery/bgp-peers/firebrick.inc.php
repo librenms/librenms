@@ -33,17 +33,17 @@ foreach ($bgpPeersCache as $key => $value) {
     if (strlen($address) > 15) {
         $address = IP::fromHexString($address)->compressed();
     }
-
-    if (isset($value['fbBgpPeerTableId'])) {
+    if (isset($value['fbBgpPeerTableId']) && $value['fbBgpPeerTableId'] !== "") {
         $bgpPeers[$value['fbBgpPeerTableId']][$address] = $value;
     } else {
-        $bgpPeers[0][$address] = $value;
+        $bgpPeers[NULL][$address] = $value;
     }
 }
 unset($bgpPeersCache);
 
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
+        $vrfId = NULL;
         $checkVrf = ' AND `vrf_id` IS NULL ';
     } else {
         $checkVrf = ' AND vrf_id = ? ';
@@ -93,9 +93,6 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
     $vrfId = $value['vrf_id'];
-    if ($vrfId === null) {
-        $vrfId = 0;
-    }
     $address = $value['bgpPeerIdentifier'];
 
     if (empty($bgpPeers[$vrfId][$address])) {
