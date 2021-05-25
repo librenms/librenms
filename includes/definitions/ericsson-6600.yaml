@@ -1,0 +1,15 @@
+os: ericsson-6600
+text: 'Ericsson 6600 series MINI-LINK'
+type: wireless
+#empty_ifdescr: true
+icon: ericsson
+#over:
+#    - { graph: device_processor, text: 'CPU Usage' }
+#    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID: 
+            - .1.3.6.1.4.1.193.81.1.1.3
+        
+mib_dir: ericsson
+
