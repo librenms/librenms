@@ -239,7 +239,6 @@ if (($device['os'] == 'routeros')) {
             } else {
                 $ifIndex = $entry_key;
             }
-	 
             if (($device['os'] == 'aos7')) {
                 $local_port_id = find_port_id($ifName, null, $device['device_id']);
             } else {
