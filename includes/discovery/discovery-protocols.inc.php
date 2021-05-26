@@ -233,7 +233,7 @@ if (($device['os'] == 'routeros')) {
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if (($device['os'] == 'aos7')) {
-		$ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+                $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
@@ -245,8 +245,7 @@ if (($device['os'] == 'routeros')) {
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
             }
-                $interface = get_port_by_id($local_port_id);
-            
+            $interface = get_port_by_id($local_port_id);
 
             d_echo($lldp_instance);
 
