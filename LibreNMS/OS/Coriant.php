@@ -85,7 +85,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
         echo PHP_EOL;
 
         foreach ($ne_alarm_oids as $alarm) {
-            if (!empty($alarm['enmsAlAlarmNumber']))  {
+            if (!empty($alarm['enmsAlAlarmNumber'])) {
                 $fields = [
                     'tnmsne_info_id' => $existing_ne->get($alarm['enmsAlNEId'])->tnmsne_info_id,
                     'device_id' => $device['device_id'],
