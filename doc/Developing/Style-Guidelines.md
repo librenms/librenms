@@ -10,17 +10,17 @@ interest that a consistent well thought out Web UI is available.
 ### Responsiveness
 
 The Web UI is designed to be mobile friendly and for the most part is
-and works well. It's worth spending sometime to read through the
+and works well. It's worth spending some time to read through the
 [Bootstrap website](http://getbootstrap.com/css/#grid) to learn more
 about how to keep things responsive.
 
 ### Navigation bar
 
-- Always pick the best location for new links to go, think about where
+- Always pick the best location for new links to go; think about where
   users would expect the link to be located and name it so that it's
   obvious what it does.
 
-- Ensure sub sections within the Navigation are separated correctly
+- Ensure sub-sections within the Navigation are separated correctly
   using `<li role="presentation" class="divider"></li>`.
 
 - Only use [Font Awesome icons](http://fontawesome.io/icons/) within the Navigation. It speeds up page load times quite considerably.
@@ -43,7 +43,7 @@ probably the most common.
 Unless the table being used will only ever display a handful of
 items - yeah that's what we all said, then you need to write your
 table using [JQuery Bootgrid](http://www.jquery-bootgrid.com/). This
-shouldn't take that much more code to do this but provides so much
+shouldn't take that much more code to do it, but provides so much
 flexibility along with stopping the need for retrieving all the data
 from SQL in the first place.
 
@@ -54,9 +54,9 @@ idea of what it's like to convert an existing pure html table to Bootgrid.
 ### Datetime format
 
 When displaying datetimes, please ensure you use the format YYYY-MM-DD
-mm:hh:ss where possible, you shouldn't change the order of this as it
+hh:mm:ss where possible, you shouldn't change the order of this as it
 will be confusing to users. Cutting it short to just display
-YYYY-MM-DD mm:hh is fine :).
+YYYY-MM-DD hh:mm is fine :).
 
 To keep things consistent we have the following variables which should
 be used rather than to format dates yourself. This has the added
