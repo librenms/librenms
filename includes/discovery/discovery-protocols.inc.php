@@ -233,19 +233,20 @@ if (($device['os'] == 'routeros')) {
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if (($device['os'] == 'aos7')) {
-                $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+		    $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
                 $ifIndex = $entry_key;
             }
-
-            $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
-            if (($device['os'] == 'aos7')) {
-                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND (`ifName`= ? OR `ifDescr` = ?)', [$device['device_id'], $ifName, $ifName]);
-            } else {
+	 
+	    if (($device['os'] == 'aos7')) {
+                  $local_port_id = find_port_id($ifName, null, $device['device_id']);
+	    } else {
+		    $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
+	    }
                 $interface = get_port_by_id($local_port_id);
-            }
+            
 
             d_echo($lldp_instance);
 
