@@ -25,20 +25,16 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-#use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-#use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-#use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-#use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessXpiDiscovery;
 use LibreNMS\OS;
 
 class Ericsson6600 extends OS implements
-#    ProcessorDiscovery,
-#    WirelessFrequencyDiscovery,
-#    WirelessPowerDiscovery,
-#    WirelessRssiDiscovery,
+    WirelessFrequencyDiscovery,
+    WirelessPowerDiscovery,
     WirelessRateDiscovery,
     WirelessXpiDiscovery,
     WirelessSnrDiscovery
@@ -109,50 +105,76 @@ class Ericsson6600 extends OS implements
         return $sensors;
     }
 
-#txFrequency
-#rxFrequency
-#xfRFCurrentOutputPower
-#xfRfCurrentInputPower
+    public function discoverWirelessFrequency()
+    {
+        $sensors = [];
 
+        $data_tx = snmpwalk_cache_oid($this->getDeviceArray(), 'txFrequency', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
+        $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'rxFrequency', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
+        foreach ($data_tx as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.1.' . $index,
+                'ericsson-6600',
+                $index . 'tx',
+                'TX Frequency: ' . $index,
+                Null,
+                1,
+                1000
+            );
+        }
+        foreach ($data_rx as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.2.' . $index,
+                'ericsson-6600',
+                $index . 'rx',
+                'RX Frequency: ' . $index,
+                Null,
+                1,
+                1000
+            );
+        }
 
-#    /**
-#     * Discover wireless tx or rx power. This is in dBm. Type is power.
-#     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-#     *
-#     * @return array
-#     */
-#    public function discoverWirelessPower()
-#    {
-#        return [
-#            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.193.81.3.4.3.1.3.1.10.2146697473', 'ericsson-6600', 1, 'Rx Power Current', Null, 1, 10),
-#            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.193.81.3.4.3.1.3.1.1.2146697473', 'ericsson-6600', 2, 'Tx Power Current'),
-#        ];
-#    }
-#
-#    /**
-#     * Discover wireless frequency This is in MHz. Type is frequency.
-#     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-#     *
-#     * @return array
-#     */
-#    public function discoverWirelessFrequency()
-#    {
-#        return [
-#            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.2.2146697473', 'ericsson-6600', 1, 'Rx Frequency', Null, 1, 1000),
-#            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.1.2146697473', 'ericsson-6600', 2, 'TX Frequency', Null, 1, 1000),
-#        ];
-#    }
-#    /**
-#     * Discover wireless rate This is in bps. Type is rate.
-#     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-#     *
-#     * @return array
-#     */
-#    public function discoverWirelessRate()
-#    {
-#        return [
-#            new WirelessSensor('rate', $this->getDeviceId(), '.1.3.6.1.4.1.193.81.3.4.1.1.14.1.7.1', 'ericsson-6600', 1, 'Pipe Capacity', Null, 1000),
-#        ];
-#    }
+        return $sensors;
+    }
+
+    public function discoverWirelessPower()
+    {
+        $sensors = [];
+
+        $data_tx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRfCurrentOutputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
+        $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRfCurrentInputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
+        foreach ($data_tx as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.193.81.3.4.3.1.8.1.3.' . $index,
+                'ericsson-6600',
+                $index . 'tx',
+                'Output power: ' . $index
+            );
+        }
+        foreach ($data_rx as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.193.81.3.4.3.1.8.1.7.' . $index,
+                'ericsson-6600',
+                $index . 'rx',
+                'Input power: ' . $index,
+                Null,
+                1,
+                10
+
+            );
+        }
+
+        return $sensors;
+    }
+
+#xfRLTMeasuredHopLength
 
 }

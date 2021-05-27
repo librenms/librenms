@@ -1,0 +1,3866 @@
+    XF-RADIOLINK-PTP-RADIO-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        entPhysicalIndex
+            FROM ENTITY-MIB
+        ifIndex
+            FROM IF-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32
+            FROM SNMPv2-SMI
+        xfRadioLink
+            FROM XF-TOP-MIB
+        xfTermRowIndex
+            FROM XF-RADIOLINK-PTP-TERMINAL-MIB;
+
+    xfRadioLinkPtpRadioMIB MODULE-IDENTITY
+
+        LAST-UPDATED "202009220000Z" -- 22 September 2020
+        ORGANIZATION
+            "Ericsson AB"
+        CONTACT-INFO
+            "
+            Ericsson AB
+            Transmission & Transport Networks
+            SE-431 84  Molndal
+            Sweden
+            "
+        DESCRIPTION
+            "
+            This MIB defines objects for point-to-point Radio Link RAUs.
+            "
+
+    REVISION "202009220000Z" -- 22 September 2020
+        DESCRIPTION
+            "
+            Rev. PY26
+            - Added new MOs in xfRfIfPowerTable:
+              * xfRfAtpcFallbackOutputPower
+              * xfRfAtpcFallbackEnable
+              * xfRfAtpcFallbackTimer
+            "
+
+    REVISION "201911260000Z" -- 26 November 2019
+        DESCRIPTION
+            "
+            Rev. PY25
+            - Added new MOs in xfRAuTable:
+              * xfRauBoosterCapability
+              * xfRauBoosterSelectedIndex
+            "
+
+    REVISION "201910140000Z" -- 14 October 2019
+        DESCRIPTION
+            "
+            Rev. PY24
+            - Added new MOs in xfRfIfPowerTable:
+              * xfRfOutputPower8192QAM
+              * xfRfOutputPower16384QAM
+            "
+
+    REVISION "201906040000Z" -- 04 June 2019
+        DESCRIPTION
+            "
+            Rev. PY23
+            - Added new MOs in ifCableMonitoringTable:
+              * xfRfOutlierTrigger
+              * xfRfRangeTrigger
+        * xfRfStddevTrigger
+        * xfRfDegradationTrigger
+        * xfRfMarginTrigger
+            "
+
+        REVISION "201905160000Z" -- 16 May 2019
+        DESCRIPTION
+            "
+            Rev. PY22
+            - Added new MOs in ifCableMonitoringTable:
+              * xfRfOutlierValue
+              * xfRfRangeValue
+        * xfRfStddevValue
+        * xfRfDegradationValue
+        * xfRfMarginValue
+            "
+
+        REVISION "201904300000Z" -- 30 April 2019
+        DESCRIPTION
+            "
+            Rev. PY21
+            - Added new table 'xfSdcTable'.
+            - Added new MOs in 'xfRfIfPowerTable':
+              * xfRfCurrentInputPowerSdcMain
+              * xfRfCurrentInputPowerSdcDiv
+            "
+
+        REVISION "201901170000Z" -- 17 January 2019
+        DESCRIPTION
+            "
+            Rev. PY20
+            - Removed the following alarms in RFAlarms - Textual convention:
+              * IfCableDamaged
+              * RccWarning
+            - Added the following alarms in RFAlarms - Textual convention:
+              * AgcOutlier
+              * AgcRange
+              * AgcStddev
+              * AgcDegradation
+              * AgcMargin
+            "
+
+        REVISION "201810290000Z" -- 29 October 2018
+        DESCRIPTION
+            "
+            Rev. PY19
+            New MO 'xfRFSpectrumDiagProgress' added in xfRFSpectrumDiagTable.
+            "
+
+        REVISION "201809030000Z" -- 3 September 2018
+        DESCRIPTION
+            "
+            Rev. PY18
+            New MOs added in xfRFSpectrumDiagTable.
+            "
+
+        REVISION "201804060000Z"  -- 6 April 2018
+        DESCRIPTION
+            "
+            Rev. PY17
+            Updated unit of measurement of XPI level in performance monitoring counters:
+            from dBm to dB
+            "
+
+        REVISION "201801300000Z" -- 30 January 2018
+        DESCRIPTION
+            "
+            Rev. PY16
+            New MO 'xfRfTaps' added in xfRfIfPowerTable.
+            "
+
+        REVISION "201711230000Z" -- 23 November 2017
+        DESCRIPTION
+            "
+            Rev. PY15
+            Changed definition of 'xfRFAlarms' MO.
+            "
+
+        REVISION "201709190000Z" -- 19 September 2017
+        DESCRIPTION
+            "
+            Rev. PY14
+            Updated comment in xfRFDuplexDistance.
+            "
+
+        REVISION "201709050000Z" -- 05 September 2017
+        DESCRIPTION
+            "
+            Rev. PY13
+            - Added the following alarms in RFAlarms - Textual convention:
+              * IfCableDamaged
+              * RccWarning
+            "
+
+        REVISION "201707250000Z" -- 25 July 2017
+        DESCRIPTION
+            "
+            Rev. PY12
+            xfRAUAlarmStatus MO extended with definition of 'companionRauMismatch' alarm.
+            "
+
+        REVISION "201706280000Z" -- 28 June 2017
+        DESCRIPTION
+            "
+            Rev. PY11
+            Corrected range for xfRFDuplexDistance MO.
+            "
+
+        REVISION "201705240000Z" -- 24 May 2017
+        DESCRIPTION
+            "
+            Rev. PY10
+            Introduction of new FF 60 MHz.
+            "
+
+        REVISION "201612200000Z" -- 20 December 2016
+        DESCRIPTION
+            "
+            Rev. PY9
+            - New MOs Added 'xfRFBoosterGain' and 'xfRFBoosterMaxInputPower' 'xfRFBoosterCapability'
+              'xfRFBoosterProductNumber' and 'xfRFBoosterHWRevision' in xfRFPowerTable.
+            "
+
+        REVISION "201606160000Z" -- 16 June 2016
+        DESCRIPTION
+            "
+            Rev. PY8
+            - Added definition of 'remoteRfIfHighestSeverityAlarm' alarm in 'RFAlarms' textual convention.
+            "
+
+        REVISION "201606010000Z" -- 01 June 2016
+        DESCRIPTION
+            "
+            Rev. PY7
+            - New MOs 'xfRfAvailableOutputPowerType' and 'xfRfSelectedOutputPowerType'
+              added in xfRfIfPowerTable.
+            "
+
+        REVISION "201605160000Z" -- 16 May 2016
+        DESCRIPTION
+            "
+            Rev. PY6
+            - Updated description for some MOs, to better specify
+              'default' and 'invalid' output power definitions.
+            "
+
+        REVISION "201605100000Z" -- 10 May 2016
+        DESCRIPTION
+            "
+            Rev. PY5
+            - 'Obsolete' MOs set back to 'current' status
+              in order to remove warnings.
+            "
+
+        REVISION "201604120000Z" -- 12 April 2016
+        DESCRIPTION
+            "
+            Rev. PY4
+            - Updated description for xfRfInputPowerReset MO.
+            "
+
+        REVISION "201602220000Z" -- 22 February 2016
+        DESCRIPTION
+            "
+            Rev. PY3
+            - Description updated for some MOs.
+            - Readability improvements (formatting).
+            "
+
+        REVISION "201602060000Z" -- 06 February 2016
+        DESCRIPTION
+            "
+            Rev. PY2
+            - Added the following alarms in RFAlarms - Textual convention:
+              * rlts1Counter15m
+              * rlts2Counter15m
+              * rltmCounter15m
+              * tlts1Counter15m
+              * tltmCounter15m
+              * rlts1Counter24h
+              * rlts2Counter24h
+              * rltmCounter24h
+              * tlts1Counter24h
+              * tltmCounter24h
+            - Obsoleted the following MOs in table xfRFPowerTable and
+              moved-renamed in xfRAUIFTable:
+              * xfRfMaxMSELast7Days
+              * xfRfMinMSELast7Days
+              * xfRfMaxXPILast7Days
+              * xfRfMinXPILast7Days
+            - Added MOs for Extended RF PM in table xfRfIfPowerTable:
+              * xfRfMeanInputPower1m
+              * xfRfMaxOutputPowerLast7Days
+              * xfRfMinOutputPowerLast7Days
+              * xfRfMaxOutputPowerSinceReset
+              * xfRfMinOutputPowerSinceReset
+              * xfRfOutputPowerReset
+            "
+
+        REVISION "201602050000Z" -- 05 February 2016
+        DESCRIPTION
+            "
+            Rev. PY1
+            - Updated description for xfRFCurrentStepNumber.
+            - Updated description for xfRFCurrentStepNumberRx.
+            "
+
+        REVISION "201512110000Z" -- 11 December 2015
+        DESCRIPTION
+            "
+            Rev. PX9
+            xfRfIfPowerTable moved at the end of file, fixing HU44212.
+            "
+
+        REVISION "201511050000Z" -- 05 November 2015
+        DESCRIPTION
+            "
+            Rev. PX8
+            - atpcVersionMismatch alarm definition removed from xfRAUAlarmStatus object (never used before).
+            - insufficientResourceRauXpic alarm definition added to xfRAUAlarmStatus object.
+            "
+
+        REVISION "201508310000Z" -- 31 August 2015
+        DESCRIPTION
+            "
+            Rev. PX7
+            * New objects added in xfRFIFTable:
+              - xfRFDuplexType
+              - xfRFDuplexConfig
+              - xfRFDuplexDistance
+            "
+
+        REVISION "201507020000Z" -- 2 July 2015
+        DESCRIPTION
+            "
+            Rev. PX6
+            Added new tables xfRFSpectrumDiagTable and xfRFSpectrumDiagResultTable
+            "
+
+        REVISION "201506250000Z" -- 25 June 2015
+        DESCRIPTION
+            "
+            Rev. PX5
+            Merged content from 19089-FAL1044129_1_X_PBB5.
+            "
+
+        REVISION "201506080000Z" -- 8 June 2015
+        DESCRIPTION
+            "
+            Rev. PX4
+            Updated description text for the following MOs:
+                     xfRFMaxMSELast7Days, xfRFMinMSELast7Days
+            "
+
+        REVISION "201504230000Z" -- 23 April 2015
+        DESCRIPTION
+            "
+            Rev. PX3
+            - xfRfSelectedMinOutputPower object added.
+            - xfRfSelectedMaxOutputPower object added.
+            "
+
+        REVISION "201504200000Z" -- 20 April 2015
+        DESCRIPTION
+            "
+            Rev. PX2
+            - xfRfAtpcSelectedInputPowerFar object renamed in xfRfAtpcTargetInputPowerFE.
+            "
+
+        REVISION "201504020000Z" -- 02 April 2015
+        DESCRIPTION
+            "
+            Rev. PX1
+            - xfRauAtpcVersion object added in xfRAUTable.
+            - Definition of xfRAUAlarmStatus extended with atpcVersionMismatch.
+            - Added new table xfRfIfPowerTable.
+            "
+
+        REVISION "201502260000Z" -- 26 February 2015
+        DESCRIPTION
+            "
+            Add new MIBs to xfRFPowerTable for improved power monitoring.
+            New MOs: xfRFMeanInputPower1m,         xfRFMaxOutputPowerLast7Days,
+                     xfRFMinOutputPowerLast7Days,  xfRFMaxOutputPowerSinceReset,
+                     xfRFMinOutputPowerSinceReset, xfRFMaxMSELast7Days,
+                     xfRFMinMSELast7Days,          xfRFMaxXPILast7Days,
+                     xfRFMinXPILast7Days,          xfRFOutputPowerReset
+            "
+
+        REVISION "201501231000Z" -- 23 January 2015
+        DESCRIPTION
+            "
+            Modified definition for xfRauNotes to have a valid syntax definition.
+            "
+
+        REVISION "201501230000Z" -- 23 January 2015
+        DESCRIPTION
+            "
+            Add new MIB xfRAUNotes to xfRAUTable.
+            "
+
+        REVISION "201501090000Z" -- 09 January 2015
+        DESCRIPTION
+            "
+            Rev. V
+            - Changed MO: xfRAUSubBand in xfRAUTable becomes R/W (previously R only)
+            - New Table: xfRAUSubBandTable (as xfRadioLinkPtpRadioObjects object)
+            "
+
+        REVISION "201402200000Z" -- 20 Febuary 2014
+        DESCRIPTION
+            "
+            Rev. PU2
+            - New value: sdcDadeCalMismatch in xfRAUAlarmStatus
+            "
+
+        REVISION "201311220000Z" -- 22 November 2013
+        DESCRIPTION
+            "
+            Rev. PU1
+            New MO: xfRFCurrentInputPowerSdcMain and xfRFCurrentInputPowerSdcDiv in xfRFPowerTable
+            "
+
+        REVISION "201311191400Z" -- 19 Nov 2013
+        DESCRIPTION
+            "
+            Rev. T
+            - Official R-State for M14A
+            "
+
+        REVISION "201105230000Z" -- 23 May 2011
+        DESCRIPTION
+            "
+            Rev. S
+            - Official R-State for TN 4.4 FP
+            "
+
+        REVISION "201102090000Z" -- 09 February 2011
+        DESCRIPTION
+            "
+            Rev. PS4
+            - New MO: xfRAUCarrierMode in xfRAUCapabilityTable
+            "
+
+        REVISION "201102010000Z" -- 01 February 2011
+        DESCRIPTION
+            "
+            Rev. PS3
+            - Correction for new 1024-QAM
+            "
+
+        REVISION "201012100000Z" -- 10 December 2010
+        DESCRIPTION
+            "
+            Rev. PS2
+            - Added 1024-QAM
+            "
+
+        REVISION "201010200000Z" -- 20 October 2010
+        DESCRIPTION
+            "
+            Rev. PS1
+            - New MO: xfRFAtpcFallbackTimer in xfRFPowerTable
+            "
+
+        REVISION "201009230000Z" -- 23 September 20010
+        DESCRIPTION
+            "
+            Rev. N
+            - Changed RfInputThreshold default value to -93dBm
+            "
+
+        REVISION "201006150000Z" -- 15 June 20010
+        DESCRIPTION
+            "
+            Rev. PN1
+            - New MO: xfRAURxCapability in xfRAUTable
+            "
+
+        REVISION "201006040000Z" -- 04 June 2010
+        DESCRIPTION
+            "
+            Rev. PN
+            - New value: swNeedUpdate in xfRAUAlarmStatus
+            "
+
+        REVISION "201001190000Z" -- 19 January 2010
+        DESCRIPTION
+            "
+            Rev. M
+            - Official R-State for TN 4.3
+            "
+
+        REVISION "200912010000Z" -- 01 December 2009
+        DESCRIPTION
+            "
+            Rev. PM2
+            - Change name on xfRFAtpcFallbackMaxOutputPower to xfRFAtpcFallbackOutputPower
+            - Removed warnings about xfRFAtpcFallbackOutputPower(xfRFAtpcFallbackMaxOutputPower) and
+              xfRFAtpcFallbackEnable not included in xfRadioLinkPtpRadioCompleteGroup
+            - Updated xfRFAlarms
+            - New alarm: rfOutputLevelATPC
+            - Updated xfRAUAlarmStatus
+            - New alarm: ConfigurationInvalid
+            "
+
+        REVISION "200911180000Z" -- 18 November 2009
+        DESCRIPTION
+            "
+            Rev. PM1
+            - New MO: xfRFAtpcFallbackMaxOutputPower and xfRFAtpcFallbackEnable in xfRFPowerTable
+            "
+
+        REVISION "200906260000Z" -- 26 June 2009
+        DESCRIPTION
+            "
+            Rev. L
+            - Update of revision history
+            "
+
+        REVISION "200906240000Z" -- 24 June 2009
+        DESCRIPTION
+            "
+            Rev. L
+            - Official Rev for TN 4.2
+            "
+
+        REVISION "200904200000Z" -- 20 April 2009
+        DESCRIPTION
+            "
+            Rev. K
+            - Official Rev for TN 4.1 FP
+            "
+
+        REVISION "200904140000Z"
+        DESCRIPTION
+            "
+            Rev. PK8
+            - Changes for TN 4.2
+            - Spectrum Effeciency Class index values have changed
+            - Adde new Spectrum Effeciency Class values
+            - Added channelspacing chsp3500kHz(10)
+            "
+
+        REVISION "200810020000Z"
+        DESCRIPTION
+            "
+            Rev. PK7
+            - Changes for TN 4.1/4.2
+            - Removed table: xfRFOutputPowerTable
+            - New MO: xfRFOutputPowerTable in xfRFPowerTable
+            - Fixed double index issue in xfRAUCapabilityTable
+            "
+
+        REVISION "200809160000Z"
+        DESCRIPTION
+            "
+            Rev. PK6
+            - Changes for TN 4.1
+            - New table: xfRFOutputPowerTable
+            "
+
+        REVISION "200806250000Z"
+        DESCRIPTION
+            "
+            Rev. PK5
+            - Changes for TN 4.1
+            - Changes in table: xfRAUCapabilityTable (xfRAUChannelModulation)
+            "
+
+        REVISION "200806240000Z"
+        DESCRIPTION
+            "
+            Rev. PK4
+            - Changes for TN 4.1
+            - Changes in table: xfRAUCapabilityTable (xfRAUChannelModulation)
+            "
+
+        REVISION "200806180000Z"
+        DESCRIPTION
+            "
+            Rev. PK3
+            - Changes for TN 4.1
+            - Changes in table: xfRAUCapabilityTable
+            "
+
+        REVISION "200806170000Z"
+        DESCRIPTION
+            "
+            Rev. PK2
+            - Changes for TN 4.1
+            - Changes in table: xfRAUCapabilityTable
+            "
+
+        REVISION "200806040000Z"
+        DESCRIPTION
+            "
+            Rev. PK1
+            - Changes for TN 4.1
+            - New table: xfRAUCapabilityTable
+            "
+
+        REVISION "200706040000Z"
+        DESCRIPTION
+            "
+            Rev. J
+            - MIB files changes according to 1/15519-CRH109625/1 Uae Rev U
+            - xfRFLoopEnable: Changed comment regarding far end limitation to no access
+            - xfRFAttenuator: Changed comment regarding far end limitation.
+            - xfRFInputPowerReset: Changed comment regarding far end limitation to read-write (Traffic Node only)
+            "
+
+        REVISION "200609191320Z"
+        DESCRIPTION
+            "
+            Rev. H
+            - MIB files changes according to 1/15519-CRH109625/1 Uae Rev M + errata
+            - Changed syntax of object xfRFTxAdminStatus for better readability in a MIB-browser
+            "
+
+        REVISION "200608290000Z"
+        DESCRIPTION
+            "
+            Rev. PH1
+            - Added 64-QAM to RAUModCapability
+            "
+
+        REVISION "200603200000Z"
+        DESCRIPTION
+            "
+            Rev. G
+            - MIB files changes according to 1/15519-CRH109625/1 Uae Rev K
+            - Addition of Enum values for RAUModCapability to support ANSI
+            "
+
+        REVISION "200602240000Z"
+        DESCRIPTION
+            "
+            Rev. F
+            - Access restrictions explained in the description field for each MO
+            "
+
+        REVISION "200601310000Z"
+        DESCRIPTION
+            "
+            Rev. E
+            - New value (0) for xfRFMaxInputPowerLast7Days and xfRFMinInputPowerLast7Days
+            - xfRFRtpcSelectedOutputPower: Value 255 no longer valid
+            - xfRFAtpcMaxOutputPower: Value 255 no longer valid. New value: 254
+            - xfRFAtpcSelectedInputPowerFar: Value 255 no longer valid. New default value
+            - xfRFAttenuator: Value 255 no longer valid. New default value
+            "
+
+        REVISION "200412130000Z"
+        DESCRIPTION
+            "
+            Rev. D
+            - Changes according to 1/15519-CRH109625/1 Uae Rev D
+            - New value (other) for RFTxAdminStatus
+            - Changed MO xfRFInputPowerThreshold to MO xfRFInputAlarmThreshold (xfRFPowerTable)
+            - MO xfRFRtpcSelectedOutputPower: Value 254 = max power (default)
+            - MO xfRFAttenuator: Value 255 (new default)
+            - DEFVAL removed. Default value info declared in corresponding description fields
+            "
+
+        REVISION "200407020000Z"
+        DESCRIPTION
+            "
+            Rev. C
+            - All config alarms are removed
+            "
+
+        REVISION "200406160000Z"
+        DESCRIPTION
+            "
+            Rev. B
+            - All config alarms are defined
+            - Alarms are updated with new names
+            "
+
+        REVISION "200405250000Z"
+        DESCRIPTION
+            "
+            Rev. PB2
+            - Minor changes
+            "
+
+        REVISION "200404260000Z"
+        DESCRIPTION
+            "
+            Rev. PB1
+            - Added MO: xfRAUTemperature, xfRFInputPowerAlarmThreshold, xfRFLoopEnable
+            - Added Table: xfRFPowerTable
+            "
+
+        REVISION "200401200000Z"
+        DESCRIPTION
+            "
+            Rev. A
+            - Other is added to integer enumerations
+            - RFTxStatus object is split into admin and oper objects
+            - Integer types updated
+            "
+
+        REVISION "200312171000Z"
+        DESCRIPTION
+            "
+            Rev. PA1
+            - Initial revision
+            "
+
+        ::= { xfRadioLink 3 }
+
+--
+-- Textual conventions
+--
+
+    RFTxOperStatus ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This TC enumerates the Tx operational status."
+        SYNTAX INTEGER
+        {
+            other(1),
+            txOff(2),
+            txOn(3),
+            txStandby(4)
+        }
+
+    RAURfLoopAvailable ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This TC enumerates the RF loop."
+        SYNTAX INTEGER
+        {
+            other(1),
+            rfLoopAvailable(2),
+            rfLoopNotAvailable(3)
+        }
+
+    RAUAtpcCapability ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This TC enumerates the ATPC capability."
+        SYNTAX INTEGER
+        {
+            other(1),
+            noAtpcSupport(2),
+            doesNotExist(3),
+            atpcCapabilityUnknown(4),
+            supportsAtpc(5)
+        }
+
+    RAUModCapability ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+        "
+        This TC enumerates the modulation capabilities.
+        Modulation capabilities is indicated by 5 bits:
+        bits 01234
+          00000  undetermined
+          00001  C-QPSK
+          00010  16-QAM
+          00011  C-QPSK & 16-QAM
+          00100  128-QAM
+          01000  32-QAM
+          10000  64-QAM
+          ...
+          11111  C-QPSK & 16-QAM & 128-QAM & 32-QAM & 64-QAM
+        "
+        SYNTAX BITS
+        {
+            cqpsk(0),
+            qam16(1),
+            qam128(2),
+            qam32(3),
+            qam64(4)
+        }
+
+    RAUChannelSpacingCapability ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Channel spacing capability."
+        SYNTAX INTEGER
+        {
+            chspUnknown(0),
+            chsp7MHz(1),
+            chsp14MHz(2),
+            chsp20MHz(3),
+            chsp28MHz(4),
+            chsp30MHz(5),
+            chsp40MHz(6),
+            chsp50MHz(7),
+            chsp56MHz(8),
+            chsp10MHz(9),
+            chsp3500KHz(10),
+            chsp60MHz(11)
+        }
+
+    RauSec ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Spectrum Effeciency Class."
+        SYNTAX INTEGER
+        {
+            other(1),
+            sec2(2),
+            sec3(3),
+            sec4L(4),
+            sec4H(5),
+            sec5A(6),
+            sec5B(7),
+            sec6A(8),
+            sec6B(9)
+        }
+
+    RAUModulation ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Type of modulation."
+        SYNTAX INTEGER
+        {
+            other(1),
+            cqpsk(2),
+            qam16(3),
+            qam128(4),
+            qam32(5),
+            qam64(6),
+            qam4(7),
+            qam8(8),
+            qam256(9),
+            qam512(10),
+            qam1024(11)
+        }
+
+    ATPCFallbackEnable ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "ATPC fallback enable status."
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+
+    RfOutputPower ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "RF output power in dBm."
+        SYNTAX Integer32 (-100..45|255)
+
+    RfInputPower ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "RF Input power in dBm/10."
+        SYNTAX Integer32 (-999..-200|0)
+
+    BoosterCapability ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Booster capabilities values codes."
+        SYNTAX INTEGER
+        {
+            other(1),
+            noBoosterSupport(2),
+            boosterSupport(3)
+        }
+
+--
+-- Node definitions
+--
+
+    xfRadioLinkPtpRadioObjects     OBJECT IDENTIFIER ::= { xfRadioLinkPtpRadioMIB 1 }
+    xfRadioLinkPtpRadioConformance OBJECT IDENTIFIER ::= { xfRadioLinkPtpRadioMIB 2 }
+
+------------------------------------------------------------------------------
+-- xfRAUTable
+------------------------------------------------------------------------------
+
+    xfRAUTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRAUEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for Radiolink point-to-point radios managed objects.
+            Table indexed with entPhysicalIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 1 }
+
+    xfRAUEntry OBJECT-TYPE
+        SYNTAX XfRAUEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in xfRadioTable."
+        INDEX { entPhysicalIndex }
+        ::= { xfRAUTable 1 }
+
+    XfRAUEntry ::=
+        SEQUENCE
+        {
+            xfRAUAlarmStatus           BITS,
+            xfRAURfLoopAvailable       RAURfLoopAvailable,
+            xfRAUAtpcCapability        RAUAtpcCapability,
+            xfRAULocalCtrlCapability   INTEGER,
+            xfRAUModCapability         RAUModCapability,
+            xfRAUFrequencyband         Unsigned32,
+            xfRAUSubBand               Unsigned32,
+            xfRAUTemperature           Integer32,
+            xfRAUProtectionPath        INTEGER,
+            xfRAURxCapability          INTEGER,
+            xfRAUNotes                 OCTET STRING,
+            xfRauAtpcVersion           INTEGER,
+            xfRauBoosterCapability     BoosterCapability,
+            xfRauBoosterSelectedIndex  Integer32
+        }
+
+--
+-- xfRAUTable MOs
+--
+
+    xfRAUAlarmStatus OBJECT-TYPE
+        SYNTAX BITS
+        {
+            atpcCapability0(0),
+            atpcCapability1(1),
+            atpcCapability2(2),
+            configurationInvalid0(3),
+            configurationInvalid1(4),
+            configurationInvalid2(5),
+            sdcHwErrorMain0(6),
+            sdcHwErrorMain1(7),
+            sdcHwErrorMain2(8),
+            sdcHwErrorDiv0(9),
+            sdcHwErrorDiv1(10),
+            sdcHwErrorDiv2(11),
+            sdcDadeCalMismatch0(12),
+            sdcDadeCalMismatch1(13),
+            sdcDadeCalMismatch2(14),
+            insufficientResourceRauXpic0(15),
+            insufficientResourceRauXpic1(16),
+            insufficientResourceRauXpic2(17),
+            companionRauMismatch0(18),
+            companionRauMismatch1(19),
+            companionRauMismatch2(20)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the alarm status of the radio unit.
+            atpcCability - The terminal is configured for ATPC, but the radio does not support ATPC.
+                           This alarm is activated only if ATPC is turned on (any direction).
+            sdcHwErrorMain - Received RF input signal level for Main path (of SDC TRX) has dropped below the threshold for the receiver.
+            sdcHwErrorDiv - Received RF input signal level for Diversity path (of SDC TRX) has dropped below the threshold for the receiver.
+            sdcDadeCalMismatch - A TRX is connected and its Serial Number doesn't match with the serial number stored into MO xfTRXSdcSerialNumber.
+            insufficientResourceRauXpic - Connected RAU is missing capabilities for XPIC.
+            companionRauMismatch - Connected RAU does not match with the companion one, either in 1+1 RLP or XPIC.
+            "
+        ::= { xfRAUEntry 1 }
+
+    xfRAURfLoopAvailable OBJECT-TYPE
+        SYNTAX RAURfLoopAvailable
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object inidicates if RF loop is available in radio unit.
+            "
+        ::= { xfRAUEntry 2 }
+
+    xfRAUAtpcCapability OBJECT-TYPE
+        SYNTAX RAUAtpcCapability
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates if the radio unit supports ATPC or not.
+            "
+        ::= { xfRAUEntry 3 }
+
+    xfRAULocalCtrlCapability OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noLocalControlSupport(2),
+            supportsLocalControl(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates if the radio unit supports local
+            transmit power control or not.
+            "
+        ::= { xfRAUEntry 4 }
+
+    xfRAUModCapability OBJECT-TYPE
+        SYNTAX RAUModCapability
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the modulation methods supported
+            by the radio unit.
+            "
+        ::= { xfRAUEntry 5 }
+
+    xfRAUFrequencyband OBJECT-TYPE
+        SYNTAX Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the frequency band for the radio unit.
+            "
+        ::= { xfRAUEntry 6 }
+
+    xfRAUSubBand OBJECT-TYPE
+        SYNTAX Unsigned32 (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the sub band (Index) for the radio unit.
+            "
+        ::= { xfRAUEntry 7 }
+
+    xfRAUTemperature OBJECT-TYPE
+        SYNTAX Integer32 (-127..127)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the temperature, in degree Celsius, inside
+            the radio unit.
+            "
+        ::= { xfRAUEntry 8 }
+
+    xfRAUProtectionPath OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            rauRa1(2),
+            rauRa2(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates what radio path the radio belongs to.
+            "
+        ::= { xfRAUEntry 9 }
+
+    xfRAURxCapability OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            rxSupport(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates if the radio unit support RX configuration.
+            "
+        ::= { xfRAUEntry 10 }
+
+    xfRAUNotes OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..800))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "You can add information in this description field,
+            for example polarization, antenna type or logging a site visit."
+        ::= { xfRAUEntry 11 }
+
+    xfRauAtpcVersion OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            version1(2),
+            version2(3),
+            version3(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object represents the RAU ATPC version.
+            "
+        ::= { xfRAUEntry 12 }
+
+    xfRauBoosterCapability OBJECT-TYPE
+        SYNTAX BoosterCapability
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object represents the Booster capability for a link.
+            "
+        ::= { xfRAUEntry 13 }
+
+    xfRauBoosterSelectedIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object represents the Booster selected index for a link.
+            "
+        ::= { xfRAUEntry 14 }
+
+------------------------------------------------------------------------------
+-- xfRFIFTable
+------------------------------------------------------------------------------
+
+    xfRFIFTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRFIFEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for Radiolink point-to-point radios RF IF managed objects.
+            Table indexed with ifIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 2 }
+
+    xfRFIFEntry OBJECT-TYPE
+        SYNTAX XfRFIFEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRFIFTable."
+        INDEX { ifIndex }
+        ::= { xfRFIFTable 1 }
+
+    XfRFIFEntry ::=
+        SEQUENCE
+        {
+            xfRFBaseTxFrequency     Unsigned32,
+            xfRFBaseRxFrequency     Unsigned32,
+            xfRFStepSize            Unsigned32,
+            xfRFStepLimitLow        Unsigned32,
+            xfRFStepLimitHigh       Unsigned32,
+            xfRFCurrentStepNumber   Unsigned32,
+            xfRFTxOperStatus        RFTxOperStatus,
+            xfRFTxAdminStatus       INTEGER,
+            xfRFLoopEnable          INTEGER,
+            xfRFAlarms              BITS,
+            xfRFStatus              BITS,
+            xfRFStepSizeRx          Unsigned32,
+            xfRFStepLimitLowRx      Unsigned32,
+            xfRFStepLimitHighRx     Unsigned32,
+            xfRFCurrentStepNumberRx Unsigned32,
+            xfRFDuplexType          INTEGER,
+            xfRFDuplexConfig        INTEGER,
+            xfRFDuplexDistance      Integer32
+        }
+
+--
+-- xfRFIFTable MOs
+--
+
+    xfRFBaseTxFrequency OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the Tx frequency in KHz when frequency
+            step number is 0.
+            "
+        ::= { xfRFIFEntry 1 }
+
+    xfRFBaseRxFrequency OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the Rx frequency in KHz when frequency.
+            step number is 0
+            "
+        ::= { xfRFIFEntry 2 }
+
+    xfRFStepSize OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the frequency step size in KHz.
+            "
+        ::= { xfRFIFEntry 3 }
+
+    xfRFStepLimitLow OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the lowest allowed frequency step number.
+            "
+        ::= { xfRFIFEntry 4 }
+
+    xfRFStepLimitHigh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the highest allowed frequency step number.
+            "
+        ::= { xfRFIFEntry 5 }
+
+    xfRFCurrentStepNumber OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets/shows the frequency step number.
+            0 = frequency not yet defined.
+
+            For Classic RAUs, TX and RX frequencies can not be set individually.
+            The span between them is always fixed and depends on different frequency and sub band.
+            - To calculate step number for TX and RX, use the following formulas:
+              New step number = (TX frequency - XfRAUBaseTxFrequency) / XfRAUStepSize
+              New step number = (RX frequency - xfRAUBaseRxFrequency) / XfRAUStepSize
+            - To calculate TX and RX frequencies, use the following formulas:
+              TX frequency = XfRAUBaseTxFrequency + XfRAUCurrentStepNumber * XfRAUStepSize
+              RX frequency = XfRAUBaseRxFrequency + XfRAUCurrentStepNumber * XfRAUStepSize
+
+            For Agile RAUs, the TX and RX frequencies can be set individually.
+            Above formulas are only valid for TX frequency.
+            For RX frequency, xfRFCurrentStepNumberRx must be used.
+
+            Default value: 0
+            "
+        ::= { xfRFIFEntry 6 }
+
+    xfRFTxOperStatus OBJECT-TYPE
+        SYNTAX RFTxOperStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the operational status of the transmitter.
+            "
+        ::= { xfRFIFEntry 7 }
+
+    xfRFTxAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            txOff(2),
+            txOn(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets the desired status of the transmitter.
+            Value other(1) not settable.
+
+            Especially for far end:
+              txOff(2), requests far end transmitter to be turned off.
+              txOn(3), requests far end transmitter to be turned on.
+              Default value: txOff(2) - near end.
+                             other(1) - far end.
+            "
+        ::= { xfRFIFEntry 8 }
+
+    xfRFLoopEnable OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage RF loop.
+            Default value: disable(3).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFEntry 9 }
+
+    xfRFAlarms OBJECT-TYPE
+        SYNTAX BITS
+        {
+            txFrequency0(0),
+            txFrequency1(1),
+            txFrequency2(2),
+            rxFrequency0(3),
+            rxFrequency1(4),
+            rxFrequency2(5),
+            rfOutputLevel0(6),
+            rfOutputLevel1(7),
+            rfOutputLevel2(8),
+            rxAfc0(9),
+            rxAfc1(10),
+            rxAfc2(11),
+            rfInputLevel0(12),
+            rfInputLevel1(13),
+            rfInputLevel2(14),
+            rfInputThreshold0(15),
+            rfInputThreshold1(16),
+            rfInputThreshold2(17),
+            rfOutputLevelATPC0(18),
+            rfOutputLevelATPC1(19),
+            rfOutputLevelATPC2(20),
+            sdcRfInputLevelMain0(21),
+            sdcRfInputLevelMain1(22),
+            sdcRfInputLevelMain2(23),
+            sdcRfInputLevelDiv0(24),
+            sdcRfInputLevelDiv1(25),
+            sdcRfInputLevelDiv2(26),
+            rlts1Counter15m0(27),
+            rlts1Counter15m1(28),
+            rlts1Counter15m2(29),
+            rlts2Counter15m0(30),
+            rlts2Counter15m1(31),
+            rlts2Counter15m2(32),
+            rltmCounter15m0(33),
+            rltmCounter15m1(34),
+            rltmCounter15m2(35),
+            tlts1Counter15m0(36),
+            tlts1Counter15m1(37),
+            tlts1Counter15m2(38),
+            tltmCounter15m0(39),
+            tltmCounter15m1(40),
+            tltmCounter15m2(41),
+            rlts1Counter24h0(42),
+            rlts1Counter24h1(43),
+            rlts1Counter24h2(44),
+            rlts2Counter24h0(45),
+            rlts2Counter24h1(46),
+            rlts2Counter24h2(47),
+            rltmCounter24h0(48),
+            rltmCounter24h1(49),
+            rltmCounter24h2(50),
+            tlts1Counter24h0(51),
+            tlts1Counter24h1(52),
+            tlts1Counter24h2(53),
+            tltmCounter24h0(54),
+            tltmCounter24h1(55),
+            tltmCounter24h2(56),
+            remoteRfIfHighestSeverityAlarm0(57),
+            remoteRfIfHighestSeverityAlarm1(58),
+            remoteRfIfHighestSeverityAlarm2(59),
+            ifcabledamaged0(60),
+            ifcabledamaged1(61),
+            ifcabledamaged2(62)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "
+        This TC enumerates the alarms for RF interface.
+        txFrequency       - Transmitter frequency synthesizer loop is unlocked.
+        rxFrequency       - Receiver frequency synthesizer loop is unlocked.
+        rfOutputLevel     - Major degradation of transmitter output power is detected.
+        rxAfc             - The frequency of the received signal is outside the range of the Automatic Frequency Control in the RAU receiver.
+        rfInputLevel      - Receiver RF input signal level has dropped below the threshold for the receiver.
+        rfInputThreshold  - The RF input level has dropped below the xfRFInputAlarmThreshold.
+        rfOutputLevelATPC - The transmitter output power has been continuously at 'Patpc,max' for too long.
+                            This can occur due to several reasons:
+                            * The operator has set 'Patpc,max' too low.
+                            * The hop attenuation has increased (steady-state).
+                            * The transmitter PA is v.
+                            * The LNA in Rx is deteriorating.
+        "
+        ::= { xfRFIFEntry 10 }
+
+    xfRFStatus OBJECT-TYPE
+        SYNTAX BITS
+        {
+            rfLoop0(0),
+            rfLoop1(1),
+            rfLoop2(2),
+            txOff0(3),
+            txOff1(4),
+            txOff2(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the RAU status.
+            rfLoop - Warns if RF-loop is enabled on RAU
+            txOff  - Warns if TX is manually set to off
+            "
+        ::= { xfRFIFEntry 11 }
+
+    xfRFStepSizeRx OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the Rx frequency step size in KHz.
+            "
+        ::= { xfRFIFEntry 12 }
+
+    xfRFStepLimitLowRx OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the Rx lowest allowed frequency step number.
+            "
+        ::= { xfRFIFEntry 13 }
+
+    xfRFStepLimitHighRx OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the Rx highest allowed frequency step number.
+            "
+        ::= { xfRFIFEntry 14 }
+
+    xfRFCurrentStepNumberRx OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets/shows the RX frequency step number for Agile RAUs.
+            0 = frequency not yet defined.
+
+            - To calculate step number for RX, use the following formula:
+              New step number Rx = (RX frequency - xfRAUBaseRxFrequency) / XfRAUStepSizeRx
+            - To calculate RX frequency, use the following formula:
+              RX frequency = XfRAUBaseRxFrequency + XfRAUCurrentStepNumberRx * XfRAUStepSizeRx
+
+            Default value: 0
+            "
+        ::= { xfRFIFEntry 15 }
+
+    xfRFDuplexType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            fixed(2),
+            variable(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object tells the duplex frequency mode for the RAU:
+            - fixed: Tx frequency only can be set by operator, Rx frequency is
+              automatically set on the basis of (fixed) RAU duplex frequency
+            - variable: duplex frequency can be configured by operator
+            "
+        ::= { xfRFIFEntry 16 }
+
+    xfRFDuplexConfig OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enabled(2),
+            disabled(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object enables setting of duplex frequency for the RAU.
+            It is always disabled(3) and can not be overwritten if xfRFDuplexType = fixed(2).
+            "
+        ::= { xfRFIFEntry 17 }
+
+    xfRFDuplexDistance OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object is aimed to select the duplex distance for the RAU.
+            It can only be set if xfRFDuplexConfig = enabled(2), so that:
+                 xfRFDuplexDistance = Tx Frequency - Rx Frequency
+            Otherwise, it is automatically filled on the basis of Tx and Rx
+            frequency settings, and can not be overwritten.
+            "
+        ::= { xfRFIFEntry 18 }
+
+------------------------------------------------------------------------------
+-- xfRFPowerTable
+------------------------------------------------------------------------------
+
+    xfRFPowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRFPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for Radiolink point-to-point radios managed objects.
+            Table indexed with ifIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 3 }
+
+    xfRFPowerEntry OBJECT-TYPE
+        SYNTAX XfRFPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRFPowerTable."
+        INDEX { ifIndex }
+        ::= { xfRFPowerTable 1 }
+
+    XfRFPowerEntry ::=
+      SEQUENCE
+      {
+          xfRFCurrentOutputPower        Integer32,
+          xfRFRtpcMinOutputPower        Integer32,
+          xfRFRtpcMaxOutputPower        Integer32,
+          xfRFRtpcSelectedOutputPower   Integer32,
+          xfRFAtpcMinOutputPower        Integer32,
+          xfRFAtpcMaxOutputPower        Integer32,
+          xfRFAtpcMinInputPowerFar      Integer32,
+          xfRFAtpcSelectedInputPowerFar Integer32,
+          xfRFAttenuator                Integer32,
+          xfRFCurrentInputPower         Integer32,
+          xfRFMaxInputPowerLast7Days    Integer32,
+          xfRFMinInputPowerLast7Days    Integer32,
+          xfRFMaxInputPowerSinceReset   Integer32,
+          xfRFMinInputPowerSinceReset   Integer32,
+          xfRFInputPowerReset           INTEGER,
+          xfRFInputAlarmThreshold       Integer32,
+          xfRFOutputPower4QAM           Integer32,
+          xfRFOutputPower8QAM           Integer32,
+          xfRFOutputPower16QAM          Integer32,
+          xfRFOutputPower32QAM          Integer32,
+          xfRFOutputPower64QAM          Integer32,
+          xfRFOutputPower128QAM         Integer32,
+          xfRFOutputPower256QAM         Integer32,
+          xfRFOutputPower512QAM         Integer32,
+          xfRFAtpcFallbackOutputPower   Integer32,
+          xfRFAtpcFallbackEnable        ATPCFallbackEnable,
+          xfRFAtpcFallbackTimer         Integer32,
+          xfRFOutputPower1024QAM        Integer32,
+          xfRFMaxOutputPowerNotLimited  Integer32,
+          xfRFMaxOutputPowerNotPossible INTEGER,
+          xfRFCurrentInputPowerSdcMain  Integer32,
+          xfRFCurrentInputPowerSdcDiv   Integer32,
+          xfRFMeanInputPower1m          Integer32,
+          xfRFMaxOutputPowerLast7Days   Integer32,
+          xfRFMinOutputPowerLast7Days   Integer32,
+          xfRFMaxOutputPowerSinceReset  Integer32,
+          xfRFMinOutputPowerSinceReset  Integer32,
+          xfRFMaxMSELast7Days           Integer32,
+          xfRFMinMSELast7Days           Integer32,
+          xfRFMaxXPILast7Days           Integer32,
+          xfRFMinXPILast7Days           Integer32,
+          xfRFOutputPowerReset          INTEGER,
+          xfRFBoosterGain               Integer32,
+          xfRFBoosterMaxInputPower      Integer32,
+          xfRFBoosterCapability         BoosterCapability,
+          xfRFBoosterProductNumber      DisplayString,
+          xfRFBoosterHWRevision         DisplayString
+      }
+
+--
+-- xfRFPowerTable MOs
+--
+
+    xfRFCurrentOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the output power in dBm including attenuator.
+            "
+        ::= { xfRFPowerEntry 1 }
+
+    xfRFRtpcMinOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the minimum output power in dBm including attenuator.
+            Value -100 indicate that RAU Tx on is not possible due to power supply limitations.
+            "
+        ::= { xfRFPowerEntry 2 }
+
+    xfRFRtpcMaxOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the maximum output power in dBm including attenuator.
+            Value -100 indicate that RAU Tx on is not possible due to power supply limitations.
+            "
+        ::= { xfRFPowerEntry 3 }
+
+    xfRFRtpcSelectedOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|254)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object set/shows the selected output power in dBm including attenuator.
+            Value 254 indicates that the selected power is set to maximum.
+            Default value: 254
+            "
+        ::= { xfRFPowerEntry 4 }
+
+    xfRFAtpcMinOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the minimum output power in dBm in ATPC.
+            mode for radio contained in the radio terminal.
+            "
+        ::= { xfRFPowerEntry 5 }
+
+    xfRFAtpcMaxOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|254)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets/shows the ATPC maximum output power in dBm for radio contained in the radio terminal.
+            Value 254 indicates that the power is set to maximum.
+            Default value: 254.
+            "
+        ::= { xfRFPowerEntry 6 }
+
+    xfRFAtpcMinInputPowerFar OBJECT-TYPE
+        SYNTAX Integer32 (-99..-30|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows the ATPC minimum input target power level for far end radio.
+            "
+        ::= { xfRFPowerEntry 7 }
+
+    xfRFAtpcSelectedInputPowerFar OBJECT-TYPE
+        SYNTAX Integer32 (-99..-30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets/shows the ATPC selected input target level for far end radio.
+            Default value: -30.
+            "
+        ::= { xfRFPowerEntry 8 }
+
+    xfRFAttenuator OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets/shows the value in dBm for fixed attenuator mounted in antenna.
+            Default value: 0.
+            "
+        ::= { xfRFPowerEntry 9 }
+
+    xfRFCurrentInputPower OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input level = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            "
+        ::= { xfRFPowerEntry 10 }
+
+    xfRFMaxInputPowerLast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200|0)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows maximum RF input level last 7 days.
+            RF input level = value/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm].
+            0 (zero) indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 11 }
+
+    xfRFMinInputPowerLast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200|0)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows minimum RF input level last 7 days.
+            RF input level = value/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm].
+            0 (zero) indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 12 }
+
+    xfRFMaxInputPowerSinceReset OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows maximum RF input level since reset.
+            RF input level = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            "
+        ::= { xfRFPowerEntry 13 }
+
+    xfRFMinInputPowerSinceReset OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows minimum RF input level since reset.
+            RF input level = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            "
+        ::= { xfRFPowerEntry 14 }
+
+    xfRFInputPowerReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            inputPowerReset(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object reset the registers for the RF input level
+            and All Time High level this seven days period and
+            counters for the next seven days period of time
+
+            Note. For protected rlMLE and rlXfMLE terminals this
+            command will reset both Ra1 and Ra2 values.
+
+            Near end access: read-write
+            Far end access: read-write  (Traffic Node only)
+            "
+        ::= { xfRFPowerEntry 15 }
+
+    xfRFInputAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32 (-99..-30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input level threshold.
+            Default value: -93.
+            "
+        ::= { xfRFPowerEntry 16 }
+
+    xfRFOutputPower4QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 4QAM."
+        ::= { xfRFPowerEntry 17 }
+
+    xfRFOutputPower8QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 8QAM."
+        ::= { xfRFPowerEntry 18 }
+
+    xfRFOutputPower16QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 16QAM."
+        ::= { xfRFPowerEntry 19 }
+
+    xfRFOutputPower32QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 32QAM."
+        ::= { xfRFPowerEntry 20 }
+
+    xfRFOutputPower64QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 64QAM."
+        ::= { xfRFPowerEntry 21 }
+
+    xfRFOutputPower128QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 128QAM."
+        ::= { xfRFPowerEntry 22 }
+
+    xfRFOutputPower256QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 256QAM."
+        ::= { xfRFPowerEntry 23 }
+
+    xfRFOutputPower512QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 512QAM."
+        ::= { xfRFPowerEntry 24 }
+
+    xfRFAtpcFallbackOutputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|254)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object sets maximum output power in dBm in ATPCFallback
+            mode for radio contained in the radio terminal.
+            Value = 254 indicates that the power is set to maximum.
+            Default value: 254.
+            "
+        ::= { xfRFPowerEntry 25 }
+
+    xfRFAtpcFallbackEnable OBJECT-TYPE
+        SYNTAX ATPCFallbackEnable
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/disable ATPCFallback."
+        ::= { xfRFPowerEntry 26 }
+
+    xfRFAtpcFallbackTimer OBJECT-TYPE
+        SYNTAX Integer32 (1..60)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ATPC Fallback Timer specifies how long
+            the output power can be at PATPC, MAX before
+            ATPC fallback is triggered
+            Default value: 15 min"
+        ::= { xfRFPowerEntry 27 }
+
+    xfRFOutputPower1024QAM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 1024QAM."
+        ::= { xfRFPowerEntry 28 }
+
+    xfRFMaxOutputPowerNotLimited OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max output power in dBm including
+             attenuator that the RAU can give if it is
+             not power supply limited."
+        ::= { xfRFPowerEntry 29 }
+
+    xfRFMaxOutputPowerNotPossible OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            unknown(0),
+            isPossible(1),
+            isNotPossible(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            unknown(0)
+            isPossible(1) Max output power is possible due
+                          to power supply limitations
+            isNotPossible(2) Max output power is not possible
+                             due to power supply limitations
+            "
+        ::= { xfRFPowerEntry 30 }
+
+    xfRFCurrentInputPowerSdcMain OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200|0)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "
+            This object shows RF input level for SDC Main path = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            0 (zero) indicates invalid value (e.g. SDC not available).
+            "
+        ::= { xfRFPowerEntry 31 }
+
+    xfRFCurrentInputPowerSdcDiv OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200|0)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input level for SDC Diversity path = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            0 (zero) indicates invalid value (e.g. SDC not available).
+            "
+        ::= { xfRFPowerEntry 32 }
+
+    xfRFMeanInputPower1m OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200|0)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input mean level for last minute.
+            RF input level = value/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm]
+            0 (zero) indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 33 }
+
+    xfRFMaxOutputPowerLast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows maximum RF output level last 7 days.
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 34 }
+
+    xfRFMinOutputPowerLast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows minimum RF output level last 7 days.
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 35 }
+
+    xfRFMaxOutputPowerSinceReset OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows maximum RF output level since reset
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 36 }
+
+    xfRFMinOutputPowerSinceReset OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows minimum RF output level since reset
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 37 }
+
+    xfRFMaxMSELast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-1000..1000|2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicate Max MSE level last 7 days.
+            Input level = value/10 dB.
+            Domain: [-100.0 ... 100.0 dB]
+            2000 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 38 }
+
+    xfRFMinMSELast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-1000..1000|2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicate Min MSE level last 7 days.
+            Input level = value/10 dB.
+            Domain: [-100.0 ... 100.0 dB]
+            2000 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 39 }
+
+    xfRFMaxXPILast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-1000..1000|2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicate Max Cross-Polar Interference (XPI) level last 7 days.
+            Input level = value/10 dB.
+            Domain: [-100.0 ... 100.0 dB]
+            2000 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 40 }
+
+    xfRFMinXPILast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-1000..1000|2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicate Min Cross-Polar Interference (XPI) level last 7 days.
+            Input level = value/10 dB.
+            Domain: [-100.0 ... 100.0 dB]
+            2000 indicates invalid value.
+            "
+        ::= { xfRFPowerEntry 41 }
+
+    xfRFOutputPowerReset OBJECT-TYPE
+        SYNTAX INTEGER { outputPowerReset(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object reset the registers for the RF output level
+            and All Time High level this seven days period and
+            counters for the next seven days period of time.
+            "
+        ::= { xfRFPowerEntry 42 }
+
+    xfRFBoosterGain OBJECT-TYPE
+        SYNTAX Integer32 ( 0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Value of the Gain of the Booster
+            "
+        ::= { xfRFPowerEntry 43 }
+
+    xfRFBoosterMaxInputPower OBJECT-TYPE
+        SYNTAX Integer32 (-100..35|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Value of the Max Input Power admitted towards the Booster
+            "
+        ::= { xfRFPowerEntry 44 }
+
+    xfRFBoosterCapability OBJECT-TYPE
+        SYNTAX BoosterCapability
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Value of Booster capability according to the system
+            "
+        ::= { xfRFPowerEntry 45 }
+
+    xfRFBoosterProductNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "
+            Product Number of the Booster connected to the specific RF IF
+            "
+        ::= {  xfRFPowerEntry 46 }
+
+    xfRFBoosterHWRevision OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "
+            HW Revision of the Booster connected to the specific RF IF
+            "
+        ::= {  xfRFPowerEntry 47 }
+
+------------------------------------------------------------------------------
+-- xfRAUCapabilityTable
+------------------------------------------------------------------------------
+
+    xfRAUCapabilityTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRAUCapabilityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for RAU capability information.
+            Table indexed with entPhysicalIndex and xfTermRowIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 4 }
+
+    xfRAUCapabilityEntry OBJECT-TYPE
+        SYNTAX XfRAUCapabilityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in xfRAUCapabilityTable."
+        INDEX { entPhysicalIndex, xfTermRowIndex }
+        ::= { xfRAUCapabilityTable 1 }
+
+    XfRAUCapabilityEntry ::=
+        SEQUENCE
+        {
+            xfRAUChannelSpacing          RAUChannelSpacingCapability,
+            xfRAUChannelModulation       RAUModulation,
+            xfRAUSpectrumEfficiencyClass RauSec,
+            xfRAUCarrierMode             INTEGER
+        }
+
+--
+-- xfRAUCapabilityTable MOs
+--
+
+    xfRAUChannelSpacing OBJECT-TYPE
+        SYNTAX RAUChannelSpacingCapability
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Channel spacing.
+            ETSI: 3.5, 7, 14, 28, 40, 56 MHz
+            ANSI: 10, 20, 30, 40, 50 MHz
+            "
+        ::= { xfRAUCapabilityEntry 1 }
+
+    xfRAUChannelModulation OBJECT-TYPE
+        SYNTAX RAUModulation
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the modulation.
+            Values:
+              cqpsk(2)    CQPSK
+              qam16(3)    16-QAM
+              qam128(4)   128-QAM
+              qam32(5)    32-QAM
+              qam64(6)    64-QAM
+              qam4(7)     4-QAM
+              qam8(8)     8-QAM
+              qam256(9)   256-QAM
+              qam512(10)  512-QAM
+              qam1024(11) 1024-QAM
+            "
+        ::= { xfRAUCapabilityEntry 2 }
+
+    xfRAUSpectrumEfficiencyClass OBJECT-TYPE
+        SYNTAX RauSec
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Spectrum Efficiency Class:
+              other(1), unknown
+              sec2(2),  Spectrum eff. Class 2
+              sec3(3),  Spectrum eff. Class 3
+              sec4L(4), Spectrum eff. Class 4L
+              sec4H(5), Specturm eff. Class 4H
+              sec5A(6), Spectrum eff. Class 5A
+              sec5B(7), Spectrum eff. Class 5B
+              sec6A(8), Spectrum eff. Class 6A
+              sec6B(9)  Spectrum eff. Class 6B
+            "
+        ::= { xfRAUCapabilityEntry 3 }
+
+    xfRAUCarrierMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            singleCarrier(1),
+            xpicDualCarrier(2),
+            mimoMultiCarrier(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Radio carrier mode.
+            "
+        ::= { xfRAUCapabilityEntry 4 }
+
+------------------------------------------------------------------------------
+-- xfRAUSubBandTable
+------------------------------------------------------------------------------
+
+    xfRAUSubBandTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRAUSubBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for RAU Sub-Band index capability.
+            Table indexed with entPhysicalIndex and xfRAUSubBandIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 5 }
+
+    xfRAUSubBandEntry OBJECT-TYPE
+        SYNTAX XfRAUSubBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in xfRAUSubBandTable."
+        INDEX { entPhysicalIndex, xfRAUSubBandIndex }
+        ::= { xfRAUSubBandTable 1 }
+
+    XfRAUSubBandEntry ::=
+        SEQUENCE
+        {
+            xfRAUSubBandIndex Unsigned32,
+            xfRAUSubBandRange Unsigned32
+        }
+
+--
+-- xfRAUSubBandTable MOs
+--
+
+    xfRAUSubBandIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (1..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An index for the specific RAU Sub-Band available index range."
+        ::= { xfRAUSubBandEntry 1 }
+
+    xfRAUSubBandRange OBJECT-TYPE
+        SYNTAX Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the RAU Sub-Band available index range [0..255]."
+        ::= { xfRAUSubBandEntry 2 }
+
+------------------------------------------------------------------------------
+-- xfRFSpectrumDiagTable
+------------------------------------------------------------------------------
+
+    xfRFSpectrumDiagTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRFSpectrumDiagEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table for RF Spectrum Diagnostics control and status"
+        ::= { xfRadioLinkPtpRadioObjects 6 }
+
+    xfRFSpectrumDiagEntry OBJECT-TYPE
+        SYNTAX XfRFSpectrumDiagEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in xfRFSpectrumDiagTable"
+        INDEX { ifIndex }
+        ::= { xfRFSpectrumDiagTable 1 }
+
+    XfRFSpectrumDiagEntry ::=
+        SEQUENCE
+        {
+            xfRFSpectrumDiagAdminStatus         INTEGER,
+            xfRFSpectrumDiagOperStatus          INTEGER,
+            xfRFSpectrumDiagChannelScanEstTime  Unsigned32,
+            xfRFSpectrumDiagSubBandScanEstTime  Unsigned32,
+            xfRFSpectrumDiagScanDate            DisplayString,
+            xfRFSpectrumDiagChannelSpacing      Unsigned32,
+            xfRFSpectrumDiagCurrRxFrequency     Unsigned32,
+            xfRFSpectrumDiagMinRxFrequency      Unsigned32,
+            xfRFSpectrumDiagMaxRxFrequency      Unsigned32,
+            xfRFSpectrumDiagIdxCompanion1       Unsigned32,
+            xfRFSpectrumDiagIdxCompanion2       Unsigned32,
+            xfRFSpectrumDiagIdxCompanion3       Unsigned32,
+            xfRFSpectrumDiagProgress            Unsigned32
+        }
+
+--
+-- xfRFSpectrumDiagTable MOs
+--
+
+    xfRFSpectrumDiagAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            channelScanStart(2),
+            subBandScanStart(3),
+            scanStop(255)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "RF Spectrum Diagnostics Admin Status"
+        ::= { xfRFSpectrumDiagEntry 1 }
+
+    xfRFSpectrumDiagOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            scanNotStarted(0),
+            subBandScanOngoing(1),
+            channelScanOngoing(2),
+            scanCanceled(3),
+            subBandScanFinished(4),
+            channelScanFinished(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RF Spectrum Diagnostics Oper Status"
+        ::= { xfRFSpectrumDiagEntry 2 }
+
+    xfRFSpectrumDiagChannelScanEstTime OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Estimated time in seconds for scanning one
+             Channel Spacing at current RX frequency"
+        ::= { xfRFSpectrumDiagEntry 3 }
+
+    xfRFSpectrumDiagSubBandScanEstTime OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Estimated time in seconds for scanning
+             full Sub Band of connected RAU"
+        ::= { xfRFSpectrumDiagEntry 4 }
+
+    xfRFSpectrumDiagScanDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Date and time when scan (channel or sub-band) is completed,
+             format: [YYYY]-[MM]-[DD]T[hh]:[mm]:[ss]"
+        ::= { xfRFSpectrumDiagEntry 5 }
+
+    xfRFSpectrumDiagChannelSpacing OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Channel width measured by Spectrum Diagnostics"
+        ::= { xfRFSpectrumDiagEntry 6 }
+
+    xfRFSpectrumDiagCurrRxFrequency OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current value of Rx frequency"
+        ::= { xfRFSpectrumDiagEntry 7 }
+
+    xfRFSpectrumDiagMinRxFrequency OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Minimum sub-band Rx frequency (RAU lower edge)"
+        ::= { xfRFSpectrumDiagEntry 8 }
+
+    xfRFSpectrumDiagMaxRxFrequency OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Maximum sub-band Rx frequency (RAU upper edge)"
+        ::= { xfRFSpectrumDiagEntry 9 }
+
+    xfRFSpectrumDiagIdxCompanion1 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RF IF index for 1st companion carrier (0 if no companion)"
+        ::= { xfRFSpectrumDiagEntry 10 }
+
+    xfRFSpectrumDiagIdxCompanion2 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RF IF index for 2nd companion carrier (0 if no companion)"
+        ::= { xfRFSpectrumDiagEntry 11 }
+
+    xfRFSpectrumDiagIdxCompanion3 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RF IF index for 3rd companion carrier (0 if no companion)"
+        ::= { xfRFSpectrumDiagEntry 12 }
+
+    xfRFSpectrumDiagProgress OBJECT-TYPE
+        SYNTAX Unsigned32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Completed percentage of Spectrum Diagnostics scan"
+        ::= { xfRFSpectrumDiagEntry 13 }
+
+------------------------------------------------------------------------------
+-- xfRFSpectrumDiagResultTable
+------------------------------------------------------------------------------
+
+    xfRFSpectrumDiagResultTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRFSpectrumDiagResultEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of Spectrum Diagnostics scan results"
+        ::= { xfRadioLinkPtpRadioObjects 7 }
+
+    xfRFSpectrumDiagResultEntry OBJECT-TYPE
+        SYNTAX XfRFSpectrumDiagResultEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in xfRFSpectrumDiagResultTable"
+        INDEX { ifIndex, xfRFSpectrumDiagResultIndex }
+        ::= { xfRFSpectrumDiagResultTable 1 }
+
+    XfRFSpectrumDiagResultEntry ::=
+        SEQUENCE
+        {
+            xfRFSpectrumDiagResultIndex        Unsigned32,
+            xfRFSpectrumDiagResultRxFrequency  Unsigned32,
+            xfRFSpectrumDiagResultRxPower      Integer32
+        }
+
+--
+-- xfRFSpectrumDiagResultTable MOs
+--
+
+    xfRFSpectrumDiagResultIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4294967295)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "Spectrum Diagnostics Scan Result Index"
+        ::= { xfRFSpectrumDiagResultEntry 1 }
+
+    xfRFSpectrumDiagResultRxFrequency OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Spectrum Diagnostics Scan Result Rx frequency in kHz"
+        ::= { xfRFSpectrumDiagResultEntry 2 }
+
+    xfRFSpectrumDiagResultRxPower OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Spectrum Diagnostics Scan Result Rx Power
+            value/10 dBm
+            Domain: [-99.9 .. -20.0 dBm]"
+        ::= { xfRFSpectrumDiagResultEntry 3 }
+
+------------------------------------------------------------------------------
+-- xfRfIfPowerTable
+------------------------------------------------------------------------------
+
+    xfRfIfPowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRfIfPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for Radio Link RAU managed objects.
+            Table indexed with ifIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 8 }
+
+    xfRfIfPowerEntry OBJECT-TYPE
+        SYNTAX XfRfIfPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRfIfPowerTable."
+        INDEX { ifIndex }
+        ::= { xfRfIfPowerTable 1 }
+
+    XfRfIfPowerEntry ::=
+      SEQUENCE
+      {
+          xfRfSelectedMinOutputPower    RfOutputPower,
+          xfRfSelectedMaxOutputPower    RfOutputPower,
+          xfRfCurrentOutputPower        RfOutputPower,
+          xfRfMinOutputPower            RfOutputPower,
+          xfRfMaxOutputPower            RfOutputPower,
+          xfRfAtpcTargetInputPowerFE    Integer32,
+          xfRfCurrentInputPower         RfInputPower,
+          xfRfMaxInputPowerLast7Days    RfInputPower,
+          xfRfMinInputPowerLast7Days    RfInputPower,
+          xfRfMaxInputPowerSinceReset   RfInputPower,
+          xfRfMinInputPowerSinceReset   RfInputPower,
+          xfRfInputPowerReset           INTEGER,
+          xfRfInputAlarmThreshold       Integer32,
+          xfRfOutputPower4QAM           RfOutputPower,
+          xfRfOutputPower16QAM          RfOutputPower,
+          xfRfOutputPower32QAM          RfOutputPower,
+          xfRfOutputPower64QAM          RfOutputPower,
+          xfRfOutputPower128QAM         RfOutputPower,
+          xfRfOutputPower256QAM         RfOutputPower,
+          xfRfOutputPower512QAM         RfOutputPower,
+          xfRfOutputPower1024QAM        RfOutputPower,
+          xfRfOutputPower2048QAM        RfOutputPower,
+          xfRfOutputPower4096QAM        RfOutputPower,
+          xfRfMaxOutputPowerNotLimited  RfOutputPower,
+          xfRfMaxOutputPowerPossible    INTEGER,
+          xfRfMeanInputPower1m          Integer32,
+          xfRfMaxOutputPowerLast7Days   Integer32,
+          xfRfMinOutputPowerLast7Days   Integer32,
+          xfRfMaxOutputPowerSinceReset  Integer32,
+          xfRfMinOutputPowerSinceReset  Integer32,
+          xfRfOutputPowerReset          INTEGER,
+          xfRfAvailableOutputPowerType  INTEGER,
+          xfRfSelectedOutputPowerType   INTEGER,
+          xfRfTaps                      INTEGER,
+          xfRfCurrentInputPowerSdcMain  RfInputPower,
+          xfRfCurrentInputPowerSdcDiv   RfInputPower,
+          xfRfOutputPower8192QAM        RfOutputPower,
+          xfRfOutputPower16384QAM       RfOutputPower,
+          xfRfAtpcFallbackOutputPower   RfOutputPower,
+          xfRfAtpcFallbackEnable        ATPCFallbackEnable,
+          xfRfAtpcFallbackTimer         Integer32
+      }
+
+--
+-- xfRfIfPowerTable MOs
+--
+
+    xfRfSelectedMinOutputPower OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Minimum output power in dBm (selected by operator).
+            Default value: 10 dBm.
+            "
+        ::= { xfRfIfPowerEntry 1 }
+
+    xfRfSelectedMaxOutputPower OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Maximum output power in dBm (selected by operator).
+            Default value: 10 dBm.
+            "
+        ::= { xfRfIfPowerEntry 2 }
+
+    xfRfCurrentOutputPower OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Current output power in dBm.
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 3 }
+
+    xfRfMinOutputPower OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Minimum output power in dBm (provided by RAU).
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 4 }
+
+    xfRfMaxOutputPower OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Maximum output power in dBm (provided by RAU).
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 5 }
+
+    xfRfAtpcTargetInputPowerFE OBJECT-TYPE
+        SYNTAX Integer32 (-99..-30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            ATPC target input power on Far End side.
+            Default value: -30.
+            "
+        ::= { xfRfIfPowerEntry 6 }
+
+    xfRfCurrentInputPower OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            RF input level.
+            Value is in 1/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            "
+        ::= { xfRfIfPowerEntry 7 }
+
+    xfRfMaxInputPowerLast7Days OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Maximum RF input level in the last 7 days.
+            Value is in 1/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm].
+            0 (zero) indicates an invalid value.
+            "
+        ::= { xfRfIfPowerEntry 8 }
+
+    xfRfMinInputPowerLast7Days OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Minimum RF input level in the last 7 days.
+            Value is in 1/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm].
+            0 (zero) indicates an invalid value.
+            "
+        ::= { xfRfIfPowerEntry 9 }
+
+    xfRfMaxInputPowerSinceReset OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Maximum RF input level since reset.
+            Value is in 1/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm].
+            0 (zero) indicates an invalid value.
+            "
+        ::= { xfRfIfPowerEntry 10 }
+
+    xfRfMinInputPowerSinceReset OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Minimum RF input level since reset.
+            Value is in 1/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm].
+            0 (zero) indicates an invalid value.
+            "
+        ::= { xfRfIfPowerEntry 11 }
+
+    xfRfInputPowerReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            inputPowerNoReset(2),
+            inputPowerReset(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object resets the registers for:
+            - RF input power levels
+            - input levels (i.e. RF power, MSE and XPI) in the next 7 days period of time.
+            "
+        ::= { xfRfIfPowerEntry 12 }
+
+    xfRfInputAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32 (-99..-30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            RF input level threshold.
+            Default value: -93.
+            "
+        ::= { xfRfIfPowerEntry 13 }
+
+    xfRfOutputPower4QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 4QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 14 }
+
+    xfRfOutputPower16QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 16QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 15 }
+
+    xfRfOutputPower32QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 32QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 16 }
+
+    xfRfOutputPower64QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 64QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 17 }
+
+    xfRfOutputPower128QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 128QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 18 }
+
+    xfRfOutputPower256QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 256QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 19 }
+
+    xfRfOutputPower512QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 512QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 20 }
+
+    xfRfOutputPower1024QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 1024QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 21 }
+
+    xfRfOutputPower2048QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 2048QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 22 }
+
+    xfRfOutputPower4096QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 4096QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 23 }
+
+    xfRfMaxOutputPowerNotLimited OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Max output power in dBm that the RAU can give
+            if it is not power supply limited.
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 24 }
+
+    xfRfMaxOutputPowerPossible OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            possible(2),
+            notPossible(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            possible(2): max output power is possible.
+            notPossible(3): max output power is not possible, due to power supply limitations.
+            "
+        ::= { xfRfIfPowerEntry 25 }
+
+    xfRfMeanInputPower1m OBJECT-TYPE
+        SYNTAX Integer32 (-999..-200|0)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input mean level for last minute.
+            RF input level = value/10 dBm.
+            Domain: [-99.9 ... -20.0 dBm]
+            0 (zero) indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 26 }
+
+    xfRfMaxOutputPowerLast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows maximum RF output level last 7 days.
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 27 }
+
+    xfRfMinOutputPowerLast7Days OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows minimum RF output level last 7 days.
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 28 }
+
+    xfRfMaxOutputPowerSinceReset OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows maximum RF output level since reset
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 29 }
+
+    xfRfMinOutputPowerSinceReset OBJECT-TYPE
+        SYNTAX Integer32 (-100..45|255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows minimum RF output level since reset
+            RF output level = value dBm.
+            Domain: [-100 ... 45 dBm]
+            255 indicates invalid value.
+            "
+        ::= { xfRfIfPowerEntry 30 }
+
+    xfRfOutputPowerReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            outputPowerNoReset(2),
+            outputPowerReset(3)
+        }
+
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object reset the registers for the RF output level
+            and All Time High level this seven days period and
+            counters for the next seven days period of time.
+            "
+        ::= { xfRfIfPowerEntry 31 }
+
+    xfRfAvailableOutputPowerType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            standardPower(2),
+            highPower(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object reports the output power capability of the RAU:
+            - standardPower
+            - highPower
+           "
+        ::= { xfRfIfPowerEntry 32 }
+
+    xfRfSelectedOutputPowerType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            standardPower(2),
+            highPower(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object allows setting the output power type:
+            - standardPower
+            - highPower
+            default: standardPower(2)
+            When the type is set to highPower(3) a HP license key is required.
+            If the license key is not present the capacity is limited to Basic Capacity.
+            The output power can be configured as 'normal' without any impact from the HP license key (present or not).
+            When the mode is standardPower(2) the availableMaxOutputPower is limited to 'max power' - 4 dB per modulation.
+            "
+        ::= { xfRfIfPowerEntry 33 }
+
+    xfRfTaps OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enabled(2),
+            disabled(3),
+            notAvailable(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object allows setting the Traffic Aware Power Saving.
+            Default: disabled(3)
+            "
+        ::= { xfRfIfPowerEntry 34 }
+
+    xfRfCurrentInputPowerSdcMain OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input level for SDC Main path = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            0 (zero) indicates invalid value (e.g. SDC not available).
+            "
+        ::= { xfRfIfPowerEntry 35 }
+
+    xfRfCurrentInputPowerSdcDiv OBJECT-TYPE
+        SYNTAX RfInputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object shows RF input level for SDC Diversity path = value/10 dBm.
+            Domain: [-20.0 .. -99.9 dBm].
+            0 (zero) indicates invalid value (e.g. SDC not available).
+            "
+        ::= { xfRfIfPowerEntry 36 }
+
+    xfRfOutputPower8192QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 8192QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 37 }
+
+    xfRfOutputPower16384QAM OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output power for 16384QAM.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 38 }
+
+    xfRfAtpcFallbackOutputPower OBJECT-TYPE
+        SYNTAX RfOutputPower
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object sets output power (in dBm) in ATPCFallback mode,
+            for radio contained in the Carrier Termination.
+            255 indicates invalid value."
+        ::= { xfRfIfPowerEntry 39 }
+
+    xfRfAtpcFallbackEnable OBJECT-TYPE
+        SYNTAX ATPCFallbackEnable
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/disable ATPCFallback."
+        ::= { xfRfIfPowerEntry 40 }
+
+    xfRfAtpcFallbackTimer OBJECT-TYPE
+        SYNTAX Integer32 (1..60)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object specifies how long the output power
+            can be at (ATPC, MAX) before ATPC fallback is triggered.
+            Default value: ETSI 15 min, ANSI 5 min."
+        ::= { xfRfIfPowerEntry 41 }
+
+------------------------------------------------------------------------------
+-- xfRFIFCableMonitoringTable
+------------------------------------------------------------------------------
+
+    xfRFIFCableMonitoringTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRFIFCableMonitoringEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Table for Radiolink point-to-point radios RF IF Cable Monitoring managed objects.
+            Table indexed with ifIndex.
+            "
+        ::= { xfRadioLinkPtpRadioObjects 9 }
+
+    xfRFIFCableMonitoringEntry OBJECT-TYPE
+        SYNTAX XfRFIFCableMonitoringEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRFIFCableMonitoringTable."
+        INDEX { ifIndex }
+        ::= { xfRFIFCableMonitoringTable 1 }
+
+    XfRFIFCableMonitoringEntry ::=
+        SEQUENCE
+        {
+            xfRFIFCMStatus          INTEGER,
+            xfRFOutlierAgc          INTEGER,
+            xfRFOutlierSetTh        Unsigned32,
+            xfRFOutlierCeaseTh      Unsigned32,
+            xfRFRangeAgc            INTEGER,
+            xfRFRangeSetTh          Unsigned32,
+            xfRFRangeCeaseTh        Unsigned32,
+            xfRFStddevAgc           INTEGER,
+            xfRFStddevSetTh         Unsigned32,
+            xfRFStddevCeaseTh       Unsigned32,
+            xfRFDegradationAgc      INTEGER,
+            xfRFDegradationSetTh    Unsigned32,
+            xfRFDegradationCeaseTh  Unsigned32,
+            xfRFMarginAgc           INTEGER,
+            xfRFMarginSetTh         Unsigned32,
+            xfRFMarginCeaseTh       Unsigned32,
+      xfRFOutlierValue        Integer32,
+      xfRFRangeValue          Integer32,
+      xfRFStddevValue         Integer32,
+      xfRFDegradationValue    Integer32,
+      xfRFMarginValue         Integer32,
+      xfRFOutlierTrigger      INTEGER,
+      xfRFRangeTrigger        INTEGER,
+      xfRFStddevTrigger       INTEGER,
+      xfRFDegradationTrigger  INTEGER,
+      xfRFMarginTrigger       INTEGER
+
+        }
+
+--
+-- xfRFIFCableMonitoringTable MOs
+--
+
+  xfRFIFCMStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Monitoring Status.
+            Default value: disable(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 1 }
+
+  xfRFOutlierAgc OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Outlier Alarm.
+            Default value: disable(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 2 }
+
+  xfRFOutlierSetTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Set Threshold for Outlier Alarm.
+            3 = Default value (0.3).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 3
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 3 }
+
+  xfRFOutlierCeaseTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Cease Threshold for Outlier Alarm.
+            2 = Default value (0.2).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 2
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 4 }
+
+  xfRFRangeAgc OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Range Alarm.
+            Default value: disable(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 5 }
+
+  xfRFRangeSetTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Set Threshold for Range Alarm.
+            30 = Default value (3).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 30 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 6 }
+
+  xfRFRangeCeaseTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Cease Threshold for Range Alarm.
+            20 = Default value (2).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 20 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 7 }
+
+  xfRFStddevAgc OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Stddev Alarm.
+            Default value: disable(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 8 }
+
+  xfRFStddevSetTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Set Threshold for Stddev Alarm.
+            50 = Default value (5).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 50 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 9 }
+
+  xfRFStddevCeaseTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Cease Threshold for Stddev Alarm.
+            20 = Default value (2).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 20 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 10 }
+
+    xfRFDegradationAgc OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Degradation Alarm.
+            Default value: disable(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 11 }
+
+  xfRFDegradationSetTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Set Threshold for Degradation Alarm.
+            2 = Default value (0.2).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 2 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 12 }
+
+  xfRFDegradationCeaseTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Cease Threshold for Degradation Alarm.
+            1 = Default value (0.1).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 1 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 13 }
+
+    xfRFMarginAgc OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disable(2),
+            enable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Margin Alarm.
+            Default value: disable(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 14 }
+
+  xfRFMarginSetTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Set Threshold for Margin Alarm.
+            30 = Default value (3).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 30 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 15 }
+
+  xfRFMarginCeaseTh OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles Cease Threshold for Margin Alarm.
+            60 = Default value (6).
+            - To calculate threshold use the following formula: SetTh/10.
+            Default value: 60 (dB/10)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 16 }
+
+  xfRFOutlierValue OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles the value calculated on 24h for Outlier Alarm.
+            0 = Default value (0).
+            - To calculate value use the following formula: Value/100.
+            Default value: 0
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 17 }
+
+  xfRFRangeValue OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles the value calculated on 24h for Range Alarm.
+            0 = Default value (0).
+            - To calculate value use the following formula: Value/100.
+            Default value: 0 (dB/100)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 18 }
+
+  xfRFStddevValue OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles the value calculated on 24h for Stddev Alarm.
+            0 = Default value (0).
+            - To calculate value use the following formula: Value/100.
+            Default value: 0 (dB/100)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 19 }
+
+  xfRFDegradationValue OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles the value calculated on 24h for Degradation Alarm.
+            0 = Default value (0).
+            - To calculate value use the following formula: Value/100.
+            Default value: 0 (dB/100)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 20 }
+
+  xfRFMarginValue OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object handles the value calculated on 24h for Margin Alarm.
+            0 = Default value (0).
+            - To calculate value use the following formula: Value/100.
+            Default value: 0 (dB/100)
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 21 }
+
+   xfRFOutlierTrigger OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noSetThreshold(2),
+            setThreshold(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Outlier Trigger.
+            Default value: noSetThreshold(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 22 }
+
+  xfRFRangeTrigger OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noSetThreshold(2),
+            setThreshold(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Range Trigger.
+            Default value: noSetThreshold(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 23 }
+
+   xfRFStddevTrigger OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noSetThreshold(2),
+            setThreshold(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Stddev Trigger.
+            Default value: noSetThreshold(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 24 }
+
+   xfRFDegradationTrigger OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noSetThreshold(2),
+            setThreshold(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Degradation Trigger.
+            Default value: noSetThreshold(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 25 }
+
+   xfRFMarginTrigger OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noSetThreshold(2),
+            setThreshold(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object manage IfCable Margin Trigger.
+            Default value: noSetThreshold(2).
+            Near end access: read-write.
+            Far end access: no access.
+            "
+        ::= { xfRFIFCableMonitoringEntry 26 }
+
+------------------------------------------------------------------------------
+-- xfSdcTable
+------------------------------------------------------------------------------
+    xfSdcTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfSdcEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table for SDC capabilities, setting and status."
+        ::= { xfRadioLinkPtpRadioObjects 10 }
+
+    xfSdcEntry OBJECT-TYPE
+        SYNTAX XfSdcEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfSdcTable."
+        INDEX { entPhysicalIndex }
+        ::= { xfSdcTable 1 }
+
+    XfSdcEntry ::=
+        SEQUENCE
+        {
+            xfSdcCapability               INTEGER,
+            xfSdcAdminStatus              INTEGER,
+            xfSdcOperStatus               INTEGER,
+            xfSdcDadeControl              INTEGER,
+            xfSdcDadeStatus               INTEGER,
+            xfSdcPath                     INTEGER,
+            xfSdcOduDateTimeCalibration   DisplayString,
+            xfSdcOduSerialNumber          DisplayString,
+            xfSdcGain                     Integer32,
+            xfSdcActualPath               INTEGER,
+            xfSdcDadeDelay                Integer32
+        }
+
+--
+-- xfSdcTable MOs
+--
+
+    xfSdcCapability OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcSupported(2),
+            sdcNotSupported(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SDC capability, including both MMU and ODU."
+        ::= { xfSdcEntry 1 }
+
+    xfSdcAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcEnabled(2),
+            sdcDisabled(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SDC Admin Status."
+        ::= { xfSdcEntry 2 }
+
+    xfSdcOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcEnabled(2),
+            sdcDisabled(3),
+            sdcInProgress(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SDC Oper Status."
+        ::= { xfSdcEntry 3 }
+
+    xfSdcDadeControl OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcDadeStart(2),
+            sdcDadeAbort(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SDC DADE procedure control."
+        ::= { xfSdcEntry 4 }
+
+    xfSdcDadeStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcCalibrated(2),
+            sdcNotCalibrated(3),
+            sdcCalInProgress(4),
+            sdcCalMismatch(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SDC DADE procedure status."
+        ::= { xfSdcEntry 5 }
+
+    xfSdcPath OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcAuto(2),
+            sdcMain(3),
+            sdcDiv(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SDC selected path (desired value)."
+        ::= { xfSdcEntry 6 }
+
+    xfSdcOduDateTimeCalibration OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Date and time of the SDC DADE calibration for the ODU with serial number in xfSdcOduSerialNumber.
+             Format: [YYYY]-[MM]-[DD]T[hh]:[mm]:[ss] (ISO 8601)."
+        ::= { xfSdcEntry 7 }
+
+    xfSdcOduSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the ODU the current value of xfSdcOduDateTimeCalibration is referred to."
+        ::= { xfSdcEntry 8 }
+
+    xfSdcGain OBJECT-TYPE
+        SYNTAX Integer32 (0..30)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            SDC gain in dB/10.
+            Domain: [0.0 .. 3.0 dB].
+            "
+        ::= { xfSdcEntry 9 }
+
+    xfSdcActualPath OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            sdcAuto(2),
+            sdcMain(3),
+            sdcDiv(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SDC actual path (current value)."
+        ::= { xfSdcEntry 10 }
+
+    xfSdcDadeDelay OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            DADE delay in nsec.
+            "
+        ::= { xfSdcEntry 11 }
+
+--
+-- Conformance
+--
+
+    xfRadioLinkPtpRadioCompliances OBJECT IDENTIFIER ::= { xfRadioLinkPtpRadioConformance 1 }
+    xfRadioLinkPtpRadioGroups      OBJECT IDENTIFIER ::= { xfRadioLinkPtpRadioConformance 2 }
+
+    xfRADIOLINKPTPRADIOFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { xfRadioLinkPtpRadioCompleteGroup }
+        ::= { xfRadioLinkPtpRadioCompliances 1 }
+
+    xfRadioLinkPtpRadioCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            xfRAUAlarmStatus,
+            xfRAURfLoopAvailable,
+            xfRAUAtpcCapability,
+            xfRAULocalCtrlCapability,
+            xfRAUModCapability,
+            xfRAUFrequencyband,
+            xfRAUSubBand,
+            xfRAUTemperature,
+            xfRAUProtectionPath,
+            xfRAURxCapability,
+            xfRAUNotes,
+            xfRauAtpcVersion,
+            xfRauBoosterCapability,
+            xfRauBoosterSelectedIndex,
+            xfRFBaseTxFrequency,
+            xfRFBaseRxFrequency,
+            xfRFStepSize,
+            xfRFStepLimitLow,
+            xfRFStepLimitHigh,
+            xfRFCurrentStepNumber,
+            xfRFTxOperStatus,
+            xfRFTxAdminStatus,
+            xfRFLoopEnable,
+            xfRFAlarms,
+            xfRFStatus,
+            xfRFStepSizeRx,
+            xfRFStepLimitLowRx,
+            xfRFStepLimitHighRx,
+            xfRFCurrentStepNumberRx,
+            xfRFDuplexType,
+            xfRFDuplexConfig,
+            xfRFDuplexDistance,
+            xfRFCurrentOutputPower,
+            xfRFRtpcMinOutputPower,
+            xfRFRtpcMaxOutputPower,
+            xfRFRtpcSelectedOutputPower,
+            xfRFAtpcMinOutputPower,
+            xfRFAtpcMaxOutputPower,
+            xfRFAtpcMinInputPowerFar,
+            xfRFAtpcSelectedInputPowerFar,
+            xfRFAttenuator,
+            xfRFCurrentInputPower,
+            xfRFMaxInputPowerLast7Days,
+            xfRFMinInputPowerLast7Days,
+            xfRFMaxInputPowerSinceReset,
+            xfRFMinInputPowerSinceReset,
+            xfRFInputPowerReset,
+            xfRFInputAlarmThreshold,
+            xfRAUChannelSpacing,
+            xfRAUChannelModulation,
+            xfRAUSpectrumEfficiencyClass,
+            xfRAUCarrierMode,
+            xfRFOutputPower4QAM,
+            xfRFOutputPower8QAM,
+            xfRFOutputPower16QAM,
+            xfRFOutputPower32QAM,
+            xfRFOutputPower64QAM,
+            xfRFOutputPower128QAM,
+            xfRFOutputPower256QAM,
+            xfRFOutputPower512QAM,
+            xfRFAtpcFallbackOutputPower,
+            xfRFAtpcFallbackEnable,
+            xfRFAtpcFallbackTimer,
+            xfRFOutputPower1024QAM,
+            xfRFMaxOutputPowerNotLimited,
+            xfRFMaxOutputPowerNotPossible,
+            xfRFCurrentInputPowerSdcMain,
+            xfRFCurrentInputPowerSdcDiv,
+            xfRAUSubBandIndex,
+            xfRAUSubBandRange,
+            xfRFMeanInputPower1m,
+            xfRFMaxOutputPowerLast7Days,
+            xfRFMinOutputPowerLast7Days,
+            xfRFMaxOutputPowerSinceReset,
+            xfRFMinOutputPowerSinceReset,
+            xfRFMaxMSELast7Days,
+            xfRFMinMSELast7Days,
+            xfRFMaxXPILast7Days,
+            xfRFMinXPILast7Days,
+            xfRFOutputPowerReset,
+            xfRfAvailableOutputPowerType,
+            xfRfSelectedOutputPowerType,
+            xfRfTaps,
+            xfRfSelectedMinOutputPower,
+            xfRfSelectedMaxOutputPower,
+            xfRfCurrentOutputPower,
+            xfRfMinOutputPower,
+            xfRfMaxOutputPower,
+            xfRfAtpcTargetInputPowerFE,
+            xfRfCurrentInputPower,
+            xfRfMaxInputPowerLast7Days,
+            xfRfMinInputPowerLast7Days,
+            xfRfMaxInputPowerSinceReset,
+            xfRfMinInputPowerSinceReset,
+            xfRfInputPowerReset,
+            xfRfInputAlarmThreshold,
+            xfRfOutputPower4QAM,
+            xfRfOutputPower16QAM,
+            xfRfOutputPower32QAM,
+            xfRfOutputPower64QAM,
+            xfRfOutputPower128QAM,
+            xfRfOutputPower256QAM,
+            xfRfOutputPower512QAM,
+            xfRfOutputPower1024QAM,
+            xfRfOutputPower2048QAM,
+            xfRfOutputPower4096QAM,
+            xfRfOutputPower8192QAM,
+            xfRfOutputPower16384QAM,
+            xfRfAtpcFallbackOutputPower,
+            xfRfAtpcFallbackEnable,
+            xfRfAtpcFallbackTimer,
+            xfRfMaxOutputPowerNotLimited,
+            xfRfMaxOutputPowerPossible,
+            xfRfMeanInputPower1m,
+            xfRfMaxOutputPowerLast7Days,
+            xfRfMinOutputPowerLast7Days,
+            xfRfMaxOutputPowerSinceReset,
+            xfRfMinOutputPowerSinceReset,
+            xfRfOutputPowerReset,
+            xfRFSpectrumDiagAdminStatus,
+            xfRFSpectrumDiagOperStatus,
+            xfRFSpectrumDiagChannelScanEstTime,
+            xfRFSpectrumDiagSubBandScanEstTime,
+            xfRFSpectrumDiagScanDate,
+            xfRFSpectrumDiagChannelSpacing,
+            xfRFSpectrumDiagCurrRxFrequency,
+            xfRFSpectrumDiagMinRxFrequency,
+            xfRFSpectrumDiagMaxRxFrequency,
+            xfRFSpectrumDiagIdxCompanion1,
+            xfRFSpectrumDiagIdxCompanion2,
+            xfRFSpectrumDiagIdxCompanion3,
+            xfRFSpectrumDiagProgress,
+            xfRFSpectrumDiagResultIndex,
+            xfRFSpectrumDiagResultRxFrequency,
+            xfRFSpectrumDiagResultRxPower,
+            xfRFBoosterGain,
+            xfRFBoosterMaxInputPower,
+            xfRFBoosterCapability,
+            xfRFBoosterProductNumber,
+            xfRFBoosterHWRevision,
+            xfRFIFCMStatus,
+            xfRFOutlierAgc,
+            xfRFOutlierSetTh,
+            xfRFOutlierCeaseTh,
+            xfRFRangeAgc,
+            xfRFRangeSetTh,
+            xfRFRangeCeaseTh,
+            xfRFStddevAgc,
+            xfRFStddevSetTh,
+            xfRFStddevCeaseTh,
+            xfRFDegradationAgc,
+            xfRFDegradationSetTh,
+            xfRFDegradationCeaseTh,
+            xfRFMarginAgc,
+            xfRFMarginSetTh,
+            xfRFMarginCeaseTh,
+            xfRFOutlierValue,
+            xfRFRangeValue,
+            xfRFStddevValue,
+            xfRFDegradationValue,
+            xfRFMarginValue,
+            xfRFOutlierTrigger,
+            xfRFRangeTrigger,
+            xfRFStddevTrigger,
+            xfRFDegradationTrigger,
+            xfRFMarginTrigger,
+            xfSdcCapability,
+            xfSdcAdminStatus,
+            xfSdcOperStatus,
+            xfSdcDadeControl,
+            xfSdcDadeStatus,
+            xfSdcPath,
+            xfSdcOduDateTimeCalibration,
+            xfSdcOduSerialNumber,
+            xfSdcGain,
+            xfSdcActualPath,
+            xfSdcDadeDelay,
+            xfRfCurrentInputPowerSdcMain,
+            xfRfCurrentInputPowerSdcDiv
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { xfRadioLinkPtpRadioGroups 1 }
+
+    END
