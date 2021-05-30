@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Sla;
 use App\Models\Device;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
@@ -182,7 +183,7 @@ class Junos extends \LibreNMS\OS implements OSPolling
                     $icmp = [
                         'MinRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMinRttUs'] / 1000,
                         'MaxRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMaxRttUs'] / 1000,
-                        'StdDevRttUs' => $pingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
+                        'StdDevRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
                         'ProbeResponses' => $pingResultsProbeResponses[$owner . '.' . $test],
                         'ProbeLoss' => (int) $pingResultsSentProbes[$owner . '.' . $test] - (int) $pingResultsProbeResponses[$owner . '.' . $test],
                     ];
