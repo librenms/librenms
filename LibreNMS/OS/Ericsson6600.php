@@ -50,7 +50,7 @@ class Ericsson6600 extends OS implements
                 'ericsson-6600',
                 $index,
                 'SNR: ' . snmp_get($this->getDeviceArray(), 'xfCarrierTermDistinguishedName' . '.' . $index, '-Oqv', 'XF-RADIOLINK-RLT-MIB'),
-                Null,
+                null,
                 1,
                 10
             );
@@ -72,7 +72,7 @@ class Ericsson6600 extends OS implements
                 'ericsson-6600',
                 $index,
                 'Rate: ' . snmp_get($this->getDeviceArray(), 'xfCarrierTermDistinguishedName' . '.' . $index, '-Oqv', 'XF-RADIOLINK-RLT-MIB'),
-                Null,
+                null,
                 1000,
                 1
             );
@@ -95,7 +95,7 @@ class Ericsson6600 extends OS implements
                 'ericsson-6600',
                 $index . 'tx',
                 'TX Frequency: ' . snmp_get($this->getDeviceArray(), 'ifName' . '.' . $index, '-Oqv', 'IF-MIB'),
-                Null,
+                null,
                 1,
                 1000
             );
@@ -108,7 +108,7 @@ class Ericsson6600 extends OS implements
                 'ericsson-6600',
                 $index . 'rx',
                 'RX Frequency: ' . snmp_get($this->getDeviceArray(), 'ifName' . '.' . $index, '-Oqv', 'IF-MIB'),
-                Null,
+                null,
                 1,
                 1000
             );
@@ -141,7 +141,7 @@ class Ericsson6600 extends OS implements
                 'ericsson-6600',
                 $index . 'rx',
                 'Input power: ' . snmp_get($this->getDeviceArray(), 'ifName' . '.' . $index, '-Oqv', 'IF-MIB'),
-                Null,
+                null,
                 1,
                 10
 
@@ -151,6 +151,5 @@ class Ericsson6600 extends OS implements
         return $sensors;
     }
 
-#xfRLTMeasuredHopLength
-
+    //xfRLTMeasuredHopLength
 }
