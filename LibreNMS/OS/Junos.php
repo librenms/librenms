@@ -25,8 +25,8 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Sla;
 use App\Models\Device;
+use App\Models\Sla;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
