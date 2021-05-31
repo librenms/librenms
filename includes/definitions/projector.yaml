@@ -20,7 +20,6 @@ poller_modules:
     cisco-voice: false
     ipmi: false
     ospf: false
-    toner: false
     ucd-diskio: false
     ucd-mib: false
 discovery_modules:
@@ -32,7 +31,6 @@ discovery_modules:
     hr-device: false
     ports-stack: false 
     arp-table: false
-    fdd-table: false
     bgp-peers: false
     cisco-cef: false
     cisco-mac-accounting: false
@@ -44,6 +42,5 @@ discovery_modules:
     libvirt-vminfo: false
     ntp: false
     stp: false
-    toner: false
     ucd-diskio: false
     vlans: false
