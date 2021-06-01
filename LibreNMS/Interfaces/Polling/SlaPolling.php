@@ -28,7 +28,7 @@ interface SlaPolling
 {
     /**
      * Poll Sla data for Sla in database.
-     * 
+     *
      * @param Collection $slas
      */
     public function pollSlas(Collection $slas);
