@@ -30,7 +30,7 @@ use App\Models\Sla;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
-class Junos extends \LibreNMS\OS implements OSPolling
+class Junos extends \LibreNMS\OS implements OSPolling, SlaPolling
 {
     public function discoverOS(Device $device): void
     {
