@@ -27,7 +27,6 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Sla;
-use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;

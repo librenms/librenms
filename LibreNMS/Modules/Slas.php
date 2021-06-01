@@ -21,7 +21,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Sla;
-use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
