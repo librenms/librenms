@@ -1,35 +1,3 @@
--- No. 3/196 03-CRXR 102 01/1                MANAGEMENT INFORMATION BASE
--- =====================================================================
--- Prepared:  XRSPAHO                 Revision   T
--- =====================================================================
--- Copyright
--- +++++++++
--- 
--- (c) Ericsson AS 2002. All rights reserved. No part of this document 
--- may be reproduced in any form without the written permission of the 
--- copyright holder.
--- 
--- Information
--- +++++++++++
--- 
--- This document is mainly intended for internal development and contains 
--- references to other documents. This document might however, after 
--- agreement with Ericsson, be delivered to customers to serve as 
--- information for design.
--- All referenced documents are however Ericsson internal and are not 
--- intended for customers or end users and will thus not be delivered 
--- externally.
---  
--- Disclaimer
--- ++++++++++
--- The content of this document is subject to revision without notice 
--- due to continued progress in methodology, design, and manufacturing. 
--- Ericsson shall have no liability for any error or damage of any kind 
--- resulting from the use of this document. 
--- 
--- =====================================================================
--- 
-
 	XF-TOP-MIB DEFINITIONS ::= BEGIN
  
 		IMPORTS
