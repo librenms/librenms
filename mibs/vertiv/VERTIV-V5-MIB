@@ -1,0 +1,6471 @@
+VERTIV-V5-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+DisplayString, TruthValue, MacAddress FROM SNMPv2-TC
+SnmpAdminString FROM SNMP-FRAMEWORK-MIB
+MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32,
+Gauge32, NOTIFICATION-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
+sysName FROM SNMPv2-MIB;
+
+vertiv MODULE-IDENTITY
+	LAST-UPDATED "202001070000Z"
+	ORGANIZATION "Vertiv"
+	CONTACT-INFO "support@geistglobal.com"
+	DESCRIPTION
+		"The MIB for Vertiv products"
+
+	REVISION "202001070000Z"
+	DESCRIPTION
+		"Updates for VRC spec change"
+
+	REVISION "201909300000Z"
+	DESCRIPTION
+		"Added hostname, alarm/warning count, and manufacturer to deviceInfo"
+
+	REVISION "201909120000Z"
+	DESCRIPTION
+		"Added SN-2D door switch sensor"
+
+	REVISION "201908300000Z"
+	DESCRIPTION
+		"Removed current min, max, and peak fields from pdu phase, line,
+		breaker, and outlet tables
+		Removed voltage min, max, and peak fields from pdu phase, line,
+		breaker, and outlet tables
+		Removed minmax reset value from pduOutletMeterReset
+		Added balance field to pdu phase table"
+
+	REVISION "201906060000Z"
+	DESCRIPTION
+		"Updated pduOutletSwitchControl description"
+
+	REVISION "201905070000Z"
+	DESCRIPTION
+		"Changed productMacAddress type to MacAddress"
+
+	REVISION "201904300000Z"
+	DESCRIPTION
+		"Added remote humidity-only sensor"
+
+	REVISION "201903070000Z"
+	DESCRIPTION
+		"Added VRC support"
+
+	REVISION "201801190000Z"
+	DESCRIPTION
+		"Modified pduOutletSwitchTable to support outlet actions with delays"
+
+	REVISION "201709190000Z"
+	DESCRIPTION
+		"Changed SYNTAX of objects, with a UTF-8 encoded string value, to
+		SnmpAdminString"
+
+	REVISION "201708100000Z"
+	DESCRIPTION
+		"Added pduBreakerCurrentPeak, pduLineCurrentPeak,
+		pduOutletMeterCurrentPeak, pduPhaseVoltagePeak, and
+		pduPhaseCurrentPeak
+		Updated object descriptions, indicating which fields are not supported
+		on all platforms"
+
+	REVISION "201705100000Z"
+	DESCRIPTION
+		"Added trapObj group with trap payload objects
+		Added additional payload objects to trap definitions"
+
+	REVISION "201704050000Z"
+	DESCRIPTION
+		"Added productPlatform to deviceInfo group
+		Added product identity entries"
+
+	REVISION "201606300000Z"
+	DESCRIPTION
+		"Raven version"
+
+	REVISION "201209110000Z"
+	DESCRIPTION
+		"Original version"
+	::= { enterprises 21239 }
+
+v5 OBJECT IDENTIFIER ::= { vertiv 5 }
+
+imd OBJECT IDENTIFIER ::= { v5 2 }
+
+--###########################################################################################--
+--deviceInfo--
+--###########################################################################################--
+
+deviceInfo OBJECT IDENTIFIER ::= { imd 1 }
+
+productTitle OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product name"
+	::= { deviceInfo 1 }
+
+productVersion OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product version"
+	::= { deviceInfo 2 }
+
+productFriendlyName OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"User-assigned name"
+	::= { deviceInfo 3 }
+
+productMacAddress OBJECT-TYPE
+	SYNTAX MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product's unique MAC address"
+	::= { deviceInfo 4 }
+
+deviceCount OBJECT-TYPE
+	SYNTAX Integer32(0..16)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of devices on unit"
+	::= { deviceInfo 6 }
+
+temperatureUnits OBJECT-TYPE
+	SYNTAX INTEGER {
+			fahrenheit(0),
+			celsius(1)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Current units for temperature/dewpoint values:
+		0 = Degrees Fahrenheit
+		1 = Degrees Celsius"
+	::= { deviceInfo 7 }
+
+productModelNumber OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product model number (factory-assigned)"
+	::= { deviceInfo 8 }
+
+productPartNumber OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product part number (factory-assigned)"
+	::= { deviceInfo 9 }
+
+productSerialNumber OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product serial number (factory-assigned)"
+	::= { deviceInfo 10 }
+
+productPlatform OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product platform"
+	::= { deviceInfo 11 }
+
+productHostname OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product hostname"
+	::= { deviceInfo 12 }
+
+productAlarmCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of alarms currently tripped"
+	::= { deviceInfo 13 }
+
+productWarnCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of warnings currently tripped"
+	::= { deviceInfo 14 }
+
+productManufacturer OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Product manufacturer"
+	::= { deviceInfo 15 }
+
+--###########################################################################################--
+--pdu--
+--###########################################################################################--
+
+pdu OBJECT IDENTIFIER ::= { imd 3 }
+
+--###########################################################################################--
+--pduMainTable--
+--###########################################################################################--
+
+pduMainTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduMainEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"PDU general information"
+	::= { pdu 1 }
+
+pduMainEntry OBJECT-TYPE
+	SYNTAX PduMainEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduMainTable table: each entry contains an index
+		and other sensor details"
+	INDEX { pduMainIndex }
+	::= { pduMainTable 1 }
+
+PduMainEntry ::= SEQUENCE {
+	pduMainIndex				Integer32,
+	pduMainSerial				DisplayString,
+	pduMainName				SnmpAdminString,
+	pduMainLabel				SnmpAdminString,
+	pduMainAvail				Gauge32,
+	pduMeterType				INTEGER,
+	pduTotalName				SnmpAdminString,
+	pduTotalLabel				SnmpAdminString,
+	pduTotalRealPower				Gauge32,
+	pduTotalApparentPower				Gauge32,
+	pduTotalPowerFactor				Gauge32,
+	pduTotalEnergy				Gauge32
+}
+
+pduMainIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduMainEntry 1 }
+
+pduMainSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { pduMainEntry 2 }
+
+pduMainName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU name (factory-assigned)"
+	::= { pduMainEntry 3 }
+
+pduMainLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"PDU label (user-defined)"
+	::= { pduMainEntry 4 }
+
+pduMainAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { pduMainEntry 5 }
+
+pduMeterType OBJECT-TYPE
+	SYNTAX INTEGER {
+			wye(0),
+			delta(1)
+			}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current meter type:
+		0 = Wye
+		1 = Delta"
+	::= { pduMainEntry 6 }
+
+pduTotalName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total name (factory-assigned)"
+	::= { pduMainEntry 7 }
+
+pduTotalLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Total label (user-defined)"
+	::= { pduMainEntry 8 }
+
+pduTotalRealPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "watts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU total real power"
+	::= { pduMainEntry 9 }
+
+pduTotalApparentPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "volt-amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU total apparent power"
+	::= { pduMainEntry 10 }
+
+pduTotalPowerFactor OBJECT-TYPE
+	SYNTAX Gauge32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU total power factor"
+	::= { pduMainEntry 11 }
+
+pduTotalEnergy OBJECT-TYPE
+	SYNTAX Gauge32(0..9999000)
+	UNITS "watt-hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU total accumulated energy in watt-hours"
+	::= { pduMainEntry 12 }
+
+--###########################################################################################--
+--pduPhaseTable--
+--###########################################################################################--
+
+pduPhaseTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduPhaseEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"PDU phases information"
+	::= { pdu 2 }
+
+pduPhaseEntry OBJECT-TYPE
+	SYNTAX PduPhaseEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduPhaseTable table: each entry contains an index
+		and other sensor details"
+	INDEX { pduPhaseIndex }
+	::= { pduPhaseTable 1 }
+
+PduPhaseEntry ::= SEQUENCE {
+	pduPhaseIndex				Integer32,
+	pduPhaseName				SnmpAdminString,
+	pduPhaseLabel				SnmpAdminString,
+	pduPhaseVoltage				Gauge32,
+	pduPhaseCurrent				Gauge32,
+	pduPhaseRealPower				Gauge32,
+	pduPhaseApparentPower				Gauge32,
+	pduPhasePowerFactor				Gauge32,
+	pduPhaseEnergy				Gauge32,
+	pduPhaseBalance				Gauge32,
+	pduPhaseCurrentCrestFactor				Gauge32
+}
+
+pduPhaseIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduPhaseEntry 1 }
+
+pduPhaseName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU phase name (factory-assigned)"
+	::= { pduPhaseEntry 2 }
+
+pduPhaseLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"PDU phase label (user-defined)"
+	::= { pduPhaseEntry 3 }
+
+pduPhaseVoltage OBJECT-TYPE
+	SYNTAX Gauge32(0..3100)
+	UNITS "decivolts (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU phase voltage in tenths of a volt"
+	::= { pduPhaseEntry 4 }
+
+pduPhaseCurrent OBJECT-TYPE
+	SYNTAX Gauge32(0..9900)
+	UNITS "centiamps (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU phase current reading in hundredths of an amp"
+	::= { pduPhaseEntry 8 }
+
+pduPhaseRealPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "watts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Real power for phase in watts"
+	::= { pduPhaseEntry 12 }
+
+pduPhaseApparentPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "volt-amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Apparent power for phase in volt-amps"
+	::= { pduPhaseEntry 13 }
+
+pduPhasePowerFactor OBJECT-TYPE
+	SYNTAX Gauge32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power factor for phase"
+	::= { pduPhaseEntry 14 }
+
+pduPhaseEnergy OBJECT-TYPE
+	SYNTAX Gauge32(0..9999000)
+	UNITS "watt-hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Accumulated energy for phase in watt-hours"
+	::= { pduPhaseEntry 15 }
+
+pduPhaseBalance OBJECT-TYPE
+	SYNTAX Gauge32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Phase balance as percent"
+	::= { pduPhaseEntry 17 }
+
+pduPhaseCurrentCrestFactor OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current crest factor for phase, in hundredths"
+	::= { pduPhaseEntry 19 }
+
+--###########################################################################################--
+--pduBreakerTable--
+--###########################################################################################--
+
+pduBreakerTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduBreakerEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"PDU breaker information"
+	::= { pdu 3 }
+
+pduBreakerEntry OBJECT-TYPE
+	SYNTAX PduBreakerEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduBreakerTable table: each entry contains an index
+		and other sensor details"
+	INDEX { pduBreakerIndex }
+	::= { pduBreakerTable 1 }
+
+PduBreakerEntry ::= SEQUENCE {
+	pduBreakerIndex				Integer32,
+	pduBreakerName				SnmpAdminString,
+	pduBreakerLabel				SnmpAdminString,
+	pduBreakerCurrent				Gauge32,
+	pduBreakerVoltage				Gauge32,
+	pduBreakerRealPower				Gauge32,
+	pduBreakerApparentPower				Gauge32,
+	pduBreakerPowerFactor				Gauge32,
+	pduBreakerEnergy				Gauge32
+}
+
+pduBreakerIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduBreakerEntry 1 }
+
+pduBreakerName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU breaker name (factory-assigned)"
+	::= { pduBreakerEntry 2 }
+
+pduBreakerLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"PDU breaker label (user-defined)"
+	::= { pduBreakerEntry 3 }
+
+pduBreakerCurrent OBJECT-TYPE
+	SYNTAX Gauge32(0..9900)
+	UNITS "centiamps (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU breaker current reading in hundredths of an amp"
+	::= { pduBreakerEntry 4 }
+
+pduBreakerVoltage OBJECT-TYPE
+	SYNTAX Gauge32(0..3100)
+	UNITS "decivolts (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU breaker voltage in tenths of a volt. This object may not exist on
+		all platforms, due to hardware differences."
+	::= { pduBreakerEntry 8 }
+
+pduBreakerRealPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "watts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Real power for breaker in watts. This object may not exist on all
+		platforms, due to hardware differences."
+	::= { pduBreakerEntry 12 }
+
+pduBreakerApparentPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "volt-amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Apparent power for breaker in volt-amps. This object may not exist on
+		all platforms, due to hardware differences."
+	::= { pduBreakerEntry 13 }
+
+pduBreakerPowerFactor OBJECT-TYPE
+	SYNTAX Gauge32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power factor for breaker. This object may not exist on all platforms,
+		due to hardware differences."
+	::= { pduBreakerEntry 14 }
+
+pduBreakerEnergy OBJECT-TYPE
+	SYNTAX Gauge32(0..9999000)
+	UNITS "watt-hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Accumulated energy for breaker in watt-hours. This object may not
+		exist on all platforms, due to hardware differences."
+	::= { pduBreakerEntry 15 }
+
+--###########################################################################################--
+--pduLineTable--
+--###########################################################################################--
+
+pduLineTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduLineEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"PDU line current information"
+	::= { pdu 4 }
+
+pduLineEntry OBJECT-TYPE
+	SYNTAX PduLineEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduLineTable table: each entry contains an index
+		and other sensor details"
+	INDEX { pduLineIndex }
+	::= { pduLineTable 1 }
+
+PduLineEntry ::= SEQUENCE {
+	pduLineIndex				Integer32,
+	pduLineName				SnmpAdminString,
+	pduLineLabel				SnmpAdminString,
+	pduLineCurrent				Gauge32
+}
+
+pduLineIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduLineEntry 1 }
+
+pduLineName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU line name (factory-assigned)"
+	::= { pduLineEntry 2 }
+
+pduLineLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"PDU line label (user-defined)"
+	::= { pduLineEntry 3 }
+
+pduLineCurrent OBJECT-TYPE
+	SYNTAX Gauge32(0..9900)
+	UNITS "centiamps (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU line current reading in hundredths of an amp"
+	::= { pduLineEntry 4 }
+
+--###########################################################################################--
+--pduOutletSwitchTable--
+--###########################################################################################--
+
+pduOutletSwitchTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletSwitchEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Data, config and control for outlets with switching"
+	::= { pdu 5 }
+
+pduOutletSwitchEntry OBJECT-TYPE
+	SYNTAX PduOutletSwitchEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduOutletSwitchTable table: each entry contains an index
+		and other sensor details"
+	INDEX { pduOutletSwitchIndex }
+	::= { pduOutletSwitchTable 1 }
+
+PduOutletSwitchEntry ::= SEQUENCE {
+	pduOutletSwitchIndex				Integer32,
+	pduOutletSwitchName				SnmpAdminString,
+	pduOutletSwitchLabel				SnmpAdminString,
+	pduOutletSwitchState				INTEGER,
+	pduOutletSwitchRelayFailure				TruthValue,
+	pduOutletSwitchControl				INTEGER,
+	pduOutletSwitchTimeToAction				Integer32,
+	pduOutletSwitchOnDelay				Integer32,
+	pduOutletSwitchOffDelay				Integer32,
+	pduOutletSwitchRebootDelay				Integer32,
+	pduOutletSwitchRebootHoldDelay				Integer32,
+	pduOutletSwitchPoaAction				INTEGER,
+	pduOutletSwitchPoaDelay				Integer32
+}
+
+pduOutletSwitchIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduOutletSwitchEntry 1 }
+
+pduOutletSwitchName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU outlet name (factory-assigned)"
+	::= { pduOutletSwitchEntry 2 }
+
+pduOutletSwitchLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"PDU outlet label (user-defined)"
+	::= { pduOutletSwitchEntry 3 }
+
+pduOutletSwitchState OBJECT-TYPE
+	SYNTAX INTEGER {
+			on(1),
+			off(2),
+			on2off(3),
+			off2on(4),
+			rebootOn(5),
+			rebootOff(6),
+			unavailable(7)
+			}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Switch state of the outlet:
+		1 = Outlet is on
+		2 = Outlet is off
+		3 = Outlet is on, but will turn off after a delay
+		4 = Outlet is off, but will turn on after a delay
+		5 = Starting reboot cycle, outlet is on, but will go to the
+		rebootOff(6) state after a delay
+		6 = Rebooting, outlet is off, but it will turn on after a delay
+		7 = Cannot get outlet state"
+	::= { pduOutletSwitchEntry 4 }
+
+pduOutletSwitchRelayFailure OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Tells if the outlet relay has failed. In normal operation, the value
+		will be false(2)."
+	::= { pduOutletSwitchEntry 5 }
+
+pduOutletSwitchControl OBJECT-TYPE
+	SYNTAX INTEGER {
+			cancel(1),
+			on(2),
+			onAfterDelay(3),
+			off(4),
+			offAfterDelay(5),
+			reboot(6),
+			rebootAfterDelay(7),
+			none(8)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Used for manual control of the outlet. If the outlet is in manual
+		mode, this field can be set to one of the following values:
+		1 = Cancel pending operation
+		2 = Turn outlet on
+		3 = After delay (pduOutletSwitchOnDelay), turn outlet on
+		4 = Turn outlet off
+		5 = After delay (pduOutletSwitchOffDelay), turn outlet off
+		6 = Reboot: turn off, delay (pduOutletSwitchRebootHoldDelay), turn
+		outlet back on
+		7 = After delay (pduOutletSwitchRebootDelay), reboot outlet
+		When not in manual mode, setting this field will give an
+		inconsistentValue error. Returns none(8) for all get requests."
+	::= { pduOutletSwitchEntry 6 }
+
+pduOutletSwitchTimeToAction OBJECT-TYPE
+	SYNTAX Integer32(0..600)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Seconds until an outlet state change. The value of
+		pduOutletSwitchState tells what state the outlet will be set, after
+		the delay."
+	::= { pduOutletSwitchEntry 7 }
+
+pduOutletSwitchOnDelay OBJECT-TYPE
+	SYNTAX Integer32(0..600)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Seconds to wait before powering on the outlet, during onAfterDelay(3)
+		operation. Changing this value has no effect on pending actions."
+	::= { pduOutletSwitchEntry 8 }
+
+pduOutletSwitchOffDelay OBJECT-TYPE
+	SYNTAX Integer32(0..600)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Seconds to wait before powering off the outlet, during
+		offAfterDelay(5) operation. Changing this value has no effect on
+		pending actions."
+	::= { pduOutletSwitchEntry 9 }
+
+pduOutletSwitchRebootDelay OBJECT-TYPE
+	SYNTAX Integer32(0..600)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Seconds to wait before powering off the outlet, during
+		rebootAfterDelay(7) operation. Changing this value has no effect on
+		pending actions. See pduOutletSwitchControl for more info."
+	::= { pduOutletSwitchEntry 10 }
+
+pduOutletSwitchRebootHoldDelay OBJECT-TYPE
+	SYNTAX Integer32(0..600)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Seconds to hold the outlet off, before powering on the outlet, during
+		rebootAfterDelay(7) operation. Changing this value has no effect on
+		pending actions. See pduOutletSwitchControl for more info."
+	::= { pduOutletSwitchEntry 11 }
+
+pduOutletSwitchPoaAction OBJECT-TYPE
+	SYNTAX INTEGER {
+			on(1),
+			off(2),
+			last(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The outlet is set to this state during power-up. The action can be
+		have one the following values:
+		1 = Outlet will be turned on
+		2 = Outlet will stay off
+		3 = Outlet will be set to last known state"
+	::= { pduOutletSwitchEntry 12 }
+
+pduOutletSwitchPoaDelay OBJECT-TYPE
+	SYNTAX Integer32(0..600)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Seconds to wait before setting the outlet to the
+		pduOutletSwitchPoaAction state. The delay starts at power-up."
+	::= { pduOutletSwitchEntry 13 }
+
+--###########################################################################################--
+--pduOutletMeterTable--
+--###########################################################################################--
+
+pduOutletMeterTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletMeterEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Metering data for outlets that support this feature"
+	::= { pdu 6 }
+
+pduOutletMeterEntry OBJECT-TYPE
+	SYNTAX PduOutletMeterEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduOutletMeterTable table: each entry contains an index
+		and other sensor details"
+	INDEX { pduOutletMeterIndex }
+	::= { pduOutletMeterTable 1 }
+
+PduOutletMeterEntry ::= SEQUENCE {
+	pduOutletMeterIndex				Integer32,
+	pduOutletMeterName				SnmpAdminString,
+	pduOutletMeterLabel				SnmpAdminString,
+	pduOutletMeterVoltage				Gauge32,
+	pduOutletMeterCurrent				Gauge32,
+	pduOutletMeterRealPower				Gauge32,
+	pduOutletMeterApparentPower				Gauge32,
+	pduOutletMeterPowerFactor				Gauge32,
+	pduOutletMeterEnergy				Gauge32,
+	pduOutletMeterReset				INTEGER,
+	pduOutletCurrentCrestFactor				Gauge32
+}
+
+pduOutletMeterIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduOutletMeterEntry 1 }
+
+pduOutletMeterName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU outlet name (factory-assigned)"
+	::= { pduOutletMeterEntry 2 }
+
+pduOutletMeterLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"PDU outlet label (user-defined)"
+	::= { pduOutletMeterEntry 3 }
+
+pduOutletMeterVoltage OBJECT-TYPE
+	SYNTAX Gauge32(0..3100)
+	UNITS "decivolts (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU outlet voltage in tenths of a volt"
+	::= { pduOutletMeterEntry 4 }
+
+pduOutletMeterCurrent OBJECT-TYPE
+	SYNTAX Gauge32(0..9900)
+	UNITS "centiamps (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU outlet current reading in hundredths of an amp"
+	::= { pduOutletMeterEntry 8 }
+
+pduOutletMeterRealPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "watts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Real power for outlet in watts"
+	::= { pduOutletMeterEntry 12 }
+
+pduOutletMeterApparentPower OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	UNITS "volt-amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Apparent power for outlet in volt-amps"
+	::= { pduOutletMeterEntry 13 }
+
+pduOutletMeterPowerFactor OBJECT-TYPE
+	SYNTAX Gauge32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power factor for outlet"
+	::= { pduOutletMeterEntry 14 }
+
+pduOutletMeterEnergy OBJECT-TYPE
+	SYNTAX Gauge32(0..9999000)
+	UNITS "watt-hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Accumulated energy for outlet in watt-hours"
+	::= { pduOutletMeterEntry 15 }
+
+pduOutletMeterReset OBJECT-TYPE
+	SYNTAX INTEGER {
+			resetEnergy(1),
+			none(8)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Used to reset energy. If read, the value is none(8). It can be set to
+		resetEnergy(1), which sets outlet energy to 0"
+	::= { pduOutletMeterEntry 16 }
+
+pduOutletCurrentCrestFactor OBJECT-TYPE
+	SYNTAX Gauge32(0..9999)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current crest factor for outlet, in hundredths"
+	::= { pduOutletMeterEntry 19 }
+
+--###########################################################################################--
+--tempSensorTable--
+--###########################################################################################--
+
+tempSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF TempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Remote Temperature (RT) sensor"
+	::= { imd 4 }
+
+tempSensorEntry OBJECT-TYPE
+	SYNTAX TempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the tempSensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { tempSensorIndex }
+	::= { tempSensorTable 1 }
+
+TempSensorEntry ::= SEQUENCE {
+	tempSensorIndex				Integer32,
+	tempSensorSerial				DisplayString,
+	tempSensorLabel				SnmpAdminString,
+	tempSensorAvail				Gauge32,
+	tempSensorTemp				Integer32
+}
+
+tempSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { tempSensorEntry 1 }
+
+tempSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { tempSensorEntry 2 }
+
+tempSensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { tempSensorEntry 3 }
+
+tempSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { tempSensorEntry 4 }
+
+tempSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Temperature in tenths of a degree. Units are given by temperatureUnits
+		field in deviceInfo."
+	::= { tempSensorEntry 5 }
+
+--###########################################################################################--
+--airFlowSensorTable--
+--###########################################################################################--
+
+airFlowSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AirFlowSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Remote Airflow, Humidity, Temperature and Dewpoint (AFHT3) Sensor"
+	::= { imd 5 }
+
+airFlowSensorEntry OBJECT-TYPE
+	SYNTAX AirFlowSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the airFlowSensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { airFlowSensorIndex }
+	::= { airFlowSensorTable 1 }
+
+AirFlowSensorEntry ::= SEQUENCE {
+	airFlowSensorIndex				Integer32,
+	airFlowSensorSerial				DisplayString,
+	airFlowSensorLabel				SnmpAdminString,
+	airFlowSensorAvail				Gauge32,
+	airFlowSensorTemp				Integer32,
+	airFlowSensorFlow				Integer32,
+	airFlowSensorHumidity				Integer32,
+	airFlowSensorDewPoint				Integer32
+}
+
+airFlowSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { airFlowSensorEntry 1 }
+
+airFlowSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { airFlowSensorEntry 2 }
+
+airFlowSensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { airFlowSensorEntry 3 }
+
+airFlowSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { airFlowSensorEntry 4 }
+
+airFlowSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Temperature reading in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { airFlowSensorEntry 5 }
+
+airFlowSensorFlow OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Airflow reading. Still air will be less than 20, while rushing air
+		will be around 100."
+	::= { airFlowSensorEntry 6 }
+
+airFlowSensorHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Humidity reading"
+	::= { airFlowSensorEntry 7 }
+
+airFlowSensorDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Dewpoint reading in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { airFlowSensorEntry 8 }
+
+--###########################################################################################--
+--t3hdSensorTable--
+--###########################################################################################--
+
+t3hdSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF T3hdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Remote Temperature x 3, Humidity and Dewpoint Sensor"
+	::= { imd 8 }
+
+t3hdSensorEntry OBJECT-TYPE
+	SYNTAX T3hdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the t3hdSensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { t3hdSensorIndex }
+	::= { t3hdSensorTable 1 }
+
+T3hdSensorEntry ::= SEQUENCE {
+	t3hdSensorIndex				Integer32,
+	t3hdSensorSerial				DisplayString,
+	t3hdSensorLabel				SnmpAdminString,
+	t3hdSensorAvail				Gauge32,
+	t3hdSensorIntLabel				SnmpAdminString,
+	t3hdSensorIntTemp				Integer32,
+	t3hdSensorIntHumidity				Integer32,
+	t3hdSensorIntDewPoint				Integer32,
+	t3hdSensorExtAAvail				Gauge32,
+	t3hdSensorExtALabel				SnmpAdminString,
+	t3hdSensorExtATemp				Integer32,
+	t3hdSensorExtBAvail				Gauge32,
+	t3hdSensorExtBLabel				SnmpAdminString,
+	t3hdSensorExtBTemp				Integer32
+}
+
+t3hdSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { t3hdSensorEntry 1 }
+
+t3hdSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { t3hdSensorEntry 2 }
+
+t3hdSensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { t3hdSensorEntry 3 }
+
+t3hdSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { t3hdSensorEntry 4 }
+
+t3hdSensorIntLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Internal label (user-defined)"
+	::= { t3hdSensorEntry 5 }
+
+t3hdSensorIntTemp OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Internal temperature in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { t3hdSensorEntry 6 }
+
+t3hdSensorIntHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Internal humidity"
+	::= { t3hdSensorEntry 7 }
+
+t3hdSensorIntDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Internal dewpoint in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { t3hdSensorEntry 8 }
+
+t3hdSensorExtAAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"External A status:
+		0 = Unavailable
+		1 = Available"
+	::= { t3hdSensorEntry 9 }
+
+t3hdSensorExtALabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"External A label (user-defined)"
+	::= { t3hdSensorEntry 10 }
+
+t3hdSensorExtATemp OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"External A temperature in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { t3hdSensorEntry 11 }
+
+t3hdSensorExtBAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"External B status:
+		0 = Unavailable
+		1 = Available"
+	::= { t3hdSensorEntry 12 }
+
+t3hdSensorExtBLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"External B label (user-defined)"
+	::= { t3hdSensorEntry 13 }
+
+t3hdSensorExtBTemp OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"External B temperature in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { t3hdSensorEntry 14 }
+
+--###########################################################################################--
+--thdSensorTable--
+--###########################################################################################--
+
+thdSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ThdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Remote Temperature, Humidity, and Dewpoint (THD) Sensor"
+	::= { imd 9 }
+
+thdSensorEntry OBJECT-TYPE
+	SYNTAX ThdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the thdSensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { thdSensorIndex }
+	::= { thdSensorTable 1 }
+
+ThdSensorEntry ::= SEQUENCE {
+	thdSensorIndex				Integer32,
+	thdSensorSerial				DisplayString,
+	thdSensorLabel				SnmpAdminString,
+	thdSensorAvail				Gauge32,
+	thdSensorTemp				Integer32,
+	thdSensorHumidity				Integer32,
+	thdSensorDewPoint				Integer32
+}
+
+thdSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { thdSensorEntry 1 }
+
+thdSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { thdSensorEntry 2 }
+
+thdSensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { thdSensorEntry 3 }
+
+thdSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { thdSensorEntry 4 }
+
+thdSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Temperature value in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { thdSensorEntry 5 }
+
+thdSensorHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Humidity value"
+	::= { thdSensorEntry 6 }
+
+thdSensorDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-400..2540)
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Dewpoint value in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { thdSensorEntry 7 }
+
+--###########################################################################################--
+--a2dSensorTable--
+--###########################################################################################--
+
+a2dSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF A2dSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Analog measurement (A2D) sensor (voltage, current, or dry-contact)"
+	::= { imd 11 }
+
+a2dSensorEntry OBJECT-TYPE
+	SYNTAX A2dSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the a2dSensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { a2dSensorIndex }
+	::= { a2dSensorTable 1 }
+
+A2dSensorEntry ::= SEQUENCE {
+	a2dSensorIndex				Integer32,
+	a2dSensorSerial				DisplayString,
+	a2dSensorLabel				SnmpAdminString,
+	a2dSensorAvail				Gauge32,
+	a2dSensorValue				Integer32,
+	a2dSensorDisplayValue				SnmpAdminString,
+	a2dSensorMode				INTEGER,
+	a2dSensorUnits				SnmpAdminString,
+	a2dSensorMin				Integer32,
+	a2dSensorMax				Integer32,
+	a2dSensorLowLabel				SnmpAdminString,
+	a2dSensorHighLabel				SnmpAdminString,
+	a2dSensorAnalogLabel				SnmpAdminString
+}
+
+a2dSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { a2dSensorEntry 1 }
+
+a2dSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { a2dSensorEntry 2 }
+
+a2dSensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { a2dSensorEntry 3 }
+
+a2dSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { a2dSensorEntry 4 }
+
+a2dSensorValue OBJECT-TYPE
+	SYNTAX Integer32(-1000000..1000000)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Analog measurement value, within either a user-defined or preset
+		range, depending on a2dSensorMode."
+	::= { a2dSensorEntry 5 }
+
+a2dSensorDisplayValue OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"For current/voltage modes, the analog value is given as a string. In
+		binary modes, the value is either a2dSensorLowLabel or
+		a2dSensorHighLabel, based on a2dSensorValue."
+	::= { a2dSensorEntry 6 }
+
+a2dSensorMode OBJECT-TYPE
+	SYNTAX INTEGER {
+			door(1),
+			powerFailure(2),
+			flood(3),
+			wscLeak(4),
+			wscFault(5),
+			smoke(6),
+			ivsNegGnd(7),
+			ivsPosGnd(8),
+			customVoltage(9),
+			customBinary(10),
+			customCurrent(11)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Binary modes have two states represented by the values 0 (low) or 1
+		(high). These correspond to a2dSensorLowLabel and a2dSensorHighLabel.
+		Current and voltage modes provide a scaled value from a2dSensorMin to
+		a2dSensorMax.
+		Analog modes:
+		1 = Door (binary)
+		2 = Power failure (binary)
+		3 = Flood (binary)
+		4 = Water-sensing cable leak (binary)
+		5 = Water-sensing cable fault (binary)
+		6 = Smoke alarm (binary)
+		7 = Isolated voltage negative ground (voltage)
+		8 = Isolated voltage positive ground (voltage)
+		9 = Custom voltage (voltage)
+		10 = Custom binary (binary)
+		11 = Custom current (current)"
+	::= { a2dSensorEntry 7 }
+
+a2dSensorUnits OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..7))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The units for the analog value. If a2dSensorMode is customVoltage(9)
+		or customCurrent(11), then this field has a user-defined value.
+		Otherwise, the value is fixed, based on mode."
+	::= { a2dSensorEntry 8 }
+
+a2dSensorMin OBJECT-TYPE
+	SYNTAX Integer32(-1000000..1000000)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Minimum analog value, given as an integer. The analog measurement is
+		scaled to the range a2dSensorMin to a2dSensorMax. If a2dSensorMode is
+		customVoltage(9) or customCurrent(11), then this field has a user-
+		defined value. Otherwise, the value is fixed, based on mode."
+	::= { a2dSensorEntry 9 }
+
+a2dSensorMax OBJECT-TYPE
+	SYNTAX Integer32(-1000000..1000000)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Maximum analog value, given as an integer. The analog measurement is
+		scaled to the range a2dSensorMin to a2dSensorMax. If a2dSensorMode is
+		customVoltage(9) or customCurrent(11), then this field has a user-
+		defined value. Otherwise, the value is fixed, based on mode."
+	::= { a2dSensorEntry 10 }
+
+a2dSensorLowLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Label for 0 (low) binary value. This field is only applicable if
+		a2dSensorMode is one of the binary modes. If a2dSensorMode is
+		customBinary(10), then this field is user-defined. Otherwise, it has a
+		pre-defined value based on the mode."
+	::= { a2dSensorEntry 11 }
+
+a2dSensorHighLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Label for 1 (high) binary value. The field is only applicable if
+		a2dSensorMode is one of the binary modes. If a2dSensorMode is
+		customBinary(10), then this field is user-defined. Otherwise, it has a
+		pre-defined value based on the mode."
+	::= { a2dSensorEntry 12 }
+
+a2dSensorAnalogLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Label for the analog measurement"
+	::= { a2dSensorEntry 13 }
+
+--###########################################################################################--
+--humiditySensorTable--
+--###########################################################################################--
+
+humiditySensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HumiditySensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Remote humidity sensor"
+	::= { imd 12 }
+
+humiditySensorEntry OBJECT-TYPE
+	SYNTAX HumiditySensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the humiditySensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { humiditySensorIndex }
+	::= { humiditySensorTable 1 }
+
+HumiditySensorEntry ::= SEQUENCE {
+	humiditySensorIndex				Integer32,
+	humiditySensorSerial				DisplayString,
+	humiditySensorLabel				SnmpAdminString,
+	humiditySensorAvail				Gauge32,
+	humiditySensorValue				Integer32
+}
+
+humiditySensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { humiditySensorEntry 1 }
+
+humiditySensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { humiditySensorEntry 2 }
+
+humiditySensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { humiditySensorEntry 3 }
+
+humiditySensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { humiditySensorEntry 4 }
+
+humiditySensorValue OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Humidity value"
+	::= { humiditySensorEntry 5 }
+
+--###########################################################################################--
+--sn2dSensorTable--
+--###########################################################################################--
+
+sn2dSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Sn2dSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"2 Door Switch Sensor (SN-2D)"
+	::= { imd 13 }
+
+sn2dSensorEntry OBJECT-TYPE
+	SYNTAX Sn2dSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the sn2dSensorTable table: each entry contains an index
+		and other sensor details"
+	INDEX { sn2dSensorIndex }
+	::= { sn2dSensorTable 1 }
+
+Sn2dSensorEntry ::= SEQUENCE {
+	sn2dSensorIndex				Integer32,
+	sn2dSensorSerial				DisplayString,
+	sn2dSensorLabel				SnmpAdminString,
+	sn2dSensorAvail				Gauge32,
+	sn2dSensorDoor1Label				SnmpAdminString,
+	sn2dSensorDoor1State				INTEGER,
+	sn2dSensorDoor1DisplayState				SnmpAdminString,
+	sn2dSensorDoor2Label				SnmpAdminString,
+	sn2dSensorDoor2State				INTEGER,
+	sn2dSensorDoor2DisplayState				SnmpAdminString
+}
+
+sn2dSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { sn2dSensorEntry 1 }
+
+sn2dSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { sn2dSensorEntry 2 }
+
+sn2dSensorLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"User-defined label"
+	::= { sn2dSensorEntry 3 }
+
+sn2dSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { sn2dSensorEntry 4 }
+
+sn2dSensorDoor1Label OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Door switch 1 label"
+	::= { sn2dSensorEntry 5 }
+
+sn2dSensorDoor1State OBJECT-TYPE
+	SYNTAX INTEGER {
+			open(1),
+			closed(2)
+			}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Door switch 1 state:
+		1 = open
+		2 = closed"
+	::= { sn2dSensorEntry 6 }
+
+sn2dSensorDoor1DisplayState OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Door switch 1 state given as a string"
+	::= { sn2dSensorEntry 7 }
+
+sn2dSensorDoor2Label OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Door switch 2 label"
+	::= { sn2dSensorEntry 8 }
+
+sn2dSensorDoor2State OBJECT-TYPE
+	SYNTAX INTEGER {
+			open(1),
+			closed(2)
+			}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Door switch 2 state:
+		1 = open
+		2 = closed"
+	::= { sn2dSensorEntry 9 }
+
+sn2dSensorDoor2DisplayState OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Door switch 2 state given as a string"
+	::= { sn2dSensorEntry 10 }
+
+--###########################################################################################--
+--cooling--
+--###########################################################################################--
+
+cooling OBJECT IDENTIFIER ::= { imd 30 }
+
+--###########################################################################################--
+--vrc--
+--###########################################################################################--
+
+vrc OBJECT IDENTIFIER ::= { cooling 1 }
+
+--###########################################################################################--
+--vrcMainTable--
+--###########################################################################################--
+
+vrcMainTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcMainEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains general VRC information"
+	::= { vrc 1 }
+
+vrcMainEntry OBJECT-TYPE
+	SYNTAX VrcMainEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcMainTable: each entry represents a VRC device"
+	INDEX { vrcMainIndex }
+	::= { vrcMainTable 1 }
+
+VrcMainEntry ::= SEQUENCE {
+	vrcMainIndex				Integer32,
+	vrcMainSerial				DisplayString,
+	vrcMainName				SnmpAdminString,
+	vrcMainLabel				SnmpAdminString,
+	vrcMainAvail				Gauge32
+}
+
+vrcMainIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcMainEntry 1 }
+
+vrcMainSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial number"
+	::= { vrcMainEntry 2 }
+
+vrcMainName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"VRC name (factory-assigned)"
+	::= { vrcMainEntry 3 }
+
+vrcMainLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"VRC label (user-defined)"
+	::= { vrcMainEntry 4 }
+
+vrcMainAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Device availability:
+		0 = Unavailable
+		1 = Available
+		2 = Partially Unavailable"
+	::= { vrcMainEntry 5 }
+
+--###########################################################################################--
+--vrcMainPtTable--
+--###########################################################################################--
+
+vrcMainPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcMainPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains general VRC status"
+	::= { vrc 2 }
+
+vrcMainPtEntry OBJECT-TYPE
+	SYNTAX VrcMainPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcMainPtTable: each entry contains status data for a VRC
+		device"
+	INDEX { vrcMainPtIndex }
+	::= { vrcMainPtTable 1 }
+
+VrcMainPtEntry ::= SEQUENCE {
+	vrcMainPtIndex				Integer32,
+	vrcMainPtRunState				INTEGER,
+	vrcMainPtEevOpened				Integer32,
+	vrcMainPtAlarmNumbers				Integer32,
+	vrcMainPtHistoryAlarmNumbers				Integer32,
+	vrcMainPtHpAbnRecordCnt				Integer32,
+	vrcMainPtMonitorBaudrate				INTEGER,
+	vrcMainPtMonitorAddress				Integer32,
+	vrcMainPtLp				TruthValue,
+	vrcMainPtFilterMaintRemind				TruthValue,
+	vrcMainPtCoolingFlag				TruthValue,
+	vrcMainPtFirstOnFlag				TruthValue,
+	vrcMainPtNewAlarmFlag				TruthValue,
+	vrcMainPtComAlarmOutState				TruthValue,
+	vrcMainPtHighWaterInput				TruthValue,
+	vrcMainPtHighWaterAlarm				TruthValue,
+	vrcMainPtWaterUnderFloorAlarm				TruthValue,
+	vrcMainPtSwShutDownStatus				TruthValue,
+	vrcMainPtRemoteShutdown				TruthValue,
+	vrcMainPtRemoteShutDownFlag				TruthValue,
+	vrcMainPtRemoteShutDownAlarm				TruthValue,
+	vrcMainPtHmiShutDownFlag				TruthValue,
+	vrcMainPtLpAlarm				TruthValue,
+	vrcMainPtHpAlarm				TruthValue,
+	vrcMainPtLpFreqAlarm				TruthValue,
+	vrcMainPtHpFreqAlarm				TruthValue,
+	vrcMainPtLpSensorFailAlarm				TruthValue,
+	vrcMainPtHpSensorFailAlarm				TruthValue,
+	vrcMainPtEevCommFailAlarm				TruthValue
+}
+
+vrcMainPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcMainPtEntry 1 }
+
+vrcMainPtRunState OBJECT-TYPE
+	SYNTAX INTEGER {
+			on(1),
+			off(2)
+			}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"VRC run state:
+		1 = on
+		2 = off"
+	::= { vrcMainPtEntry 2 }
+
+vrcMainPtEevOpened OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Eev opened value (percent)"
+	::= { vrcMainPtEntry 3 }
+
+vrcMainPtAlarmNumbers OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Alarm numbers value"
+	::= { vrcMainPtEntry 4 }
+
+vrcMainPtHistoryAlarmNumbers OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"History alarm numbers value"
+	::= { vrcMainPtEntry 5 }
+
+vrcMainPtHpAbnRecordCnt OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Hp Abnormal record count"
+	::= { vrcMainPtEntry 6 }
+
+vrcMainPtMonitorBaudrate OBJECT-TYPE
+	SYNTAX INTEGER {
+			error(1),
+			baud1200(2),
+			baud2400(3),
+			baud4800(4),
+			baud9600(5),
+			baud19200(6)
+			}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Monitor baud rate:
+		1 = error
+		2 = 1200
+		3 = 2400
+		4 = 4800
+		5 = 9600
+		6 = 19200"
+	::= { vrcMainPtEntry 7 }
+
+vrcMainPtMonitorAddress OBJECT-TYPE
+	SYNTAX Integer32(1..247)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Monitor address"
+	::= { vrcMainPtEntry 8 }
+
+vrcMainPtLp OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Lp status"
+	::= { vrcMainPtEntry 9 }
+
+vrcMainPtFilterMaintRemind OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Filter maintenance reminder status"
+	::= { vrcMainPtEntry 10 }
+
+vrcMainPtCoolingFlag OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Cooling flag"
+	::= { vrcMainPtEntry 11 }
+
+vrcMainPtFirstOnFlag OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"First on flag"
+	::= { vrcMainPtEntry 12 }
+
+vrcMainPtNewAlarmFlag OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"New alarm flag"
+	::= { vrcMainPtEntry 13 }
+
+vrcMainPtComAlarmOutState OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Common alarm output state"
+	::= { vrcMainPtEntry 14 }
+
+vrcMainPtHighWaterInput OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"High water input"
+	::= { vrcMainPtEntry 15 }
+
+vrcMainPtHighWaterAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"High water alarm status"
+	::= { vrcMainPtEntry 16 }
+
+vrcMainPtWaterUnderFloorAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Water under floor alarm status"
+	::= { vrcMainPtEntry 17 }
+
+vrcMainPtSwShutDownStatus OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Software shutdown status"
+	::= { vrcMainPtEntry 18 }
+
+vrcMainPtRemoteShutdown OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Remote shutdown status"
+	::= { vrcMainPtEntry 19 }
+
+vrcMainPtRemoteShutDownFlag OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Remote shutdown flag"
+	::= { vrcMainPtEntry 20 }
+
+vrcMainPtRemoteShutDownAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Remote shutdown alarm status"
+	::= { vrcMainPtEntry 21 }
+
+vrcMainPtHmiShutDownFlag OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Hmi shutdown flag"
+	::= { vrcMainPtEntry 22 }
+
+vrcMainPtLpAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Low pressure alarm status"
+	::= { vrcMainPtEntry 23 }
+
+vrcMainPtHpAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"High pressure alarm status"
+	::= { vrcMainPtEntry 24 }
+
+vrcMainPtLpFreqAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Low pressure frequently alarm status"
+	::= { vrcMainPtEntry 25 }
+
+vrcMainPtHpFreqAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"High pressure frequently alarm status"
+	::= { vrcMainPtEntry 26 }
+
+vrcMainPtLpSensorFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Low pressure sensor failure alarm status"
+	::= { vrcMainPtEntry 27 }
+
+vrcMainPtHpSensorFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"High pressure sensor failure alarm status"
+	::= { vrcMainPtEntry 28 }
+
+vrcMainPtEevCommFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Eev communication failure alarm status"
+	::= { vrcMainPtEntry 29 }
+
+--###########################################################################################--
+--vrcMainCfgTable--
+--###########################################################################################--
+
+vrcMainCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcMainCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains general VRC configuration"
+	::= { vrc 3 }
+
+vrcMainCfgEntry OBJECT-TYPE
+	SYNTAX VrcMainCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcMainCfgTable: each entry contains general config
+		fields for a VRC device"
+	INDEX { vrcMainCfgIndex }
+	::= { vrcMainCfgTable 1 }
+
+VrcMainCfgEntry ::= SEQUENCE {
+	vrcMainCfgIndex				Integer32,
+	vrcMainCfgModelSelect				INTEGER,
+	vrcMainCfgSystemTimeYear				Integer32,
+	vrcMainCfgSystemTimeMonth				Integer32,
+	vrcMainCfgSystemTimeDay				Integer32,
+	vrcMainCfgSystemTimeHour				Integer32,
+	vrcMainCfgSystemTimeMin				Integer32,
+	vrcMainCfgSystemTimeSec				Integer32,
+	vrcMainCfgEevShtSettingMin				Integer32,
+	vrcMainCfgEevShtSettingMax				Integer32,
+	vrcMainCfgEevValveCloseSht				Integer32,
+	vrcMainCfgEevMopPressSetting				Integer32,
+	vrcMainCfgLpdt				Integer32,
+	vrcMainCfgDeadBand				Integer32,
+	vrcMainCfgOnOffSwitch				TruthValue,
+	vrcMainCfgVacuumState				TruthValue,
+	vrcMainCfgControlMode				INTEGER,
+	vrcMainCfgManualRunEnable				TruthValue,
+	vrcMainCfgRemShutdownInput				TruthValue,
+	vrcMainCfgMonitorShutDownFlag				TruthValue,
+	vrcMainCfgFirstOnPassword				Integer32,
+	vrcMainCfgFilterMaintSetting				TruthValue,
+	vrcMainCfgFilterMaintRemindTime				Integer32,
+	vrcMainCfgFilterMaintRemindCtrl				INTEGER,
+	vrcMainCfgCommonAlarmOutputDir				TruthValue,
+	vrcMainCfgHpAbnAlarmSetting				Integer32,
+	vrcMainCfgLpAlarmCtrl				INTEGER,
+	vrcMainCfgHpAlarmCtrl				INTEGER,
+	vrcMainCfgLpFreqAlarmCtrl				INTEGER,
+	vrcMainCfgHpFreqAlarmCtrl				INTEGER,
+	vrcMainCfgLpSensorFailAlarmCtrl				INTEGER,
+	vrcMainCfgHpSensorFailAlarmCtrl				INTEGER,
+	vrcMainCfgHighWaterAlarmCtrl				INTEGER,
+	vrcMainCfgRemShutdownAlarmCtrl				INTEGER,
+	vrcMainCfgEevCommFailAlarmCtrl				INTEGER
+}
+
+vrcMainCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcMainCfgEntry 1 }
+
+vrcMainCfgModelSelect OBJECT-TYPE
+	SYNTAX INTEGER {
+			tmLoc(1),
+			r035Ap(2),
+			r035Ak(3),
+			scLoc(4),
+			zeroULoc(5),
+			r035Ep(6),
+			r035Ek(7)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Model Selection:
+		1 = TMM-Local 220V 50/60HZ
+		2 = TMM-Global 208/230V 50/60HZ
+		3 = TMM-Global 120V 50/60HZ
+		4 = SC 220V 50/60HZ
+		5 = 0U 220V 50/60HZ
+		6 = SS 208/230V 50/60HZ
+		7 = SS 120V 50/60HZ"
+	::= { vrcMainCfgEntry 2 }
+
+vrcMainCfgSystemTimeYear OBJECT-TYPE
+	SYNTAX Integer32(2000..2099)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"System time - year"
+	::= { vrcMainCfgEntry 3 }
+
+vrcMainCfgSystemTimeMonth OBJECT-TYPE
+	SYNTAX Integer32(1..12)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"System time - month"
+	::= { vrcMainCfgEntry 4 }
+
+vrcMainCfgSystemTimeDay OBJECT-TYPE
+	SYNTAX Integer32(1..31)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"System time - day"
+	::= { vrcMainCfgEntry 5 }
+
+vrcMainCfgSystemTimeHour OBJECT-TYPE
+	SYNTAX Integer32(0..23)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"System time - hour"
+	::= { vrcMainCfgEntry 6 }
+
+vrcMainCfgSystemTimeMin OBJECT-TYPE
+	SYNTAX Integer32(0..59)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"System time - minutes"
+	::= { vrcMainCfgEntry 7 }
+
+vrcMainCfgSystemTimeSec OBJECT-TYPE
+	SYNTAX Integer32(0..59)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"System time - seconds"
+	::= { vrcMainCfgEntry 8 }
+
+vrcMainCfgEevShtSettingMin OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Min Eev sht in tenths of a degree. Units are given by temperatureUnits
+		field in deviceInfo. The settable range is determined by the current
+		temperature units.
+		Celsius:    50 to 200
+		Fahrenheit: 90 to 359"
+	::= { vrcMainCfgEntry 9 }
+
+vrcMainCfgEevShtSettingMax OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Max Eev sht in tenths of a degree. Units are given by temperatureUnits
+		field in deviceInfo. The settable range is determined by the current
+		temperature units.
+		Celsius:    50 to 200
+		Fahrenheit: 90 to 359"
+	::= { vrcMainCfgEntry 10 }
+
+vrcMainCfgEevValveCloseSht OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Eev valve close sht in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The settable range is determined
+		by the current temperature units.
+		Celsius:    0 to 100
+		Fahrenheit: 0 to 179"
+	::= { vrcMainCfgEntry 11 }
+
+vrcMainCfgEevMopPressSetting OBJECT-TYPE
+	SYNTAX Integer32(0..200)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Eev mop pressure setting in tenths of a bar."
+	::= { vrcMainCfgEntry 12 }
+
+vrcMainCfgLpdt OBJECT-TYPE
+	SYNTAX Integer32(30..600)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Low pressure dt in seconds"
+	::= { vrcMainCfgEntry 13 }
+
+vrcMainCfgDeadBand OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Dead band in tenths of a degree. Units are given by temperatureUnits
+		field in deviceInfo. The settable range is determined by the current
+		temperature units.
+		Celsius:    0 to 20
+		Fahrenheit: 0 to 35"
+	::= { vrcMainCfgEntry 14 }
+
+vrcMainCfgOnOffSwitch OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"On-off switch"
+	::= { vrcMainCfgEntry 15 }
+
+vrcMainCfgVacuumState OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Vacuum state"
+	::= { vrcMainCfgEntry 16 }
+
+vrcMainCfgControlMode OBJECT-TYPE
+	SYNTAX INTEGER {
+			supply(1),
+			return(2)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Control mode:
+		1 = supply
+		2 = return"
+	::= { vrcMainCfgEntry 17 }
+
+vrcMainCfgManualRunEnable OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Manual run enable"
+	::= { vrcMainCfgEntry 18 }
+
+vrcMainCfgRemShutdownInput OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Remote shutdown input"
+	::= { vrcMainCfgEntry 19 }
+
+vrcMainCfgMonitorShutDownFlag OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Monitor shutdown flag"
+	::= { vrcMainCfgEntry 20 }
+
+vrcMainCfgFirstOnPassword OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"First on password value"
+	::= { vrcMainCfgEntry 21 }
+
+vrcMainCfgFilterMaintSetting OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Filter maintenance setting"
+	::= { vrcMainCfgEntry 22 }
+
+vrcMainCfgFilterMaintRemindTime OBJECT-TYPE
+	SYNTAX Integer32(30..360)
+	UNITS "days"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Time between filter maintenance reminders in days"
+	::= { vrcMainCfgEntry 23 }
+
+vrcMainCfgFilterMaintRemindCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Filter maintenance reminder:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 24 }
+
+vrcMainCfgCommonAlarmOutputDir OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Common alarm output direction"
+	::= { vrcMainCfgEntry 25 }
+
+vrcMainCfgHpAbnAlarmSetting OBJECT-TYPE
+	SYNTAX Integer32(300..360)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Abnormal high pressure alarm value in tenths of a bar"
+	::= { vrcMainCfgEntry 26 }
+
+vrcMainCfgLpAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Low pressure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 27 }
+
+vrcMainCfgHpAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"High pressure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 28 }
+
+vrcMainCfgLpFreqAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Low pressure frequently alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 29 }
+
+vrcMainCfgHpFreqAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"High pressure frequently alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 30 }
+
+vrcMainCfgLpSensorFailAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Low pressure sensor failure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 31 }
+
+vrcMainCfgHpSensorFailAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"High pressure sensor failure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 32 }
+
+vrcMainCfgHighWaterAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"High water alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 33 }
+
+vrcMainCfgRemShutdownAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Remote shutdown alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 34 }
+
+vrcMainCfgEevCommFailAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Eev communication failure alarm:
+		2 = suspend
+		3 = open"
+	::= { vrcMainCfgEntry 35 }
+
+--###########################################################################################--
+--vrcOutFanPtTable--
+--###########################################################################################--
+
+vrcOutFanPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcOutFanPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC out-fan status"
+	::= { vrc 4 }
+
+vrcOutFanPtEntry OBJECT-TYPE
+	SYNTAX VrcOutFanPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcOutFanPtTable: each entry represents data for a VRC
+		out-fan"
+	INDEX { vrcOutFanPtIndex }
+	::= { vrcOutFanPtTable 1 }
+
+VrcOutFanPtEntry ::= SEQUENCE {
+	vrcOutFanPtIndex				Integer32,
+	vrcOutFanPtName				SnmpAdminString,
+	vrcOutFanPtSpeed				Integer32
+}
+
+vrcOutFanPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcOutFanPtEntry 1 }
+
+vrcOutFanPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Out-fan name (factory-assigned)"
+	::= { vrcOutFanPtEntry 2 }
+
+vrcOutFanPtSpeed OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Fan speed (percent)"
+	::= { vrcOutFanPtEntry 3 }
+
+--###########################################################################################--
+--vrcOutFanCfgTable--
+--###########################################################################################--
+
+vrcOutFanCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcOutFanCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC out-fan configuration"
+	::= { vrc 5 }
+
+vrcOutFanCfgEntry OBJECT-TYPE
+	SYNTAX VrcOutFanCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcOutFanCfgTable: each entry contains config fields for
+		a VRC out-fan"
+	INDEX { vrcOutFanCfgIndex }
+	::= { vrcOutFanCfgTable 1 }
+
+VrcOutFanCfgEntry ::= SEQUENCE {
+	vrcOutFanCfgIndex				Integer32,
+	vrcOutFanCfgStartPress				Integer32,
+	vrcOutFanCfgPressSetting				Integer32,
+	vrcOutFanCfgMinPowerVoltage				Integer32,
+	vrcOutFanCfgMaxPowerVoltage				Integer32,
+	vrcOutFanCfgSpeed				Integer32
+}
+
+vrcOutFanCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcOutFanCfgEntry 1 }
+
+vrcOutFanCfgStartPress OBJECT-TYPE
+	SYNTAX Integer32(190..250)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Out-fan start pressure in tenths of a bar"
+	::= { vrcOutFanCfgEntry 2 }
+
+vrcOutFanCfgPressSetting OBJECT-TYPE
+	SYNTAX Integer32(50..80)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Out-fan pressure setting in tenths of a bar"
+	::= { vrcOutFanCfgEntry 3 }
+
+vrcOutFanCfgMinPowerVoltage OBJECT-TYPE
+	SYNTAX Integer32(30..50)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Min out-fan voltage (percent)"
+	::= { vrcOutFanCfgEntry 4 }
+
+vrcOutFanCfgMaxPowerVoltage OBJECT-TYPE
+	SYNTAX Integer32(60..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Max out-fan voltage (percent)"
+	::= { vrcOutFanCfgEntry 5 }
+
+vrcOutFanCfgSpeed OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Out-fan speed  (percent)"
+	::= { vrcOutFanCfgEntry 6 }
+
+--###########################################################################################--
+--vrcInFanPtTable--
+--###########################################################################################--
+
+vrcInFanPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcInFanPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC in-fan status"
+	::= { vrc 6 }
+
+vrcInFanPtEntry OBJECT-TYPE
+	SYNTAX VrcInFanPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcInFanPtTable: each entry represents data for a VRC in-
+		fan"
+	INDEX { vrcInFanPtIndex }
+	::= { vrcInFanPtTable 1 }
+
+VrcInFanPtEntry ::= SEQUENCE {
+	vrcInFanPtIndex				Integer32,
+	vrcInFanPtName				SnmpAdminString,
+	vrcInFanPtRunTimeHours				Integer32,
+	vrcInFanPtStartStopCount				Integer32
+}
+
+vrcInFanPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcInFanPtEntry 1 }
+
+vrcInFanPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"In-fan name (factory-assigned)"
+	::= { vrcInFanPtEntry 2 }
+
+vrcInFanPtRunTimeHours OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	UNITS "hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"In-fan run time in hours"
+	::= { vrcInFanPtEntry 3 }
+
+vrcInFanPtStartStopCount OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"In-fan start/stop count"
+	::= { vrcInFanPtEntry 4 }
+
+--###########################################################################################--
+--vrcInFanCfgTable--
+--###########################################################################################--
+
+vrcInFanCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcInFanCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC in-fan configuration"
+	::= { vrc 7 }
+
+vrcInFanCfgEntry OBJECT-TYPE
+	SYNTAX VrcInFanCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcInFanCfgTable: each entry contains config fields for a
+		VRC in-fan"
+	INDEX { vrcInFanCfgIndex }
+	::= { vrcInFanCfgTable 1 }
+
+VrcInFanCfgEntry ::= SEQUENCE {
+	vrcInFanCfgIndex				Integer32,
+	vrcInFanCfgOutputStatus				TruthValue,
+	vrcInFanCfgLowSpeedStep				Integer32,
+	vrcInFanCfgHighSpeedStep				Integer32,
+	vrcInFanCfgMinSpeed				Integer32,
+	vrcInFanCfgStandardSpeed				Integer32,
+	vrcInFanCfgMinCfc				Integer32,
+	vrcInFanCfgStandardCfc				Integer32,
+	vrcInFanCfgStartDelay				Integer32,
+	vrcInFanCfgStopDelay				Integer32,
+	vrcInFanCfgReduceSpeedDelay				Integer32,
+	vrcInFanCfgJumpBand1				Integer32,
+	vrcInFanCfgJumpBand2				Integer32,
+	vrcInFanCfgJumpBand3				Integer32,
+	vrcInFanCfgJumpBand4				Integer32,
+	vrcInFanCfgJumpBand5				Integer32,
+	vrcInFanCfgJumpFreq1				Integer32,
+	vrcInFanCfgJumpFreq2				Integer32,
+	vrcInFanCfgJumpFreq3				Integer32,
+	vrcInFanCfgJumpFreq4				Integer32,
+	vrcInFanCfgJumpFreq5				Integer32,
+	vrcInFanCfgTempP				Integer32,
+	vrcInFanCfgTempI				Integer32,
+	vrcInFanCfgTempD				Integer32
+}
+
+vrcInFanCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcInFanCfgEntry 1 }
+
+vrcInFanCfgOutputStatus OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan output status"
+	::= { vrcInFanCfgEntry 2 }
+
+vrcInFanCfgLowSpeedStep OBJECT-TYPE
+	SYNTAX Integer32(1..20)
+	UNITS "0.1%/s"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan low speed step in tenths of a percent per second"
+	::= { vrcInFanCfgEntry 3 }
+
+vrcInFanCfgHighSpeedStep OBJECT-TYPE
+	SYNTAX Integer32(1..50)
+	UNITS "0.1%/s"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan high speed step in tenths of a percent per second"
+	::= { vrcInFanCfgEntry 4 }
+
+vrcInFanCfgMinSpeed OBJECT-TYPE
+	SYNTAX Integer32(30..80)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Min in-fan speed (percent)"
+	::= { vrcInFanCfgEntry 5 }
+
+vrcInFanCfgStandardSpeed OBJECT-TYPE
+	SYNTAX Integer32(80..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Standard in-fan speed (percent)"
+	::= { vrcInFanCfgEntry 6 }
+
+vrcInFanCfgMinCfc OBJECT-TYPE
+	SYNTAX Integer32(0..30)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Min in-fan cfc (percent)"
+	::= { vrcInFanCfgEntry 7 }
+
+vrcInFanCfgStandardCfc OBJECT-TYPE
+	SYNTAX Integer32(85..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Standard in-fan cfc (percent)"
+	::= { vrcInFanCfgEntry 8 }
+
+vrcInFanCfgStartDelay OBJECT-TYPE
+	SYNTAX Integer32(10..600)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan start delay in seconds"
+	::= { vrcInFanCfgEntry 9 }
+
+vrcInFanCfgStopDelay OBJECT-TYPE
+	SYNTAX Integer32(10..300)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan stop delay in seconds"
+	::= { vrcInFanCfgEntry 10 }
+
+vrcInFanCfgReduceSpeedDelay OBJECT-TYPE
+	SYNTAX Integer32(0..300)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan reduce speed delay in seconds"
+	::= { vrcInFanCfgEntry 11 }
+
+vrcInFanCfgJumpBand1 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump band 1 in tenths of a percent"
+	::= { vrcInFanCfgEntry 12 }
+
+vrcInFanCfgJumpBand2 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump band 2 in tenths of a percent"
+	::= { vrcInFanCfgEntry 13 }
+
+vrcInFanCfgJumpBand3 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump band 3 in tenths of a percent"
+	::= { vrcInFanCfgEntry 14 }
+
+vrcInFanCfgJumpBand4 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump band 4 in tenths of a percent"
+	::= { vrcInFanCfgEntry 15 }
+
+vrcInFanCfgJumpBand5 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump band 5 in tenths of a percent"
+	::= { vrcInFanCfgEntry 16 }
+
+vrcInFanCfgJumpFreq1 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump frequency 1 in tenths of a percent"
+	::= { vrcInFanCfgEntry 17 }
+
+vrcInFanCfgJumpFreq2 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump frequency 2 in tenths of a percent"
+	::= { vrcInFanCfgEntry 18 }
+
+vrcInFanCfgJumpFreq3 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump frequency 3 in tenths of a percent"
+	::= { vrcInFanCfgEntry 19 }
+
+vrcInFanCfgJumpFreq4 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump frequency 4 in tenths of a percent"
+	::= { vrcInFanCfgEntry 20 }
+
+vrcInFanCfgJumpFreq5 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan jump frequency 5 in tenths of a percent"
+	::= { vrcInFanCfgEntry 21 }
+
+vrcInFanCfgTempP OBJECT-TYPE
+	SYNTAX Integer32(10..150)
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan temperature P in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo."
+	::= { vrcInFanCfgEntry 22 }
+
+vrcInFanCfgTempI OBJECT-TYPE
+	SYNTAX Integer32(0..900)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan temperature I in seconds"
+	::= { vrcInFanCfgEntry 23 }
+
+vrcInFanCfgTempD OBJECT-TYPE
+	SYNTAX Integer32(0..900)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"In-fan temperature D in seconds"
+	::= { vrcInFanCfgEntry 24 }
+
+--###########################################################################################--
+--vrcCompPtTable--
+--###########################################################################################--
+
+vrcCompPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcCompPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC compressor status"
+	::= { vrc 8 }
+
+vrcCompPtEntry OBJECT-TYPE
+	SYNTAX VrcCompPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcCompPtTable: each entry represents data for a VRC
+		compressor"
+	INDEX { vrcCompPtIndex }
+	::= { vrcCompPtTable 1 }
+
+VrcCompPtEntry ::= SEQUENCE {
+	vrcCompPtIndex				Integer32,
+	vrcCompPtName				SnmpAdminString,
+	vrcCompPtCapacity				Integer32,
+	vrcCompPtRunTimeHours				Integer32,
+	vrcCompPtStartStopCount				Integer32,
+	vrcCompPtDriverFaultU00				TruthValue,
+	vrcCompPtDriverFaultU01				TruthValue,
+	vrcCompPtDriverFaultU02				TruthValue,
+	vrcCompPtDriverFaultU03				TruthValue,
+	vrcCompPtDriverFaultU04				TruthValue,
+	vrcCompPtDriverFaultU05				TruthValue,
+	vrcCompPtDriverFaultU06				TruthValue,
+	vrcCompPtDriverFaultU07				TruthValue,
+	vrcCompPtDriverFaultU08				TruthValue,
+	vrcCompPtDriverFaultU09				TruthValue,
+	vrcCompPtDriverFaultU10				TruthValue,
+	vrcCompPtDriverFaultU11				TruthValue,
+	vrcCompPtDriverFaultU12				TruthValue,
+	vrcCompPtDriverFaultU13				TruthValue,
+	vrcCompPtDriverFaultU14				TruthValue,
+	vrcCompPtDriverFaultU15				TruthValue,
+	vrcCompPtDriverCommFailAlarm				TruthValue,
+	vrcCompPtFaultLockAlarm				TruthValue
+}
+
+vrcCompPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcCompPtEntry 1 }
+
+vrcCompPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor name (factory-assigned)"
+	::= { vrcCompPtEntry 2 }
+
+vrcCompPtCapacity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor capacity value (percent)"
+	::= { vrcCompPtEntry 3 }
+
+vrcCompPtRunTimeHours OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	UNITS "hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor run time in hours"
+	::= { vrcCompPtEntry 4 }
+
+vrcCompPtStartStopCount OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor start/stop count"
+	::= { vrcCompPtEntry 5 }
+
+vrcCompPtDriverFaultU00 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U00 state"
+	::= { vrcCompPtEntry 6 }
+
+vrcCompPtDriverFaultU01 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U01 state"
+	::= { vrcCompPtEntry 7 }
+
+vrcCompPtDriverFaultU02 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U02 state"
+	::= { vrcCompPtEntry 8 }
+
+vrcCompPtDriverFaultU03 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U03 state"
+	::= { vrcCompPtEntry 9 }
+
+vrcCompPtDriverFaultU04 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U04 state"
+	::= { vrcCompPtEntry 10 }
+
+vrcCompPtDriverFaultU05 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U05 state"
+	::= { vrcCompPtEntry 11 }
+
+vrcCompPtDriverFaultU06 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U06 state"
+	::= { vrcCompPtEntry 12 }
+
+vrcCompPtDriverFaultU07 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U07 state"
+	::= { vrcCompPtEntry 13 }
+
+vrcCompPtDriverFaultU08 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U08 state"
+	::= { vrcCompPtEntry 14 }
+
+vrcCompPtDriverFaultU09 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U09 state"
+	::= { vrcCompPtEntry 15 }
+
+vrcCompPtDriverFaultU10 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U10 state"
+	::= { vrcCompPtEntry 16 }
+
+vrcCompPtDriverFaultU11 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U11 state"
+	::= { vrcCompPtEntry 17 }
+
+vrcCompPtDriverFaultU12 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U12 state"
+	::= { vrcCompPtEntry 18 }
+
+vrcCompPtDriverFaultU13 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U13 state"
+	::= { vrcCompPtEntry 19 }
+
+vrcCompPtDriverFaultU14 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U14 state"
+	::= { vrcCompPtEntry 20 }
+
+vrcCompPtDriverFaultU15 OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm U15 state"
+	::= { vrcCompPtEntry 21 }
+
+vrcCompPtDriverCommFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor driver communication failure alarm state"
+	::= { vrcCompPtEntry 22 }
+
+vrcCompPtFaultLockAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressor fault lock alarm state"
+	::= { vrcCompPtEntry 23 }
+
+--###########################################################################################--
+--vrcCompCfgTable--
+--###########################################################################################--
+
+vrcCompCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcCompCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC compressor configuration"
+	::= { vrc 9 }
+
+vrcCompCfgEntry OBJECT-TYPE
+	SYNTAX VrcCompCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcCompCfgTable: each entry contains config fields for a
+		VRC compressor"
+	INDEX { vrcCompCfgIndex }
+	::= { vrcCompCfgTable 1 }
+
+VrcCompCfgEntry ::= SEQUENCE {
+	vrcCompCfgIndex				Integer32,
+	vrcCompCfgOutputStatus				TruthValue,
+	vrcCompCfgOutputDeadBand				Integer32,
+	vrcCompCfgCapacityOutputValue				Integer32,
+	vrcCompCfgMinCapacity				Integer32,
+	vrcCompCfgStartCapacity				Integer32,
+	vrcCompCfgStandardCapacity				Integer32,
+	vrcCompCfgStartCfc				Integer32,
+	vrcCompCfgStopCfc				Integer32,
+	vrcCompCfgMinRunTime				Integer32,
+	vrcCompCfgMinStopTime				Integer32,
+	vrcCompCfgJumpBand1				Integer32,
+	vrcCompCfgJumpBand2				Integer32,
+	vrcCompCfgJumpBand3				Integer32,
+	vrcCompCfgJumpBand4				Integer32,
+	vrcCompCfgJumpBand5				Integer32,
+	vrcCompCfgJumpFreq1				Integer32,
+	vrcCompCfgJumpFreq2				Integer32,
+	vrcCompCfgJumpFreq3				Integer32,
+	vrcCompCfgJumpFreq4				Integer32,
+	vrcCompCfgJumpFreq5				Integer32,
+	vrcCompCfgTempP				Integer32,
+	vrcCompCfgTempI				Integer32,
+	vrcCompCfgTempD				Integer32,
+	vrcCompCfgDriverFaultAlmCtrl				INTEGER,
+	vrcCompCfgDriverCommFailAlmCtrl				INTEGER,
+	vrcCompCfgFaultLockAlmCtrl				INTEGER
+}
+
+vrcCompCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcCompCfgEntry 1 }
+
+vrcCompCfgOutputStatus OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor output status"
+	::= { vrcCompCfgEntry 2 }
+
+vrcCompCfgOutputDeadBand OBJECT-TYPE
+	SYNTAX Integer32(0..50)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor output dead band in tenths of a percent"
+	::= { vrcCompCfgEntry 3 }
+
+vrcCompCfgCapacityOutputValue OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor capacity output (percent)"
+	::= { vrcCompCfgEntry 4 }
+
+vrcCompCfgMinCapacity OBJECT-TYPE
+	SYNTAX Integer32(15..50)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor min capacity (percent)"
+	::= { vrcCompCfgEntry 5 }
+
+vrcCompCfgStartCapacity OBJECT-TYPE
+	SYNTAX Integer32(40..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor start capacity (percent)"
+	::= { vrcCompCfgEntry 6 }
+
+vrcCompCfgStandardCapacity OBJECT-TYPE
+	SYNTAX Integer32(80..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor standard capacity (percent)"
+	::= { vrcCompCfgEntry 7 }
+
+vrcCompCfgStartCfc OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor start cfc (percent)"
+	::= { vrcCompCfgEntry 8 }
+
+vrcCompCfgStopCfc OBJECT-TYPE
+	SYNTAX Integer32(-200..-50)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor stop cfc (percent)"
+	::= { vrcCompCfgEntry 9 }
+
+vrcCompCfgMinRunTime OBJECT-TYPE
+	SYNTAX Integer32(0..30)
+	UNITS "minutes"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor min run time in minutes"
+	::= { vrcCompCfgEntry 10 }
+
+vrcCompCfgMinStopTime OBJECT-TYPE
+	SYNTAX Integer32(0..10)
+	UNITS "minutes"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor min stop time in minutes"
+	::= { vrcCompCfgEntry 11 }
+
+vrcCompCfgJumpBand1 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump band 1 in tenths of a percent"
+	::= { vrcCompCfgEntry 12 }
+
+vrcCompCfgJumpBand2 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump band 2 in tenths of a percent"
+	::= { vrcCompCfgEntry 13 }
+
+vrcCompCfgJumpBand3 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump band 3 in tenths of a percent"
+	::= { vrcCompCfgEntry 14 }
+
+vrcCompCfgJumpBand4 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump band 4 in tenths of a percent"
+	::= { vrcCompCfgEntry 15 }
+
+vrcCompCfgJumpBand5 OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump band 5 in tenths of a percent"
+	::= { vrcCompCfgEntry 16 }
+
+vrcCompCfgJumpFreq1 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump frequency 1 in tenths of a percent"
+	::= { vrcCompCfgEntry 17 }
+
+vrcCompCfgJumpFreq2 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump frequency 2 in tenths of a percent"
+	::= { vrcCompCfgEntry 18 }
+
+vrcCompCfgJumpFreq3 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump frequency 3 in tenths of a percent"
+	::= { vrcCompCfgEntry 19 }
+
+vrcCompCfgJumpFreq4 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump frequency 4 in tenths of a percent"
+	::= { vrcCompCfgEntry 20 }
+
+vrcCompCfgJumpFreq5 OBJECT-TYPE
+	SYNTAX Integer32(0..1000)
+	UNITS "0.1%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor jump frequency 5 in tenths of a percent"
+	::= { vrcCompCfgEntry 21 }
+
+vrcCompCfgTempP OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor temperature P in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The settable range is determined
+		by the current temperature units.
+		Celsius:    10 to 150
+		Fahrenheit: 18 to 269"
+	::= { vrcCompCfgEntry 22 }
+
+vrcCompCfgTempI OBJECT-TYPE
+	SYNTAX Integer32(0..900)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor temperature I in seconds"
+	::= { vrcCompCfgEntry 23 }
+
+vrcCompCfgTempD OBJECT-TYPE
+	SYNTAX Integer32(0..900)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor temperature D in seconds"
+	::= { vrcCompCfgEntry 24 }
+
+vrcCompCfgDriverFaultAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor driver fault alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcCompCfgEntry 25 }
+
+vrcCompCfgDriverCommFailAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor driver communication failure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcCompCfgEntry 26 }
+
+vrcCompCfgFaultLockAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Compressor fault lock alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcCompCfgEntry 27 }
+
+--###########################################################################################--
+--vrcReturnPtTable--
+--###########################################################################################--
+
+vrcReturnPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcReturnPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC return status"
+	::= { vrc 10 }
+
+vrcReturnPtEntry OBJECT-TYPE
+	SYNTAX VrcReturnPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcReturnPtTable: each entry represents return data for a
+		VRC"
+	INDEX { vrcReturnPtIndex }
+	::= { vrcReturnPtTable 1 }
+
+VrcReturnPtEntry ::= SEQUENCE {
+	vrcReturnPtIndex				Integer32,
+	vrcReturnPtName				SnmpAdminString,
+	vrcReturnPtTemp				Integer32,
+	vrcReturnPtHighTempAlarm				TruthValue,
+	vrcReturnPtTempSensorFailAlarm				TruthValue
+}
+
+vrcReturnPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcReturnPtEntry 1 }
+
+vrcReturnPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Return name (factory-assigned)"
+	::= { vrcReturnPtEntry 2 }
+
+vrcReturnPtTemp OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Return temperature value in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The range is determined by the
+		current temperature units.
+		Celsius:    -400 to 1000
+		Fahrenheit: -400 to 2120"
+	::= { vrcReturnPtEntry 3 }
+
+vrcReturnPtHighTempAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Return high temperature alarm state"
+	::= { vrcReturnPtEntry 4 }
+
+vrcReturnPtTempSensorFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Return temperature sensor failure alarm state"
+	::= { vrcReturnPtEntry 5 }
+
+--###########################################################################################--
+--vrcReturnCfgTable--
+--###########################################################################################--
+
+vrcReturnCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcReturnCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC return configuration"
+	::= { vrc 11 }
+
+vrcReturnCfgEntry OBJECT-TYPE
+	SYNTAX VrcReturnCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcReturnCfgTable: each entry contains config fields for
+		VRC return"
+	INDEX { vrcReturnCfgIndex }
+	::= { vrcReturnCfgTable 1 }
+
+VrcReturnCfgEntry ::= SEQUENCE {
+	vrcReturnCfgIndex				Integer32,
+	vrcReturnCfgOilCycle				Integer32,
+	vrcReturnCfgOilRunCapacity				Integer32,
+	vrcReturnCfgOilRunTime				Integer32,
+	vrcReturnCfgTempCalValue				Integer32,
+	vrcReturnCfgTempSetting				Integer32,
+	vrcReturnCfgHighTempAlarmValue				Integer32,
+	vrcReturnCfgHighTempAlarmCtrl				INTEGER,
+	vrcReturnCfgTempSensFailAlmCtrl				INTEGER
+}
+
+vrcReturnCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcReturnCfgEntry 1 }
+
+vrcReturnCfgOilCycle OBJECT-TYPE
+	SYNTAX Integer32(5..50)
+	UNITS "decihours"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return oil cycle in tenths of an hour"
+	::= { vrcReturnCfgEntry 2 }
+
+vrcReturnCfgOilRunCapacity OBJECT-TYPE
+	SYNTAX Integer32(50..100)
+	UNITS "%"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return Oil run capacity (percent)"
+	::= { vrcReturnCfgEntry 3 }
+
+vrcReturnCfgOilRunTime OBJECT-TYPE
+	SYNTAX Integer32(0..10)
+	UNITS "minutes"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return oil run time in minutes"
+	::= { vrcReturnCfgEntry 4 }
+
+vrcReturnCfgTempCalValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return temperature calibration value in tenths of a degree. Units are
+		given by temperatureUnits field in deviceInfo. The settable range is
+		determined by the current temperature units.
+		Celsius:    -100 to 100
+		Fahrenheit: -179 to 179"
+	::= { vrcReturnCfgEntry 5 }
+
+vrcReturnCfgTempSetting OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return temperature setting in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The settable range is determined
+		by the current temperature units.
+		Celsius:    250 to 350
+		Fahrenheit: 770 to 949"
+	::= { vrcReturnCfgEntry 6 }
+
+vrcReturnCfgHighTempAlarmValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return high temperature alarm value in tenths of a degree. Units are
+		given by temperatureUnits field in deviceInfo. The settable range is
+		determined by the current temperature units.
+		Celsius:    300 to 450
+		Fahrenheit: 860 to 1129"
+	::= { vrcReturnCfgEntry 7 }
+
+vrcReturnCfgHighTempAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return high temperature alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcReturnCfgEntry 8 }
+
+vrcReturnCfgTempSensFailAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Return temperature sensor failure alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcReturnCfgEntry 9 }
+
+--###########################################################################################--
+--vrcSupplyPtTable--
+--###########################################################################################--
+
+vrcSupplyPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcSupplyPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC supply status"
+	::= { vrc 12 }
+
+vrcSupplyPtEntry OBJECT-TYPE
+	SYNTAX VrcSupplyPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcSupplyPtTable: each entry represents supply data for a
+		VRC"
+	INDEX { vrcSupplyPtIndex }
+	::= { vrcSupplyPtTable 1 }
+
+VrcSupplyPtEntry ::= SEQUENCE {
+	vrcSupplyPtIndex				Integer32,
+	vrcSupplyPtName				SnmpAdminString,
+	vrcSupplyPtTemp				Integer32,
+	vrcSupplyPtLowTempAlarm				TruthValue,
+	vrcSupplyPtHighTempAlarm				TruthValue,
+	vrcSupplyPtTempSensorFailAlarm				TruthValue
+}
+
+vrcSupplyPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcSupplyPtEntry 1 }
+
+vrcSupplyPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Supply name (factory-assigned)"
+	::= { vrcSupplyPtEntry 2 }
+
+vrcSupplyPtTemp OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Supply temperature value in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The range is determined by the
+		current temperature units.
+		Celsius:    -400 to 1000
+		Fahrenheit: -400 to 2120"
+	::= { vrcSupplyPtEntry 3 }
+
+vrcSupplyPtLowTempAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Supply low temperature alarm state"
+	::= { vrcSupplyPtEntry 4 }
+
+vrcSupplyPtHighTempAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Supply high temperature alarm state"
+	::= { vrcSupplyPtEntry 5 }
+
+vrcSupplyPtTempSensorFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Supply temperature sensor failure alarm state"
+	::= { vrcSupplyPtEntry 6 }
+
+--###########################################################################################--
+--vrcSupplyCfgTable--
+--###########################################################################################--
+
+vrcSupplyCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcSupplyCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC supply configuration"
+	::= { vrc 13 }
+
+vrcSupplyCfgEntry OBJECT-TYPE
+	SYNTAX VrcSupplyCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcSupplyCfgTable: each entry contains config fields for
+		a VRC supply"
+	INDEX { vrcSupplyCfgIndex }
+	::= { vrcSupplyCfgTable 1 }
+
+VrcSupplyCfgEntry ::= SEQUENCE {
+	vrcSupplyCfgIndex				Integer32,
+	vrcSupplyCfgTempCalValue				Integer32,
+	vrcSupplyCfgTempSetting				Integer32,
+	vrcSupplyCfgLowTempAlarmValue				Integer32,
+	vrcSupplyCfgHighTempAlarmValue				Integer32,
+	vrcSupplyCfgLowTempAlmCtrl				INTEGER,
+	vrcSupplyCfgHighTempAlmCtrl				INTEGER,
+	vrcSupplyCfgTempSensFailAlmCtrl				INTEGER
+}
+
+vrcSupplyCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcSupplyCfgEntry 1 }
+
+vrcSupplyCfgTempCalValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply temperature calibration value in tenths of a degree. Units are
+		given by temperatureUnits field in deviceInfo. The settable range is
+		determined by the current temperature units.
+		Celsius:    -100 to 100
+		Fahrenheit: -179 to 179"
+	::= { vrcSupplyCfgEntry 2 }
+
+vrcSupplyCfgTempSetting OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply temperature setting in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The settable range is determined
+		by the current temperature units.
+		Celsius:    130 to 280
+		Fahrenheit: 554 to 823"
+	::= { vrcSupplyCfgEntry 3 }
+
+vrcSupplyCfgLowTempAlarmValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply low temperature alarm value in tenths of a degree. Units are
+		given by temperatureUnits field in deviceInfo. The settable range is
+		determined by the current temperature units.
+		Celsius:    50 to 200
+		Fahrenheit: 410 to 679"
+	::= { vrcSupplyCfgEntry 4 }
+
+vrcSupplyCfgHighTempAlarmValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply high temperature alarm value in tenths of a degree. Units are
+		given by temperatureUnits field in deviceInfo. The settable range is
+		determined by the current temperature units.
+		Celsius:    200 to 350
+		Fahrenheit: 680 to 949"
+	::= { vrcSupplyCfgEntry 5 }
+
+vrcSupplyCfgLowTempAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply low temperature alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcSupplyCfgEntry 6 }
+
+vrcSupplyCfgHighTempAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply high temperature alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcSupplyCfgEntry 7 }
+
+vrcSupplyCfgTempSensFailAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Supply temperature sensor failure alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcSupplyCfgEntry 8 }
+
+--###########################################################################################--
+--vrcPowerPtTable--
+--###########################################################################################--
+
+vrcPowerPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcPowerPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC power status"
+	::= { vrc 14 }
+
+vrcPowerPtEntry OBJECT-TYPE
+	SYNTAX VrcPowerPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcPowerPtTable: each entry represents power data for a
+		VRC"
+	INDEX { vrcPowerPtIndex }
+	::= { vrcPowerPtTable 1 }
+
+VrcPowerPtEntry ::= SEQUENCE {
+	vrcPowerPtIndex				Integer32,
+	vrcPowerPtName				SnmpAdminString,
+	vrcPowerPtVoltage				Integer32,
+	vrcPowerPtFrequency				Integer32,
+	vrcPowerPtLowVoltageAlarm				TruthValue,
+	vrcPowerPtHighVoltageAlarm				TruthValue,
+	vrcPowerPtLossOfPhasePowerAlarm				TruthValue,
+	vrcPowerPtLossOfPowerAlarm				TruthValue,
+	vrcPowerPtFrequencyErrorAlarm				TruthValue
+}
+
+vrcPowerPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcPowerPtEntry 1 }
+
+vrcPowerPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power name (factory-assigned)"
+	::= { vrcPowerPtEntry 2 }
+
+vrcPowerPtVoltage OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	UNITS "decivolts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power voltage measurement in tenths of a volt"
+	::= { vrcPowerPtEntry 3 }
+
+vrcPowerPtFrequency OBJECT-TYPE
+	SYNTAX Integer32(-32768..32767)
+	UNITS "decihertz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power frequency measurement in tenths of hertz"
+	::= { vrcPowerPtEntry 4 }
+
+vrcPowerPtLowVoltageAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power low voltage alarm state"
+	::= { vrcPowerPtEntry 5 }
+
+vrcPowerPtHighVoltageAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power high voltage alarm state"
+	::= { vrcPowerPtEntry 6 }
+
+vrcPowerPtLossOfPhasePowerAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Phase power loss alarm state"
+	::= { vrcPowerPtEntry 7 }
+
+vrcPowerPtLossOfPowerAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power loss alarm state"
+	::= { vrcPowerPtEntry 8 }
+
+vrcPowerPtFrequencyErrorAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Power frequency error alarm state"
+	::= { vrcPowerPtEntry 9 }
+
+--###########################################################################################--
+--vrcPowerCfgTable--
+--###########################################################################################--
+
+vrcPowerCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcPowerCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC power configuration"
+	::= { vrc 15 }
+
+vrcPowerCfgEntry OBJECT-TYPE
+	SYNTAX VrcPowerCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcPowerCfgTable: each entry contains config fields for
+		VRC power"
+	INDEX { vrcPowerCfgIndex }
+	::= { vrcPowerCfgTable 1 }
+
+VrcPowerCfgEntry ::= SEQUENCE {
+	vrcPowerCfgIndex				Integer32,
+	vrcPowerCfgLowVoltageSetting				Integer32,
+	vrcPowerCfgHighVoltageSetting				Integer32,
+	vrcPowerCfgLowVoltageAlarmCtrl				INTEGER,
+	vrcPowerCfgHighVoltageAlarmCtrl				INTEGER,
+	vrcPowerCfgLossOfPowerAlarmCtrl				INTEGER,
+	vrcPowerCfgFreqErrorAlarmCtrl				INTEGER
+}
+
+vrcPowerCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcPowerCfgEntry 1 }
+
+vrcPowerCfgLowVoltageSetting OBJECT-TYPE
+	SYNTAX Integer32(100..230)
+	UNITS "volts"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Power low voltage setting in volts"
+	::= { vrcPowerCfgEntry 2 }
+
+vrcPowerCfgHighVoltageSetting OBJECT-TYPE
+	SYNTAX Integer32(100..300)
+	UNITS "volts"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Power high voltage setting in volts"
+	::= { vrcPowerCfgEntry 3 }
+
+vrcPowerCfgLowVoltageAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Power low voltage alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcPowerCfgEntry 4 }
+
+vrcPowerCfgHighVoltageAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Power high voltage alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcPowerCfgEntry 5 }
+
+vrcPowerCfgLossOfPowerAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Power loss alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcPowerCfgEntry 6 }
+
+vrcPowerCfgFreqErrorAlarmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			close(1),
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Power frequency error alarm control:
+		1 = close
+		2 = suspend
+		3 = open"
+	::= { vrcPowerCfgEntry 7 }
+
+--###########################################################################################--
+--vrcOutdoorPtTable--
+--###########################################################################################--
+
+vrcOutdoorPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcOutdoorPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC outdoor status"
+	::= { vrc 16 }
+
+vrcOutdoorPtEntry OBJECT-TYPE
+	SYNTAX VrcOutdoorPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcOutdoorPtTable: each entry represents data for a VRC
+		outdoor"
+	INDEX { vrcOutdoorPtIndex }
+	::= { vrcOutdoorPtTable 1 }
+
+VrcOutdoorPtEntry ::= SEQUENCE {
+	vrcOutdoorPtIndex				Integer32,
+	vrcOutdoorPtName				SnmpAdminString,
+	vrcOutdoorPtTemp				Integer32
+}
+
+vrcOutdoorPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcOutdoorPtEntry 1 }
+
+vrcOutdoorPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Outdoor name (factory-assigned)"
+	::= { vrcOutdoorPtEntry 2 }
+
+vrcOutdoorPtTemp OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Outdoor temperature value in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The range is determined by the
+		current temperature units.
+		Celsius:    -400 to 1000
+		Fahrenheit: -400 to 2120"
+	::= { vrcOutdoorPtEntry 3 }
+
+--###########################################################################################--
+--vrcDischPtTable--
+--###########################################################################################--
+
+vrcDischPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcDischPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC discharge status"
+	::= { vrc 18 }
+
+vrcDischPtEntry OBJECT-TYPE
+	SYNTAX VrcDischPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcDischPtTable: each entry represents discharge data for
+		a VRC"
+	INDEX { vrcDischPtIndex }
+	::= { vrcDischPtTable 1 }
+
+VrcDischPtEntry ::= SEQUENCE {
+	vrcDischPtIndex				Integer32,
+	vrcDischPtName				SnmpAdminString,
+	vrcDischPtTemp				Integer32,
+	vrcDischPtPressure				Integer32,
+	vrcDischPtHighTempAlarm				TruthValue,
+	vrcDischPtHighTempFreqAlarm				TruthValue,
+	vrcDischPtTempSensorFailAlarm				TruthValue
+}
+
+vrcDischPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcDischPtEntry 1 }
+
+vrcDischPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Discharge name (factory-assigned)"
+	::= { vrcDischPtEntry 2 }
+
+vrcDischPtTemp OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge temperature value in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The range is determined by the
+		current temperature units.
+		Celsius:    -400 to 1560
+		Fahrenheit: -400 to 3128"
+	::= { vrcDischPtEntry 3 }
+
+vrcDischPtPressure OBJECT-TYPE
+	SYNTAX Integer32(0..460)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge air pressure value in tenths of a bar"
+	::= { vrcDischPtEntry 4 }
+
+vrcDischPtHighTempAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Discharge high temperature alarm state"
+	::= { vrcDischPtEntry 5 }
+
+vrcDischPtHighTempFreqAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Discharge high temperature frequently alarm state"
+	::= { vrcDischPtEntry 6 }
+
+vrcDischPtTempSensorFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Discharge temperature sensor failure alarm state"
+	::= { vrcDischPtEntry 7 }
+
+--###########################################################################################--
+--vrcDischCfgTable--
+--###########################################################################################--
+
+vrcDischCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcDischCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC discharge configuration"
+	::= { vrc 19 }
+
+vrcDischCfgEntry OBJECT-TYPE
+	SYNTAX VrcDischCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcDischCfgTable: each entry contains config fields for
+		VRC discharge"
+	INDEX { vrcDischCfgIndex }
+	::= { vrcDischCfgTable 1 }
+
+VrcDischCfgEntry ::= SEQUENCE {
+	vrcDischCfgIndex				Integer32,
+	vrcDischCfgTempCalValue				Integer32,
+	vrcDischCfgPressCalValue				Integer32,
+	vrcDischCfgHighTempAlmCtrl				INTEGER,
+	vrcDischCfgHighTempFreqAlmCtrl				INTEGER,
+	vrcDischCfgTempSensFailAlmCtrl				INTEGER
+}
+
+vrcDischCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcDischCfgEntry 1 }
+
+vrcDischCfgTempCalValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge temperature calibration value in tenths of a degree. Units
+		are given by temperatureUnits field in deviceInfo. The settable range
+		is determined by the current temperature units.
+		Celsius:    -100 to 100
+		Fahrenheit: -179 to 179"
+	::= { vrcDischCfgEntry 2 }
+
+vrcDischCfgPressCalValue OBJECT-TYPE
+	SYNTAX Integer32(-100..100)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge pressure calibration value in tenths of a bar"
+	::= { vrcDischCfgEntry 3 }
+
+vrcDischCfgHighTempAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge high temperature alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcDischCfgEntry 4 }
+
+vrcDischCfgHighTempFreqAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge high temperature frequenctly alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcDischCfgEntry 5 }
+
+vrcDischCfgTempSensFailAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Discharge temperature sensor failure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcDischCfgEntry 6 }
+
+--###########################################################################################--
+--vrcSuctPtTable--
+--###########################################################################################--
+
+vrcSuctPtTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcSuctPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table that contains VRC suction status"
+	::= { vrc 20 }
+
+vrcSuctPtEntry OBJECT-TYPE
+	SYNTAX VrcSuctPtEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcSuctPtTable: each entry represents suction data for a
+		VRC"
+	INDEX { vrcSuctPtIndex }
+	::= { vrcSuctPtTable 1 }
+
+VrcSuctPtEntry ::= SEQUENCE {
+	vrcSuctPtIndex				Integer32,
+	vrcSuctPtName				SnmpAdminString,
+	vrcSuctPtTemp				Integer32,
+	vrcSuctPtPressure				Integer32,
+	vrcSuctPtSuperHeatTemp				Integer32,
+	vrcSuctPtTempSensorFailAlarm				TruthValue
+}
+
+vrcSuctPtIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcSuctPtEntry 1 }
+
+vrcSuctPtName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Suction name (factory-assigned)"
+	::= { vrcSuctPtEntry 2 }
+
+vrcSuctPtTemp OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Suction temperature in tenths of a degree. Units are given by
+		temperatureUnits field in deviceInfo. The range is determined by the
+		current temperature units.
+		Celsius:    -400 to 1000
+		Fahrenheit: -400 to 2120"
+	::= { vrcSuctPtEntry 3 }
+
+vrcSuctPtPressure OBJECT-TYPE
+	SYNTAX Integer32(0..173)
+	UNITS "decibars"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Suction air pressure in tenths of a bar"
+	::= { vrcSuctPtEntry 4 }
+
+vrcSuctPtSuperHeatTemp OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "decidegrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Suction super heat temperature in tenths of a degree. Units are given
+		by temperatureUnits field in deviceInfo. The range is determined by
+		the current temperature units.
+		Celsius:    -400 to 1000
+		Fahrenheit: -400 to 2120"
+	::= { vrcSuctPtEntry 5 }
+
+vrcSuctPtTempSensorFailAlarm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Suction temperature sensor failure alarm state"
+	::= { vrcSuctPtEntry 6 }
+
+--###########################################################################################--
+--vrcSuctCfgTable--
+--###########################################################################################--
+
+vrcSuctCfgTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VrcSuctCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table used for VRC suction configuration"
+	::= { vrc 21 }
+
+vrcSuctCfgEntry OBJECT-TYPE
+	SYNTAX VrcSuctCfgEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the vrcSuctCfgTable: each entry contains config fields for
+		VRC suction"
+	INDEX { vrcSuctCfgIndex }
+	::= { vrcSuctCfgTable 1 }
+
+VrcSuctCfgEntry ::= SEQUENCE {
+	vrcSuctCfgIndex				Integer32,
+	vrcSuctCfgPressCalValue				Integer32,
+	vrcSuctCfgTempSensFailAlmCtrl				INTEGER
+}
+
+vrcSuctCfgIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Unique id for each entry in the table"
+	::= { vrcSuctCfgEntry 1 }
+
+vrcSuctCfgPressCalValue OBJECT-TYPE
+	SYNTAX Integer32(-100..100)
+	UNITS "decibars"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Suction pressure calibration value in tenths of a bar"
+	::= { vrcSuctCfgEntry 2 }
+
+vrcSuctCfgTempSensFailAlmCtrl OBJECT-TYPE
+	SYNTAX INTEGER {
+			suspend(2),
+			open(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Suction temperature sensor failure alarm control:
+		2 = suspend
+		3 = open"
+	::= { vrcSuctCfgEntry 3 }
+
+--###########################################################################################--
+--Notifications--
+--###########################################################################################--
+
+trap OBJECT IDENTIFIER ::= { imd 32767 }
+
+trapPrefix OBJECT IDENTIFIER ::= { trap 0 }
+
+trapObj OBJECT IDENTIFIER ::= { trap 1 }
+
+
+trapSeverity OBJECT-TYPE
+	SYNTAX INTEGER {
+			none(0),
+			warning(1),
+			alarm(2)
+			}
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Indicates the severity of the trap:
+		0 = None
+		1 = Warning
+		2 = Alarm"
+	::= { trapObj 1 }
+
+trapThreshType OBJECT-TYPE
+	SYNTAX INTEGER {
+			low(1),
+			high(2)
+			}
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Only sent for threshold alarms. Identifies the threshold type:
+		1 = Low
+		2 = High"
+	::= { trapObj 2 }
+
+internalTestNOTIFY NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION "Test SNMP Trap"
+	::= { trapPrefix 10101 }
+
+--#####deviceInfo#####--
+
+--#####pdu#####--
+
+--#####pduMainTable#####--
+
+pduMainAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduMainAvail,
+			trapSeverity,
+			sysName,
+			pduMainLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU availability trap"
+	::= { trapPrefix 10305 }
+
+pduMainAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduMainAvail,
+			trapSeverity,
+			sysName,
+			pduMainLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU availability clear trap"
+	::= { trapPrefix 20305 }
+
+pduTotalRealPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total real power trap"
+	::= { trapPrefix 10309 }
+
+pduTotalRealPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total real power clear trap"
+	::= { trapPrefix 20309 }
+
+pduTotalApparentPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total apparent power trap"
+	::= { trapPrefix 10310 }
+
+pduTotalApparentPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total apparent power clear trap"
+	::= { trapPrefix 20310 }
+
+pduTotalPowerFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalPowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total power factor trap"
+	::= { trapPrefix 10311 }
+
+pduTotalPowerFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalPowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total power factor clear trap"
+	::= { trapPrefix 20311 }
+
+pduTotalEnergyNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total energy trap"
+	::= { trapPrefix 10312 }
+
+pduTotalEnergyCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduTotalEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduTotalLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU total energy clear trap"
+	::= { trapPrefix 20312 }
+
+--#####pduPhaseTable#####--
+
+pduPhaseVoltageNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase voltage trap"
+	::= { trapPrefix 10324 }
+
+pduPhaseVoltageCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase voltage clear trap"
+	::= { trapPrefix 20324 }
+
+pduPhaseCurrentNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase current trap"
+	::= { trapPrefix 10328 }
+
+pduPhaseCurrentCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase current clear trap"
+	::= { trapPrefix 20328 }
+
+pduPhaseRealPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase real power trap"
+	::= { trapPrefix 10332 }
+
+pduPhaseRealPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase real power clear trap"
+	::= { trapPrefix 20332 }
+
+pduPhaseApparentPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase apparent power trap"
+	::= { trapPrefix 10333 }
+
+pduPhaseApparentPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase apparent power clear trap"
+	::= { trapPrefix 20333 }
+
+pduPhasePowerFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhasePowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase power factor trap"
+	::= { trapPrefix 10334 }
+
+pduPhasePowerFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhasePowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase power factor clear trap"
+	::= { trapPrefix 20334 }
+
+pduPhaseEnergyNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase energy trap"
+	::= { trapPrefix 10335 }
+
+pduPhaseEnergyCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase energy clear trap"
+	::= { trapPrefix 20335 }
+
+pduPhaseBalanceNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseBalance,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase balance trap"
+	::= { trapPrefix 10337 }
+
+pduPhaseBalanceCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseBalance,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase balance clear trap"
+	::= { trapPrefix 20337 }
+
+pduPhaseCurrentCrestFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseCurrentCrestFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase current crest factor trap"
+	::= { trapPrefix 10339 }
+
+pduPhaseCurrentCrestFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduPhaseCurrentCrestFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduPhaseLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU phase current crest factor clear trap"
+	::= { trapPrefix 20339 }
+
+--#####pduBreakerTable#####--
+
+pduBreakerCurrentNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker current trap"
+	::= { trapPrefix 10354 }
+
+pduBreakerCurrentCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker current clear trap"
+	::= { trapPrefix 20354 }
+
+pduBreakerVoltageNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker voltage trap"
+	::= { trapPrefix 10358 }
+
+pduBreakerVoltageCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker voltage clear trap"
+	::= { trapPrefix 20358 }
+
+pduBreakerRealPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker real power trap"
+	::= { trapPrefix 10362 }
+
+pduBreakerRealPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker real power clear trap"
+	::= { trapPrefix 20362 }
+
+pduBreakerApparentPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker apparent power trap"
+	::= { trapPrefix 10363 }
+
+pduBreakerApparentPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker apparent power clear trap"
+	::= { trapPrefix 20363 }
+
+pduBreakerPowerFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerPowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker power factor trap"
+	::= { trapPrefix 10364 }
+
+pduBreakerPowerFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerPowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker power factor clear trap"
+	::= { trapPrefix 20364 }
+
+pduBreakerEnergyNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker energy trap"
+	::= { trapPrefix 10365 }
+
+pduBreakerEnergyCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduBreakerEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduBreakerLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU breaker energy clear trap"
+	::= { trapPrefix 20365 }
+
+--#####pduLineTable#####--
+
+pduLineCurrentNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduLineCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduLineLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU line current trap"
+	::= { trapPrefix 10374 }
+
+pduLineCurrentCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduLineCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduLineLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU line current clear trap"
+	::= { trapPrefix 20374 }
+
+--#####pduOutletSwitchTable#####--
+
+--#####pduOutletMeterTable#####--
+
+pduOutletMeterVoltageNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet voltage trap"
+	::= { trapPrefix 10385 }
+
+pduOutletMeterVoltageCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet voltage clear trap"
+	::= { trapPrefix 20385 }
+
+pduOutletMeterCurrentNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet current trap"
+	::= { trapPrefix 10389 }
+
+pduOutletMeterCurrentCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterCurrent,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet current clear trap"
+	::= { trapPrefix 20389 }
+
+pduOutletMeterRealPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet real power trap"
+	::= { trapPrefix 10393 }
+
+pduOutletMeterRealPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterRealPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet real power clear trap"
+	::= { trapPrefix 20393 }
+
+pduOutletMeterApparentPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet apparent power trap"
+	::= { trapPrefix 10394 }
+
+pduOutletMeterApparentPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterApparentPower,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet apparent power clear trap"
+	::= { trapPrefix 20394 }
+
+pduOutletMeterPowerFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterPowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet power factor trap"
+	::= { trapPrefix 10395 }
+
+pduOutletMeterPowerFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterPowerFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet power factor clear trap"
+	::= { trapPrefix 20395 }
+
+pduOutletMeterEnergyNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet energy trap"
+	::= { trapPrefix 10396 }
+
+pduOutletMeterEnergyCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletMeterEnergy,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet energy clear trap"
+	::= { trapPrefix 20396 }
+
+pduOutletCurrentCrestFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletCurrentCrestFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet current crest factor trap"
+	::= { trapPrefix 10400 }
+
+pduOutletCurrentCrestFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduOutletCurrentCrestFactor,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduOutletMeterLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU outlet current crest factor clear trap"
+	::= { trapPrefix 20400 }
+
+--#####tempSensorTable#####--
+
+tempSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			tempSensorAvail,
+			trapSeverity,
+			sysName,
+			tempSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "RT availability trap"
+	::= { trapPrefix 10404 }
+
+tempSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			tempSensorAvail,
+			trapSeverity,
+			sysName,
+			tempSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "RT availability clear trap"
+	::= { trapPrefix 20404 }
+
+tempSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			tempSensorTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			tempSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "RT temperature trap"
+	::= { trapPrefix 10405 }
+
+tempSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			tempSensorTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			tempSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "RT temperature clear trap"
+	::= { trapPrefix 20405 }
+
+--#####airFlowSensorTable#####--
+
+airFlowSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorAvail,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 availability trap"
+	::= { trapPrefix 10504 }
+
+airFlowSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorAvail,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 availability clear trap"
+	::= { trapPrefix 20504 }
+
+airFlowSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 temperature trap"
+	::= { trapPrefix 10505 }
+
+airFlowSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 temperature clear trap"
+	::= { trapPrefix 20505 }
+
+airFlowSensorFlowNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorFlow,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 airflow trap"
+	::= { trapPrefix 10506 }
+
+airFlowSensorFlowCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorFlow,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 airflow clear trap"
+	::= { trapPrefix 20506 }
+
+airFlowSensorHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorHumidity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 humidity trap"
+	::= { trapPrefix 10507 }
+
+airFlowSensorHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorHumidity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 humidity clear trap"
+	::= { trapPrefix 20507 }
+
+airFlowSensorDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorDewPoint,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 dewpoint trap"
+	::= { trapPrefix 10508 }
+
+airFlowSensorDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			airFlowSensorDewPoint,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			airFlowSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "AFHT3 dewpoint clear trap"
+	::= { trapPrefix 20508 }
+
+--#####t3hdSensorTable#####--
+
+t3hdSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorAvail,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD availability trap"
+	::= { trapPrefix 10804 }
+
+t3hdSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorAvail,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD availability clear trap"
+	::= { trapPrefix 20804 }
+
+t3hdSensorIntTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorIntTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorIntLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD Internal temperature trap"
+	::= { trapPrefix 10806 }
+
+t3hdSensorIntTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorIntTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorIntLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD Internal temperature clear trap"
+	::= { trapPrefix 20806 }
+
+t3hdSensorIntHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorIntHumidity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorIntLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD Internal humidity trap"
+	::= { trapPrefix 10807 }
+
+t3hdSensorIntHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorIntHumidity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorIntLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD Internal humidity clear trap"
+	::= { trapPrefix 20807 }
+
+t3hdSensorIntDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorIntDewPoint,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorIntLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD Internal dewpoint trap"
+	::= { trapPrefix 10808 }
+
+t3hdSensorIntDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorIntDewPoint,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorIntLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD Internal dewpoint clear trap"
+	::= { trapPrefix 20808 }
+
+t3hdSensorExtATempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorExtATemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorExtALabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD External A temperature trap"
+	::= { trapPrefix 10811 }
+
+t3hdSensorExtATempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorExtATemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorExtALabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD External A temperature clear trap"
+	::= { trapPrefix 20811 }
+
+t3hdSensorExtBTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorExtBTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorExtBLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD External B temperature trap"
+	::= { trapPrefix 10814 }
+
+t3hdSensorExtBTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			t3hdSensorExtBTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			t3hdSensorLabel,
+			t3hdSensorExtBLabel
+		}
+	STATUS current
+	DESCRIPTION "T3HD External B temperature clear trap"
+	::= { trapPrefix 20814 }
+
+--#####thdSensorTable#####--
+
+thdSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorAvail,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD availability trap"
+	::= { trapPrefix 10904 }
+
+thdSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorAvail,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD availability clear trap"
+	::= { trapPrefix 20904 }
+
+thdSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD temperature trap"
+	::= { trapPrefix 10905 }
+
+thdSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD temperature clear trap"
+	::= { trapPrefix 20905 }
+
+thdSensorHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorHumidity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD humidity trap"
+	::= { trapPrefix 10906 }
+
+thdSensorHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorHumidity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD humidity clear trap"
+	::= { trapPrefix 20906 }
+
+thdSensorDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorDewPoint,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD dewpoint trap"
+	::= { trapPrefix 10907 }
+
+thdSensorDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			thdSensorDewPoint,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			thdSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "THD dewpoint clear trap"
+	::= { trapPrefix 20907 }
+
+--#####a2dSensorTable#####--
+
+a2dSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			a2dSensorAvail,
+			trapSeverity,
+			sysName,
+			a2dSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "A2D availability trap"
+	::= { trapPrefix 11104 }
+
+a2dSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			a2dSensorAvail,
+			trapSeverity,
+			sysName,
+			a2dSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "A2D availability clear trap"
+	::= { trapPrefix 21104 }
+
+a2dSensorValueNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			a2dSensorValue,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			a2dSensorLabel,
+			a2dSensorAnalogLabel,
+			a2dSensorDisplayValue
+		}
+	STATUS current
+	DESCRIPTION "A2D measurement trap"
+	::= { trapPrefix 11105 }
+
+a2dSensorValueCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			a2dSensorValue,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			a2dSensorLabel,
+			a2dSensorAnalogLabel,
+			a2dSensorDisplayValue
+		}
+	STATUS current
+	DESCRIPTION "A2D measurement clear trap"
+	::= { trapPrefix 21105 }
+
+--#####humiditySensorTable#####--
+
+humiditySensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			humiditySensorAvail,
+			trapSeverity,
+			sysName,
+			humiditySensorLabel
+		}
+	STATUS current
+	DESCRIPTION "Remote humidity availability trap"
+	::= { trapPrefix 11204 }
+
+humiditySensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			humiditySensorAvail,
+			trapSeverity,
+			sysName,
+			humiditySensorLabel
+		}
+	STATUS current
+	DESCRIPTION "Remote humidity availability clear trap"
+	::= { trapPrefix 21204 }
+
+humiditySensorValueNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			humiditySensorValue,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			humiditySensorLabel
+		}
+	STATUS current
+	DESCRIPTION "Remote humidity value trap"
+	::= { trapPrefix 11205 }
+
+humiditySensorValueCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			humiditySensorValue,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			humiditySensorLabel
+		}
+	STATUS current
+	DESCRIPTION "Remote humidity value clear trap"
+	::= { trapPrefix 21205 }
+
+--#####sn2dSensorTable#####--
+
+sn2dSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			sn2dSensorAvail,
+			trapSeverity,
+			sysName,
+			sn2dSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "SN-2D availability trap"
+	::= { trapPrefix 11304 }
+
+sn2dSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			sn2dSensorAvail,
+			trapSeverity,
+			sysName,
+			sn2dSensorLabel
+		}
+	STATUS current
+	DESCRIPTION "SN-2D availability clear trap"
+	::= { trapPrefix 21304 }
+
+sn2dSensorDoor1StateNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			sn2dSensorDoor1State,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			sn2dSensorLabel,
+			sn2dSensorDoor1Label,
+			sn2dSensorDoor1DisplayState
+		}
+	STATUS current
+	DESCRIPTION "SN-2D Door switch 1 state trap"
+	::= { trapPrefix 11306 }
+
+sn2dSensorDoor1StateCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			sn2dSensorDoor1State,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			sn2dSensorLabel,
+			sn2dSensorDoor1Label,
+			sn2dSensorDoor1DisplayState
+		}
+	STATUS current
+	DESCRIPTION "SN-2D Door switch 1 state clear trap"
+	::= { trapPrefix 21306 }
+
+sn2dSensorDoor2StateNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			sn2dSensorDoor2State,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			sn2dSensorLabel,
+			sn2dSensorDoor2Label,
+			sn2dSensorDoor2DisplayState
+		}
+	STATUS current
+	DESCRIPTION "SN-2D Door switch 2 state trap"
+	::= { trapPrefix 11309 }
+
+sn2dSensorDoor2StateCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			sn2dSensorDoor2State,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			sn2dSensorLabel,
+			sn2dSensorDoor2Label,
+			sn2dSensorDoor2DisplayState
+		}
+	STATUS current
+	DESCRIPTION "SN-2D Door switch 2 state clear trap"
+	::= { trapPrefix 21309 }
+
+--#####cooling#####--
+
+--#####vrc#####--
+
+--#####vrcMainTable#####--
+
+vrcMainAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcMainAvail,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC availability trap"
+	::= { trapPrefix 13001 }
+
+vrcMainAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcMainAvail,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC availability clear trap"
+	::= { trapPrefix 23001 }
+
+--#####vrcMainPtTable#####--
+
+--#####vrcMainCfgTable#####--
+
+--#####vrcOutFanPtTable#####--
+
+vrcOutFanPtSpeedNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcOutFanPtSpeed,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC out-fan speed trap"
+	::= { trapPrefix 13002 }
+
+vrcOutFanPtSpeedCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcOutFanPtSpeed,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC out-fan speed clear trap"
+	::= { trapPrefix 23002 }
+
+--#####vrcOutFanCfgTable#####--
+
+--#####vrcInFanPtTable#####--
+
+--#####vrcInFanCfgTable#####--
+
+--#####vrcCompPtTable#####--
+
+vrcCompPtCapacityNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcCompPtCapacity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC compressor capacity trap"
+	::= { trapPrefix 13003 }
+
+vrcCompPtCapacityCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcCompPtCapacity,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC compressor capacity clear trap"
+	::= { trapPrefix 23003 }
+
+--#####vrcCompCfgTable#####--
+
+--#####vrcReturnPtTable#####--
+
+vrcReturnPtTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcReturnPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC return temperature trap"
+	::= { trapPrefix 13004 }
+
+vrcReturnPtTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcReturnPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC return temperature clear trap"
+	::= { trapPrefix 23004 }
+
+--#####vrcReturnCfgTable#####--
+
+--#####vrcSupplyPtTable#####--
+
+vrcSupplyPtTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcSupplyPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC supply temperature trap"
+	::= { trapPrefix 13005 }
+
+vrcSupplyPtTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcSupplyPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC supply temperature clear trap"
+	::= { trapPrefix 23005 }
+
+--#####vrcSupplyCfgTable#####--
+
+--#####vrcPowerPtTable#####--
+
+vrcPowerPtVoltageNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcPowerPtVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC power voltage trap"
+	::= { trapPrefix 13006 }
+
+vrcPowerPtVoltageCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcPowerPtVoltage,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC power voltage clear trap"
+	::= { trapPrefix 23006 }
+
+vrcPowerPtFrequencyNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcPowerPtFrequency,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC power frequency trap"
+	::= { trapPrefix 13007 }
+
+vrcPowerPtFrequencyCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcPowerPtFrequency,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC power frequency clear trap"
+	::= { trapPrefix 23007 }
+
+--#####vrcPowerCfgTable#####--
+
+--#####vrcOutdoorPtTable#####--
+
+vrcOutdoorPtTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcOutdoorPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC outdoor temperature trap"
+	::= { trapPrefix 13008 }
+
+vrcOutdoorPtTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcOutdoorPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC outdoor temperature clear trap"
+	::= { trapPrefix 23008 }
+
+--#####vrcDischPtTable#####--
+
+vrcDischPtTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcDischPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC discharge temperature trap"
+	::= { trapPrefix 13009 }
+
+vrcDischPtTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcDischPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC discharge temperature clear trap"
+	::= { trapPrefix 23009 }
+
+vrcDischPtPressureNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcDischPtPressure,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC discharge pressure trap"
+	::= { trapPrefix 13010 }
+
+vrcDischPtPressureCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcDischPtPressure,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC discharge pressure clear trap"
+	::= { trapPrefix 23010 }
+
+--#####vrcDischCfgTable#####--
+
+--#####vrcSuctPtTable#####--
+
+vrcSuctPtTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcSuctPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC suction temperature trap"
+	::= { trapPrefix 13011 }
+
+vrcSuctPtTempCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcSuctPtTemp,
+			temperatureUnits,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC suction temperature clear trap"
+	::= { trapPrefix 23011 }
+
+vrcSuctPtPressureNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			vrcSuctPtPressure,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC suction pressure trap"
+	::= { trapPrefix 13012 }
+
+vrcSuctPtPressureCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			vrcSuctPtPressure,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			vrcMainLabel
+		}
+	STATUS current
+	DESCRIPTION "VRC suction pressure clear trap"
+	::= { trapPrefix 23012 }
+
+--#####vrcSuctCfgTable#####--
+
+--###########################################################################################--
+--common group--
+--###########################################################################################--
+
+common OBJECT IDENTIFIER ::= { vertiv 42 }
+
+identity OBJECT IDENTIFIER ::= { common 1 }
+
+i03 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Value given for sysObjectID on IMD3 units"
+	::= { identity 53 }
+
+r05 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Value given for sysObjectID on R-Series units"
+	::= { identity 15 }
+
+END

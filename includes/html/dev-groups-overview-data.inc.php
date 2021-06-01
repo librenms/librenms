@@ -8,7 +8,7 @@ if (count($device_groups)) {
         <div class='col-md-12'>
             <div class='panel panel-default panel-condensed device-overview'>
                 <div class='panel-heading'>
-                    <a href="/device-groups">
+                    <a href="<?=url('device-groups')?>">
                         <i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i>
                         <strong>Device Group Membership</strong>
                     </a>
@@ -18,7 +18,7 @@ if (count($device_groups)) {
                         <div class="col-sm-12">
                         <?php foreach ($device_groups as $group) { ?>
                             <span style="margin: 8px;">
-                                <a href="/devices/group=<?=$group['id']?>" target="_blank"><?=$group['name']?></a>
+                                <a href="<?=url('devices/group=' . $group['id'])?>" target="_blank"><?=$group['name']?></a>
                             </span>
                         <?php } ?>
                         </div>

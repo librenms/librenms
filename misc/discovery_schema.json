@@ -433,6 +433,9 @@
                                     "array"
                                 ]
                             },
+                            "nobulk": {
+                                "type": "boolean"
+                            },
                             "entPhysicalIndex": {
                                 "type": ["integer", "string"]
                             },
