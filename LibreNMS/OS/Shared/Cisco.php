@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
