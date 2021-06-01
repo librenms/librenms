@@ -1,6 +1,6 @@
 <?php
 /**
- * Ericsson-ml.php
+ * Ericsson-6600.php
  *
  *
  *
