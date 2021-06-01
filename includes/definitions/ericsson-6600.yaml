@@ -1,5 +1,5 @@
 os: ericsson-6600
-text: 'Ericsson MINI-LINK 6600'
+text: 'Ericsson 6600'
 type: wireless
 icon: ericsson
 discovery:
