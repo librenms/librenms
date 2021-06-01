@@ -1,15 +1,3 @@
-                                                   --
---
---   No. 3/19603-CXC 132 7551/1                MANAGEMENT INFORMATION BASE
---   =====================================================================
---   Prepared:  TEI/XMS/A                      Revision BB
---   =====================================================================
---   Copyright (C)Ericsson AB 2008.
---   All rights reserved.
---   =====================================================================
---
---
-
   XF-RADIOLINK-PTP-TERMINAL-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS

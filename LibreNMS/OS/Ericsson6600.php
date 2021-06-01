@@ -1,6 +1,6 @@
 <?php
 /**
- * Ericsson-6600.php
+ * Ericsson6600.php
  *
  *
  *
@@ -150,6 +150,4 @@ class Ericsson6600 extends OS implements
 
         return $sensors;
     }
-
-    //xfRLTMeasuredHopLength
 }
