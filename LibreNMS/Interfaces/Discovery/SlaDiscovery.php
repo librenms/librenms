@@ -24,8 +24,6 @@
 
 namespace LibreNMS\Interfaces\Discovery;
 
-use App\Models\Device;
-
 interface SlaDiscovery
 {
     /**
