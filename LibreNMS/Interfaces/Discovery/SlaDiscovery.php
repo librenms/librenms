@@ -32,5 +32,5 @@ interface SlaDiscovery
      * Discover additional information about the OS.
      * Primarily this is just version, hardware, features, serial, but could be anything
      */
-    public function discoverSlas(): void;
+    public function discoverSlas();
 }

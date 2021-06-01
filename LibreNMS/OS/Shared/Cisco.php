@@ -41,7 +41,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling
+class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling, SlaPolling
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;

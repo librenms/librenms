@@ -27,10 +27,12 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Sla;
+use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\RRD\RrdDefinition;
 
-class Junos extends \LibreNMS\OS implements OSPolling, SlaPolling
+class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 {
     public function discoverOS(Device $device): void
     {
@@ -64,6 +66,70 @@ class Junos extends \LibreNMS\OS implements OSPolling, SlaPolling
 
             $this->enableGraph('junos_jsrx_spu_sessions');
         }
+    }
+
+    public function discoverSlas()
+    {
+        $device = $this->getDeviceArray();
+
+        $slas = collect();
+        $data = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
+
+        // Index the MIB information
+        $sla_table = [];
+        foreach (explode("\n", $data) as $index) {
+            $key_val = explode(' ', $index, 3);
+
+            $key = $key_val[0];
+            $value = $key_val[2];
+
+            $prop_id = explode('.', $key);
+
+            $property = $prop_id[0];
+            $owner = $prop_id[1];
+            $test = $prop_id[2];
+
+            $sla_table[$owner . '.' . $test][$property] = $value;
+        }
+
+        foreach ($sla_table as $sla_key => $sla_config) {
+            // To get right owner index and test name from $sla_table key
+            $prop_id = explode('.', $sla_key);
+            $owner = $prop_id[0];
+            $test = $prop_id[1];
+
+            $sla_data = Sla::select('sla_id', 'sla_nr')
+                ->where('device_id', $device['device_id'])
+                ->where('owner', $owner)
+                ->where('tag', $test)
+                ->get();
+
+            $sla_id = $sla_data[0]->sla_id;
+            $sla_nr = $sla_data[0]->sla_nr;
+
+            $data = [
+                'device_id' => $device['device_id'],
+                'sla_nr'    => $sla_nr,
+                'owner'     => $owner,
+                'tag'       => $test,
+                'rtt_type'  => $sla_config['pingCtlType'],
+                'status'    => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
+                'opstatus'  => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
+                'deleted'   => 0,
+            ];
+
+            // If it is a standard type delete ping preffix
+            $data['rtt_type'] = str_replace('ping', '', $data['rtt_type']);
+
+            // To retrieve specific Juniper PingCtlType
+            if ($device['os'] == 'junos') {
+                $data['rtt_type'] = $this->retrieveJuniperType($data['rtt_type']);
+            }
+
+            $slas->push($data);
+        }
+
+        return $slas;
     }
 
     public function pollSlas($slas)
