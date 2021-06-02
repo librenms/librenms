@@ -8,7 +8,7 @@
                     "sysDescr": "MINI-LINK 6600",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": null,
+                    "hardware": "MINI-LINK 6691",
                     "features": null,
                     "os": "ericsson-6600",
                     "type": "wireless",

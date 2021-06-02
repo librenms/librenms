@@ -42,6 +42,7 @@ class Ericsson6600 extends OS implements
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfCarrierTermSNIR', [], 'XF-RADIOLINK-RLT-MIB');
+	$carrier = $this->getCacheTable('xfCarrierTermDistinguishedName', 'XF-RADIOLINK-RLT-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'snr',
@@ -49,7 +50,7 @@ class Ericsson6600 extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.5.1.3.1.17.' . $index,
                 'ericsson-6600',
                 $index,
-                'SNR: ' . snmp_get($this->getDeviceArray(), 'xfCarrierTermDistinguishedName' . '.' . $index, '-Oqv', 'XF-RADIOLINK-RLT-MIB'),
+		'SNR: ' . $carrier[$index]['xfCarrierTermDistinguishedName'],
                 null,
                 1,
                 10
@@ -64,6 +65,7 @@ class Ericsson6600 extends OS implements
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfCarrierTermActualCapacity', [], 'XF-RADIOLINK-RLT-MIB');
+	$carrier = $this->getCacheTable('xfCarrierTermDistinguishedName', 'XF-RADIOLINK-RLT-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -71,7 +73,7 @@ class Ericsson6600 extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.5.1.3.1.13.' . $index,
                 'ericsson-6600',
                 $index,
-                'Rate: ' . snmp_get($this->getDeviceArray(), 'xfCarrierTermDistinguishedName' . '.' . $index, '-Oqv', 'XF-RADIOLINK-RLT-MIB'),
+		'Rate: ' . $carrier[$index]['xfCarrierTermDistinguishedName'],
                 null,
                 1000,
                 1

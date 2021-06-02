@@ -1,5 +1,5 @@
 os: ericsson-6600
-text: 'Ericsson 6600'
+text: 'Ericsson 6600 series'
 type: wireless
 icon: ericsson
 discovery:
