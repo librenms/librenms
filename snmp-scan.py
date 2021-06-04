@@ -46,6 +46,8 @@ class Outcome:
 
 
 POLLER_GROUP = "0"
+WITHIN_POLLER_GROUPS = ""
+POLLER_GROUP = "0"
 VERBOSE_LEVEL = 0
 THREADS = 32
 CONFIG = {}
@@ -132,10 +134,13 @@ def scan_host(scan_ip):
                 "addhost.php",
                 "-g",
                 POLLER_GROUP,
+                "-G", 
+                WITHIN_POLLER_GROUPS,
                 hostname or scan_ip,
             ]
+
             if args.ping:
-                arguments.insert(5, args.ping)
+                arguments.insert(len(arguments) - 1, args.ping)
             add_output = check_output(arguments)
             return Result(scan_ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
@@ -199,6 +204,13 @@ Example: """
             POLLER_GROUP
         ),
     )
+    parser.add_argument(
+        "-G", 
+        dest="within_poller_groups",
+        type=str,
+        help="A list of poller groups to restrict duplicate IP checking within"
+    )
+
     parser.add_argument("-l", "--legend", action="store_true", help="Print the legend.")
     parser.add_argument(
         "-v",
@@ -219,7 +231,7 @@ Example: """
 
     VERBOSE_LEVEL = args.verbose or VERBOSE_LEVEL
     THREADS = args.threads or THREADS
-
+    WITHIN_POLLER_GROUPS = args.within_poller_groups or WITHIN_POLLER_GROUPS
     # Import LibreNMS config
     install_dir = path.dirname(path.realpath(__file__))
     chdir(install_dir)

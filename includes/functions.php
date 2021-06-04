@@ -380,8 +380,10 @@ function delete_device($id)
  */
 function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
 {
+    $within_poller_groups = $additional['within_poller_groups'] ?? [];
+
     // Test Database Exists
-    if (host_exists($host)) {
+    if (host_exists($host, null, $within_poller_groups)) {
         throw new HostExistsException("Already have host $host");
     }
 
@@ -400,7 +402,8 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && $device = device_has_ip($ip)) {
+
+    if ($force_add !== true && $device = device_has_ip($ip, $within_poller_groups)) {
         $message = "Cannot add $host, already have device with this IP $ip";
         if ($ip != $device->hostname) {
             $message .= " ($device->hostname)";
@@ -436,7 +439,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
             foreach (Config::get('snmp.v3') as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode, $overwrite_ip);
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip, $additional);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . '/' . $v3['authlevel']);
                 }
@@ -447,7 +450,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode, $overwrite_ip);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
+                    return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip, $additional);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -607,6 +610,10 @@ function createHost(
 
     $poller_group = getpollergroup($poller_group);
 
+    $within_poller_groups = [];
+    if (isset($additional['within_poller_groups'])) {
+        $within_poller_groups = $additional['within_poller_groups'];
+    }
     /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
@@ -636,7 +643,7 @@ function createHost(
         $device['os'] = Core::detectOS($device);
 
         $snmphost = snmp_get($device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
-        if (host_exists($host, $snmphost)) {
+        if (host_exists($host, $snmphost, $within_poller_groups)) {
             throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
         }
     }
@@ -1168,24 +1175,33 @@ function fix_integer_value($value)
  * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
  *
  * @param string $ip
+ * @param array $within_poller_groups
  * @return \App\Models\Device|false
  */
-function device_has_ip($ip)
+function device_has_ip($ip, $within_poller_groups = [])
 {
     if (IPv6::isValid($ip)) {
-        $ip_address = \App\Models\Ipv6Address::query()
+        $ip_addresses = \App\Models\Ipv6Address::query()
             ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
+            ->whereNotNull('port_id')
             ->with('port.device')
-            ->first();
+            ->get();
     } elseif (IPv4::isValid($ip)) {
-        $ip_address = \App\Models\Ipv4Address::query()
+        $ip_addresses = \App\Models\Ipv4Address::query()
             ->where('ipv4_address', $ip)
+            ->whereNotNull('port_id')
             ->with('port.device')
-            ->first();
+            ->get();
     }
 
-    if (isset($ip_address) && $ip_address->port) {
-        return $ip_address->port->device;
+    if (isset($ip_addresses)) {
+        if (! empty($within_poller_groups)) {
+            $ip_addresses = $ip_addresses->filter(function ($ip_address) use ($within_poller_groups) {
+                return in_array($ip_address->port->device->poller_group, $within_poller_groups);
+            });
+        }
+
+        return $ip_addresses->first()->port->device;
     }
 
     return false; // not an ipv4 or ipv6 address...
@@ -1219,13 +1235,14 @@ function snmpTransportToAddressFamily($transport)
  *
  * @param string $hostname The hostname to check for
  * @param string $sysName The sysName to check
+ * @param string $within_poller_groups If non-empty, will only check for dupe hosts within specified poller groups
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null)
+function host_exists($hostname, $sysName = null, $within_poller_groups = [])
 {
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
+    $query = 'SELECT COUNT(*) FROM `devices` WHERE (`hostname`=? OR `overwrite_ip`=?)';
+    $params = [$hostname, $hostname];
 
     if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
         $query .= ' OR `sysName`=?';
@@ -1236,6 +1253,11 @@ function host_exists($hostname, $sysName = null)
             $query .= ' OR `sysName`=?';
             $params[] = $full_sysname;
         }
+    }
+    if (! empty($within_poller_groups)) {
+        $placeholders = implode(',', array_fill(1, count($within_poller_groups), '?'));
+        $query .= " AND `poller_group` IN ($placeholders)";
+        $params = array_merge($params, $within_poller_groups);
     }
 
     return dbFetchCell($query, $params) > 0;

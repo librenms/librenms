@@ -15,7 +15,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('Pbg:p:f::');
+$options = getopt('Pbg:G:p:f::');
 
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
@@ -27,6 +27,14 @@ if (isset($options['g']) && $options['g'] >= 0) {
     $poller_group = Config::get('default_poller_group');
 } else {
     $poller_group = 0;
+}
+
+if (isset($options['G']) && ! empty(strval($options['G']))) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+    $within_poller_groups = explode(',', strval($options['G']));
 }
 
 if (isset($options['f']) && $options['f'] == 0) {
@@ -196,6 +204,10 @@ if (! empty($argv[1])) {
         }
     }//end if
 
+    if (isset($options['G'])) {
+        $additional['within_poller_groups'] = $within_poller_groups;
+    }
+
     try {
         $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
         $device = device_by_id_cache($device_id);
@@ -224,6 +236,7 @@ if (! empty($argv[1])) {
     Usage (ICMP only)    : ./addhost.php [-g <poller group>] [-f] -P <%Whostname or IP%n> [os] [hardware]
 
     -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
+    -G <within_poller_groups> a list of poller groups to restrict duplicate IP checking within
     -f forces the device to be added by skipping the icmp and snmp check against the host.
     -p <port assoc mode> allow you to set a port association mode for this device. By default ports are associated by \'ifIndex\'.
         For Linux/Unix based devices \'ifName\' or \'ifDescr\' might be useful for a stable iface mapping.
