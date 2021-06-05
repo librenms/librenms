@@ -5,9 +5,9 @@ icon: fs
 group: fs
 mib_dir: fs
 over:
-    - { graph: fanState, text: Fan }
-    - { graph: power1State, text: PSU 1 }
-    - { graph: power2State, text: PSU 2 }
+    - { graph: device_state, text: 'Sensors' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_dbm, text: 'dbm' }
 discovery:
     -
         sysObjectID:
@@ -30,6 +30,7 @@ poller_modules:
     junose-atm-vp: false
     printer-supplies: false
     ucd-diskio: false
+    os: true
     wifi: false
     wireless: false
     ospf: false
@@ -83,6 +84,7 @@ discovery_modules:
     discovery-protocols: false
     arp-table: false
     discovery-arp: false
+    os: true
     junose-atm-vp: false
     bgp-peers: false
     vlans: false
