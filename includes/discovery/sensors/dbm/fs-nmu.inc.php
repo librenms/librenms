@@ -22,18 +22,22 @@
  * @copyright  2021 Priority Colo Inc.
  * @author     Jonathan J Davis <davis@1m.ca>
  * 
- * fs-mnu was originally started by Jozef Rebjak <jozefrebjak@icloud.com> (see git)
+ * fs-mnu was originally started by Jozef Rebjak <jozefrebjak@icloud.com> (see git history)
  * 
  */
-
 
  echo "FS NMU OEO Light Levels (dbm)\n";
 
 // OAP C1 -> C16 OEOs 
 $oap_oeos = range(1,16);
 $oap_oeo_sensors = [
-    'TxPower' => ['desc' => 'Tx Power', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '4'],
-    'RxPower' => ['desc' => 'Rx Power', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '5'],
+    'TxPower' => ['desc' => 'Tx Power', 'id' => '4'],
+    'RxPower' => ['desc' => 'Rx Power', 'id' => '5'],
+    ];
+
+$oap_oeo_optic_limits = [
+    '10000' => ['low_limit' => -17, 'low_warn_limit' => -16, 'warn_limit' => 0.5, 'high_limit' => 1],
+    '80000' => ['low_limit' => -23, 'low_warn_limit' => -20 ,'warn_limit' => -10, 'high_limit' => -7],
     ];
 
 foreach($oap_oeos as $oap_oeo) {
@@ -52,9 +56,23 @@ foreach($oap_oeos as $oap_oeo) {
             } else {
                 $mode_wave = '( E nm)';
             }
+
+            $tx_distance = snmp_get($device, 'vSFP' . $slot . $pair . 'ModeTransmissionDistance.0', '-Ovqe', $object_ident);
+            if(is_numeric($tx_distance)) { 
+                $low_limit = $oap_oeo_optic_limits[$tx_distance]['low_limit'];
+                $low_warn_limit = $oap_oeo_optic_limits[$tx_distance]['low_warn_limit'];
+                $warn_limit = $oap_oeo_optic_limits[$tx_distance]['warn_limit'];
+                $high_limit = $oap_oeo_optic_limits[$tx_distance]['high_limit'];
+            } else {
+                $low_limit = -2;
+                $low_warn_limit = -1;
+                $warn_limit = 1;
+                $high_limit = 2;
+            }
+
             foreach($oap_oeo_sensors as $sensor => $options) {
                 $object_type = 'vSFP' . $slot . $pair . $sensor . '.0';
-                $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
+                $dbm_value = snmp_get($device, $object_type, '-Ovqe', $object_ident);
                 if (is_numeric($dbm_value)) {
                     $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_oeo . '.2.' . $oeo_offset . '.' . $options['id'] . '.0';
                     $sensor_description = 'C' . $oap_oeo . ' OEO ' . $slot . $pair . ' ' . $mode_wave . ' ' . $options['desc'];
@@ -66,9 +84,12 @@ foreach($oap_oeos as $oap_oeo) {
                         $object_ident . '::' .  $object_type,
                         'fs-nmu', 
                         $sensor_description,
-                        $options['divisor'],
-                        $options['multiplier'],
-                        null, null, null, null,
+                        100,
+                        1,
+                        $low_limit,
+                        $low_warn_limit,
+                        $warn_limit,
+                        $high_limit,
                         $dbm_value,
                         'snmp',
                         null, null, null,
@@ -81,13 +102,11 @@ foreach($oap_oeos as $oap_oeo) {
     }
 }
 
-
 echo "FS NMU EDFAs Levels (dbm)\n";
 
-// OAP C1 -> C16 EDFAs 
+// OAP C1 -> C16 EDFAs
 $oap_edfas = range(1,16);
 $oap_edfa_sensors = [
-    //'vGainOrOutputPower' => ['flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', ],
     'PUMPPower' => ['desc' => 'Pump Power', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '24'],
     'Input' => ['desc' => 'Input', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '28'],
     'Output' => ['desc' => 'Output', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '29'],
