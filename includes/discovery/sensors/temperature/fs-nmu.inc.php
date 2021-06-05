@@ -28,7 +28,7 @@ echo "FS NMU OEO Temperatures\n";
 // OAP C1 -> C16 OEOs 
 $oap_oeos = range(1,16);
 $oap_oeo_sensors = [
-    'ModeTemperature' => ['desc' => 'Mode Temperature', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '9'],
+    'ModeTemperature' => ['desc' => 'Mode Temperature', 'id' => '9'],
     ];
 
 foreach($oap_oeos as $oap_oeo) {
@@ -49,7 +49,7 @@ foreach($oap_oeos as $oap_oeo) {
             }
             foreach($oap_oeo_sensors as $sensor => $options) {
                 $object_type = 'vSFP' . $slot . $pair . $sensor . '.0';
-                $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
+                $dbm_value = snmp_get($device, $object_type, '-Ovqe', $object_ident);
                 if (is_numeric($dbm_value)) {
                     $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_oeo . '.2.' . $oeo_offset . '.' . $options['id'] . '.0';
                     $sensor_description = 'C' . $oap_oeo . ' OEO ' . $slot . $pair . ' ' . $mode_wave . ' ' . $options['desc'];
@@ -61,9 +61,12 @@ foreach($oap_oeos as $oap_oeo) {
                         $object_ident . '::' .  $object_type,
                         'fs-nmu', 
                         $sensor_description,
-                        $options['divisor'],
-                        $options['multiplier'],
-                        null, null, null, null,
+                        100, // divisor
+                        1, // multiplier
+                        -10, // low_limit
+                        -5, // low_warn_limit
+                        85, // warn_limit
+                        90, // high_limit
                         $dbm_value,
                         'snmp',
                         null, null, null,
@@ -80,15 +83,15 @@ foreach($oap_oeos as $oap_oeo) {
 echo "FS NMU EDFA Temperatures\n";
 $oap_edfas = range(1,16);
 $oap_edfa_sensors = [
-    'ModuleTemperature' => ['desc' => 'Module Temperature', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '22'],
-    'PUMPTemperature' => ['desc' => 'Pump Temperature', 'flags' => '-Ovqe', 'divisor' => '100', 'multiplier' => '1', 'id' => '25'],
+    'ModuleTemperature' => ['desc' => 'Module Temperature', 'id' => '22'],
+    'PUMPTemperature' => ['desc' => 'Pump Temperature', 'id' => '25'],
     ];
 
 foreach($oap_edfas as $oap_edfa) {
     $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
     foreach($oap_edfa_sensors as $sensor => $options) {
         $object_type = 'v' . $sensor. '.0';
-        $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
+        $dbm_value = snmp_get($device, $object_type, '-Ovqe', $object_ident);
         if (is_numeric($dbm_value)) {
             $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' .$options['id'] . '.0';
             $sensor_description = 'C' . $oap_edfa . ' EDFA ' . $options['desc'];
@@ -100,9 +103,12 @@ foreach($oap_edfas as $oap_edfa) {
                 $object_ident . '::' .  $object_type,
                 'fs-nmu', 
                 $sensor_description,
-                $options['divisor'],
-                $options['multiplier'],
-                null, null, null, null,
+                100, // divisor
+                1, // multiplier
+                -10, // low_limit
+                -5, // low_warn_limit
+                85, // warn_limit
+                90, // high_limit
                 $dbm_value,
                 'snmp',
                 null, null, null,
