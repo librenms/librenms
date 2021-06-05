@@ -1,75 +1,137 @@
 <?php
 /**
  * fs-nmu.inc.php
- *
- * -Description-
- *
+ * 
+ * OAP OEO and EDFA Modules for FibreSwitches NMUs
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
+ *  (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * 
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
+ * along with this program. If not, see https://www.gnu.org/licenses/.
+ * 
  * @link       https://www.librenms.org
- * @copyright  2020 Jozef Rebjak
- * @author     Jozef Rebjak <jozefrebjak@icloud.com>
+ * 
+ * @copyright  2021 Priority Colo Inc.
+ * @author     Jonathan J Davis <davis@1m.ca>
+ * 
  */
-$power1 = snmp_get($device, 'power1State.0', '-Ovqe', 'OAP-NMU');
-$power2 = snmp_get($device, 'power2State.0', '-Ovqe', 'OAP-NMU');
-$fan = snmp_get($device, 'fanState.0', '-Ovqe', 'OAP-NMU');
-$oid_power1 = '.1.3.6.1.4.1.40989.10.16.20.11.0';
-$oid_power2 = '.1.3.6.1.4.1.40989.10.16.20.12.0';
-$oid_fan = '.1.3.6.1.4.1.40989.10.16.20.10.0';
-$index = '0';
 
-// Power 1 State
-if (is_numeric($power1)) {
-    $state_name = 'power1State';
-    $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+$oap_state_name = 'OAPAlarmStates';
+$oap_states = [
+    ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'alarm'],
+    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
+];
+
+create_state_index($oap_state_name, $oap_states);
+
+echo "FS NMU OEO Alarm States\n";
+
+// OAP C1 -> C16 OEOs 
+$oap_oeos = range(1,16);
+$oap_oeo_sensors = [
+    'TxPowerAlarm' => ['desc' => 'Tx Power Alarm', 'flags' => '-Ovqe',  'id' => '10'],
+    'RxPowerAlarm' => ['desc' => 'Rx Power Alarm', 'flags' => '-Ovqe',  'id' => '11'],
+    'ModeTemperatureAlarm' => ['desc' => 'Mode Temperature Alarm ', 'flags' => '-Ovqe', 'id' => '12'],
     ];
-    create_state_index($state_name, $states);
 
-    $descr = 'Power 1 State';
-    discover_sensor($valid['sensor'], 'state', $device, $oid_power1, $index, $state_name, $descr, 1, 1, null, null, null, null, $power1, 'snmp', $index);
+foreach($oap_oeos as $oap_oeo) {
+    $object_ident = 'OAP-C' . $oap_oeo . '-OEO';
 
-    create_sensor_to_state_index($device, $state_name, $index);
+    // slots
+    $oap_oeo_slots = ['A', 'B', 'C', 'D'];
+    $oeo_offset = 11;
+    // pairs e.g. A1, A2; B1, B2; C1, C2; D1, D1;
+    $oap_oeo_pairs = [1,2];
+    foreach($oap_oeo_slots as $slot) {
+        foreach($oap_oeo_pairs as $pair) {
+            $mode_wave = snmp_get($device, 'vSFP' . $slot . $pair . 'ModeWave.0', '-Ovqe', $object_ident);
+            if (is_numeric($mode_wave)) {
+                $mode_wave = '(' . strval($mode_wave / 100) . 'nm)';
+            } else {
+                $mode_wave = '( E nm)';
+            }
+            foreach($oap_oeo_sensors as $sensor => $options) {
+                $object_type = 'vSFP' . $slot . $pair . $sensor . '.0';
+                $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
+                if (is_numeric($dbm_value)) {
+                    $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_oeo . '.2.' . $oeo_offset . '.' . $options['id'] . '.0';
+                    $sensor_description = 'C' . $oap_oeo . ' OEO ' . $slot . $pair . ' ' . $mode_wave . ' ' . $options['desc'];
+                    $index = $object_ident . '::' .  $object_type;
+
+                    discover_sensor(
+                        $valid['sensor'], 
+                        'state', 
+                        $device, 
+                        $sensor_oid,
+                        $index,
+                        $oeo_state_name, 
+                        $sensor_description,
+                        1, // div
+                        1, // multiply
+                        null, null, null, null,
+                        $dbm_value,
+                        'snmp',
+                        null, null, null,
+                        $object_ident
+                        );
+
+                    create_sensor_to_state_index($device, $oap_state_name, $index);
+                }
+            }
+            $oeo_offset++;
+        }
+    }
 }
 
-// Power 2 State
-if (is_numeric($power2)) {
-    $state_name = 'power2State';
-    $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
-    ];
-    create_state_index($state_name, $states);
+echo "FS NMU EDFAs Alarm States\n";
 
-    $descr = 'Power 2 State';
-    discover_sensor($valid['sensor'], 'state', $device, $oid_power2, $index, $state_name, $descr, 1, 1, null, null, null, null, $power2, 'snmp', $index);
+// OAP C1 -> C16 EDFAs
+$oap_edfas = range(1,16);
+$oap_edfa_sensors = [
+    'InputPowerState' => ['desc' => 'Input Power State', 'flags' => '-Ovqe', 'id' => '16'],
+    'OutputPowerState' => ['desc' => 'Output Power State', 'flags' => '-Ovqe', 'id' => '17'],
+    'ModuleTemperatureState' => ['desc' => 'Module Temperature State', 'flags' => '-Ovqe', 'id' => '18'],
+    'PUMPTemperatureState' => ['desc' => 'PUMP Temperature State', 'flags' => '-Ovqe', 'id' => '19'],
+    'PUMPCurrentState' => ['desc' => 'PUMP Current State', 'flags' => '-Ovqe', 'id' => '20'],
+];
 
-    create_sensor_to_state_index($device, $state_name, $index);
-}
+foreach($oap_edfas as $oap_edfa) {
+    $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
+    foreach($oap_edfa_sensors as $sensor => $options) {
+        $object_type = 'v' . $sensor. '.0';
+        $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
+        if (is_numeric($dbm_value)) {
+            $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' .$options['id'] . '.0';
+            $sensor_description = 'C' . $oap_edfa . ' EDFA ' . $options['desc'];
 
-// Fan State
-if (is_numeric($fan)) {
-    $state_name = 'fanState';
-    $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
-    ];
-    create_state_index($state_name, $states);
+            $index = $object_ident . '::' .  $object_type;
 
-    $descr = 'Fan State';
-    discover_sensor($valid['sensor'], 'state', $device, $oid_fan, $index, $state_name, $descr, 1, 1, null, null, null, null, $fan, 'snmp', $index);
+            discover_sensor(
+                $valid['sensor'], 
+                'state', 
+                $device, 
+                $sensor_oid,
+                $index,
+                $oap_state_name, 
+                $sensor_description,
+                1,
+                1,
+                null, null, null, null,
+                $dbm_value,
+                'snmp',
+                null, null, null,
+                $object_ident
+                );
 
-    create_sensor_to_state_index($device, $state_name, $index);
+                create_sensor_to_state_index($device, $oap_state_name, $index);
+        }
+    }
 }
