@@ -3,8 +3,9 @@ modules:
     mempools:
         data:
             -
-                used: TIMETRA-SYSTEM-MIB::sgiMemoryUsed
-                free: TIMETRA-SYSTEM-MIB::sgiMemoryAvailable
+                used: TIMETRA-SYSTEM-MIB::sgiKbMemoryPoolAllocated
+                free: TIMETRA-SYSTEM-MIB::sgiKbMemoryAvailable
+                precision: 1000
     os:
         version:
             - TIMETRA-SYSTEM-MIB::sgiSwMajorVersion.0
