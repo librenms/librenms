@@ -21,22 +21,39 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1588.2.1.1.1",
-                    "sysDescr": "Fibre Channel Switch.",
-                    "sysContact": "<private>",
-                    "version": "v8.1.2g",
-                    "hardware": "Brocade 6520 Switch",
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.1588.2.1.1.117",
+                    "sysDescr": "FC5022 16Gb SAN Scalable Switch:IBM Flex System FC5022 24-port 16Gb ESB SAN Scalable Switch",
+                    "sysContact": null,
+                    "version": "0",
+                    "hardware": "Unknown Brocade FC Switch",
                     "features": null,
                     "os": "fabos",
                     "type": "network",
                     "serial": null,
                     "icon": "brocade.svg",
-                    "location": "<private>"
+                    "location": null
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.1588.2.1.1.117",
+                    "sysDescr": "FC5022 16Gb SAN Scalable Switch:IBM Flex System FC5022 24-port 16Gb ESB SAN Scalable Switch",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "Unknown Brocade FC Switch",
+                    "features": null,
+                    "os": "fabos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "brocade.svg",
+                    "location": null
+                }
+            ]
+        }
     },
     "ports": {
         "discovery": {
