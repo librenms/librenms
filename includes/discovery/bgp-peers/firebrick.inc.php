@@ -44,6 +44,7 @@ unset($bgpPeersCache);
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
+        // Force to null to avoid 0s going to the DB instead of Nulls
         $vrfId = null;
     } else {
         $checkVrf = ' AND vrf_id = ? ';
@@ -92,8 +93,18 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 // clean up peers
 $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
-    $vrfId = empty($value['vrf_id']) ? 0 : $value['vrf_id'];
+    $vrfId = $value['vrf_id'];
     $address = $value['bgpPeerIdentifier'];
+
+    // Cleanup code to deal with 0 vs Null in the DB
+    if($vrfId === 0){
+        // Database says it's table 0 - which is wrong.  It should be "null" for global table
+        $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+        echo str_repeat('-', $deleted);
+        continue;
+    }else{
+        $testVrfId = $vrfId;
+    }
 
     if (empty($bgpPeers[$vrfId][$address])) {
         if ($vrfId === null) {
