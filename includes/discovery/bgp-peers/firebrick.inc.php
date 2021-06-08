@@ -36,14 +36,13 @@ foreach ($bgpPeersCache as $key => $value) {
     if (isset($value['fbBgpPeerTableId']) && $value['fbBgpPeerTableId'] !== '') {
         $bgpPeers[$value['fbBgpPeerTableId']][$address] = $value;
     } else {
-        $bgpPeers[null][$address] = $value;
+        $bgpPeers[0][$address] = $value;
     }
 }
 unset($bgpPeersCache);
 
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
-        $vrfId = null;
         $checkVrf = ' AND `vrf_id` IS NULL ';
     } else {
         $checkVrf = ' AND vrf_id = ? ';
@@ -92,7 +91,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 // clean up peers
 $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
-    $vrfId = $value['vrf_id'];
+    $vrfId = empty($value['vrf_id']) ? null : $value['vrf_id'];
     $address = $value['bgpPeerIdentifier'];
 
     if (empty($bgpPeers[$vrfId][$address])) {
