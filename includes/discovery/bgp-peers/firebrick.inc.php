@@ -97,12 +97,12 @@ foreach ($peers as $value) {
     $address = $value['bgpPeerIdentifier'];
 
     // Cleanup code to deal with 0 vs Null in the DB
-    if($vrfId === 0){
+    if ($vrfId === 0) {
         // Database says it's table 0 - which is wrong.  It should be "null" for global table
         $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
         echo str_repeat('-', $deleted);
         continue;
-    }else{
+    } else {
         $testVrfId = $vrfId;
     }
 
