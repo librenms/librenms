@@ -91,7 +91,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 // clean up peers
 $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
-    $vrfId = empty($value['vrf_id']) ? null : $value['vrf_id'];
+    $vrfId = empty($value['vrf_id']) ? 0 : $value['vrf_id'];
     $address = $value['bgpPeerIdentifier'];
 
     if (empty($bgpPeers[$vrfId][$address])) {
@@ -101,7 +101,6 @@ foreach ($peers as $value) {
             $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
         }
         echo str_repeat('-', $deleted);
-        echo PHP_EOL;
     }
 }
 
