@@ -44,6 +44,7 @@ unset($bgpPeersCache);
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
+        $vrfId = null;
     } else {
         $checkVrf = ' AND vrf_id = ? ';
         $vrfs = [
