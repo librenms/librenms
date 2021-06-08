@@ -22,9 +22,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use Illuminate\Database\Eloquent\Collection;
-
 namespace LibreNMS\Interfaces\Polling;
+
+use Illuminate\Database\Eloquent\Collection;
 
 interface SlaPolling
 {
