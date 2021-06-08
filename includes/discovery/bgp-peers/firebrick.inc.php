@@ -103,10 +103,10 @@ foreach ($peers as $value) {
         echo str_repeat('-', $deleted);
         continue;
     } else {
-        $testVrfId = $vrfId;
+        $testVrfId = empty($vrfId) ? 0 : $vrfId;
     }
 
-    if (empty($bgpPeers[$vrfId][$address])) {
+    if (empty($bgpPeers[$testVrfId][$address])) {
         if ($vrfId === null) {
             $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id IS NULL', [$device['device_id'], $address]);
         } else {
