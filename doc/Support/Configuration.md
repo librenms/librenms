@@ -9,11 +9,12 @@ config.php: This applies to the local poller only.  Configs set here will be dis
 
 The LibreNMS uses dot notation for config items:
 | Database | config.php |
+| -------- | ---------- |
 | `snmp.community` | `$config['snmp']['community']` |
 | `snmp.community.+` | `$config['snmp']['community'][]` |
 | `snmp.v3.0.authalgo` | `$config['snmp']['v3'][0]['authalgo']` |
 
-> The documentation has not been up dated to reflect the new way to set config items, but it will work for all settings.  Not all settings have been defined in LibreNMS, but they can still be set with the `--ignore-checks` option.  Without that option input is checked for correctness, that does not mean it is not possible to set bad values.  Please report missing settings.
+> The documentation has not been updated to reflect using `lnms config:set` to set config items, but it will work for all settings.  Not all settings have been defined in LibreNMS, but they can still be set with the `--ignore-checks` option.  Without that option input is checked for correctness, that does not mean it is not possible to set bad values.  Please report missing settings.
 
 # CLI
 `lnms config:get` will fetch the current config settings (composite of database and config.php).
@@ -68,13 +69,6 @@ lnms config:get snmp.community --json
 
 
 # Directories
-
-```php
-$config['install_dir'] = "/opt/librenms";
-```
-
-Set the installation directory (defaults to /opt/librenms), if you
-clone the GitHub branch to another location ensure you alter this.
 
 ```php
 $config['temp_dir'] = "/tmp";
