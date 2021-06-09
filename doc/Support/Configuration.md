@@ -17,7 +17,7 @@ The LibreNMS uses dot notation for config items:
 > The documentation has not been updated to reflect using `lnms config:set` to set config items, but it will work for all settings.  Not all settings have been defined in LibreNMS, but they can still be set with the `--ignore-checks` option.  Without that option input is checked for correctness, that does not mean it is not possible to set bad values.  Please report missing settings.
 
 # CLI
-`lnms config:get` will fetch the current config settings (composite of database and config.php).
+`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).
 `lnms config:set` will set the config setting in the database.  Calling `lnms config:set` on a setting with no value will reset it to the default value.
 
 If you set up bash completion, you can use tab completion to find config settings.
