@@ -16,7 +16,7 @@ modules:
         data:
             -
                 percent_used: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue
-                warn_percent: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageHighWarning
+                #warn_percent: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageHighWarning
                 index: 1
     sensors:
         pre-cache:
