@@ -24,7 +24,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.1248.4.1')) {
         $device,
         '.1.3.6.1.4.1.1248.4.1.1.1.1.0',
         0,
-        'projector',
+        'epson-projector',
         'Lamp Hours',
         1,
         1,

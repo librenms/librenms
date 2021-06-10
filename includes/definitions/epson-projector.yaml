@@ -1,4 +1,4 @@
-os: projector
+os: epson-projector	
 text: 'Epson Projector'
 type: collaboration
 icon: epson
