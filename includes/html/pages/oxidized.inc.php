@@ -121,7 +121,7 @@ $pagetitle[] = 'Oxidized';
                     $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
                         if (value['dev_id']) {
-                            $('#search-output').append('<p><a href="device/device=' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
+                            $('#search-output').append('<p><a href="{{ url('device') }}/device=' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
                         } else {
                             $('#search-output').append('<p>' + value['full_name'] + '</p>');
                         }
