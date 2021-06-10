@@ -23,6 +23,8 @@
  * 
  */
 
+$oap_flags = '-Ovqe';
+
 echo "FS NMU OEO Temperatures\n";
 
 // OAP C1 -> C16 OEOs 
@@ -41,15 +43,15 @@ foreach($oap_oeos as $oap_oeo) {
     $oap_oeo_pairs = [1,2];
     foreach($oap_oeo_slots as $slot) {
         foreach($oap_oeo_pairs as $pair) {
-            $mode_wave = snmp_get($device, 'vSFP' . $slot . $pair . 'ModeWave.0', '-Ovqe', $object_ident);
+            $mode_wave = snmp_get($device, 'vSFP' . $slot . $pair . 'ModeWave.0', $oap_flags, $object_ident);
             if (is_numeric($mode_wave)) {
                 $mode_wave = '(' . strval($mode_wave / 100) . 'nm)';
             } else {
-                $mode_wave = '( E nm)';
+                $mode_wave = '';
             }
             foreach($oap_oeo_sensors as $sensor => $options) {
                 $object_type = 'vSFP' . $slot . $pair . $sensor . '.0';
-                $dbm_value = snmp_get($device, $object_type, '-Ovqe', $object_ident);
+                $dbm_value = snmp_get($device, $object_type, $oap_flags, $object_ident);
                 if (is_numeric($dbm_value)) {
                     $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_oeo . '.2.' . $oeo_offset . '.' . $options['id'] . '.0';
                     $sensor_description = 'C' . $oap_oeo . ' OEO ' . $slot . $pair . ' ' . $mode_wave . ' ' . $options['desc'];
@@ -63,10 +65,10 @@ foreach($oap_oeos as $oap_oeo) {
                         $sensor_description,
                         100, // divisor
                         1, // multiplier
-                        -10, // low_limit
-                        -5, // low_warn_limit
-                        85, // warn_limit
-                        90, // high_limit
+                        0, // low_limit
+                        5, // low_warn_limit
+                        60, // warn_limit
+                        70, // high_limit
                         $dbm_value,
                         'snmp',
                         null, null, null,
@@ -91,7 +93,7 @@ foreach($oap_edfas as $oap_edfa) {
     $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
     foreach($oap_edfa_sensors as $sensor => $options) {
         $object_type = 'v' . $sensor. '.0';
-        $dbm_value = snmp_get($device, $object_type, '-Ovqe', $object_ident);
+        $dbm_value = snmp_get($device, $object_type, $oap_flags, $object_ident);
         if (is_numeric($dbm_value)) {
             $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' .$options['id'] . '.0';
             $sensor_description = 'C' . $oap_edfa . ' EDFA ' . $options['desc'];
@@ -105,10 +107,10 @@ foreach($oap_edfas as $oap_edfa) {
                 $sensor_description,
                 100, // divisor
                 1, // multiplier
-                -10, // low_limit
-                -5, // low_warn_limit
-                85, // warn_limit
-                90, // high_limit
+                -5, // low_limit
+                5, // low_warn_limit
+                45, // warn_limit
+                55, // high_limit
                 $dbm_value,
                 'snmp',
                 null, null, null,

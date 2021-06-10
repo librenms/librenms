@@ -24,6 +24,8 @@
  * 
  */
 
+$oap_flags = '-Ovqe';
+
 echo "FS NMU EDFAs voltages\n";
 
 // OAP C1 -> C16 EDFAs
@@ -36,7 +38,7 @@ foreach($oap_edfas as $oap_edfa) {
     $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
     foreach($oap_edfa_sensors as $sensor => $options) {
         $object_type = 'v' . $sensor. '.0';
-        $dbm_value = snmp_get($device, $object_type, '-Ovqe', $object_ident);
+        $dbm_value = snmp_get($device, $object_type, $oap_flags, $object_ident);
         if (is_numeric($dbm_value)) {
             $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' .$options['id'] . '.0';
             $sensor_description = 'C' . $oap_edfa . ' EDFA ' . $options['desc'];
@@ -50,8 +52,8 @@ foreach($oap_edfas as $oap_edfa) {
                 $sensor_description,
                 1000,
                 1,
-                1, 
-                1.5, 
+                0.5, 
+                0.8, 
                 3.7, 
                 4,
                 $dbm_value,

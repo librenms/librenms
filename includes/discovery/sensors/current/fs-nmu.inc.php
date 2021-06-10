@@ -24,20 +24,24 @@
  * 
  */
 
+$oap_current_divisor = 100000;
+$oap_current_multiplier = 1;
+$oap_flags = '-Ovqe';
+
 echo "FS NMU EDFAs current\n";
 
 // OAP C1 -> C16 EDFAs
 $oap_edfas = range(1,16);
 $oap_edfa_sensors = [
-    'PUMPCurrent' => ['desc' => 'Pump Current', 'flags' => '-Ovqe', 'divisor' => '1000', 'multiplier' => '1', 'id' => '26'],
-    'TECCurrent' => ['desc' => 'TEC Current', 'flags' => '-Ovqe', 'divisor' => '1000', 'multiplier' => '1', 'id' => '27'],
+    'PUMPCurrent' => ['desc' => 'Pump Current',  'id' => '26'],
+    'TECCurrent' => ['desc' => 'TEC Current', 'id' => '27'],
 ];
 
 foreach($oap_edfas as $oap_edfa) {
     $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
     foreach($oap_edfa_sensors as $sensor => $options) {
         $object_type = 'v' . $sensor. '.0';
-        $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
+        $dbm_value = snmp_get($device, $object_type, $oap_flags, $object_ident);
         if (is_numeric($dbm_value)) {
             $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' .$options['id'] . '.0';
             $sensor_description = 'C' . $oap_edfa . ' EDFA ' . $options['desc'];
@@ -49,9 +53,12 @@ foreach($oap_edfas as $oap_edfa) {
                 $object_ident . '::' .  $object_type,
                 'fs-nmu', 
                 $sensor_description,
-                $options['divisor'],
-                $options['multiplier'],
-                null, null, null, null,
+                $oap_current_divisor,
+                $oap_current_multiplier,
+                -4,
+                -3,
+                3,
+                4,
                 $dbm_value,
                 'snmp',
                 null, null, null,
