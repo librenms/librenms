@@ -1,0 +1,109 @@
+-- CONTROLBOX SNMP STACK SMIV2 SPECIFICATION MIB
+--
+
+CONTROLBOX-TH332-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   Integer32, enterprises 		FROM SNMPv2-SMI   				
+   DisplayString                        FROM SNMPv2-TC
+   NOTIFICATION-TYPE                  	FROM SNMPv2-SMI; 
+
+th332 MODULE-IDENTITY
+    LAST-UPDATED "201503230000Z"
+    ORGANIZATION "Controlbox"
+    CONTACT-INFO "www.controlbox-bg.com"
+    DESCRIPTION  "The MIB for TH-332 SNMP server."
+    REVISION 	"201503230000Z"
+    DESCRIPTION "The MIB module for SMIv2."
+    ::= { controlbox 2 }   
+   
+controlbox              OBJECT IDENTIFIER ::=  { enterprises 17095 }
+trapNotifications 	OBJECT IDENTIFIER ::=  { th332 0 }
+control                 OBJECT IDENTIFIER ::=  { th332 1 }
+  
+temperatureTrap NOTIFICATION-TYPE
+   OBJECTS { deviceName, temperature, temperatureState }
+   STATUS current  
+   DESCRIPTION 
+      "SMIV2 Trap notification information for the SNMP Manager. 
+      The objects used in the demo trap notification are 
+      deviceName, temperature and temperatureState."
+   ::= { trapNotifications 1 }
+   
+humidityTrap NOTIFICATION-TYPE
+   OBJECTS { deviceName, humidity, humidityState }
+   STATUS current
+   DESCRIPTION 
+      "SMIV2 Trap notification information for the SNMP Manager. 
+      The objects used in the demo trap notification are 
+      deviceName, humidity and humidityState."
+   ::= { trapNotifications 2 }
+   
+dewpointTrap NOTIFICATION-TYPE
+   OBJECTS { deviceName, dewpoint, dewpointState }
+   STATUS current
+   DESCRIPTION 
+      "SMIV2 Trap notification information for the SNMP Manager. 
+      The objects used in the demo trap notification are 
+      deviceName, dewpoint and dewpointState."
+   ::= { trapNotifications 3 }
+
+deviceID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device ID"
+    ::= { control 1 }
+   
+deviceName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device name"
+    ::= { control 2 }
+   
+temperature OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Current measured temperature"
+    ::= { control 3 }
+    
+humidity OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Current measured humidity"
+    ::= { control 4 }
+
+dewpoint    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Calculated dew point"
+   ::= { control 5 }
+
+temperatureState   OBJECT-TYPE
+   SYNTAX INTEGER { normal(0),alert(1),warning(2),critical(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Current temperature state"
+   ::= { control 6 }
+   
+humidityState   OBJECT-TYPE
+   SYNTAX INTEGER { normal(0),alert(1),warning(2),critical(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Current himidity state"
+   ::= { control 7 }
+
+dewpointState   OBJECT-TYPE
+   SYNTAX INTEGER { normal(0),alert(1) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Current dew point state"
+   ::= { control 8 }
+
+END   
+
