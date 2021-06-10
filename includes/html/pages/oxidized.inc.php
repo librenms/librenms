@@ -92,7 +92,7 @@ $pagetitle[] = 'Oxidized';
                     return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id +
                             '" id="btn-refresh-node-devId' + row.id + '" onclick="refresh_oxidized_node(\'' + row.hostname + '\');" title="Refetch config">' +
                             '<i class="fa fa-refresh"></i></button> ' +
-                            '<a href="device/device=' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
+                            '<a href="{{ url('device') }}/device=' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
                 }
             },
             "status": function(column, row) {
