@@ -21,6 +21,8 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Sla;
+use App\Observers\ModuleModelObserver;
+use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -28,6 +30,8 @@ use LibreNMS\OS;
 
 class Slas implements Module
 {
+    use SyncsModels;
+
     /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
@@ -37,53 +41,9 @@ class Slas implements Module
     public function discover(OS $os)
     {
         if ($os instanceof SlaDiscovery) {
-            // Get existing SLAs
-            $existing_slas = Sla::select('sla_id')
-            ->where('device_id', $os->getDevice()['device_id'])
-            ->where('deleted', 0)
-            ->get();
-
             $slas = $os->discoverSlas();
-
-            // To ensure unity of mock sla_nr field
-            $max_sla_nr = Sla::where('device_id', $os->getDevice()['device_id'])
-                ->max('sla_nr');
-            $i = 1;
-
-            foreach ($slas as $sla) {
-                $sla_data = Sla::select('sla_id')
-                    ->where('device_id', $os->getDevice()['device_id'])
-                    ->where('sla_nr', $sla['sla_nr'])
-                    ->get();
-                $sla_id = $sla_data[0]->sla_id;
-
-                if (! $sla_id) {
-                    // If not Cisco, set mock sla_nr to ensure unicity
-                    if (($os->getDevice()['os'] != 'ios') && ($os->getDevice()['os'] != 'iosxe') && ($os->getDevice()['os'] != 'iosxr')) {
-                        $sla['sla_nr'] = $max_sla_nr + $i;
-                        $i++;
-                    }
-
-                    Sla::insert($sla);
-                    echo '+';
-                } else {
-                    // Remove from the list
-                    $existing_slas = $existing_slas->except([$sla_id]);
-
-                    Sla::where('sla_id', $sla_id)
-                        ->update($sla);
-                    echo '.';
-                }
-            }//end foreach
-
-            // Mark all remaining SLAs as deleted
-            foreach ($existing_slas as $existing_sla) {
-                Sla::where('sla_id', $existing_sla->sla_id)
-                    ->update(['deleted' => 1]);
-                echo '-';
-            }
-
-            echo "\n";
+            ModuleModelObserver::observe(Sla::class);
+            $this->syncModels($os->getDevice(), 'slas', $slas);
         }
     }
 

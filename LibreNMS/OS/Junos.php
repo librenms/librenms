@@ -70,63 +70,21 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
     public function discoverSlas()
     {
-        $device = $this->getDeviceArray();
-
         $slas = collect();
-        $data = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
-
-        // Index the MIB information
-        $sla_table = [];
-        foreach (explode("\n", $data) as $index) {
-            $key_val = explode(' ', $index, 3);
-
-            $key = $key_val[0];
-            $value = $key_val[2];
-
-            $prop_id = explode('.', $key);
-
-            $property = $prop_id[0];
-            $owner = $prop_id[1];
-            $test = $prop_id[2];
-
-            $sla_table[$owner . '.' . $test][$property] = $value;
-        }
+        $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'pingCtlTable', [], 'DISMAN-PING-MIB');
+        $index = 0;
 
         foreach ($sla_table as $sla_key => $sla_config) {
-            // To get right owner index and test name from $sla_table key
-            $prop_id = explode('.', $sla_key);
-            $owner = $prop_id[0];
-            $test = $prop_id[1];
+            [$owner, $test] = explode('.', $sla_key, 2);
 
-            $sla_data = Sla::select('sla_id', 'sla_nr')
-                ->where('device_id', $device['device_id'])
-                ->where('owner', $owner)
-                ->where('tag', $test)
-                ->get();
-
-            $sla_id = $sla_data[0]->sla_id;
-            $sla_nr = $sla_data[0]->sla_nr;
-
-            $data = [
-                'device_id' => $device['device_id'],
-                'sla_nr'    => $sla_nr,
-                'owner'     => $owner,
-                'tag'       => $test,
-                'rtt_type'  => $sla_config['pingCtlType'],
-                'status'    => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
-                'opstatus'  => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
-                'deleted'   => 0,
-            ];
-
-            // If it is a standard type delete ping preffix
-            $data['rtt_type'] = str_replace('ping', '', $data['rtt_type']);
-
-            // To retrieve specific Juniper PingCtlType
-            if ($device['os'] == 'junos') {
-                $data['rtt_type'] = $this->retrieveJuniperType($data['rtt_type']);
-            }
-
-            $slas->push($data);
+            $slas->push(new Sla([
+                'sla_nr' => $index++, // does not matter, not used
+                'owner' => $owner,
+                'tag' => $test,
+                'rtt_type' => $this->retrieveJuniperType($sla_config['pingCtlType']),
+                'status' => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
+                'opstatus' => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
+            ]));
         }
 
         return $slas;
@@ -275,7 +233,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             // Update the DB if necessary
             if (count($update) > 0) {
                 Sla::where('sla_id', $sla_id)
-                ->update($update);
+                    ->update($update);
             }
         }
     }
@@ -283,37 +241,24 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     /**
      * Retrieve specific Juniper PingCtlType
      */
-    public function retrieveJuniperType($mib_location)
+    private function retrieveJuniperType($rtt_type)
     {
-        // Return without changes if not in the list
-        $rtt_type = $mib_location;
-
-        switch ($mib_location) {
+        switch ($rtt_type) {
             case 'enterprises.2636.3.7.2.1':
-                $rtt_type = 'IcmpTimeStamp';
-                break;
-
+                return 'IcmpTimeStamp';
             case 'enterprises.2636.3.7.2.2':
-                $rtt_type = 'HttpGet';
-                break;
-
+                return 'HttpGet';
             case 'enterprises.2636.3.7.2.3':
-                $rtt_type = 'HttpGetMetadata';
-                break;
-
+                return 'HttpGetMetadata';
             case 'enterprises.2636.3.7.2.4':
-                $rtt_type = 'DnsQuery';
-                break;
-
+                return 'DnsQuery';
             case 'enterprises.2636.3.7.2.5':
-                $rtt_type = 'NtpQuery';
-                break;
+                return 'NtpQuery';
             case 'enterprises.2636.3.7.2.6':
-                $rtt_type = 'UdpTimestamp';
-                break;
+                return 'UdpTimestamp';
+            default:
+                return str_replace('ping', '', $rtt_type);
         }
-
-        return $rtt_type;
     }
 
     /**

@@ -308,74 +308,45 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
     public function discoverSlas()
     {
-        $device = $this->getDeviceArray();
-
         $slas = collect();
-        $data = snmp_walk($device, 'ciscoRttMonMIB.ciscoRttMonObjects.rttMonCtrl', '-Osq', '+CISCO-RTTMON-MIB');
 
-        // Index the MIB information
-        $sla_table = [];
-        foreach (explode("\n", $data) as $index) {
-            $key_val = explode(' ', $index, 2);
-            if (count($key_val) != 2) {
-                $key_val[] = '';
-            }
-
-            $key = $key_val[0];
-            $value = $key_val[1];
-
-            $prop_id = explode('.', $key);
-            if ((count($prop_id) != 2) || ! ctype_digit($prop_id[1])) {
-                continue;
-            }
-
-            $property = $prop_id[0];
-            $id = intval($prop_id[1]);
-
-            $sla_table[$id][$property] = trim($value);
-        }
-
-        foreach ($sla_table as $sla_nr => $sla_config) {
-            $data = [
-                'device_id' => $device['device_id'],
-                'sla_nr'    => $sla_nr,
-                'owner'     => $sla_config['rttMonCtrlAdminOwner'],
-                'tag'       => $sla_config['rttMonCtrlAdminTag'],
-                'rtt_type'  => $sla_config['rttMonCtrlAdminRttType'],
-                'status'    => ($sla_config['rttMonCtrlAdminStatus'] == 'active') ? 1 : 0,
-                'opstatus'  => ($sla_config['rttMonLatestRttOperSense'] == 'ok') ? 0 : 2,
-                'deleted'   => 0,
-            ];
-
-            // Some fallbacks for when the tag is empty
-            if (! $data['tag']) {
-                switch ($data['rtt_type']) {
-                    case 'http':
-                        $data['tag'] = $sla_config['rttMonEchoAdminURL'];
-                        break;
-
-                    case 'dns':
-                        $data['tag'] = $sla_config['rttMonEchoAdminTargetAddressString'];
-                        break;
-
-                    case 'echo':
-                        $data['tag'] = IP::fromHexString($sla_config['rttMonEchoAdminTargetAddress'], true);
-                        break;
-
-                    case 'jitter':
-                        if ($sla_config['rttMonEchoAdminCodecType'] != 'notApplicable') {
-                            $codec_info = ' (' . $sla_config['rttMonEchoAdminCodecType'] . ' @ ' . preg_replace('/milliseconds/', 'ms', $sla_config['rttMonEchoAdminCodecInterval']) . ')';
-                        } else {
-                            $codec_info = '';
-                        }
-                        $data['tag'] = IP::fromHexString($sla_config['rttMonEchoAdminTargetAddress'], true) . ':' . $sla_config['rttMonEchoAdminTargetPort'] . $codec_info;
-                        break;
-                }//end switch
-            }//end if
-            $slas->push($data);
+        $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB');
+        foreach ($sla_data as $index => $sla_config) {
+            $slas->push(new Sla([
+                'sla_nr' => $index,
+                'owner' => $sla_config['rttMonCtrlAdminOwner'] ?? '',
+                'tag' => $this->getSlaTag($sla_config),
+                'rtt_type' => $sla_config['rttMonCtrlAdminRttType'],
+                'status' => ($sla_config['rttMonCtrlAdminStatus'] == 'active') ? 1 : 0,
+                'opstatus' => ($sla_config['rttMonLatestRttOperSense'] == 'ok') ? 0 : 2,
+            ]));
         }
 
         return $slas;
+    }
+
+    private function getSlaTag($data)
+    {
+        if (! empty($data['rttMonCtrlAdminTag'])) {
+            return $data['rttMonCtrlAdminTag'];
+        }
+
+        switch ($data['rttMonCtrlAdminRttType']) {
+            case 'http':
+                return $data['rttMonEchoAdminURL'];
+            case 'dns':
+                return $data['rttMonEchoAdminTargetAddressString'];
+            case 'echo':
+                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true);
+            case 'jitter':
+                $tag = IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) . ':' . $data['rttMonEchoAdminTargetPort'];
+                if (isset($data['rttMonEchoAdminCodecType']) && $data['rttMonEchoAdminCodecType'] != 'notApplicable') {
+                    $tag .= ' (' . $data['rttMonEchoAdminCodecType'] . ' @ ' . $data['rttMonEchoAdminCodecInterval'] . 'ms)';
+                }
+                return $tag;
+            default:
+                return '';
+        }
     }
 
     public function pollNac()
@@ -539,7 +510,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             // Update the DB if necessary
             if (count($update) > 0) {
                 Sla::where('sla_id', $sla_id)
-                ->update($update);
+                    ->update($update);
             }
         }
     }
