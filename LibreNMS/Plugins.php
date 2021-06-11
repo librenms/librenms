@@ -46,7 +46,7 @@ class Plugins
     /**
      * Array of plugin hooks
      *
-     * @var array
+     * @var array|null
      */
     private static $plugins = null;
 

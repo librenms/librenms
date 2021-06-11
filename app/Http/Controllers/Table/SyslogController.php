@@ -25,7 +25,6 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
-use Illuminate\Database\Eloquent\Builder;
 
 class SyslogController extends TableController
 {
@@ -68,7 +67,6 @@ class SyslogController extends TableController
      */
     public function baseQuery($request)
     {
-        /** @var Builder $query */
         return Syslog::hasAccess($request->user())
             ->with('device')
             ->when($request->device_group, function ($query) use ($request) {
@@ -82,6 +80,9 @@ class SyslogController extends TableController
             });
     }
 
+    /**
+     * @param Syslog $syslog
+     */
     public function formatItem($syslog)
     {
         $device = $syslog->device;
@@ -109,7 +110,7 @@ class SyslogController extends TableController
 
     /**
      * @param int $syslog_priority
-     * @return string $syslog_priority_icon
+     * @return string
      */
     private function priorityLabel($syslog_priority)
     {
@@ -130,6 +131,8 @@ class SyslogController extends TableController
                 return 'label-danger'; //Alert
             case 'emerg':
                 return 'label-danger'; //Emergency
+            default:
+                return '';
         }
     }
 

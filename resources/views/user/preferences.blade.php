@@ -169,7 +169,7 @@
 @endsection
 
 @section('javascript')
-    <script src="{{ asset('js/jquery.qrcode.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-qrcode.min.js') }}"></script>
 @endsection
 
 @section('scripts')
@@ -202,7 +202,7 @@
                 });
             });
 
-        $('.ajax-select').change(function () {
+        $('.ajax-select').on("change", function () {
             var $this = $(this);
             var value = $this.val();
             var pref = $this.data('pref');

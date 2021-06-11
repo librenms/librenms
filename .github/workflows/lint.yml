@@ -1,0 +1,72 @@
+name: Lint
+on:
+  push:
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  super-linter:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      -
+        name: Lint Code Base
+        uses: github/super-linter@v3
+        env:
+          VALIDATE_BASH: true
+          VALIDATE_PHP_BUILTIN: true
+          VALIDATE_PYTHON_PYLINT: true
+          VALIDATE_PYTHON_BLACK: true
+
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  phpstan:
+    name: PHP Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      -
+        name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer
+
+      -
+        name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      -
+        name: Cache composer
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
+
+      -
+        name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
+
+      -
+        name: Composer install
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      -
+        name: Run phpstan
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G

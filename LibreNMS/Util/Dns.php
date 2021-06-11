@@ -57,8 +57,8 @@ class Dns implements Geocoder
     {
         foreach ($this->getRecord($hostname, 'LOC') as $record) {
             return [
-                'lat' => $record->latitude,
-                'lng' => $record->longitude,
+                'lat' => $record->latitude ?? null,
+                'lng' => $record->longitude ?? null,
             ];
         }
 

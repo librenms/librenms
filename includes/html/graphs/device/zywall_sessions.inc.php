@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'zywall-sessions');
+$rrd_filename = Rrd::name($device['hostname'], 'zywall-sessions');
 
 $ds = 'sessions';
 

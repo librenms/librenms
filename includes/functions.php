@@ -19,49 +19,11 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Process\Process;
-
-if (! function_exists('set_debug')) {
-    /**
-     * Set debugging output
-     *
-     * @param bool $state If debug is enabled or not
-     * @param bool $silence When not debugging, silence every php error
-     * @return bool
-     */
-    function set_debug($state = true, $silence = false)
-    {
-        global $debug;
-
-        $debug = $state; // set to global
-
-        restore_error_handler(); // disable Laravel error handler
-
-        if (isset($debug) && $debug) {
-            ini_set('display_errors', 1);
-            ini_set('display_startup_errors', 1);
-            ini_set('log_errors', 0);
-            error_reporting(E_ALL & ~E_NOTICE);
-
-            \LibreNMS\Util\Laravel::enableCliDebugOutput();
-            \LibreNMS\Util\Laravel::enableQueryDebug();
-        } else {
-            ini_set('display_errors', 0);
-            ini_set('display_startup_errors', 0);
-            ini_set('log_errors', 1);
-            error_reporting($silence ? 0 : E_ERROR);
-
-            \LibreNMS\Util\Laravel::disableCliDebugOutput();
-            \LibreNMS\Util\Laravel::disableQueryDebug();
-        }
-
-        return $debug;
-    }
-}//end set_debug()
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -96,11 +58,6 @@ function array_sort_by_column($array, $on, $order = SORT_ASC)
     }
 
     return $new_array;
-}
-
-function mac_clean_to_readable($mac)
-{
-    return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
 
 function only_alphanumeric($string)
@@ -188,6 +145,12 @@ function preg_match_any($subject, $regexes)
  */
 function compare_var($a, $b, $comparison = '=')
 {
+    // handle PHP8 change to implicit casting
+    if (is_numeric($a) || is_numeric($b)) {
+        $a = cast_number($a);
+        $b = is_array($b) ? $b : cast_number($b);
+    }
+
     switch ($comparison) {
         case '=':
             return $a == $b;
@@ -302,7 +265,7 @@ function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
 
-    if (! is_dir(get_rrd_dir($new)) && rename(get_rrd_dir($host), get_rrd_dir($new)) === true) {
+    if (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
@@ -316,9 +279,7 @@ function renamehost($id, $new, $source = 'console')
 
 function device_discovery_trigger($id)
 {
-    global $debug;
-
-    if (isCli() === false) {
+    if (App::runningInConsole() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
@@ -335,9 +296,7 @@ function device_discovery_trigger($id)
 
 function delete_device($id)
 {
-    global $debug;
-
-    if (isCli() === false) {
+    if (App::runningInConsole() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
@@ -379,13 +338,13 @@ function delete_device($id)
         foreach (dbFetch('SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?', [$db_name, $field]) as $table) {
             $table = $table['TABLE_NAME'];
             $entries = (int) dbDelete($table, "`$field` =  ?", [$id]);
-            if ($entries > 0 && $debug === true) {
+            if ($entries > 0 && Debug::isEnabled()) {
                 $ret .= "$field@$table = #$entries\n";
             }
         }
     }
 
-    $ex = shell_exec("bash -c '( [ ! -d " . trim(get_rrd_dir($host)) . ' ] || rm -vrf ' . trim(get_rrd_dir($host)) . " 2>&1 ) && echo -n OK'");
+    $ex = shell_exec("bash -c '( [ ! -d " . trim(Rrd::dirFromHost($host)) . ' ] || rm -vrf ' . trim(Rrd::dirFromHost($host)) . " 2>&1 ) && echo -n OK'");
     $tmp = explode("\n", $ex);
     if ($tmp[sizeof($tmp) - 1] != 'OK') {
         $ret .= "Could not remove files:\n$ex\n";
@@ -403,7 +362,7 @@ function delete_device($id)
  *
  * @param string $host dns name or ip address
  * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
- * @param string $port the port to connect to for snmp
+ * @param int $port the port to connect to for snmp
  * @param string $transport udp or tcp
  * @param string $poller_group the poller group this device will belong to
  * @param bool $force_add add even if the device isn't reachable
@@ -419,7 +378,7 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
+function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
 {
     // Test Database Exists
     if (host_exists($host)) {
@@ -535,11 +494,6 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
 
     return $device;
 }//end deviceArray()
-
-function formatUptime($diff, $format = 'long')
-{
-    return Time::formatInterval($diff, $format);
-}
 
 function isSNMPable($device)
 {
@@ -704,11 +658,6 @@ function isDomainResolves($domain)
     $records = dns_get_record($domain);  // returns array or false
 
     return ! empty($records);
-}
-
-function hoststatus($id)
-{
-    return dbFetchCell('SELECT `status` FROM `devices` WHERE `device_id` = ?', [$id]);
 }
 
 function match_network($nets, $ip, $first = false)
@@ -1107,144 +1056,21 @@ function validate_device_id($id)
     return $return;
 }
 
-// The original source of this code is from Stackoverflow (www.stackoverflow.com).
-// http://stackoverflow.com/questions/6054033/pretty-printing-json-with-php
-// Answer provided by stewe (http://stackoverflow.com/users/3202187/ulk200
-if (! defined('JSON_UNESCAPED_SLASHES')) {
-    define('JSON_UNESCAPED_SLASHES', 64);
-}
-if (! defined('JSON_PRETTY_PRINT')) {
-    define('JSON_PRETTY_PRINT', 128);
-}
-if (! defined('JSON_UNESCAPED_UNICODE')) {
-    define('JSON_UNESCAPED_UNICODE', 256);
-}
-
-function _json_encode($data, $options = 448)
-{
-    if (version_compare(PHP_VERSION, '5.4', '>=')) {
-        return json_encode($data, $options);
-    } else {
-        return _json_format(json_encode($data), $options);
-    }
-}
-
-function _json_format($json, $options = 448)
-{
-    $prettyPrint = (bool) ($options & JSON_PRETTY_PRINT);
-    $unescapeUnicode = (bool) ($options & JSON_UNESCAPED_UNICODE);
-    $unescapeSlashes = (bool) ($options & JSON_UNESCAPED_SLASHES);
-
-    if (! $prettyPrint && ! $unescapeUnicode && ! $unescapeSlashes) {
-        return $json;
-    }
-
-    $result = '';
-    $pos = 0;
-    $strLen = strlen($json);
-    $indentStr = ' ';
-    $newLine = "\n";
-    $outOfQuotes = true;
-    $buffer = '';
-    $noescape = true;
-
-    for ($i = 0; $i < $strLen; $i++) {
-        // Grab the next character in the string
-        $char = substr($json, $i, 1);
-
-        // Are we inside a quoted string?
-        if ('"' === $char && $noescape) {
-            $outOfQuotes = ! $outOfQuotes;
-        }
-
-        if (! $outOfQuotes) {
-            $buffer .= $char;
-            $noescape = '\\' === $char ? ! $noescape : true;
-            continue;
-        } elseif ('' !== $buffer) {
-            if ($unescapeSlashes) {
-                $buffer = str_replace('\\/', '/', $buffer);
-            }
-
-            if ($unescapeUnicode && function_exists('mb_convert_encoding')) {
-                // http://stackoverflow.com/questions/2934563/how-to-decode-unicode-escape-sequences-like-u00ed-to-proper-utf-8-encoded-cha
-                $buffer = preg_replace_callback(
-                    '/\\\\u([0-9a-f]{4})/i',
-                    function ($match) {
-                        return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-                    },
-                    $buffer
-                );
-            }
-
-            $result .= $buffer . $char;
-            $buffer = '';
-            continue;
-        } elseif (false !== strpos(" \t\r\n", $char)) {
-            continue;
-        }
-
-        if (':' === $char) {
-            // Add a space after the : character
-            $char .= ' ';
-        } elseif (('}' === $char || ']' === $char)) {
-            $pos--;
-            $prevChar = substr($json, $i - 1, 1);
-
-            if ('{' !== $prevChar && '[' !== $prevChar) {
-                // If this character is the end of an element,
-                // output a new line and indent the next line
-                $result .= $newLine;
-                for ($j = 0; $j < $pos; $j++) {
-                    $result .= $indentStr;
-                }
-            } else {
-                // Collapse empty {} and []
-                $result = rtrim($result) . "\n\n" . $indentStr;
-            }
-        }
-
-        $result .= $char;
-
-        // If the last character was the beginning of an element,
-        // output a new line and indent the next line
-        if (',' === $char || '{' === $char || '[' === $char) {
-            $result .= $newLine;
-
-            if ('{' === $char || '[' === $char) {
-                $pos++;
-            }
-
-            for ($j = 0; $j < $pos; $j++) {
-                $result .= $indentStr;
-            }
-        }
-    }
-    // If buffer not empty after formating we have an unclosed quote
-    if (strlen($buffer) > 0) {
-        //json is incorrectly formatted
-        $result = false;
-    }
-
-    return $result;
-}
-
 function convert_delay($delay)
 {
-    $delay = preg_replace('/\s/', '', $delay);
-    if (strstr($delay, 'm', true)) {
-        $delay_sec = $delay * 60;
-    } elseif (strstr($delay, 'h', true)) {
-        $delay_sec = $delay * 3600;
-    } elseif (strstr($delay, 'd', true)) {
-        $delay_sec = $delay * 86400;
-    } elseif (is_numeric($delay)) {
-        $delay_sec = $delay;
-    } else {
-        $delay_sec = 300;
+    if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
     }
 
-    return $delay_sec;
+    return $delay === '' ? 0 : 300;
 }
 
 function normalize_snmp_ip_address($data)
@@ -1292,9 +1118,8 @@ function get_guzzle_proxy()
 
     $tmp = rtrim($proxy, '/');
     $proxy = str_replace(['http://', 'https://'], '', $tmp);
-    if (! empty($proxy)) {
-        return 'tcp://' . $proxy;
-    }
+
+    return empty($proxy) ? '' : ('tcp://' . $proxy);
 }
 
 /**
@@ -1326,27 +1151,6 @@ function target_to_id($target)
     }
 
     return $target;
-}
-
-function id_to_target($id)
-{
-    if ($id[0] == 'g') {
-        $id = 'g:' . dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [substr($id, 1)]);
-    } else {
-        $id = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
-    }
-
-    return $id;
-}
-
-function first_oid_match($device, $list)
-{
-    foreach ($list as $item) {
-        $tmp = trim(snmp_get($device, $item, '-Ovq'), '" ');
-        if (! empty($tmp)) {
-            return $tmp;
-        }
-    }
 }
 
 function fix_integer_value($value)
@@ -1779,6 +1583,12 @@ function q_bridge_bits2indices($hex_data)
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
     */
     $hex_data = str_replace(' ', '', $hex_data);
+
+    // we need an even number of digits for hex2bin
+    if (strlen($hex_data) % 2 === 1) {
+        $hex_data = '0' . $hex_data;
+    }
+
     $value = hex2bin($hex_data);
     $length = strlen($value);
     $indices = [];
@@ -1792,52 +1602,6 @@ function q_bridge_bits2indices($hex_data)
     }
 
     return $indices;
-}
-
-/**
- * @param array $device
- * @param int|string $raw_value The value returned from snmp
- * @param int $capacity the normalized capacity
- * @return int the toner level as a percentage
- */
-function get_toner_levels($device, $raw_value, $capacity)
-{
-    // -3 means some toner is left
-    if ($raw_value == '-3') {
-        return 50;
-    }
-
-    // -2 means unknown
-    if ($raw_value == '-2') {
-        return false;
-    }
-
-    // -1 mean no restrictions
-    if ($raw_value == '-1') {
-        return 0;  // FIXME: is 0 what we should return?
-    }
-
-    // Non-standard snmp values
-    if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
-        if ($raw_value == '-100') {
-            return 0;
-        }
-    } elseif ($device['os'] == 'brother') {
-        if (! Str::contains($device['hardware'], 'MFC-L8850')) {
-            switch ($raw_value) {
-                case '0':
-                    return 100;
-                case '1':
-                    return 5;
-                case '2':
-                    return 0;
-                case '3':
-                    return 1;
-            }
-        }
-    }
-
-    return round($raw_value / $capacity * 100);
 }
 
 /**
@@ -1875,10 +1639,10 @@ function printChangedStats($update_only = false)
     global $snmp_stats_last, $db_stats_last;
     $output = sprintf(
         '>> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]',
-        array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
-        array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
-        array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
-        array_sum($db_stats['time']) - array_sum($db_stats_last['time'])
+        array_sum($snmp_stats['ops'] ?? []) - array_sum($snmp_stats_last['ops'] ?? []),
+        array_sum($snmp_stats['time'] ?? []) - array_sum($snmp_stats_last['time'] ?? []),
+        array_sum($db_stats['ops'] ?? []) - array_sum($db_stats_last['ops'] ?? []),
+        array_sum($db_stats['time'] ?? []) - array_sum($db_stats_last['time'] ?? [])
     );
 
     foreach (app('Datastore')->getStats() as $datastore => $stats) {
@@ -2095,6 +1859,53 @@ function update_device_logo(&$device)
 }
 
 /**
+ * Function to generate Mac OUI Cache
+ */
+function cache_mac_oui()
+{
+    // timers:
+    $mac_oui_refresh_int_min = 86400 * rand(7, 11); // 7 days + a random number between 0 and 4 days
+    $mac_oui_cache_time = 1296000; // we keep data during 15 days maximum
+
+    $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
+
+    if (Config::get('mac_oui.enabled') !== true) {
+        echo 'Mac OUI integration disabled' . PHP_EOL;
+
+        return 0;
+    }
+
+    if ($lock->get()) {
+        echo 'Caching Mac OUI' . PHP_EOL;
+        try {
+            $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
+            echo '  -> Downloading ...' . PHP_EOL;
+            $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
+            echo '  -> Processing ...' . PHP_EOL;
+            $json_data = $get->body;
+            foreach (explode("\n", $json_data) as $json_line) {
+                $entry = json_decode($json_line);
+                if ($entry && $entry->{'assignmentBlockSize'} == 'MA-L') {
+                    $oui = strtolower(str_replace(':', '', $entry->{'oui'}));
+                    $key = 'OUIDB-' . $oui;
+                    Cache::put($key, $entry->{'companyName'}, $mac_oui_cache_time);
+                }
+            }
+        } catch (Exception $e) {
+            echo 'Error processing Mac OUI :' . PHP_EOL;
+            echo 'Exception: ' . get_class($e) . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;
+
+            $lock->release(); // we did not succeed so we'll try again next time
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+/**
  * Function to generate PeeringDB Cache
  */
 function cache_peeringdb()
@@ -2207,27 +2018,6 @@ function get_schema_list()
 }
 
 /**
- * Get the current database schema, will return 0 if there is no schema.
- *
- * @return int
- */
-function get_db_schema()
-{
-    try {
-        $db = \LibreNMS\DB\Eloquent::DB();
-        if ($db) {
-            return (int) $db->table('dbSchema')
-                ->orderBy('version', 'DESC')
-                ->value('version');
-        }
-    } catch (PDOException $e) {
-        // return default
-    }
-
-    return 0;
-}
-
-/**
  * @param $device
  * @return int|null
  */
@@ -2305,22 +2095,6 @@ function lock_and_purge_query($table, $sql, $msg)
     }
 
     return -1;
-}
-
-/**
- * Convert space separated hex OID content to character
- *
- * @param string $hex_string
- * @return string $chr_string
- */
-function hexbin($hex_string)
-{
-    $chr_string = '';
-    foreach (explode(' ', $hex_string) as $a) {
-        $chr_string .= chr(hexdec($a));
-    }
-
-    return $chr_string;
 }
 
 /**

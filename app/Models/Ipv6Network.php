@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ipv6Network extends Model
 {
@@ -33,7 +34,7 @@ class Ipv6Network extends Model
 
     // ---- Define Relationships ----
 
-    public function ipv6()
+    public function ipv6(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv6Address::class, 'ipv6_network_id');
     }

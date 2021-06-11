@@ -72,7 +72,9 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
+
             if (! empty($location)) { // legacy support, remove when no longer needed
+                /** @phpstan-ignore-next-line */
                 $deviceModel->setLocation($location);
                 optional($deviceModel->location)->save();
             }
@@ -112,7 +114,7 @@ class OS implements Module
     {
         $device = $os->getDevice();
         $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
-        $device->sysContact = str_replace(['', '"', '\n', 'not set'], null, $device->sysContact);
+        $device->sysContact = str_replace(['', '"', '\n', 'not set'], '', $device->sysContact);
         if (empty($device->sysContact)) {
             $device->sysContact = null;
         }

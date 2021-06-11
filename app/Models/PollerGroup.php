@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PollerGroup extends Model
 {
@@ -51,7 +52,7 @@ class PollerGroup extends Model
         return self::query()->pluck('group_name', 'id')->prepend(__('General'), 0);
     }
 
-    public function devices()
+    public function devices(): HasMany
     {
         return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
     }

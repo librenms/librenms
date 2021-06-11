@@ -30,7 +30,7 @@ COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
 # get the librenms user
-# shellcheck source=/opt/librenms/.env
+# shellcheck source=.env.example
 source "${LIBRENMS_DIR}/.env"
 LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
@@ -74,7 +74,7 @@ status_run() {
         if [[ "${arg_option}" == "update" ]]; then
             php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
-        if [[ ! -z "${tmp}" ]]; then
+        if [[ -n "${tmp}" ]]; then
             # print output in case of failure
             echo "${tmp}"
         fi
@@ -369,6 +369,7 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
+                status_run 'Caching Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             cleanup)
                 # Cleanups
@@ -404,6 +405,9 @@ main () {
                 options=("peeringdb")
                 call_daily_php "${options[@]}"
             ;;
+            mac_oui)
+                options=("mac_oui")
+                call_daily_php "${options[@]}"
         esac
     fi
 }

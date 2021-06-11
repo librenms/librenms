@@ -158,8 +158,8 @@ function record_sensor_data($device, $all_sensors)
 
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
-        $unit = $supported_sensors[$class];
-        $sensor_value = is_string($sensor['new_value']) ? floatval($sensor['new_value']) : $sensor['new_value'];
+        $unit = $supported_sensors[$sensor['sensor_class']];
+        $sensor_value = cast_number($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {
@@ -220,7 +220,7 @@ function record_sensor_data($device, $all_sensors)
             log_event("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
-            dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$class, $sensor['sensor_id']]);
+            dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$sensor['sensor_class'], $sensor['sensor_id']]);
         }
     }
 }
@@ -283,7 +283,7 @@ function poll_device($device, $force_module = false)
     $poll_update_array = [];
     $update_array = [];
 
-    $host_rrd = rrd_name($device['hostname'], '', '');
+    $host_rrd = Rrd::name($device['hostname'], '', '');
     if (Config::get('norrd') !== true && ! is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
@@ -341,7 +341,7 @@ function poll_device($device, $force_module = false)
                 $os->enableGraph('poller_perf');
 
                 // remove old rrd
-                $oldrrd = rrd_name($device['hostname'], ['poller', $module, 'perf']);
+                $oldrrd = Rrd::name($device['hostname'], ['poller', $module, 'perf']);
                 if (is_file($oldrrd)) {
                     unlink($oldrrd);
                 }
@@ -570,13 +570,6 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         echo PHP_EOL;
     }
-}
-
-function convert_to_celsius($value)
-{
-    $value = ($value - 32) / 1.8;
-
-    return sprintf('%.02f', $value);
 }
 
 /**

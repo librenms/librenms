@@ -25,6 +25,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Cache;
 use LibreNMS\Config;
 
 class Rewrite
@@ -55,6 +56,29 @@ class Rewrite
         }
 
         return $type;
+    }
+
+    public static function shortenIfType($type)
+    {
+        return str_ireplace(
+            [
+                'FastEthernet',
+                'TenGigabitEthernet',
+                'GigabitEthernet',
+                'Port-Channel',
+                'Ethernet',
+                'Bundle-Ether',
+            ],
+            [
+                'Fa',
+                'Te',
+                'Gi',
+                'Po',
+                'Eth',
+                'BE',
+            ],
+            $type
+        );
     }
 
     public static function normalizeIfName($name)
@@ -114,12 +138,25 @@ class Rewrite
     /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
-     * @param $mac
+     * @param string $mac
      * @return string
      */
     public static function readableMac($mac)
     {
         return rtrim(chunk_split($mac, 2, ':'), ':');
+    }
+
+    /**
+     * Extract the OUI and match it against cached values
+     *
+     * @param string $mac
+     * @return string
+     */
+    public static function readableOUI($mac)
+    {
+        $key = 'OUIDB-' . (substr($mac, 0, 6));
+
+        return Cache::get($key, '');
     }
 
     /**

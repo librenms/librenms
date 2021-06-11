@@ -96,13 +96,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
                             <div class="col-sm-9">
-                                <input type='checkbox' id='ignore' name='ignore'>
+                                <input type="hidden" name="ignore" id='ignore' value="0">
+                                <input type='checkbox' id='ignore_box' name='ignore_box' onclick="$('#ignore').attr('value', $('#ignore_box').prop('checked')?1:0);">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
                             <div class="col-sm-9">
-                                <input type='checkbox' id='disabled' name='disabled'>
+                                <input type='hidden' id='disabled' name='disabled' value="0">
+                                <input type='checkbox' id='disabled_box' name='disabled_box' onclick="$('#disabled').attr('value', $('#disabled_box').prop('checked')?1:0);">
                             </div>
                         </div>
                         <hr>
@@ -127,7 +129,9 @@ $('#create-service').on('hide.bs.modal', function (event) {
     $('#desc').val('');
     $('#param').val('');
     $('#ignore').val('');
+    $('#ignore_box').val('');
     $('#disabled').val('');
+    $('#disabled_box').val('');
     $('#service_template_id').val('');
     $('#name').val('');
     $('#service_template_name').val('');
@@ -152,11 +156,13 @@ $('#create-service').on('show.bs.modal', function (e) {
             $('#param').val(output['param']);
             $('#ignore').val(output['ignore']);
             $('#disabled').val(output['disabled']);
+            $('#ignore_box').val(output['ignore']);
+            $('#disabled_box').val(output['disabled']);
             if ($('#ignore').attr('value') == 1) {
-                $('#ignore').prop("checked", true);
+                $('#ignore_box').prop("checked", true);
             }
             if ($('#disabled').attr('value') == 1) {
-                $('#disabled').prop("checked", true);
+                $('#disabled_box').prop("checked", true);
             }
             $('#service_template_id').val(output['service_template_id']);
             $('#name').val(output['name']);
@@ -166,7 +172,7 @@ $('#create-service').on('show.bs.modal', function (e) {
 });
 
 // on-submit
-$('#service-submit').click('', function(e) {
+$('#service-submit').on("click", function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",

@@ -47,33 +47,28 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.116.1.10.8.{{ $index }}'
                     descr: 'Power Consumption'
                     index: 'powerConsumption.{{ $index }}'
-                    value: powerConsumption
                 -
                     oid: MOXA-EDSG508E-MIB::powerConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.69.1.10.8.{{ $index }}'
                     descr: 'Power Consumption'
                     index: 'powerConsumption.{{ $index }}'
-                    value: powerConsumption
                 -
                     oid: MOXA-EDSP510A8POE-MIB::poePortConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.40.6.1.2.{{ $index }}'
                     descr: '{{ $ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
-                    value: poePortConsumption
                     high_limit: 36.0
                 -
                     oid: MOXA-EDSG512E8POE-MIB::powerConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.8.{{ $index }}'
                     descr: 'Power Consumption'
                     index: 'powerConsumption.{{ $index }}'
-                    value: powerConsumption
                     high_limit: 240.0
                 -
                     oid: MOXA-EDSG512E8POE-MIB::poePortConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.40.6.1.2.{{ $index }}'
                     descr: '{{ $ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
-                    value: poePortConsumption
                     high_limit: 36.0
         temperature:
             data:
@@ -82,7 +77,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.3.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module temperature'
                     index: 'sfpTemperature.{{ $index }}'
-                    value: sfpTemperature
                     low_limit: -40.0
                     high_limit: 85.0
                 -
@@ -90,7 +84,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.5.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module temperature'
                     index: 'fiberTemperature.{{ $index }}'
-                    value: fiberTemperature
                     low_limit: -40.0
                     high_limit: 85.0
         voltage:
@@ -100,7 +93,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.4.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Supply Voltage'
                     index: 'sfpVoltage.{{ $index }}'
-                    value: sfpVoltage
                     low_limit: 3.13
                     high_limit: 3.47
                 -
@@ -108,7 +100,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.4.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Supply Voltage'
                     index: 'fiberVoltage.{{ $index }}'
-                    value: fiberVoltage
                     low_limit: 3.13
                     high_limit: 3.47
         dbm:
@@ -118,7 +109,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.5.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Transmit Power'
                     index: 'sfpTxPower.{{ $index }}'
-                    value: sfpTxPower
                     low_limit: -9.0
                     high_limit: -3.0
                 -
@@ -126,7 +116,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.6.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Receive Power'
                     index: 'sfpRxPower.{{ $index }}'
-                    value: sfpRXPower
                     low_limit: -21.0
                     high_limit: -3.0
                 -
@@ -134,7 +123,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.7.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Transmit Power'
                     index: 'fiberTxPower.{{ $index }}'
-                    value: fiberTxPower
                     low_limit: -9.0
                     high_limit: -3.0
                 -
@@ -142,7 +130,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.9.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Receive Power'
                     index: 'fiberRxPower.{{ $index }}'
-                    value: fiberRxPower
                     low_limit: -21.0
                     high_limit: -3.0
         state:
@@ -152,7 +139,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.1.{{ $index }}'
                     descr: 'Power Input 1 Status'
                     index: 'powerInputStatus.1'
-                    value: power1InputStatus
                     state_name: powerInputStatus
                     states:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
@@ -162,7 +148,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.2.{{ $index }}'
                     descr: 'Power Input 2 Status'
                     index: 'powerInputStatus.2'
-                    value: power2InputStatus
                     state_name: powerInputStatus
                     states:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
@@ -172,7 +157,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.1.{{ $index }}'
                     descr: 'Power Input 1 Status'
                     index: 'powerInputStatus.1'
-                    value: power1InputStatus
                     state_name: powerInputStatus
                     states:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
@@ -182,7 +166,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.2.{{ $index }}'
                     descr: 'Power Input 2 Status'
                     index: 'powerInputStatus.2'
-                    value: power2InputStatus
                     state_name: powerInputStatus
                     states:
                         - { value:  0, generic: 2, graph: 0, descr: not present }

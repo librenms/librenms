@@ -43,8 +43,10 @@ if (! empty($fdbPort_table)) {
     $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-        $portid_dict[$portLocal] = $port['port_id'];
+        if (isset($data['dot1dBasePortIfIndex'])) {
+            $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
+            $portid_dict[$portLocal] = $port['port_id'];
+        }
     }
 
     // Build VLAN fdb index to real VLAN ID dictionary
@@ -67,7 +69,7 @@ if (! empty($fdbPort_table)) {
         // device VLANs table should catch anything invalid.
         $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
 
-        foreach ($data[$data_oid] as $mac => $dot1dBasePort) {
+        foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 d_echo("No port known for $mac\n");
                 continue;

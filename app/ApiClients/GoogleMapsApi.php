@@ -41,7 +41,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      * @param array $data
      * @return array
      */
-    private function parseLatLng($data)
+    protected function parseLatLng($data)
     {
         return [
             'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,

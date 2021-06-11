@@ -28,23 +28,23 @@ if ($sub_type == 'new-maintenance') {
     $update = 0;
     $message = '';
 
-    $schedule_id = mres($_POST['schedule_id']);
+    $schedule_id = $_POST['schedule_id'];
     if ($schedule_id > 0) {
         $update = 1;
     }
 
-    $title = mres($_POST['title']);
-    $notes = mres($_POST['notes']);
+    $title = $_POST['title'];
+    $notes = $_POST['notes'];
     $recurring = $_POST['recurring'] ? 1 : 0;
-    $start_recurring_dt = mres($_POST['start_recurring_dt']);
-    $end_recurring_dt = mres($_POST['end_recurring_dt']);
-    $start_recurring_hr = mres($_POST['start_recurring_hr']);
-    $end_recurring_hr = mres($_POST['end_recurring_hr']);
-    $recurring_day = mres($_POST['recurring_day']);
-    $start = mres($_POST['start']);
-    [$duration_hour, $duration_min] = explode(':', mres($_POST['duration']));
-    $end = mres($_POST['end']);
-    $maps = mres($_POST['maps']);
+    $start_recurring_dt = $_POST['start_recurring_dt'];
+    $end_recurring_dt = $_POST['end_recurring_dt'];
+    $start_recurring_hr = $_POST['start_recurring_hr'];
+    $end_recurring_hr = $_POST['end_recurring_hr'];
+    $recurring_day = $_POST['recurring_day'];
+    $start = $_POST['start'];
+    [$duration_hour, $duration_min] = explode(':', $_POST['duration']);
+    $end = $_POST['end'];
+    $maps = $_POST['maps'];
 
     if (isset($duration_hour) && isset($duration_min)) {
         $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
@@ -208,7 +208,7 @@ if ($sub_type == 'new-maintenance') {
     $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
     $response['targets'] = $items;
 } elseif ($sub_type == 'del-maintenance') {
-    $schedule_id = mres($_POST['del_schedule_id']);
+    $schedule_id = $_POST['del_schedule_id'];
     dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
     dbDelete('alert_schedulables', '`schedule_id`=?', [$schedule_id]);
     $status = 'ok';
@@ -219,4 +219,4 @@ if ($sub_type == 'new-maintenance') {
     ];
 }//end if
 header('Content-type: application/json');
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

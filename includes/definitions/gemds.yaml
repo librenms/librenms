@@ -1,0 +1,10 @@
+os: gemds
+text: GE MDS Orbit network Operating System
+type: network
+icon: ge
+mib_dir: gemds
+
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.4130.10
+    
+    

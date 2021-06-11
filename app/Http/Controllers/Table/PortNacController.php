@@ -47,6 +47,7 @@ class PortNacController extends TableController
         return [
             'port_id',
             'mac_address',
+            'mac_oui',
             'ip_address',
             'vlan',
             'domain',
@@ -70,14 +71,22 @@ class PortNacController extends TableController
      */
     public function baseQuery($request)
     {
-        return PortsNac::where('device_id', $request->device_id)->hasAccess($request->user())->with('port');
+        return PortsNac::select('port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
+            ->where('device_id', $request->device_id)
+            ->hasAccess($request->user())
+            ->with('port');
     }
 
+    /**
+     * @param PortsNac $nac
+     */
     public function formatItem($nac)
     {
         $item = $nac->toArray();
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
+        $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
         $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
+        $item['port'] = null; //free some unused data to be sent to the browser
 
         return $item;
     }

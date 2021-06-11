@@ -14,9 +14,9 @@
 
 include 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
-$rrd_filename = rrd_name($device['hostname'], 'cisco-iospri');
+$rrd_filename = Rrd::name($device['hostname'], 'cisco-iospri');
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
     $rrd_options .= ' DEF:Total=' . $rrd_filename . ':total:AVERAGE ';
     $rrd_options .= ' AREA:Total#c099ff ';

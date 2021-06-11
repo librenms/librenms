@@ -46,7 +46,7 @@
 @section('javascript')
     <script type="application/javascript">
         $(document).ready(function () {
-            $('#twofactor-unlock').click(function () {
+            $('#twofactor-unlock').on("click", function () {
                 console.log('unlock');
                 $.ajax({
                     type: 'POST',
@@ -66,7 +66,7 @@
                 });
             });
 
-            $('#twofactor-disable').click(function () {
+            $('#twofactor-disable').on("click", function () {
                 $.ajax({
                     type: 'DELETE',
                     url: '{{ route('2fa.delete', ['user' => $user->user_id]) }}',

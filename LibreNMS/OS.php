@@ -138,7 +138,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * @param string $oid textual oid
      * @param string $mib mib for this oid
      * @param string $snmpflags snmpflags for this oid
-     * @return array array indexed by the snmp index with the value as the data returned by snmp
+     * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
@@ -163,8 +163,8 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      *
      * @param string $oid textual oid
      * @param string $mib mib for this oid (optional)
-     * @param string $depth depth for snmpwalk_group (optional)
-     * @return array array indexed by the snmp index with the value as the data returned by snmp
+     * @param int $depth depth for snmpwalk_group (optional)
+     * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
@@ -184,7 +184,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Check if an OID has been cached
      *
-     * @param $oid
+     * @param string $oid
      * @return bool
      */
     public function isCached($oid)

@@ -25,11 +25,17 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Panos extends \LibreNMS\OS implements OSPolling
 {
+    private $validNetBufferMemory = [
+        'Packet Descriptors',
+        'Packet Buffers',
+    ];
+
     public function pollOS()
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
@@ -132,5 +138,12 @@ class Panos extends \LibreNMS\OS implements OSPolling
 
             $this->enableGraph('panos_activetunnels');
         }
+    }
+
+    protected function memValid($storage)
+    {
+        return $storage['hrStorageType'] == 'hrStorageOther'
+            && Str::contains($storage['hrStorageDescr'], $this->validNetBufferMemory)
+            || parent::memValid($storage);
     }
 }

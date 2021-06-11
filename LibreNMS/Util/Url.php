@@ -26,9 +26,9 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
-use Auth;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -47,7 +47,7 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
-        if (is_null($device)) {
+        if (! $device instanceof Device || ! $device->hostname) {
             return '';
         }
 
@@ -172,7 +172,7 @@ class Url
     }
 
     /**
-     * @param Sensor $sensor
+     * @param \App\Models\Sensor $sensor
      * @param string $text
      * @param string $type
      * @param bool $overlib
@@ -225,7 +225,7 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [is_int($device) ? $device : $device->device_id];
+        $routeParams = [is_numeric($device) ? $device : $device->device_id];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
@@ -253,6 +253,24 @@ class Url
         $graph_array = [
             'port_id' => $port->port_id,
             'graph_type' => 'port_bits',
+            'from' => Carbon::now()->subDay()->timestamp,
+            'to' => Carbon::now()->timestamp,
+            'width' => 150,
+            'height' => 21,
+        ];
+
+        return self::portImage($graph_array);
+    }
+
+    /**
+     * @param Port $port
+     * @return string
+     */
+    public static function portErrorsThumbnail($port)
+    {
+        $graph_array = [
+            'port_id' => $port->port_id,
+            'graph_type' => 'port_errors',
             'from' => Carbon::now()->subDay()->timestamp,
             'to' => Carbon::now()->timestamp,
             'width' => 150,
@@ -352,11 +370,13 @@ class Url
             $urlargs[] = $key . '=' . urlencode($arg);
         }
 
+        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+
         if (Config::get('enable_lazy_load', true)) {
-            return '<img class="lazy img-responsive" data-original="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+            return $tag . ' loading="lazy" />';
         }
 
-        return '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return $tag . ' />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
@@ -494,7 +514,7 @@ class Url
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
                 if (strpos($feature, ' ') !== false) {
-                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";
                     $possibilities[] = "$distro.png";

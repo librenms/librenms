@@ -166,7 +166,9 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="js/jquery.gridster.min.js"></script>
+<script src="{{ asset('js/jquery.gridster.min.js?ver=05072021') }}"></script>
+<script src="{{ asset('js/raphael.min.js?ver=05072021') }}"></script>
+<script src="{{ asset('js/justgage.min.js?ver=05072021') }}"></script>
 @endsection
 
 @push('scripts')
@@ -565,7 +567,7 @@
         var datas = $(data).serializeArray();
         for( var field in datas ) {
             var name = datas[field].name;
-            if (name.endsWith('[]')) {
+            if (name.substring(name.length - 2, name.length) === '[]') {
                 name = name.slice(0, -2);
                 if (widget_settings[name]) {
                     widget_settings[name].push(datas[field].value);

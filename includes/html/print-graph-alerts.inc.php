@@ -52,6 +52,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
     <?php
     $groups = [];
     $max_count = 0;
+    $data = [];
 
     foreach (dbFetchRows($query, $param) as $return_value) {
         $date = $return_value['Date'];
@@ -71,7 +72,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
         }
     }
 
-    $graph_data = _json_encode($data);
+    $graph_data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     ?>
     var groups = new vis.DataSet();
 <?php

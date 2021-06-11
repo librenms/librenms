@@ -49,11 +49,12 @@ class Lcos extends OS implements
     /**
      * Convert String to decimal encoded string notation
      *
-     * @param string
+     * @param string $index
      * @return string decimal encoded OID string
      */
     private function strToDecOid($index)
     {
+        $dec_index = [];
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
             $dec_index[] = ord($index[$i]);
         }

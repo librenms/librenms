@@ -58,7 +58,7 @@ class DynamicConfigItem implements \ArrayAccess
     /**
      * Check given value is valid. Using the type of this config item and possibly other variables.
      *
-     * @param $value
+     * @param mixed $value
      * @return bool|mixed
      */
     public function checkValue($value)

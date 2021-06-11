@@ -77,13 +77,13 @@ class RunAlerts
     /**
      * Describe Alert
      * @param array $alert Alert-Result from DB
-     * @return array|bool
+     * @return array|bool|string
      */
     public function describeAlert($alert)
     {
         $obj = [];
         $i = 0;
-        $device = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', [$alert['device_id']]);
+        $device = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, serial, features, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', [$alert['device_id']]);
         $attribs = get_dev_attribs($alert['device_id']);
 
         $obj['hostname'] = $device['hostname'];
@@ -112,7 +112,7 @@ class RunAlerts
         $obj['status_reason'] = $device['status_reason'];
         if (can_ping_device($attribs)) {
             $ping_stats = DevicePerf::where('device_id', $alert['device_id'])->latest('timestamp')->first();
-            $obj['ping_timestamp'] = $ping_stats->template;
+            $obj['ping_timestamp'] = $ping_stats->timestamp;
             $obj['ping_loss'] = $ping_stats->loss;
             $obj['ping_min'] = $ping_stats->min;
             $obj['ping_max'] = $ping_stats->max;

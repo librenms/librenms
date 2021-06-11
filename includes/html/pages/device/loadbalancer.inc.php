@@ -49,7 +49,7 @@ if (is_file("includes/html/pages/device/loadbalancer/$type.inc.php")) {
 } else {
     foreach ($loadbalancer_tabs as $type) {
         if ($type != 'overview') {
-            if (is_file('includes/html/pages/device/loadbalancer/overview/' . mres($type) . '.inc.php')) {
+            if (is_file('includes/html/pages/device/loadbalancer/overview/' . $type . '.inc.php')) {
                 $g_i++;
                 if (! is_integer($g_i / 2)) {
                     $row_colour = \LibreNMS\Config::get('list_colour.even');
@@ -60,7 +60,7 @@ if (is_file("includes/html/pages/device/loadbalancer/$type.inc.php")) {
                 echo '<div style="background-color: ' . $row_colour . ';">';
                 echo '<div style="padding:4px 0px 0px 8px;"><span class=graphhead>' . $type_text[$type] . '</span>';
 
-                include 'includes/html/pages/device/loadbalancer/overview/' . mres($type) . '.inc.php';
+                include 'includes/html/pages/device/loadbalancer/overview/' . $type . '.inc.php';
 
                 echo '</div>';
                 echo '</div>';

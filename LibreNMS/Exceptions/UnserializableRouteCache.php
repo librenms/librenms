@@ -43,7 +43,7 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
      * Try to convert the given Exception to this exception
      *
      * @param \Exception $exception
-     * @return static
+     * @return static|null
      */
     public static function upgrade($exception)
     {
@@ -61,7 +61,6 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)

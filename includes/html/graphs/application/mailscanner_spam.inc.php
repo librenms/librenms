@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $scale_min = 0;
 $nototal = (($width < 550) ? 1 : 0);
 $unit_text = 'Messages/sec';
-$rrd_filename = rrd_name($device['hostname'], ['app', 'mailscannerV2', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mailscannerV2', $app['app_id']]);
 $array = [
     'spam'  => [
         'descr'  => 'Spam',
@@ -19,7 +19,7 @@ $array = [
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

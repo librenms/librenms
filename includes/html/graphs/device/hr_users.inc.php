@@ -2,7 +2,7 @@
 
 $scale_min = '0';
 
-$rrd_filename = rrd_name($device['hostname'], 'hr_users');
+$rrd_filename = Rrd::name($device['hostname'], 'hr_users');
 
 $ds = 'users';
 

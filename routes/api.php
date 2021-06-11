@@ -23,6 +23,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('oxidized/{hostname?}', 'LegacyApiController@list_oxidized')->name('list_oxidized');
         Route::get('devicegroups/{name}', 'LegacyApiController@get_devices_by_group')->name('get_devices_by_group');
         Route::get('devicegroups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
+        Route::get('port_groups', 'LegacyApiController@get_port_groups')->name('get_port_groups');
         Route::get('portgroups/multiport/bits/{id}', 'LegacyApiController@get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
         Route::get('portgroups/{group}', 'LegacyApiController@get_graph_by_portgroup')->name('get_graph_by_portgroup');
         Route::get('alerts/{id}', 'LegacyApiController@list_alerts')->name('get_alert');
@@ -74,6 +75,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
         Route::get('oxidized/config/{device_name}', 'LegacyApiController@get_oxidized_config')->name('get_oxidized_config');
         Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
+        Route::post('port_groups', 'LegacyApiController@add_port_group')->name('add_port_group');
         Route::post('devices/{id}/parents', 'LegacyApiController@add_parents_to_host')->name('add_parents_to_host');
         Route::delete('/devices/{id}/parents', 'LegacyApiController@del_parents_from_host')->name('del_parents_from_host');
         Route::post('locations', 'LegacyApiController@add_location')->name('add_location');

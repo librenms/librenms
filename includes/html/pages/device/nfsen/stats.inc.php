@@ -2,7 +2,7 @@
 
 print_optionbar_start();
 
-echo '<form action = "' . generate_url($link_array, ['nfsen' => 'stats']) . '" iOCd = "FlowStats" method = "SUBMIT">';
+echo '<form action = "' . \LibreNMS\Util\Url::generate($link_array, ['nfsen' => 'stats']) . '" iOCd = "FlowStats" method = "SUBMIT">';
 
 echo 'Top N:
 <select name = "topN" id = "topN" size = 1>

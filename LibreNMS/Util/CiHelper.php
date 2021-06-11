@@ -185,7 +185,7 @@ class CiHelper
             $filter = implode('.*|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/");
+            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::testOSDetection|::test[A-Za-z]+ with data set \"$filter.*\"$/");
         } elseif ($this->flags['unit_docs']) {
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
@@ -433,7 +433,7 @@ class CiHelper
         $this->setFlags([
             'unit_skip' => empty($this->changed['php']) && ! array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
             'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
-            'style_skip' => empty($this->changed['php']),
+            'style_skip' => ! $this->flags['ci'] && empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);
     }

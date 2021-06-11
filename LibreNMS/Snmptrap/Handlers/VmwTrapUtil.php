@@ -31,6 +31,8 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
+use LibreNMS\Snmptrap\Trap;
+
 class VmwTrapUtil
 {
     /**

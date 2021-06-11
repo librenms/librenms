@@ -76,7 +76,7 @@ class Rrd extends BaseValidation
                 $validator->fail("$port doesn't appear to exist, rrdcached test failed");
             }
         } else {
-            $connection = @fsockopen($host, $port);
+            $connection = @fsockopen($host, (int) $port);
             if (is_resource($connection)) {
                 fclose($connection);
             } else {

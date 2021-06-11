@@ -49,7 +49,7 @@ class Avocent extends OS implements OSDiscovery
             } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.10418.26')) {
                 $avocent_oid = '.1.3.6.1.4.1.10418.26.2.1';
             }
-            if ($avocent_oid) {
+            if (isset($avocent_oid)) {
                 $avocent_tmp = snmp_get_multi_oid($this->getDeviceArray(), "$avocent_oid.2.0 $avocent_oid.4.0 $avocent_oid.7.0");
                 $hardware = explode(' ', $avocent_tmp["$avocent_oid.2.0"] ?? '', 2)[0] ?: null;
                 $serial = $avocent_tmp["$avocent_oid.4.0"] ?? null;

@@ -4,6 +4,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $options = getopt('u:rldvh');
 if (isset($options['h']) || (! isset($options['l']) && ! isset($options['u']))) {
@@ -17,7 +18,7 @@ if (isset($options['h']) || (! isset($options['l']) && ! isset($options['u']))) 
 }
 
 if (isset($options['d'])) {
-    $debug = true;
+    Debug::set();
 }
 
 $init_modules = [];

@@ -17,7 +17,9 @@ if (count($components) > 0) {
                     <table class="table table-hover table-condensed table-striped">
     <?php
     foreach ($components as $component => $array) {
-        if ($array['status'] == 2) {
+        if ($array['disabled'] == 1) {
+            continue;
+        } elseif ($array['status'] == 2) {
             $class = 'danger';
             $message = 'Alert';
         } else {

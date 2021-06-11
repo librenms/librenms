@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Component extends DeviceRelatedModel
 {
@@ -53,12 +54,12 @@ class Component extends DeviceRelatedModel
 
     // ---- Define Relationships ----
 
-    public function logs()
+    public function logs(): HasMany
     {
         return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
     }
 
-    public function prefs()
+    public function prefs(): HasMany
     {
         return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
     }

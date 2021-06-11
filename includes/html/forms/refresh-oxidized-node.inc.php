@@ -12,7 +12,7 @@
 
 header('Content-type: application/json');
 
-$device_hostname = clean($_POST['device_hostname']);
+$device_hostname = strip_tags($_POST['device_hostname']);
 if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
     if (oxidized_node_update($device_hostname, 'LibreNMS GUI refresh', Auth::user()->username)) {
         $status = 'ok';
@@ -32,4 +32,4 @@ $output = [
 ];
 
 header('Content-type: application/json');
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

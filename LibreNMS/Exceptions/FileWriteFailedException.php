@@ -39,7 +39,6 @@ class FileWriteFailedException extends \Exception
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function render(\Illuminate\Http\Request $request)

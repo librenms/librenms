@@ -1,0 +1,8 @@
+os: epson-projector	
+text: 'Epson Projector'
+type: collaboration
+icon: epson
+group: epson
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1248.4

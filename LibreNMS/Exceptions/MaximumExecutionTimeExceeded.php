@@ -34,7 +34,7 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
      * Try to convert the given Exception to a FilePermissionsException
      *
      * @param \Exception $exception
-     * @return static
+     * @return static|null
      */
     public static function upgrade($exception)
     {
@@ -50,7 +50,6 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)

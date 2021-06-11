@@ -28,8 +28,12 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
+use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
+use LibreNMS\Util\Debug;
+use LibreNMS\Util\Rewrite;
 use Log;
+use Symfony\Component\Process\Process;
 
 class Rrd extends BaseDatastore
 {
@@ -259,9 +263,9 @@ class Rrd extends BaseDatastore
     /**
      * Generates a filename for a proxmox cluster rrd
      *
-     * @param $pmxcluster
-     * @param $vmid
-     * @param $vmport
+     * @param string $pmxcluster
+     * @param string $vmid
+     * @param string $vmport
      * @return string full path to the rrd.
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport)
@@ -355,8 +359,8 @@ class Rrd extends BaseDatastore
      */
     private function command($command, $filename, $options)
     {
-        global $vdebug;
         $stat = Measurement::start($this->coalesceStatisticType($command));
+        $output = null;
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
@@ -379,7 +383,7 @@ class Rrd extends BaseDatastore
         }
 
         // send the command!
-        if ($command == 'last' && $this->init(false)) {
+        if (in_array($command, ['last', 'list']) && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
             $output = $this->sync_process->sendCommand($cmd);
         } elseif ($this->init()) {
@@ -389,7 +393,7 @@ class Rrd extends BaseDatastore
             Log::error('rrdtool could not start');
         }
 
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             echo 'RRDtool Output: ';
             echo $output[0];
             echo $output[1];
@@ -441,6 +445,70 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Get array of all rrd files for a device,
+     * via rrdached or localdisk.
+     *
+     * @param array $device device for which we get the rrd's
+     * @return array array of rrd files for this host
+     */
+    public function getRrdFiles($device)
+    {
+        if ($this->rrdcached) {
+            $filename = sprintf('/%s', $device['hostname']);
+            $rrd_files = $this->command('list', $filename, '');
+            // Command output is an array, create new array with each filename as a item in array.
+            $rrd_files_array = explode("\n", trim($rrd_files[0]));
+            // Remove status line from response
+            array_pop($rrd_files_array);
+        } else {
+            $rrddir = $this->dirFromHost($device['hostname']);
+            $pattern = sprintf('%s/*.rrd', $rrddir);
+            $rrd_files_array = glob($pattern);
+        }
+
+        sort($rrd_files_array);
+
+        return $rrd_files_array;
+    }
+
+    /**
+     * Get array of rrd files for specific application.
+     *
+     * @param array $device device for which we get the rrd's
+     * @param int   $app_id application id on the device
+     * @param string  $app_name name of app to be searched
+     * @param string  $category which category of graphs are searched
+     * @return array  array of rrd files for this host
+     */
+    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null)
+    {
+        $entries = [];
+        $separator = '-';
+
+        $rrdfile_array = $this->getRrdFiles($device);
+        if ($category) {
+            $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
+        } else {
+            $pattern = sprintf('%s-%s-%s', 'app', $app_name, $app_id);
+        }
+
+        // app_name contains a separator character? consider it
+        $offset = substr_count($app_name, $separator);
+
+        foreach ($rrdfile_array as $rrd) {
+            if (str_contains($rrd, $pattern)) {
+                $filename = basename($rrd, '.rrd');
+                $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
+                if ($entry) {
+                    array_push($entries, $entry);
+                }
+            }
+        }
+
+        return $entries;
+    }
+
+    /**
      * Checks if the rrd file exists on the server
      * This will perform a remote check if using rrdcached and rrdtool >= 1.5
      *
@@ -479,25 +547,53 @@ class Rrd extends BaseDatastore
 
     /**
      * Generates a graph file at $graph_file using $options
-     * Opens its own rrdtool pipe.
+     * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param string $graph_file
-     * @param string $options
-     * @return int
+     * @param  string  $options
+     * @return string
+     * @throws \LibreNMS\Exceptions\FileExistsException
+     * @throws \LibreNMS\Exceptions\RrdGraphException
      */
-    public function graph($graph_file, $options)
+    public function graph(string $options): string
     {
-        if ($this->init(false)) {
-            $cmd = $this->buildCommand('graph', $graph_file, $options);
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir);
+        $process->setTimeout(300);
+        $process->setIdleTimeout(300);
 
-            $output = implode($this->sync_process->sendCommand($cmd));
+        $command = $this->buildCommand('graph', '-', $options);
+        $process->setInput($command . "\nquit");
+        $process->run();
 
-            d_echo("<p>$cmd</p>\n<p>command returned ($output)</p>");
-
-            return $output;
-        } else {
-            return 0;
+        $feedback_position = strrpos($process->getOutput(), 'OK ');
+        if ($feedback_position !== false) {
+            return substr($process->getOutput(), 0, $feedback_position);
         }
+
+        // if valid image is returned with error, extract image and feedback
+        $image_type = Config::get('webui.graph_type', 'png');
+        $search = $this->getImageEnd($image_type);
+        if (($position = strrpos($process->getOutput(), $search)) !== false) {
+            $position += strlen($search);
+            throw new RrdGraphException(
+                substr($process->getOutput(), $position),
+                $process->getExitCode(),
+                substr($process->getOutput(), 0, $position)
+            );
+        }
+
+        // only error text was returned
+        $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
+        throw new RrdGraphException($error, $process->getExitCode(), '');
+    }
+
+    private function getImageEnd(string $type): string
+    {
+        $image_suffixes = [
+            'png' => hex2bin('0000000049454e44ae426082'),
+            'svg' => '</svg>',
+        ];
+
+        return $image_suffixes[$type] ?? '';
     }
 
     public function __destruct()
@@ -528,9 +624,39 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Escapes strings and sets them to a fixed length for use with RRDtool
+     *
+     * @param string $descr the string to escape
+     * @param int $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
+     * @return string
+     */
+    public static function fixedSafeDescr($descr, $length)
+    {
+        $result = Rewrite::shortenIfType($descr);
+        $result = str_replace("'", '', $result);            // remove quotes
+
+        if (is_numeric($length)) {
+            // preserve original $length for str_pad()
+
+            // determine correct strlen() for substr_count()
+            $substr_count_length = $length <= 0 ? null : min(strlen($descr), $length);
+
+            $extra = substr_count($descr, ':', 0, $substr_count_length);
+            $result = substr(str_pad($result, $length), 0, ($length + $extra));
+            if ($extra > 0) {
+                $result = substr($result, 0, (-1 * $extra));
+            }
+        }
+
+        $result = str_replace(':', '\:', $result);          // escape colons
+
+        return $result . ' ';
+    }
+
+    /**
      * Only track update and create primarily, just put all others in an "other" bin
      *
-     * @param $type
+     * @param string $type
      * @return string
      */
     private function coalesceStatisticType($type)

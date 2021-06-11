@@ -99,7 +99,7 @@ class Dnos extends OS implements ProcessorDiscovery
      * @param string $mib MIB
      * @param string $num_oid Numerical OID
      * @param string $name Name prefix to display to user
-     * @param string custom type (if there are multiple in one chassis)
+     * @param string $type custom type (if there are multiple in one chassis)
      */
     private function findProcessors(&$processors, $oid, $mib, $num_oid, $name, $type = null)
     {
