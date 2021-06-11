@@ -311,12 +311,18 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         $slas = collect();
 
         $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB');
+
+        if (! empty($sla_data)) {
+            $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonLatestRttOperCompletionTime', $sla_data, 'CISCO-RTTMON-MIB');
+        }
+
         foreach ($sla_data as $index => $sla_config) {
             $slas->push(new Sla([
                 'sla_nr' => $index,
                 'owner' => $sla_config['rttMonCtrlAdminOwner'] ?? '',
                 'tag' => $this->getSlaTag($sla_config),
                 'rtt_type' => $sla_config['rttMonCtrlAdminRttType'],
+                'rtt' => $sla_config['rttMonLatestRttOperCompletionTime'] ?? null,
                 'status' => ($sla_config['rttMonCtrlAdminStatus'] == 'active') ? 1 : 0,
                 'opstatus' => ($sla_config['rttMonLatestRttOperSense'] == 'ok') ? 0 : 2,
             ]));

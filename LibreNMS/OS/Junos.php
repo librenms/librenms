@@ -73,8 +73,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     {
         $slas = collect();
         $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'pingCtlTable', [], 'DISMAN-PING-MIB');
-        $index = 1;
 
+        if (! empty($sla_table)) {
+            $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxPingResultsRttUs', $sla_table, 'JUNIPER-PING-MIB');
+        }
+
+        $index = 1;
         foreach ($sla_table as $sla_key => $sla_config) {
             [$owner, $test] = explode('.', $sla_key, 2);
 
@@ -83,6 +87,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 'owner' => $owner,
                 'tag' => $test,
                 'rtt_type' => $this->retrieveJuniperType($sla_config['pingCtlType']),
+                'rtt' => isset($sla_config['jnxPingResultsRttUs']) ? $sla_config['jnxPingResultsRttUs'] / 1000 : null,
                 'status' => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
                 'opstatus' => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
             ]));

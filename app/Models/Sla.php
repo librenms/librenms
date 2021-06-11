@@ -15,6 +15,7 @@ class Sla extends DeviceRelatedModel implements Keyable
         'owner',
         'tag',
         'rtt_type',
+        'rtt',
         'status',
         'opstatus',
         'deleted',
