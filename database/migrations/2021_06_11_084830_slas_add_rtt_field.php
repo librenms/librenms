@@ -17,7 +17,6 @@ class SlasAddRttField extends Migration
             $table->unsignedInteger('sla_nr')->change();
             $table->unsignedFloat('rtt')->nullable()->after('rtt_type');
         });
-
     }
 
     /**

@@ -82,7 +82,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             [$owner, $test] = explode('.', $sla_key, 2);
 
             $slas->push(new Sla([
-                'sla_nr' => hexdec(hash('crc32', $owner.$test)), // indexed by owner+test, convert to int
+                'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
                 'owner' => $owner,
                 'tag' => $test,
                 'rtt_type' => $this->retrieveJuniperType($sla_config['pingCtlType']),
@@ -100,9 +100,9 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
         $device = $this->getDeviceArray();
 
         // Go get some data from the device.
-        $data = snmpwalk_group($device, 'pingCtlRowStatus','DISMAN-PING-MIB', 2);
-        $data = snmpwalk_group($device, 'pingResultsProbeResponses','DISMAN-PING-MIB', 2, $data);
-        $data = snmpwalk_group($device, 'pingResultsSentProbes','DISMAN-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'pingCtlRowStatus', 'DISMAN-PING-MIB', 2);
+        $data = snmpwalk_group($device, 'pingResultsProbeResponses', 'DISMAN-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'pingResultsSentProbes', 'DISMAN-PING-MIB', 2, $data);
         $data = snmpwalk_group($device, 'jnxPingResultsTable', 'JUNIPER-PING-MIB', 2, $data);
 
         // Get the needed information
@@ -171,7 +171,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     {
         $sum = 0;
         $length = strlen($key);
-        for($i = 0; $i < $length; $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $sum += ord($key[$i]);
         }
 
