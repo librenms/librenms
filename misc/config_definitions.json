@@ -1049,7 +1049,7 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.cisco-sla": {
+        "discovery_modules.slas": {
             "order": 80,
             "group": "discovery",
             "section": "discovery_modules",
@@ -1527,10 +1527,6 @@
         },
         "enable_pseudowires": {
             "default": true,
-            "type": "boolean"
-        },
-        "enable_sla": {
-            "default": false,
             "type": "boolean"
         },
         "enable_syslog": {
@@ -4417,7 +4413,7 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.cisco-sla": {
+        "poller_modules.slas": {
             "order": 140,
             "group": "poller",
             "section": "poller_modules",
@@ -4979,90 +4975,6 @@
                 "light": "light",
                 "mono": "mono"
             }
-        },
-        "sla_type_labels.dhcp": {
-            "default": "DHCP",
-            "type": "text"
-        },
-        "sla_type_labels.dlsw": {
-            "default": "DLSW",
-            "type": "text"
-        },
-        "sla_type_labels.dns": {
-            "default": "DNS",
-            "type": "text"
-        },
-        "sla_type_labels.echo": {
-            "default": "ICMP ping",
-            "type": "text"
-        },
-        "sla_type_labels.ethernetJitter": {
-            "default": "Ethernet jitter",
-            "type": "text"
-        },
-        "sla_type_labels.ethernetPing": {
-            "default": "Ethernet ping",
-            "type": "text"
-        },
-        "sla_type_labels.fileIO": {
-            "default": "File I/O",
-            "type": "text"
-        },
-        "sla_type_labels.ftp": {
-            "default": "FTP",
-            "type": "text"
-        },
-        "sla_type_labels.http": {
-            "default": "HTTP",
-            "type": "text"
-        },
-        "sla_type_labels.icmpjitter": {
-            "default": "ICMP jitter",
-            "type": "text"
-        },
-        "sla_type_labels.jitter": {
-            "default": "Jitter",
-            "type": "text"
-        },
-        "sla_type_labels.lspGroup": {
-            "default": "LSP group",
-            "type": "text"
-        },
-        "sla_type_labels.lspPing": {
-            "default": "LSP ping",
-            "type": "text"
-        },
-        "sla_type_labels.lspPingPseudowire": {
-            "default": "LSP Pseudowire ping",
-            "type": "text"
-        },
-        "sla_type_labels.lspTrace": {
-            "default": "LSP trace",
-            "type": "text"
-        },
-        "sla_type_labels.pathEcho": {
-            "default": "Path ICMP ping",
-            "type": "text"
-        },
-        "sla_type_labels.rtp": {
-            "default": "RTP",
-            "type": "text"
-        },
-        "sla_type_labels.script": {
-            "default": "Script",
-            "type": "text"
-        },
-        "sla_type_labels.tcpConnect": {
-            "default": "TCP connect",
-            "type": "text"
-        },
-        "sla_type_labels.udpEcho": {
-            "default": "UDP ping",
-            "type": "text"
-        },
-        "sla_type_labels.voip": {
-            "default": "VoIP",
-            "type": "text"
         },
         "smokeping.pings": {
             "default": 5,

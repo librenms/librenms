@@ -1849,10 +1849,11 @@ slas:
   Columns:
     - { Field: sla_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: sla_nr, Type: int, 'Null': false, Extra: '' }
+    - { Field: sla_nr, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: tag, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: rtt, Type: 'double(8,2) unsigned', 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: opstatus, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
