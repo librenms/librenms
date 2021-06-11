@@ -343,6 +343,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                 if (isset($data['rttMonEchoAdminCodecType']) && $data['rttMonEchoAdminCodecType'] != 'notApplicable') {
                     $tag .= ' (' . $data['rttMonEchoAdminCodecType'] . ' @ ' . $data['rttMonEchoAdminCodecInterval'] . 'ms)';
                 }
+
                 return $tag;
             default:
                 return '';

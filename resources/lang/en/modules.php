@@ -31,6 +31,6 @@ return [
             'udpEcho' => 'UDP Ping',
             'UdpTimestamp' => 'UDP Timestamp',
             'voip' => 'VoIP',
-        ]
-    ]
+        ],
+    ],
 ];
