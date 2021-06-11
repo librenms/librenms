@@ -58,13 +58,13 @@ class Slas implements Module
     {
         if ($os instanceof SlaPolling) {
             // Gather our SLA's from the DB.
-            $slas = Sla::where('device_id', $os->getDevice()['device_id'])
-                ->where('deleted', 0)
-                ->get();
+            $slas = $os->getDevice()->slas()
+                ->where('deleted', 0)->get();
 
-            if (count($slas) > 0) {
+            if ($slas->isNotEmpty()) {
                 // We have SLA's, lets go!!!
-                $data = $os->pollSlas($slas);
+                $os->pollSlas($slas);
+                $os->getDevice()->slas()->saveMany($slas);
             }
         }
     }

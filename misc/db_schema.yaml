@@ -1834,6 +1834,7 @@ slas:
     - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: tag, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: rtt, Type: 'float unsigned', 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: opstatus, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

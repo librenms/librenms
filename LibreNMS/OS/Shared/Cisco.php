@@ -398,41 +398,29 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
     {
         $device = $this->getDeviceArray();
 
-        // Go get some data from the device.
-        $rttMonLatestRttOperTable = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.42.1.2.10.1', 1);
-        $rttMonLatestOper = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.42.1.5', 1);
+        $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
+        $data = snmpwalk_group($device, 'ttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
 
-        $uptime = snmp_get($device, 'sysUpTime.0', '-Otv');
-        $time_offset = (time() - intval($uptime) / 100);
+        $time_offset = time() - $this->getDevice()->uptime;
 
         foreach ($slas as $sla) {
-            $sla_id = $sla['sla_id'];
-            $sla_nr = $sla['sla_nr'];
-            $rtt_type = $sla['rtt_type'];
+            $sla_id = $sla->sla_id;
+            $sla_nr = $sla->sla_nr;
+            $rtt_type = $sla->rtt_type;
 
             // Lets process each SLA
-            $unixtime = intval(($rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.5'][$sla_nr] / 100 + $time_offset));
+            $unixtime = intval(($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset));
             $time = strftime('%Y-%m-%d %H:%M:%S', $unixtime);
-            $update = [];
 
-            // Use Nagios Status codes.
-            $opstatus = $rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.2'][$sla_nr];
-            if ($opstatus == 1) {
-                $opstatus = 0;        // 0=Good
-            } else {
-                $opstatus = 2;        // 2=Critical
-            }
+            // Save data
+            $sla->rtt = $data[$sla_nr]['rttMonLatestRttOperCompletionTime'];
+            // Use Nagios Status codes. 0: Good, 2: Critical
+            $sla->opstatus = $data[$sla_nr]['rttMonLatestRttOperSense'] == 1 ? 0 : 2;
 
-            // Populating the update array means we need to update the DB.
-            if ($opstatus != $sla['opstatus']) {
-                $update['opstatus'] = $opstatus;
-            }
-
-            $rtt = $rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.1'][$sla_nr];
-            echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $rtt . 'ms at ' . $time . '\n';
+            echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
             $fields = [
-                'rtt' => $rtt,
+                'rtt' => $sla->rtt,
             ];
 
             // The base RRD
@@ -445,17 +433,17 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             switch ($rtt_type) {
                 case 'jitter':
                     $jitter = [
-                        'PacketLossSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.26'][$sla_nr],
-                        'PacketLossDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.27'][$sla_nr],
-                        'PacketOutOfSequence' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.28'][$sla_nr],
-                        'PacketMIA' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.29'][$sla_nr],
-                        'PacketLateArrival' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.30'][$sla_nr],
-                        'MOS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.42'][$sla_nr] / 100,
-                        'ICPIF' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.43'][$sla_nr],
-                        'OWAvgSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.49'][$sla_nr],
-                        'OWAvgDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.50'][$sla_nr],
-                        'AvgSDJ' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.47'][$sla_nr],
-                        'AvgDSJ' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.48'][$sla_nr],
+                        'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
+                        'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
+                        'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
+                        'PacketMIA' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'],
+                        'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'],
+                        'MOS' => isset($data[$sla_nr]['rttMonLatestJitterOperMOS']) ? intval($data[$sla_nr]['rttMonLatestJitterOperMOS']) / 100 : null,
+                        'ICPIF' => $data[$sla_nr]['rttMonLatestJitterOperICPIF'] ?? null,
+                        'OWAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgSD'] ?? null,
+                        'OWAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgDS'] ?? null,
+                        'AvgSDJ' => $data[$sla_nr]['rttMonLatestJitterOperAvgSDJ'] ?? null,
+                        'AvgDSJ' => $data[$sla_nr]['rttMonLatestJitterOperAvgDSJ'] ?? null,
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
@@ -476,16 +464,16 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     break;
                 case 'icmpjitter':
                     $icmpjitter = [
-                        'PacketLoss' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.26'][$sla_nr],
-                        'PacketOosSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.28'][$sla_nr],
-                        'PacketOosDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.29'][$sla_nr],
-                        'PacketLateArrival' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.32'][$sla_nr],
-                        'JitterAvgSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.45'][$sla_nr],
-                        'JitterAvgDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.46'][$sla_nr],
-                        'LatencyOWAvgSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.47'][$sla_nr],
-                        'LatencyOWAvgDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.48'][$sla_nr],
-                        'JitterIAJOut' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.49'][$sla_nr],
-                        'JitterIAJIn' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.50'][$sla_nr],
+                        'PacketLoss' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
+                        'PacketOosSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
+                        'PacketOosDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'],
+                        'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'],
+                        'JitterAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperAvgSDJ'],
+                        'JitterAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperAvgDSJ'],
+                        'LatencyOWAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgSD'],
+                        'LatencyOWAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgDS'],
+                        'JitterIAJOut' => $data[$sla_nr]['rttMonLatestJitterOperIAJOut'],
+                        'JitterIAJIn' => $data[$sla_nr]['rttMonLatestJitterOperIAJIn'],
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
@@ -507,12 +495,6 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
-
-            // Update the DB if necessary
-            if (count($update) > 0) {
-                Sla::where('sla_id', $sla_id)
-                    ->update($update);
-            }
         }
     }
 

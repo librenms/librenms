@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Sla;
+use Carbon\Carbon;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -72,7 +73,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     {
         $slas = collect();
         $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'pingCtlTable', [], 'DISMAN-PING-MIB');
-        $index = 0;
+        $index = 1;
 
         foreach ($sla_table as $sla_key => $sla_config) {
             [$owner, $test] = explode('.', $sla_key, 2);
@@ -95,99 +96,29 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
         $device = $this->getDeviceArray();
 
         // Go get some data from the device.
-        $pingCtlResults = snmp_walk($device, 'pingMIB.pingObjects.pingCtlTable.pingCtlEntry', '-OQUs', '+DISMAN-PING-MIB');
-        $pingResults = snmp_walk($device, 'pingMIB.pingObjects.pingResultsTable.pingResultsEntry', '-OQUs', '+DISMAN-PING-MIB');
-        $jnxPingResults = snmp_walk($device, 'jnxPingResultsEntry', '-OQUs', '+JUNIPER-PING-MIB');
+        $data = snmpwalk_group($device, 'pingCtlRowStatus','DISMAN-PING-MIB', 2);
+        $data = snmpwalk_group($device, 'pingResultsProbeResponses','DISMAN-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'pingResultsSentProbes','DISMAN-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'jnxPingResultsTable', 'JUNIPER-PING-MIB', 2, $data);
 
-        // Instanciate index foreach MIB to query field more easily
-        $jnxPingResults_table = [];
-        foreach (explode("\n", $jnxPingResults) as $line) {
-            $key_val = explode(' ', $line, 3);
-
-            $key = $key_val[0];
-            $value = $key_val[2];
-
-            // To get owner index and test name
-            $prop_id = explode('.', $key);
-            $property = $prop_id[0];
-            $owner = $prop_id[1];
-            $test = $prop_id[2];
-
-            $jnxPingResults_table[$owner . '.' . $test][$property] = $value;
-        }
-
-        // Getting only ProbeResponses and SentProbes
-        $pingResultsProbeResponses = [];
-        $pingResultsSentProbes = [];
-        foreach (explode("\n", $pingResults) as $line) {
-            $key_val = explode(' ', $line, 3);
-
-            $key = $key_val[0];
-            $value = $key_val[2];
-
-            // To get owner index and test name
-            $prop_id = explode('.', $key);
-            $property = $prop_id[0];
-            $owner = $prop_id[1];
-            $test = $prop_id[2];
-
-            if ($property == 'pingResultsProbeResponses') {
-                $pingResultsProbeResponses[$owner . '.' . $test] = $value;
-            } elseif ($property == 'pingResultsSentProbes') {
-                $pingResultsSentProbes[$owner . '.' . $test] = $value;
-            }
-        }
-
-        // Getting only pingCtlRowStatuses
-        $pingCtlRowStatuses = [];
-        foreach (explode("\n", $pingCtlResults) as $line) {
-            $key_val = explode(' ', $line, 3);
-
-            $key = $key_val[0];
-            $value = $key_val[2];
-
-            // To get owner index and test name
-            $prop_id = explode('.', $key);
-            $property = $prop_id[0];
-            $owner = $prop_id[1];
-            $test = $prop_id[2];
-
-            if ($property == 'pingCtlRowStatus') {
-                $pingCtlRowStatuses[$owner . '.' . $test] = $value;
-            }
-        }
-
-        // Get the needed informations
+        // Get the needed information
         foreach ($slas as $sla) {
-            $sla_id = $sla['sla_id'];
-            $sla_nr = $sla['sla_nr'];
-            $rtt_type = $sla['rtt_type'];
-            $owner = $sla['owner'];
-            $test = $sla['tag'];
+            $sla_nr = $sla->sla_nr;
+            $rtt_type = $sla->rtt_type;
+            $owner = $sla->owner;
+            $test = $sla->tag;
 
             // Lets process each SLA
-            $time = $this->fixdate($jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsTime']);
-            $update = [];
 
-            // Use DISMAN-PING Status codes.
-            $opstatus = $pingCtlRowStatuses[$owner . '.' . $test];
+            // Use DISMAN-PING Status codes. 0=Good 2=Critical
+            $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
 
-            if ($opstatus == 'active') {
-                $opstatus = 0;        // 0=Good
-            } else {
-                $opstatus = 2;        // 2=Critical
-            }
-
-            // Populating the update array means we need to update the DB.
-            if ($opstatus != $sla['opstatus']) {
-                $update['opstatus'] = $opstatus;
-            }
-
-            $rtt = $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsRttUs'] / 1000;
-            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $rtt . 'ms at ' . $time . "\n";
+            $sla->rtt = $data[$owner][$test]['jnxPingResultsRttUs'] / 1000;
+            $time = Carbon::parse($data[$owner][$test]['jnxPingResultsTime'])->toDateTimeString();
+            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
             $fields = [
-                'rtt' => $rtt,
+                'rtt' => $sla->rtt,
             ];
 
             // The base RRD
@@ -205,11 +136,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 case 'IcmpEcho':
                 case 'IcmpTimeStamp':
                     $icmp = [
-                        'MinRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMinRttUs'] / 1000,
-                        'MaxRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsMaxRttUs'] / 1000,
-                        'StdDevRttUs' => $jnxPingResults_table[$owner . '.' . $test]['jnxPingResultsStdDevRttUs'] / 1000,
-                        'ProbeResponses' => $pingResultsProbeResponses[$owner . '.' . $test],
-                        'ProbeLoss' => (int) $pingResultsSentProbes[$owner . '.' . $test] - (int) $pingResultsProbeResponses[$owner . '.' . $test],
+                        'MinRttUs' => $data[$owner][$test]['jnxPingResultsMinRttUs'] / 1000,
+                        'MaxRttUs' => $data[$owner][$test]['jnxPingResultsMaxRttUs'] / 1000,
+                        'StdDevRttUs' => $data[$owner][$test]['jnxPingResultsStdDevRttUs'] / 1000,
+                        'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'],
+                        'ProbeLoss' => (int) $data[$owner][$test]['pingResultsSentProbes'] - (int) $data[$owner][$test]['pingResultsProbeResponses'],
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
@@ -229,12 +160,6 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
-
-            // Update the DB if necessary
-            if (count($update) > 0) {
-                Sla::where('sla_id', $sla_id)
-                    ->update($update);
-            }
         }
     }
 
@@ -259,31 +184,5 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             default:
                 return str_replace('ping', '', $rtt_type);
         }
-    }
-
-    /**
-     * Function to fix the 0 missing before digit on a date from the MIB
-     */
-    private function fixdate($string)
-    {
-        $datetime = explode(',', $string);
-        $date = explode('-', $datetime[0]);
-        $time = explode(':', $datetime[1]);
-
-        // If one digit, add a 0 before
-        foreach ($date as &$field) {
-            if ((int) $field < 10) {
-                $field = '0' . $field;
-            }
-        }
-        foreach ($time as &$field) {
-            if ((int) $field < 10) {
-                $field = '0' . $field;
-            }
-        }
-        // To remove the decisecond
-        $time[2] = explode('.', $time[2])[0];
-
-        return $date[0] . '-' . $date[1] . '-' . $date[2] . ' ' . $time[0] . ':' . $time[1] . ':' . $time[2];
     }
 }
