@@ -78,12 +78,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxPingResultsRttUs', $sla_table, 'JUNIPER-PING-MIB');
         }
 
-        $index = 1;
         foreach ($sla_table as $sla_key => $sla_config) {
             [$owner, $test] = explode('.', $sla_key, 2);
 
             $slas->push(new Sla([
-                'sla_nr' => $index++, // does not matter, not used
+                'sla_nr' => hexdec(hash('crc32', $owner.$test)), // indexed by owner+test, convert to int
                 'owner' => $owner,
                 'tag' => $test,
                 'rtt_type' => $this->retrieveJuniperType($sla_config['pingCtlType']),
@@ -166,6 +165,17 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
         }
+    }
+
+    private function calculateSlaNr($key): int
+    {
+        $sum = 0;
+        $length = strlen($key);
+        for($i = 0; $i < $length; $i++) {
+            $sum += ord($key[$i]);
+        }
+
+        return $sum;
     }
 
     /**

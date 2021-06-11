@@ -14,7 +14,8 @@ class SlasAddRttField extends Migration
     public function up()
     {
         Schema::table('slas', function (Blueprint $table) {
-            $table->unsignedFloat('rtt', 32)->nullable()->after('rtt_type');
+            $table->unsignedInteger('sla_nr')->change();
+            $table->unsignedFloat('rtt')->nullable()->after('rtt_type');
         });
 
     }
@@ -27,6 +28,7 @@ class SlasAddRttField extends Migration
     public function down()
     {
         Schema::table('slas', function (Blueprint $table) {
+            $table->integer('sla_nr')->change();
             $table->dropColumn('rtt');
         });
     }
