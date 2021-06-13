@@ -24,6 +24,7 @@
 
 namespace LibreNMS\Validations;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
@@ -47,7 +48,7 @@ class User extends BaseValidation
         $lnms_groupname = \config('librenms.group');
 
         if (! ($username === 'root' || $username === $lnms_username)) {
-            if (isCli()) {
+            if (App::runningInConsole()) {
                 $validator->fail("You need to run this script as '$lnms_username' or root");
             } elseif (function_exists('posix_getgrnam')) {
                 $lnms_group = posix_getgrnam($lnms_groupname);

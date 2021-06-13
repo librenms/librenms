@@ -279,7 +279,7 @@ function renamehost($id, $new, $source = 'console')
 
 function device_discovery_trigger($id)
 {
-    if (isCli() === false) {
+    if (App::runningInConsole() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
@@ -296,7 +296,7 @@ function device_discovery_trigger($id)
 
 function delete_device($id)
 {
-    if (isCli() === false) {
+    if (App::runningInConsole() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
@@ -311,6 +311,9 @@ function delete_device($id)
     // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
     dbQuery('DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?', [$id]);
     dbQuery('DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?', [$id]);
+
+    //Remove IsisAdjacencies
+    \App\Models\IsisAdjacency::where('device_id', $id)->delete();
 
     //Remove Outages
     \App\Models\Availability::where('device_id', $id)->delete();
@@ -2015,27 +2018,6 @@ function get_schema_list()
     ksort($files); // fix dbSchema 1000 order
 
     return $files;
-}
-
-/**
- * Get the current database schema, will return 0 if there is no schema.
- *
- * @return int
- */
-function get_db_schema()
-{
-    try {
-        $db = \LibreNMS\DB\Eloquent::DB();
-        if ($db) {
-            return (int) $db->table('dbSchema')
-                ->orderBy('version', 'DESC')
-                ->value('version');
-        }
-    } catch (PDOException $e) {
-        // return default
-    }
-
-    return 0;
 }
 
 /**

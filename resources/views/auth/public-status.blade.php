@@ -81,11 +81,11 @@
 @section('javascript')
             <script class="code" type="text/javascript">
                 $(document).ready(function () {
-                    $("#ToggleLogon").click(function () {
+                    $("#ToggleLogon").on("click", function () {
                         document.getElementById('public-logon').style.display = "block";
                         document.getElementById('public-status').style.display = "none";
                     });
-                    $("#ToggleStatus").click(function () {
+                    $("#ToggleStatus").on("click", function () {
                         document.getElementById('public-logon').style.display = "none";
                         document.getElementById('public-status').style.display = "block";
                     });

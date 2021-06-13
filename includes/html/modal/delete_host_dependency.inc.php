@@ -43,7 +43,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 </div>
 
 <script>
-$('#hostdep-removal').click('', function(event) {
+$('#hostdep-removal').on("click", function(event) {
     event.preventDefault();
     var parent_id = $("#delete-parent_id").val();
     var device_id = $("#delete-device_id").val();

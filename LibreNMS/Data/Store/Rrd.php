@@ -556,17 +556,44 @@ class Rrd extends BaseDatastore
      */
     public function graph(string $options): string
     {
-        $cmd = $this->buildCommand('graph', '-', $options);
-        $process = Process::fromShellCommandline(Config::get('rrdtool') . ' ' . $cmd, $this->rrd_dir);
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
+
+        $command = $this->buildCommand('graph', '-', $options);
+        $process->setInput($command . "\nquit");
         $process->run();
 
-        if (! $process->isSuccessful()) {
-            throw new RrdGraphException($process->getErrorOutput(), $process->getExitCode(), $process->getOutput());
+        $feedback_position = strrpos($process->getOutput(), 'OK ');
+        if ($feedback_position !== false) {
+            return substr($process->getOutput(), 0, $feedback_position);
         }
 
-        return $process->getOutput();
+        // if valid image is returned with error, extract image and feedback
+        $image_type = Config::get('webui.graph_type', 'png');
+        $search = $this->getImageEnd($image_type);
+        if (($position = strrpos($process->getOutput(), $search)) !== false) {
+            $position += strlen($search);
+            throw new RrdGraphException(
+                substr($process->getOutput(), $position),
+                $process->getExitCode(),
+                substr($process->getOutput(), 0, $position)
+            );
+        }
+
+        // only error text was returned
+        $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
+        throw new RrdGraphException($error, $process->getExitCode(), '');
+    }
+
+    private function getImageEnd(string $type): string
+    {
+        $image_suffixes = [
+            'png' => hex2bin('0000000049454e44ae426082'),
+            'svg' => '</svg>',
+        ];
+
+        return $image_suffixes[$type] ?? '';
     }
 
     public function __destruct()

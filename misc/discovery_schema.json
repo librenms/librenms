@@ -269,6 +269,9 @@
                                                     "array"
                                                 ]
                                             },
+                                            "nobulk": {
+                                                "type": "boolean"
+                                            },
                                             "entPhysicalIndex": {
                                                 "type": ["integer", "string"]
                                             },
@@ -432,6 +435,9 @@
                                     "string",
                                     "array"
                                 ]
+                            },
+                            "nobulk": {
+                                "type": "boolean"
                             },
                             "entPhysicalIndex": {
                                 "type": ["integer", "string"]

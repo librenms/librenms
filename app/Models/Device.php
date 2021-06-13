@@ -464,6 +464,17 @@ class Device extends BaseModel
         ]);
     }
 
+    public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
+    {
+        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
+            $query->on('devices.device_id', 'devices_attribs.device_id')
+                ->where('devices_attribs.attrib_type', $attribute);
+        })->where(function (Builder $query) {
+            $query->whereNull('devices_attribs.attrib_value')
+                ->orWhere('devices_attribs.attrib_value', '!=', 'true');
+        });
+    }
+
     public function scopeWhereUptime($query, $uptime, $modifier = '<')
     {
         return $query->where([
@@ -472,17 +483,9 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeCanPing(Builder $query)
+    public function scopeCanPing(Builder $query): Builder
     {
-        return $query->where('disabled', 0)
-            ->leftJoin('devices_attribs', function (JoinClause $query) {
-                $query->on('devices.device_id', 'devices_attribs.device_id')
-                    ->where('devices_attribs.attrib_type', 'override_icmp_disable');
-            })
-            ->where(function (Builder $query) {
-                $query->whereNull('devices_attribs.attrib_value')
-                    ->orWhere('devices_attribs.attrib_value', '!=', 'true');
-            });
+        return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
     }
 
     public function scopeHasAccess($query, User $user)
@@ -649,6 +652,11 @@ class Device extends BaseModel
     public function ospfPorts(): HasMany
     {
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
+    }
+
+    public function isisAdjacencies(): HasMany
+    {
+        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
     }
 
     public function netscalerVservers(): HasMany

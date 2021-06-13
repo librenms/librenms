@@ -1,0 +1,17 @@
+os: janitza-umg96
+text: 'Janitza UMG96'
+type: power
+icon: janitza
+over:
+    - { graph: device_power, text: 'Power' }
+mib_dir: janitza
+discovery_modules:
+    storage: false
+    mempools: false
+    processors: false
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.34278
+        sysDescr_regex:
+            - '/^Janitza.*UMG96/'

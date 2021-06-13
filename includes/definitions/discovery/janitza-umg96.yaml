@@ -1,0 +1,339 @@
+mib: JANITZA-MIB-UMG96
+modules:
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - janitza
+
+        power_consumed:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: wh3
+                    num_oid: .1.3.6.1.4.1.34278.4.1.{{ $index }}
+                    index: wh3.{{ $index }}
+                    descr: 'L1-L3'
+                -
+                    oid: qh3
+                    num_oid: .1.3.6.1.4.1.34278.4.2.{{ $index }}
+                    index: qh2.{{ $index }}
+                    descr: 'L1-L3 Reactive'
+        voltage:
+            options:
+                divisor: 10
+                skip_value_lt: 40
+            data:
+                -
+                    oid: uLN1
+                    num_oid: .1.3.6.1.4.1.34278.1.1.{{ $index }}
+                    index: uLN1.{{ $index }}
+                    group: 'L to N'
+                    descr: 'L1'
+                -
+                    oid: uLN2
+                    num_oid: .1.3.6.1.4.1.34278.1.2.{{ $index }}
+                    index: uLN2.{{ $index }}
+                    group: 'L to N'
+                    descr: 'L2'
+                -
+                    oid: uLN3
+                    num_oid: .1.3.6.1.4.1.34278.1.3.{{ $index }}
+                    index: uLN3.{{ $index }}
+                    group: 'L to N'
+                    descr: 'L3'
+                -
+                    oid: uL1L2
+                    num_oid: .1.3.6.1.4.1.34278.1.4.{{ $index }}
+                    index: uL1L2.{{ $index }}
+                    group: 'L to L'
+                    descr: 'L1 to L2'
+                -
+                    oid: uL2L3
+                    num_oid: .1.3.6.1.4.1.34278.1.5.{{ $index }}
+                    index: uL2L3.{{ $index }}
+                    group: 'L to L'
+                    descr: 'L2 to L3'
+                -
+                    oid: uL3L1
+                    num_oid: .1.3.6.1.4.1.34278.1.6.{{ $index }}
+                    index: uL3L1.{{ $index }}
+                    group: 'L to L'
+                    descr: 'L3 to L1'
+        current:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: iL1
+                    num_oid: .1.3.6.1.4.1.34278.1.7.{{ $index }}
+                    index: iL1.{{ $index }}
+                    descr: 'L1'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: iL2
+                    num_oid: .1.3.6.1.4.1.34278.1.8.{{ $index }}
+                    index: iL2.{{ $index }}
+                    descr: 'L2'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: iL3
+                    num_oid: .1.3.6.1.4.1.34278.1.9.{{ $index }}
+                    index: iL3.{{ $index }}
+                    descr: 'L3'
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+        power:
+            data:
+                -
+                    oid: pL1
+                    num_oid: .1.3.6.1.4.1.34278.1.13.{{ $index }}
+                    index: pL1.{{ $index }}
+                    group: 'Real'
+                    descr: 'L1'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: pL2
+                    num_oid: .1.3.6.1.4.1.34278.1.14.{{ $index }}
+                    index: pL2.{{ $index }}
+                    group: 'Real'
+                    descr: 'L2'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: pL3
+                    num_oid: .1.3.6.1.4.1.34278.1.15.{{ $index }}
+                    index: pL3.{{ $index }}
+                    group: 'Real'
+                    descr: L3
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+                -
+                    oid: p3
+                    num_oid: .1.3.6.1.4.1.34278.2.1.{{ $index }}
+                    index: p3.{{ $index }}
+                    group: 'Real'
+                    descr: 'SUM L1-3'
+                -
+                    oid: qL1
+                    num_oid: .1.3.6.1.4.1.34278.1.16.{{ $index }}
+                    index: qL1.{{ $index }}
+                    group: 'Reactiv'
+                    descr: 'L1'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: qL2
+                    num_oid: .1.3.6.1.4.1.34278.1.17.{{ $index }}
+                    index: qL2.{{ $index }}
+                    group: 'Reactiv'
+                    descr: 'L2'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: qL3
+                    num_oid: .1.3.6.1.4.1.34278.1.18.{{ $index }}
+                    index: qL3.{{ $index }}
+                    group: 'Reactiv'
+                    descr: 'L3'
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+                -
+                    oid: q3
+                    num_oid: .1.3.6.1.4.1.34278.2.2.{{ $index }}
+                    index: q3.{{ $index }}
+                    group: 'Reactiv'
+                    descr: 'SUM L1-3'
+                -
+                    oid: sL1
+                    num_oid: .1.3.6.1.4.1.34278.1.19.{{ $index }}
+                    index: sL1.{{ $index }}
+                    group: 'Complex'
+                    descr: 'L1'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: sL2
+                    num_oid: .1.3.6.1.4.1.34278.1.20.{{ $index }}
+                    index: sL2.{{ $index }}
+                    group: 'Complex'
+                    descr: 'L2'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: sL3
+                    num_oid: .1.3.6.1.4.1.34278.1.21.{{ $index }}
+                    index: sL3.{{ $index }}
+                    group: 'Complex'
+                    descr: 'L3'
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+                -
+                    oid: s3
+                    num_oid: .1.3.6.1.4.1.34278.2.3.{{ $index }}
+                    index: s3.{{ $index }}
+                    group: 'Complex'
+                    descr: 'SUM L1-3'
+        quality_factor:
+            data:
+                -
+                    oid: cosPL1
+                    num_oid: .1.3.6.1.4.1.34278.1.22.{{ $index }}
+                    index: cosPL1.{{ $index }}
+                    group: 'Cos Phi'
+                    divisor: 1000
+                    descr: 'L1'
+                    low_warn_limit: '0.9'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: cosPL2
+                    num_oid: .1.3.6.1.4.1.34278.1.23.{{ $index }}
+                    index: cosPL2.{{ $index }}
+                    group: 'Cos Phi'
+                    divisor: 1000
+                    descr: 'L2'
+                    low_warn_limit:  '0.9'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: cosPL3
+                    num_oid: .1.3.6.1.4.1.34278.1.24.{{ $index }}
+                    index: cosPL3.{{ $index }}
+                    group: 'Cos Phi'
+                    divisor: 1000
+                    descr: 'L3'
+                    low_warn_limit: '0.9'
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+                -
+                    oid: thdULN1
+                    num_oid: .1.3.6.1.4.1.34278.5.1.{{ $index }}
+                    index: thdULN1.{{ $index }}
+                    group: 'Harmonic Distortion Current'
+                    divisor: 10
+                    descr: 'L1'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: thdULN2
+                    num_oid: .1.3.6.1.4.1.34278.5.2.{{ $index }}
+                    index: thdULN2.{{ $index }}
+                    group: 'Harmonic Distortion Current'
+                    divisor: 10
+                    descr: 'L2'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: thdULN3
+                    num_oid: .1.3.6.1.4.1.34278.5.3.{{ $index }}
+                    index: thdULN3.{{ $index }}
+                    group: 'Harmonic Distortion Current'
+                    divisor: 10
+                    descr: 'L3'
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+                -
+                    oid: thdIL1
+                    num_oid: .1.3.6.1.4.1.34278.5.4.{{ $index }}
+                    index: thdIL1.{{ $index }}
+                    group: 'Harmonic Distortion Voltage'
+                    divisor: 10
+                    descr: 'L1'
+                    skip_values:
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
+                -
+                    oid: thdIL2
+                    num_oid: .1.3.6.1.4.1.34278.5.5.{{ $index }}
+                    index: thdIL2.{{ $index }}
+                    group: 'Harmonic Distortion Voltage'
+                    divisor: 10
+                    descr: 'L2'
+                    skip_values:
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
+                -
+                    oid: thdIL3
+                    num_oid: .1.3.6.1.4.1.34278.5.6.{{ $index }}
+                    index: thdIL3.{{ $index }}
+                    group: 'Harmonic Distortion Voltage'
+                    divisor: 10
+                    descr: 'L3'
+                    skip_values:
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
+        frequency:
+            options:
+                divisor: 100
+            data:
+                -
+                    oid: frequence
+                    num_oid: .1.3.6.1.4.1.34278.6.1.{{ $index }}
+                    index: frequenz.{{ $index }}
+                    descr: 'Frequency'

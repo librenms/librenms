@@ -170,7 +170,7 @@ abstract class Model
      */
     public static function onDelete($model)
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo '-';
         }
     }
@@ -180,7 +180,7 @@ abstract class Model
      */
     public static function onCreate($model)
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo '+';
         }
     }
@@ -190,14 +190,14 @@ abstract class Model
      */
     public static function onUpdate($model)
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo 'U';
         }
     }
 
     public static function onNoUpdate()
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo '.';
         }
     }

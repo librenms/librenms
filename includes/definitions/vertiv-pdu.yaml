@@ -1,0 +1,12 @@
+os: vertiv-pdu
+text: 'Vertiv PDU'
+type: power
+icon: vertiv
+group: vertiv
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.21239.42.1.53
+mib_dir: vertiv
+over:
+    - { graph: device_current, text: 'Current' }
+    - { graph: device_voltage, text: 'Voltage' }

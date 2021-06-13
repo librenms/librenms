@@ -50,7 +50,7 @@ use LibreNMS\Config;
         document.getElementById('ack-alert').innerText = button_label;
         $("#ack_until_clear").bootstrapSwitch('state', <?php echo Config::get('alert.ack_until_clear') ? 'true' : 'false'; ?>);
     });
-    $("#ack-alert").click('', function(event) {
+    $("#ack-alert").on("click", function(event) {
         event.preventDefault();
         var ack_alert_id    = $("#ack_alert_id").val();
         var ack_alert_note  = $('#ack_msg').val();

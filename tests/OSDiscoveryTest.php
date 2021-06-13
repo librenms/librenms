@@ -60,7 +60,7 @@ class OSDiscoveryTest extends TestCase
      * @dataProvider osProvider
      * @param string $os_name
      */
-    public function testOS($os_name)
+    public function testOSDetection($os_name)
     {
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
@@ -83,7 +83,7 @@ class OSDiscoveryTest extends TestCase
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
      *
-     * @depends testOS
+     * @depends testOSDetection
      */
     public function testAllFilesTested()
     {

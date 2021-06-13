@@ -17,7 +17,7 @@ poller_modules:
     cisco-mac-accounting: true
     cisco-voice: true
     cisco-remote-access-monitor: true
-    cisco-sla: true
+    slas: true
     cisco-ipsec-flow-monitor: true
     cipsec-tunnels: true
     cisco-otv: true
@@ -26,7 +26,7 @@ poller_modules:
     cisco-qfp: true
 discovery_modules:
     cisco-cef: true
-    cisco-sla: true
+    slas: true
     cisco-mac-accounting: true
     cisco-otv: true
     cisco-pw: true

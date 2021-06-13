@@ -78,3 +78,19 @@ function cast_number($number)
 {
     return \LibreNMS\Util\Number::cast($number);
 }
+
+if (! function_exists('trans_fb')) {
+    /**
+     * Translate the given message with a fallback string if none exists.
+     *
+     * @param  string  $key
+     * @param  string  $fallback
+     * @param  array   $replace
+     * @param  string  $locale
+     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     */
+    function trans_fb($key, $fallback, $replace = [], $locale = null)
+    {
+        return ($key === ($translation = trans($key, $replace, $locale))) ? $fallback : $translation;
+    }
+}

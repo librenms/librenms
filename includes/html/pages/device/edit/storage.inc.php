@@ -51,7 +51,7 @@
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
 
-        grid.find(".storage").blur(function(event) {
+        grid.find(".storage").on("blur", function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var storage_id = $(this).data("storage_id");
