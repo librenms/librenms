@@ -38,12 +38,14 @@ LibreNMS has a whole list of Widgets to select from.
 - Top Devices: By Traffic, or  Uptime, or Response time, or Poller
   Duration, or Processor load, or Memory Usage, or Storage Usage.
 - Top Interfaces: Lists top interfaces by traffic utilization.
+- Top Errors: shows the top list of interface errors.
 - World Map: displays all your devices locations. From syslocation or
   from override sysLocation.
 
 List of Widgets:
 ![List of Widgets][image of widgets]
 
+![list-widgets](https://user-images.githubusercontent.com/81437419/121815671-e7f99480-cc77-11eb-8fda-44440aeeee04.png)
 [image of widgets]: /img/list-widgets.png "List of the widgets"
 
 ## Dashboard Permissions
