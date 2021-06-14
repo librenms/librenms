@@ -27,6 +27,7 @@ namespace LibreNMS\Exceptions;
 
 use Illuminate\Database\QueryException;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
+use LibreNMS\ValidationResult;
 use LibreNMS\Validations\Database;
 use LibreNMS\Validator;
 use Throwable;
@@ -49,7 +50,12 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
         if ($exception instanceof QueryException || $exception->getPrevious() instanceof QueryException) {
             $validator = new Validator();
             (new Database())->validate($validator);
-            $results = $validator->getResults('database');
+
+            // get only failed results
+            $results = array_filter($validator->getResults('database'), function (ValidationResult $result) {
+                return $result->getStatus() === ValidationResult::FAILURE;
+            });
+
             if ($results) {
                 return new static($results, $exception->getMessage(), $exception->getCode(), $exception);
             }
