@@ -32,7 +32,7 @@
                    @blur="updateItem(group, $event.target.value)"
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
-            <span class="input-group-btn" style="width:0;"></span>
+            <span class="input-group-btn" style=" width:0;"></span>
             <select class="form-control" @change="updateLevel(group, $event.target.value)">
                 <option value="1" :selected="data.level === 1">{{ $t('Normal') }}</option>
                 <option value="5" :selected="data.level === 5">{{ $t('Global Read') }}</option>
@@ -60,20 +60,25 @@
 </template>
 
 <script>
-    import BaseSetting from "./BaseSetting";
+import BaseSetting from "./BaseSetting";
 
-    export default {
+export default {
         name: "SettingLdapGroups",
         mixins: [BaseSetting],
         data() {
             return {
-                localList: this.value,
+                localList: Array.isArray(this.localList) ? {} :  bngthis.value,
                 newItem: "",
                 newItemLevel: 1
             }
         },
         methods: {
             addItem() {
+                // fix error with PHP json encode returning an array
+                if (Array.isArray(this.localList)) {
+                    this.localList = {};
+                }
+
                 this.$set(this.localList, this.newItem, {level: this.newItemLevel});
                 this.newItem = "";
                 this.newItemLevel = 1;
