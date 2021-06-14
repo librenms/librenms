@@ -138,10 +138,10 @@ configuring your install to record data more frequently.
 ### fping
 
 ```php
-$config['fping']            = "/usr/bin/fping";
-$config['fping6']           = "fping6";
-$config['fping_options']['timeout'] = 500;
-$config['fping_options']['count'] = 3;
+$config['fping']                     = "/usr/bin/fping";
+$config['fping6']                    = "fping6";
+$config['fping_options']['timeout']  = 500;
+$config['fping_options']['count']    = 3;
 $config['fping_options']['interval'] = 500;
 ```
 
@@ -325,11 +325,11 @@ $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
 $config['summary_errors']          = 0;  # Show Errored ports in summary boxes on the dashboard
-$config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
-$config['transit_descr']           = 'transit'; // Add custom transit descriptions (can be an array)
-$config['peering_descr']           = 'peering'; // Add custom peering descriptions (can be an array)
-$config['core_descr']              = 'core'; // Add custom core descriptions (can be an array)
-$config['custom_descr']            = ''; // Add custom interface descriptions (can be an array)
+$config['customers_descr']         = 'cust';  # The description to look for in ifDescr. Can be an array as well array('cust','cid');
+$config['transit_descr']           = 'transit';  # Add custom transit descriptions (can be an array)
+$config['peering_descr']           = 'peering';  # Add custom peering descriptions (can be an array)
+$config['core_descr']              = 'core';  # Add custom core descriptions (can be an array)
+$config['custom_descr']            = '';  # Add custom interface descriptions (can be an array)
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
@@ -484,8 +484,8 @@ hostnames are resolved and the check is also performed.  This helps
 prevents accidental duplicate hosts.
 
 ```php
-$config['addhost_alwayscheckip']   = false; #true - check for duplicate ips even when adding host by name.
-                                            #false- only check when adding host by ip.
+$config['addhost_alwayscheckip']   = false; # true - check for duplicate ips even when adding host by name.
+                                            # false- only check when adding host by ip.
 ```
 
 By default we allow hosts to be added with duplicate sysName's, you
@@ -502,8 +502,8 @@ OS](../Developing/os/Settings.md#poller-and-discovery-modules) or
 device.
 
 ```php
-$config['discovery_modules]['arp-table'] = true;
-$config['poller_modules']['bgp-peers'] = false;
+$config['discovery_modules']['arp-table'] = true;
+$config['poller_modules']['bgp-peers']    = false;
 ```
 
 # SNMP Settings
@@ -514,9 +514,9 @@ default version and port.
 ```php
 $config['snmp']['timeout'] = 1;                         # timeout in seconds
 $config['snmp']['retries'] = 5;                         # how many times to retry the query
-$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');    # Transports to use
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];               # Default versions to use
-$config['snmp']['port'] = 161;                      # Default port
+$config['snmp']['transports'] = ['udp', 'udp6', 'tcp', 'tcp6'];    # Transports to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];       # Default versions to use
+$config['snmp']['port'] = 161;                          # Default port
 $config['snmp']['exec_timeout'] = 1200;                 # execution time limit in seconds
 ```
 

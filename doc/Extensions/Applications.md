@@ -1053,10 +1053,10 @@ configuration responsible for the localhost server:
 ```text
 location /nginx-status {
     stub_status on;
-    access_log   off;
+    access_log  off;
     allow 127.0.0.1;
     allow ::1;
-    deny all;
+    deny  all;
 }
 ```
 

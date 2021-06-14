@@ -257,12 +257,12 @@ then need to assign the relevant permissions unless you set
 `$config['radius']['userlevel']` to be something other than 1.
 
 ```php
-$config['radius']['hostname']   = 'localhost';
-$config['radius']['port']       = '1812';
-$config['radius']['secret']     = 'testing123';
-$config['radius']['timeout']    = 3;
-$config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14 days.
-$config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user.
+$config['radius']['hostname']      = 'localhost';
+$config['radius']['port']          = '1812';
+$config['radius']['secret']        = 'testing123';
+$config['radius']['timeout']       = 3;
+$config['radius']['users_purge']   = 14;  // Purge users who haven't logged in for 14 days.
+$config['radius']['default_level'] = 1;  // Set the default user level when automatically creating a user.
 ```
 
 ## Old account cleanup

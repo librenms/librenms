@@ -24,10 +24,10 @@ Shared FS: Is a shared filesystem required?
 Features: Supported features in the version indicated.
 
 ```
-          G = Graphs.
-          C = Create RRD files.
-          U = Update RRD files.
-          T = Tune RRD files.
+G = Graphs.
+C = Create RRD files.
+U = Update RRD files.
+T = Tune RRD files.
 ```
 
 | Version | Shared FS | Features |
@@ -129,7 +129,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 4: Restart the rrdcached service
 
 ```bash
-    systemctl restart rrdcached.service
+systemctl restart rrdcached.service
 ```
 
 5: Edit /opt/librenms/config.php to include:
@@ -187,7 +187,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 4: Restart the rrdcached service
 
 ```bash
-    systemctl restart rrdcached.service
+systemctl restart rrdcached.service
 ```
 
 5: Edit /opt/librenms/config.php to include:

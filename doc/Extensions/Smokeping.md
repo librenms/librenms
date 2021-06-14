@@ -202,9 +202,9 @@ Add the following configuration to your `/etc/nginx/conf.d/librenms` config file
 The following will configure Nginx to respond to `http://yourlibrenms/smokeping`:
 
 ```
-#Browsing to `http://librenms.xxx/smokeping/` should bring up the smokeping web interface
+# Browsing to `http://yourlibrenms/smokeping/` should bring up the smokeping web interface
 
- location = /smokeping/ {
+location = /smokeping/ {
         fastcgi_intercept_errors on;
 
         fastcgi_param   SCRIPT_FILENAME         /usr/lib/cgi-bin/smokeping.cgi;
@@ -228,11 +228,11 @@ The following will configure Nginx to respond to `http://yourlibrenms/smokeping`
         fastcgi_pass unix:/var/run/fcgiwrap.socket;
 }
 
-        location ^~ /smokeping/ {
-                alias /usr/share/smokeping/www/;
-                index smokeping.cgi;
-                gzip off;
-        }
+location ^~ /smokeping/ {
+        alias /usr/share/smokeping/www/;
+        index smokeping.cgi;
+        gzip off;
+}
 ```
 
 After saving the configuration file, verify your Nginx configuration file syntax

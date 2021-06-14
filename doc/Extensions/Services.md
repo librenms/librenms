@@ -217,28 +217,28 @@ $config['service_poller_enabled']           = true;
 $config['service_poller_workers']           = 16;
 ```
 ```php
-$config['service_poller_frequency']           = 300;
+$config['service_poller_frequency']         = 300;
 ```
 ```php
-$config['service_poller_down_retry']           = 5;
+$config['service_poller_down_retry']        = 5;
 ```
 ```php
-$config['service_discovery_enabled']           = true;
+$config['service_discovery_enabled']        = true;
 ```
 ```php
-$config['service_discovery_workers']           = 16;
+$config['service_discovery_workers']        = 16;
 ```
 ```php
-$config['service_discovery_frequency']           = 3600;
+$config['service_discovery_frequency']      = 3600;
 ```
 ```php
-$config['service_services_enabled']           = true;
+$config['service_services_enabled']         = true;
 ```
 ```php
-$config['service_services_workers']           = 16;
+$config['service_services_workers']         = 16;
 ```
 ```php
-$config['service_services_frequency']           = 60;
+$config['service_services_frequency']       = 60;
 ```
 
 ## Service checks polling logic
