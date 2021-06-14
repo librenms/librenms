@@ -11,17 +11,14 @@ integrating syslog with LibreNMS.
 
 ### syslog-ng
 
-For Debian / Ubuntu:
-
-```ssh
-apt-get install syslog-ng
-```
-
-For CentOS / RedHat
-
-```ssh
-yum install syslog-ng
-```
+=== "Debian / Ubuntu"
+    ```ssh
+    apt-get install syslog-ng
+    ```
+=== "CentOS / RedHat"
+    ```ssh
+    yum install syslog-ng
+    ```
 
 Once syslog-ng is installed, edit the relevant config file (most
 likely /etc/syslog-ng/syslog-ng.conf) and paste the following:

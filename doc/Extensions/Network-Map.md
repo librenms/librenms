@@ -26,8 +26,9 @@ Groups can be drawn with Network Map.
 
 # Network Map Configurator
 
-This link will show you all the options and explain what they
-do. [Link](https://visjs.github.io/vis-network/docs/network/)
+[This link](https://visjs.github.io/vis-network/docs/network/) will
+show you all the options and explain what they do.
+
 You may also access the dynamic configuration interface [example
 here](https://visjs.github.io/vis-network/examples/network/other/configuration.html)
 from within LibreNMS by adding the following to config.php

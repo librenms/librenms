@@ -238,7 +238,7 @@ location ^~ /smokeping/ {
 After saving the configuration file, verify your Nginx configuration file syntax
 is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
 
-You should be able to load the Smokeping web interface at `http://yourhost/smokeping`
+You should be able to load the Smokeping web interface at `http://yourlibrenms/smokeping`
 
 #### Nginx Password Authentication
 

@@ -48,7 +48,7 @@ so you can view the disk I/O usage delta.
 1. [RRDCached installation Debian Stretch](#rrdcached-installation-debian-stretch)
 1. [RRDCached installation CentOS 7 or 8](#rrdcached-installation-centos-7-or-8)
 1. [RRDCached installation CentOS 6](#rrdcached-installation-centos-6)
-1. [Securing RRCached](#Securing-RRCached)
+1. [Securing RRCached](#securing-rrcached)
 
 
 ## RRDCached installation Ubuntu 16

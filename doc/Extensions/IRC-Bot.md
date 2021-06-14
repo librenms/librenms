@@ -57,7 +57,7 @@ Command | Description
 `.status <type>` | Prints status information for given `type`. Type can be `devices`, `services`, `ports`. Shorthands are: `dev`,`srv`,`prt`
 `.version` | Prints `$this->config['project_name_version']`.
 
-( __/!\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
+( __/!\\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
 
 # Examples
 

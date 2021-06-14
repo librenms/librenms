@@ -374,6 +374,7 @@ via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/
 A small python3 script that checks age and remaining validity of certificates
 
 This script needs following packages on Debian/Ubuntu Systems:
+
 * python3
 * python3-openssl
 
@@ -951,7 +952,7 @@ Extend` heading top of page.
 
 To create your own custom munin scripts, please see this example:
 
-```
+```bash
 #!/bin/bash
 if [ "$1" = "config" ]; then
     echo 'graph_title Some title'

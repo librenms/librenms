@@ -8,16 +8,21 @@ Database: This applies to all pollers and can be set with either `lnms config:se
 config.php: This applies to the local poller only.  Configs set here will be disabled in the Web UI to prevent unexpected behaviour.
 
 The LibreNMS uses dot notation for config items:
+
 | Database | config.php |
 | -------- | ---------- |
 | `snmp.community` | `$config['snmp']['community']` |
 | `snmp.community.+` | `$config['snmp']['community'][]` |
 | `snmp.v3.0.authalgo` | `$config['snmp']['v3'][0]['authalgo']` |
 
-> The documentation has not been updated to reflect using `lnms config:set` to set config items, but it will work for all settings.  Not all settings have been defined in LibreNMS, but they can still be set with the `--ignore-checks` option.  Without that option input is checked for correctness, that does not mean it is not possible to set bad values.  Please report missing settings.
+> The documentation has not been updated to reflect using `lnms config:set` to
+> set config items, but it will work for all settings.  Not all settings have
+> been defined in LibreNMS, but they can still be set with the `--ignore-checks`
+> option.  Without that option input is checked for correctness, that does not
+> mean it is not possible to set bad values.  Please report missing settings.
 
 # CLI
-`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).
+`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).  
 `lnms config:set` will set the config setting in the database.  Calling `lnms config:set` on a setting with no value will reset it to the default value.
 
 If you set up bash completion, you can use tab completion to find config settings.
@@ -247,7 +252,7 @@ https_proxy=proxy.domain.com
 
 # RRDCached
 
-[RRDCached](../Extensions/RRDCached.md)
+Please refer to [RRDCached](../Extensions/RRDCached.md)
 
 # WebUI Settings
 
@@ -520,8 +525,8 @@ $config['snmp']['port'] = 161;                          # Default port
 $config['snmp']['exec_timeout'] = 1200;                 # execution time limit in seconds
 ```
 
->NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
->is the max time to run a query.
+> NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
+> is the max time to run a query.
 
 The default v1/v2c snmp community to use, you can expand this array
 with `[1]`, `[2]`, `[3]`, etc.
@@ -545,7 +550,7 @@ $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 
 # Auto discovery settings
 
-[Auto-Discovery](../Extensions/Auto-Discovery.md)
+Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 # Email configuration
 
@@ -572,11 +577,11 @@ options after that are to support the different transports.
 
 # Alerting
 
-[Alerting](../Alerting/index.md)
+Please refer to [Alerting](../Alerting/index.md)
 
 # Billing
 
-[Billing](../Extensions/Billing-Module.md)
+Please refer to [Billing](../Extensions/Billing-Module.md)
 
 # Global module support
 
@@ -591,7 +596,7 @@ $config['enable_sla']                   = 0; # Enable Cisco SLA collection and d
 
 # Port extensions
 
-[Port-Description-Parser](../Extensions/Port-Description-Parser.md)
+Please refer to [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
 ```php
 $config['enable_ports_etherlike']       = 0;
@@ -618,7 +623,7 @@ will disable showing lines that start with #
 
 ## Oxidized
 
-[Oxidized](../Extensions/Oxidized.md)
+Please refer to [Oxidized](../Extensions/Oxidized.md)
 
 ## CollectD
 
@@ -663,11 +668,11 @@ drawn. Be sure that your web server has permissions to write to this socket.
 
 ## Smokeping
 
-[Smokeping](../Extensions/Smokeping.md)
+Please refer to [Smokeping](../Extensions/Smokeping.md)
 
 ## NFSen
 
-[NFSen](../Extensions/NFSen.md)
+Please refer to [NFSen](../Extensions/NFSen.md)
 
 ## Location mapping
 
@@ -758,7 +763,7 @@ $config['os']['ios']['good_if'][] = 'FastEthernet';
 ```
 
 `good_if` is matched against ifDescr value. This can be a bad_if value
-as well which would stop that port from being ignored. I.e If bad_if
+as well which would stop that port from being ignored. i.e. if bad_if
 and good_if both contained FastEthernet then ports with this value in
 the ifDescr will be valid.
 
@@ -867,11 +872,11 @@ $config['os']['linux']['storage_perc_warn'] = 60;
 
 # IRC Bot
 
-[IRC Bot](../Extensions/IRC-Bot.md)
+Please refer to [IRC Bot](../Extensions/IRC-Bot.md)
 
 # Authentication
 
-[Authentication](../Extensions/Authentication.md)
+Please refer to [Authentication](../Extensions/Authentication.md)
 
 # Cleanup options
 
@@ -897,7 +902,7 @@ automatically purged. You can alter these individually. values are in days.
 
 # Syslog options
 
-[Syslog](../Extensions/Syslog.md)
+Please refer to [Syslog](../Extensions/Syslog.md)
 
 # Virtualization
 
@@ -932,7 +937,7 @@ You can use this array to rewrite the description of ASes that you have discover
 
 # Auto updates
 
-[Updating](../General/Updating.md)
+Please refer to [Updating](../General/Updating.md)
 
 # IPMI
 
@@ -949,7 +954,7 @@ $config['ipmi']['type'][] = "open";
 
 # Distributed poller settings
 
-[Distributed Poller](../Extensions/Distributed-Poller.md)
+Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
 
 # API Settings
 

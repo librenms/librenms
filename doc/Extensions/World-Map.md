@@ -77,21 +77,21 @@ $config['leaflet']['group_radius']                      = 1;
 # Geocode engine config
 
 ```php
-$config['geoloc']['engine'] = "google";// Valid options are google, mapquest or bing
+$config['geoloc']['engine']  = "google"; // Valid options are google, mapquest or bing
 $config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
 ```
 
-Google:
-Pros: fast, accurate
+Google:  
+Pros: fast, accurate  
 Cons: requires a credit card even for a free account
 
-MapQuest:
-Pros: free, no credit card required
+MapQuest:  
+Pros: free, no credit card required  
 Cons: inaccurate: most addresses are returned as locations at the center of the US
 
-Bing:
-Pros: free, no credit card required, accurate
-Cons: Microsoft(debatable)
+Bing:  
+Pros: free, no credit card required, accurate  
+Cons: Microsoft (debatable)
 
 # Jquery-Mapael config
 
