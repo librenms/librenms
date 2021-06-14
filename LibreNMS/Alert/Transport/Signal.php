@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Dummy Transport
+ * Signal Transport
  * @author kzink <kevin.zink@mpi-hd.mpg.de>
  * @copyright 2021 kzink, LibreNMS
  * @license GPL
