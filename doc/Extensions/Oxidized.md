@@ -150,12 +150,12 @@ To edit an existing map, you must use the index to override it.
 ```bash
 lnms config:get oxidized.maps.os.os
 array (
-  0 => 
+  0 =>
   array (
     'match' => 'airos-af-ltu',
     'value' => 'airfiber',
   ),
-  1 => 
+  1 =>
   array (
     'match' => 'airos-af',
     'value' => 'airfiber',
@@ -245,8 +245,8 @@ ensure they are used in the correct location.
 
 # Accessing configuration of a disabled/removed device
 
-When you're disabling or removing a device from LibreNMS, the 
-configuration will no longer be available via the LibreNMS web interface. 
+When you're disabling or removing a device from LibreNMS, the
+configuration will no longer be available via the LibreNMS web interface.  
 You can gain access to these configurations directly in the Git repository of
 Oxidized (if using Git for version control).
 
@@ -271,7 +271,7 @@ git cat-file -p <object id>
 ```
 
 # Remove disabled/removed device
-If you want to purge saved config of a device that is not in LibreNMS anymore, you can run the following command: 
+If you want to purge saved config of a device that is not in LibreNMS anymore, you can run the following command:
 
 ```
 git rm --cached <object id>

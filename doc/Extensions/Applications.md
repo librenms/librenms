@@ -495,7 +495,7 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh 
 4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
-extend docker /etc/snmp/docker-stats.sh 
+extend docker /etc/snmp/docker-stats.sh
 ```
 
 5: Restart snmpd on your host
@@ -1022,7 +1022,7 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
 ## SNMP extend
 
-1: Copy the mysql script to the desired host. 
+1: Copy the mysql script to the desired host.
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/mysql
 ```
@@ -1568,7 +1568,7 @@ script which method to use. The are several options to assist with testing, see
 
 ### Initial setup
 
-1. Download the python script onto the host: 
+1. Download the python script onto the host:
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/powermon-snmp.py -O /usr/local/bin/powermon-snmp.py
 ```

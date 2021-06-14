@@ -12,7 +12,7 @@ tune over rrdcached. To enable this set the following config:
 ```php
 $config['rrdtool_version'] = '1.5.5';
 ```
-This setting has to be the exact version of rrdtool you are running. 
+This setting has to be the exact version of rrdtool you are running.
 
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
 or newer, in addition to your rrdcached version.

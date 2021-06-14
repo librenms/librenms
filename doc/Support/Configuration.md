@@ -703,14 +703,14 @@ you don't need to configure full location within snmp.
 
 # Interfaces to be ignored
 
-Interfaces can be automatically ignored during discovery by modifying 
-bad_if\* entries in a default array, unsetting a default array and 
-customizing it, or creating an OS specific array. The preferred method 
-for ignoring interfaces is to use an OS specific array. The default 
-arrays can be found in misc/config_definitions.json. OS specific 
-definitions (includes/definitions/_specific_os_.yaml) can contain 
-bad_if\* arrays, but should only be modified via pull-request as 
-manipulation of the definition files will block updating. 
+Interfaces can be automatically ignored during discovery by modifying
+bad_if\* entries in a default array, unsetting a default array and
+customizing it, or creating an OS specific array. The preferred method
+for ignoring interfaces is to use an OS specific array. The default
+arrays can be found in misc/config_definitions.json. OS specific
+definitions (includes/definitions/\_specific_os_.yaml) can contain
+bad_if\* arrays, but should only be modified via pull-request as
+manipulation of the definition files will block updating:
 
 Examples:
 
