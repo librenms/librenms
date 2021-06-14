@@ -113,7 +113,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
-1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
+1. [Open Grid Scheduler](#open-grid-scheduler) - SNMP extend
 1. [Opensips](#opensips) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
@@ -126,7 +126,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [PowerMon](#powermon) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
-1. [Puppet Agent](#puppet_agent) - SNMP extend
+1. [Puppet Agent](#puppet-agent) - SNMP extend
 1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [Redis](#redis) - SNMP extend
@@ -2108,7 +2108,7 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-# Option 2: Agent
+## Option 2: Agent
 
 [Install the agent](#agent-setup) on this device if it isn't already
 and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
