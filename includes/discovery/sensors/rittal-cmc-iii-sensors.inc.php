@@ -139,18 +139,18 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
         // We need separate state indexes for each device because the sensor logic can vary from device to device depending on its configuration. So we add our device serial here.
         $sensor_data['name'] = $sensor_data['name'] . '_' . $serial_number;
         $sensor_logic = [
-        [
+            [
                 'value'   => 0,
                 'generic' => 0,
                 'graph'   => 1,
                 'descr'   => $sensor_data['logic'][0],
-        ],
-        [
+            ],
+            [
                 'value'   => 1,
                 'generic' => 0,
                 'graph'   => 1,
                 'descr'   => $sensor_data['logic'][1],
-        ],
+            ],
         ];
 
         create_state_index($sensor_data['name'], $sensor_logic);
