@@ -1,8 +1,3 @@
-<?php
-
-use LibreNMS\Config;
-?>
-
 <div style="text-align: center;">
     <form class="form-inline" id="customrange">
 	<input type="hidden" id="selfaction" value="<?= url()->current() ?>">
