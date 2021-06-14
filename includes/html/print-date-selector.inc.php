@@ -1,4 +1,5 @@
 <?php
+
 use LibreNMS\Config;
 ?>
 
