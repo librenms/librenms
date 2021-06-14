@@ -261,11 +261,11 @@ The index pattern uses strftime() formatting.
 | Port | 9200 |
 | Index Patter | librenms-%Y.%m.%d |
 
-## Gitlab
+## GitLab
 
 LibreNMS will create issues for warning and critical level alerts
 however only title and description are set. Uses Personal access
-tokens to authenticate with Gitlab and will store the token in cleartext.
+tokens to authenticate with GitLab and will store the token in cleartext.
 
 **Example:**
 
