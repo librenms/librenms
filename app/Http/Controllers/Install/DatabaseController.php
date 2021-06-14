@@ -79,11 +79,10 @@ class DatabaseController extends InstallationController implements InstallerStep
             (new Database())->validateSystem($validator);
             $results = $validator->getResults('database');
 
-            /** @var \LibreNMS\ValidationResult $result */
             foreach ($results as $result) {
                 if ($result->getStatus() == ValidationResult::FAILURE) {
                     $ok = false;
-                    $messages[] = $result->getMessage();
+                    $messages[] = $result->getMessage() . '  ' . $result->getFix();
                 }
             }
         } catch (\Exception $e) {
