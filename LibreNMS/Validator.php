@@ -118,7 +118,7 @@ class Validator
      * Get the ValidationResults for a specific validation group.
      *
      * @param string $validation_group
-     * @return array
+     * @return ValidationResult[]
      */
     public function getResults($validation_group = null)
     {

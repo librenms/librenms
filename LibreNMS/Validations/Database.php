@@ -106,16 +106,16 @@ class Database extends BaseValidation
             if (version_compare($version[0], self::MARIADB_MIN_VERSION, '<=')) {
                 $validator->fail(
                     'MariaDB version ' . self::MARIADB_MIN_VERSION . ' is the minimum supported version as of ' .
-                    self::MARIADB_MIN_VERSION_DATE . '. Update MariaDB to a supported version ' .
-                    self::MARIADB_RECOMMENDED_VERSION . ' suggested).'
+                    self::MARIADB_MIN_VERSION_DATE . '.',
+                    'Update MariaDB to a supported version, ' . self::MARIADB_RECOMMENDED_VERSION . ' suggested.'
                 );
             }
         } else {
             if (version_compare($version[0], self::MYSQL_MIN_VERSION, '<=')) {
                 $validator->fail(
                     'MySQL version ' . self::MYSQL_MIN_VERSION . ' is the minimum supported version as of ' .
-                    self::MYSQL_MIN_VERSION_DATE . '. Update MySQL to a supported version (' .
-                    self::MYSQL_RECOMMENDED_VERSION . ' suggested).'
+                    self::MYSQL_MIN_VERSION_DATE . '.',
+                    'Update MySQL to a supported version, ' . self::MYSQL_RECOMMENDED_VERSION . ' suggested.'
                 );
             }
         }
