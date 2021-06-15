@@ -31,7 +31,11 @@ class Stellar extends OS implements
 
         $client_ws_data = $this->getCacheTable('apClientWlanService', $device['hardware']);
 
-        $total_clients = sizeof($client_ws_data);
+        if (empty($client_ws_data)) {
+            $total_clients = 0;
+        } else {
+            $total_clients = sizeof($client_ws_data);
+        }
 
         $combined_oid = sprintf('%s::%s', $device['hardware'], 'apClientWlanService');
         $oid = snmp_translate($combined_oid, 'ALL', 'nokia/stellar', '-On');
