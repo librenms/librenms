@@ -1,14 +1,14 @@
 <div style="text-align: center;">
     <form class="form-inline" id="customrange">
-	<input type="hidden" id="selfaction" value="<?= url()->current() ?>">
-	<?= csrf_field() ?>
+	<input type="hidden" id="selfaction" value="<?php echo url()->current(); ?>">
+	<?php echo csrf_field(); ?>
 	<div class="form-group">
 	    <label for="dtpickerfrom">From</label>
 	    <input type="text"
 		   class="form-control"
 		   id="dtpickerfrom"
 		   maxlength="16"
-		   value="<?= $graph_array['from'] ?>"
+		   value="<?php echo $graph_array['from']; ?>"
 		   data-date-format="YYYY-MM-DD HH:mm">
 	</div>
 	<div class="form-group">
@@ -17,7 +17,7 @@
 		   class="form-control"
 		   id="dtpickerto"
 		   maxlength=16
-		   value="<?= $graph_array['to'] ?>"
+		   value="<?php echo $graph_array['to']; ?>"
 		   data-date-format="YYYY-MM-DD HH:mm">
 	</div>
 	<input type="submit"
