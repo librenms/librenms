@@ -39,7 +39,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
         }
 
         $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
-        $cmc_iii_sensors[$sensor_id]['desc'] = $entry['cmcIIIVarValueStr'] ?: $sensor_name;;
+        $cmc_iii_sensors[$sensor_id]['desc'] = $entry['cmcIIIVarValueStr'] ?: $sensor_name;
     }
 
     switch ($var_type) {
