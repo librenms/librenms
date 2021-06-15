@@ -384,6 +384,12 @@
                 "type": "string"
             }
         },
+        "bad_ifHighSpeed": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "bad_iftype": {
             "type": "array",
             "items": {

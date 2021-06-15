@@ -4,6 +4,8 @@ type: network
 icon: dlink
 ifname: true
 empty_ifdescr: true
+bad_ifXEntry:
+    - DES-3028
 discovery:
     -
         sysObjectID_except:

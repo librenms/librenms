@@ -67,6 +67,14 @@ that the device doesn't support ifXEntry and to ignore it:
      - cisco2811
 ```
 
+`bad_ifHighSpeed`: This is a list of models for which to tell LibreNMS
+that the device doesn't support ifHighSpeed and to ignore it:
+
+```yaml
+ bad_ifHighSpeed:
+     - DES-3028
+```
+
 `mib_dir`: You can use this to specify an additional directory to
 look in for MIBs. An array is not accepted, only one directory may be specified.
 

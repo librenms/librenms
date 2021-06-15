@@ -595,6 +595,11 @@ foreach ($ports as $port) {
             }
         }
 
+        // For devices that are on the bad_ifHighSpeed list, use ifSpeed.
+        if (in_array(strtolower($device['hardware']), array_map('strtolower', (array) Config::getOsSetting($device['os'], 'bad_ifHighSpeed', [])))) {
+            $this_port['ifHighSpeed'] = null;
+        }
+
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
