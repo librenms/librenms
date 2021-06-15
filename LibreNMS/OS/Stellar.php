@@ -7,21 +7,20 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
 
-class Stellar extends OS implements 
+class Stellar extends OS implements
     WirelessClientsDiscovery,
     WirelessClientsPolling
 {
     public function discoverWirelessClients()
     {
-
-        $sensors = [];    
+        $sensors = [];
         $device = $this->getDeviceArray();
 
         $ssid = [];
         $ssid_data = $this->getCacheTable('apWlanEssid', $device['hardware']);
 
     	foreach ($ssid_data as $ssid_entry) {
-            if ($ssid_entry['apWlanEssid'] == "athmon2") {
+            if ($ssid_entry['apWlanEssid'] == 'athmon2') {
     	        continue;
             } elseif (array_key_exists($ssid_entry['apWlanEssid'], $ssid)) {
                 continue;
@@ -42,7 +41,7 @@ class Stellar extends OS implements
         }
 
         foreach ($ssid as $key => $value) {
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'stellar', $key, "SSID ".$key." Clients", $value);
+            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'stellar', $key, 'SSID ' .$key. ' Clients', $value);
         }
 
         $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'stellar', 'total-clients', 'Total Clients', $total_clients);
@@ -81,6 +80,7 @@ class Stellar extends OS implements
 
             $data[$sensors[0]['sensor_id']] = $total_clients;
         }
+
         return $data;
     }
 }
