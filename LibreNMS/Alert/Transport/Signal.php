@@ -62,13 +62,13 @@ class Signal extends Transport
                         'Group'         => ' -g ',
                     ],
                 ],
-            [
-                'title' => 'Recipient',
-                'name'  => 'recipient',
-                'descr' => 'Message recipient',
-                'type'  => 'text',
+                [
+                    'title' => 'Recipient',
+                    'name'  => 'recipient',
+                    'descr' => 'Message recipient',
+                    'type'  => 'text',
+                ],
             ],
-        ],
-    ];
+        ];
     }
 }
