@@ -19,9 +19,9 @@ class Stellar extends OS implements
         $ssid = [];
         $ssid_data = $this->getCacheTable('apWlanEssid', $device['hardware']);
 
-    	foreach ($ssid_data as $ssid_entry) {
+        foreach ($ssid_data as $ssid_entry) {
             if ($ssid_entry['apWlanEssid'] == 'athmon2') {
-    	        continue;
+                continue;
             } elseif (array_key_exists($ssid_entry['apWlanEssid'], $ssid)) {
                 continue;
             } else {
@@ -41,7 +41,7 @@ class Stellar extends OS implements
         }
 
         foreach ($ssid as $key => $value) {
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'stellar', $key, 'SSID ' .$key. ' Clients', $value);
+            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'stellar', $key, 'SSID ' . $key . ' Clients', $value);
         }
 
         $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'stellar', 'total-clients', 'Total Clients', $total_clients);
