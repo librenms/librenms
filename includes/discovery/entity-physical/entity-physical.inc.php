@@ -251,8 +251,8 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalAssetID = array_key_exists('entPhysicalAssetID', $entry) ? $entry['entPhysicalAssetID'] : '';
     }//end if
 
-    if ($device['os'] == 'dnos' && $entPhysicalSerialNum == 'NA' && preg_match('/Unit/', $entPhysicalName )) {
-        $entPhysicalSerialNum = snmp_get($device, '.1.3.6.1.4.1.674.10895.3000.1.2.100.8.1.4.' . preg_replace('/Unit (\d+)/', '$1', $entPhysicalName), '-Oqv', '' );
+    if ($device['os'] == 'dnos' && $entPhysicalSerialNum == 'NA' && preg_match('/Unit/', $entPhysicalName)) {
+        $entPhysicalSerialNum = snmp_get($device, '.1.3.6.1.4.1.674.10895.3000.1.2.100.8.1.4.' . preg_replace('/Unit (\d+)/', '$1', $entPhysicalName), '-Oqv', '');
     }
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
