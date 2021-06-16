@@ -104,7 +104,7 @@ class IPMIClient
     public function getSDR()
     {
         try {
-            return Cache::remember("ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function() {
+            return Cache::remember("ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
                 $this->fetchSDR();
             });
         } catch (\Throwable $th) {
@@ -159,7 +159,8 @@ class IPMIClient
         return $proc->execute();
     }
 
-    private function fetchSDR(): string {
+    private function fetchSDR(): string
+    {
         $basePath = sys_get_temp_dir() . '/ipmitool';
         if (! is_dir($basePath)) {
             mkdir($basePath, 0777, true);
@@ -168,7 +169,7 @@ class IPMIClient
         $filePath = "$basePath/" . $this->host . '.sdr.tmp';
         unlink($filePath);
         if (! $this->sendCommand("sdr dump $filePath")) {
-            throw new ErrorException("The SDR dump command failed");
+            throw new ErrorException('The SDR dump command failed');
         }
 
         try {
