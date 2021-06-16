@@ -26,13 +26,15 @@
 namespace LibreNMS\IPMI;
 
 use ErrorException;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Represents an IPMI connection with a host machine.
  */
 class IPMIClient
 {
+    const SDR_TTL = 60 * 15;
+
     private $ipmiToolPath;
     private $host;
     private $user;
@@ -101,25 +103,30 @@ class IPMIClient
      */
     public function getSDR()
     {
-        $basePath = Config::get('install_dir') . '/cache/ipmi';
-        $filePath = "$basePath/$this->host.sdr.cache";
-        if (! is_dir($basePath)) {
-            mkdir($basePath, 0777, true);
-        }
-
-        if (! file_exists($filePath)) {
-            if (! $this->sendCommand("sdr dump $filePath")) {
-                return false;
+        return Cache::remember("ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
+            $basePath = sys_get_temp_dir() . '/ipmitool';
+            $filePath = "$basePath/" . $this->host . '.sdr.tmp';
+            if (! is_dir($basePath)) {
+                mkdir($basePath, 0777, true);
             }
-        }
+    
+            if (! file_exists($filePath)) {
+                if (! $this->sendCommand("sdr dump $filePath")) {
+                    return false;
+                }
+            }
+    
+            try {
+                return file_get_contents($filePath);
+            } catch (ErrorException $e) {
+                echo 'Failed to read SDR: ', $e->getMessage(), "\n";
+    
+                return false;
+            } finally {
+                unlink($filePath);
+            }
+        });
 
-        try {
-            return file_get_contents($filePath);
-        } catch (ErrorException $e) {
-            echo 'Failed to read SDR: ', $e->getMessage(), "\n";
-
-            return false;
-        }
     }
 
     /**
