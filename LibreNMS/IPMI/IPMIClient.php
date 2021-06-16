@@ -164,7 +164,7 @@ class IPMIClient
         if (! is_dir($basePath)) {
             mkdir($basePath, 0777, true);
         }
-        
+
         $filePath = "$basePath/" . $this->host . '.sdr.tmp';
         unlink($filePath);
         if (! $this->sendCommand("sdr dump $filePath")) {
