@@ -26,8 +26,8 @@
 namespace LibreNMS\IPMI;
 
 use Exception;
-use LibreNMS\Proc;
 use LibreNMS\Util\Debug;
+use Symfony\Component\Process\Process;
 
 /**
  * Represents an executable IPMICommand.
@@ -59,12 +59,12 @@ final class IPMICommand
 
         $this->printInput($this->command);
 
-        $this->proc = new Proc($this->command);
-        $out = $this->proc->getOutput();
+        $this->proc = new Process($this->command);
+        $this->proc->run();
 
-        $this->printOutput($out);
+        $this->printOutput([$this->proc->getErrorOutput(), $this->proc->getOutput()]);
 
-        return $this->proc->getExitCode() > 0 ? null : $out[0];
+        return $this->proc->getExitCode() > 0 ? null : $this->proc->getOutput();
     }
 
     /**
