@@ -790,6 +790,25 @@ ipv6_networks:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_network_id], Unique: true, Type: BTREE }
+isis_adjacencies:
+  Columns:
+    - { Field: id, Type: int unsigned, 'Null': false, Extra: 'auto_increment' }
+    - { Field: device_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: ifIndex, Type: int, 'Null': false, Extra: '' }
+    - { Field: isisISAdjState, Type: varchar(13), 'Null': false, Extra: '' }
+    - { Field: isisISAdjNeighSysType, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisISAdjNeighSysID, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisISAdjNeighPriority, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisISAdjLastUpTime, Type: bigint unsigned, 'Null': false, Extra: '' }
+    - { Field: isisISAdjAreaAddress, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisISAdjIPAddrType, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisISAdjIPAddrAddress, Type: varchar(128), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    isis_adjacencies_port_id_index: { Name: isis_adjacencies_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+    isis_adjacencies_ifindex_index: { Name: isis_adjacencies_ifindex_index, Columns: [ifIndex], Unique: false, Type: BTREE }
 juniAtmVp:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -1830,10 +1849,11 @@ slas:
   Columns:
     - { Field: sla_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: sla_nr, Type: int, 'Null': false, Extra: '' }
+    - { Field: sla_nr, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: tag, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: rtt, Type: 'double(8,2) unsigned', 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: opstatus, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

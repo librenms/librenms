@@ -437,6 +437,8 @@ class Config
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
         self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
         self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
+        self::deprecatedVariable('discovery_modules.cisco-sla', 'discovery_modules.slas');
+        self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();

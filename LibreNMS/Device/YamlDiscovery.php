@@ -27,6 +27,7 @@ namespace LibreNMS\Device;
 use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
@@ -288,6 +289,8 @@ class YamlDiscovery
                         continue;
                     }
 
+                    $saved_nobulk = Config::getOsSetting($os->getName(), 'nobulk', false);
+
                     foreach ($data_array as $data) {
                         foreach ((array) $data['oid'] as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
@@ -300,8 +303,15 @@ class YamlDiscovery
                                 }
                                 $snmp_flag[] = '-Ih';
 
+                                // disable bulk request for specific data
+                                if (! empty($data['nobulk'])) {
+                                    Config::set('os.' . $os->getName() . '.nobulk', true);
+                                }
+
                                 $mib = $device['dynamic_discovery']['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
+
+                                Config::set('os.' . $os->getName() . '.nobulk', $saved_nobulk);
                             }
                         }
                     }

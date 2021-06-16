@@ -62,6 +62,9 @@ if ($outlet_oids) {
             $outlet_insert_index = $outlet_index;
             $outlet_oid = ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.$outletsuffix.5";
             $outlet_descr = snmp_get($device, "outletName.1.$outletsuffix", '-Ovq', 'PDU2-MIB');
+            if (! $outlet_descr) {
+                $outlet_descr = 'Outlet ' . $outletsuffix;
+            }
             $outlet_divisor = pow(10, snmp_get($device, "outletSensorDecimalDigits.1.$outlet_index.activePower", '-Ovq', 'PDU2-MIB'));
             $outlet_power = (snmp_get($device, "measurementsOutletSensorValue.1.$outlet_index.activePower", '-Ovq', 'PDU2-MIB') / $outlet_divisor);
             if ($outlet_power >= 0) {

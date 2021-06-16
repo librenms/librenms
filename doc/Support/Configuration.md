@@ -1,17 +1,74 @@
 source: Support/Configuration.md
 path: blob/master/doc/
-The options shown below also contain the default values.
 
-If you would like to alter any of these then please add your config option to `config.php`.
+LibreNMS configuration is a set of key values.
 
-# Directories
+The config is stored in two places:
+Database: This applies to all pollers and can be set with either `lnms config:set` or in the Web UI. Database config takes precedence over config.php.
+config.php: This applies to the local poller only.  Configs set here will be disabled in the Web UI to prevent unexpected behaviour.
 
-```php
-$config['install_dir'] = "/opt/librenms";
+The LibreNMS uses dot notation for config items:
+| Database | config.php |
+| -------- | ---------- |
+| `snmp.community` | `$config['snmp']['community']` |
+| `snmp.community.+` | `$config['snmp']['community'][]` |
+| `snmp.v3.0.authalgo` | `$config['snmp']['v3'][0]['authalgo']` |
+
+> The documentation has not been updated to reflect using `lnms config:set` to set config items, but it will work for all settings.  Not all settings have been defined in LibreNMS, but they can still be set with the `--ignore-checks` option.  Without that option input is checked for correctness, that does not mean it is not possible to set bad values.  Please report missing settings.
+
+# CLI
+`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).
+`lnms config:set` will set the config setting in the database.  Calling `lnms config:set` on a setting with no value will reset it to the default value.
+
+If you set up bash completion, you can use tab completion to find config settings.
+
+## Examples
+
+```bash
+lnms config:get snmp.community
+  array (
+    0 => 'public',
+  )
+
+lnms config:set snmp.community.+ testing
+
+lnms config:get snmp.community
+  array (
+    0 => 'public',
+    1 => 'testing',
+  )
+
+lnms config:set snmp.community.0 private
+
+lnms config:get snmp.community
+  array (
+    0 => 'private',
+    1 => 'testing',
+  )
+
+lnms config:set snmp.community test
+  Invalid format
+
+lnms config:set snmp.community '["test", "othercommunity"]'
+
+lnms config:get snmp.community
+  array (
+    0 => 'test',
+    1 => 'othercommunity',
+  )
+
+lnms config:set snmp.community
+
+  Reset snmp.community to the default? (yes/no) [no]:
+  > yes
+
+
+lnms config:get snmp.community --json
+  ["public"]
 ```
 
-Set the installation directory (defaults to /opt/librenms), if you
-clone the GitHub branch to another location ensure you alter this.
+
+# Directories
 
 ```php
 $config['temp_dir'] = "/tmp";

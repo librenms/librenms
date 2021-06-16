@@ -99,12 +99,12 @@ out:
 
 ## Architecture
 
-How you setup the distribution is entirely up to you, you can choose
+How you set the distribution up is entirely up to you. You can choose
 to host the majority of the required services on a single virtual
 machine or server and then a poller to actually query the devices
-being monitored all the way through to having a dedicated server for
+being monitored, all the way through to having a dedicated server for
 each of the individual roles. Below are notes on what you need to
-consider both from the software layer but also connectivity.
+consider both from the software layer, but also connectivity.
 
 ### Web / API Layer
 
