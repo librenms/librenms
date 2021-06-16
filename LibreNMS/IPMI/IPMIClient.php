@@ -105,7 +105,7 @@ class IPMIClient
     {
         try {
             return Cache::remember(".ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
-                $this->fetchSDR();
+                return $this->fetchSDR();
             });
         } catch (\Throwable $th) {
             echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";
