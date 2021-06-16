@@ -98,7 +98,7 @@ class Gitlab extends Transport
                 [
                     'title' => 'Project ID',
                     'name' => 'gitlab-id',
-                    'descr' => 'GitLab Prokect ID',
+                    'descr' => 'GitLab Project ID',
                     'type'=> 'text',
                 ],
                 [
