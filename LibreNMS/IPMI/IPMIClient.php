@@ -168,7 +168,7 @@ class IPMIClient
         $filePath = "$basePath/" . $this->host . '.sdr.tmp';
         unlink($filePath);
         if (! $this->sendCommand("sdr dump $filePath")) {
-            throw new ErrorException("Failed to dump SDR");
+            throw new ErrorException("The SDR dump command failed");
         }
 
         try {
