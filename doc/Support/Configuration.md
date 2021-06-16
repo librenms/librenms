@@ -8,16 +8,21 @@ Database: This applies to all pollers and can be set with either `lnms config:se
 config.php: This applies to the local poller only.  Configs set here will be disabled in the Web UI to prevent unexpected behaviour.
 
 The LibreNMS uses dot notation for config items:
+
 | Database | config.php |
 | -------- | ---------- |
 | `snmp.community` | `$config['snmp']['community']` |
 | `snmp.community.+` | `$config['snmp']['community'][]` |
 | `snmp.v3.0.authalgo` | `$config['snmp']['v3'][0]['authalgo']` |
 
-> The documentation has not been updated to reflect using `lnms config:set` to set config items, but it will work for all settings.  Not all settings have been defined in LibreNMS, but they can still be set with the `--ignore-checks` option.  Without that option input is checked for correctness, that does not mean it is not possible to set bad values.  Please report missing settings.
+> The documentation has not been updated to reflect using `lnms config:set` to
+> set config items, but it will work for all settings.  Not all settings have
+> been defined in LibreNMS, but they can still be set with the `--ignore-checks`
+> option.  Without that option input is checked for correctness, that does not
+> mean it is not possible to set bad values.  Please report missing settings.
 
 # CLI
-`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).
+`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).  
 `lnms config:set` will set the config setting in the database.  Calling `lnms config:set` on a setting with no value will reset it to the default value.
 
 If you set up bash completion, you can use tab completion to find config settings.
@@ -138,10 +143,10 @@ configuring your install to record data more frequently.
 ### fping
 
 ```php
-$config['fping']            = "/usr/bin/fping";
-$config['fping6']           = "fping6";
-$config['fping_options']['timeout'] = 500;
-$config['fping_options']['count'] = 3;
+$config['fping']                     = "/usr/bin/fping";
+$config['fping6']                    = "fping6";
+$config['fping_options']['timeout']  = 500;
+$config['fping_options']['count']    = 3;
 $config['fping_options']['interval'] = 500;
 ```
 
@@ -247,7 +252,7 @@ https_proxy=proxy.domain.com
 
 # RRDCached
 
-[RRDCached](../Extensions/RRDCached.md)
+Please refer to [RRDCached](../Extensions/RRDCached.md)
 
 # WebUI Settings
 
@@ -325,11 +330,11 @@ $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
 $config['summary_errors']          = 0;  # Show Errored ports in summary boxes on the dashboard
-$config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
-$config['transit_descr']           = 'transit'; // Add custom transit descriptions (can be an array)
-$config['peering_descr']           = 'peering'; // Add custom peering descriptions (can be an array)
-$config['core_descr']              = 'core'; // Add custom core descriptions (can be an array)
-$config['custom_descr']            = ''; // Add custom interface descriptions (can be an array)
+$config['customers_descr']         = 'cust';  # The description to look for in ifDescr. Can be an array as well array('cust','cid');
+$config['transit_descr']           = 'transit';  # Add custom transit descriptions (can be an array)
+$config['peering_descr']           = 'peering';  # Add custom peering descriptions (can be an array)
+$config['core_descr']              = 'core';  # Add custom core descriptions (can be an array)
+$config['custom_descr']            = '';  # Add custom interface descriptions (can be an array)
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
@@ -484,8 +489,8 @@ hostnames are resolved and the check is also performed.  This helps
 prevents accidental duplicate hosts.
 
 ```php
-$config['addhost_alwayscheckip']   = false; #true - check for duplicate ips even when adding host by name.
-                                            #false- only check when adding host by ip.
+$config['addhost_alwayscheckip']   = false; # true - check for duplicate ips even when adding host by name.
+                                            # false- only check when adding host by ip.
 ```
 
 By default we allow hosts to be added with duplicate sysName's, you
@@ -502,8 +507,8 @@ OS](../Developing/os/Settings.md#poller-and-discovery-modules) or
 device.
 
 ```php
-$config['discovery_modules]['arp-table'] = true;
-$config['poller_modules']['bgp-peers'] = false;
+$config['discovery_modules']['arp-table'] = true;
+$config['poller_modules']['bgp-peers']    = false;
 ```
 
 # SNMP Settings
@@ -514,14 +519,14 @@ default version and port.
 ```php
 $config['snmp']['timeout'] = 1;                         # timeout in seconds
 $config['snmp']['retries'] = 5;                         # how many times to retry the query
-$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');    # Transports to use
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];               # Default versions to use
-$config['snmp']['port'] = 161;                      # Default port
+$config['snmp']['transports'] = ['udp', 'udp6', 'tcp', 'tcp6'];    # Transports to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];       # Default versions to use
+$config['snmp']['port'] = 161;                          # Default port
 $config['snmp']['exec_timeout'] = 1200;                 # execution time limit in seconds
 ```
 
->NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
->is the max time to run a query.
+> NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
+> is the max time to run a query.
 
 The default v1/v2c snmp community to use, you can expand this array
 with `[1]`, `[2]`, `[3]`, etc.
@@ -545,7 +550,7 @@ $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 
 # Auto discovery settings
 
-[Auto-Discovery](../Extensions/Auto-Discovery.md)
+Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 # Email configuration
 
@@ -572,11 +577,11 @@ options after that are to support the different transports.
 
 # Alerting
 
-[Alerting](../Alerting/index.md)
+Please refer to [Alerting](../Alerting/index.md)
 
 # Billing
 
-[Billing](../Extensions/Billing-Module.md)
+Please refer to [Billing](../Extensions/Billing-Module.md)
 
 # Global module support
 
@@ -591,7 +596,7 @@ $config['enable_sla']                   = 0; # Enable Cisco SLA collection and d
 
 # Port extensions
 
-[Port-Description-Parser](../Extensions/Port-Description-Parser.md)
+Please refer to [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
 ```php
 $config['enable_ports_etherlike']       = 0;
@@ -618,7 +623,7 @@ will disable showing lines that start with #
 
 ## Oxidized
 
-[Oxidized](../Extensions/Oxidized.md)
+Please refer to [Oxidized](../Extensions/Oxidized.md)
 
 ## CollectD
 
@@ -663,11 +668,11 @@ drawn. Be sure that your web server has permissions to write to this socket.
 
 ## Smokeping
 
-[Smokeping](../Extensions/Smokeping.md)
+Please refer to [Smokeping](../Extensions/Smokeping.md)
 
 ## NFSen
 
-[NFSen](../Extensions/NFSen.md)
+Please refer to [NFSen](../Extensions/NFSen.md)
 
 ## Location mapping
 
@@ -703,14 +708,14 @@ you don't need to configure full location within snmp.
 
 # Interfaces to be ignored
 
-Interfaces can be automatically ignored during discovery by modifying 
-bad_if\* entries in a default array, unsetting a default array and 
-customizing it, or creating an OS specific array. The preferred method 
-for ignoring interfaces is to use an OS specific array. The default 
-arrays can be found in misc/config_definitions.json. OS specific 
-definitions (includes/definitions/_specific_os_.yaml) can contain 
-bad_if\* arrays, but should only be modified via pull-request as 
-manipulation of the definition files will block updating. 
+Interfaces can be automatically ignored during discovery by modifying
+bad_if\* entries in a default array, unsetting a default array and
+customizing it, or creating an OS specific array. The preferred method
+for ignoring interfaces is to use an OS specific array. The default
+arrays can be found in misc/config_definitions.json. OS specific
+definitions (includes/definitions/\_specific_os_.yaml) can contain
+bad_if\* arrays, but should only be modified via pull-request as
+manipulation of the definition files will block updating:
 
 Examples:
 
@@ -758,7 +763,7 @@ $config['os']['ios']['good_if'][] = 'FastEthernet';
 ```
 
 `good_if` is matched against ifDescr value. This can be a bad_if value
-as well which would stop that port from being ignored. I.e If bad_if
+as well which would stop that port from being ignored. i.e. if bad_if
 and good_if both contained FastEthernet then ports with this value in
 the ifDescr will be valid.
 
@@ -867,11 +872,11 @@ $config['os']['linux']['storage_perc_warn'] = 60;
 
 # IRC Bot
 
-[IRC Bot](../Extensions/IRC-Bot.md)
+Please refer to [IRC Bot](../Extensions/IRC-Bot.md)
 
 # Authentication
 
-[Authentication](../Extensions/Authentication.md)
+Please refer to [Authentication](../Extensions/Authentication.md)
 
 # Cleanup options
 
@@ -897,7 +902,7 @@ automatically purged. You can alter these individually. values are in days.
 
 # Syslog options
 
-[Syslog](../Extensions/Syslog.md)
+Please refer to [Syslog](../Extensions/Syslog.md)
 
 # Virtualization
 
@@ -932,7 +937,7 @@ You can use this array to rewrite the description of ASes that you have discover
 
 # Auto updates
 
-[Updating](../General/Updating.md)
+Please refer to [Updating](../General/Updating.md)
 
 # IPMI
 
@@ -949,7 +954,7 @@ $config['ipmi']['type'][] = "open";
 
 # Distributed poller settings
 
-[Distributed Poller](../Extensions/Distributed-Poller.md)
+Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
 
 # API Settings
 

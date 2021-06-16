@@ -12,7 +12,7 @@ To detect non-standard MIBs, they can be defined via Yaml.
 ##### YAML
 
 In order to successfully detect memory amount and usage, two of the for keys below are required.  Some OS only
-provide a usage percentage, which will work, but a total RAM amount will not be displayed. 
+provide a usage percentage, which will work, but a total RAM amount will not be displayed.
 
 - total
 - used
@@ -36,7 +36,7 @@ including {{ }} parsing, skip_values, and precache.
 Valid data entry keys:
 
 - `oid` oid to walk to collect processor data
-- `total` oid or integer total memory size in bytes (or precision), 
+- `total` oid or integer total memory size in bytes (or precision)
 - `used` oid memory used in bytes (or precision)
 - `free` oid memory free in bytes (or precision)
 - `percent_used` oid of percentage of used memory

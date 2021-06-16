@@ -82,6 +82,6 @@ If you want to restrict which network adapter the agent listens on, do the follo
 
 
 ## Windows
-1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows
+1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): <https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows>
 2. Run the msi / exe
 3. Make sure your LibreNMS instance can reach TCP port 6556 on your target.

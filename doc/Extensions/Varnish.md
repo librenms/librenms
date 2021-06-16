@@ -139,7 +139,7 @@ DAEMON_OPTS="-p thread_pool_min=5 -p thread_pool_max=500 -p thread_pool_timeout=
 
 Edit librenms.conf and modify the Apache Virtual Host listening port.
 
-- Modify:`<VirtualHost *:80>` to: `<VirtualHost *:8080>`
+- Modify: `<VirtualHost *:80>` to `<VirtualHost *:8080>`
 
 ```bash
 vim /etc/httpd/conf.d/librenms.conf
@@ -147,7 +147,7 @@ vim /etc/httpd/conf.d/librenms.conf
 
 Varnish can not share a port with Apache. Change the Apache listening port to 8080.
 
-- Modify:`Listen 80` to:`Listen 8080`
+- Modify: `Listen 80` to `Listen 8080`
 
 ```bash
 vim /etc/httpd/conf/httpd.conf

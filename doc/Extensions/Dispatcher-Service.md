@@ -6,7 +6,7 @@ path: blob/master/doc/
 > Status: Release Candidate
 
 The LibreNMS dispatcher service (`librenms-service.py`) is a new method
-of running the poller service at set times. It does not replace the php scripts, 
+of running the poller service at set times. It does not replace the php scripts,
 just the cron entries running them.
 
 # External Requirements
@@ -47,7 +47,7 @@ system. See <https://redis.io/topics/security>
 
 LibreNMS can still use memcached as a locking mechanism when using
 distributed polling.  So you can configure memcached for this purpose
-unless you have updates disabled. 
+unless you have updates disabled.
 
 See `Locking Mechanisms` at
 <https://docs.librenms.org/Extensions/Distributed-Poller/>
@@ -133,7 +133,7 @@ $config['distributed_poller_group']              = 0;               # Which grou
 ```
 ### Tuning the number of workers
 
-See https://your_librenms_install/poller 
+See https://your_librenms_install/poller
 
 You want to keep Consumed Worker Seconds comfortably below Maximum Worker Seconds. The closer the values are to each other, the flatter the CPU graph of the poller machine. Meaning that you are utilizing your CPU resources well. As long as Consumed WS stays below Maximum WS and Devices Pending is 0, you should be ok.
 
