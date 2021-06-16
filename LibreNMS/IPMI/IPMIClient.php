@@ -104,7 +104,7 @@ class IPMIClient
     public function getSDR()
     {
         try {
-            return Cache::remember("ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
+            return Cache::remember(".ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
                 $this->fetchSDR();
             });
         } catch (\Throwable $th) {
