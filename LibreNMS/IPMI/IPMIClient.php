@@ -103,30 +103,13 @@ class IPMIClient
      */
     public function getSDR()
     {
-        return Cache::remember("ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
-            $basePath = sys_get_temp_dir() . '/ipmitool';
-            $filePath = "$basePath/" . $this->host . '.sdr.tmp';
-            if (! is_dir($basePath)) {
-                mkdir($basePath, 0777, true);
-            }
-    
-            if (! file_exists($filePath)) {
-                if (! $this->sendCommand("sdr dump $filePath")) {
-                    return false;
-                }
-            }
-    
-            try {
-                return file_get_contents($filePath);
-            } catch (ErrorException $e) {
-                echo 'Failed to read SDR: ', $e->getMessage(), "\n";
-    
-                return false;
-            } finally {
-                unlink($filePath);
-            }
-        });
-
+        try {
+            return Cache::remember("ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function() {
+                $this->fetchSDR();
+            });
+        } catch (\Throwable $th) {
+            echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";
+        }
     }
 
     /**
@@ -174,5 +157,24 @@ class IPMIClient
         $proc = new IPMICommand($cmd);
 
         return $proc->execute();
+    }
+
+    private function fetchSDR(): string {
+        $basePath = sys_get_temp_dir() . '/ipmitool';
+        if (! is_dir($basePath)) {
+            mkdir($basePath, 0777, true);
+        }
+        
+        $filePath = "$basePath/" . $this->host . '.sdr.tmp';
+        unlink($filePath);
+        if (! $this->sendCommand("sdr dump $filePath")) {
+            throw new ErrorException("Failed to dump SDR");
+        }
+
+        try {
+            return file_get_contents($filePath);
+        } finally {
+            unlink($filePath);
+        }
     }
 }
