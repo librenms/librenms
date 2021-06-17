@@ -27,48 +27,53 @@ class Signal extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $signalOpts = [
-            'path'  => $this->config['path'],
-            'recipient-type'  => $this->config['recipient-type'],
-            'recipient' => $this->config['recipient'],
-        ];
-
-        return $this->contactSignal($obj, $signalOpts);
+	$signalOpts = [
+	    'path'  => escapeshellarg($this->config['path']),
+	    'recipient-type'  => ($this->config['recipient-type'] == 'group') ? ' -g ' : ' ',
+	    'recipient' => escapeshellarg($this->config['recipient']),
+	];
+	
+	return $this->contactSignal($obj, $signalOpts);
     }
 
     public function contactSignal($obj, $opts)
     {
-        return exec($opts['path'] . ' --dbus-system send' . $opts['recipient-type'] . $opts['recipient'] . ' -m "' . $obj['title'] . '"');
+	exec($opts['path'] 
+	   . ' --dbus-system send'
+           . $opts['recipient-type']
+	   . $opts['recipient']
+	   . ' -m ' . escapeshellarg($obj['title']));
+	return true;
     }
 
     public static function configTemplate()
     {
-        return [
-            'validation' => [],
-            'config' => [
-                [
-                    'title' => 'Path',
-                    'name'  => 'path',
-                    'descr' => 'Local Path to CLI',
-                    'type'  => 'text',
-                ],
-                [
-                    'title' => 'Recipient type',
-                    'name'  => 'recipient-type',
-                    'descr' => 'Phonenumber ',
-                    'type'  => 'select',
-                    'options' => [
-                        'Mobile number' => ' ',
-                        'Group'         => ' -g ',
-                    ],
-                ],
-                [
-                    'title' => 'Recipient',
-                    'name'  => 'recipient',
-                    'descr' => 'Message recipient',
-                    'type'  => 'text',
-                ],
-            ],
-        ];
+	return [
+	    'validation' => [],
+	    'config' => [
+		[
+		    'title' => 'Path',
+		    'name' => 'path',
+		    'descr' => 'Local Path to CLI',
+		    'type' => 'text',
+		],
+		[
+		    'title' => 'Recipient type',
+		    'name' => 'recipient-type',
+		    'descr' => 'Phonenumber ',
+		    'type' => 'select',
+		    'options' => [
+			'Mobile number' => 'single',
+			'Group' => 'group',
+		    ],
+		],
+		[
+		    'title' => 'Recipient',
+		    'name' => 'recipient',
+		    'descr' => 'Message recipient',
+		    'type' => 'text',
+		],
+	    ]
+	];
     }
 }
