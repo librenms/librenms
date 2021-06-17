@@ -32,13 +32,12 @@ class Signal extends Transport
             'recipient-type'  => ($this->config['recipient-type'] == 'group') ? ' -g ' : ' ',
             'recipient' => escapeshellarg($this->config['recipient']),
         ];
-        
         return $this->contactSignal($obj, $signalOpts);
     }
 
     public function contactSignal($obj, $opts)
     {
-        exec($opts['path'] 
+        exec($opts['path']
            . ' --dbus-system send'
            . $opts['recipient-type']
            . $opts['recipient']
@@ -73,7 +72,7 @@ class Signal extends Transport
                     'descr' => 'Message recipient',
                     'type' => 'text',
                 ],
-            ]
+            ],
         ];
     }
 }
