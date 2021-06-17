@@ -842,6 +842,20 @@ connect to servicedesk
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako Department | 1 |
 
+## Signal CLI
+
+Use the Signal Mesenger for Alerts. Run the Signal CLI with the D-Bus option.
+
+[GitHub Project](https://github.com/AsamK/signal-cli)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Path | /opt/signal-cli/bin/signal-cli |
+| Recipient type | Group |
+| Recipient | dfgjsdkgljior4345== |
+
 ## SMSFeedback
 
 SMSFeedback is a SAAS service, which can be used to deliver Alerts via API, using API url, Username & Password.
