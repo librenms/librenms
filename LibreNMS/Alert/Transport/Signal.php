@@ -32,6 +32,7 @@ class Signal extends Transport
             'recipient-type'  => ($this->config['recipient-type'] == 'group') ? ' -g ' : ' ',
             'recipient' => escapeshellarg($this->config['recipient']),
         ];
+
         return $this->contactSignal($obj, $signalOpts);
     }
 
@@ -42,6 +43,7 @@ class Signal extends Transport
            . $opts['recipient-type']
            . $opts['recipient']
            . ' -m ' . escapeshellarg($obj['title']));
+
         return true;
     }
 
