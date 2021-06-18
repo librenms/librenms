@@ -257,12 +257,12 @@ then need to assign the relevant permissions unless you set
 `$config['radius']['userlevel']` to be something other than 1.
 
 ```php
-$config['radius']['hostname']   = 'localhost';
-$config['radius']['port']       = '1812';
-$config['radius']['secret']     = 'testing123';
-$config['radius']['timeout']    = 3;
-$config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14 days.
-$config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user.
+$config['radius']['hostname']      = 'localhost';
+$config['radius']['port']          = '1812';
+$config['radius']['secret']        = 'testing123';
+$config['radius']['timeout']       = 3;
+$config['radius']['users_purge']   = 14;  // Purge users who haven't logged in for 14 days.
+$config['radius']['default_level'] = 1;  // Set the default user level when automatically creating a user.
 ```
 
 ## Old account cleanup
@@ -297,16 +297,16 @@ This will then assign the userlevel for guest to all authenticated users.
 
 Config option: `ad-authorization`
 
-This module is a combination of ___http-auth___ and ___active_directory___
+This module is a combination of ___http-auth___ and ___active\_directory___
 
 LibreNMS will expect the user to have authenticated via your
 webservice already (e.g. using Kerberos Authentication in Apache) but
 will use Active Directory lookups to determine and assign the
 userlevel of a user. The userlevel will be calculated by using AD
-group membership information as the ___active_directory___ module
+group membership information as the ___active\_directory___ module
 does.
 
-The configuration is the same as for the ___active_directory___ module
+The configuration is the same as for the ___active\_directory___ module
 with two extra, optional options: auth_ad_binduser and
 auth_ad_bindpassword. These should be set to a AD user with read
 capabilities in your AD Domain in order to be able to perform
@@ -428,7 +428,7 @@ supply environment variables or headers.
 ### User Attribute
 
 If for some reason your relying party doesn't store the username in
-___REMOTE_USER___, you can override this choice.
+___REMOTE\_USER___, you can override this choice.
 
 ```php
 $config['sso']['user_attr'] = 'HTTP_UID';
@@ -483,9 +483,9 @@ $config['sso']['level_attr']     = "entitlement";
 
 If your Relying Party is capable of calculating the necessary
 privilege level, you can configure the module to read the privilege
-number straight from an attribute. ___sso_level_attr___ should contain
+number straight from an attribute. ___sso\_level\_attr___ should contain
 the name of the attribute that the Relying Party exposes to LibreNMS -
-as long as ___sso_mode___ is correctly set, the mechanism should find
+as long as ___sso\_mode___ is correctly set, the mechanism should find
 the value.
 
 #### Group Map
@@ -500,14 +500,14 @@ $config['sso']['group_delimiter'] = ';';
 ```
 
 The mechanism expects to find a delimited list of groups within the
-attribute that ___sso_group_attr___ points to. This should be an
+attribute that ___sso\_group\_attr___ points to. This should be an
 associative array of group name keys, with  privilege levels as
 values. The mechanism will scan the list and find the ___highest___
 privilege level that the user is entitled to, and assign that value to
 the user.
 
 This format may be specific to Shibboleth; other relying party
-software may need changes to the mechanism (e.g. ___mod_auth_mellon___
+software may need changes to the mechanism (e.g. ___mod\_auth\_mellon___
 may create pseudo arrays).
 
 There is an optional value for sites with large numbers of groups:

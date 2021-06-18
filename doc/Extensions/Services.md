@@ -9,7 +9,7 @@ perform additional monitoring outside of SNMP. Services can also be used
 in conjunction with your SNMP monitoring for larger monitoring functionality.
 
 **Services must be tied to a device to function properly. A good generic
-option is to use `localhost`, but it is suggested to attach the check to 
+option is to use `localhost`, but it is suggested to attach the check to
 the device you are monitoring.**
 
 ## Nagios plugins source
@@ -75,8 +75,8 @@ $config['discover_services_templates']           = true;
 
 Service checks are now distributable if you run a distributed
 setup. To leverage this, use the `dispatch` service. Alternatively,
-you could also replace `check-services.php` with `services-wrapper.py` in 
-cron instead to run across all polling nodes. 
+you could also replace `check-services.php` with `services-wrapper.py` in
+cron instead to run across all polling nodes.
 
 If you need to debug the output of services-wrapper.py then you can
 add `-d` to the end of the command - it is NOT recommended to do this
@@ -217,28 +217,28 @@ $config['service_poller_enabled']           = true;
 $config['service_poller_workers']           = 16;
 ```
 ```php
-$config['service_poller_frequency']           = 300;
+$config['service_poller_frequency']         = 300;
 ```
 ```php
-$config['service_poller_down_retry']           = 5;
+$config['service_poller_down_retry']        = 5;
 ```
 ```php
-$config['service_discovery_enabled']           = true;
+$config['service_discovery_enabled']        = true;
 ```
 ```php
-$config['service_discovery_workers']           = 16;
+$config['service_discovery_workers']        = 16;
 ```
 ```php
-$config['service_discovery_frequency']           = 3600;
+$config['service_discovery_frequency']      = 3600;
 ```
 ```php
-$config['service_services_enabled']           = true;
+$config['service_services_enabled']         = true;
 ```
 ```php
-$config['service_services_workers']           = 16;
+$config['service_services_workers']         = 16;
 ```
 ```php
-$config['service_services_frequency']           = 60;
+$config['service_services_frequency']       = 60;
 ```
 
 ## Service checks polling logic

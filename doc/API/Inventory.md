@@ -11,7 +11,7 @@ cage, then the sfp itself. The way this API call is designed is to
 enable a recursive lookup. The first call will retrieve the root
 entry, included within this response will be entPhysicalIndex, you can
 then call for entPhysicalContainedIn which will then return the next
-layer of results.  To retrieve all items together, see 
+layer of results.  To retrieve all items together, see
 [get_inventory_for_device](#get_inventory_for_device).
 
 Route: `/api/v0/inventory/:hostname`
@@ -69,8 +69,8 @@ Output:
 
 ### `get_inventory_for_device`
 
-Retrieve the flattened inventory for a device.  This retrieves all 
-inventory items for a device regardless of their structure, and may be 
+Retrieve the flattened inventory for a device.  This retrieves all
+inventory items for a device regardless of their structure, and may be
 more useful for devices with with nested components.
 
 Route: `/api/v0/inventory/:hostname/all`

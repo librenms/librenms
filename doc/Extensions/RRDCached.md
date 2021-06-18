@@ -12,7 +12,7 @@ tune over rrdcached. To enable this set the following config:
 ```php
 $config['rrdtool_version'] = '1.5.5';
 ```
-This setting has to be the exact version of rrdtool you are running. 
+This setting has to be the exact version of rrdtool you are running.
 
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
 or newer, in addition to your rrdcached version.
@@ -24,10 +24,10 @@ Shared FS: Is a shared filesystem required?
 Features: Supported features in the version indicated.
 
 ```
-          G = Graphs.
-          C = Create RRD files.
-          U = Update RRD files.
-          T = Tune RRD files.
+G = Graphs.
+C = Create RRD files.
+U = Update RRD files.
+T = Tune RRD files.
 ```
 
 | Version | Shared FS | Features |
@@ -48,7 +48,7 @@ so you can view the disk I/O usage delta.
 1. [RRDCached installation Debian Stretch](#rrdcached-installation-debian-stretch)
 1. [RRDCached installation CentOS 7 or 8](#rrdcached-installation-centos-7-or-8)
 1. [RRDCached installation CentOS 6](#rrdcached-installation-centos-6)
-1. [Securing RRCached](#Securing-RRCached)
+1. [Securing RRCached](#securing-rrcached)
 
 
 ## RRDCached installation Ubuntu 16
@@ -129,7 +129,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 4: Restart the rrdcached service
 
 ```bash
-    systemctl restart rrdcached.service
+systemctl restart rrdcached.service
 ```
 
 5: Edit /opt/librenms/config.php to include:
@@ -187,7 +187,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 4: Restart the rrdcached service
 
 ```bash
-    systemctl restart rrdcached.service
+systemctl restart rrdcached.service
 ```
 
 5: Edit /opt/librenms/config.php to include:

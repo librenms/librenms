@@ -29,6 +29,7 @@ use App\Models\BgpPeer;
 use App\Models\CefSwitching;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\IsisAdjacency;
 use App\Models\Mpls;
 use App\Models\OspfInstance;
 use App\Models\Port;
@@ -64,6 +65,7 @@ class ObjectCache
                 'vrf' => Vrf::hasAccess($user)->count(),
                 'mpls' => Mpls::hasAccess($user)->count(),
                 'ospf' => OspfInstance::hasAccess($user)->count(),
+                'isis' => IsisAdjacency::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),
                 'cef' => CefSwitching::hasAccess($user)->count(),

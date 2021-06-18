@@ -23,7 +23,7 @@ Collection](../Alerting/Rules.md#alert-rules-collection).
 1: If you are using [RRDCached](../Extensions/RRDCached.md), stop the service.
 
     - This will flush all pending writes so that the rrdstep.php script can change the steps.
-    
+
 2: Change the ping_rrd_step setting in config.php
 
 ```
