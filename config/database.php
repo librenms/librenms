@@ -116,7 +116,6 @@ return [
             ]) : [],
         ],
 
-
         'testing' => [
             'driver' => env('DB_TEST_DRIVER', 'mysql'),
             'host' => env('DB_TEST_HOST', 'localhost'),
