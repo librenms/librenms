@@ -52,6 +52,24 @@ return [
         ],
 
         'mysql' => [
+            'read' => [
+                'host' => [
+                    env('DB_HOST', 'localhost'),
+                    env('DB_HOST2', ''),
+	            env('DB_HOST3', ''),
+                    env('DB_HOST4', ''),
+                    env('DB_HOST5', ''),
+                ],
+            ],
+            'write' => [
+                'host' => [
+                    env('DB_HOST', 'localhost'),
+                    env('DB_HOST2', ''),
+                    env('DB_HOST3', ''),
+                    env('DB_HOST4', ''),
+                    env('DB_HOST5', ''),
+               ],
+            ],
             'driver' => 'mysql',
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
