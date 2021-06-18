@@ -56,7 +56,7 @@ return [
                 'host' => [
                     env('DB_HOST', 'localhost'),
                     env('DB_HOST2', ''),
-	            env('DB_HOST3', ''),
+	                env('DB_HOST3', ''),
                     env('DB_HOST4', ''),
                     env('DB_HOST5', ''),
                 ],
