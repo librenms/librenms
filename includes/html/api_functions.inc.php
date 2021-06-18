@@ -979,13 +979,13 @@ function search_ports(Illuminate\Http\Request $request)
 {
     $search = $request->route('search');
     $value = "%$search%";
-    $ports = \App\Models\Port::hasAccess(Auth::user())
-                 ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
-                 ->where('ifAlias', 'like', $value)
-                 ->orWhere('ifDescr', 'like', $value)
-                 ->orWhere('ifName', 'like', $value)
-                 ->orderBy('ifName')
-                 ->get();
+    $ports = Port::hasAccess(Auth::user())
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
+         ->where('ifAlias', 'like', $value)
+         ->orWhere('ifDescr', 'like', $value)
+         ->orWhere('ifName', 'like', $value)
+         ->orderBy('ifName')
+         ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
