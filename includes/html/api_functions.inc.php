@@ -1406,6 +1406,10 @@ function list_oxidized(Illuminate\Http\Request $request)
                 }
             }
         }
+        //Exclude groups from being sent to Oxidized
+        if (in_array($output['group'], Config::get('oxidized.ignore_groups'))) {
+            break;
+        }
 
         $return[] = $output;
     }
