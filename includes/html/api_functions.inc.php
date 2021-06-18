@@ -2586,6 +2586,15 @@ function del_service_from_host(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to delete the service');
 }
 
+function search_by_mac(\Illuminate\Http\Request $request)
+{
+    $search = $request->route('search');
+    $ports = dbFetchRows("select ports.* from ports_fdb join ports on ports.port_id=ports_fdb.port_id join devices on devices.device_id=ports.device_id where ports_fdb.port_id in (select port_id from ports_fdb where mac_address=?) group by ports_fdb.port_id having count(ports_fdb.port_id)>0 order by count(ports_fdb.port_id) limit 1", $search);
+    if (empty($ports)) {
+	return api_error(404, 'No ports found for ' . $search);
+    }
+    return api_success($ports, 'ports');
+}
 function edit_service_for_host(Illuminate\Http\Request $request)
 {
     $service_id = $request->route('id');
