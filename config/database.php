@@ -75,11 +75,11 @@ return [
                 'host' => [
                     env('DB_HOST', 'localhost'),
                     env('DB_HOST_R2', ''),
-	            env('DB_HOST_R3', ''),
+                    env('DB_HOST_R3', ''),
                     env('DB_HOST_R4', ''),
                     env('DB_HOST_R5', ''),
                     env('DB_HOST_R6', ''),
-	            env('DB_HOST_R7', ''),
+                    env('DB_HOST_R7', ''),
                     env('DB_HOST_R8', ''),
                     env('DB_HOST_R9', ''),
                 ],
