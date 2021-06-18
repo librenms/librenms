@@ -465,8 +465,8 @@ function device_availability(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function ($device_id) {
         $availabilities = Availability::select('duration', 'availability_perc')
-				      ->where('device_id', '=', $device_id)
-				      ->orderBy('duration', 'ASC');
+                      ->where('device_id', '=', $device_id)
+                      ->orderBy('duration', 'ASC');
 
         return api_success($availabilities->get(), 'availability');
     });
@@ -486,8 +486,8 @@ function device_outages(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function ($device_id) {
         $outages = DeviceOutage::select('going_down', 'up_again')
-			       ->where('device_id', '=', $device_id)
-			       ->orderBy('going_down', 'DESC');
+                   ->where('device_id', '=', $device_id)
+                   ->orderBy('going_down', 'DESC');
 
         return api_success($outages->get(), 'outages');
     });
@@ -980,12 +980,12 @@ function search_ports(Illuminate\Http\Request $request)
     $search = $request->route('search');
     $value = "%$search%";
     $ports = \App\Models\Port::hasAccess(Auth::user())
-			     ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
-			     ->where('ifAlias', 'like', $value)
-			     ->orWhere('ifDescr', 'like', $value)
-			     ->orWhere('ifName', 'like', $value)
-			     ->orderBy('ifName')
-			     ->get();
+                 ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
+                 ->where('ifAlias', 'like', $value)
+                 ->orWhere('ifDescr', 'like', $value)
+                 ->orWhere('ifName', 'like', $value)
+                 ->orderBy('ifName')
+                 ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
@@ -1346,15 +1346,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-		     ->where('disabled', 0)
-		     ->when($request->route('hostname'), function ($query, $hostname) {
-			 return $query->where('hostname', $hostname);
-		     })
-		     ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
-		     ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
-		     ->whereAttributeDisabled('override_Oxidized_disable')
-		     ->select(['hostname', 'sysName', 'sysDescr', 'hardware', 'os', 'ip', 'location_id'])
-		     ->get();
+             ->where('disabled', 0)
+             ->when($request->route('hostname'), function ($query, $hostname) {
+                 return $query->where('hostname', $hostname);
+             })
+             ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
+             ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
+             ->whereAttributeDisabled('override_Oxidized_disable')
+             ->select(['hostname', 'sysName', 'sysDescr', 'hardware', 'os', 'ip', 'location_id'])
+             ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
@@ -2130,10 +2130,10 @@ function list_fdb(Illuminate\Http\Request $request)
     $mac = $request->route('mac');
 
     $fdb = PortsFdb::hasAccess(Auth::user())
-		   ->when(! empty($mac), function (Builder $query) use ($mac) {
-		       return $query->where('mac_address', $mac);
-		   })
-		   ->get();
+           ->when(! empty($mac), function (Builder $query) use ($mac) {
+               return $query->where('mac_address', $mac);
+           })
+           ->get();
 
     if ($fdb->isEmpty()) {
         return api_error(404, 'Fdb do not exist');
@@ -2591,16 +2591,17 @@ function search_by_mac(Illuminate\Http\Request $request)
 {
     $search = $request->route('search');
     $portlist = PortsFdb::select('port_id')
-			->where('mac_address', $search)
-			->groupBy('port_id')
-			->get();
+            ->where('mac_address', $search)
+            ->groupBy('port_id')
+            ->get();
     $portId = PortsFdb::select('port_id')
-		      ->whereIn('port_id', $portlist)
-		      ->groupBy('port_id')
-		      ->orderByRaw('count(port_id)')
-		      ->limit(1)
-		      ->first();
+              ->whereIn('port_id', $portlist)
+              ->groupBy('port_id')
+              ->orderByRaw('count(port_id)')
+              ->limit(1)
+              ->first();
     $port = Port::findOrFail($portId);
+
     return api_success($port, 'ports');
 }
 function edit_service_for_host(Illuminate\Http\Request $request)
