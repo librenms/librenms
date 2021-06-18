@@ -52,22 +52,49 @@ return [
         ],
 
         'mysql' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'librenms'),
+            'username' => env('DB_USERNAME', 'librenms'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'mysql_cluster' => [
             'read' => [
                 'host' => [
                     env('DB_HOST', 'localhost'),
-                    env('DB_HOST2', ''),
-	            env('DB_HOST3', ''),
-                    env('DB_HOST4', ''),
-                    env('DB_HOST5', ''),
+                    env('DB_HOST_R2', ''),
+	            env('DB_HOST_R3', ''),
+                    env('DB_HOST_R4', ''),
+                    env('DB_HOST_R5', ''),
+                    env('DB_HOST_R6', ''),
+	            env('DB_HOST_R7', ''),
+                    env('DB_HOST_R8', ''),
+                    env('DB_HOST_R9', ''),
                 ],
             ],
             'write' => [
                 'host' => [
                     env('DB_HOST', 'localhost'),
-                    env('DB_HOST2', ''),
-                    env('DB_HOST3', ''),
-                    env('DB_HOST4', ''),
-                    env('DB_HOST5', ''),
+                    env('DB_HOST_W2', ''),
+                    env('DB_HOST_W3', ''),
+                    env('DB_HOST_W4', ''),
+                    env('DB_HOST_W5', ''),
+                    env('DB_HOST_W6', ''),
+                    env('DB_HOST_W7', ''),
+                    env('DB_HOST_W8', ''),
+                    env('DB_HOST_W9', ''),
                ],
             ],
             'driver' => 'mysql',
@@ -87,6 +114,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+
 
         'testing' => [
             'driver' => env('DB_TEST_DRIVER', 'mysql'),
