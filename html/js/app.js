@@ -1349,18 +1349,14 @@ __webpack_require__.r(__webpack_exports__);
   mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__.default],
   data: function data() {
     return {
-      localList: Array.isArray(this.localList) ? {} : bngthis.value,
+      localList: Array.isArray(this.value) ? {} : this.value,
       newItem: "",
-      newItemLevel: 1
+      newItemLevel: 1,
+      lock: false
     };
   },
   methods: {
     addItem: function addItem() {
-      // fix error with PHP json encode returning an array
-      if (Array.isArray(this.localList)) {
-        this.localList = {};
-      }
-
       this.$set(this.localList, this.newItem, {
         level: this.newItemLevel
       });
@@ -1387,7 +1383,17 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     localList: function localList() {
-      this.$emit('input', this.localList);
+      if (!this.lock) {
+        this.$emit('input', this.localList);
+      } else {
+        // release the lock
+        this.lock = false;
+      }
+    },
+    value: function value() {
+      this.lock = true; // prevent loop
+
+      this.localList = Array.isArray(this.value) ? {} : this.value;
     }
   }
 });

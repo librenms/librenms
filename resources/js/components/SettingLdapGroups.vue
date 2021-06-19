@@ -67,18 +67,14 @@ export default {
         mixins: [BaseSetting],
         data() {
             return {
-                localList: Array.isArray(this.localList) ? {} :  bngthis.value,
+                localList: Array.isArray(this.value) ? {} : this.value,
                 newItem: "",
-                newItemLevel: 1
+                newItemLevel: 1,
+                lock: false
             }
         },
         methods: {
             addItem() {
-                // fix error with PHP json encode returning an array
-                if (Array.isArray(this.localList)) {
-                    this.localList = {};
-                }
-
                 this.$set(this.localList, this.newItem, {level: this.newItemLevel});
                 this.newItem = "";
                 this.newItemLevel = 1;
@@ -99,7 +95,16 @@ export default {
         },
         watch: {
             localList() {
-                this.$emit('input', this.localList)
+                if (! this.lock) {
+                    this.$emit('input', this.localList)
+                } else {
+                    // release the lock
+                    this.lock = false;
+                }
+            },
+            value() {
+                this.lock = true // prevent loop
+                this.localList = Array.isArray(this.value) ? {} : this.value;
             }
         }
     }
