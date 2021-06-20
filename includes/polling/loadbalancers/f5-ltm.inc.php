@@ -51,6 +51,7 @@ if (! empty($components)) {
     $f5_stats['ltmVirtualServStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
     $f5_stats['ltmVirtualServStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
     $f5_stats['ltmVirtualServStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
+    $f5_stats['ltmVirtualServStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12', 0);
 
     $f5_stats['ltmBwcEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.7', 0);
     $f5_stats['ltmBwcEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.4', 0);
@@ -62,6 +63,7 @@ if (! empty($components)) {
     $f5_stats['ltmPoolMemberStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.6', 0);
     $f5_stats['ltmPoolMemberStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.8', 0);
     $f5_stats['ltmPoolMemberStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.10', 0);
+    $f5_stats['ltmPoolMemberStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.11', 0);
 
     // and check the status
     $f5_stats['ltmVsStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
@@ -108,7 +110,8 @@ if (! empty($components)) {
                 ->addDataset('pktsout', 'COUNTER', 0)
                 ->addDataset('bytesin', 'COUNTER', 0)
                 ->addDataset('bytesout', 'COUNTER', 0)
-                ->addDataset('totconns', 'COUNTER', 0);
+                ->addDataset('totconns', 'COUNTER', 0)
+                ->addDataset('currconns', 'COUNTER', 0);
 
             $fields = [
                 'pktsin' => $f5_stats['ltmVirtualServStatEntryPktsin']['1.3.6.1.4.1.3375.2.2.10.2.3.1.6.' . $UID],
@@ -116,6 +119,7 @@ if (! empty($components)) {
                 'bytesin' => $f5_stats['ltmVirtualServStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.10.2.3.1.7.' . $UID],
                 'bytesout' => $f5_stats['ltmVirtualServStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.10.2.3.1.9.' . $UID],
                 'totconns' => $f5_stats['ltmVirtualServStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.11.' . $UID],
+                'currconns' => $f5_stats['ltmVirtualServStatEntryCurrconns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.12.' . $UID],
             ];
 
             // Let's print some debugging info.
@@ -170,7 +174,8 @@ if (! empty($components)) {
                 ->addDataset('pktsout', 'COUNTER', 0)
                 ->addDataset('bytesin', 'COUNTER', 0)
                 ->addDataset('bytesout', 'COUNTER', 0)
-                ->addDataset('totconns', 'COUNTER', 0);
+                ->addDataset('totconns', 'COUNTER', 0)
+                ->addDataset('currconns', 'COUNTER', 0);
 
             $array['state'] = $f5_stats['ltmPoolMbrStatusEntryState']['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.' . $UID];
             $array['available'] = $f5_stats['ltmPoolMbrStatusEntryAvail']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.' . $UID];
@@ -181,6 +186,7 @@ if (! empty($components)) {
                 'bytesin' => $f5_stats['ltmPoolMemberStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.' . $UID],
                 'bytesout' => $f5_stats['ltmPoolMemberStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.' . $UID],
                 'totconns' => $f5_stats['ltmPoolMemberStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.' . $UID],
+                'currconns' => $f5_stats['ltmPoolMemberStatEntryCurrconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.11.' . $UID],
             ];
 
             // Let's print some debugging info.
