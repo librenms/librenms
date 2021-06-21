@@ -1,5 +1,9 @@
-mib: TPLINK-SYSMONITOR-MIB
+mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB
 modules:
+    os:
+        hardware: TPLINK-SYSINFO-MIB::tpSysInfoHwVersion.0
+        serial: TPLINK-SYSINFO-MIB::tpSysInfoSerialNum.0
+        version: TPLINK-SYSINFO-MIB::tpSysInfoSwVersion.0
     mempools:
         data:
             -

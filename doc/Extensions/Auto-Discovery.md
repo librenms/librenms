@@ -108,7 +108,7 @@ Enabled by default.
 This includes FDP, CDP and LLDP support based on the device type.
 
 The LLDP/xDP links with neighbours will always be discovered as soon as the discovery module is enabled.
-However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true`; 
+However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true;`.
 
 Devices may be excluded from xdp discovery by sysName and sysDescr.
 
@@ -187,4 +187,5 @@ optional arguments:
 # Discovered devices
 
 Newly discovered devices will be added to the `default_poller_group`, this value defaults to 0 if unset.
-When using distributed polling, this value can be changed locally by setting `$config['default_poller_group`]` in config.php or globally by using `lnms config:set`.
+
+When using distributed polling, this value can be changed locally by setting `$config['default_poller_group']` in config.php or globally by using `lnms config:set`.

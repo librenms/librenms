@@ -1,3 +1,107 @@
+## 21.6.0
+*(2021-06-17)*
+
+A big thank you to the following 23 contributors this last month:
+
+  - [mpikzink](https://github.com/mpikzink) (9)
+  - [murrant](https://github.com/murrant) (6)
+  - [PipoCanaja](https://github.com/PipoCanaja) (5)
+  - [dust241999](https://github.com/dust241999) (3)
+  - [mathieu-artic](https://github.com/mathieu-artic) (2)
+  - [paulierco](https://github.com/paulierco) (2)
+  - [paddy01](https://github.com/paddy01) (2)
+  - [andrzejmaczka](https://github.com/andrzejmaczka) (2)
+  - [zombah](https://github.com/zombah) (1)
+  - [BennyE](https://github.com/BennyE) (1)
+  - [Sea-n](https://github.com/Sea-n) (1)
+  - [jbronn](https://github.com/jbronn) (1)
+  - [d-k-7](https://github.com/d-k-7) (1)
+  - [systemcrash](https://github.com/systemcrash) (1)
+  - [loopodoopo](https://github.com/loopodoopo) (1)
+  - [maesbrisa](https://github.com/maesbrisa) (1)
+  - [thomseddon](https://github.com/thomseddon) (1)
+  - [cliffalbert](https://github.com/cliffalbert) (1)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+  - [wolfraider](https://github.com/wolfraider) (1)
+  - [rpardim](https://github.com/rpardim) (1)
+  - [geg347](https://github.com/geg347) (1)
+  - [ottorei](https://github.com/ottorei) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (31)
+  - [PipoCanaja](https://github.com/PipoCanaja) (15)
+  - [murrant](https://github.com/murrant) (10)
+  - [tayyabali785](https://github.com/tayyabali785) (1)
+
+#### Feature
+* New module add juniper rpm support + reimplementation of cisco-sla module ([#12799](https://github.com/librenms/librenms/pull/12799)) - [geg347](https://github.com/geg347)
+* ISIS-adjacency polling support ([#12461](https://github.com/librenms/librenms/pull/12461)) - [ottorei](https://github.com/ottorei)
+
+#### Device
+* Add Serialnumber for some Dell ForceTen devices ([#12960](https://github.com/librenms/librenms/pull/12960)) - [mpikzink](https://github.com/mpikzink)
+* 2 more Rittal variants ([#12953](https://github.com/librenms/librenms/pull/12953)) - [mpikzink](https://github.com/mpikzink)
+* Added New-OS: Alcatel-Lucent Enterprise Stellar Wireless ([#12952](https://github.com/librenms/librenms/pull/12952)) - [BennyE](https://github.com/BennyE)
+* Add SDSL Support for OneAccess routers ([#12948](https://github.com/librenms/librenms/pull/12948)) - [mathieu-artic](https://github.com/mathieu-artic)
+* Improve TP-Link JetStream Discovery ([#12946](https://github.com/librenms/librenms/pull/12946)) - [jbronn](https://github.com/jbronn)
+* Alcatel-Lucent aos6 and aos7 fdb fix ([#12945](https://github.com/librenms/librenms/pull/12945)) - [paulierco](https://github.com/paulierco)
+* Janitza UMG96 ([#12944](https://github.com/librenms/librenms/pull/12944)) - [mpikzink](https://github.com/mpikzink)
+* Imporoved raritan pdu support ([#12937](https://github.com/librenms/librenms/pull/12937)) - [d-k-7](https://github.com/d-k-7)
+* Alcatel-Lucent Aos7 sensors nobulk ([#12935](https://github.com/librenms/librenms/pull/12935)) - [paulierco](https://github.com/paulierco)
+* Add Epson Projector as new OS ([#12928](https://github.com/librenms/librenms/pull/12928)) - [mpikzink](https://github.com/mpikzink)
+* Add Barco Clickshare ([#12927](https://github.com/librenms/librenms/pull/12927)) - [mpikzink](https://github.com/mpikzink)
+* Fix nokia(TiMOS) memory ([#12925](https://github.com/librenms/librenms/pull/12925)) - [paddy01](https://github.com/paddy01)
+* Device - Vertiv-PDU - Issue 11608 ([#12923](https://github.com/librenms/librenms/pull/12923)) - [dust241999](https://github.com/dust241999)
+* Adding basic support for Vertiv PDUs and power graphs ([#12908](https://github.com/librenms/librenms/pull/12908)) - [dust241999](https://github.com/dust241999)
+* Ciena 6500 ([#12903](https://github.com/librenms/librenms/pull/12903)) - [loopodoopo](https://github.com/loopodoopo)
+* Added support for PowerWalker VFI ([#12891](https://github.com/librenms/librenms/pull/12891)) - [andrzejmaczka](https://github.com/andrzejmaczka)
+* Initial HAProxy ALOHA support ([#12889](https://github.com/librenms/librenms/pull/12889)) - [Jellyfrog](https://github.com/Jellyfrog)
+* HWG WaterLeak sensor support ([#12865](https://github.com/librenms/librenms/pull/12865)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added definition for Riello 204 ([#12861](https://github.com/librenms/librenms/pull/12861)) - [wolfraider](https://github.com/wolfraider)
+* Add support for oneaccess router ([#12850](https://github.com/librenms/librenms/pull/12850)) - [mathieu-artic](https://github.com/mathieu-artic)
+* Gaia VPN IPSEC discovery ([#12823](https://github.com/librenms/librenms/pull/12823)) - [rpardim](https://github.com/rpardim)
+
+#### Webui
+* Human readable database inconsistent error ([#12950](https://github.com/librenms/librenms/pull/12950)) - [murrant](https://github.com/murrant)
+* Add TopErrors widget based on ifError_rate ([#12926](https://github.com/librenms/librenms/pull/12926)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix "Sub-directory Support" in small steps ([#12911](https://github.com/librenms/librenms/pull/12911)) - [mpikzink](https://github.com/mpikzink)
+* Fix "Sub-directory Support" in small steps ([#12910](https://github.com/librenms/librenms/pull/12910)) - [mpikzink](https://github.com/mpikzink)
+* Fix "Sub-directory Support" in small steps ([#12905](https://github.com/librenms/librenms/pull/12905)) - [mpikzink](https://github.com/mpikzink)
+* FIX Alert rules: Import from Alert Rule ([#12897](https://github.com/librenms/librenms/pull/12897)) - [andrzejmaczka](https://github.com/andrzejmaczka)
+* Fix port down alert toggle ([#12884](https://github.com/librenms/librenms/pull/12884)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* Add number sign to special character handling in ActiveDirectoryAuthorizer ([#12943](https://github.com/librenms/librenms/pull/12943)) - [paddy01](https://github.com/paddy01)
+
+#### Applications
+* Fix type error ([#12899](https://github.com/librenms/librenms/pull/12899)) - [murrant](https://github.com/murrant)
+
+#### Api
+* Add api call to list OSPF ports ([#12955](https://github.com/librenms/librenms/pull/12955)) - [zombah](https://github.com/zombah)
+
+#### Alerting
+* Add Signal CLI transport support ([#12954](https://github.com/librenms/librenms/pull/12954)) - [mpikzink](https://github.com/mpikzink)
+* Update device_component_down_junos macro ([#12898](https://github.com/librenms/librenms/pull/12898)) - [thomseddon](https://github.com/thomseddon)
+
+#### Discovery
+* LLDP - ifAlias should be last checked in function find_port_id ([#12904](https://github.com/librenms/librenms/pull/12904)) - [PipoCanaja](https://github.com/PipoCanaja)
+* LLDP - Extend discovery lldp code to support different subtypes ([#12901](https://github.com/librenms/librenms/pull/12901)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Polling
+* Nobulk setting in sensors yaml ([#12833](https://github.com/librenms/librenms/pull/12833)) - [murrant](https://github.com/murrant)
+
+#### Rancid
+* Support for fortiswitch in gen_rancid ([#12894](https://github.com/librenms/librenms/pull/12894)) - [cliffalbert](https://github.com/cliffalbert)
+
+#### Refactor
+* Filter unwanted data in Routes Ajax reply ([#12847](https://github.com/librenms/librenms/pull/12847)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Improve Markdown syntax in Document ([#12949](https://github.com/librenms/librenms/pull/12949)) - [Sea-n](https://github.com/Sea-n)
+* Add info about lnms config:set at top of Configuration page ([#12939](https://github.com/librenms/librenms/pull/12939)) - [murrant](https://github.com/murrant)
+* Update docs ([#12919](https://github.com/librenms/librenms/pull/12919)) - [systemcrash](https://github.com/systemcrash)
+
+
 ## 21.5.0
 *(2021-05-17)*
 

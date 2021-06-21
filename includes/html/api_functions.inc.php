@@ -16,6 +16,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\OspfPort;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
@@ -647,6 +648,17 @@ function list_ospf(Illuminate\Http\Request $request)
     }
 
     return api_success($ospf_neighbours, 'ospf_neighbours');
+}
+
+function list_ospf_ports(Illuminate\Http\Request $request)
+{
+    $ospf_ports = OspfPort::hasAccess(Auth::user())
+        ->get();
+    if ($ospf_ports->isEmpty()) {
+        return api_error(404, 'Ospf ports do not exist');
+    }
+
+    return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
 function get_graph_by_portgroup(Illuminate\Http\Request $request)

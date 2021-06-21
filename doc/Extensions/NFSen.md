@@ -10,12 +10,12 @@ path: blob/master/doc/
 The following is the configuration that can be used:
 
 ```php
-$config['nfsen_enable'] = 1;
-$config['nfsen_split_char']   = '_';
-$config['nfsen_rrds'][]   = '/var/nfsen/profiles-stat/live/';
-$config['nfsen_rrds'][] = '/var/nfsen/profiles-stat';
-$config['nfsen_base'][] = '/var/nfsen/';
-$config['nfsen_suffix']   = "_yourdomain_com";
+$config['nfsen_enable']      = 1;
+$config['nfsen_split_char']  = '_';
+$config['nfsen_rrds'][]      = '/var/nfsen/profiles-stat/live/';
+$config['nfsen_rrds'][]      = '/var/nfsen/profiles-stat';
+$config['nfsen_base'][]      = '/var/nfsen/';
+$config['nfsen_suffix']      = "_yourdomain_com";
 ```
 
 Set `$config['nfsen_enable'] = 1;` to enable NFSen support.
@@ -78,9 +78,9 @@ the same name.
 
 Below are the default settings used with nfdump for stats.
 
-For more defaulted information on that, please see nfdump(1). 
+For more defaulted information on that, please see nfdump(1).  
 The default location for nfdump is `/usr/bin/nfdump`. If nfdump
-is located elsewhere, set it with 
+is located elsewhere, set it with
 `$config['nfdump'] = '/usr/local/bin/nfdump';` for example.
 
 
@@ -143,7 +143,7 @@ $config['nfsen_stat_default']='srcip';
 The above sets default stat type to use from the drop down.
 
 ```
-record  Flow Records
+record   Flow Records
 ip       Any IP Address
 srcip    SRC IP Address
 dstip    DST IP Address

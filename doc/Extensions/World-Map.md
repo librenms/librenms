@@ -77,21 +77,21 @@ $config['leaflet']['group_radius']                      = 1;
 # Geocode engine config
 
 ```php
-$config['geoloc']['engine'] = "google";// Valid options are google, mapquest or bing
+$config['geoloc']['engine']  = "google"; // Valid options are google, mapquest or bing
 $config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
 ```
 
-Google:
-Pros: fast, accurate
+Google:  
+Pros: fast, accurate  
 Cons: requires a credit card even for a free account
 
-MapQuest:
-Pros: free, no credit card required
+MapQuest:  
+Pros: free, no credit card required  
 Cons: inaccurate: most addresses are returned as locations at the center of the US
 
-Bing:
-Pros: free, no credit card required, accurate
-Cons: Microsoft(debatable)
+Bing:  
+Pros: free, no credit card required, accurate  
+Cons: Microsoft (debatable)
 
 # Jquery-Mapael config
 
@@ -100,11 +100,11 @@ world, set default coordinates of where the map will zoom and the zoom
 level by default. An example of this is:
 
 ```php
-$config['map']['engine']                                = "jquery-mapael";
-$config['mapael']['default_map'] = 'mapael-maps/united_kingdom/united_kingdom.js';
-$config['mapael']['map_width'] = 400;
-$config['mapael']['default_lat'] = '50.898482';
-$config['mapael']['default_lng'] = '-3.401402';
+$config['map']['engine']          = "jquery-mapael";
+$config['mapael']['default_map']  = 'mapael-maps/united_kingdom/united_kingdom.js';
+$config['mapael']['map_width']    = 400;
+$config['mapael']['default_lat']  = '50.898482';
+$config['mapael']['default_lng']  = '-3.401402';
 $config['mapael']['default_zoom'] = 20;
 ```
 

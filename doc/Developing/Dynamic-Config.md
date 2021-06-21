@@ -16,7 +16,7 @@ If the user is overriding the option in config.php it would use the format `$con
 
 ## Translation
 
-The config definition system inherently supports translation. You must add the English names in the 
+The config definition system inherently supports translation. You must add the English names in the
 `resoures/lang/en/settings.php` file (and other languages if you can).
 
 To update the javascript translation files, run:

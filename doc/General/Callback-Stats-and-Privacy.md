@@ -9,7 +9,7 @@ it calls back home to report some anonymous statistics.
 Let's start off by saying, all of the code that processes the data and
 submits it is included in the standard LibreNMS branch you've
 installed, the code that accepts this data and in turn generates some
-pretty graphs is all open source and available on Git Hub. Please feel
+pretty graphs is all open source and available on GitHub. Please feel
 free to review the code, comment on it and suggest changes /
 improvements. Also, don't forget - by default installations DO NOT
 call back home, you need to opt into this.
