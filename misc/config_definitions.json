@@ -384,7 +384,11 @@
             "group": "auth",
             "section": "ad",
             "order": 4,
-            "type": "ldap-groups"
+            "type": "ldap-groups",
+            "validate": {
+                "value": "array",
+                "value.*": "array"
+            }
         },
         "auth_ad_user_filter": {
             "default": "(objectclass=user)",
@@ -508,7 +512,11 @@
             "group": "auth",
             "section": "ldap",
             "order": 4,
-            "type": "ldap-groups"
+            "type": "ldap-groups",
+            "validate": {
+                "value": "array",
+                "value.*": "array"
+            }
         },
         "auth_ldap_port": {
             "default": 389,
