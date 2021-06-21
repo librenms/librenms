@@ -1,0 +1,21 @@
+os: hwg-wld
+text: 'HWg WLD'
+type: environment
+icon: hwg
+mib_dir: hwg
+over:
+    - { graph: device_state, text: States }
+nobulk: true
+poller_modules:
+    stp: false
+    ucd-mib: false
+    ports: false
+discovery_modules:
+    stp: false
+    ports: false
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.21796.4.1
+        sysDescr:
+            - 'HWg-WLD'

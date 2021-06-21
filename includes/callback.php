@@ -55,6 +55,7 @@ if ($enabled == 1) {
         'processors'      => 'SELECT COUNT(*) AS `total`,`processor_type` FROM `processors` GROUP BY `processor_type`',
         'pseudowires'     => 'SELECT COUNT(*) AS `total` FROM `pseudowires`',
         'sensors'         => 'SELECT COUNT(*) AS `total`,`sensor_class` FROM `sensors` GROUP BY `sensor_class`',
+        'sla'             => 'SELECT COUNT(*) AS `total`,`rtt_type` FROM `slas` GROUP BY `rtt_type`',
         'wireless'        => 'SELECT COUNT(*) AS `total`,`sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`',
         'storage'         => 'SELECT COUNT(*) AS `total`,`storage_type` FROM `storage` GROUP BY `storage_type`',
         'toner'           => 'SELECT COUNT(*) AS `total`,`supply_type` FROM `printer_supplies` GROUP BY `supply_type`',

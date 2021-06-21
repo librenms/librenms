@@ -160,6 +160,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('syslog', 'SyslogController');
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
+            Route::post('top-errors', 'TopErrorsController');
             Route::post('worldmap', 'WorldMapController');
             Route::post('alertlog-stats', 'AlertlogStatsController');
         });

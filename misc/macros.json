@@ -6,7 +6,7 @@
     "component_normal": "(%component.status = 0 && %macros.component)",
     "component_warning": "(%component.status = 1 && %macros.component)",
     "device": "(%devices.disabled = 0 && %devices.ignore = 0)",
-    "device_component_down_junos": "%sensors.sensor_class = \"state\" && %sensors.sensor_current != \"6\" && %sensors.sensor_type = \"jnxFruState\" && %sensors.sensor_current != \"2\" && %sensors.sensor_alert = \"1\"",
+    "device_component_down_junos": "%sensors.sensor_class = \"state\" && %sensors.sensor_current != \"6\" && (%sensors.sensor_type = \"jnxFruState\" || %sensors.sensor_type = \"jnxFruTable\") && %sensors.sensor_current != \"2\" && %sensors.sensor_alert = \"1\"",
     "device_component_down_cisco": "%sensors.sensor_current != \"1\" && %sensors.sensor_current != \"5\" && %sensors.sensor_type REGEXP \"^cisco.*State$\" && %sensors.sensor_alert = \"1\"",
     "device_up": "(%devices.status = 1 && %macros.device)",
     "device_down": "(%devices.status = 0 && %macros.device)",

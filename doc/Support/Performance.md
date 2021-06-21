@@ -141,7 +141,7 @@ quick. However for devices with a lot of ports and good % of those are
 either deleted or disabled then this approach isn't optimal. So to
 counter this you can enable 'selected port polling' per device within
 the edit device -> misc section or by globally enabling it (**not
-recommended**): `$config['polling']['selected_ports'] = true;`. 
+recommended**): `$config['polling']['selected_ports'] = true;`.  
 This is truly not recommended, as it has been proven to affect cpu
 usage of your poller negatively. You can also set it for a specific OS:
 `$config['os']['ios']['polling']['selected_ports'] = true;`.
@@ -158,10 +158,10 @@ is run. There are a number of options:
 -e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change
 ```
 If you want to run this script to have it set selected port polling
-on devices where a change of **10% or more is evaluated**, run it with 
-`./scripts/collect-port-polling.php -e 10`. But note: it will not 
+on devices where a change of **10% or more is evaluated**, run it with
+`./scripts/collect-port-polling.php -e 10`. But note: it will not
 blindly use only the 10%. There is a second condition that the change
-has to be more than one second in polling time. 
+has to be more than one second in polling time.
 
 ## Web interface
 
@@ -177,7 +177,7 @@ For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost conf
 
 ## PHP-opcache
 
-A lot of performance can be gained from setting up `php-opcache` correctly. 
+A lot of performance can be gained from setting up `php-opcache` correctly.
 
 **Note: Memory based caching with PHP cli will increase memory usage and slow things down. File based caching is not as fast as memory based and is more likely to have stale cache issues.**
 
@@ -185,7 +185,7 @@ Some distributions allow separate cli, mod_php and php-fpm configurations, we ca
 
 ### For web servers using mod_php and php-fpm
 
-Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache
@@ -200,7 +200,7 @@ If you are having caching issues, you can clear the opcache by simply restarting
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache.so
@@ -212,6 +212,6 @@ opcache.file_cache_consistency_checks=1
 opcache.memory_consumption=256
 ```
 
-If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`. 
+If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`.
 
 

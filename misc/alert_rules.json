@@ -25,6 +25,10 @@
     "extra": "{\"count\": 1}"
   },
   {
+    "builder": {"condition":"AND","rules":[{"id":"isis_adjacencies.isisISAdjState","field":"isis_adjacencies.isisISAdjState","type":"string","input":"text","operator":"equal","value":"down"},{"condition":"AND","rules":[{"id":"component.type","field":"component.type","type":"string","input":"text","operator":"equal","value":"ISIS"},{"condition":"AND","rules":[{"id":"component.ignore","field":"component.ignore","type":"string","input":"text","operator":"equal","value":"0"},{"id":"component.disabled","field":"component.disabled","type":"string","input":"text","operator":"equal","value":"0"}]}]},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "ISIS Adjacency down"
+  },
+  {
     "rule": "bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && bgpPeers.bgpPeerState = \"established\" && macros.device_up = \"1\"",
     "name": "BGP Session established",
     "extra": "{\"count\": 1}"

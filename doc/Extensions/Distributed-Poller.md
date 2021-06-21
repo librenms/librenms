@@ -9,10 +9,10 @@ A normal install contains all parts of LibreNMS:
 - RRD (Time series data store) *
 - Database *
 - Webserver (Web UI/API) *
- 
+
 \* may only be installed on one server (however, some can be clustered)
 
-Distributed Polling allows the workers to be spread across additional 
+Distributed Polling allows the workers to be spread across additional
 servers for horizontal scaling. Distributed polling is not intended for
 remote polling.
 
@@ -23,7 +23,7 @@ All pollers need to write to the same set of RRD files, preferably via
 RRDcached.
 
 It is also a requirement that at least one locking service is in place
-to which all pollers can connect. There are currently three locking 
+to which all pollers can connect. There are currently three locking
 mechanisms available
 
 - memcached
@@ -67,7 +67,7 @@ time.
 
 ## Using REDIS
 
-In your `.env` file you will need to specify a redis server, port and 
+In your `.env` file you will need to specify a redis server, port and
 the driver.
 
 ```
@@ -85,7 +85,7 @@ memcached host and port, and then in your `.env` file you will need to add:
 CACHE_DRIVER=memcached
 ```
 If you want to use memcached, you will also need to install an additional
-Python 3 python-memcached package. 
+Python 3 python-memcached package.
 
 ## Example Setup
 
@@ -180,7 +180,7 @@ Depending on your setup will depend on how you configure your discovery processe
 
 **Cron based polling**
 
-It's not necessary to run discovery services on all pollers. In fact, you should 
+It's not necessary to run discovery services on all pollers. In fact, you should
 only run one discovery process per poller group.
 Designate a single poller to run discovery (or a separate server if required).
 

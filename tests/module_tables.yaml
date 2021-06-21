@@ -69,6 +69,9 @@ ospf:
         excluded_fields: [id, device_id]
     ospf_nbrs:
         excluded_fields: [id, device_id]
+isis:
+    isis_adjacencies:
+        excluded_fields: [id, device_id, port_id]
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
@@ -113,6 +116,10 @@ sensors:
             - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
         order_by: state_indexes.state_name, state_translations.state_value
         custom_where: ''
+slas:
+    slas:
+        excluded_fields: [device_id, sla_id]
+        order_by: sla_nr
 storage:
     storage:
         excluded_fields: [device_id, storage_id]

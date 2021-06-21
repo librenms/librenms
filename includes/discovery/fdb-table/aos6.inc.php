@@ -30,7 +30,12 @@ if (empty($fdbPort_table)) { // no empty if come from aos7 script
         $fdbPort_table = [];
         foreach ($dot1d['slMacAddressDisposition'] as $portLocal => $data) {
             foreach ($data as $vlanLocal => $data2) {
-                $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => array_combine(array_keys($data2), array_fill(0, count($data2), $portLocal))];
+                if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
+                    $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
+                }
+                foreach ($data2 as $macLocal => $one) {
+                    $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
+                }
             }
         }
     }

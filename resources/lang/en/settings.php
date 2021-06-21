@@ -499,6 +499,9 @@ return [
             'ipv6-addresses' => [
                 'description' => 'IPv6 Addresses',
             ],
+            'isis' => [
+                'description' => 'ISIS',
+            ],
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
             ],
@@ -1052,6 +1055,9 @@ return [
             ],
             'ospf' => [
                 'description' => 'OSPF',
+            ],
+            'isis' => [
+                'description' => 'ISIS',
             ],
             'cisco-ipsec-flow-monitor' => [
                 'description' => 'Cisco IPSec flow Monitor',
