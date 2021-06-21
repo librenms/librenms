@@ -2589,18 +2589,18 @@ function del_service_from_host(Illuminate\Http\Request $request)
 
 function search_by_mac(Illuminate\Http\Request $request)
 {
-    $search = $request->route('search');
-    $portlist = PortsFdb::select('port_id')
-            ->where('mac_address', $search)
-            ->groupBy('port_id')
-            ->get();
-    $portId = PortsFdb::select('port_id')
-              ->whereIn('port_id', $portlist)
-              ->groupBy('port_id')
-              ->orderByRaw('count(port_id)')
-              ->limit(1)
-              ->first();
-    $port = Port::findOrFail($portId);
+    $macAddress = $request->route('search');
+
+    $port = PortsFdb::whereIn('port_id', function ($fdbList) use ($macAddress) {
+        $fdbList->from('ports_fdb')
+          ->where('mac_address', $macAddress)
+          ->select('port_id');
+    })
+        ->groupBy('port_id')
+        ->orderByRaw('count(port_id)')
+        ->select('port_id')
+        ->first()
+        ->port;
 
     return api_success($port, 'ports');
 }
