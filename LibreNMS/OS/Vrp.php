@@ -508,13 +508,11 @@ class Vrp extends OS implements
             ]));
         }
 
-
         return $slas;
     }
 
     public function pollSlas($slas)
     {
-
         $device = $this->getDeviceArray();
 
         // Go get some data from the device.
