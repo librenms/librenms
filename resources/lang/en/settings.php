@@ -940,6 +940,10 @@ return [
             'default_group' => [
                 'description' => 'Set the default group returned',
             ],
+            'ignore_groups' => [
+                'description' => 'Do not backup these groups',
+                'help' => 'Groups excluded from being sent to Oxidized',
+            ],
             'enabled' => [
                 'description' => 'Enable Oxidized support',
             ],
