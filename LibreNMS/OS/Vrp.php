@@ -520,8 +520,8 @@ class Vrp extends OS implements
         $data = snmpwalk_group($device, 'pingResultsProbeResponses', 'DISMAN-PING-MIB', 2, $data);
         $data = snmpwalk_group($device, 'pingResultsSentProbes', 'DISMAN-PING-MIB', 2, $data);
         //$data = snmpwalk_group($device, 'nqaScheduleLastFinishIndex', 'NQA-MIB', 2, $data);
-        $data = snmpwalk_group($device, 'pingResultsMinRtt', 'DISMAN-PING-MIB', 2, $data);
-        $data = snmpwalk_group($device, 'pingResultsMaxRtt', 'DISMAN-PING-MIB', 2, $data);
+        //$data = snmpwalk_group($device, 'pingResultsMinRtt', 'DISMAN-PING-MIB', 2, $data);
+        //$data = snmpwalk_group($device, 'pingResultsMaxRtt', 'DISMAN-PING-MIB', 2, $data);
         $data = snmpwalk_group($device, 'pingResultsAverageRtt', 'DISMAN-PING-MIB', 2, $data);
 
         // Get the needed information
@@ -553,15 +553,15 @@ class Vrp extends OS implements
             switch ($rtt_type) {
                 case 'icmpAppl':
                     $icmp = [
-                        'MinRtt' => $data[$owner][$test]['pingResultsMinRtt'] / $divisor,
-                        'MaxRtt' => $data[$owner][$test]['pingResultsMaxRtt'] / $divisor,
+                        //'MinRtt' => $data[$owner][$test]['pingResultsMinRtt'] / $divisor,
+                        //'MaxRtt' => $data[$owner][$test]['pingResultsMaxRtt'] / $divisor,
                         'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'],
                         'ProbeLoss' => (int) $data[$owner][$test]['pingResultsSentProbes'] - (int) $data[$owner][$test]['pingResultsProbeResponses'],
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
-                        ->addDataset('MinRtt', 'GAUGE', 0, 300000)
-                        ->addDataset('MaxRtt', 'GAUGE', 0, 300000)
+                        //->addDataset('MinRtt', 'GAUGE', 0, 300000)
+                        //->addDataset('MaxRtt', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
