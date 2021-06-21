@@ -480,7 +480,8 @@ class Vrp extends OS implements
         return $sensors;
     }
 
-    public function discoverSlas() {
+    public function discoverSlas()
+    {
         $slas = collect();
         // Get the index of the last finished test
         // NQA-MIB::nqaScheduleLastFinishIndex
@@ -492,9 +493,6 @@ class Vrp extends OS implements
             $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'nqaAdminParaTimeUnit', $sla_table, 'NQA-MIB');
             $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'nqaScheduleLastFinishIndex', $sla_table, 'NQA-MIB');
         }
-
-        d_echo($sla_table);
-//        die();
 
         foreach ($sla_table as $sla_key => $sla_config) {
             [$owner, $test] = explode('.', $sla_key, 2);
@@ -514,7 +512,8 @@ class Vrp extends OS implements
         return $slas;
     }
 
-    public function pollSlas($slas) {
+    public function pollSlas($slas)
+    {
 
         $device = $this->getDeviceArray();
 
