@@ -941,8 +941,8 @@ return [
                 'description' => 'Set the default group returned',
             ],
             'ignore_groups' => [
-                'description' => 'Do not backup these groups',
-                'help' => 'Groups excluded from being sent to Oxidized',
+                'description' => 'Do not backup these oxidezed groups',
+                'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
             ],
             'enabled' => [
                 'description' => 'Enable Oxidized support',
