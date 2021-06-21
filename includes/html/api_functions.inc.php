@@ -33,6 +33,7 @@ use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\Rewrite;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
@@ -2601,19 +2602,14 @@ function del_service_from_host(Illuminate\Http\Request $request)
 
 function search_by_mac(Illuminate\Http\Request $request)
 {
-    $macAddress = $request->route('search');
+    $macAddress = Rewrite::normalizeMac($request->route('search'));
 
-    $port = PortsFdb::whereIn('port_id', function ($fdbList) use ($macAddress) {
-        $fdbList->from('ports_fdb')
-          ->where('mac_address', $macAddress)
-          ->select('port_id');
+    $port = Port::whereHas('fdbEntries', function($fdbDownlink) use ($macAddress) {
+	$fdbDownlink->where('mac_address', $macAddress);
     })
-        ->groupBy('port_id')
-        ->orderByRaw('count(port_id)')
-        ->select('port_id')
-        ->first()
-        ->port;
-
+		->withCount('fdbEntries')
+		->orderBy('fdb_entries_count')
+		->first();
     return api_success($port, 'ports');
 }
 function edit_service_for_host(Illuminate\Http\Request $request)
