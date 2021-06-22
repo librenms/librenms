@@ -43,7 +43,7 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0';
         $processor = snmp_get($this->getDeviceArray(), $oid, '-OQv');
 
-	return [
+        return [
             Processor::discover(
                 'scalance-cpu',
                 $this->getDeviceId(),
