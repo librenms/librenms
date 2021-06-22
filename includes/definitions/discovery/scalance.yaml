@@ -4,19 +4,35 @@ modules:
         sysDescr_regex: '/SCALANCE (?<hardware>[^,]+), (?<features>[^,]+)/'
         serial: '.1.3.6.1.4.1.4329.6.3.2.1.1.3.0'
         version: '.1.3.6.1.4.1.4329.6.3.2.1.1.5.0'
-    processors:
-        data:
-            -
-                oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue
-                num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0'
-                index: 0
-                snmp_flags: ['-OaeQUs', '-Pu'] # display name HEX as ASCII
-    mempools:
-        data:
-            -
-                percent_used: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue
-                #warn_percent: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageHighWarning
-                index: 1
+#    processors:
+#        data:
+#            -
+#                # snMspsDiagnosticsUsageTable contains multiple disaparate items with no formal type identifiers, specific OIDs used
+#                oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue.0
+#                num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0'
+#                snmp_flags: ['-OaeQUs', '-Pu'] # display name HEX as ASCII
+#    mempools:
+#        pre-cache:
+#            data:
+#                -
+#                    oid:
+#                        - SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageName 
+#        data:
+#            -
+#
+#            #oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.1'
+#                percent_used: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue
+#                warn_percent: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageHighWarning
+#                #index: 1
+#                skip_values:
+#                    -
+#                        oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageName
+#                        op: 'regex'
+#                        value: '/CPU/'
+#                        #-
+#                        #oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue.0
+#                        #op: 'exists'
+#                        #value: true
     sensors:
         pre-cache:
             data:
