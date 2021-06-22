@@ -222,8 +222,9 @@ class Routeros extends OS implements
         if (is_null($this->data)) {
             $wl60 = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GTable', [], 'MIKROTIK-MIB');
             $wlap = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWlApTable', [], 'MIKROTIK-MIB');
+            $wllte = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrLTEModemTable', [], 'MIKROTIK-MIB');
             $wl60sta = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GStaTable', [], 'MIKROTIK-MIB');
-            $this->data = $wl60 + $wlap;
+            $this->data = $wl60 + $wlap + $wllte;
             $this->data = $this->data + $wl60sta;
         }
 
@@ -266,6 +267,18 @@ class Routeros extends OS implements
                     'SSID: ' . $entry['mtxrWlApSsid'],
                     $entry[$oid]
                 );
+            } elseif (($entry['mtxrLTEModemInterfaceIndex'] !== null)) {
+                $intname = snmp_get($this->getDeviceArray(),
+                    'mtxrInterfaceStatsName.' . $index, '-OQv', 'MIKROTIK-MIB');
+                $sensors[] = new WirelessSensor(
+                    $type,
+                    $this->getDeviceId(),
+                    $num_oid_base . $index,
+                    'mikrotik',
+                    $index,
+                    $intname,
+                    $entry[$oid]
+                );
             } else {
                 $sensors[] = new WirelessSensor(
                     $type,
@@ -282,55 +295,82 @@ class Routeros extends OS implements
         return $sensors;
     }
 
+    /**
+     * Discover LTE RSRQ.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessRsrq()
     {
-        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.3.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRQ
-
-        return [
-            new WirelessSensor(
+        $data = $this->fetchData();
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $intname = snmp_get($this->getDeviceArray(),
+                'mtxrInterfaceStatsName.' . $index, '-OQv', 'MIKROTIK-MIB');
+            $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
-                $sinr,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.3.' . $index,
                 'routeros',
-                0,
-                'Signal RSRQ',
+                $index,
+                $intname . ': Signal RSRQ',
                 null
-            ),
-        ];
+            ); // mtxrLTEModemSignalRSRQ
+        }
+        return $sensors;
     }
 
+    /**
+     * Discover LTE RSRP.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessRsrp()
     {
-        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.4.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRP
-
-        return [
-            new WirelessSensor(
+        $data = $this->fetchData();
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $intname = snmp_get($this->getDeviceArray(),
+                'mtxrInterfaceStatsName.' . $index, '-OQv', 'MIKROTIK-MIB');
+            $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
-                $sinr,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.4.' . $index,
                 'routeros',
-                0,
-                'Signal RSRP',
+                $index,
+                $intname . ': Signal RSRP',
                 null
-            ),
-        ];
+            ); // mtxrLTEModemSignalRSRP
+        }
+        return $sensors;
     }
 
+    /**
+     * Discover LTE SINR.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessSinr()
     {
-        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.7.1'; //MIKROTIK-MIB::mtxrLTEModemSignalSINR
-
-        return [
-            new WirelessSensor(
+        $data = $this->fetchData();
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $intname = snmp_get($this->getDeviceArray(),
+                'mtxrInterfaceStatsName.' . $index, '-OQv', 'MIKROTIK-MIB');
+            $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
-                $sinr,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.7.' . $index,
                 'routeros',
-                0,
-                'Signal SINR',
+                $index,
+                $intname . ': Signal SINR',
                 null
-            ),
-        ];
+            ); // mtxrLTEModemSignalSINR
+        }
+        return $sensors;
     }
 
     public function pollOS()
