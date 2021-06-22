@@ -42,7 +42,8 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
     {
         $oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0';
         $processor = snmp_get($this->getDeviceArray(), $oid, '-OQv');
-        return [
+
+	return [
             Processor::discover(
                 'scalance-cpu',
                 $this->getDeviceId(),
@@ -57,7 +58,7 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
     {
         $perc_oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.1';
         $warn_oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.16.1';
-        $mempool_data = snmp_get_multi_oid($this->getDeviceArray(), [$perc_oid, $warn_oid]); 
+        $mempool_data = snmp_get_multi_oid($this->getDeviceArray(), [$perc_oid, $warn_oid]);
 
         if ($mempool_data[$perc_oid] === false) {
             return collect();
