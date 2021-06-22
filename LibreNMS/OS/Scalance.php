@@ -24,7 +24,6 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use App\Models\Mempool;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -41,8 +40,9 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-	$oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0';
-	$processor = snmp_get($this->getDeviceArray(), $oid, '-OQv');
+        $oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0';
+        $processor = snmp_get($this->getDeviceArray(), $oid, '-OQv');
+
         return [
             Processor::discover(
                 'scalance-cpu',
@@ -56,11 +56,11 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
 
     public function discoverMempools()
     {
-    	$perc_oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.1';
-    	$warn_oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.16.1';
-        $mempool_data = snmp_get_multi_oid($this->getDeviceArray(), [$perc_oid, $warn_oid]); 
+        $perc_oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.1';
+        $warn_oid = '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.16.1';
+        $mempool_data = snmp_get_multi_oid($this->getDeviceArray(), [$perc_oid, $warn_oid]);
 
-	if ($mempool_data[$perc_oid] === false) {
+        if ($mempool_data[$perc_oid] === false) {
             return collect();
         }
 
@@ -69,9 +69,8 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
             'mempool_type' => 'scalance',
             'mempool_class' => 'system',
             'mempool_descr' => 'Memory',
-	    'mempool_perc_oid' => $perc_oid,
-	    'mempool_perc_warn' => $mempool_data[$warn_oid],
+            'mempool_perc_oid' => $perc_oid,
+            'mempool_perc_warn' => $mempool_data[$warn_oid],
         ]))->fillUsage(null, null, null, $mempool_data[$perc_oid]));
-        #]))->fillUsage(null, null, null, $memory));
     }
 }
