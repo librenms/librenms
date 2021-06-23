@@ -22,4 +22,3 @@ foreach ($aos6_fan_oids as $index => $data) {
         }
     }
 }
-
