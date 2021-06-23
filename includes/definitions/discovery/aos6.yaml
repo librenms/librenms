@@ -20,6 +20,7 @@ modules:
             data:
                 -
                     oid:
+                        - ifName
                         - entPhysicalName
                         - alclnkaggAggNumber
                         - alaStackMgrSlotNINumber
