@@ -95,7 +95,7 @@ var greenMarker = L.AwesomeMarkers.icon({
         $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
                 FROM `devices`
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
-                WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]')) 
+                WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
                 AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids)) .
                 ' AND `status` IN ' . dbGenPlaceholders(count($show_status)) .
