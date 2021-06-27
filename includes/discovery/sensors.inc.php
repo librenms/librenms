@@ -41,6 +41,10 @@ if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
 
+if ($device['os'] == 'jetstream') {
+    include 'includes/discovery/sensors/jetstream.inc.php';
+}
+
 if ($device['os_group'] == 'printer') {
     include 'includes/discovery/sensors/state/printer.inc.php';
 }
