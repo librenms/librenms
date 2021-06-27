@@ -1,4 +1,4 @@
-mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB:TPLINK-DDMSTATUS-MIB
+mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB:TPLINK-DDMSTATUS-MIB:TPLINK-POWER-OVER-ETHERNET-MIB
 modules:
     os:
         hardware: TPLINK-SYSINFO-MIB::tpSysInfoHwVersion.0
@@ -22,3 +22,29 @@ modules:
                 -
                     oid:
                         - ddmStatusEntry
+        power:
+            data:
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.0'
+                    value: tpSystemPowerConsumption
+                    descr: 'Power Consumption'
+                    divisor: 10
+                    index: tpSystemPowerConsumption
+                    group: PoE
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.0'
+                    value: tpSystemPowerRemain
+                    descr: 'Power Remaining'
+                    divisor: 10
+                    index: tpSystemPowerRemain
+                    group: PoE
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.0'
+                    value: tpSystemPowerLimit
+                    descr: 'Power Limit'
+                    divisor: 10
+                    index: tpSystemPowerLimit
+                    group: PoE
