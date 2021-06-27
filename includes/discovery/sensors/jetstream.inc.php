@@ -91,10 +91,10 @@ $tplink_ddm_sensors = [
     ],
 ];
 
-if (! empty($pre_cache['ddmStatusEntry'])){
-    foreach($tplink_ddm_sensors as $sensor_name => $sensor_info) {
+if (! empty($pre_cache['ddmStatusEntry'])) {
+    foreach ($tplink_ddm_sensors as $sensor_name => $sensor_info) {
         /* Query for sensor limits. */
-        if(isset($sensor_info['limits'])) {
+        if (isset($sensor_info['limits'])) {
             $sensor_limits = snmpwalk_cache_multi_oid(
                 $device,
                 $sensor_info['limits']['oid'],
@@ -112,7 +112,7 @@ if (! empty($pre_cache['ddmStatusEntry'])){
             if ($sensor_value != 'N/A') {
                 if ($sensor_info['class'] == 'state') {
                     /* Work around TP-Link's string 'True'/'False' booleans. */
-                    if ($sensor_value == 'True'){
+                    if ($sensor_value == 'True') {
                         $sensor_value = 1;
                     } elseif ($sensor_value == 'False') {
                         $sensor_value = 0;

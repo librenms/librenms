@@ -1,4 +1,5 @@
 <?php
+
 if ($device['os'] == 'jetstream') {
     if (in_array($sensor['sensor_type'], ['ddmStatusDataReady', 'ddmStatusLossSignal', 'ddmStatusTxFault'])) {
         if ($sensor_value == 'True') {
