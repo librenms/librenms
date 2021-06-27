@@ -2613,18 +2613,22 @@ function search_by_mac(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $port = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress) {
+    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress) {
         $fdbDownlink->where('mac_address', $macAddress);
     })
-        ->withCount('fdbEntries')
-        ->orderBy('fdb_entries_count')
-        ->get();
+         ->withCount('fdbEntries')
+         ->orderBy('fdb_entries_count')
+         ->get();
 
-    if ($port->count() == 0) {
+    if ($ports->count() == 0) {
         return api_error(404, 'mac not found');
     }
 
-    return api_success($port, 'ports');
+    if ($request->has('filter') && $request->get('filter') === 'first') {
+        return  api_success($ports->first(), 'ports');
+    }
+
+    return api_success($ports, 'ports');
 }
 function edit_service_for_host(Illuminate\Http\Request $request)
 {
