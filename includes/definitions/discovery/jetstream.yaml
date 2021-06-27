@@ -26,25 +26,25 @@ modules:
             data:
                 -
                     oid: tpPoeGlobal
-                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.0'
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.{{ $index }}'
                     value: tpSystemPowerConsumption
                     descr: 'Power Consumption'
                     divisor: 10
-                    index: tpSystemPowerConsumption
+                    index: 'tpSystemPowerConsumption.{{ $index }}'
                     group: PoE
                 -
                     oid: tpPoeGlobal
-                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.0'
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.{{ $index }}'
                     value: tpSystemPowerRemain
                     descr: 'Power Remaining'
                     divisor: 10
-                    index: tpSystemPowerRemain
+                    index: 'tpSystemPowerRemain.{{ $index }}'
                     group: PoE
                 -
                     oid: tpPoeGlobal
-                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.0'
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.{{ $index }}'
                     value: tpSystemPowerLimit
                     descr: 'Power Limit'
                     divisor: 10
-                    index: tpSystemPowerLimit
+                    index: 'tpSystemPowerLimit.{{ $index }}'
                     group: PoE
