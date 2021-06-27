@@ -1,4 +1,4 @@
-mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB:ALCATEL-IND1-LAG-MIB:ALCATEL-IND1-STACK-MANAGER-MIB
+mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB:ALCATEL-IND1-LAG-MIB
 modules:
     mempools:
         data:
@@ -20,6 +20,7 @@ modules:
             data:
                 -
                     oid:
+                        - ifName
                         - entPhysicalName
                         - alclnkaggAggNumber
                         - alaStackMgrSlotNINumber
