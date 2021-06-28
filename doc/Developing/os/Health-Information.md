@@ -85,9 +85,9 @@ For `data:` you have the following options:
 The only sensor we have defined here is airflow. The available options
 are as follows:
 
-- `oid` (required): This is the name of the table you want to do the snmp walk on.
+- `oid` (required): This is the name of the table you want to snmp walk for data.
 - `value` (optional): This is the key within the table that contains
-  the value. If not provided willuse `oid`
+  the value. If not provided will use `oid`
 - `num_oid` (required for PullRequests): If not provided, this parameter should be computed
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
@@ -142,7 +142,7 @@ case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
 When referencing an oid in another table the full index will be used to match the other table.
-If this is undesirable, you may use a single sub index by appending the sub index after a colon to 
+If this is undesirable, you may use a single sub index by appending the sub index after a colon to
 the variable name.  Example `{{ $ifName:2 }}`
 
 > `skip_values` can also compare items within the OID table against
@@ -214,7 +214,7 @@ the discovery code in php.
 The directory structure for sensor information is
 `includes/discovery/sensors/$class/$os.inc.php`. The format of all of
 the sensors follows the same code format which is to collect sensor information
-via SNMP and then call the `discover_sensor()` function; with the exception of state 
+via SNMP and then call the `discover_sensor()` function; with the exception of state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
 well. Sensor information is first collected by
@@ -324,7 +324,7 @@ line walks the cmEntityObject table to get information about the chassis and lin
 this information we extract the model type which will identify which tables in the CM-Facility-Mib
 the ports are populated in. The program then reads the appropriate table into the `$pre_cache`
 array `adva_fsp150_ports`. This array will have OID indexies for each port, which we will use
-later to identify our sensor OIDs. 
+later to identify our sensor OIDs.
 
 ```
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');

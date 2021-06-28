@@ -43,6 +43,7 @@ use App\Models\Processor;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
+use App\Models\Sla;
 use App\Models\Storage;
 use App\Models\Syslog;
 use App\Models\Vlan;
@@ -96,6 +97,7 @@ class AboutController extends Controller
             'stat_pw'         => Pseudowire::count(),
             'stat_sensors'    => Sensor::count(),
             'stat_services'   => Service::count(),
+            'stat_slas'       => Sla::count(),
             'stat_storage'    => Storage::count(),
             'stat_syslog'     => Syslog::count(),
             'stat_toner'      => PrinterSupply::count(),

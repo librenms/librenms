@@ -113,7 +113,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
-1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
+1. [Open Grid Scheduler](#open-grid-scheduler) - SNMP extend
 1. [Opensips](#opensips) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
@@ -126,7 +126,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [PowerMon](#powermon) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
-1. [Puppet Agent](#puppet_agent) - SNMP extend
+1. [Puppet Agent](#puppet-agent) - SNMP extend
 1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [Redis](#redis) - SNMP extend
@@ -374,6 +374,7 @@ via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/
 A small python3 script that checks age and remaining validity of certificates
 
 This script needs following packages on Debian/Ubuntu Systems:
+
 * python3
 * python3-openssl
 
@@ -495,7 +496,7 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh 
 4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
-extend docker /etc/snmp/docker-stats.sh 
+extend docker /etc/snmp/docker-stats.sh
 ```
 
 5: Restart snmpd on your host
@@ -951,7 +952,7 @@ Extend` heading top of page.
 
 To create your own custom munin scripts, please see this example:
 
-```
+```bash
 #!/bin/bash
 if [ "$1" = "config" ]; then
     echo 'graph_title Some title'
@@ -1008,6 +1009,10 @@ you may have to specify 127.0.0.1 instead of localhost. Localhost make
 a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
 IP connection to mysql.
 
+Note also if you get a mysql error `Uncaught TypeError: mysqli_num_rows(): Argument #1`,
+this is because you are using a newer mysql version which doesnt support `UNBLOCKING` for slave statuses,
+so you need to also include the line `$chk_options['slave'] = false;` into `mysql.cnf` to skip checking slave statuses
+
 ## Agent
 
 [Install the agent](Agent-Setup.md) on this device if it isn't already
@@ -1018,13 +1023,17 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
 ## SNMP extend
 
-1: Copy the mysql script to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/mysql `
+1: Copy the mysql script to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/mysql
+```
 
-2: Run `chmod +x /etc/snmp/mysql`
+2: Make the file executable
+```
+chmod +x /etc/snmp/mysql
+```
 
 3: Edit your snmpd.conf file and add:
-
 ```
 extend mysql /etc/snmp/mysql
 ```
@@ -1045,10 +1054,10 @@ configuration responsible for the localhost server:
 ```text
 location /nginx-status {
     stub_status on;
-    access_log   off;
+    access_log  off;
     allow 127.0.0.1;
     allow ::1;
-    deny all;
+    deny  all;
 }
 ```
 
@@ -1560,7 +1569,7 @@ script which method to use. The are several options to assist with testing, see
 
 ### Initial setup
 
-1. Download the python script onto the host: 
+1. Download the python script onto the host:
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/powermon-snmp.py -O /usr/local/bin/powermon-snmp.py
 ```
@@ -1858,6 +1867,33 @@ SNMP extend script to monitor your (remote) RRDCached via snmp
 extend rrdcached /etc/snmp/rrdcached
 ```
 
+# SDFS info
+
+A small shell script that exportfs SDFS volume info.
+
+## SNMP Extend
+
+1: Download the script onto the desired host (the host must be added
+   to LibreNMS devices)
+
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/sdfsinfo -O /etc/snmp/sdfsinfo
+```
+
+2: Make the script executable (chmod +x /etc/snmp/sdfsinfo)
+
+3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+```
+extend sdfsinfo /etc/snmp/sdfsinfo
+```
+
+4: Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 # Seafile
 
 SNMP extend script to monitor your Seafile Server
@@ -2020,7 +2056,7 @@ snmp_access deny all
 community, host, and port as above:
 
 ```
-proxy -v 2c -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
+proxy -v 2c -Cc -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
 ```
 
 For more advanced information on Squid and SNMP or setting up proxying
@@ -2100,7 +2136,7 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-# Option 2: Agent
+## Option 2: Agent
 
 [Install the agent](#agent-setup) on this device if it isn't already
 and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
@@ -2152,33 +2188,6 @@ using, you may need to do something like below.
 
 ```
 extend ups-apcups/usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/ups-apcups
-```
-
-4: Restart snmpd on your host
-
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
-
-# SDFS info
-
-A small shell script that exportfs SDFS volume info.
-
-## SNMP Extend
-
-1: Download the script onto the desired host (the host must be added
-   to LibreNMS devices)
-
-```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/sdfsinfo -O /etc/snmp/sdfsinfo
-```
-
-2: Make the script executable (chmod +x /etc/snmp/sdfsinfo)
-
-3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
-```
-extend sdfsinfo /etc/snmp/sdfsinfo
 ```
 
 4: Restart snmpd on your host

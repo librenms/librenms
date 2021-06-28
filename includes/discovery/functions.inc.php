@@ -152,7 +152,7 @@ function discover_device(&$device, $force_module = false)
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
         d_echo('Device' . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
-            isset($attribs['discover_' . $module]) ||
+            ! empty($attribs['discover_' . $module]) ||
             ($os_module_status && ! isset($attribs['discover_' . $module])) ||
             ($module_status && ! isset($os_module_status) && ! isset($attribs['discover_' . $module]))
         ) {
@@ -1352,11 +1352,6 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
             $params[] = $device_id;
             $params[] = $description;
             $params[] = $description;
-
-            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
-            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?';
-            $params[] = $device_id;
-            $params[] = $description;
         }
 
         if ($identifier) {
@@ -1368,6 +1363,13 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
             $params[] = $device_id;
             $params[] = $identifier;
             $params[] = $identifier;
+        }
+
+        if ($description) {
+            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
+            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?';
+            $params[] = $device_id;
+            $params[] = $description;
         }
     }
 

@@ -1,0 +1,180 @@
+TPLINK-SYSINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	TimeStamp          	 
+		FROM SNMPv2-TC
+	OBJECT-TYPE
+		    FROM SNMPv2-SMI
+	tplinkMgmt	          
+			FROM TPLINK-MIB
+	ifIndex
+			FROM RFC1213-MIB;
+
+tplinkSysInfoMIB MODULE-IDENTITY
+    LAST-UPDATED  "201211290000Z"
+    ORGANIZATION  "TP-LINK"
+    CONTACT-INFO  "www.tplink.com"
+    DESCRIPTION
+         "This MIB module contain a collection of managed objects
+          that get infomation of the system."
+
+    REVISION    "201211290000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tplinkMgmt 1 }
+
+tplinkSysInfoMIBObjects OBJECT IDENTIFIER ::= {tplinkSysInfoMIB 1}
+tplinkSysInfoNotifications OBJECT IDENTIFIER ::= {tplinkSysInfoMIB 2}
+  
+  
+tpSysInfoDescription OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+		  "A textual description of the entity.  This value
+		  should include the full name and version
+		  identification of the system's hardware type,
+		  software operating-system, and networking
+		  software.  It is current that this only contain
+		  printable ASCII characters."
+  ::= { tplinkSysInfoMIBObjects 1 }
+  
+tpSysInfoHostName OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+		  "An administratively-assigned name for this
+		  managed node.  By convention, this is the node's
+		  fully-qualified domain name.range:17 byte."
+  ::= { tplinkSysInfoMIBObjects 2 }
+  
+tpSysInfoLocation OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+		  "The physical location of this node (e.g.,
+		  `telephone closet, 3rd floor'),range:32 byte."
+  ::= { tplinkSysInfoMIBObjects 3 }   
+
+tpSysInfoContact OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+		  "The textual identification of the contact person
+		  for this managed node, together with information
+		  on how to contact this person.range:32 byte."
+  ::= { tplinkSysInfoMIBObjects 4 }
+		
+tpSysInfoHwVersion OBJECT-TYPE	
+SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+		  "The hardWare version of the product."
+  ::= { tplinkSysInfoMIBObjects 5 }
+	
+tpSysInfoSwVersion OBJECT-TYPE	
+SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+		  "The softWare version of the product."
+  ::= { tplinkSysInfoMIBObjects 6 }
+  
+tpSysInfoMacAddr	OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+		  "The MAC address of the product."
+  ::= { tplinkSysInfoMIBObjects 7 }
+
+tpSysInfoSerialNum	OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+		  "The Serial number of the product."
+  ::= { tplinkSysInfoMIBObjects 8 }
+  
+tpSysInfoUpTime OBJECT-TYPE
+  SYNTAX  TimeStamp
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+		  "The time (in hundredths of a second) since the
+		  network management portion of the system was last
+		  re-initialized."
+  ::= { tplinkSysInfoMIBObjects 9 }
+
+tpSysInfoSerialPort OBJECT-TYPE
+ SYNTAX INTEGER{
+		9600(0), 					--config the baud rate as 9600
+		19200(1),					--config the baud rate as 19200
+		38400(2), 					--config the baud rate as 38400
+		57600(3),					--config the baud rate as 57600
+		115200(4)	 				--config the baud rate as 115200
+		}   
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+		  "config the baud rate of the system"
+  ::= { tplinkSysInfoMIBObjects 10}
+
+tpSysInfoPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF TPSYSINFOPORTENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Port Utilization."
+              ::= { tplinkSysInfoMIBObjects 11 }
+
+          tpSysInfoPortEntry OBJECT-TYPE
+              SYNTAX  TPSYSINFOPORTENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "An entry contains of the information of port Utilization."     
+              INDEX   { ifIndex }
+              ::= { tpSysInfoPortTable 1 }
+      
+          TPSYSINFOPORTENTRY ::=
+              SEQUENCE {
+                  tpSysInfoPortRxUtilization
+                      OCTET STRING,
+                  tpSysInfoPortTxUtilization
+                  		OCTET STRING 		
+              	}      
+                        
+           tpSysInfoPortRxUtilization OBJECT-TYPE
+          		SYNTAX  OCTET STRING (SIZE (0..255))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      	"Displays the  port Tx Utilization."
+              ::= { tpSysInfoPortEntry 1 }  
+           
+           tpSysInfoPortTxUtilization OBJECT-TYPE
+          		SYNTAX  OCTET STRING (SIZE (0..255))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      	"Displays the  port Tx Utilization."
+              ::= { tpSysInfoPortEntry 2 }
+
+tpSysInfoLed OBJECT-TYPE
+ SYNTAX INTEGER{
+		off(0), 				--LED off
+		on(1),					--LED on
+		}   
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+		  "Config the switch LED status."
+  ::= { tplinkSysInfoMIBObjects 12}
+  
+END	  	         

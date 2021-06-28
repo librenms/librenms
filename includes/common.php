@@ -19,6 +19,7 @@
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
@@ -67,14 +68,12 @@ function graylog_severity_label($severity)
  */
 function external_exec($command)
 {
-    global $debug, $vdebug;
-
     $device = DeviceCache::getPrimary();
 
     $proc = new Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-    if ($debug && ! $vdebug) {
+    if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $patterns = [
             '/-c\' \'[\S]+\'/',
             '/-u\' \'[\S]+\'/',
@@ -98,7 +97,7 @@ function external_exec($command)
 
         $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
-    } elseif ($vdebug) {
+    } elseif (Debug::isVerbose()) {
         c_echo('SNMP[%c' . $proc->getCommandLine() . "%n]\n");
     }
 
@@ -115,11 +114,11 @@ function external_exec($command)
         d_echo($proc->getErrorOutput());
     }
 
-    if ($debug && ! $vdebug) {
+    if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
         $debug_output = preg_replace($ip_regex, '*', $output);
         d_echo($debug_output . PHP_EOL);
-    } elseif ($vdebug) {
+    } elseif (Debug::isVerbose()) {
         d_echo($output . PHP_EOL);
     }
     d_echo($proc->getErrorOutput());
@@ -146,18 +145,9 @@ function shorthost($hostname, $len = 12)
     return $shorthost;
 }
 
-function isCli()
-{
-    if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 function print_error($text)
 {
-    if (isCli()) {
+    if (Laravel::isCli()) {
         c_echo('%r' . $text . "%n\n");
     } else {
         echo '<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> ' . $text . '</div>';
@@ -166,7 +156,7 @@ function print_error($text)
 
 function print_message($text)
 {
-    if (isCli()) {
+    if (Laravel::isCli()) {
         c_echo('%g' . $text . "%n\n");
     } else {
         echo '<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> ' . $text . '</div>';
@@ -427,27 +417,6 @@ function del_dev_attrib($device, $attrib_type)
     return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
 }
 
-/*
- * convenience function - please use this instead of 'if ($debug) { echo ...; }'
- */
-if (! function_exists('d_echo')) {
-    //TODO remove this after installs have updated, leaving it for for transition
-    function d_echo($text, $no_debug_text = null)
-    {
-        global $debug;
-
-        if (Laravel::isBooted()) {
-            \Log::debug(is_string($text) ? rtrim($text) : $text);
-        } elseif ($debug) {
-            print_r($text);
-        }
-
-        if (! $debug && $no_debug_text) {
-            echo "$no_debug_text";
-        }
-    }
-}
-
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
@@ -461,7 +430,7 @@ function c_echo($string, $enabled = true)
         return;
     }
 
-    if (isCli()) {
+    if (Laravel::isCli()) {
         global $console_color;
         if ($console_color) {
             echo $console_color->convert($string);

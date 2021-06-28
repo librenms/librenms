@@ -88,6 +88,7 @@
                                     "snmp3auth",
                                     "ldap-groups",
                                     "ad-groups",
+                                    "oxidized-maps",
                                     "executable",
                                     "directory"
                                 ]

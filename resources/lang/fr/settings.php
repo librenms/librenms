@@ -43,6 +43,7 @@ return [
             'location' => 'Cartes',
             'graylog' => 'Intégration Graylog',
             'oxidized' => 'Intégration Oxidized',
+            'mac_oui' => 'Intégration des prefixes OUI d\'adresses mac',
             'peeringdb' => 'Intégration PeeringDB',
             'nfsen' => 'Intégration NfSen',
             'unix-agent' => 'Intégration Unix-Agent',
@@ -656,6 +657,12 @@ return [
         'login_message' => [
             'description' => 'Logon Message',
             'help' => 'Displayed on the login page',
+        ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => 'Activer la recherche des préfixes OUI (prefixes d\'adresses mac par fournisseur)',
+                'help' => 'Les données sont mises à jour via daily.sh',
+            ],
         ],
         'mono_font' => [
             'description' => 'Monospaced Font',

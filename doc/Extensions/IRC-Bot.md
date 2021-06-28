@@ -37,8 +37,8 @@ Option | Default-Value | Notes
 `$config['irc_pass']` |  | Optional; This sends the IRC-PASS Sequence to IRC-Servers that require Password on Connect
 `$config['irc_port']` | `6667` | Required; To enable SSL append a `+` before the Port. (Example: `+6697`)
 `$config['irc_ctcp']` | `false` | Optional; Enable/disable ctcp-replies from the bot (currently VERSION, PING and TIME).
-`$config['irc_ctcp_version']` | `LibreNMS IRCbot. https://www.librenms.org/` | Optional: Reply-string to CTCP VERSION requests
-`$config['irc_auth']` |  | Optional: Array of hostmasks that are automatically authenticated.
+`$config['irc_ctcp_version']` | `LibreNMS IRCbot. https://www.librenms.org/` | Optional; Reply-string to CTCP VERSION requests
+`$config['irc_auth']` |  | Optional; Array of hostmasks that are automatically authenticated.
 
 ### IRC-Commands
 
@@ -57,7 +57,7 @@ Command | Description
 `.status <type>` | Prints status information for given `type`. Type can be `devices`, `services`, `ports`. Shorthands are: `dev`,`srv`,`prt`
 `.version` | Prints `$this->config['project_name_version']`.
 
-( __/!\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
+( __/!\\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
 
 # Examples
 

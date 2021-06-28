@@ -3,6 +3,7 @@
 
 use App\Jobs\PingCheck;
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
 $init_modules = ['alerts', 'laravel', 'nodb'];
 require __DIR__ . '/includes/init.php';
@@ -21,12 +22,8 @@ END;
     exit;
 }
 
-set_debug(isset($options['d']));
-
-if (isset($options['v'])) {
-    global $vdebug;
-    $vdebug = true;
-}
+Debug::set(isset($options['d']));
+Debug::setVerbose(isset($options['v']));
 
 Datastore::init($options);
 

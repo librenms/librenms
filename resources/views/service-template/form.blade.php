@@ -177,7 +177,7 @@
         }
     });
 
-    $('.service-template-form').submit(function (eventObj) {
+    $('.service-template-form').on("submit", function (eventObj) {
         if ($('#type').val() === 'dynamic') {
             $('<input type="hidden" name="rules" />')
                 .attr('value', JSON.stringify(builder.queryBuilder('getRules')))

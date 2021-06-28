@@ -30,6 +30,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Fping;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
@@ -89,7 +90,7 @@ class OSModulesTest extends DBTestCase
         $this->stubClasses();
 
         try {
-            set_debug(false); // avoid all undefined index errors in the legacy code
+            Debug::set(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
@@ -107,7 +108,7 @@ class OSModulesTest extends DBTestCase
         }
 
         // output all discovery and poller output if debug mode is enabled for phpunit
-        $debug = in_array('--debug', $_SERVER['argv'], true);
+        $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
             $expected = $expected_data[$module]['discovery'] ?? [];
@@ -117,7 +118,7 @@ class OSModulesTest extends DBTestCase
                 $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($debug ? null : $module)
+                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
@@ -137,7 +138,7 @@ class OSModulesTest extends DBTestCase
                 $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($debug ? null : $module)
+                . $helper->getPollerOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }

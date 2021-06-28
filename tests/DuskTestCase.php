@@ -19,7 +19,9 @@ abstract class DuskTestCase extends BaseTestCase
      */
     public static function prepare()
     {
-        static::startChromeDriver();
+        if (! static::runningInSail()) {
+            static::startChromeDriver();
+        }
     }
 
     /**
@@ -29,17 +31,31 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver()
     {
-        $arguments = [
-            '--disable-gpu',
-        ];
+        $options = (new ChromeOptions)->addArguments(collect([
+            '--window-size=1920,1080',
+        ])->unless($this->hasHeadlessDisabled(), function ($items) {
+            return $items->merge([
+                '--disable-gpu',
+                '--headless',
+            ]);
+        })->all());
 
-        if (getenv('CHROME_HEADLESS')) {
-            $arguments[] = '--headless';
-        }
+        return RemoteWebDriver::create(
+            $_ENV['DUSK_DRIVER_URL'] ?? 'http://localhost:9515',
+            DesiredCapabilities::chrome()->setCapability(
+                ChromeOptions::CAPABILITY, $options
+            )
+        );
+    }
 
-        return RemoteWebDriver::create('http://localhost:9515', DesiredCapabilities::chrome()->setCapability(
-            ChromeOptions::CAPABILITY,
-            (new ChromeOptions)->addArguments($arguments)
-        ));
+    /**
+     * Determine whether the Dusk command has disabled headless mode.
+     *
+     * @return bool
+     */
+    protected function hasHeadlessDisabled()
+    {
+        return isset($_SERVER['DUSK_HEADLESS_DISABLED']) ||
+               isset($_ENV['DUSK_HEADLESS_DISABLED']);
     }
 }

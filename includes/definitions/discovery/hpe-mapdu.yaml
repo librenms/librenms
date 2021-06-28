@@ -1,0 +1,418 @@
+mib: CPQPOWER-MIB
+modules:
+    os:
+            serial: 
+                - CPQPOWER-MIB::deviceSerialNumber.0
+            version:
+                - CPQPOWER-MIB::deviceFirmwareVersion.0
+            hardware:
+                - CPQPOWER-MIB::deviceModel.0
+    sensors:
+        pre_cached:
+            data:
+                -
+                    oid:
+                        - pdu2OutletName
+                        - pdu2OutletControlStatus
+                        - pdu2InputPhaseIndex
+                        - pdu3OutletName
+                        - pdu3OutletControlStatus
+                        - pdu3InputPhaseIndex                        
+        state:
+            data:
+                -
+                    oid: pdu2OutletControlStatus
+                    value: pdu2OutletControlStatus
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.2.1.1.{{ $index }}'
+                    descr: '{{ $pdu2OutletName }} State'
+                    group: 'Outlets'
+                    states:
+                        - { value: 1, generic: 3, descr: off, graph: 0 }
+                        - { value: 2, generic: 0, descr: on, graph: 0 }
+                        - { value: 3, generic: 1, descr: pendingOff, graph: 0 }
+                        - { value: 4, generic: 2, descr: pendingOn, graph: 0 }
+                -
+                    oid: pdu2InputType
+                    value: pdu2InputType
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.1.{{ $index }}'
+                    descr: 'PDU Type'
+                    states:
+                        - { value: 1, generic: 0, descr: singlePhase, graph: 0 }
+                        - { value: 2, generic: 1, descr: splitPhase, graph: 0 }
+                        - { value: 3, generic: 2, descr: threePhaseDelta, graph: 0 }
+                        - { value: 4, generic: 3, descr: threePhaseWye, graph: 0 }
+                -
+                    oid: pdu3OutletControlStatus
+                    value: pdu3OutletControlStatus
+                    index: 'pdu3OutletControlStatus.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.2.1.1.{{ $index }}'
+                    descr: '{{ $pdu3OutletName }} State'
+                    group: 'Outlets'
+                    states:
+                        - { value: 1, generic: 3, descr: off, graph: 0 }
+                        - { value: 2, generic: 0, descr: on, graph: 0 }
+                        - { value: 3, generic: 1, descr: pendingOff, graph: 0 }
+                        - { value: 4, generic: 2, descr: pendingOn, graph: 0 }
+                    skip_values:
+                    -
+                        oid: 'pdu3OutletName'
+                        op: '=='
+                        value: '00 00 00 00 00 00 00 00'
+                -
+                    oid: pdu3InputType
+                    value: pdu3InputType
+                    index: 'pdu3InputType.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.1.{{ $index }}'
+                    descr: 'PDU Type'
+                    states:
+                        - { value: 1, generic: 0, descr: singlePhase, graph: 0 }
+                        - { value: 2, generic: 1, descr: splitPhase, graph: 0 }
+                        - { value: 3, generic: 2, descr: threePhaseDelta, graph: 0 }
+                        - { value: 4, generic: 3, descr: threePhaseWye, graph: 0 }
+        frequency:
+            data:
+                -
+                    oid: pdu2InputFrequency
+                    value: pdu2InputFrequency
+                    index: 'pdu2InputFrequency.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.2.{{ $index }}'
+                    descr: 'Input Frequency'
+                    divisor: 10
+                -
+                    oid: pdu3InputFrequency
+                    value: pdu3InputFrequency
+                    index: 'pdu3InputFrequency.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.2.{{ $index }}'
+                    descr: 'Input Frequency'
+                    divisor: 10
+        voltage:
+            data:
+                -
+                    oid: pdu2InputPhaseVoltage
+                    value: pdu2InputPhaseVoltage
+                    index: 'pdu2InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.3.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Voltage'
+                    divisor: 1000
+                    low_limit: pdu2InputPhaseVoltageThLowerCritical
+                    low_warn_limit: pdu2InputPhaseVoltageThLowerWarning
+                    warn_limit: pdu2InputPhaseVoltageThUpperWarning
+                    high_limit: pdu2InputPhaseVoltageThUpperCritical
+                -
+                    oid: pdu3InputPhaseVoltage
+                    value: pdu3InputPhaseVoltage
+                    index: 'pdu3InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.3.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Voltage'
+                    divisor: 10
+                    low_limit: pdu3InputPhaseVoltageThLowerCritical
+                    low_warn_limit: pdu3InputPhaseVoltageThLowerWarning
+                    warn_limit: pdu3InputPhaseVoltageThUpperWarning
+                    high_limit: pdu3InputPhaseVoltageThUpperCritical
+                    skip_values: 0
+        current:       
+            data:
+                -
+                    oid: pdu2InputPhaseCurrent
+                    value: pdu2InputPhaseCurrent
+                    index: 'pdu2InputPhaseCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.11.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Current'
+                    skip_values: -1
+                    divisor: 1000
+                -
+                    oid: pdu2OutletCurrent
+                    value: pdu2OutletCurrent
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.5.{{ $index }}'
+                    index: 'pdu2OutletCurrent.{{ $index }}'
+                    descr: '{{ $pdu2OutletName }} Current'
+                    divisor: 1000
+                    group: 'Outlets'
+                    skip_values:
+                    -
+                        oid: 'pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: pdu3InputPhaseCurrent
+                    value: pdu3InputPhaseCurrent
+                    index: 'pdu3InputPhaseCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.11.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Current'
+                    divisor: 100
+                    skip_values:
+                    -
+                        oid: 'pdu3InputPhaseIndex'
+                        op: '=='
+                        value: '0'
+                -
+                    oid: pdu3OutletCurrent
+                    value: pdu3OutletCurrent
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.5.{{ $index }}'
+                    index: 'pdu3OutletCurrent.{{ $index }}'
+                    descr: '{{ $pdu3OutletName }} Current'
+                    divisor: 100
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'pdu3OutletName'
+                        op: '=='
+                        value: '00 00 00 00 00 00 00 00'
+        power:
+            data:
+                -
+                    oid: pdu2InputPowerWatts
+                    value: pdu2InputPowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.5.{{ $index }}'
+                    index: 'Pdu2InputEntry.{{ $index }}'
+                    descr: 'Total Input Power'
+                    skip_values: -1
+                -
+                    oid: pdu2InputPhasePowerWatts
+                    value: pdu2InputPhasePowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.21.{{ $index }}'
+                    index: 'Pdu2InputEntry.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Power'
+                    skip_values:
+                    -
+                        oid: 'pdu2InputType'
+                        op: '!='
+                        value: '1'
+                -
+                    oid: pdu2OutletWatts
+                    value: pdu2OutletWatts
+                    index: 'Pdu2OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.14.{{ $index }}'                    
+                    descr: '{{ $pdu2OutletName }} Power'
+                    group: 'Outlets'
+                    skip_values:
+                    -
+                        oid: 'pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: pdu3InputPowerWatts
+                    value: pdu3InputPowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.5.{{ $index }}'
+                    index: 'Pdu3InputEntry.{{ $index }}'
+                    descr: 'Total Input Power'
+                    skip_values: 0
+                -
+                    oid: pdu3InputPhasePowerWatts
+                    value: pdu3InputPhasePowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.20.{{ $index }}'
+                    index: 'Pdu3InputEntry.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Power'
+                    skip_values:
+                    -
+                        oid: 'pdu3InputType'
+                        op: '!='
+                        value: '1'
+                -
+                    oid: pdu3OutletWatts
+                    value: pdu3OutletWatts
+                    index: 'Pdu3OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.13.{{ $index }}'
+                    descr: '{{ $pdu3OutletName }} Power'
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'pdu3OutletName'
+                        op: '=='
+                        value: '00 00 00 00 00 00 00 00'
+        power_factor:
+            data:
+                -
+                    oid: pdu2InputPhasePowerFactor
+                    value: pdu2InputPhasePowerFactor
+                    index: 'Pdu2InputIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.8.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Power Factor'
+                    divisor: 1000  
+                    skip_values:
+                    -
+                        oid: 'pdu2InputType'
+                        op: '!='
+                        value: '1'
+                    -
+                        oid: 'pdu2InputPhasePowerFactor'
+                        op: '=='
+                        value: '-1'
+                -
+                    oid: pdu2InputPowerFactor
+                    value: pdu2InputPowerFactor
+                    index: 'Pdu2InputIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.8.{{ $index }}'
+                    descr: 'Input Power Factor'
+                    skip_values: -1
+                    divisor: 1000
+                -
+                    oid: pdu2OutletPowerFactor
+                    value: pdu2OutletPowerFactor
+                    index: 'pdu2OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.17.{{ $index }}'
+                    descr: '{{ $pdu2OutletName }} Power Factor'
+                    divisor: -1000
+                    group: 'Outlets'
+                    skip_values:
+                    -
+                        oid: 'pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: pdu3InputPowerFactor
+                    value: pdu3InputPowerFactor
+                    index: 'Pdu3InputIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.9.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Power Factor'
+                    skip_values: -1
+                    divisor: 100
+                -
+                    oid: pdu3OutletPowerFactor
+                    value: pdu3OutletPowerFactor
+                    index: 'pdu3OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.16.{{ $index }}'
+                    descr: '{{ $pdu3OutletName }} Power Factor'
+                    divisor: 100
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'pdu3OutletName'
+                        op: '=='
+                        value: '00 00 00 00 00 00 00 00'
+        load:
+            data:
+                -
+                    oid: pdu2OutletCurrentPercentLoad
+                    value: pdu2OutletCurrentPercentLoad
+                    index: 'pdu2OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.12.{{ $index }}'
+                    descr: '{{ $pdu2OutletName }} Load'
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: pdu2InputPhaseCurrentPercentLoad
+                    value: pdu2InputPhaseCurrentPercentLoad
+                    index: 'pdu2InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.18.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Load'
+                    skip_value_lt: 0
+                -
+                    oid: pdu3OutletCurrentPercentLoad
+                    value: pdu3OutletCurrentPercentLoad
+                    index: 'pdu3OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.11.{{ $index }}'
+                    descr: '{{ $pdu3OutletName }} Load'
+                    divisor: 10
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'pdu3OutletName'
+                        op: '=='
+                        value: '00 00 00 00 00 00 00 00'
+                -
+                    oid: pdu3InputPhaseCurrentPercentLoad
+                    value: pdu3InputPhaseCurrentPercentLoad
+                    index: 'pdu3InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.17.{{ $index }}'
+                    descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Load'
+                    divisor: 10
+                    skip_values:
+                    -
+                        oid: 'pdu3InputPhaseIndex'
+                        op: '=='
+                        value: '0'
+        temperature:
+            data:
+                -
+                    oid: pdu2TemperatureTable
+                    value: pdu2TemperatureValue
+                    index: 'pdu2TemperatureIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.4.2.1.4.{{ $index }}'
+                    descr: '{{ $pdu2TemperatureName }} Temperature sensor'
+                    low_limit: pdu2TemperatureThLowerCritical
+                    low_warn_limit: pdu2TemperatureThLowerWarning
+                    warn_limit: pdu2TemperatureThUpperWarning
+                    high_limit: pdu2TemperatureThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'pdu2TemperatureProbeStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: pdu3TemperatureTable
+                    value: pdu3TemperatureValue
+                    index: 'pdu3TemperatureIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.4.2.1.4.{{ $index }}'
+                    descr: '{{ $pdu3TemperatureName }} Temperature sensor'
+                    low_limit: pdu3TemperatureThLowerCritical
+                    low_warn_limit: pdu3TemperatureThLowerWarning
+                    warn_limit: pdu3TemperatureThUpperWarning
+                    high_limit: pdu3TemperatureThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'pdu3TemperatureProbeStatus'
+                        op: '=='
+                        value: '1'
+        humidity:
+            data:
+                -
+                    oid: pdu2HumidityTable
+                    value: pdu2HumidityValue
+                    index: 'pdu2HumidityIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.4.3.1.4.{{ $index }}'
+                    descr: '{{ $pdu2HumidityName.0.1 }} Humidity sensor'
+                    low_limit: pdu2HumidityThLowerCritical
+                    low_warn_limit: pdu2HumidityThLowerWarning
+                    warn_limit: pdu2HumidityThUpperWarning
+                    high_limit: pdu2HumidityThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'pdu2HumidityProbeStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: pdu3HumidityTable
+                    value: pdu3HumidityValue
+                    index: 'pdu3HumidityIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.4.3.1.4.{{ $index }}'
+                    descr: '{{ $pdu3HumidityName.0.1 }} Humidity sensor'
+                    low_limit: pdu3HumidityThLowerCritical
+                    low_warn_limit: pdu3HumidityThLowerWarning
+                    warn_limit: pdu3HumidityThUpperWarning
+                    high_limit: pdu3HumidityThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'pdu3HumidityProbeStatus'
+                        op: '=='
+                        value: '1'

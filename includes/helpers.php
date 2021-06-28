@@ -22,11 +22,12 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 
 if (! function_exists('d_echo')) {
     /**
-     * Legacy convenience function - please use this instead of 'if ($debug) { echo ...; }'
+     * Legacy convenience function - please use this instead of 'if (Debug::isEnabled()) { echo ...; }'
      * Use Log directly in pure Laravel code!
      *
      * @param string|array $text The error message or array to print
@@ -34,55 +35,15 @@ if (! function_exists('d_echo')) {
      */
     function d_echo($text, $no_debug_text = null)
     {
-        global $debug;
-
         if (Laravel::isBooted()) {
             \Log::debug(is_string($text) ? rtrim($text) : $text);
-        } elseif ($debug) {
+        } elseif (Debug::isEnabled()) {
             print_r($text);
         }
 
-        if (! $debug && $no_debug_text) {
+        if (! Debug::isEnabled() && $no_debug_text) {
             echo "$no_debug_text";
         }
-    }
-}
-
-if (! function_exists('set_debug')) {
-    /**
-     * Set debugging output
-     *
-     * @param bool $state If debug is enabled or not
-     * @param bool $silence When not debugging, silence every php error
-     * @return bool
-     */
-    function set_debug($state = true, $silence = false)
-    {
-        global $debug;
-
-        $debug = $state; // set to global
-
-        restore_error_handler(); // disable Laravel error handler
-
-        if ($debug) {
-            ini_set('display_errors', 1);
-            ini_set('display_startup_errors', 1);
-            ini_set('log_errors', 0);
-            error_reporting(E_ALL & ~E_NOTICE);
-
-            \LibreNMS\Util\Laravel::enableCliDebugOutput();
-            \LibreNMS\Util\Laravel::enableQueryDebug();
-        } else {
-            ini_set('display_errors', 0);
-            ini_set('display_startup_errors', 0);
-            ini_set('log_errors', 1);
-            error_reporting($silence ? 0 : E_ERROR);
-
-            \LibreNMS\Util\Laravel::disableCliDebugOutput();
-            \LibreNMS\Util\Laravel::disableQueryDebug();
-        }
-
-        return $debug;
     }
 }
 
@@ -116,4 +77,20 @@ if (! function_exists('array_pairs')) {
 function cast_number($number)
 {
     return \LibreNMS\Util\Number::cast($number);
+}
+
+if (! function_exists('trans_fb')) {
+    /**
+     * Translate the given message with a fallback string if none exists.
+     *
+     * @param  string  $key
+     * @param  string  $fallback
+     * @param  array   $replace
+     * @param  string  $locale
+     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     */
+    function trans_fb($key, $fallback, $replace = [], $locale = null)
+    {
+        return ($key === ($translation = trans($key, $replace, $locale))) ? $fallback : $translation;
+    }
 }

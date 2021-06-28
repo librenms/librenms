@@ -32,6 +32,7 @@ $rancid_map['edgeos'] = 'edgerouter';
 $rancid_map['edgeswitch'] = 'edgemax';
 $rancid_map['f5'] = 'f5';
 $rancid_map['fortigate'] = 'fortigate';
+$rancid_map['fortiswitch'] = 'fortigate';
 $rancid_map['ftos'] = 'force10';
 $rancid_map['ios'] = 'cisco';
 $rancid_map['iosxe'] = 'cisco';

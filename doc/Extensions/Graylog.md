@@ -49,7 +49,7 @@ Timezone must be PHP supported timezones, available at:
 
 ## Graylog Version
 If you are running a version earlier than Graylog then please set
-```php 
+```php
 $config['graylog']['version']
 ```
 to the version  number of your Graylog
@@ -57,12 +57,12 @@ install. Earlier versions than 2.1 use the default port `12900`
 
 ## URI
 If you have altered the default uri for your Graylog setup then you
-can override the default of `/api/` using 
+can override the default of `/api/` using
 ```php
 $config['graylog']['base_uri'] = '/somepath/';
 ```
 
-## User Credentials 
+## User Credentials
 If you choose to use another user besides the admin user, please note
 that currently you must give the user "admin" permissions from within
 Graylog, "read" permissions alone are not sufficient.
@@ -72,7 +72,7 @@ If you have enabled TLS for the Graylog API and you are using a
 self-signed certificate, please make sure that the certificate is
 trusted by your LibreNMS host, otherwise the connection will
 fail. Additionally, the certificate's Common Name (CN) has to match
-the FQDN or IP address specified in 
+the FQDN or IP address specified in
 ```php
 $config['graylog']['server']
 ```
@@ -81,7 +81,7 @@ $config['graylog']['server']
 If you want to match the source address of the log entries against any
 IP address of a device instead of only against the primary address and
 the host name to assign the log entries to a device, you can activate
-this function using 
+this function using
 
 ```php
 $config['graylog']['match-any-address'] = 'true';
@@ -90,13 +90,13 @@ $config['graylog']['match-any-address'] = 'true';
 ## Recent Devices
 There are 2 configuration parameters to influence the behaviour of the
 "Recent Graylog" table on the overview page of the
-devices. 
+devices.
 
 ```php
 $config['graylog']['device-page']['rowCount']
-``` 
+```
 
-Sets the maximum number of rows to be displayed (default: 10) 
+Sets the maximum number of rows to be displayed (default: 10)
 
 
 
@@ -106,11 +106,11 @@ $config['graylog']['device-page']['loglevel']
 ```
 
 You can set which loglevels that should be displayed on the overview page. (default: 7, min:
-0, max: 7) 
+0, max: 7)
 
 ```php
 $config['graylog']['device-page']['loglevel'] = 4
-``` 
+```
 Shows only entries with a log level less than or equal to 4 (Emergency,
 Alert, Critical, Error, Warning).
 

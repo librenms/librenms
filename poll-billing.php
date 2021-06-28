@@ -12,6 +12,7 @@
  */
 
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
@@ -23,11 +24,11 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
     $options = getopt('db:');
 }
 
-set_debug(isset($options['d']));
+Debug::set(isset($options['d']));
 Datastore::init();
 
 // Wait for schema update, as running during update can break update
-if (get_db_schema() < 107) {
+if (\LibreNMS\DB\Schema::getLegacySchema() < 107) {
     logfile('BILLING: Cannot continue until the database schema update to >= 107 is complete');
     exit(1);
 }

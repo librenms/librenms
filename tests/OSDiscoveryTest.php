@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\OS;
 
 class OSDiscoveryTest extends TestCase
@@ -59,7 +60,7 @@ class OSDiscoveryTest extends TestCase
      * @dataProvider osProvider
      * @param string $os_name
      */
-    public function testOS($os_name)
+    public function testOSDetection($os_name)
     {
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
@@ -82,7 +83,7 @@ class OSDiscoveryTest extends TestCase
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
      *
-     * @depends testOS
+     * @depends testOSDetection
      */
     public function testAllFilesTested()
     {
@@ -102,9 +103,8 @@ class OSDiscoveryTest extends TestCase
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-        global $debug, $vdebug;
-        $debug = true;
-        $vdebug = true;
+        Debug::set();
+        Debug::setVerbose();
         ob_start();
         $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();

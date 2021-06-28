@@ -25,9 +25,6 @@
 namespace LibreNMS\Util;
 
 use App;
-use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\DB\Eloquent;
-use Log;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
@@ -77,54 +74,16 @@ class Laravel
         return function_exists('app') && ! empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
     }
 
-    public static function enableQueryDebug()
+    /**
+     * Check if running in the command line.
+     * Safe for code without Laravel running and in Laravel console application.
+     * @return bool
+     */
+    public static function isCli(): bool
     {
-        static $sql_debug_enabled;
-        $db = Eloquent::DB();
-
-        if ($db && ! $sql_debug_enabled) {
-            $db->listen(function (QueryExecuted $query) {
-                // collect bindings and make them a little more readable
-                $bindings = collect($query->bindings)->map(function ($item) {
-                    if ($item instanceof \Carbon\Carbon) {
-                        return $item->toDateTimeString();
-                    }
-
-                    return $item;
-                })->toJson();
-
-                if (self::isBooted()) {
-                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
-                } else {
-                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
-                }
-            });
-            $sql_debug_enabled = true;
-        }
-    }
-
-    public static function disableQueryDebug()
-    {
-        $db = Eloquent::DB();
-
-        if ($db) {
-            // remove all query executed event handlers
-            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
-        }
-    }
-
-    public static function enableCliDebugOutput()
-    {
-        if (self::isBooted() && App::runningInConsole()) {
-            Log::setDefaultDriver('console');
-        }
-    }
-
-    public static function disableCliDebugOutput()
-    {
-        if (self::isBooted()) {
-            Log::setDefaultDriver('stack');
-        }
+        return Laravel::isBooted()
+            ? App::runningInConsole()
+            : (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']));
     }
 
     /**

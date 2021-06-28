@@ -3,6 +3,9 @@
 $pdf->AddPage('L');
 $where = '1';
 
+$param = [];
+$data = [];
+
 if (is_numeric($_GET['device_id'])) {
     $where .= ' AND E.device_id = ?';
     $param[] = $_GET['device_id'];

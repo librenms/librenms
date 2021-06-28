@@ -34,7 +34,7 @@ $('#delete-oid-form').on('show.bs.modal', function(event) {
     $("#dcustomoid_id").val(customoid_id);
 });
 
-$('#delete-oid-button').click('', function(event) {
+$('#delete-oid-button').on('click', function(event) {
     event.preventDefault();
     var customoid_id = $("#dcustomoid_id").val();
     $.ajax({

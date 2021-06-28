@@ -28,19 +28,19 @@
                         <div class="form-row pb-3">
                             <label for="host" class="col-4 col-form-label text-right">@lang('install.database.host')</label>
                             <div class="col-6">
-                                <input type="text" class="form-control" name="host" id="host" value="{{ $host ?? 'localhost' }}" placeholder="@lang('install.database.socket_empty')">
+                                <input type="text" class="form-control" name="host" id="host" value="{{ $host ?? 'localhost' }}" placeholder="@lang('install.database.host_placeholder')">
                             </div>
                         </div>
                         <div class="form-row pb-3">
                             <label for="port" class="col-4 col-form-label text-right">@lang('install.database.port')</label>
                             <div class="col-6">
-                                <input type="text" class="form-control" name="port" id="port" value="{{ $port ?? 3306 }}" placeholder="@lang('install.database.socket_empty')">
+                                <input type="text" class="form-control" name="port" id="port" value="{{ $port ?? 3306 }}" placeholder="@lang('install.database.port_placeholder')">
                             </div>
                         </div>
                         <div class="form-row pb-3">
                             <label for="unix_socket" class="col-4 col-form-label text-right">@lang('install.database.socket')</label>
                             <div class="col-6">
-                                <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket ?? '' }}" placeholder="@lang('install.database.ip_empty')">
+                                <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket ?? '' }}" placeholder="@lang('install.database.socket_placeholder')">
                             </div>
                         </div>
                         <div class="form-row pb-3">
@@ -112,7 +112,7 @@
 
 @section('scripts')
     <script>
-        $('#database-form').submit(function (event) {
+        $('#database-form').on("submit", function (event) {
             event.preventDefault();
             $('#credential-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
@@ -138,7 +138,7 @@
             });
         });
 
-        $('#migrate-btn').click(function () {
+        $('#migrate-btn').on("click", function () {
             $('#migrate-warning').show()
             $('#migrate-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
