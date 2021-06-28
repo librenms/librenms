@@ -4082,6 +4082,13 @@
             "order": 4,
             "type": "text"
         },
+        "oxidized.ignore_groups": {
+            "default": [],
+            "type" : "array",
+            "group": "external",
+            "section": "oxidized",
+            "order": 5
+        },
         "oxidized.enabled": {
             "default": false,
             "group": "external",

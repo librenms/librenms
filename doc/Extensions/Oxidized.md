@@ -219,6 +219,12 @@ lnms config:set oxidized.ignore_types '["server", "power"]'
 lnms config:set oxidized.ignore_os '["linux", "windows"]'
 ```
 
+You can also ignore whole groups of devices
+
+```bash
+lnms config:set oxidized.ignore_groups '["london-switches", "default"]'
+```
+
 # Trigger configuration backups
 
 Using the Oxidized REST API and [Syslog
