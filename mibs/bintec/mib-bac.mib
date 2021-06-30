@@ -1,0 +1,626 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2009-2014 bintec elmeg GmbH
+---------------------------------------------------------------------------
+
+FEC-BAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    bibo
+	FROM BINTEC-MIB;
+
+---------------------------------------------------------------------------
+-- bacMIB
+---------------------------------------------------------------------------
+bacMIB MODULE-IDENTITY
+    LAST-UPDATED "201502120000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+             Web:     www.bintec-elmeg.com"
+    DESCRIPTION
+            "The MIB module for Bandwidth Admission Control (BAC) administration
+	     entities."
+
+    REVISION      "200911200000Z"
+    DESCRIPTION
+            "Initial revision"
+    REVISION      "201109130000Z"
+    DESCRIPTION
+            "Global switch for admission control was added."
+
+    ::= { bibo 60 }
+
+---------------------------------------------------------------------------
+-- OID groups & all tables 
+---------------------------------------------------------------------------
+bacConf OBJECT IDENTIFIER
+--  bacPropertyTable                    1
+--  bacPropertyStatusTable              2
+--  bacEntityRelationTable              3
+--  bacInterfaceRelationTable           4
+--  bacAddressTable                     5
+--  bacAudioCodecPropertyTable          6
+--  bacGlobal                           7
+::= { bacMIB 1 }
+
+---------------------------------------------------------------------------
+-- bacGlobal
+---------------------------------------------------------------------------
+bacGlobal OBJECT IDENTIFIER
+    ::= { bacConf 7 }
+
+    bacGlobalAdmissionDefault OBJECT-TYPE
+      SYNTAX      INTEGER {
+            forbidden(1),
+            private-networks-only(2),
+            unrestriced(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The default behaviour for admission checking, if not any entity
+            relation is configured for a given voip entity.
+            forbidden(1)            : Admission is always refused.
+            private-networks-only(2): Admission is granted, if IP of voip entity
+                                      is a private network address (see RFC 1918
+                                      and RFC 5735).
+            unrestriced(3)          : Admission is always granted."
+        DEFVAL { private-networks-only }
+        ::= { bacGlobal 1 }
+
+    bacGlobalDscpSignallingDefault OBJECT-TYPE
+        SYNTAX      INTEGER (0 .. 63)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The 6 bit DSCP value used in IP header for signalling data,
+            if no entry in bacPropertyTable found."
+        DEFVAL { 46 }
+            -- 46 is binary 101110, see RFC 2598 (expedited forwarding)
+        ::= { bacGlobal 2 }
+
+    bacGlobalDscpAudioDefault OBJECT-TYPE
+        SYNTAX      INTEGER (0 .. 63)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The 6 bit DSCP value used in IP header for media data,
+            if no entry in bacPropertyTable found."
+        DEFVAL { 46 }
+            -- 46 is binary 101110, see RFC 2598 (expedited forwarding)
+        ::= { bacGlobal 3 }
+
+---------------------------------------------------------------------------
+-- bacPropertyTable
+---------------------------------------------------------------------------
+bacPropertyTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BacPropertyEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of configured bandwidth admission control property entries.
+         Typically one entry is created for each IP interface (WAN, LAN, WLAN)
+         and describes mainly the static bandwidth properties for this
+         interface.
+         A hierarchical relation can be achived, by defining a parent property
+         entry via bacPropertyParentIndex field."
+    ::= { bacConf 1 }
+
+    bacPropertyEntry OBJECT-TYPE
+    SYNTAX      BacPropertyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry in bacPropertyTable"
+    INDEX   { bacPropertyIndex }
+    ::= { bacPropertyTable 1 }
+
+    BacPropertyEntry ::=
+        SEQUENCE {
+            bacPropertyIndex                    INTEGER,
+            bacPropertyDescr                    DisplayString,
+            bacPropertyParentIndex              INTEGER,
+            bacPropertyDscpSignalling           INTEGER,
+            bacPropertyDscpAudio                INTEGER,
+            bacPropertyBwConfigUp               INTEGER,
+            bacPropertyBwConfigDown             INTEGER,
+            bacPropertyAdminStatus              INTEGER
+        }
+
+    bacPropertyIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The index in this property table."
+        ::= { bacPropertyEntry 1 }
+
+    bacPropertyDescr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The description of the bandwidth property entry."
+        ::= { bacPropertyEntry 2 }
+
+    bacPropertyParentIndex OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The index of the parent BAC property. Is 0, if no parent defined."
+        ::= { bacPropertyEntry 3 }
+
+    bacPropertyDscpSignalling OBJECT-TYPE
+        SYNTAX      INTEGER (0 .. 63)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The 6 bit DSCP value used in IP header for signalling data."
+        DEFVAL { 46 }
+            -- 46 is binary 101110, see RFC 2598 (expedited forwarding)
+        ::= { bacPropertyEntry 4 }
+
+    bacPropertyDscpAudio OBJECT-TYPE
+        SYNTAX      INTEGER (0 .. 63)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The 6 bit DSCP value used IP header for media data."
+        DEFVAL { 46 }
+            -- 46 is binary 101110, see RFC 2598 (expedited forwarding)
+        ::= { bacPropertyEntry 5 }
+
+    bacPropertyBwConfigUp OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The configured bandwidth for up direction."
+        ::= { bacPropertyEntry 6 }
+
+    bacPropertyBwConfigDown OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The configured bandwidth for down direction."
+        ::= { bacPropertyEntry 7 }
+
+    bacPropertyAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2), delete(3) }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "If the AdminStatus is set to enabled(1) this entry will be used,
+             if set to disabled(2) it won't be used. You may also
+             delete this entry by changing it to delete(3)."
+        DEFVAL { enabled }
+        ::= { bacPropertyEntry 8 }
+
+---------------------------------------------------------------------------
+-- bacPropertyStatusTable
+---------------------------------------------------------------------------
+bacPropertyStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BacPropertyStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of bandwidth admission control property entries.
+         Typically one entry is created for each interface (WAN, LAN, WLAN)
+         and describes the dynamic properties of this interface. Each entry is
+         the dynamic part of the properties defined in bacPropertyTable and is
+         referenced by bacPropertyStatusIndex."
+    ::= { bacConf 2 }
+
+    bacPropertyStatusEntry OBJECT-TYPE
+        SYNTAX      BacPropertyStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           "One entry in bacPropertyStatusTable."
+        INDEX   { bacPropertyStatusIndex }
+        ::= { bacPropertyStatusTable 1 }
+
+    BacPropertyStatusEntry ::=
+        SEQUENCE {
+            bacPropertyStatusIndex                      INTEGER,
+            bacPropertyStatusBwReservedUp               INTEGER,
+            bacPropertyStatusBwReservedDown             INTEGER,
+            bacPropertyStatusBwInterfaceUp              INTEGER,
+            bacPropertyStatusBwInterfaceDown            INTEGER
+    }
+
+    bacPropertyStatusIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The index in this status table. This index is used to reference the
+            entry in bacPropertyTable where it is used as index as well."
+        ::= { bacPropertyStatusEntry 1 }
+
+    bacPropertyStatusBwReservedUp OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The currently reserved bandwidth for up direction."
+        DEFVAL { 0 }
+        ::= { bacPropertyStatusEntry 2 }
+
+    bacPropertyStatusBwReservedDown OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The currently reserved bandwidth for down direction."
+        DEFVAL { 0 }
+        ::= { bacPropertyStatusEntry 3 }
+
+    bacPropertyStatusBwInterfaceUp OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The bandwidth of the corresponding interface for up direction.
+            0 if no interface available or no information about interface
+            available."
+        DEFVAL { 0 }
+        ::= { bacPropertyStatusEntry 4 }
+
+    bacPropertyStatusBwInterfaceDown OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The bandwidth of the corresponding interface for down direction.
+            0 if no interface available or no information about interface
+            available."
+        DEFVAL { 0 }
+        ::= { bacPropertyStatusEntry 5 }
+
+---------------------------------------------------------------------------
+-- bacEntityRelationTable
+---------------------------------------------------------------------------
+bacEntityRelationTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BacEntityRelationEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of relation entries between BAC properties and voip entities.
+         The BAC properties are described as entries in bacPropertyTable.
+         Entities are referenced by type and index."
+    ::= { bacConf 3 }
+
+    bacEntityRelationEntry OBJECT-TYPE
+    SYNTAX      BacEntityRelationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry in bacEntityRelationTable."
+    INDEX   { bacEntityRelationIndex }
+    ::= { bacEntityRelationTable 1 }
+
+    BacEntityRelationEntry ::=
+        SEQUENCE {
+            bacEntityRelationIndex              INTEGER,
+            bacEntityRelationPropertyIndex      INTEGER,
+            bacEntityRelationEntityType         INTEGER,
+            bacEntityRelationEntityIndex        INTEGER,
+            bacEntityRelationAdminStatus        INTEGER
+    }
+
+    bacEntityRelationIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The index in this entity relation table."
+        ::= { bacEntityRelationEntry 1 }
+
+    bacEntityRelationPropertyIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Index of entry in bacPropertyTable to be referenced."
+        ::= { bacEntityRelationEntry 2 }
+
+    bacEntityRelationEntityType OBJECT-TYPE
+        SYNTAX      INTEGER { provider(1), extension(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The type of entity.
+              provider(1)     The entity is a provider
+              extension(2)    The entity is an extension"
+        DEFVAL { provider }
+        ::= { bacEntityRelationEntry 3 }
+
+    bacEntityRelationEntityIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The index in corresponding entity table.
+            Depending on the used product different entities are addressed:
+            bacEntityRelationEntityType provider:
+                voipProviderTable or mpsTrunkGroupTable
+            bacEntityRelationEntityType extension:
+                voipExtensionTable or mpsTerminalTable"
+        ::= { bacEntityRelationEntry 4 }
+
+    bacEntityRelationAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2), delete(3) }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "If the AdminStatus is set to enabled(1) this entry will be used,
+             if set to disabled(2) it won't be used. You may also
+             delete this entry by changing it to delete(3)."
+        DEFVAL { enabled }
+        ::= { bacEntityRelationEntry 5 }
+
+---------------------------------------------------------------------------
+-- bacInterfaceRelationTable
+---------------------------------------------------------------------------
+bacInterfaceRelationTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BacInterfaceRelationTable
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of relation entries between BAC properties and interfaces.
+         The BAC properties are described as entries in bacPropertyTable.
+         Entities are referenced by ifIndex."
+    ::= { bacConf 4 }
+
+    bacInterfaceRelationEntry OBJECT-TYPE
+    SYNTAX      BacInterfaceRelationTable
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry in bacInterfaceRelationTable."
+    INDEX   { bacInterfaceRelationIndex }
+    ::= { bacInterfaceRelationTable 1 }
+
+    BacInterfaceRelationTable ::=
+        SEQUENCE {
+            bacInterfaceRelationIndex                   INTEGER,
+            bacInterfaceRelationPropertyIndex           INTEGER,
+            bacInterfaceRelationIfIndex                 INTEGER,
+            bacInterfaceRelationAdminStatus             INTEGER
+    }
+
+    bacInterfaceRelationIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The index in this interface relation table."
+        ::= { bacInterfaceRelationEntry 1 }
+
+    bacInterfaceRelationPropertyIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Index of entry in bacPropertyTable to be referenced."
+        ::= { bacInterfaceRelationEntry 2 }
+
+    bacInterfaceRelationIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Index of entry in ifTable to be referenced."
+        ::= { bacInterfaceRelationEntry 3 }
+
+    bacInterfaceRelationAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2), delete(3) }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "If AdminStatus is set to enabled(1) this entry will be used,
+             if set to disabled(2) it won't be used.
+	     You may also delete this entry by changing it to delete(3)."
+        DEFVAL { enabled }
+        ::= { bacInterfaceRelationEntry 4 }
+
+---------------------------------------------------------------------------
+-- bacAddressTable
+---------------------------------------------------------------------------
+bacAddressTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BacAddressTable
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of IP address ranges or address names belonging to BAC
+         properties. The BAC properties are described as entries in
+         bacPropertyTable. The IP address ranges are defines by address and
+         netmask."
+    ::= { bacConf 5 }
+
+    bacAddressEntry OBJECT-TYPE
+    SYNTAX      BacAddressTable
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry in bacAddressTable."
+    INDEX   { bacAddressIndex }
+    ::= { bacAddressTable 1 }
+
+    BacAddressTable ::=
+        SEQUENCE {
+            bacAddressIndex                     INTEGER,
+            bacAddressPropertyIndex             INTEGER,
+            bacAddressIpAddress                 IpAddress,
+            bacAddressIpNetmask                 IpAddress,
+            bacAddressDomain                    DisplayString,
+            bacAddressAdminStatus               INTEGER
+    }
+
+    bacAddressIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The index in this IP address table."
+        ::= { bacAddressEntry 1 }
+
+    bacAddressPropertyIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Index of entry in bacPropertyTable to be referenced."
+        ::= { bacAddressEntry 2 }
+
+    bacAddressIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The address defining the IP address range."
+        ::= { bacAddressEntry 3 }
+
+    bacAddressIpNetmask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The netmask defining the IP address range."
+        DEFVAL { 'FFFFFFFF'H }
+        ::= { bacAddressEntry 4 }
+
+    bacAddressDomain OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The domain name defining the address. If empty bacAddressIpAddress
+            and bacAddressIpNetmask is used."
+        DEFVAL { "" }
+        ::= { bacAddressEntry 5 }
+
+    bacAddressAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2), delete(3) }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "If the AdminStatus is set to enabled(1) this entry will be used,
+             if set to disabled(2) it won't be used. You may also
+             delete this entry by changing it to delete(3)."
+        DEFVAL { enabled }
+        ::= { bacAddressEntry 6 }
+
+---------------------------------------------------------------------------
+-- bacAudioCodecPropertyTable
+---------------------------------------------------------------------------
+bacAudioCodecPropertyTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BacAudioCodecPropertyTable
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of audio codec property entries."
+    ::= { bacConf 6 }
+
+    bacAudioCodecPropertyEntry OBJECT-TYPE
+    SYNTAX      BacAudioCodecPropertyTable
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry in bacAudioCodecPropertyTable."
+    INDEX   { bacAudioCodecPropertyIndex }
+    ::= { bacAudioCodecPropertyTable 1 }
+
+    BacAudioCodecPropertyTable ::=
+        SEQUENCE {
+            bacAudioCodecPropertyIndex             INTEGER,
+            bacAudioCodecPropertyDescr             DisplayString,
+            bacAudioCodecPropertyBandwidth         INTEGER,
+            bacAudioCodecPropertyFrameDuration     INTEGER,
+            bacAudioCodecPropertyFrameSize         INTEGER,
+            bacAudioCodecPropertyMosValue          INTEGER
+    }
+
+    bacAudioCodecPropertyIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..32)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The id of the codec and index in this property table."
+        ::= { bacAudioCodecPropertyEntry 1 }
+
+    bacAudioCodecPropertyDescr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The decription of this codec entry."
+        ::= { bacAudioCodecPropertyEntry 2 }
+
+        bacAudioCodecPropertyBandwidth OBJECT-TYPE
+        SYNTAX      INTEGER
+	UNITS       "bps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The required bandwidth in bits per seconds."
+        ::= { bacAudioCodecPropertyEntry 3 }
+
+    bacAudioCodecPropertyFrameDuration OBJECT-TYPE
+        SYNTAX      INTEGER
+	UNITS       "microseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The duration of one frame in microseconds."
+           -- The duration is choosen in microsends and not in millisonds
+           -- because of codecs like LPC10: 22.5 ms = 225 us
+        ::= { bacAudioCodecPropertyEntry 4 }
+
+    bacAudioCodecPropertyFrameSize OBJECT-TYPE
+        SYNTAX      INTEGER
+	UNITS       "bits"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The size of one frame in bits."
+           -- The size is choosen in bits and not in bytes
+           -- because of codecs like GSM: 32.5 bytes = 260 bits
+        ::= { bacAudioCodecPropertyEntry 5 }
+
+    bacAudioCodecPropertyMosValue OBJECT-TYPE
+        SYNTAX      INTEGER (100..500)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The mean opinion score of this codec in hundredth. MOS specifies
+            a numerical indication of the perceived audio quality.
+            The following rating scheme exists:
+            1.00 Bad
+            2.00 Poor
+            3.00 Fair
+            4.00 Good
+            5.00 Excellent"
+        ::= { bacAudioCodecPropertyEntry 6 }
+
+---------------------------------------------------------------------------
+END

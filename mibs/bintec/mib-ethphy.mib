@@ -1,0 +1,701 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1999-2016 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-ethphy,v $ 
+-- $Revision: 1.11 $ 
+
+BIANCA-ETH-PHY-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+            Integer32, Unsigned32, Counter32, Gauge32, Counter64,
+            IpAddress, TimeTicks, mib-2, enterprises
+                FROM SNMPv2-SMI
+        
+            DisplayString, TimeStamp, PhysAddress, TruthValue
+                FROM SNMPv2-TC
+
+            phy, Date, HexValue
+                FROM BINTEC-MIB
+
+            TRAP-TYPE
+                FROM RFC-1215;
+
+        exthPhyMIB MODULE-IDENTITY
+            LAST-UPDATED "200907240000Z"
+            ORGANIZATION
+                "bintec elmeg GmbH"
+            CONTACT-INFO
+                "EMail:   info@bintec-elmeg.com
+                 Web:     www.bintec-elmeg.com
+                "
+            DESCRIPTION
+                "MIB module for ethernet (or the like) phy specific
+                 definitions."
+            REVISION     "200907240000Z"
+            DESCRIPTION
+                "First version conforming to SMIv2."
+            ::= { phy 250 }
+
+    -- Interfaces Group
+
+    -- Management Information for the integrated Ethernet Switches
+
+	ethPhyTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF EthPhyEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The ethPhyTable contains information relating to the 
+		 interfaces available on the system. Each entry corresponds
+		 to an available ethernet or switch port. Entries cannot be
+		 added or deleted by the user. 
+
+		 Creating entries: Entries are created by the system
+		 automatically during ethernet interface hardware scan
+		 and when a managable switch is detected.
+
+		 Deleting entries: Entries can't be deleted."
+	::= { phy 1 }
+
+	ethPhyEntry OBJECT-TYPE
+	    SYNTAX  EthPhyEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+
+	    DESCRIPTION
+		"The ethPhyEntry contains configuration and status information
+		 of a physical interface associated to one ethernet interface."
+	    INDEX   { ethPhyPortIndex }
+	::= { ethPhyTable 1 }
+
+	EthPhyEntry ::=
+	    SEQUENCE {
+		ethPhyPortIndex			INTEGER,
+
+		-- status variables
+		ethPhyChipVendor		DisplayString,
+		ethPhyChipModel			DisplayString,
+		ethPhyPortLinkStatus		INTEGER,
+		ethPhyPortMdixStatus		INTEGER,
+		ethPhyPortCapabilities		BITS,
+
+		-- configuration
+		ethPhyPortMode			INTEGER,
+		ethPhyEthAssignedIfIndex	INTEGER,
+		ethPhyExtendedDistance		INTEGER,
+		ethPhyPortGroup			INTEGER,
+		ethPhyPortDescr			DisplayString,
+		ethPhyPortFlowControl		INTEGER,
+		ethPhyPortFlowControlStatus	INTEGER
+	    }
+
+	ethPhyPortIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The unique ethernet PHY interface index."
+	::= { ethPhyEntry 1 }
+
+    -- status information
+
+	ethPhyChipVendor OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE(1..40))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The vendor name or identifier of the PHY or switch
+		 detected during hardware scan."
+	::= { ethPhyEntry 2 }
+
+	ethPhyChipModel OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE(1..40))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The chip modell/revision of the PHY or switch
+		 detected during hardware scan."
+	::= { ethPhyEntry 3 }
+
+-- obsolete	ethPhyMiiChipIdent OBJECT-TYPE ::= { ethPhyEntry 4 }
+
+-- obsolete	ethPhyMiiAddress OBJECT-TYPE ::= { ethPhyEntry 5 }
+
+	ethPhyPortLinkStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	       	down(1),
+		auto-neg-failed(2),
+		auto-neg-unavail(3),
+		auto-neg-running(4),
+		auto-full-100(5),
+		auto-half-100(6),
+		auto-full-10(7),
+		auto-half-10(8),
+		full-100(9),
+		half-100(10),
+		full-10(11),
+		half-10(12),
+		admin-down(13),
+		full-1000(14)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This variable indicates link status and autonegotiation 
+		 results:
+
+		 down(1)             -- link down or autonegotiation failed
+		 auto-neg-failed(2)  -- autonegotiation failed
+		 auto-neg-unavail(3) -- autonegotiation not available
+		 auto-neg-running(4) -- autonegotiation running
+		 auto-full-100(5)    -- negotiated  100 mbps/full duplex
+		 auto-half-100(6)    -- negotiated  100 mbps/half duplex
+		 auto-full-10(7)     -- negotiated  10  mbps/full duplex
+		 auto-half-10(8)     -- negotiated  10  mbps/half duplex
+		 full-100(9)         -- forced mode 100 mbps/full duplex
+		 half-100(10)        -- forced mode 100 mbps/half duplex
+		 full-10(11)         -- forced mode 10  mbps/full duplex
+		 half-10(12)         -- forcde mode 10  mbps/half duplex
+		 admin-down(13)      -- link set administrative down
+		 full-1000(14)       -- forced mode 1000 mbps/full duplex
+		"
+	::= { ethPhyEntry 6 }
+
+	ethPhyPortMdixStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		normal(1),
+	       	crossover(2),
+		unknown(3)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This variable indicates the cables MDIX status
+		 if the link is established."
+	::= { ethPhyEntry 7 }
+
+    -- management information
+
+-- obsolete	ethPhyPortCommand OBJECT-TYPE ::= { ethPhyEntry 8 }
+
+	ethPhyPortCapabilities OBJECT-TYPE
+	    SYNTAX  BITS {
+	    	    half-10(0),
+	    	    full-10(1),
+	    	    half-100(2),
+	    	    full-100(3),
+	    	    half-1000(4),
+	    	    full-1000(5),
+		    autoneg(6)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This bitfield describes what modes the port supports:
+		 	half-10		: 10Mbit/s half duplex
+		 	full-10		: 10Mbit/s full duplex
+		 	half-100	: 100Mbit/s half duplex
+		 	full-100	: 100Mbit/s full duplex
+		 	half-1000	: 1000Mbit/s half duplex
+		 	full-1000	: 1000Mbit/s full duplex
+			autoneg         : Autonegotiation supported
+		 ." 
+	::= { ethPhyEntry 9 }
+
+    -- configuration
+
+	ethPhyPortMode OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	       	disable(1),
+		auto(2),
+		auto-100(3),
+		auto-10(4),
+		auto-full-100(5),
+		auto-half-100(6),
+		auto-full-10(7),
+		auto-half-10(8),
+		fixed-full-100(9),
+		fixed-half-100(10),
+		fixed-full-10(11),
+		fixed-half-10(12),
+		auto-1000(14),
+		fixed-full-1000(15)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The initial mode of the ethernet PHY or switch port:
+
+		 disable(1)          -- disconnect from physical line
+		 auto(2)             -- use default autonegotiation
+		 auto-100(3)         -- use autonegotiation for 100 mbps only
+		 auto-10(4)          -- use autonegotiation for 10 mbps only
+		 auto-full-100(5)    -- auto-negotiate 100 mbps/full-duplex
+		 auto-half-100(6)    -- auto-negotiate 100 mbps/half-duplex
+		 auto-full-10(7)     -- auto-negotiate 10  mbps/full-duplex
+		 auto-half-10(8)     -- auto-negotiate 10  mbps/half-duplex
+		 fixed-full-100(9)   -- use fixed mode 100 mbps/full-duplex
+		 fixed-half-100(10)  -- use fixed mode 100 mbps/half-duplex
+		 fixed-full-10(11)   -- use fixed mode 10  mbps/full-duplex
+		 fixed-half-10(12)   -- use fixed mode 10  mbps/half-duplex
+		 auto-1000(14)       -- use autonegotiation for 1000 mbps only
+		 fixed-full-1000(15) -- use fixed mode 1000 mbps/full-duplex
+		"
+	    DEFVAL { auto }
+	::= { ethPhyEntry 10 }
+
+-- obsolete	ethPhyEthBaseIfIndex OBJECT-TYPE ::= { ethPhyEntry 11 }
+
+	ethPhyEthAssignedIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  obsolete
+	    DESCRIPTION
+		"The Ethernet interface index the PHY or switch port
+		 is connected/assigned to.
+		 The system will create interfaces as needed, but there
+		 can't be more ethernet interfaces than switch ports."
+	    DEFVAL { -1 }
+	::= { ethPhyEntry 12 }
+
+	ethPhyExtendedDistance OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		default(1),
+		short-cable(2),
+		long-cable(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"If the PHY supports different receive thresholds depending
+		 on the cable length (long-cable > 100 m) and speed (10BaseT)
+		 it could be configured by this variable."
+	    DEFVAL { default }
+	::= { ethPhyEntry 13 }
+
+-- obsolete	ethPhyMaxFrameSize OBJECT-TYPE ::= { ethPhyEntry 14 }
+
+-- obsolete	ethPhyLed0Function OBJECT-TYPE ::= { ethPhyEntry 15 }
+
+-- obsolete	ethPhyLed1Function OBJECT-TYPE ::= { ethPhyEntry 16 }
+
+-- obsolete	ethPhyLed2Function OBJECT-TYPE ::= { ethPhyEntry 17 }
+
+	ethPhyPortGroup OBJECT-TYPE
+	    SYNTAX  INTEGER (0..99)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The port group this phy is member of."
+	::= { ethPhyEntry 18 }
+
+-- obsolete	ethPhySwitchTableAging OBJECT-TYPE ::= { ethPhyEntry 20 }
+
+	ethPhyPortDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object is available to the user for
+		 specifying a user-friendly name or tag."
+	::= { ethPhyEntry 21 }
+
+	ethPhyPortFlowControl OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disable(1),
+		enable(2),
+		auto(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"If the PHY supports flow control according to IEEE 802.3x
+		 flow control can be enabled on that port by setting variable
+		 to value 'auto'. This will cause 802.3x to be advertised via
+		 that port as well as enabled automatically in case flow
+		 control gets negotiated.
+		 Value 'disable' keeps flow control from being advertised and,
+		 hence, from being used at all.
+		 With value 'enable' flow control can be forced to be enabled
+		 regardless of any auto-negotiation.
+
+		 Default value is disable."
+	    DEFVAL { disable }
+	::= { ethPhyEntry 22 }
+
+	ethPhyPortFlowControlStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(1),
+		enabled(2)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This variable indicates whether flow control according to IEEE
+		 802.3x is currently active on that port.
+		 Possible values are ...
+			disabled(1) and
+			enabled(2)
+		"
+	    DEFVAL { disabled }
+	::= { ethPhyEntry 23 }
+
+ -- The Ethernet Statistics Group
+ --
+ -- Implementation of the Ethernet Statistics group is optional.
+ -- Consult the MODULE-COMPLIANCE macro for the authoritative
+ -- conformance information for this MIB.
+ --
+ -- The ethernet statistics group contains statistics measured by the
+ -- probe for each monitored interface on this device.  These
+ -- statistics take the form of free running counters that start from
+ -- zero when a valid entry is created.
+ --
+ -- This group currently has statistics defined only for
+ -- Ethernet interfaces.  Each etherStatsEntry contains statistics
+ -- for one Ethernet interface.  The probe must create one
+ -- etherStats entry for each monitored Ethernet interface
+ -- on the device.
+
+ etherStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF EtherStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of Ethernet statistics entries."
+     ::= { phy 2 }
+
+ etherStatsEntry OBJECT-TYPE
+     SYNTAX     EtherStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of statistics kept for a particular
+         Ethernet interface.  As an example, an instance of the
+         etherStatsPkts object might be named etherStatsPkts.1"
+     INDEX { etherStatsIndex, etherStatsDataDirection }
+     ::= { etherStatsTable 1 }
+
+ EtherStatsEntry ::= SEQUENCE {
+     etherStatsIndex                    Integer32,
+     etherStatsDataDirection            INTEGER,
+     etherStatsDropPkts                 Counter32,
+     etherStatsOctets                   Counter64,
+     etherStatsGoodPkts                 Counter64,
+     etherStatsBroadcastPkts            Counter32,
+     etherStatsMulticastPkts            Counter32,
+     etherStatsCRCAlignErrors           Counter32,
+     etherStatsUndersizePkts            Counter32,
+     etherStatsOversizePkts             Counter32,
+     etherStatsFragments                Counter32,
+     etherStatsJabbers                  Counter32,
+     etherStatsCollisions               Counter32,
+     etherStatsPkts64Octets             Counter32,
+     etherStatsPkts65to127Octets        Counter32,
+     etherStatsPkts128to255Octets       Counter32,
+     etherStatsPkts256to511Octets       Counter32,
+     etherStatsPkts512to1023Octets      Counter32,
+     etherStatsPkts1024to1518Octets     Counter32,
+     etherStatsPausePkts                Counter32
+ }
+
+ etherStatsIndex OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object together with the value of
+	 the etherStatsDataDirection object identifies this
+         etherStats entry."
+     ::= { etherStatsEntry 1 }
+
+ etherStatsDataDirection OBJECT-TYPE
+     SYNTAX INTEGER { rx (1), tx (2) }
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object identifies the source of the data that
+         this etherStats entry is configured to analyze.  This
+         source can be any ethernet interface on this device.
+         In order to identify a particular interface, this object
+         shall identify the instance of the ifIndex object,
+         defined in RFC 2233 [17], for the desired interface.
+         For example, if an entry were to receive data from
+         interface #1, this object would be set to ifIndex.1.
+
+         The statistics in this group reflect all packets
+         on the local network segment attached to the identified
+         interface."
+     DEFVAL { rx }
+     ::= { etherStatsEntry 2 }
+
+ etherStatsDropPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of events in which packets
+         were dropped by the probe due to lack of resources.
+         Note that this number is not necessarily the number of
+         packets dropped; it is just the number of times this
+         condition has been detected."
+     ::= { etherStatsEntry 3 }
+
+ etherStatsOctets OBJECT-TYPE
+     SYNTAX     Counter64
+     UNITS      "Octets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of octets of data (including
+         those in bad packets) received on the
+         network (excluding framing bits but including
+         FCS octets).
+         This object can be used as a reasonable estimate of
+         10-Megabit ethernet utilization.  If greater precision is
+         desired, the etherStatsPkts and etherStatsOctets objects
+         should be sampled before and after a common interval.  The
+         differences in the sampled values are Pkts and Octets,
+         respectively, and the number of seconds in the interval is
+         Interval.  These values are used to calculate the Utilization
+         as follows:
+
+                          Pkts * (9.6 + 6.4) + (Octets * .8)
+          Utilization = -------------------------------------
+                                  Interval * 10,000
+
+         The result of this equation is the value Utilization which
+         is the percent utilization of the ethernet segment on a
+         scale of 0 to 100 percent."
+     ::= { etherStatsEntry 4 }
+
+ etherStatsGoodPkts OBJECT-TYPE
+     SYNTAX     Counter64
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad packets,
+         broadcast packets, and multicast packets) received."
+     ::= { etherStatsEntry 5 }
+
+ etherStatsBroadcastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good packets received that were
+         directed to the broadcast address.  Note that this
+         does not include multicast packets."
+     ::= { etherStatsEntry 6 }
+
+ etherStatsMulticastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good packets received that were
+         directed to a multicast address.  Note that this number
+         does not include packets directed to the broadcast
+         address."
+     ::= { etherStatsEntry 7 }
+
+ etherStatsCRCAlignErrors OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that
+         had a length (excluding framing bits, but
+         including FCS octets) of between 64 and 1518
+         octets, inclusive, but had either a bad
+         Frame Check Sequence (FCS) with an integral
+         number of octets (FCS Error) or a bad FCS with
+         a non-integral number of octets (Alignment Error)."
+     ::= { etherStatsEntry 8 }
+
+ etherStatsUndersizePkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were
+         less than 64 octets long (excluding framing bits,
+         but including FCS octets) and were otherwise well
+         formed."
+     ::= { etherStatsEntry 9 }
+
+ etherStatsOversizePkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were
+         longer than 1518 octets (excluding framing bits,
+         but including FCS octets) and were otherwise
+         well formed."
+     ::= { etherStatsEntry 10 }
+
+ etherStatsFragments OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were less than
+         64 octets in length (excluding framing bits but including
+         FCS octets) and had either a bad Frame Check Sequence
+         (FCS) with an integral number of octets (FCS Error) or a
+         bad FCS with a non-integral number of octets (Alignment
+         Error).
+
+         Note that it is entirely normal for etherStatsFragments to
+         increment.  This is because it counts both runts (which are
+         normal occurrences due to collisions) and noise hits."
+     ::= { etherStatsEntry 11 }
+
+ etherStatsJabbers OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were
+         longer than 1518 octets (excluding framing bits,
+         but including FCS octets), and had either a bad
+         Frame Check Sequence (FCS) with an integral number
+         of octets (FCS Error) or a bad FCS with a non-integral
+         number of octets (Alignment Error).
+
+         Note that this definition of jabber is different
+         than the definition in IEEE-802.3 section 8.2.1.5
+         (10BASE5) and section 10.3.1.4 (10BASE2).  These
+         documents define jabber as the condition where any
+         packet exceeds 20 ms.  The allowed range to detect
+         jabber is between 20 ms and 150 ms."
+     ::= { etherStatsEntry 12 }
+
+ etherStatsCollisions OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Collisions"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The best estimate of the total number of collisions
+         on this Ethernet segment.
+
+         The value returned will depend on the location of the
+         RMON probe. Section 8.2.1.3 (10BASE-5) and section
+         10.3.1.3 (10BASE-2) of IEEE standard 802.3 states that a
+         station must detect a collision, in the receive mode, if
+         three or more stations are transmitting simultaneously.  A
+         repeater port must detect a collision when two or more
+         stations are transmitting simultaneously.  Thus a probe
+         placed on a repeater port could record more collisions
+         than a probe connected to a station on the same segment
+         would.
+
+         Probe location plays a much smaller role when considering
+         10BASE-T.  14.2.1.4 (10BASE-T) of IEEE standard 802.3
+         defines a collision as the simultaneous presence of signals
+         on the DO and RD circuits (transmitting and receiving
+         at the same time).  A 10BASE-T station can only detect
+         collisions when it is transmitting.  Thus probes placed on
+         a station and a repeater, should report the same number of
+         collisions.
+
+         Note also that an RMON probe inside a repeater should
+         ideally report collisions between the repeater and one or
+         more other hosts (transmit collisions as defined by IEEE
+         802.3k) plus receiver collisions observed on any coax
+         segments to which the repeater is connected."
+     ::= { etherStatsEntry 13 }
+
+ etherStatsPkts64Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were 64 octets in length
+         (excluding framing bits but including FCS octets)."
+     ::= { etherStatsEntry 14 }
+
+ etherStatsPkts65to127Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         65 and 127 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherStatsEntry 15 }
+
+ etherStatsPkts128to255Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         128 and 255 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherStatsEntry 16 }
+
+ etherStatsPkts256to511Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         256 and 511 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherStatsEntry 17 }
+
+ etherStatsPkts512to1023Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         512 and 1023 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherStatsEntry 18 }
+
+ etherStatsPkts1024to1518Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         1024 and 1518 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherStatsEntry 19 }
+
+ etherStatsPausePkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of pause packets received."
+     ::= { etherStatsEntry 20 }
+
+END

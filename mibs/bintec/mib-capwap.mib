@@ -1,0 +1,263 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+CAPWAP-BASE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+   PhysAddress, TEXTUAL-CONVENTION, TruthValue,
+   DateAndTime, RowStatus
+       FROM SNMPv2-TC
+   InterfaceIndex, ifGeneralInformationGroup
+       FROM IF-MIB
+   SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB
+   NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+       FROM SNMPv2-CONF
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, mib-2,
+   Integer32, Unsigned32, Counter32, Gauge32, TimeTicks
+       FROM SNMPv2-SMI
+   InetAddressType, InetAddress
+       FROM INET-ADDRESS-MIB;
+
+capwapBaseMIB MODULE-IDENTITY
+    LAST-UPDATED "201007120000Z"	-- Jul 12th, 2010
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail: info@bintec-elmeg.com
+             Web: www.bintec-elmeg.com
+            "
+    DESCRIPTION
+        "This file is based on on an internet draft standard but takes out
+	 only the very small portion needed for FEC products.
+
+	 Original informations for the standard are below.
+
+         LAST-UPDATED
+	      201002100000Z        -- Feb 10th, 2010
+
+         ORGANIZATION
+	      IETF Control And Provisioning of Wireless Access
+              Points (CAPWAP) Working Group
+              http://www.ietf.org/html.charters/capwap-charter.html
+
+	 DESCRIPTION
+	      Copyright (C) 2010 The Internet Society.  This version of
+              the MIB module is part of RFC xxx; see the RFC itself
+              for full legal notices.
+     
+              This MIB module contains managed object definitions for
+              the CAPWAP Protocol.
+	
+	 CONTACT-INFO
+	      General Discussion: capwap@frascone.com
+              To Subscribe: http://lists.frascone.com/mailman/listinfo/capwap
+
+              Yang Shi (editor)
+              Hangzhou H3C Tech. Co., Ltd.
+              Beijing R&D Center of H3C, Digital Technology Plaza,
+              NO.9 Shangdi 9th Street,Haidian District,
+              Beijing
+              China(100085)
+              Phone: +86 010 82775276
+              EMail: young@h3c.com
+
+              David T. Perkins
+              228 Bayview Dr
+              San Carlos, CA 94070
+              USA
+              Phone: +1 408 394-8702
+              Email:  dperkins@snmpinfo.com
+
+              Chris Elliott
+              Cisco Systems, Inc.
+              7025 Kit Creek Rd., P.O. Box 14987
+              Research Triangle Park  27709
+              USA
+              Phone: +1 919-392-2146
+              Email: chelliot@gmail.com
+
+              Yong Zhang
+              Fortinet, Inc.
+              1090 Kifer Road
+              Sunnyvale, CA 94086
+              USA
+              Email: yzhang@fortinet.com"
+    REVISION    "201007120000Z"
+    DESCRIPTION
+        "Initial version extracted from RFC 5833 as of May 2010."
+   -- TODO
+        ::= { mib-2 60 }
+
+
+-- Top level components of this MIB module
+
+-- Tables, Scalars
+capwapBaseObjects OBJECT IDENTIFIER
+    ::= { capwapBaseMIB 1 }
+
+
+-- CAPWAP Base Parameters Group
+
+capwapBaseParameters OBJECT IDENTIFIER
+    ::= { capwapBaseObjects 3 }
+
+capwapBaseAcMaxRetransmit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of retransmissions for a given
+         CAPWAP packet before the link layer considers the peer dead.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.8.7. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 5 }
+    ::= { capwapBaseParameters 1 }
+
+capwapBaseAcChangeStatePendingTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time, in seconds, the AC will wait
+         for the Change State Event Request from the WTP after having
+         transmitted a successful Configuration Status Response
+         message.
+         The value is multiplied by the number of WTP's radio-modules.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.1. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 150 }
+    ::= { capwapBaseParameters 2 }
+
+capwapBaseAcDataCheckTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents The number of seconds the AC will wait for
+         the Data Channel Keep Alive, which is required by the
+         CAPWAP state machine's Data Check state.
+         The AC resets the state machine if this timer expires
+         prior to transitioning to the next state.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.4. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseParameters 3 }
+
+-- capwapBaseAcDTLSSessionDeleteTimer OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     UNITS       "second"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Represents the minimum time, in seconds, the AC MUST wait
+--          for DTLS session deletion.
+--          The value of the object is persistent at restart/reboot."
+--     REFERENCE
+--         "Section 4.7.6. of CAPWAP Protocol Specification, RFC 5415."
+--     DEFVAL { 5 }
+--     ::= { capwapBaseParameters 4 }
+
+capwapBaseAcEchoInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, between sending Echo
+         Request messages to the AC with which the WTP has joined.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.7. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 10 }
+    ::= { capwapBaseParameters 5 }
+
+capwapBaseAcRetransmitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, in which a
+         non-acknowledged CAPWAP packet will be retransmitted.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.12. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 3 }
+    ::= { capwapBaseParameters 6 }
+
+-- capwapBaseAcSilentInterval OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     UNITS       "second"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Represents the minimum time, in seconds, during which the AC
+--          SHOULD ignore all CAPWAP and DTLS packets received from the
+--          WTP that is in the Sulking state.
+--          The value of the object is persistent at restart/reboot."
+--     REFERENCE
+--         "Section 4.7.13. of CAPWAP Protocol Specification, RFC 5415."
+--     DEFVAL { 30 }
+--     ::= { capwapBaseParameters 7 }
+-- 
+-- capwapBaseAcWaitDTLSTimer OBJECT-TYPE
+--     SYNTAX      Unsigned32 (30..4294967295)
+--     UNITS       "second"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Represents the maximum time, in seconds, the AC MUST wait
+--          without having received a DTLS Handshake message from an AC.
+--          This timer MUST be greater than 30 seconds.
+--          The value of the object is persistent at restart/reboot."
+--     REFERENCE
+--         "Section 4.7.15. of CAPWAP Protocol Specification, RFC 5415."
+--     DEFVAL { 60 }
+--     ::= { capwapBaseParameters 8 }
+
+capwapBaseAcWaitJoinTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (20..4294967295)
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time, in seconds, the AC will wait
+         after the DTLS session has been established until it receives
+         the Join Request from the WTP. This timer MUST be greater
+         than 20 seconds.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.16. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 60 }
+    ::= { capwapBaseParameters 9 }
+
+-- capwapBaseAcEcnSupport OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                   limited(0),
+--                   fullAndLimited(1)
+--                 }
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Represents the support for the Explicit Congestion Notification
+--          (ECN) bits, as defined in [RFC3168].
+--          The value of the object is persistent at restart/reboot.
+--          The following enumerated values are supported:
+--            limited(0)        - Limited ECN support
+--            fullAndLimited(1) - Full and limited ECN support
+--          Note that the CAPWAP field [RFC5415] modelled by this
+--          object takes zero as starting value, this MIB object follows
+--          this rule."
+--     REFERENCE
+--         "Section 4.6.25. of CAPWAP Protocol Specification, RFC 5415."
+--     ::= { capwapBaseParameters 10 }
+
+-- End of CAPWAP Base Parameters Group
+
+END

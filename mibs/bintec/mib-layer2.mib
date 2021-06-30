@@ -1,0 +1,316 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2006-2016 bintec elmeg GmbH
+-- $RCSfile: mib-layer2,v $ 
+-- $Revision: 1.9 $ 
+-- $Date: 2016-07-04 11:17:10 $
+---------------------------------------------------------------------------
+
+FEC-LAYER2-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, enterprises
+		FROM SNMPv2-SMI
+
+	    MacAddress, TruthValue
+		FROM SNMPv2-TC
+
+	    bibo
+		FROM BINTEC-MIB
+		;
+
+    bintec  OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo    OBJECT IDENTIFIER ::= { bintec 4 }
+	
+	layer2 MODULE-IDENTITY
+		LAST-UPDATED "201607040000Z"
+		ORGANIZATION "bintec elmeg GmbH"
+		CONTACT-INFO
+		"EMail:   info@bintec-elmeg.com
+		 Web:     www.bintec-elmeg.com"
+		DESCRIPTION
+		"The MIB module for layer-2 administration entities."
+		REVISION	"201510080000Z"
+		DESCRIPTION
+		"Layer-2 MIB." 
+
+    ::= { bibo 56 }
+
+    -- Management Information for the layer2 subsystem 
+
+	-- **********************************************************************
+	-- *	layer2BridgeTable TABLE
+	-- **********************************************************************
+	layer2BridgeTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Layer2BridgeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The layer-2 learn table contains information about all learned hosts
+		 identified by their MAC addresses, the bridge group each host belongs to,
+		 and the port over which each host is currently reachable."
+	::= { layer2 1 }
+
+	layer2BridgeEntry OBJECT-TYPE
+		SYNTAX		Layer2BridgeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Each entry consists of a unique MAC address and corresponding
+		 layer-2 informations."
+		INDEX {
+			layer2BridgeMacAddr
+		}
+	::= { layer2BridgeTable 1 }
+
+	Layer2BridgeEntry ::=
+		SEQUENCE {
+			layer2BridgeMacAddr		MacAddress,
+			layer2BridgePortIfIndex	INTEGER,
+			layer2BridgeIndex	INTEGER
+		}
+
+	layer2BridgeMacAddr OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The MAC address identifying the host on layer-2."
+	::= { layer2BridgeEntry 1 }
+
+	layer2BridgePortIfIndex OBJECT-TYPE
+		SYNTAX		INTEGER 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The layer-2 port over which the host is currently reachable."
+	::= { layer2BridgeEntry 2 }
+
+-- obsolete  layer2BridgeLinkIfIndex OBJECT-TYPE ::= { layer2BridgeEntry 3 }
+
+	layer2BridgeIndex OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The bridge group the host logically belongs to."
+	::= { layer2BridgeEntry 4 }
+
+
+	-- **********************************************************************
+	-- *	layer25BridgeTable TABLE
+	-- **********************************************************************
+	layer25BridgeTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Layer25BridgeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The layer-2.5 table contains information about all learned hosts
+		 connected to mobile LANs on layer-2 using layer-3 names.
+		 Each association consists of the host's IP address, MAC address,
+		 logical bridge group, and the port over which the host is currently
+		 reachable."
+	::= { layer2 2 }
+
+	layer25BridgeEntry OBJECT-TYPE
+		SYNTAX		Layer25BridgeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Each entry consists of a unique IP address and corresponding
+		 layer-2 informations."
+		INDEX {
+			layer25BridgeIpAddr
+		}
+	::= { layer25BridgeTable 1 }
+
+	Layer25BridgeEntry ::=
+		SEQUENCE {
+			layer25BridgeIpAddr			IpAddress,
+			layer25BridgeMacAddr		MacAddress,
+			layer25BridgePortIfIndex	INTEGER,
+			layer25BridgeLinkIfIndex	INTEGER
+		}
+
+	layer25BridgeIpAddr OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The IP address identifying the host on layer-3."
+	::= { layer25BridgeEntry 1 }
+
+	layer25BridgeMacAddr OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The MAC address identifying the host on layer-2."
+	::= { layer25BridgeEntry 2 }
+
+	layer25BridgePortIfIndex OBJECT-TYPE
+		SYNTAX		INTEGER 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The layer-2 port over which the host is currently reachable."
+	::= { layer25BridgeEntry 3 }
+
+	layer25BridgeLinkIfIndex OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The bridge group the host logically belongs to."
+	::= { layer25BridgeEntry 4 }
+
+
+	-- **********************************************************************
+	-- *	layer25WildcardTable TABLE
+	-- **********************************************************************
+	layer25WildcardTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Layer25WildcardEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The layer-2.5 wildcard table contains information about
+		 the handling of non-IP and non-ARP frames for each of
+		 the layer-2.5 instances."
+	::= { layer2 3 }
+
+	layer25WildcardEntry OBJECT-TYPE
+		SYNTAX		Layer25WildcardEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Each entry contains a unique layer-2.5 interface instance."
+		INDEX {
+			layer25WildcardIfIndex
+		}
+	::= { layer25WildcardTable 1 }
+
+	Layer25WildcardEntry ::=
+		SEQUENCE {
+			layer25WildcardIfIndex		INTEGER,
+			layer25WildcardMode			INTEGER,
+			layer25WildcardMacAddr		MacAddress,
+			layer25WildcardTransparent	TruthValue
+		}
+
+	layer25WildcardIfIndex OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The interface index identifying the layer-2.5 interface instance."
+	::= { layer25WildcardEntry 1 }
+
+	layer25WildcardMode OBJECT-TYPE
+		SYNTAX		INTEGER {
+			none(0),
+			static(1),
+			first(2),
+			last(3),
+			reset(4)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"The layer-2.5 wildcard mode determines the handling of non-IP/ARP frames.
+		 With wildcard mode equal to none(0), any unicast non-IP/ARP frames get dropped.
+		 With wildcard mode equal to static(1), the wildcard MAC address is writable
+		 and any unicast non-IP/ARP frames will be converted using that MAC address.
+		 With wildcard mode first(2), the source MAC address of the first frame received
+		 on the mobile LAN determines the wildcard MAC address - independent of the
+		 protocol type. With wildcard mode last(3), the source MAC address of the last
+		 non-IP/ARP frame received determines the wildcard MAC address.
+		 The wildcard mode reset(4) resets the learn table and in case of wildcard mode
+		 first(2) and last(3) also the wildcard MAC address."
+		DEFVAL { last }
+	::= { layer25WildcardEntry 2 }
+
+	layer25WildcardMacAddr OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"The MAC address used for translating non-IP/ARP frames."
+	::= { layer25WildcardEntry 3 }
+
+	layer25WildcardTransparent OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"The transparent value determines if the physical MAC address of the
+		 layer-2.5 interface is updated with the wildcard MAC address.
+		 This option can be enabled only if the wilcard mode is set
+		 to either static(1) or first(2)."
+		DEFVAL { false }
+	::= { layer25WildcardEntry 4 }
+
+	-- **********************************************************************
+	-- *	bridgeTable TABLE
+	-- **********************************************************************
+	bridgeTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF BridgeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The BridgeTable allows setting of parameters for
+		 configured bridges."
+	::= { layer2 4 }
+
+	bridgeEntry OBJECT-TYPE
+		SYNTAX		BridgeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The system will create an entry for each configured
+		 bridge. Each entry provides settings for these bridges."
+		INDEX {
+			bridgeIndex
+		}
+	::= { bridgeTable 1 }
+
+	BridgeEntry ::=
+		SEQUENCE {
+			bridgeIndex    	INTEGER,
+			bridgeVlan	INTEGER,
+			bridgeWlanFilter INTEGER
+		}
+
+	bridgeIndex OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Index of the bridge."
+	::= { bridgeEntry 1 }
+
+	bridgeVlan OBJECT-TYPE
+	        SYNTAX  INTEGER { enabled(1), disabled(2) }
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"VLAN operation mode of the bridge:
+		   enabled:  bridge is VLAN aware
+		   disabled: transparent bridge.
+		"
+		DEFVAL { disabled }
+	::= { bridgeEntry 2 }
+		
+	bridgeWlanFilter OBJECT-TYPE
+	        SYNTAX  INTEGER { enabled(1), disabled(2) }
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"If enabled bridge will drop packets from
+		 WLAN ports directed to WLAN ports.
+		"
+		DEFVAL { disabled }
+	::= { bridgeEntry 3 }
+
+END

@@ -1,0 +1,617 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2011-2014 bintec elmeg GmbH
+---------------------------------------------------------------------------
+
+FEC-IPLOADB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, Counter32, mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    biboip
+        FROM BINTEC-MIB;
+
+---------------------------------------------------------------------------
+-- iploadbMIB
+---------------------------------------------------------------------------
+iploadbMIB MODULE-IDENTITY
+    LAST-UPDATED "201112020000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+	    "EMail:   info@bintec-elmeg.com
+	     Web:     www.bintec-elmeg.com
+	    "
+    DESCRIPTION
+            "MIB for IP load Balancing."
+    REVISION      "201111230000Z"
+    DESCRIPTION
+            "IPLOADB MIB." 
+    ::= { biboip 252 }
+
+
+-- **********************************************************************
+-- *    ipLoadBGroup  TABLE
+-- **********************************************************************
+
+	ipLoadBGroupTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF IpLoadBGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ipLoadBGroupTable contains parameters related to the
+		 IP session-based load balancing algorithm. Each entry
+		 defines a load balancing interface group, the members
+		 of this group (interfaces) are associated via specific
+		 entries in the ipLoadBIfTable.
+		 Entries can only be added or deleted by the user.
+		 
+		 Creating entries: Entries are created by assigning a
+		 value to the ipLoadBGroupId object.
+		 
+		 Deleting entries: Entries are removed by setting an
+		 entry's ipLoadBGroupDistributionMode object to 'delete'."
+
+        ::= { biboip 40 }
+
+        ipLoadBGroupEntry OBJECT-TYPE
+            SYNTAX IpLoadBGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                ""
+            INDEX { ipLoadBGroupId }
+        ::= { ipLoadBGroupTable 1 }
+
+	
+	IpLoadBGroupEntry ::=
+            SEQUENCE {
+	        ipLoadBGroupId			INTEGER,
+                ipLoadBGroupDescription		DisplayString, 
+		ipLoadBGroupDistributionPolicy 	INTEGER,
+		ipLoadBGroupDistributionMode 	INTEGER
+           }
+
+	ipLoadBGroupId OBJECT-TYPE
+	    SYNTAX INTEGER  (0..99)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Unique ID for the IP load balancing interface group."
+	    DEFVAL { 0 }
+        ::= { ipLoadBGroupEntry 1 }
+
+        ipLoadBGroupDescription OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Short Description for the IP load balancing interface
+		 group."
+            DEFVAL { "" }
+        ::= { ipLoadBGroupEntry 2 }
+
+        ipLoadBGroupDistributionPolicy OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	round-robin(1),
+		load-dependent(2),
+		download-dependent(3),
+		upload-dependent(4),
+		static-routing(5)
+	    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The distribution policy for the sesson-based IP load
+		 balancing algorithm. If set to round-robin(1) new IP
+		 sessions will be distributed to one member of the interface
+		 group according the ratio defined in ipLoadBIfTable
+		 (weighted round-robin policy).
+		 If set to load-dependent(2) new IP sessions will be
+		 distributed to one member of the group according the
+		 projected ratio (defined via ipLoadBIfTable) of bandwidth
+		 consumption in receive and transmit direction.
+		 If set to download-dependent(3) new IP sessions will be
+		 distributed to one member of the group according the
+		 projected ratio (defined via ipLoadBIfTable) of bandwidth
+		 consumption in receive direction (download only).
+		 If set to upload-dependent(4) new IP sessions will be
+		 distributed to one member of the group according the
+		 projected ratio (defined via ipLoadBIfTable) of bandwidth
+		 consumption in transmit direction (upload only).
+		 If set to static-routing(5) new sessions will be distributed
+		 according the source/destination IP addresses and/or
+		 protocols/services defined via specific ipExtRtTable entries." 
+	    DEFVAL { round-robin }
+        ::= { ipLoadBGroupEntry 3 }
+
+        ipLoadBGroupDistributionMode OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	always(1),
+		up-only(2),
+		delete(10)
+	    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The distribution mode for the sesson-based IP load
+		 balancing algorithm. This variable determines the
+		 ifOperStatus conditions of the IP load balancing
+		 interface group members to be considered for the
+		 session distribution procedure. If set to always(1)
+		 the interface is used either at once or - if the status
+		 is dormant - the ifAdminStatus is set to dialup to bring
+		 the interface in the up state. If set to up-only(2), the
+		 interfaces which are not in the up state will be ignored."
+	    DEFVAL { always }
+        ::= { ipLoadBGroupEntry 4 }
+
+-- **********************************************************************
+-- *    ipLoadBIf  TABLE
+-- **********************************************************************
+
+	ipLoadBIfTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF IpLoadBIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ipLoadBIfTable contains parameters related to the
+		 IP session-based load balancing algorithm. Each entry
+		 defines a load balancing interface group member via
+		 it's unique interface index. 
+		 Entries can only be added or deleted by the user.
+		 
+		 Creating entries: Entries are created by assigning a
+		 value to the ipLoadBIfIndex object.
+		 
+		 Deleting entries: Entries are removed by setting an
+		 entry's ipLoadBIfMode object to 'delete'."
+
+        ::= { biboip 41 }
+
+        ipLoadBIfEntry OBJECT-TYPE
+            SYNTAX IpLoadBIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                ""
+            INDEX { ipLoadBIfIndex }
+        ::= { ipLoadBIfTable 1 }
+
+	
+	IpLoadBIfEntry ::=
+            SEQUENCE {
+	        ipLoadBIfIndex			INTEGER,
+                ipLoadBIfGroupId		INTEGER, 
+		ipLoadBIfRatio		 	INTEGER,
+		ipLoadBIfMode		 	INTEGER,
+		ipLoadBIfActAssignedSessions 	Counter32,
+		ipLoadBIfTotAssignedSessions 	Counter32,
+		ipLoadBIfActLoad	 	INTEGER,
+		ipLoadBIfActDownLoad		INTEGER,
+		ipLoadBIfActUpLoad		INTEGER,
+		ipLoadBIfDestSelect		INTEGER,
+		ipLoadBIfRtDest			IpAddress,
+		ipLoadBIfExtRtDest		IpAddress,
+		ipLoadBIfTrackingAddr		IpAddress,
+		ipLoadBIfTrackingStatus		INTEGER
+           }
+
+	ipLoadBIfIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The unique interface index."
+	    DEFVAL { 0 }
+        ::= { ipLoadBIfEntry 1 }
+
+	ipLoadBIfGroupId OBJECT-TYPE
+	    SYNTAX INTEGER  (0..99)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The unique ID of the interface group which the interface
+		 specified by the variable ipLoadBIfIndex belongs to."
+	    DEFVAL { 0 }
+        ::= { ipLoadBIfEntry 2 }
+
+	ipLoadBIfRatio OBJECT-TYPE
+	    SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "For statistical IP session distribution only, determines
+		 the fraction of of all sessions or bandwidth consumption
+		 of the whole group projected for this interface."
+	    DEFVAL { 50 }
+        ::= { ipLoadBIfEntry 3 }
+
+	ipLoadBIfMode OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	enabled(1),
+		disabled(2),
+		delete(10)
+	    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Currently an auxiliary variable for the user to enable/
+		 disable the associated interface for load balancing or
+		 to delete this entry."
+	    DEFVAL { enabled }
+        ::= { ipLoadBIfEntry 4 }
+
+	ipLoadBIfActAssignedSessions OBJECT-TYPE
+	    SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of distributed IP sessions to the associated
+		 interface since last configuration or status change of
+		 the interface group."
+        ::= { ipLoadBIfEntry 5 }
+
+	ipLoadBIfTotAssignedSessions OBJECT-TYPE
+	    SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of distributed IP sessions to the associated
+		 interface since startup of the system or enabling the
+		 load balancing."
+        ::= { ipLoadBIfEntry 6 }
+
+	ipLoadBIfActLoad OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current bandwidth consumption in bits per second."
+        ::= { ipLoadBIfEntry 7 }
+
+	ipLoadBIfActDownLoad OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current bandwidth consumption (download) in bits per second."
+        ::= { ipLoadBIfEntry 8 }
+
+	ipLoadBIfActUpLoad OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current bandwidth consumption (upload) in bits per second."
+        ::= { ipLoadBIfEntry 9 }
+
+	ipLoadBIfDestSelect OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	none(1),
+		rt(2),
+		extrt(3)
+	    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "In conjunction with the variable 'ipLoadBIfRtDest' or
+		 'ipLoadBIfExtRtDest' this setting provides additional
+		 granularity for load balancing group configuration by
+		 checking the association with 'ipRouteTable'/'ipExtRtTable'
+		 entries. This check is done against 'ipLoadBIfRtDest' if set
+		 to rt (2) or against 'ipLoadBIfExtRtDest' if set to extrt (3)."
+	    DEFVAL { none }
+        ::= { ipLoadBIfEntry 10 }
+
+	ipLoadBIfRtDest OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Points to one ipRouteTable entry associated with the
+		 interface index defined in variable ipLoadBIfIndex. If set
+		 it provides additional granularity for load balancing group
+		 configuration, necessary for example if load balancing should
+		 be enabled only within one of several subnets reachable via
+		 that interface."
+        ::= { ipLoadBIfEntry 11 }
+
+	ipLoadBIfExtRtDest OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Points to one ipExtRtTable entry associated with the
+		 interface index defined in variable ipLoadBIfIndex. If set
+		 it provides additional granularity for load balancing group
+		 configuration, necessary for example if load balancing should
+		 be enabled only within one of several subnets reachable via
+		 that interface."
+        ::= { ipLoadBIfEntry 12 }
+
+	ipLoadBIfTrackingAddr OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Points to one ipHostsAliveTable table entry specified via
+		 'ipHostsAliveIPAddress', therefore in conjunction with the
+		 'Keep Alive Monitoring' feature it's possible to check the
+		 reachability of the subnet determined by ipLoadBIfRtDest or
+		 ipLoadBIfExtRtDest. Note that it's not (!) mandatory that
+		 ipLoadBIfTrackingAddr is part of this IP subnet."
+        ::= { ipLoadBIfEntry 13 }
+
+	ipLoadBIfTrackingStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	up(1),
+		down(2)
+	    }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "In conjunction with ipLoadBIfTrackingAddr this variable
+		 represents the 'ipHostsAliveState' of the referred
+		 ipHostsAliveTable entry, ipHostsAliveState_down (2) leads to
+		 ipLoadBIfTrackingStatus_down (2), in this case this entry will
+		 be considered as operational down and therefore will not be
+		 used for the load balancing procedure."
+	    DEFVAL { up }
+        ::= { ipLoadBIfEntry 20 }
+
+-- **********************************************************************
+-- *    ipLoadBExtHandling  TABLE
+-- **********************************************************************
+
+	iploadBExtHandlingTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF IploadBExtHandlingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The iploadBExtHandlingTable contains IP-related parameters
+		 in order to specify special load balancing handling
+		 for specific traffic like HTTPS sessions for example.
+		 The intention is to share the same load balancing decision
+		 (which means usage of the same destination interface) for
+		 different but subsequent sessions belonging together on higher
+		 level context. This stickiness of a load balancing decision
+		 has a configurable minimum livetime.
+		 Entries can only be added or deleted by the user."
+
+        ::= { biboip 66 }
+
+        iploadBExtHandlingEntry OBJECT-TYPE
+            SYNTAX IploadBExtHandlingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                ""
+            INDEX { iploadBExtHandlingIndex }
+        ::= { iploadBExtHandlingTable 1 }
+
+        IploadBExtHandlingEntry ::=
+            SEQUENCE {
+	        iploadBExtHandlingIndex			INTEGER,
+            	iploadBExtHandlingDescr			DisplayString,
+	        iploadBExtHandlingAdminStatus		INTEGER,
+	        iploadBExtHandlingOrder			INTEGER,
+	        iploadBExtHandlingProtocol		INTEGER,
+	        iploadBExtHandlingSrcAddr		IpAddress,
+	        iploadBExtHandlingSrcMask		IpAddress,
+	        iploadBExtHandlingSrcPort		INTEGER,
+            	iploadBExtHandlingSrcRange		INTEGER,
+	        iploadBExtHandlingSrcIfIndex		INTEGER,
+	        iploadBExtHandlingDstAddr		IpAddress,
+	        iploadBExtHandlingDstMask		IpAddress,
+	        iploadBExtHandlingDstPort		INTEGER,
+            	iploadBExtHandlingDstRange		INTEGER,
+	        iploadBExtHandlingLifetime		INTEGER,
+            	iploadBExtHandlingCacheGranularity	BITS
+           }
+
+	iploadBExtHandlingIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The unique index."
+	    DEFVAL { 0 }
+        ::= { iploadBExtHandlingEntry 1 }
+
+	iploadBExtHandlingDescr OBJECT-TYPE
+	    SYNTAX DisplayString (SIZE(0..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is an description name for this entry"
+        ::= { iploadBExtHandlingEntry 2 }
+
+	iploadBExtHandlingAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	enabled(1),
+	    	disabled(2),
+	    	delete(10)
+	    	}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The administrative status of this entry."
+	    DEFVAL { enabled }
+        ::= { iploadBExtHandlingEntry 3 }
+
+	iploadBExtHandlingOrder OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Order is used to get a first match, because best match
+		 search is not possible here."
+	    DEFVAL { 0 }
+        ::= { iploadBExtHandlingEntry 4 }
+
+	iploadBExtHandlingProtocol OBJECT-TYPE
+        SYNTAX  INTEGER { 
+            dont-verify(0),
+            icmp(1), 
+            igmp(2), 
+            ggp(3), 
+            tcp(6), 
+            egp(8), 
+            pup(12), 
+            udp(17), 
+            hmp(20), 
+            xns-idp(22), 
+            rdp(27),
+            rsvp(46),
+            ipv6(41),
+            gre(47),
+            esp(50),
+            ah(51),
+            igrp(88),
+            ospf(89),
+            pim(103),
+            l2tp(115)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of the protocol field in the ip header.
+		 A value of 0 means not to check this value."
+	    DEFVAL { dont-verify }
+        ::= { iploadBExtHandlingEntry 5 }
+
+	iploadBExtHandlingSrcAddr OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The source IP address, used in conjunction with
+		 iploadBExtHandlingSrcMask. A value of 0 means not to check
+		 this value."
+	    DEFVAL { '00000000'H }
+        ::= { iploadBExtHandlingEntry 6 }
+
+	iploadBExtHandlingSrcMask OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The source IP address mask, used in conjunction with
+		 iploadBExtHandlingSrcAddr."
+	    DEFVAL { '00000000'H }
+        ::= { iploadBExtHandlingEntry 7 }
+
+	iploadBExtHandlingSrcPort OBJECT-TYPE
+	    SYNTAX INTEGER (-1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The starting UDP/TCP source port.
+		 A value of -1 means not to check this value."
+	    DEFVAL { -1 }
+        ::= { iploadBExtHandlingEntry 8 }
+
+    iploadBExtHandlingSrcRange OBJECT-TYPE
+	    SYNTAX INTEGER (-1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The ending UDP/TCP source port.
+		 A value of -1 means not to check this value."
+	    DEFVAL { -1 }
+        ::= { iploadBExtHandlingEntry 9 }
+
+	iploadBExtHandlingSrcIfIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The source interface.
+		 A value of -1 means not to check this value."
+	    DEFVAL { -1 }
+        ::= { iploadBExtHandlingEntry 10 }
+        
+	iploadBExtHandlingDstAddr OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The destination IP address, used in conjunction with
+		 iploadBExtHandlingDstMask. A value of 0 means not to check
+		 this value."
+	    DEFVAL { '00000000'H }
+        ::= { iploadBExtHandlingEntry 11 }
+
+	iploadBExtHandlingDstMask OBJECT-TYPE
+	    SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The destination IP address mask, used in conjunction with
+		 iploadBExtHandlingDstAddr."
+	    DEFVAL { '00000000'H }
+        ::= { iploadBExtHandlingEntry 12 }
+
+	iploadBExtHandlingDstPort OBJECT-TYPE
+	    SYNTAX INTEGER (-1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The starting UDP/TCP destination port.
+		 A value of -1 means not to check this value."
+	    DEFVAL { -1 }
+        ::= { iploadBExtHandlingEntry 13 }
+
+	iploadBExtHandlingDstRange OBJECT-TYPE
+	    SYNTAX INTEGER (-1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The ending UDP/TCP destination port.
+		 A value of -1 means not to check this value."
+	    DEFVAL { -1 }
+        ::= { iploadBExtHandlingEntry 14 }
+
+	iploadBExtHandlingLifetime OBJECT-TYPE
+	    SYNTAX INTEGER (30..2147483647)
+	    UNITS "s"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This variabl specifies the minmum lifetime of load balancing
+		 decisions' stickiness which was triggered by a matching
+		 session before."
+	    DEFVAL { 900 }
+        ::= { iploadBExtHandlingEntry 15 }
+
+	iploadBExtHandlingCacheGranularity OBJECT-TYPE
+	    SYNTAX BITS {
+            srcIP(0),
+            dstIP(1),
+            dstPort(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Specifies the granularity of the stickiness,
+		 ((1) enabled or (0) disabled)
+                  srcIP  : source IP has to match exactly
+                  dstIP  : destination IP has to match exactly
+                  dstPort: destination port has to match exactly
+                "
+	    DEFVAL { {srcIP, dstIP, dstPort} }
+        ::= { iploadBExtHandlingEntry 16 }
+END

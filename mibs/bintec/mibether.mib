@@ -1,0 +1,124 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $Revision: 1.10 $ 
+
+BIANCA-ETH-IF-MIB DEFINITIONS ::= BEGIN
+
+
+	IMPORTS
+	    NetworkAddress, IpAddress, Counter, Gauge, TimeTicks, enterprises
+		FROM RFC1155-SMI
+
+	    OBJECT-TYPE
+		FROM RFC-1212;
+
+	--  This MIB module uses the extended OBJECT-TYPE macro as
+	--  defined in [14];
+
+
+	--  MIB-II (same prefix as MIB-I)
+	bintec 		OBJECT IDENTIFIER ::= { enterprises 272 }
+	bibo		OBJECT IDENTIFIER ::= { bintec 4 }
+	eth		OBJECT IDENTIFIER 
+	::= { bibo 37 }
+
+    -- Interfaces Group
+
+    -- Management Information for non-standard interface settings of
+    -- BIANCA/BRICK
+
+	Date ::= INTEGER
+	HexValue ::= INTEGER
+        PhysAddress ::= OCTET STRING
+
+
+        ethIfTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF EthIfEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The ethIfTable allows to perform interface status changes of
+		 one or more interfaces based on a status transition of another
+		 interface."
+	::= { eth 1 }
+
+	ethIfEntry OBJECT-TYPE
+            SYNTAX  EthIfEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { ethIfIndex }
+              ::= { ethIfTable 1 }
+
+	EthIfEntry ::=
+            SEQUENCE {
+		ethIfIndex			INTEGER,
+		ethIfPortGroup			INTEGER,
+		ethIfMACSlot			INTEGER,
+		ethIfMACUnit			INTEGER,
+		ethIfAdminStatus		INTEGER
+            }
+
+        ethIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+		"A unique value for each interface. Its value ranges  
+                between 1000 and the value of ifNumber. The following 
+                information is encoded in the ifIndex:
+                
+                 a. An ifIndex between 1000 and 9999 define  
+                    hardware  interfaces with the following attributes.
+                 
+                 b. An ifIndex greater than or equal to 10000 defines
+                    a software interface. Examples include the 
+                    dialup-interfaces as defined in the  biboPPPTable."
+
+              ::= { ethIfEntry 1 }
+
+-- obsolete	ethIfPhysAddr OBJECT-TYPE ::= { ethIfEntry 2 }
+
+-- obsolete	ethIfOrigPhysAddr OBJECT-TYPE ::= { ethIfEntry 3 }
+
+	ethIfPortGroup OBJECT-TYPE
+              SYNTAX  INTEGER (0..99)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port group the interface is member of."
+              ::= { ethIfEntry 4 }
+
+	ethIfMACSlot OBJECT-TYPE
+              SYNTAX  INTEGER (0..9)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The slot of the connected media access controller."
+              ::= { ethIfEntry 5 }
+
+	ethIfMACUnit OBJECT-TYPE
+              SYNTAX  INTEGER (0..9)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The unit of the connected media access controller."
+              ::= { ethIfEntry 6 }
+
+	ethIfAdminStatus OBJECT-TYPE
+              SYNTAX  INTEGER { 
+	          down(1),
+		  up(2)
+	      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      ""
+	      DEFVAL  { down }
+              ::= { ethIfEntry 7 }
+
+END

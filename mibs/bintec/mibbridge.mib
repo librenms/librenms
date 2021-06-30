@@ -1,0 +1,1283 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibbridge,v $ 
+-- $Revision: 1.28 $ 
+
+BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+          IMPORTS
+                     Counter, TimeTicks, enterprises
+                             FROM RFC1155-SMI
+                     OBJECT-TYPE
+                             FROM RFC-1212
+                     TRAP-TYPE
+                             FROM RFC-1215
+                     MacAddress
+                             FROM SNMPv2-TC;
+			     
+          -- All representations of MAC addresses in this MIB Module
+          -- use, as a textual convention (i.e. this convention does
+          -- not affect their encoding), the data type:
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    dot1dBridge	OBJECT IDENTIFIER
+	::= { bibo 8 }
+
+
+          BridgeId ::= OCTET STRING
+	  -- (SIZE (8))   the
+	  -- Bridge-Identifier as used in the Spanning Tree
+          -- Protocol to uniquely identify a bridge.  Its first two
+          -- octets (in network byte order) contain a priority
+          -- value and its last 6 octets contain the MAC address
+          -- used to refer to a bridge in a unique fashion
+          -- (typically, the numerically smallest MAC address
+          -- of all ports on the bridge).
+
+
+          -- Several objects in this MIB module represent values of
+          -- timers used by the Spanning Tree Protocol.  In this
+          -- MIB, these timers have values in units of hundreths of
+          -- a second (i.e. 1/100 secs).
+          -- These timers, when stored in a Spanning Tree Protocol's
+          -- BPDU, are in units of 1/256 seconds.  Note, however,
+          -- that 802.1D-1990 specifies a settable granularity of
+          -- no more than 1 second for these timers.  To avoid
+          -- ambiguity, a data type is defined here as a textual
+          -- convention and all representation of these timers
+          -- in this MIB module are defined using this data type.  An
+          -- algorithm is also defined for converting between the
+          -- different units, to ensure a timer's value is not
+          -- distorted by multiple conversions.
+          -- The data type is:
+
+          Timeout ::= INTEGER -- a STP timer in units of 1/100 seconds
+
+          -- To convert a Timeout value into a value in units of
+          -- 1/256 seconds, the following algorithm should be used:
+          --
+          --      b  = floor( (n * 256) / 100)
+          --
+          -- where:
+          --      floor   =  quotient [ignore remainder]
+          --      n is the value in 1/100 second units
+          --      b is the value in 1/256 second units
+          --
+          -- To convert the value from 1/256 second units back to
+          -- 1/100 seconds, the following algorithm should be used:
+          --
+          --      n = ceiling( (b * 100) / 256)
+          --
+          -- where:
+          --      ceiling =  quotient [if remainder is 0], or
+          --                 quotient + 1 [if remainder is non-zero]
+          --      n is the value in 1/100 second units
+          --      b is the value in 1/256 second units
+          --
+          -- Note: it is important that the arithmetic operations are
+          -- done in the order specified (i.e., multiply first, divide
+          -- second).
+
+
+          -- groups in the Bridge MIB
+
+          dot1dBase     OBJECT IDENTIFIER ::= { dot1dBridge 1 }
+
+          dot1dStp      OBJECT IDENTIFIER ::= { dot1dBridge 2 }
+
+          dot1dSr       OBJECT IDENTIFIER ::= { dot1dBridge 3 }
+          -- separately documented
+
+          dot1dTp       OBJECT IDENTIFIER ::= { dot1dBridge 4 }
+
+          dot1dStatic   OBJECT IDENTIFIER ::= { dot1dBridge 5 }
+
+          -- the dot1dBase group
+
+          -- Implementation of the dot1dBase group is mandatory for all
+          -- bridges.
+
+          dot1dBaseBridgeAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+		"The MAC address used by the BRICK when it must be
+                referred to in a unique fashion.   It is recommended that
+                this be the numerically smallest MAC address of all ports
+                belonging to the BRICK. However it is only required to
+                be unique. When concatenated with dot1dStpPriority a
+                unique BridgeIdentifier is formed which is used in the
+                Spanning Tree Protocol."
+              REFERENCE
+                      "IEEE 802.1D-1990: Sections 6.4.1.1.3 and 3.12.5"
+              ::= { dot1dBase 1 }
+
+          dot1dBaseNumPorts OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of ports controlled by the BRICK."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.4.1.1.3"
+              ::= { dot1dBase 2 }
+
+          dot1dBaseType OBJECT-TYPE
+
+
+              SYNTAX  INTEGER {
+                          unknown(1),
+                          transparent-only(2),
+                          sourceroute-only(3),
+                          srt(4)
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+		"Indicates what type of bridging this BRICK can perform.
+                If the BRICK is actually performing a certain type
+                of bridging this will be indicated by entries in the port 
+                table for the given type."
+	      DEFVAL { transparent-only }
+              ::= { dot1dBase 3 }
+
+          -- The Generic Bridge Port Table
+
+          dot1dBasePortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1dBasePortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+		"The dot1dBasePortTable contains generic information
+                 about each port associated with the BRICK. Transparent,
+                source-route, and srt ports are included. Entries
+                in this table correspond to entries in the ifTable and can
+                only be added by the system.
+
+                Creating entries: New entries are added when a new
+                entry is made to the ifTable.
+
+                Deleting entries: Entries can not be removed."
+              ::= { dot1dBase 4 }
+
+          dot1dBasePortEntry OBJECT-TYPE
+              SYNTAX  Dot1dBasePortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of information for each port of the
+                      bridge."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.4.2, 6.6.1"
+              INDEX  { dot1dBasePortIfIndex }
+              ::= { dot1dBasePortTable 1 }
+
+          Dot1dBasePortEntry ::=
+              SEQUENCE {
+                  dot1dBasePortIfIndex
+                      INTEGER,
+                  dot1dBasePortCircuit
+
+
+                      OBJECT IDENTIFIER,
+                  dot1dBasePortDelayExceededDiscards
+                      Counter,
+                  dot1dBasePortMtuExceededDiscards
+                      Counter
+              }
+
+          dot1dBasePortIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value of the instance of the ifIndex object,
+                      defined in MIB-II, for the interface corresponding
+                      to this port."
+              ::= { dot1dBasePortEntry 2 }
+
+          dot1dBasePortCircuit OBJECT-TYPE
+              SYNTAX  OBJECT IDENTIFIER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "For a port which (potentially) has the same value
+                      of dot1dBasePortIfIndex as another port on the
+                      same bridge, this object contains the name of an
+                      object instance unique to this port.  For example,
+                      in the case where multiple ports correspond 
+                      one-to-one with multiple X.25 virtual circuits, this
+                      value might identify an (e.g., the first) object
+                      instance associated with the X.25 virtual circuit
+                      corresponding to this port.
+
+                      For a port which has a unique value of
+                      dot1dBasePortIfIndex, this object can have the
+                      value { 0 0 }."
+              ::= { dot1dBasePortEntry 3 }
+
+          dot1dBasePortDelayExceededDiscards OBJECT-TYPE
+              SYNTAX  Counter
+
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of frames discarded by this port due
+                      to excessive transit delay through the bridge.  It
+                      is incremented by both transparent and source
+                      route bridges."
+              REFERENCE
+                       "IEEE 802.1D-1990: Section 6.6.1.1.3"
+              ::= { dot1dBasePortEntry 4 }
+
+          dot1dBasePortMtuExceededDiscards OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of frames discarded by this port due
+                      to an excessive size.  It is incremented by both
+                      transparent and source route bridges."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.6.1.1.3"
+              ::= { dot1dBasePortEntry 5 }
+
+          -- the dot1dStp group
+
+          -- Implementation of the dot1dStp group is optional.  It is
+          -- implemented by those bridges that support the Spanning Tree
+          -- Protocol.
+
+          dot1dStpProtocolSpecification OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          unknown(1),
+                          decLb100(2),
+                          ieee8021d(3)
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "An indication of what version of the Spanning
+                      Tree Protocol is being run.  The value
+                      'decLb100(2)' indicates the DEC LANbridge 100
+                      Spanning Tree protocol.  IEEE 802.1d
+                      implementations will return 'ieee8021d(3)'.  If
+                      future versions of the IEEE Spanning Tree Protocol
+                      are released that are incompatible with the
+                      current version a new value will be defined."
+
+
+	      DEFVAL { ieee8021d }
+              ::= { dot1dStp 1 }
+
+          dot1dStpPriority OBJECT-TYPE
+              SYNTAX  INTEGER (0..65535)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value of the write-able portion of the Bridge
+                      ID, i.e., the first two octets of the (8 octet
+                      long) Bridge ID.  The other (last) 6 octets of the
+                      Bridge ID are given by the value of
+                      dot1dBaseBridgeAddress."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.7"
+	      DEFVAL { 32768 }
+              ::= { dot1dStp 2 }
+
+          dot1dStpTimeSinceTopologyChange OBJECT-TYPE
+              SYNTAX  TimeTicks
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The time (in hundredths of a second) since the
+                      last time a topology change was detected by the
+                      BRICK."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.8.1.1.3"
+              ::= { dot1dStp 3 }
+
+          dot1dStpTopChanges OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of topology changes detected by
+                      the BRICK since the management entity was last
+                      reset or initialized."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.8.1.1.3"
+              ::= { dot1dStp 4 }
+
+          dot1dStpDesignatedRoot OBJECT-TYPE
+              SYNTAX  BridgeId
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+		"The bridge identifier of the root of the spanning tree
+                as determined by the Spanning Tree Protocol as executed
+                by the BRICK. This value is used as the Root Identifier
+                parameter in all Configuration Bridge PDUs originated
+                by this BRICK."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.1"
+              ::= { dot1dStp 5 }
+
+          dot1dStpRootCost OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The cost of the path to the root as seen from
+                      the BRICK."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.2"
+              ::= { dot1dStp 6 }
+
+          dot1dStpRootPort OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port number of the port which offers the
+                      lowest cost path from this bridge to the root
+                      bridge."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.3"
+              ::= { dot1dStp 7 }
+
+          dot1dStpMaxAge OBJECT-TYPE
+              SYNTAX  Timeout
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The maximum age of Spanning Tree Protocol
+                      information learned from the network on any port
+                      before it is discarded, in units of hundredths of
+                      a second.  This is the actual value that the 
+                      BRICK is currently using."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.4"
+              ::= { dot1dStp 8 }
+
+          dot1dStpHelloTime OBJECT-TYPE
+              SYNTAX  Timeout
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+		"The amount of time between the transmission of 
+                Configuration bridge PDUs by the BRICK on any port when
+                it is the root of the spanning tree or trying to become so,
+                in units of hundredths of a second. This is the actual 
+                value currently being used."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.5"
+              ::= { dot1dStp 9 }
+
+          dot1dStpHoldTime OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "This time value determines the interval length
+                      during which no more than two Configuration bridge
+                      PDUs shall be transmitted by this node, in units
+                      of hundredths of a second."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.14"
+	      DEFVAL { 100 }
+              ::= { dot1dStp 10 }
+
+          dot1dStpForwardDelay OBJECT-TYPE
+              SYNTAX  Timeout
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+		"This time value, measured in units of hundredths of a
+                second, controls how fast a port changes its spanning
+                state when moving towards the Forwarding state. The
+                value determines how long the port stays in each of the
+                Listening and Learning states, which precede the 
+                Forwarding state. This value is also used, when a topology
+                change has been detected and is under way, to age all 
+                dynamic entries in the Forwarding Database.
+                [Note that this value is the one that is currently being
+                used, in contrast to dot1dStpBridgeForwardDelay which is
+                the value that this BRICK and all others would start 
+                using if/when this BRICK were to become the root.]"
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.6"
+              ::= { dot1dStp 11 }
+
+          dot1dStpBridgeMaxAge OBJECT-TYPE
+              SYNTAX  INTEGER (600..4000) -- Timeout
+
+
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value that all bridges use for MaxAge when
+                      this bridge is acting as the root.  Note that
+                      802.1D-1990 specifies that the range for this
+                      parameter is related to the value of
+                      dot1dStpBridgeHelloTime. The granularity of this
+                      timer is specified by 802.1D-1990 to be 1 second.
+                      An agent may return a badValue error if a set is
+                      attempted to a value which is not a whole number
+                      of seconds."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.8"
+	      DEFVAL { 2000 }
+              ::= { dot1dStp 12 }
+
+          dot1dStpBridgeHelloTime OBJECT-TYPE
+              SYNTAX  INTEGER (100..1000) -- Timeout
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value that all bridges use for HelloTime when
+                      this bridge is acting as the root.  The
+                      granularity of this timer is specified by 
+                      802.1D-1990 to be 1 second.  An agent may return a
+                      badValue error if a set is attempted to a value
+                      which is not a whole number of seconds."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.9"
+	      DEFVAL { 200 }
+              ::= { dot1dStp 13 }
+
+          dot1dStpBridgeForwardDelay OBJECT-TYPE
+              SYNTAX  INTEGER (400..3000) -- Timeout
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value that all bridges use for ForwardDelay
+                      when this bridge is acting as the root.  Note that
+                      802.1D-1990 specifies that the range for this
+                      parameter is related to the value of
+                      dot1dStpBridgeMaxAge.  The granularity of this
+                      timer is specified by 802.1D-1990 to be 1 second.
+                      An agent may return a badValue error if a set is
+                      attempted to a value which is not a whole number
+                      of seconds."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.3.10"
+	      DEFVAL { 1500 }
+              ::= { dot1dStp 14 }
+
+          -- The Spanning Tree Port Table
+
+          dot1dStpPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1dStpPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+		"The dot1dStpPortTable contains port-specific information
+                mation required by the Spanning Tree Protocol. Entries in
+                this table correspond to entries in the ifTable and can
+                only be added by the system.
+
+                Creating entries: New entries are added when a new
+                entry is made to the ifTable.
+
+                Deleting entries: Entries can not be removed."
+              ::= { dot1dStp 15 }
+
+          dot1dStpPortEntry OBJECT-TYPE
+              SYNTAX  Dot1dStpPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of information maintained by every port
+                      about the Spanning Tree Protocol state for that
+                      port."
+              INDEX   { dot1dStpPortIfIndex }
+              ::= { dot1dStpPortTable 1 }
+
+          Dot1dStpPortEntry ::=
+              SEQUENCE {
+                  dot1dStpPortIfIndex 			INTEGER,
+                  dot1dStpPortNumber			INTEGER,
+                  dot1dStpPortPriority			INTEGER,
+                  dot1dStpPortState			INTEGER,
+                  dot1dStpPortEnable			INTEGER,
+                  dot1dStpPortPathCost			INTEGER,
+                  dot1dStpPortDesignatedRoot		BridgeId,
+                  dot1dStpPortDesignatedCost		INTEGER,
+                  dot1dStpPortDesignatedBridge		BridgeId,
+                  dot1dStpPortDesignatedPort		INTEGER,
+                  dot1dStpPortForwardTransitions	Counter,
+                  dot1dStpPortBackupForIfIndex		INTEGER
+              }
+
+          dot1dStpPortIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value of the instance of the ifIndex object defined
+                       in MIB-II, for the interface corresponding to this port."
+              ::= { dot1dStpPortEntry 1 }
+
+          dot1dStpPortNumber OBJECT-TYPE
+              SYNTAX  INTEGER (1..255)
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the port."
+              ::= { dot1dStpPortEntry 2 }
+
+          dot1dStpPortPriority OBJECT-TYPE
+              SYNTAX  INTEGER (0..255)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value of the priority field which is
+                      contained in the first (in network byte order)
+                      octet of the (2 octet long) Port ID.  The other
+                      octet of the Port ID is given by the value of
+                      dot1dStpPort."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.1"
+              ::= { dot1dStpPortEntry 3 }
+
+          dot1dStpPortState OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          disabled(1),
+                          blocking(2),
+                          listening(3),
+                          learning(4),
+                          forwarding(5),
+                          broken(6)
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port's current state as defined by
+                      application of the Spanning Tree Protocol.  This
+                      state controls what action a port takes on
+                      reception of a frame.  If the bridge has detected
+                      a port that is malfunctioning it will place that
+                      port into the broken(6) state.  For ports which
+                      are disabled (see dot1dStpPortEnable), this object
+                      will have a value of disabled(1)."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.2"
+	      DEFVAL { disabled }
+              ::= { dot1dStpPortEntry 4 }
+
+
+          dot1dStpPortEnable OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The enabled/disabled status of the port.At least two
+                ports must be enabled for bridging to be possible."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.2"
+	      DEFVAL { disabled }
+              ::= { dot1dStpPortEntry 5 }
+
+          dot1dStpPortPathCost OBJECT-TYPE
+              SYNTAX  INTEGER (1..65535)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The contribution of this port to the path cost of
+                      paths towards the spanning tree root which include
+                      this port.  802.1D-1990 recommends that the
+                      default value of this parameter be in inverse
+                      proportion to the speed of the attached LAN."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.3"
+              ::= { dot1dStpPortEntry 6 }
+
+          dot1dStpPortDesignatedRoot OBJECT-TYPE
+              SYNTAX  BridgeId
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The unique Bridge Identifier of the Bridge
+                      recorded as the Root in the Configuration BPDUs
+                      transmitted by the Designated Bridge for the
+                      segment to which the port is attached."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.4"
+              ::= { dot1dStpPortEntry 7 }
+
+          dot1dStpPortDesignatedCost OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The path cost of the Designated Port of the
+                      segment connected to this port.  This value is
+                      compared to the Root Path Cost field in received
+                      bridge PDUs."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.5"
+              ::= { dot1dStpPortEntry 8 }
+
+          dot1dStpPortDesignatedBridge OBJECT-TYPE
+              SYNTAX  BridgeId
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The Bridge Identifier of the bridge which this
+                      port considers to be the Designated Bridge for
+                      this port's segment."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.6"
+              ::= { dot1dStpPortEntry 9 }
+
+          dot1dStpPortDesignatedPort OBJECT-TYPE
+              SYNTAX  INTEGER (1..65535)
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The Port Identifier of the port on the Designated
+                      Bridge for this port's segment."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 4.5.5.7"
+              ::= { dot1dStpPortEntry 10 }
+
+          dot1dStpPortForwardTransitions OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of times this port has transitioned
+                      from the Learning state to the Forwarding state."
+              ::= { dot1dStpPortEntry 11 }
+
+          dot1dStpPortBackupForIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "May be used to represent a backup interface. 
+                      Its value is the IfIndex of the regular used interface.
+                      A dialup of the backup interface is only triggered, 
+                      if the regular interface has stopped forwarding."
+              ::= { dot1dStpPortEntry 12 }
+
+
+          dot1dStpBridgePPPForwardDelay OBJECT-TYPE
+              SYNTAX  INTEGER (100..3000) -- Timeout
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "This is the forward delay for PPP interfaces."
+	      DEFVAL { 500 }
+              ::= { dot1dStp 16 }
+
+          -- the dot1dTp group
+
+          -- Implementation of the dot1dTp group is optional.  It is
+          -- implemented by those bridges that support the transparent
+          -- bridging mode.  A transparent or SRT bridge will implement
+          -- this group.
+
+          dot1dTpLearnedEntryDiscards OBJECT-TYPE
+              SYNTAX  Counter
+
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of Forwarding Database entries,
+                      which have been or would have been learnt, but
+                      have been discarded due to a lack of space to
+                      store them in the Forwarding Database.  If this
+                      counter is increasing, it indicates that the
+                      Forwarding Database is regularly becoming full (a
+                      condition which has unpleasant performance effects
+                      on the subnetwork).  If this counter has a
+                      significant value but is not presently increasing,
+                      it indicates that the problem has been occurring
+                      but is not persistent."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.7.1.1.3"
+              ::= { dot1dTp 1 }
+
+          dot1dTpAgingTime OBJECT-TYPE
+              SYNTAX   INTEGER (10..1000000)
+              ACCESS   read-write
+              STATUS   mandatory
+              DESCRIPTION
+                      "The timeout period in seconds for aging out
+                      dynamically learned forwarding information."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.7.1.1.3"
+	      DEFVAL { 300 } 
+              ::= { dot1dTp 2 }
+
+          --  The Forwarding Database for Transparent Bridges
+
+          dot1dTpFdbTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1dTpFdbEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+		"The dot1dTpFdbTable is the BRICK's forwarding database
+                tabase. It contains information about unicast entries for
+                which the BRICK has forwarding and/or filtering 
+                information. This information is used by the transparent
+                bridging function in determining how to propagate 
+                received frames. Only the system can add or delete entries
+                to this table.
+
+                Creating entries: Entries are created automatically
+                once a new MAC address is learned.
+
+                Deleting entries: Entries are removed when the
+                dot1dTpFdbAge field exceeds (becomes older than) the
+                value specified in the AgingTime field of dot1dTp or by 
+                setting the dot1dTpFdbStatus object to 'delete'."
+              ::= { dot1dTp 3 }
+
+          dot1dTpFdbEntry OBJECT-TYPE
+              SYNTAX  Dot1dTpFdbEntry
+              ACCESS  not-accessible
+
+
+              STATUS  mandatory
+              DESCRIPTION
+                      "Information about a specific unicast MAC address
+                      for which the bridge has some forwarding and/or
+                      filtering information."
+              INDEX   { dot1dTpFdbAddress }
+              ::= { dot1dTpFdbTable 1 }
+
+          Dot1dTpFdbEntry ::=
+              SEQUENCE {
+                  dot1dTpFdbAddress
+                      MacAddress,
+                  dot1dTpFdbDestPortIfIndex
+                      INTEGER,
+                  dot1dTpFdbStatus
+                      INTEGER,
+                  dot1dTpFdbAge
+                      TimeTicks
+              }
+
+          dot1dTpFdbAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unicast MAC address for which the bridge has
+                      forwarding and/or filtering information."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 3.9.1, 3.9.2"
+              ::= { dot1dTpFdbEntry 1 }
+
+          dot1dTpFdbDestPortIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Either the value '0', or the port number of the
+                      port on which a frame having a source address
+                      equal to the value of the corresponding instance
+                      of dot1dTpFdbAddress has been seen.  A value of
+                      '0' indicates that the port number has not been
+                      learned but that the bridge does have some
+                      forwarding/filtering information about this
+                      address (e.g. in the dot1dStaticTable).
+                      Implementors are encouraged to assign the port
+                      value to this object whenever it is learned even
+                      for addresses for which the corresponding value of
+                      dot1dTpFdbStatus is not learned(3)."
+              ::= { dot1dTpFdbEntry 2 }
+
+          dot1dTpFdbStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          learned(3),
+                          self(4),
+                          mgmt(5)
+                      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The status of this entry." 
+	      DEFVAL { mgmt }
+              ::= { dot1dTpFdbEntry 4 }
+
+          dot1dTpFdbAge OBJECT-TYPE
+              SYNTAX  TimeTicks
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Age of this entry in seconds."
+              ::= { dot1dTpFdbEntry 5 }
+
+
+          --  Port Table for Transparent Bridges
+
+          dot1dTpPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1dTpPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+		"The dot1dTpPortTable contains information about
+                each port on the system as it relates to the transparent
+                bridging function. Entries in this table correspond to 
+                entries in the ifTable and can only be added by the system.
+
+                Creating entries: New entries are added when a new
+                entry is made to the ifTable.
+
+                Deleting entries: Entries can not be removed."
+              ::= { dot1dTp 4 }
+
+          dot1dTpPortEntry OBJECT-TYPE
+              SYNTAX  Dot1dTpPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of information for each port of a
+                      transparent bridge."
+              INDEX   { dot1dTpPortIfIndex }
+              ::= { dot1dTpPortTable 1 }
+
+          Dot1dTpPortEntry ::=
+              SEQUENCE {
+                  dot1dTpPortIfIndex
+                      INTEGER,
+                  dot1dTpPortMaxInfo
+                      INTEGER,
+                  dot1dTpPortInFrames
+                      Counter,
+                  dot1dTpPortOutFrames
+                      Counter,
+                  dot1dTpPortInDiscards
+                      Counter
+              }
+
+          dot1dTpPortIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port number of the port for which this entry
+                      contains Transparent bridging management
+                      information."
+              ::= { dot1dTpPortEntry 1 }
+
+          -- It would be nice if we could use ifMtu as the size of the
+          -- largest INFO field, but we can't because ifMtu is defined
+
+
+          -- to be the size that the (inter-)network layer can use which
+          -- can differ from the MAC layer (especially if several layers
+          -- of encapsulation are used).
+
+          dot1dTpPortMaxInfo OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The maximum size of the INFO (non-MAC) field that
+                      this port will receive or transmit."
+              ::= { dot1dTpPortEntry 2 }
+
+          dot1dTpPortInFrames OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of frames that have been received by
+                      this port from its segment. Note that a frame
+                      received on the interface corresponding to this
+                      port is only counted by this object if and only if
+                      it is for a protocol being processed by the local
+                      bridging function, including bridge management
+                      frames."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.6.1.1.3"
+              ::= { dot1dTpPortEntry 3 }
+
+          dot1dTpPortOutFrames OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of frames that have been transmitted
+                      by this port to its segment.  Note that a frame
+                      transmitted on the interface corresponding to this
+                      port is only counted by this object if and only if
+                      it is for a protocol being processed by the local
+                      bridging function, including bridge management
+                      frames."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.6.1.1.3"
+              ::= { dot1dTpPortEntry 4 }
+
+          dot1dTpPortInDiscards OBJECT-TYPE
+              SYNTAX   Counter
+              ACCESS   read-only
+
+
+              STATUS   mandatory
+              DESCRIPTION
+                      "Count of valid frames received which were
+                      discarded (i.e., filtered) by the forwarding
+                      process."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.6.1.1.3"
+              ::= { dot1dTpPortEntry 5 }
+
+          -- The Static (Destination-Address Filtering) Database
+
+          -- Implementation of this group is optional.
+
+          dot1dStaticAllowTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1dStaticAllowEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+		" The dot1dStaticAllowTable contains filtering information
+                configured into the bridge by (local or network)
+                management specifying the set of ports to which frames
+                received from specific ports and containing specific 
+                destination addresses are allowed to be forwarded. The 
+                value of zero in this table as the port number from which
+                frames with a specific destination address are received, is
+                used to specify all ports for which there is no specific 
+                entry in this table for that particular destination address.
+                Entries are valid for unicast and group/broadcast 
+                addresses.
+
+                Creating entries: Entries are created by assigning 
+                values to dot1dStaticAllowSrcIfIndex and 
+		dot1dStaticAllowDstIfIndex within one operation
+                (on one command line).
+
+                Deleting entries: Entries are removed by setting the
+                dot1dStaticAllowStatus field to `invalid'."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.7.2"
+              ::= { dot1dStatic 1 }
+
+          dot1dStaticAllowEntry OBJECT-TYPE
+              SYNTAX  Dot1dStaticAllowEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Filtering information configured into the bridge
+                      by (local or network) management specifying the
+                      set of ports to which frames received from a
+                      specific port and containing a specific
+                      destination address are allowed to be forwarded."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.7.2"
+
+
+              INDEX   {
+			  dot1dStaticAllowSrcIfIndex,
+			  dot1dStaticAllowDstIfIndex
+		      }
+              ::= { dot1dStaticAllowTable 1 }
+
+          Dot1dStaticAllowEntry ::=
+              SEQUENCE {
+                  dot1dStaticAllowSrcIfIndex
+                      INTEGER,
+                  dot1dStaticAllowDstIfIndex
+                      INTEGER,
+                  dot1dStaticAllowByteOffset
+                      INTEGER,
+                  dot1dStaticAllowMask
+                      OCTET STRING,
+                  dot1dStaticAllowValue
+                      OCTET STRING,
+                  dot1dStaticAllowStatus
+                      INTEGER,
+                  dot1dStaticAllowAge
+                      TimeTicks
+              }
+
+          dot1dStaticAllowSrcIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Either the value '0', or the port number of the
+                      port from which a frame must be received in order
+                      for this entry's filtering information to apply.
+                      A value of zero indicates that this entry applies
+                      on all ports of the bridge for which there is no
+                      other applicable entry."
+              ::= { dot1dStaticAllowEntry 1 }
+
+          dot1dStaticAllowDstIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Either the value '0', or the port number of the
+                      port  to which a frame can be forwarded.
+                      A value of zero indicates that this entry applies
+                      on all ports of the bridge for which there is no
+                      other applicable entry."
+              ::= { dot1dStaticAllowEntry 2 }
+
+          dot1dStaticAllowByteOffset OBJECT-TYPE
+              SYNTAX  INTEGER (0..65535)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+		"The number of bytes in the packet that are skipped 
+                before making the comparison."
+              ::= { dot1dStaticAllowEntry 3 }
+
+          dot1dStaticAllowMask OBJECT-TYPE
+              SYNTAX  OCTET STRING (SIZE(0..64))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+		"This octet string specifies which bytes are compared.
+                Leading 0's are handled as when using
+                dot1dStaticAllowByteOffset."
+              ::= { dot1dStaticAllowEntry 4 }
+
+          dot1dStaticAllowValue OBJECT-TYPE
+              SYNTAX  OCTET STRING (SIZE(0..64))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+		"The value of the bytes to look for. For example:
+               
+                Offset=12       Offset=0
+
+                Mask=ff:ff      Mask=0:0:0:0:0:0:0:0:0:0:0:0:ff:ff
+
+                Value=81:37     Value=0:0:0:0:0:0:0:0:0:0:0:0:81:37
+
+                Both examples above specify that the 13th byte must
+                be '0x81' and the 14th byte must be '0x37' in order for
+                the filter to match. These examples would allow IPX
+                packets to be bridged."
+              ::= { dot1dStaticAllowEntry 5 }
+
+          dot1dStaticAllowStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          permanent(3),
+                          deleteOnReset(4),
+                          deleteOnTimeout(5)
+                      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+		"The status of this entry."
+	      DEFVAL { permanent }
+              ::= { dot1dStaticAllowEntry 6 }
+
+          dot1dStaticAllowAge OBJECT-TYPE
+              SYNTAX  TimeTicks
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Age of the entry in seconds."
+              ::= { dot1dStaticAllowEntry 7 }
+
+          dot1dStaticDenyTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1dStaticDenyEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+		"The dot1dStaticDenyTable contains filtering information
+                configured into the bridge by (local or network)
+                management specifying the set of ports to which frames
+                received from specific ports and containing specific 
+                destination addresses are denied to be forwarded. The value
+                of zero in this table as the port number from which
+                frames with a specific destination address are received, is
+                used to specify all ports for which there is no specific 
+                entry in this table for that particular destination address.
+                Entries are valid for unicast and for group/broadcast 
+                addresses.
+
+                Creating entries: Entries are created by assigning values
+                to both the dot1dStaticDenySrcIfIndex and 
+                dot1dStaticDenyDstIfIndex objects within one 
+		operation (i.e on one command line).
+                
+                Deleting entries: To remove an entry, the
+                dot1dStaticDenyStatus must be set to 'delete'."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.7.2"
+              ::= { dot1dStatic 2 }
+
+          dot1dStaticDenyEntry OBJECT-TYPE
+              SYNTAX  Dot1dStaticDenyEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Filtering information configured into the bridge
+                      by (local or network) management specifying the
+                      set of ports to which frames received from a
+                      specific port and containing a specific
+                      destination address are denied to be forwarded."
+              REFERENCE
+                      "IEEE 802.1D-1990: Section 6.7.2"
+
+
+              INDEX   {
+			  dot1dStaticDenySrcIfIndex,
+			  dot1dStaticDenyDstIfIndex
+		      }
+              ::= { dot1dStaticDenyTable 1 }
+
+          Dot1dStaticDenyEntry ::=
+              SEQUENCE {
+                  dot1dStaticDenySrcIfIndex
+                      INTEGER,
+                  dot1dStaticDenyDstIfIndex
+                      INTEGER,
+                  dot1dStaticDenyByteOffset
+                      INTEGER,
+                  dot1dStaticDenyMask
+                      OCTET STRING,
+                  dot1dStaticDenyValue
+                      OCTET STRING,
+                  dot1dStaticDenyStatus
+                      INTEGER,
+                  dot1dStaticDenyAge
+                      TimeTicks
+              }
+
+          dot1dStaticDenySrcIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Either the value '0', or the port number of the
+                      port from which a frame must be received in order
+                      for this entry's filtering information to apply.
+                      A value of zero indicates that this entry applies
+                      on all ports of the bridge for which there is no
+                      other applicable entry."
+              ::= { dot1dStaticDenyEntry 1 }
+
+          dot1dStaticDenyDstIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Either the value '0', or the port number of the
+                      port  to which a frame can be forwarded.
+                      A value of zero indicates that this entry applies
+                      on all ports of the bridge for which there is no
+                      other applicable entry."
+              ::= { dot1dStaticDenyEntry 2 }
+
+          dot1dStaticDenyByteOffset OBJECT-TYPE
+              SYNTAX  INTEGER (0..65535)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of bytes in the packet, which are skipped
+		      before making the comparison."
+              ::= { dot1dStaticDenyEntry 3 }
+
+          dot1dStaticDenyMask OBJECT-TYPE
+              SYNTAX  OCTET STRING (SIZE(0..64))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+		"This octet string specifies which bytes are compared.
+                Leading 0's are handled as when using
+                dot1dStaticDenyByteOffset."
+              ::= { dot1dStaticDenyEntry 4 }
+
+          dot1dStaticDenyValue OBJECT-TYPE
+              SYNTAX  OCTET STRING (SIZE(0..64))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+		"This octet string indicates the value of the bytes to
+                look for. For example:
+               
+                Offset=12       Offset=0
+
+                Mask=ff:ff      Mask=0:0:0:0:0:0:0:0:0:0:0:0:ff:ff
+                
+                Value=81:37     Value=0:0:0:0:0:0:0:0:0:0:0:0:81:37
+
+                Both examples above specify that the 13th byte must
+                be '0x81' and the 14th byte must be '0x37' in order for
+                the filter to match. These examples would deny packets
+                to be bridged."
+              ::= { dot1dStaticDenyEntry 5 }
+
+          dot1dStaticDenyStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          permanent(3),
+                          deleteOnReset(4),
+                          deleteOnTimeout(5)
+                      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "This object indicates the status of this entry."
+
+	      DEFVAL { permanent }
+              ::= { dot1dStaticDenyEntry 6 }
+
+          dot1dStaticDenyAge OBJECT-TYPE
+              SYNTAX  TimeTicks
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Age of the entry in seconds."
+              ::= { dot1dStaticDenyEntry 7 }
+
+          -- Traps for use by Bridges
+
+          -- Traps for the Spanning Tree Protocol
+
+--          newRoot TRAP-TYPE
+--              ENTERPRISE  dot1dBridge
+--              DESCRIPTION
+--                      "The newRoot trap indicates that the sending agent
+--                      has become the new root of the Spanning Tree; the
+--                      trap is sent by a bridge soon after its election
+--                      as the new root, e.g., upon expiration of the
+--                      Topology Change Timer immediately subsequent to
+--                      its election.  Implementation of this trap is
+--                      optional."
+--              ::= 1
+--
+--          topologyChange TRAP-TYPE
+--              ENTERPRISE  dot1dBridge
+--              DESCRIPTION
+--                      "A topologyChange trap is sent by a bridge when
+--                      any of its configured ports transitions from the
+--                      Learning state to the Forwarding state, or from
+--                      the Forwarding state to the Blocking state.  The
+--                      trap is not sent if a newRoot trap is sent for the
+--                      same transition.  Implementation of this trap is
+--                      optional."
+--              ::= 2
+
+END

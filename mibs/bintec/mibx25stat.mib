@@ -1,0 +1,578 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2005-2014 bintec elmeg GmbH
+-- $RCSfile: mibx25stat,v $ 
+-- $Revision: 1.8 $ 
+-- $Date: 2014-02-07 10:37:51 $
+---------------------------------------------------------------------------
+
+BIANCA-BRICK-X25STAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Counter, TimeTicks, enterprises
+	FROM RFC1155-SMI
+
+    DisplayString
+	FROM RFC1158-MIB
+
+    OBJECT-TYPE
+	FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    x25		OBJECT IDENTIFIER ::= { bibo 6 }
+    x25statMIB	OBJECT IDENTIFIER ::= { x25 16 }
+
+---------------------------------------------------------------------------
+-- x25 statistic objects
+
+x25SwStats	OBJECT IDENTIFIER  ::= { x25statMIB 1 }
+
+x25MuxStats	OBJECT IDENTIFIER  ::= { x25statMIB 2 }
+
+x25ToTcpStats	OBJECT IDENTIFIER  ::= { x25statMIB 3 }
+
+---------------------------------------------------------------------------
+
+-- Statistics for x25 switch modul
+
+x25SwIncomingAttempts OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 1 }
+
+x25SwIncomingSucceeded OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 2 }
+
+x25SwIncomingFailed OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 3 }
+
+x25SwIncCurrentCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 4 }
+
+x25SwIncMaxConcCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 5 }
+
+x25SwIncCurrentPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 6 }
+
+x25SwIncMaxConcPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 7 }
+
+x25SwIncFailedTimeout OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 8 }
+
+x25SwOutgoingAttempts OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 15 }
+
+x25SwOutgoingSucceeded OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 16 }
+
+x25SwOutgoingFailed OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 17 }
+
+x25SwOutCurrentCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 18 }
+
+x25SwOutMaxConcCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 19 }
+
+x25SwOutCurrentPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 20 }
+
+x25SwOutMaxConcPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 21 }
+
+x25SwOutFailedTimeout OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 22 }
+
+x25SwCallCnt OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25SwStats 23 }
+
+
+-- Statistics for X25 multiplexer
+
+x25MuxIncomingAttempts OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 1 }
+
+x25MuxIncomingSucceeded OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 2 }
+
+x25MuxIncomingFailed OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 3 }
+
+x25MuxIncCurrentCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 4 }
+
+x25MuxIncMaxConcCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 5 }
+
+x25MuxIncCurrentPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 6 }
+
+x25MuxIncMaxConcPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 7 }
+
+x25MuxIncResets OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 8 }
+
+x25MuxOutgoingAttempts OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 15 }
+
+x25MuxOutgoingSucceeded OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 16 }
+
+x25MuxOutgoingFailed OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 17 }
+
+x25MuxOutCurrentCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 18 }
+
+x25MuxOutMaxConcCalls OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 19 }
+
+x25MuxOutCurrentPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 20 }
+
+x25MuxOutMaxConcPending OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 21 }
+
+x25MuxOutResets OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 22 }
+
+x25MuxInstCnt OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25MuxStats 23 }
+
+
+-- Statistics of x25totcp modul
+
+
+x25ToTcpRestart OBJECT-TYPE
+    SYNTAX  INTEGER { yes(1), no(2) }
+    ACCESS  read-write
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    DEFVAL { no }
+    ::= { x25ToTcpStats 1 }
+
+x25ToTcpCurrentRestart OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 2 }
+
+x25ToTcpTotalRestart OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 3 }
+
+x25ToTcpIncX25Attempts OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 4 }
+
+x25ToTcpIncX25Succeeded OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 5 }
+
+x25ToTcpIncX25Failed OBJECT-TYPE
+    SYNTAX	Counter 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 6 }
+
+x25ToTcpOutTcpAttempts OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 7 }
+
+x25ToTcpOutTcpSucceeded OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 8 }
+
+x25ToTcpOutTcpFailed OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 9 }
+
+x25ToTcpIncX25CurrentCalls OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 10 }
+
+x25ToTcpIncX25MaxConcCalls OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 11 }
+
+x25ToTcpIncX25CurrentPending OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 12 }
+
+x25ToTcpIncX25MaxConcPending OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 13 }
+
+x25ToTcpIncTcpAttempts OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 14 }
+
+x25ToTcpIncTcpSucceeded OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 15 }
+
+x25ToTcpIncTcpFailed OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 16 }
+
+x25ToTcpOutX25Attempts OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 17 }
+
+x25ToTcpOutX25Succeeded OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 18 }
+
+x25ToTcpOutX25Failed OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 19 }
+
+x25ToTcpIncTcpCurrentCalls OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 20 }
+
+x25ToTcpIncTcpMaxConcCalls OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 21 }
+
+x25ToTcpIncTcpCurrentPending OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 22 }
+
+x25ToTcpIncTcpMaxConcPending OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 23 }
+
+x25ToTcpUEvTcpListen OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 24 }
+
+x25ToTcpUEvTcpData OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 25 }
+
+x25ToTcpUEvX25Listen OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 26 }
+
+x25ToTcpUEvX25Data OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 27 }
+
+x25ToTcpX25CanPutEvDisc OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 28 }
+
+x25ToTcpX25CanPutEvTok OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 29 }
+
+x25ToTcpX25CanPutEvReset OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 30 }
+
+x25ToTcpTcpCanPutEvDisc OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 31 }
+
+x25ToTcpTcpCanPutEvTok OBJECT-TYPE
+    SYNTAX	Counter
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	""
+    ::= { x25ToTcpStats 32 }
+
+
+END

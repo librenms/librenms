@@ -1,0 +1,198 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2008-2014 bintec elmeg GmbH
+-- $RCSfile: mib-itp,v $
+-- $Revision: 1.9 $
+-- $Date: 2014-02-07 10:37:49 $
+-- Author: mmossner
+--------------------------------------------------------------------------
+
+
+BINTEC-ITP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64, IpAddress, TimeTicks,
+    mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+
+    isdn, Date, BitValue, HexValue
+	FROM BINTEC-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+
+itpMIB MODULE-IDENTITY
+    LAST-UPDATED "200702270000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail: info@bintec-elmeg.com
+         Web: www.bintec-elmeg.com
+        "
+    DESCRIPTION
+        "MIB for ISDN Theft Protection"
+    REVISION    "200702270000Z"
+    DESCRIPTION
+        "ITP MIB."
+
+    ::= { isdn 18 }
+
+itp OBJECT IDENTIFIER ::= { itpMIB 1 }
+
+itpAdmin  OBJECT IDENTIFIER ::= { itp 1 }
+    itpAdminMode OBJECT-TYPE
+    SYNTAX Integer32 { 
+        enabled(1),
+        disabled(2)
+    }
+    ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object represents the operation mode of the ISDN Theft Protection.
+     In enabled(1) mode ITP is active, setting the mode to disabled(2) ITP is
+     inactive. 
+    "
+    DEFVAL { disabled }
+    ::= { itpAdmin 1 }
+
+    itpAdminDialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This represents the number which should be dialled."
+    ::= { itpAdmin 2 }
+    
+    itpAdminOutgoingNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This represents the number which should be send as outgoing/dialing
+         number."
+    ::= { itpAdmin 3 }
+
+    itpAdminIncomingNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This represents the number which an incoming call number should
+         match to."
+    ::= { itpAdmin 4 }
+
+    itpAdminStkMask OBJECT-TYPE
+    SYNTAX      BitValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This binary number defines the ISDN stack(s) to use.
+         Each bit corresponds to one entry in the isdnStkTable,
+         the rightmost bit selects entry 0, the next bit selects
+         entry 1, and so forth. A mask of 0 disables dialup completely,
+         while a mask of -1 (default) enables dialup on all available
+         ISDN stacks."
+    DEFVAL { 4294967295 }            
+    ::= { itpAdmin 5 }
+
+    itpAdminTimeOut OBJECT-TYPE
+    SYNTAX      Integer32 (2..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the TimeOut for a calling try."
+    DEFVAL { 5 }            
+    ::= { itpAdmin 6 }
+
+    itpAdminMaxRetries OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of retries which should be made before ITP should be
+         set to failed."
+    DEFVAL { 3 }
+    ::= { itpAdmin 7 }
+
+    itpAdminRetriesStat OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows how much retries are already made."
+    DEFVAL { 0 }
+    ::= { itpAdmin 8 }
+
+    itpAdminStatus OBJECT-TYPE
+    SYNTAX      Integer32 { pending(1), successful(2), failed(3) } 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of the ISDN Theft Protection.
+         pending(1) means it is still at work, on success the status is
+         successful(2), else the status is failed(3)."
+    DEFVAL { 1 }
+    ::= { itpAdmin 9 }
+
+
+itpIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF ItpIfEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+        "The itpIfTable contains the interfaces which should be
+         controlled by the ISDN Theft Protection.
+        " 
+    ::= { itp 2 }
+
+itpIfEntry OBJECT-TYPE
+    SYNTAX      ItpIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry of the itpIfTable."
+    INDEX { itpIfStartIndex, itpIfStopIndex }
+    ::= { itpIfTable 1 }
+
+
+ItpIfEntry ::=
+    SEQUENCE {
+        itpIfAdminMode     INTEGER,
+        itpIfStartIndex    Integer32,
+        itpIfStopIndex     Integer32
+    }
+
+    itpIfAdminMode OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2), delete(3) } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this entry should be used for ITP or not."
+    DEFVAL { 1 }             
+    ::= { itpIfEntry 1 }
+    
+    itpIfStartIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the index where this range should start."
+    DEFVAL { 0 }
+    ::= { itpIfEntry 2 }
+
+    itpIfStopIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the index where this range should stop."
+    DEFVAL { 0 }
+    ::= { itpIfEntry 3 }
+
+END

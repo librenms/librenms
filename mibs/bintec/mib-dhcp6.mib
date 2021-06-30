@@ -1,0 +1,1442 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2006-2014 bintec elmeg GmbH
+-- $RCSfile: mib-dhcp6,v $
+-- $Revision: 1.7 $
+-- $Date: 2015-07-14 12:10:05 $
+---------------------------------------------------------------------------
+
+BINTEC-DHCP6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter64, Counter32, Unsigned32        FROM SNMPv2-SMI
+    DisplayString, TimeStamp                FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero    FROM IF-MIB
+    InetAddressIPv6                         FROM INET-ADDRESS-MIB
+    ip6MIB                                  FROM IPV6-MIB;
+
+---------------------------------------------------------------------------
+-- Module-info
+
+dhcp6MIB MODULE-IDENTITY
+    LAST-UPDATED    "201507140000Z"
+    ORGANIZATION    "bintec elmeg GmbH"
+    CONTACT-INFO    "EMail:   info@bintec-elmeg.com
+                     Web:     www.bintec-elmeg.com"
+    DESCRIPTION     "Vendor-specific management-information for DHCPv6-subsystem"
+    ::= { ip6MIB 4 }
+
+---------------------------------------------------------------------------
+-- Administrative: Global DHCPv6-settings
+
+ip6DhcpConfig OBJECT IDENTIFIER ::= { dhcp6MIB 1 }
+
+ip6DhcpConfigAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate DHCPv6-server.
+         In addition to this global switch, DHCPv6-server must be activated
+         per interface via 'ip6AdmIfDhcpMode'."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpConfig 1 }
+
+ip6DhcpConfigPreference OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Optional server-preference (see 22.8 of RFC-3315).
+         A value of 0 means that preference is unspecified."
+    ::= { ip6DhcpConfig 2 }
+
+ip6DhcpConfigReportOffLink OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate replies telling that some requested addresses or
+         prefixes are 'not on link' (see 18.2 of RFC-3315). This check works
+         properly only if the list of locally configured 'ip6LinkPrefix'
+         entries and 'ip6DhcpPrefixPool' entries is complete, i.e. there are
+         no other DHCPv6-servers offering addresses or prefixes on the same
+         link for some additional link-prefixes or prefix-pools. If this
+         condition is not true, this feature should be deactivated, causing
+         positive replies to still be sent but negative ones suppressed."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpConfig 3 }
+
+ip6DhcpConfigDeclinePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Blocking-time in seconds for addresses that have been rejected by
+         clients via Decline-message (see section 5.3 of RFC-33)."
+    DEFVAL      { 43200 }
+    ::= { ip6DhcpConfig 4 }
+
+ip6DhcpConfigPseudoPrefLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For calculating T1/T2, sections 22.4 of RFC-3315 and 9 of RFC-3633
+         recommend '.5 and .8 times the shortest preferred lifetime of the
+         addresses[/prefixes] in the IA[_PD]'. However, deprecated addresses
+         [/prefixes] have preferred lifetime of 0, leading to T1/T2 of 0,
+         having special meaning that choice of T1/T2 'is to be left to the
+         discretion of the requesting router'.
+         Therefore, for deprecated addresses [/prefixes], this field defines
+         a 'pseudo preferred lifetime' that replaces the 0 lifetime in the
+         procedure described above. However, it does NOT affect the REPORTED
+         preferred lifetime for deprecated entries (staying 0)."
+    DEFVAL      { 120 }
+    ::= { ip6DhcpConfig 5 }
+
+---------------------------------------------------------------------------
+-- Operative: Global DHCPv6-statistics
+
+ip6DhcpStats OBJECT IDENTIFIER ::= { dhcp6MIB 2 }
+
+ip6DhcpStatsInSolicit OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Solicit messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 1 }
+
+ip6DhcpStatsInRequest OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Request messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 2 }
+
+ip6DhcpStatsInConfirm OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Confirm messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 3 }
+
+ip6DhcpStatsInRenew OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Renew messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 4 }
+
+ip6DhcpStatsInRebind OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Rebind messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 5 }
+
+ip6DhcpStatsInRelease OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Release messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 6 }
+
+ip6DhcpStatsInDecline OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Decline messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 7 }
+
+ip6DhcpStatsInInfoReq OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Information-request messages
+         (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 8 }
+
+ip6DhcpStatsInRelayForw OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Relay-forward messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 9 }
+
+ip6DhcpStatsInRelayRepl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received Relay-reply messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 10 }
+
+ip6DhcpStatsInUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received messages of unknown type (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 11 }
+
+ip6DhcpStatsOutAdvertise OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent Advertise messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 12 }
+
+ip6DhcpStatsOutReply OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent Reply messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 13 }
+
+ip6DhcpStatsOutReconf OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent Reconfigure messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 14 }
+
+ip6DhcpStatsOutRelayForw OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent Relay-forward messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 15 }
+
+ip6DhcpStatsOutRelayRepl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent Relay-reply messages (see 5.3 of RFC-3315)."
+    ::= { ip6DhcpStats 16 }
+
+---------------------------------------------------------------------------
+-- Administrative: DHCPv6-option-sets
+
+ip6DhcpOptionSetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpOptionSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Option-sets control what options are 'visible' per incoming message.
+         Each configured option belongs to exactly one option-set (may contain
+         multiple options) which can be assigned to a certain interface or
+         client via its filter-settings.
+         Per incoming message, 'visible options' are selected in two phases.
+         In phase one, 'matching option-sets' are found via filter-settings,
+         and contained options make up list of 'matching options'.
+         In phase two, 'matching options' may 'override' each other, based on
+         option-set-specific prio-settings. If multiple options of same 'type'
+         (i.e. defined in same MIB-table) are matching but have different
+         prios then all entries that do not have highest matching prio are
+         'overridden' and thus not 'visible'.
+         In a typical scenario, there is one high-prio option-set per
+         interface with some interface-specific options plus one low-prio
+         option-set with some default-options to be visible only if no options
+         of same type are listed for related matching interface.
+         Further option-type-specific requirements (e.g. if related option was
+         listed in 'Option Request Option', see 22.7 of RFC-3315) may have an
+         impact on whether a 'visible option' is also 'processing-relevant'."
+    ::= { dhcp6MIB 3 }
+
+ip6DhcpOptionSetEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpOptionSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpOptionSetId }
+    ::= { ip6DhcpOptionSetTable 1 }
+
+Ip6DhcpOptionSetEntry ::=
+    SEQUENCE {
+        ip6DhcpOptionSetId              INTEGER,
+        ip6DhcpOptionSetAdminStatus     INTEGER,
+        ip6DhcpOptionSetDescription     DisplayString,
+        ip6DhcpOptionSetPrio            INTEGER,
+        ip6DhcpOptionSetIfIndex         InterfaceIndexOrZero,
+        ip6DhcpOptionSetClientDUID      OCTET STRING
+    }
+
+ip6DhcpOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this option-set."
+    ::= { ip6DhcpOptionSetEntry 1 }
+
+ip6DhcpOptionSetAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this option-set."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpOptionSetEntry 2 }
+
+ip6DhcpOptionSetDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this option-set."
+    ::= { ip6DhcpOptionSetEntry 3 }
+
+ip6DhcpOptionSetPrio OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Priority for the 'override' mechanism described above."
+    ::= { ip6DhcpOptionSetEntry 4 }
+
+ip6DhcpOptionSetIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Optional filter-criterion: Rx-interface of processed DHCPv6-frame.
+         A value of 0 means that any Rx-interface matches."
+    ::= { ip6DhcpOptionSetEntry 5 }
+
+ip6DhcpOptionSetClientDUID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Optional filter-criterion: Client-DUID of processed DHCPv6-frame
+         (see 9 and 22.2 of RFC-3315).
+         An empty string means that any Client-DUID or even missing DUID
+         matches."
+    ::= { ip6DhcpOptionSetEntry 6 }
+
+---------------------------------------------------------------------------
+-- Administrative: Generic stateless DHCPv6-options
+
+ip6DhcpGenericOptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpGenericOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "With this table, some stateless DHCPv6-options with fixed values can
+         be specified rather generically.
+         This may be useful for configuring such options that lack dedicated
+         support by current DHCPv6-code and that may even be completely
+         proprietary or vendor-specific.
+         However, great care should be taken not to specify any options here
+         that may interfere with any 'regular' ones, i.e. such that are
+         automatically handled by current DHCPv6-code or that are configured
+         by some dedicated, option-code-specific tables.
+         At present, all (matching) configured generic options are put into
+         related Advertise/Reply messages even if their option-codes have not
+         been requested by Option Request Option (see 22.7 of RFC-3315).
+         Each matching generic option results in a separate option-entry (in
+         arbitrary order) even if sharing same option-code."
+    ::= { dhcp6MIB 4 }
+
+ip6DhcpGenericOptEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpGenericOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpGenericOptId }
+    ::= { ip6DhcpGenericOptTable 1 }
+
+Ip6DhcpGenericOptEntry ::=
+    SEQUENCE {
+        ip6DhcpGenericOptId             INTEGER,
+        ip6DhcpGenericOptAdminStatus    INTEGER,
+        ip6DhcpGenericOptDescription    DisplayString,
+        ip6DhcpGenericOptOptionSetId    INTEGER,
+        ip6DhcpGenericOptCode           INTEGER,
+        ip6DhcpGenericOptData           OCTET STRING
+    }
+
+ip6DhcpGenericOptId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this option-entry."
+    ::= { ip6DhcpGenericOptEntry 1 }
+
+ip6DhcpGenericOptAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this option-entry."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpGenericOptEntry 2 }
+
+ip6DhcpGenericOptDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this option-entry."
+    ::= { ip6DhcpGenericOptEntry 3 }
+
+ip6DhcpGenericOptOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this option-entry is ignored."
+    ::= { ip6DhcpGenericOptEntry 4 }
+
+ip6DhcpGenericOptCode OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6-option-code of this entry (see 22.1 of RFC-3315).
+         Please read warning in general description of this table about not
+         specifying any option-codes here that may interfere with 'regular'
+         options-processing."
+    ::= { ip6DhcpGenericOptEntry 5 }
+
+ip6DhcpGenericOptData OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Data-string that is pasted into data-part of this option-entry
+         (see 22.1 of RFC-3315)."
+    ::= { ip6DhcpGenericOptEntry 6 }
+
+---------------------------------------------------------------------------
+-- Administrative: DHCPv6-prefix-pools for IA_PDs
+
+ip6DhcpPrefixPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpPrefixPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6-prefix-pools for filling requested IA_PD options
+         (see 9 and 10 of RFC-3633)."
+    ::= { dhcp6MIB 5 }
+
+ip6DhcpPrefixPoolEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpPrefixPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpPrefixPoolId }
+    ::= { ip6DhcpPrefixPoolTable 1 }
+
+Ip6DhcpPrefixPoolEntry ::=
+    SEQUENCE {
+        ip6DhcpPrefixPoolId                 INTEGER,
+        ip6DhcpPrefixPoolAdminStatus        INTEGER,
+        ip6DhcpPrefixPoolDescription        DisplayString,
+        ip6DhcpPrefixPoolOptionSetId        INTEGER,
+        ip6DhcpPrefixPoolPrefixId           INTEGER,
+        ip6DhcpPrefixPoolSubPrefixLength    INTEGER,
+        ip6DhcpPrefixPoolStartOffset        InetAddressIPv6,
+        ip6DhcpPrefixPoolStartPrefix        InetAddressIPv6,
+        ip6DhcpPrefixPoolEndOffset          InetAddressIPv6,
+        ip6DhcpPrefixPoolEndPrefix          InetAddressIPv6,
+        ip6DhcpPrefixPoolSize               Counter64,
+        ip6DhcpPrefixPoolPrefLifetime       Unsigned32,
+        ip6DhcpPrefixPoolValidLifetime      Unsigned32,
+        ip6DhcpPrefixPoolAutoRoutePrio      INTEGER,
+        ip6DhcpPrefixPoolOpPrefLifetime     Unsigned32,
+        ip6DhcpPrefixPoolOpValidLifetime    Unsigned32
+    }
+
+ip6DhcpPrefixPoolId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this prefix-pool."
+    ::= { ip6DhcpPrefixPoolEntry 1 }
+
+ip6DhcpPrefixPoolAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this prefix-pool."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpPrefixPoolEntry 2 }
+
+ip6DhcpPrefixPoolDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this prefix-pool."
+    ::= { ip6DhcpPrefixPoolEntry 3 }
+
+ip6DhcpPrefixPoolOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this prefix-pool is ignored."
+    ::= { ip6DhcpPrefixPoolEntry 4 }
+
+ip6DhcpPrefixPoolPrefixId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6Prefix' entry.
+         Prefixes from this pool are assigned only if related 'ip6Prefix'
+         entry exists and if its 'OperStatus' is not 'down'.
+         If multiple pools refer to same 'ip6Prefix' then their ranges
+         must not overlap (see 'ip6DhcpPrefixPoolStartOffset' and
+         'ip6DhcpPrefixPoolEndOffset').
+         If any 'ip6LinkPrefix' entries refer to same 'ip6Prefix' then their
+         sub-prefixes must not overlap with prefix-range of this pool.
+         'IfIndex' of related 'ip6Prefix' entry must be zero (unspecified)
+         because DHCPv6-clients may freely link-assign their prefixes.
+         'OnLinkFlag' of related 'ip6LinkPrefix' entry must be 'false'.
+         'AutonomousFlag' of related 'ip6LinkPrefix' entry must be 'false'."
+    ::= { ip6DhcpPrefixPoolEntry 5 }
+
+ip6DhcpPrefixPoolSubPrefixLength OBJECT-TYPE
+    SYNTAX      INTEGER (0..64)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Length of generated sub-prefixes, must be <= 64 and >= related
+         'ip6PrefixLength'."
+    ::= { ip6DhcpPrefixPoolEntry 6 }
+
+ip6DhcpPrefixPoolStartOffset OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Together with 'Prefix' of related 'ip6Prefix' entry, specifies
+         lowest assignable prefix in this pool.
+         Result of prefix plus offset is stored in 'StartPrefix' field.
+         Lowest (128-'SubPrefixLength') bits of offset must be zero.
+         Offset must be smaller than 2^(128-L) where L is 'Length' of related
+         'ip6Prefix' entry."
+    ::= { ip6DhcpPrefixPoolEntry 7 }
+
+ip6DhcpPrefixPoolStartPrefix OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lowest assignable prefix in this pool,
+         or 0 if no suitable 'ip6Prefix' entry was found.
+         See description of 'StartOffset' field for further details."
+    ::= { ip6DhcpPrefixPoolEntry 8 }
+
+ip6DhcpPrefixPoolEndOffset OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Together with 'Prefix' of related 'ip6Prefix' entry, specifies
+         highest assignable prefix in this pool.
+         Result of prefix plus offset is stored in 'EndPrefix' field.
+         Lowest (128-'SubPrefixLength') bits of offset must be zero.
+         Offset must be smaller than 2^(128-L) where L is 'Length' of related
+         'ip6Prefix' entry.
+         Offset must not be smaller than related 'StartOffset'."
+    ::= { ip6DhcpPrefixPoolEntry 9 }
+
+ip6DhcpPrefixPoolEndPrefix OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest assignable prefix in this pool,
+         or 0 if no suitable 'ip6Prefix' entry was found.
+         See description of 'EndOffset' field for further details."
+    ::= { ip6DhcpPrefixPoolEntry 10 }
+
+ip6DhcpPrefixPoolSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of prefixes in this pool, calculated by formula
+         1+(('EndPrefix'-'StartPrefix')/(2^(128-'SubPrefixLength'))),
+         or 0 if no suitable 'ip6Prefix' entry was found.
+         Warning: Due to 64-bit-restriction of this field, the maximum
+         possible pool-size of 2^64 is also represented by a 0 value."
+    ::= { ip6DhcpPrefixPoolEntry 11 }
+
+ip6DhcpPrefixPoolPrefLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum 'preferred lifetime' in seconds of prefixes in this pool.
+         More details are described for 'ip6DhcpPrefixPoolOpPrefLifetime'."
+    DEFVAL      { 43200 }
+    ::= { ip6DhcpPrefixPoolEntry 12 }
+
+ip6DhcpPrefixPoolValidLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum 'valid lifetime' in seconds of prefixes in this pool.
+         More details are described for 'ip6DhcpPrefixPoolOpValidLifetime'."
+    DEFVAL      { 86400 }
+    ::= { ip6DhcpPrefixPoolEntry 13 }
+
+ip6DhcpPrefixPoolAutoRoutePrio OBJECT-TYPE
+    SYNTAX      INTEGER (-1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Priority' value of related, auto-generated 'ip6AdmRoute' entries.
+         A value of -1 means NO auto-generated 'ip6AdmRoute' entries.
+         See also description for 'ip6DhcpClientPrefixFwdIfIndex' and
+         'ip6DhcpClientPrefixFwdAddress'."
+    DEFVAL      { 8 }
+    ::= { ip6DhcpPrefixPoolEntry 14 }
+
+ip6DhcpPrefixPoolOpPrefLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Preferred lifetime' in seconds of prefixes in this pool
+         (see 10 of RFC-3633). Value is set to minimum of configured
+         maximum 'ip6DhcpPrefixPoolPrefLifetime' and inherited
+         'ip6PrefixAdvPreferredLifetime'."
+    DEFVAL      { 43200 }
+    ::= { ip6DhcpPrefixPoolEntry 15 }
+
+ip6DhcpPrefixPoolOpValidLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Valid lifetime' in seconds of prefixes in this pool
+         (see 10 of RFC-3633). Value is set to minimum of configured
+         maximum 'ip6DhcpPrefixPoolValidLifetime' and inherited
+         'ip6PrefixAdvValidLifetime'."
+    DEFVAL      { 86400 }
+    ::= { ip6DhcpPrefixPoolEntry 16 }
+
+---------------------------------------------------------------------------
+-- Administrative: Static interface-IDs for DHCPv6-assigned addresses
+
+ip6DhcpStaticIfIdentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpStaticIfIdentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface-IDs (least significant 64 bits, see 2.5.1 of RFC-4291) for
+         semi-statically assigned 'ip6DhcpClientAddress' entries (find more
+         details on address-building there).
+         Related DHCPv6-client is specified by 'ClientDUID' of related
+         'ip6DhcpOptionSet' entry.
+         Warning: Clients with static interface-IDs do not get any other
+         addresses than such ending with one of their specified interface-IDs,
+         making any address-conflicts more critical. Additionally, if clients
+         with static interface-IDs request multiple IAs on the same link
+         because they have multiple interfaces to it, only the first IA will
+         receive the related addresses."
+    ::= { dhcp6MIB 6 }
+
+ip6DhcpStaticIfIdentEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpStaticIfIdentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpStaticIfIdentId }
+    ::= { ip6DhcpStaticIfIdentTable 1 }
+
+Ip6DhcpStaticIfIdentEntry ::=
+    SEQUENCE {
+        ip6DhcpStaticIfIdentId              INTEGER,
+        ip6DhcpStaticIfIdentAdminStatus     INTEGER,
+        ip6DhcpStaticIfIdentDescription     DisplayString,
+        ip6DhcpStaticIfIdentOptionSetId     INTEGER,
+        ip6DhcpStaticIfIdentIdentifier      InetAddressIPv6
+    }
+
+ip6DhcpStaticIfIdentId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this static interface-ID-entry."
+    ::= { ip6DhcpStaticIfIdentEntry 1 }
+
+ip6DhcpStaticIfIdentAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this static interface-ID-entry."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpStaticIfIdentEntry 2 }
+
+ip6DhcpStaticIfIdentDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this static interface-ID-entry."
+    ::= { ip6DhcpStaticIfIdentEntry 3 }
+
+ip6DhcpStaticIfIdentOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this entry is ignored.
+         'ClientDUID' must be specified in related 'ip6DhcpOptionSet' entry
+         in order to avoid that same address is assigned to multiple clients."
+    ::= { ip6DhcpStaticIfIdentEntry 4 }
+
+ip6DhcpStaticIfIdentIdentifier OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Static interface-ID-value (see 2.5.1 of RFC-4291)."
+    ::= { ip6DhcpStaticIfIdentEntry 5 }
+
+---------------------------------------------------------------------------
+-- Administrative: Statically DHCPv6-assigned client-FQDNs
+
+ip6DhcpClientFqdnOptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpClientFqdnOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statically assigned client-FQDNs (see 4 of RFC-4704).
+         If router is configured as DNS-server then related (name, address)
+         entries are added also into DNS-cache, independently from whether
+         FQDN-option is requested or not.
+         In case of FQDN-request, at most one entry may be replied. Thus,
+         following rule applies. If entry with empty 'Name' matches and if
+         client provides own name then it is simply confirmed. Otherwise,
+         'first' matching one is taken according to sorting-order defined via
+         'ip6DhcpClientFqdnOptListIdx'."
+    ::= { dhcp6MIB 7 }
+
+ip6DhcpClientFqdnOptEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpClientFqdnOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpClientFqdnOptId }
+    ::= { ip6DhcpClientFqdnOptTable 1 }
+
+Ip6DhcpClientFqdnOptEntry ::=
+    SEQUENCE {
+        ip6DhcpClientFqdnOptId              INTEGER,
+        ip6DhcpClientFqdnOptAdminStatus     INTEGER,
+        ip6DhcpClientFqdnOptDescription     DisplayString,
+        ip6DhcpClientFqdnOptOptionSetId     INTEGER,
+        ip6DhcpClientFqdnOptListIdx         INTEGER,
+        ip6DhcpClientFqdnOptName            DisplayString,
+        ip6DhcpClientFqdnOptFullName        DisplayString
+    }
+
+ip6DhcpClientFqdnOptId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this FQDN-entry."
+    ::= { ip6DhcpClientFqdnOptEntry 1 }
+
+ip6DhcpClientFqdnOptAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this FQDN-entry."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpClientFqdnOptEntry 2 }
+
+ip6DhcpClientFqdnOptDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this FQDN-entry."
+    ::= { ip6DhcpClientFqdnOptEntry 3 }
+
+ip6DhcpClientFqdnOptOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this FQDN-entry is ignored.
+         'ClientDUID' must be specified in related 'ip6DhcpOptionSet' entry
+         in order to avoid that same FQDN is assigned to multiple clients."
+    ::= { ip6DhcpClientFqdnOptEntry 4 }
+
+ip6DhcpClientFqdnOptListIdx OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines sorting-order in case of several matching FQDN-entries.
+         Lower number means 'earlier in list'."
+    ::= { ip6DhcpClientFqdnOptEntry 5 }
+
+ip6DhcpClientFqdnOptName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Fully qualified domain-name, or empty.
+         If empty, 'Name' field of related 'ip6DhcpStatefulClient' is used
+         instead, if not also empty.
+         At most one entry with empty 'Name' should be specified per client.
+         Fully qualified domain-names must have trailing dot for distinction
+         from relative/partial domain-names. However, many users/admins tend
+         to forget this. Thus, 'proper version' of this field is stored in
+         field 'FullName'."
+    ::= { ip6DhcpClientFqdnOptEntry 6 }
+
+ip6DhcpClientFqdnOptFullName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Proper' fully qualified domain-name, or empty.
+         See description of field 'Name'."
+    ::= { ip6DhcpClientFqdnOptEntry 7 }
+
+---------------------------------------------------------------------------
+-- Administrative: Statically DHCPv6-assigned SNTP-servers
+
+ip6DhcpSntpServerOptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpSntpServerOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statically assigned SNTP-server-addresses (see 4 of RFC-4075).
+         If multiple entries match then all related addresses are stored in
+         a single SNTP-server-option according to sorting-order specified via
+         'ip6DhcpSntpServerOptListIdx'.
+         If SNTP-option is requested but no entries match then DHCP-server
+         returns own address if NTP-service of router is activated."
+    ::= { dhcp6MIB 8 }
+
+ip6DhcpSntpServerOptEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpSntpServerOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpSntpServerOptId }
+    ::= { ip6DhcpSntpServerOptTable 1 }
+
+Ip6DhcpSntpServerOptEntry ::=
+    SEQUENCE {
+        ip6DhcpSntpServerOptId              INTEGER,
+        ip6DhcpSntpServerOptAdminStatus     INTEGER,
+        ip6DhcpSntpServerOptDescription     DisplayString,
+        ip6DhcpSntpServerOptOptionSetId     INTEGER,
+        ip6DhcpSntpServerOptListIdx         INTEGER,
+        ip6DhcpSntpServerOptAddress         InetAddressIPv6
+    }
+
+ip6DhcpSntpServerOptId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this SNTP-entry."
+    ::= { ip6DhcpSntpServerOptEntry 1 }
+
+ip6DhcpSntpServerOptAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this SNTP-entry."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpSntpServerOptEntry 2 }
+
+ip6DhcpSntpServerOptDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this SNTP-entry."
+    ::= { ip6DhcpSntpServerOptEntry 3 }
+
+ip6DhcpSntpServerOptOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this SNTP-entry is ignored."
+    ::= { ip6DhcpSntpServerOptEntry 4 }
+
+ip6DhcpSntpServerOptListIdx OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines sorting-order in case of several matching SNTP-entries.
+         Lower number means 'earlier in list'."
+    ::= { ip6DhcpSntpServerOptEntry 5 }
+
+ip6DhcpSntpServerOptAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Address of SNTP-server."
+    ::= { ip6DhcpSntpServerOptEntry 6 }
+
+---------------------------------------------------------------------------
+-- Administrative: Statically DHCPv6-assigned DNS-servers
+
+ip6DhcpDnsServerOptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpDnsServerOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statically assigned recursive name-servers (see 3 of RFC-3646).
+         If multiple entries match then all related addresses are stored in
+         a single DNS-server-option according to sorting-order specified via
+         'ip6DhcpDnsServerOptListIdx'.
+         If DNS-option is requested but no static entries match then rules of
+         related 'ip6AdmIfDnsAssign' entry apply."
+    ::= { dhcp6MIB 9 }
+
+ip6DhcpDnsServerOptEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpDnsServerOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpDnsServerOptId }
+    ::= { ip6DhcpDnsServerOptTable 1 }
+
+Ip6DhcpDnsServerOptEntry ::=
+    SEQUENCE {
+        ip6DhcpDnsServerOptId           INTEGER,
+        ip6DhcpDnsServerOptAdminStatus  INTEGER,
+        ip6DhcpDnsServerOptDescription  DisplayString,
+        ip6DhcpDnsServerOptOptionSetId  INTEGER,
+        ip6DhcpDnsServerOptListIdx      INTEGER,
+        ip6DhcpDnsServerOptAddress      InetAddressIPv6
+    }
+
+ip6DhcpDnsServerOptId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this DNS-entry."
+    ::= { ip6DhcpDnsServerOptEntry 1 }
+
+ip6DhcpDnsServerOptAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this DNS-entry."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpDnsServerOptEntry 2 }
+
+ip6DhcpDnsServerOptDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this DNS-entry."
+    ::= { ip6DhcpDnsServerOptEntry 3 }
+
+ip6DhcpDnsServerOptOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this DNS-entry is ignored."
+    ::= { ip6DhcpDnsServerOptEntry 4 }
+
+ip6DhcpDnsServerOptListIdx OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines sorting-order in case of several matching DNS-entries.
+         Lower number means 'earlier in list'."
+    ::= { ip6DhcpDnsServerOptEntry 5 }
+
+ip6DhcpDnsServerOptAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Address of DNS-server."
+    ::= { ip6DhcpDnsServerOptEntry 6 }
+
+---------------------------------------------------------------------------
+-- Administrative: Statically DHCPv6-assigned domain-search-list
+
+ip6DhcpDomainNameOptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpDomainNameOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statically assigned domain-search-names (see 4 of RFC-3646).
+         If multiple entries match then all related domain-names are stored in
+         a single domain-list-option according to sorting-order specified via
+         'ip6DhcpDomainNameOptListIdx'."
+    ::= { dhcp6MIB 10 }
+
+ip6DhcpDomainNameOptEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpDomainNameOptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpDomainNameOptId }
+    ::= { ip6DhcpDomainNameOptTable 1 }
+
+Ip6DhcpDomainNameOptEntry ::=
+    SEQUENCE {
+        ip6DhcpDomainNameOptId              INTEGER,
+        ip6DhcpDomainNameOptAdminStatus     INTEGER,
+        ip6DhcpDomainNameOptDescription     DisplayString,
+        ip6DhcpDomainNameOptOptionSetId     INTEGER,
+        ip6DhcpDomainNameOptListIdx         INTEGER,
+        ip6DhcpDomainNameOptValue           DisplayString,
+        ip6DhcpDomainNameOptFullValue       DisplayString
+    }
+
+ip6DhcpDomainNameOptId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this domain-entry."
+    ::= { ip6DhcpDomainNameOptEntry 1 }
+
+ip6DhcpDomainNameOptAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this domain-entry."
+    DEFVAL      { enabled }
+    ::= { ip6DhcpDomainNameOptEntry 2 }
+
+ip6DhcpDomainNameOptDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this domain-entry."
+    ::= { ip6DhcpDomainNameOptEntry 3 }
+
+ip6DhcpDomainNameOptOptionSetId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpOptionSet' entry.
+         If no 'ip6DhcpOptionSetId' matches, this domain-entry is ignored."
+    ::= { ip6DhcpDomainNameOptEntry 4 }
+
+ip6DhcpDomainNameOptListIdx OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines sorting-order in case of several matching domain-names.
+         Lower number means 'earlier in list'."
+    ::= { ip6DhcpDomainNameOptEntry 5 }
+
+ip6DhcpDomainNameOptValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Fully qualified domain-name to be added to search-list.
+         Fully qualified domain-names must have trailing dot for distinction
+         from relative/partial domain-names. However, many users/admins tend
+         to forget this. Thus, 'proper version' of this field is stored in
+         field 'FullValue'."
+    ::= { ip6DhcpDomainNameOptEntry 6 }
+
+ip6DhcpDomainNameOptFullValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Proper' fully qualified domain-name.
+         See description of field 'Value'."
+    ::= { ip6DhcpDomainNameOptEntry 7 }
+
+---------------------------------------------------------------------------
+-- Operative: DHCPv6-clients with assigned addresses/prefixes
+
+ip6DhcpStatefulClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpStatefulClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6-clients with currently assigned address, prefix, or FQDN."
+    ::= { dhcp6MIB 11 }
+
+ip6DhcpStatefulClientEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpStatefulClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpStatefulClientDUID }
+    ::= { ip6DhcpStatefulClientTable 1 }
+
+Ip6DhcpStatefulClientEntry ::=
+    SEQUENCE {
+        ip6DhcpStatefulClientDUID           OCTET STRING,
+        ip6DhcpStatefulClientName           DisplayString,
+        ip6DhcpStatefulClientAge            TimeStamp,
+        ip6DhcpStatefulClientLastUpdate     TimeStamp
+    }
+
+ip6DhcpStatefulClientDUID OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DUID of DHCPv6-client (see 9 and 22.2 of RFC-3315).
+         An empty dummy-DUID is used for storing addresses from received
+         Decline-messages (see section 5.3 of RFC-33)."
+    ::= { ip6DhcpStatefulClientEntry 1 }
+
+ip6DhcpStatefulClientName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Partial or fully qualified domain-name, if provided by client,
+         otherwise empty. Value is overridden by 'Name' of related
+         'ip6DhcpClientFqdnOpt' entry, if existing and not empty."
+    ::= { ip6DhcpStatefulClientEntry 2 }
+
+ip6DhcpStatefulClientAge OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Age of this client-entry."
+    ::= { ip6DhcpStatefulClientEntry 3 }
+
+ip6DhcpStatefulClientLastUpdate OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp for latest update of this client-entry."
+    ::= { ip6DhcpStatefulClientEntry 4 }
+
+---------------------------------------------------------------------------
+-- Operative: Currently DHCPv6-assigned IA_NA-addresses
+
+ip6DhcpClientAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ip6DhcpClientAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Currently assigned client-addresses, built for each pair of requested
+         IA_NA and matching 'ip6LinkPrefix' entry.
+         For clients with semi-statically assigned addresses, the interface-ID
+         part (least significant 64 bits, see section 2.5.1 of RFC-4291) is
+         taken from their 'ip6DhcpStaticIfIdent' entries.
+         For all other clients, some random interface-ID (excluding any static
+         ones) is used unless they request some specific and valid addresses."
+    ::= { dhcp6MIB 12 }
+
+ip6DhcpClientAddressEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpClientAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpClientAddressValue }
+    ::= { ip6DhcpClientAddressTable 1 }
+
+Ip6DhcpClientAddressEntry ::=
+    SEQUENCE {
+        ip6DhcpClientAddressValue           InetAddressIPv6,
+        ip6DhcpClientAddressDUID            OCTET STRING,
+        ip6DhcpClientAddressLinkPrefixId    INTEGER,
+        ip6DhcpClientAddressIAID            Unsigned32,
+        ip6DhcpClientAddressPrefLifetime    Unsigned32,
+        ip6DhcpClientAddressValidLifetime   Unsigned32,
+        ip6DhcpClientAddressAge             TimeStamp
+    }
+
+ip6DhcpClientAddressValue OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Assigned address."
+    ::= { ip6DhcpClientAddressEntry 1 }
+
+ip6DhcpClientAddressDUID OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DUID of related DHCPv6-client (see 9 and 22.2 of RFC-3315).
+         An empty dummy-DUID is used for storing addresses from received
+         Decline-messages (see section 5.3 of RFC-33)."
+    ::= { ip6DhcpClientAddressEntry 2 }
+
+ip6DhcpClientAddressLinkPrefixId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6LinkPrefix' entry."
+    ::= { ip6DhcpClientAddressEntry 3 }
+
+ip6DhcpClientAddressIAID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IAID of related IA_NA (see 22.4 of RFC-3315)."
+    ::= { ip6DhcpClientAddressEntry 4 }
+
+ip6DhcpClientAddressPrefLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Preferred lifetime' in seconds of assigned address
+         (see 22.6 of RFC-3315)."
+    ::= { ip6DhcpClientAddressEntry 5 }
+
+ip6DhcpClientAddressValidLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Valid lifetime' in seconds of assigned address
+         (see 22.6 of RFC-3315)."
+    ::= { ip6DhcpClientAddressEntry 6 }
+
+ip6DhcpClientAddressAge OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Age of this address-entry."
+    ::= { ip6DhcpClientAddressEntry 7 }
+
+---------------------------------------------------------------------------
+-- Operative: Currently DHCPv6-assigned IA_PD-prefixes
+
+ip6DhcpClientPrefixTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Ip6DhcpClientPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Currently assigned prefixes."
+    ::= { dhcp6MIB 13 }
+
+ip6DhcpClientPrefixEntry OBJECT-TYPE
+    SYNTAX      Ip6DhcpClientPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { ip6DhcpClientPrefixValue }
+    ::= { ip6DhcpClientPrefixTable 1 }
+
+Ip6DhcpClientPrefixEntry ::=
+    SEQUENCE {
+        ip6DhcpClientPrefixValue            InetAddressIPv6,
+        ip6DhcpClientPrefixLength           INTEGER,
+        ip6DhcpClientPrefixDUID             OCTET STRING,
+        ip6DhcpClientPrefixPoolId           INTEGER,
+        ip6DhcpClientPrefixIAID             Unsigned32,
+        ip6DhcpClientPrefixPrefLifetime     Unsigned32,
+        ip6DhcpClientPrefixValidLifetime    Unsigned32,
+        ip6DhcpClientPrefixFwdIfIndex       InterfaceIndex,
+        ip6DhcpClientPrefixFwdAddress       InetAddressIPv6,
+        ip6DhcpClientPrefixAge              TimeStamp
+    }
+
+ip6DhcpClientPrefixValue OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Assigned prefix."
+    ::= { ip6DhcpClientPrefixEntry 1 }
+
+ip6DhcpClientPrefixLength OBJECT-TYPE
+    SYNTAX      INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Length of assigned prefix."
+    ::= { ip6DhcpClientPrefixEntry 2 }
+
+ip6DhcpClientPrefixDUID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DUID of related DHCPv6-client (see 9 and 22.2 of RFC-3315)."
+    ::= { ip6DhcpClientPrefixEntry 3 }
+
+ip6DhcpClientPrefixPoolId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Id' value of related 'ip6DhcpPrefixPool' entry."
+    ::= { ip6DhcpClientPrefixEntry 4 }
+
+ip6DhcpClientPrefixIAID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IAID of related IA_PD (see 9 of RFC-3633)."
+    ::= { ip6DhcpClientPrefixEntry 5 }
+
+ip6DhcpClientPrefixPrefLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Preferred lifetime' in seconds of assigned prefix
+         (see 10 of RFC-3633)."
+    ::= { ip6DhcpClientPrefixEntry 6 }
+
+ip6DhcpClientPrefixValidLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'Valid lifetime' in seconds of assigned prefix
+         (see 10 of RFC-3633)."
+    ::= { ip6DhcpClientPrefixEntry 7 }
+
+ip6DhcpClientPrefixFwdIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Together with 'ip6DhcpClientPrefixFwdAddress', tells next hop for
+         forwarding IPv6-frames targeted to this prefix. This info equals to
+         target of related IA_PD option.
+         See also description for 'ip6DhcpPrefixPoolAutoRoutePrio'.
+         Warning: Do not confuse forwarding-interface (chosen by server) with
+         on-link-interface (chosen by client)."
+    ::= { ip6DhcpClientPrefixEntry 8 }
+
+ip6DhcpClientPrefixFwdAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "See description for 'ip6DhcpClientPrefixFwdIfIndex'."
+    ::= { ip6DhcpClientPrefixEntry 9 }
+
+ip6DhcpClientPrefixAge OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Age of this prefix-entry."
+    ::= { ip6DhcpClientPrefixEntry 10 }
+
+END

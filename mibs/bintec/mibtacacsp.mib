@@ -1,0 +1,338 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 2004-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibtacacsp,v $ 
+-- $Revision: 1.7 $ 
+
+BIANCA-BRICK-TACACSP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            Counter, IpAddress, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+ 
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bintecsec 	OBJECT IDENTIFIER ::= { bintec 254 }
+    tacacsp	OBJECT IDENTIFIER
+		::= { bintecsec  13 } 
+
+	tacacspServerTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF TacacspServerEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	::= { tacacsp 1 }
+
+	tacacspServerEntry OBJECT-TYPE
+	    SYNTAX  TacacspServerEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	    INDEX { tacacspSrvPriority }
+	::= { tacacspServerTable 1 }
+
+	TacacspServerEntry ::=
+	    SEQUENCE {
+		tacacspSrvPriority			INTEGER,
+		tacacspSrvAddress			IpAddress,
+		tacacspSrvTcpPort			INTEGER,
+		tacacspSrvSecret			DisplayString,
+		tacacspSrvTimeout			INTEGER,
+--		tacacspSrvRetries			INTEGER,
+		tacacspSrvAdminStatus			INTEGER,
+		tacacspSrvOperStatus			INTEGER,
+		tacacspSrvPolicy			INTEGER,
+		tacacspSrvEncrMode			INTEGER,
+		tacacspSrvMultiSession			INTEGER,
+--		tacacspSrvKeepalive			INTEGER,
+		tacacspSrvPppAuth			INTEGER,
+		tacacspSrvLoginAuth			INTEGER,
+		tacacspSrvAccounting			INTEGER,
+		tacacspSrvBlockTimeout			INTEGER,
+		tacacspSrvAuthentNoResp			INTEGER,
+		tacacspSrvAuthentNegResp		INTEGER,
+		tacacspSrvPrivLvlOnLogin		INTEGER
+	    }
+
+	tacacspSrvPriority OBJECT-TYPE
+	    SYNTAX  INTEGER (0..9) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The TACACS+ server with the lowest priority is the first
+		 used for an TACACS+ AAA request. If there is no response
+		 or the access was denied (in the non-authoritave case only,
+		 see also tacacspSrvPolicy) the TACACS+ server with the next
+		 lowest priority will be used. The default value is 0."
+	    DEFVAL { 0 }
+	::= { tacacspServerEntry 1 }
+
+	tacacspSrvAddress OBJECT-TYPE
+	    SYNTAX  IpAddress 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The TACACS+ server IP address."
+	::= { tacacspServerEntry 2 }
+
+	tacacspSrvTcpPort OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The Login Host Protocol (TACACS) TCP port assigned
+	   	 by the IANA."
+	    DEFVAL { 49 }
+	::= { tacacspServerEntry 3 }
+
+	tacacspSrvSecret OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The shared secret between the TACACS+ server and the NAS
+		 (encryption key in the TACACS+ server's configuration file)."
+	    DEFVAL { "" }
+	::= { tacacspServerEntry 4 }
+
+	tacacspSrvTimeout OBJECT-TYPE
+	    SYNTAX  INTEGER (1..60) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The amount of seconds waiting for an outstanding TACACS+
+		 response. Default is three seconds."
+	    DEFVAL { 3 }
+	::= { tacacspServerEntry 5 }
+
+--	tacacspSrvRetries OBJECT-TYPE
+--	    SYNTAX  INTEGER (0..10) 
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		"The number of retries sent for each request."
+--	    DEFVAL { 1 }
+--	::= { tacacspServerEntry 6 }
+
+	tacacspSrvAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			up(1), 
+			down(2), 
+			delete(3)
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The administrative status of this TACACS+ server entry,
+		 if set to up(1) the associated server will be used
+		 for authentication, authorization and accounting according
+		 the priority (see tacacspSrvPriority) and the current
+		 operational status (see tacacspSrvOperStatus). Otherwise
+		 this entry will not be considered for TACACS+ AAA requests."
+	    DEFVAL { up }
+	::= { tacacspServerEntry 7 }
+
+	tacacspSrvOperStatus OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			up(1), 
+			blocked(2), 
+			down(3)
+		} 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The operational status of this TACACS+ server entry, the
+		 status blocked will be set after a failed TACACS+ request.
+		 If set to blocked(2) or down(3) this entry will not be
+		 considered for TACACS+ AAA requests."
+	    DEFVAL { up }
+	::= { tacacspServerEntry 8 }
+
+	tacacspSrvPolicy OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			authoritative(1),
+			non-authoritative(2)
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"If set to authoritative(1), a negative answer to a
+		 request will be accepted. This is not necessarily
+		 true when set to non-authoritative(2), where the
+		 next TACACS+ server will be asked until there is
+		 finally an authoritative(1) server configured."
+	    DEFVAL { non-authoritative }
+	::= { tacacspServerEntry 9 }
+
+	tacacspSrvEncrMode OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			encrypt(1),
+			cleartext(2) 
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"If set to encrypt(1) the TACACS+ packet will be MD5
+		 encrypted. Otherwise - if set to cleartext(2) - the packet
+		 and therefore all related information will be send
+		 unencrypted. This mode is intended for testing but not
+		 recommended for normal use."
+	    DEFVAL { encrypt }
+	::= { tacacspServerEntry 10 }
+
+	tacacspSrvMultiSession OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			enabled(1),
+			disabled(2) 
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"If enabled(1) multiple TACACS+ sessions (subsequent TACACS+
+		 requests) may be supported simultaneously over a single TCP
+		 connection. If multiple sessions are not being multiplexed
+		 over a single TCP connection, a new connection will be opened
+		 for each TACACS+ session and closed at the end of that
+		 session."
+	    DEFVAL { disabled }
+	::= { tacacspServerEntry 11 }
+
+--	tacacspSrvKeepalive OBJECT-TYPE
+--	    SYNTAX  INTEGER { 
+--			enabled(1), 
+--			disabled(2) 
+--		} 
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		"Enables the periodicaly keep alive check of established
+--		 (see tacacspSrvOperStatus) TACACS+ server."
+--	    DEFVAL { disabled }
+--	::= { tacacspServerEntry 12 }
+
+	tacacspSrvPppAuth OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			disabled(1), 
+			enabled(2) 
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Enables the PPP authentication for the associated TACACS+
+		 server."
+	    DEFVAL { disabled }
+	::= { tacacspServerEntry 13 }
+
+	tacacspSrvLoginAuth OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			disabled(1), 
+			enabled(2) 
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Enables the login authentication (shell) for the associated
+		 TACACS+ server."
+	    DEFVAL { enabled }
+	::= { tacacspServerEntry 14 }
+
+	tacacspSrvAccounting OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			disabled(1), 
+			enabled(2) 
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Enables the TACACS+ accounting for the associated TACACS+
+		 server."
+	    DEFVAL { disabled }
+	::= { tacacspServerEntry 15 }
+
+	tacacspSrvBlockTimeout OBJECT-TYPE
+	    SYNTAX  INTEGER (0..3600)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Timeout in seconds for the blocked status (see also
+		 tacacspSrvOperStatus), if expired, the operational status
+		 is set to up(1) or down(3) according the the current
+		 tacacspSrvAdminStatus. When set to zero, the operational
+		 status is never set to blocked."
+	    DEFVAL { 60 }
+	::= { tacacspServerEntry 16 }
+
+
+	tacacspSrvAuthentNoResp OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			connection-bydefault(1),
+			connection-bylocalloginpwd(2), 
+			connection-forbidden(3)
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Possible actions for the client when no response from servers :
+		  - allowing the connection to the router by local login pwd (2)
+		  - or stop the negociation (3)."
+	    DEFVAL { 1 }
+	::= { tacacspServerEntry 17 }
+
+	tacacspSrvAuthentNegResp OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			connection-bydefault(1),
+			connection-bylocalloginpwd(2), 
+			connection-forbidden(3)
+		} 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Possible actions for the client when negative response :
+		 from servers.
+		 - allowing the connection to the router by local login pwd (2)
+		 -  or stop the negociation (3)."
+	    DEFVAL { 1 }
+	::= { tacacspServerEntry 18 }
+
+	tacacspSrvPrivLvlOnLogin OBJECT-TYPE
+	    SYNTAX  INTEGER (-1..15)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Configurable TACACS+ privilege level assigned after
+		 successful authentication procedure. This user-specific
+		 privilege level is needed for the subsequent command
+		 authorization request(s). Note that the user is free to
+		 change that initial privilege level via the 'enab<n>'
+		 command, provided that it's enabled on the TACACS+ server.
+		 If set to -1, this parameter will be ignored."
+	    DEFVAL { 1 }
+	::= { tacacspServerEntry 19 }
+
+
+END

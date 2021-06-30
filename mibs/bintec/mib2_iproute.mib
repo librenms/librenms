@@ -1,0 +1,348 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- $RCSfile: mib2_iproute,v $
+-- $Revision: 1.7 $
+-- $Date: 2009-11-06 13:18:59 $
+---------------------------------------------------------------------------
+
+-- contains only ipRouteTable from former file mib2 (SMIv1)
+--
+-- for MIB2 in SMIv2 (mib-snmpv2,mib-if,mib-ip,mib-tcp,mib-udp)
+--   ipRouteTable was obsoleted by ipCidrRouteTable (RFC2096) in SMIv2,
+--   but is not supported (using still ipRouteTable)
+
+RFC1213-IPROUTE-MIB DEFINITIONS ::= BEGIN
+
+--internet     OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) }
+
+          IMPORTS
+                 NetworkAddress, IpAddress, Counter, Gauge,
+                         TimeTicks, mib-2
+                     FROM RFC1155-SMI
+
+		 DisplayString
+		     FROM RFC1158-MIB
+
+		 PhysAddress
+		     FROM RFC1213-MIB
+
+                 OBJECT-TYPE
+		     FROM RFC-1212;
+
+          ip           OBJECT IDENTIFIER
+	      ::= { mib-2 4 }
+
+
+          -- the IP routing table
+
+          -- The IP routing table contains an entry for each route
+          -- presently known to this entity.
+
+          ipRouteTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IpRouteEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+			"The ipRouteTable contains the BRICK's routing table.
+                	The IP routing table contains an entry for each route 
+                	presently known to the BRICK. Each entry in this table is a
+                	route to a particular destination.
+
+                	Creating entries: Entries may be created by setting a
+                	new value for the ipRouteDest object.
+
+                	Deleting entries: Entries may be deleted by setting
+                	the ipRouteType of the entry to 'delete' or 'invalid'."
+              ::= { ip 21 }
+
+          ipRouteEntry OBJECT-TYPE
+              SYNTAX  IpRouteEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A route to a particular destination."
+              INDEX   { ipRouteDest }
+              ::= { ipRouteTable 1 }
+
+          IpRouteEntry ::=
+              SEQUENCE {
+                  ipRouteDest
+                      IpAddress,
+                  ipRouteIfIndex
+                      INTEGER,
+                  ipRouteMetric1
+                      INTEGER,
+                  ipRouteMetric2
+                      INTEGER,
+                  ipRouteMetric3
+                      INTEGER,
+                  ipRouteMetric4
+                      INTEGER,
+                  ipRouteNextHop
+                      IpAddress,
+                  ipRouteType
+                      INTEGER,
+                  ipRouteProto
+                      INTEGER,
+                  ipRouteAge
+                      INTEGER,
+                  ipRouteMask
+                      IpAddress,
+                  ipRouteMetric5
+                      INTEGER,
+
+                  ipRouteInfo
+                      OBJECT IDENTIFIER
+              }
+
+          ipRouteDest OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The destination IP address of this route.  An
+                      entry with a value of 0.0.0.0 is considered a
+                      default route.  Multiple routes to a single
+                      destination can appear in the table, but access to
+                      such multiple entries is dependent on the 
+                      table-access mechanisms defined by the network
+                      management protocol in use."
+              ::= { ipRouteEntry 1 }
+
+          ipRouteIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The index value which uniquely identifies the
+                      local interface through which the next hop of this
+                      route should be reached.  The interface identified
+                      by a particular value of this index is the same
+                      interface as identified by the same value of
+                      ifIndex.The special interface index zero (0)
+                      means, discard the packet."
+              ::= { ipRouteEntry 2 }
+
+          ipRouteMetric1 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The metric of the route as specified by the RIP 
+              	       protocol. When selecting routes, the route with the 
+		       lowest value of ipRouteMetric1 is chosen."
+              ::= { ipRouteEntry 3 }
+
+          ipRouteMetric2 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Defined, but not used by the BRICK."
+	      DEFVAL { -1 }
+              ::= { ipRouteEntry 4 }
+
+          ipRouteMetric3 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Defined, but nor used by the BRICK."
+	      DEFVAL { -1 }
+              ::= { ipRouteEntry 5 }
+
+          ipRouteMetric4 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Defined, but not used by the BRICK."
+	      DEFVAL { -1 }
+              ::= { ipRouteEntry 6 }
+
+          ipRouteNextHop OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The IP address of the next hop of this route.
+                      (In the case of a route bound to an interface
+                      which is realized via a broadcast media, the value
+                      of this field is the agent's IP address on that
+                      interface.)"
+              ::= { ipRouteEntry 7 }
+
+          ipRouteType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),        -- none of the following
+
+                          invalid(2),      -- an invalidated route
+
+                                           -- route to directly
+                          direct(3),       -- connected (sub-)network
+
+                                           -- route to a non-local
+                          indirect(4)      -- host/network/sub-network
+                      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The type of route.  Note that the values
+                      direct(3) and indirect(4) refer to the notion of
+                      direct and indirect routing in the IP
+                      architecture.
+
+                      Setting this object to the value invalid(2) has
+                      the effect of deleting the routing entry from 
+                      the ipRouteTable object.  That is, it
+                      effectively dissasociates the destination
+                      identified with said entry from the route
+                      identified with said entry.  It is an
+                      implementation-specific matter as to whether the
+                      agent removes an invalidated entry from the table.
+                      Accordingly, management stations must be prepared
+                      to receive tabular information from agents that
+                      corresponds to entries not currently in use.
+                      Proper interpretation of such entries requires
+                      examination of the relevant ipRouteType object.
+
+                          other(1)	= none of the following;
+ 
+	                  delete(2);
+                          invalid(2)	= an invalidated route;
+
+                          direct(3)	=  route to directly connected (sub-)network;
+
+                          indirect(4)	= route to a non-local host/network/sub-network"
+
+              ::= { ipRouteEntry 8 }
+
+          ipRouteProto OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),       -- none of the following
+
+                                          -- non-protocol information,
+                                          -- e.g., manually configured
+                          local(2),       -- entries
+
+                                          -- set via a network
+                          netmgmt(3),     -- management protocol
+
+                                          -- obtained via ICMP,
+                          icmp(4),        -- e.g., Redirect
+
+                                          -- the remaining values are
+                                          -- all gateway routing
+                                          -- protocols
+                          egp(5),
+                          ggp(6),
+
+                          hello(7),
+                          rip(8),
+                          is-is(9),
+                          es-is(10),
+                          ciscoIgrp(11),
+                          bbnSpfIgp(12),
+                          ospf(13),
+                          bgp(14),
+			  ospf-ext(31)    -- OSPF external routes
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The routing mechanism via which this route was
+                      learned.  Inclusion of values for gateway routing
+                      protocols is not intended to imply that hosts
+                      should support those protocols.
+
+			other(1)	= none of the following;
+
+                        local(2         = non-protocol information
+                                          e.g., manually configured
+                        		  entries;
+
+                        netmgmt(3)      = set via a network
+                                          management protocol;
+ 
+                        icmp(4)         = obtained via ICMP,
+                                          e.g., Redirect;   
+ 
+                                          the remaining values are
+                                          all gateway routing  
+                                          protocols:
+                          egp(5);
+                          ggp(6);
+ 
+                          hello(7);
+                          rip(8); 
+                          is-is(9);
+                          es-is(10);
+                          ciscoIgrp(11);
+                          bbnSpfIgp(12);
+                          ospf(13);    
+                          bgp(14) "
+              ::= { ipRouteEntry 9 }
+
+          ipRouteAge OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of seconds since this route was last
+                      updated or otherwise determined to be correct.
+                      Note that no semantics of `too old' can be implied
+                      except through knowledge of the routing protocol
+                      by which the route was learned."
+              ::= { ipRouteEntry 10 }
+
+          ipRouteMask OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+			"Indicate the mask to be logical-ANDed with the 
+                	destination address before being compared to the value in the
+                	ipRouteDest field. The BRICK is able to use arbitrary 
+                	subnet-masks. If the subnet mask is not specified, it will be
+                	set automatically according to the following table:
+
+                                0.0.0.0                 default route
+
+                                255.0.0.0               class-A
+
+                                255.255.0.0             class-B
+
+                                255.255.255.0           class-C
+
+                	If the value of the ipRouteDest is 0.0.0.0 (a default
+                	route) then the mask value is also 0.0.0.0. It should be 
+                	noted that all IP routing subsystems implicitly use this
+                	mechanism. Host routes are created by setting the subnet
+                	mask to 255.255.255.255."
+              ::= { ipRouteEntry 11 }
+
+          ipRouteMetric5 OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Defined, but not used by the BRICK."
+	      DEFVAL { -1 }
+              ::= { ipRouteEntry 12 }
+
+          ipRouteInfo OBJECT-TYPE
+              SYNTAX  OBJECT IDENTIFIER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+			"A reference to MIB definitions specific to the particular
+                	routing protocol which is responsible for this route, as
+               	 	determined by the value specified in the route's 
+                	ipRoute-Proto value. This value is currently not used 
+                	by the BRICK and is therefore always set to 0.0."
+              ::= { ipRouteEntry 13 }
+
+
+END

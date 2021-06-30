@@ -1,0 +1,399 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 2011-2014 bintec elmeg GmbH
+-- $RCSfile: mib-user,v $ 
+-- $Revision: 1.12 $ 
+
+BIANCA-BRICK-USER-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            IpAddress, Counter, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+            MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Counter32, Counter64, TimeTicks
+                FROM SNMPv2-SMI
+
+            OBJECT-TYPE
+                FROM RFC-1212
+
+	    bibo
+		FROM BINTEC-MIB;
+
+
+userMIB MODULE-IDENTITY
+    LAST-UPDATED "201603290000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail: info@bintec-elmeg.com
+             Web: www.bintec-elmeg.com
+            "
+    DESCRIPTION
+            "E-Mail Alert MIB"
+    REVISION "201202270000Z"
+    DESCRIPTION
+            "E-Mail Alert MIB"
+    ::= { bibo 62 }
+
+    user        OBJECT IDENTIFIER
+    ::= { userMIB 1 }
+
+-- user MIB
+
+	userAlertTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF UserAlertEntry
+            MAX-ACCESS not-accessible
+            STATUS current 
+            DESCRIPTION
+                "Contains the complete user notification table."
+        ::= { user 1 }
+
+        userAlertEntry OBJECT-TYPE
+            SYNTAX UserAlertEntry
+            MAX-ACCESS not-accessible
+            STATUS current 
+            DESCRIPTION
+                "Contents the notification Entry."
+            INDEX { userAlertAddress }
+        ::= { userAlertTable 1 }
+
+	
+	UserAlertEntry ::=
+            SEQUENCE {
+                userAlertAddress	DisplayString, 
+		userAlertRule   	DisplayString,
+		userAlertTimeout	INTEGER,
+		userAlertCount		INTEGER,
+		userAlertCompress	INTEGER,
+		userAlertLevel		INTEGER,
+		userAlertMask		INTEGER,
+		userAlertSubject        DisplayString,
+                userAlertBits           BITS,
+                userAlertService        INTEGER,
+                userAlertContent        INTEGER
+           }
+
+
+        userAlertAddress OBJECT-TYPE
+            SYNTAX DisplayString  (SIZE (0..80))
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "The E-Mail recipient of a notification or
+                 the subscriber number of a SMS capable (mobile) device."
+            DEFVAL { "" }
+        ::= { userAlertEntry 1 }
+
+
+        userAlertRule OBJECT-TYPE
+            SYNTAX DisplayString  (SIZE (0..255))
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "The expression which is searched for in the syslog message."
+	    DEFVAL { "" }
+        ::= { userAlertEntry 2 }
+
+        userAlertTimeout OBJECT-TYPE
+            SYNTAX INTEGER (0..86400)
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "The time after which the E-Mail or SMS is forced to be sent."
+	    DEFVAL { 0 }
+        ::= { userAlertEntry 3 }
+
+        userAlertCount OBJECT-TYPE
+            SYNTAX INTEGER (0..1024)
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "The count of messages to be collected after 
+                 which the E-Mail is forced to be sent.
+                 Since SMS is restricted to 160 characters this
+                 object is ignored for SMS."
+	    DEFVAL { 0 }
+        ::= {  userAlertEntry 4 }
+
+
+        userAlertCompress OBJECT-TYPE
+            SYNTAX INTEGER { 
+	    	enable(1),
+		disable(2),
+		delete(3)
+	    } 
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "Definition for userAlertService E-Mail:
+                 Declares whether identical messages should just
+                 be displayed once followed by the message:
+                     `This Message was repeated xxTimes'.
+                 Definition for userAlertService SMS:
+                 When enabled the syslog message timestamp
+                 is suppressed to save space for the message text."
+	    DEFVAL { enable }
+        ::= { userAlertEntry 5 }
+
+        userAlertLevel OBJECT-TYPE
+            SYNTAX INTEGER {
+	        emerg(1), 
+		user(2), 
+		crit(3), 
+		err(4), 
+		warning(5), 
+		notice(6), 
+		info(7), 
+		debug(8) 
+	    } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The syslog level of the syslog message to be searched for."
+	    DEFVAL { emerg }
+        ::= { userAlertEntry 6 }
+
+        userAlertMask OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "The Subtypes of Message watching."
+	    DEFVAL { -1 }
+        ::= { userAlertEntry 7 }
+
+        userAlertSubject OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "Defines the subject of the email message."
+	    DEFVAL { "" }
+        ::= { userAlertEntry 8 }
+
+        userAlertBits OBJECT-TYPE
+            SYNTAX BITS{
+                acct(1),
+                isdn(2),
+                inet(3),
+                x25(4),
+                ipx(5),
+                capi(6),
+                ppp(7),
+                bridge(8),
+                config(9),
+                snmp(10),
+                x21(11),
+                token(12),
+                ether(13),
+                radius(14),
+                tapi(15),
+                ospf(16),
+                fr(17),
+                modem(18),
+                rip(19),
+                atm(20),
+                pabx(21),
+                ipsec(22),
+                tty(23),
+                bgp(24),
+                tacacs(25),
+                brrp(26),
+                mps(27),
+                voip(28),
+                tr069(29),
+                wlan(30),
+                usb(31),
+                http(32),
+                inet6(33),
+                wlc(34),
+                ldap(35),
+                osp(36),
+                wtp(37),
+                tremp(38),
+                presence(39)
+            }
+            MAX-ACCESS read-write
+            STATUS current 
+            DESCRIPTION
+                "The subjects of the syslog message for which user alert shall
+		 be active."
+        ::= { userAlertEntry 9 }
+
+        userAlertService OBJECT-TYPE
+            SYNTAX INTEGER {
+	        email(1),
+		sms(2)
+	    } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The service which is used to deliver the alert."
+	    DEFVAL { email }
+        ::= { userAlertEntry 10 }
+
+
+    userAlertContent OBJECT-TYPE
+            SYNTAX INTEGER {
+	        html(1),
+		plain(2)
+	    } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Coding of the email content:
+                   html(1)  - coding as HTML text.
+                   plain(2) - coding as plain text."
+	    DEFVAL { plain }
+        ::= { userAlertEntry 11 }
+
+------------------------------------------------------------------------------
+
+	userAlert OBJECT IDENTIFIER
+	::= { user 2 }
+
+	userAlertAdminStatus  OBJECT-TYPE
+	   SYNTAX  INTEGER {
+	        enable(1),
+	   	disable(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"Disable or enable user Alert service."
+	    DEFVAL { enable }
+	::= { userAlert 1 } 
+	
+
+	userAlertSMTPHost OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..60)) 
+	    MAX-ACCESS  read-write
+	    STATUS current 
+	    DESCRIPTION
+	    	"SMTP Server for outgoing emails."
+	    DEFVAL { "" }
+	::= { userAlert 2 } 
+
+	
+	userAlertOrigin OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..60))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	    	"The name which is used as originator of the email."
+	    DEFVAL { "" }
+	::= { userAlert 3 } 
+
+	userAlertMails OBJECT-TYPE
+	    SYNTAX  INTEGER (1..30)
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"The maximum number of mails sent within one minute."
+	    DEFVAL { 6 }
+	::= { userAlert 4 }
+
+	userAlertError OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..60))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    	"Displays last SMTP error."
+	    DEFVAL { "" }
+	 ::= { userAlert 5 }
+
+	userAlertAuthentication OBJECT-TYPE
+	    SYNTAX INTEGER {
+	       none(1),
+	       esmtp(2),
+	       pop3(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"SMTP server authentication mode."
+	    DEFVAL { 1 }
+	::= { userAlert 6 } 
+
+	userAlertPOP3Host OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..60)) 
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"POP3 server for SMTP after POP."
+	    DEFVAL { "" }
+	::= { userAlert 7 } 
+
+	userAlertPOP3valid OBJECT-TYPE
+	    SYNTAX  INTEGER (30..3600) 
+	    UNITS   "seconds"
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"The time slot in which mail could be sent via SMTP after POP3
+		 login."
+	    DEFVAL { 600 }
+	::= { userAlert 8 } 
+
+
+	userAlertUser OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..40))
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"Username for SMTP login."
+	    DEFVAL { "" }
+	 ::= { userAlert 9 }
+
+	userAlertPass OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..40))
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"Password for SMTP login."
+	    DEFVAL { "" }
+	 ::= { userAlert 10 }
+
+	userAlertSMSDevice OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..60)) 
+	    MAX-ACCESS  read-write
+	    STATUS current 
+	    DESCRIPTION
+	    	"The ICC-ID of the SIM-Card used to sent SMS if present."
+	    DEFVAL { "" }
+	::= { userAlert 11 } 
+
+	userAlertSmsPerDay OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+		"The maximum number of SMS sent within one day (24 hours).
+		 The special value `0' allows unlimited SMS distribution."
+	    DEFVAL { 10 }
+	::= { userAlert 12 }
+
+	userAlertSSL OBJECT-TYPE
+	    SYNTAX INTEGER {
+	        enable(1),
+	   	disable(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+	    	"Disable or enable SSL."
+	    DEFVAL { 2 }
+	::= { userAlert 13 }
+
+	userAlertServerPort OBJECT-TYPE
+	    SYNTAX INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current 
+	    DESCRIPTION
+		"SMTP Server port for outgoing emails."
+	    DEFVAL { 25 }
+	::= { userAlert 14 }
+
+END

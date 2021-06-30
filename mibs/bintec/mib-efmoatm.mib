@@ -1,0 +1,147 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-efmoatm,v $
+-- $Revision: 1.4 $
+
+BIANCA-BRICK-EFMOATM-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            IpAddress, Counter, Gauge, TimeTicks, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+ 
+	    PhysAddress 
+		FROM RFC1213-MIB
+
+            OBJECT-TYPE
+                FROM RFC-1212
+
+	    atm
+		FROM BINTEC-MIB;
+
+---
+--- Ethernet first mile over ATM (Utopia) PVC table
+---
+
+	efmoaPvcTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF EfmoaPvcEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "The efmoaPvcTable displays all virtual ethernets defined for
+		 a VCI/VPI on a specified hardware."
+	::= { atm 22 }
+
+
+	efmoaPvcEntry OBJECT-TYPE
+	    SYNTAX  EfmoaPvcEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+
+	    DESCRIPTION
+		""
+	    INDEX { efmoaPvcAtmIfIndex, efmoaPvcDescr }
+	::= { efmoaPvcTable 1 }
+
+	EfmoaPvcEntry ::=
+	    SEQUENCE {
+		efmoaPvcIfIndex  		INTEGER,
+		efmoaPvcFilter  		INTEGER,
+		efmoaPvcDescr			DisplayString,
+		efmoaPvcAtmIfIndex		INTEGER,
+		efmoaPvcVpi			INTEGER,
+		efmoaPvcVci			INTEGER,
+		efmoaPvcEncapsulation		INTEGER,
+		efmoaPvcPhysAddress		PhysAddress
+	    }
+
+	efmoaPvcIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	        "This object contains an interface index and assigns the
+                 row to an entry in ifTable. When creating new entries
+                 in the table, the value of this object shall be set to 0.
+                 The next free ifIndex value is than allocated and assigned
+		 to the object. At the same time a new interface is created
+		 in the IfTable."
+            DEFVAL { 0 }
+	::= { efmoaPvcEntry 1 }
+
+        efmoaPvcFilter OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(2),        -- PVC for packets not matching other filters
+		vlan-id(3),     -- vlan id
+		dst-mac(4)     -- destination MAC address
+	    }
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "The VLAN-Tag-Id used for the EFM interface.
+                 "
+            DEFVAL { none }
+        ::= { efmoaPvcEntry 2 }
+
+        efmoaPvcDescr OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Short description of the configured PVC"
+        ::= { efmoaPvcEntry 3 }
+                
+	efmoaPvcAtmIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The Index to the ATM hardware."
+	::= { efmoaPvcEntry 4 }
+
+	efmoaPvcVpi OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path Connection."
+	    DEFVAL { 0 }
+	::= { efmoaPvcEntry 5 }
+
+	efmoaPvcVci OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	    DEFVAL { 0 }
+	::= { efmoaPvcEntry 6 }
+	
+	efmoaPvcEncapsulation OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		bridged-no-fcs(1),	-- without frame checksum (FCS
+		bridged-fcs(2),		-- with frame checksum (FCS)
+		vc-multiplexed(3),	-- VC multiplexing
+		delete(10)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This values decides whether frames are send without FCS(1),
+		 with FCS(2) or wether VC multiplexing is used."
+	    DEFVAL { bridged-no-fcs }
+	::= { efmoaPvcEntry 7 }
+
+	efmoaPvcPhysAddress OBJECT-TYPE
+	    SYNTAX  PhysAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	    	"The MAC-Address used for the virtual interface."
+	::= { efmoaPvcEntry 8 }
+	
+END

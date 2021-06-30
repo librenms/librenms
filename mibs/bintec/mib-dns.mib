@@ -1,0 +1,1140 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2012-2014 bintec elmeg GmbH
+-- $RCSfile: mib-dns,v $
+-- $Revision: 1.10.1.1 $
+-- $Date: 2018-01-29 12:17:52 $
+-- Author: awimmer
+---------------------------------------------------------------------------
+
+BINTEC-DNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises                                         FROM RFC1155-SMI
+    IpAddress, enterprises                              FROM RFC1155-SMI
+    MacAddress, DisplayString, TimeStamp, TruthValue    FROM SNMPv2-TC
+    Date, BitValue, biboip                              FROM BINTEC-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter32, Counter64, TimeTicks                     FROM SNMPv2-SMI
+    TRAP-TYPE                                           FROM RFC-1215
+    TruthValue                                          FROM SNMPv2-TC
+    ifIndex                                             FROM IF-MIB
+    OBJECT-TYPE                                         FROM RFC-1212
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+    InetAddressType, InetAddress, InetAddressIPv6       FROM INET-ADDRESS-MIB;
+
+dnsMIB MODULE-IDENTITY
+    LAST-UPDATED "201510200000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+             Web:     www.bintec-elmeg.com
+            "
+    DESCRIPTION
+            "MIB for DNS handling."
+    REVISION      "201012170000Z"
+    DESCRIPTION
+            "DNS MIB."
+    REVISION      "201306260000Z"
+    DESCRIPTION
+            "Replaced ipDnsTable with ipDnsStaticTable and ipDnsDynamicTable."
+    ::= { biboip 251 }
+
+-- **********************************************************************
+-- *    ipDns  TABLE
+-- **********************************************************************
+ipDns OBJECT IDENTIFIER ::= { biboip 20 }
+
+    ipDnsDhcpAssign OBJECT-TYPE
+        SYNTAX      INTEGER { none(1), self(2), global(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Assignment policy when a BinTec router acts as a DHCP-server
+             and is asked for nameserver addresses. Possible values:
+             - none:   Do not send any nameserver-addresses.
+             - self:   Send own address as the only nameserver.
+             - global: Send addresses from global nameserver-table."
+        DEFVAL { self }
+    ::= { ipDns 1 }
+
+    ipDnsIpcpAssign OBJECT-TYPE
+        SYNTAX      INTEGER { none(1), self(2), global(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Assignment policy when a BinTec router is asked for
+             nameservers during IPCP negotiation. Possible values:
+             - none:   Do not send any nameserver addresses.
+             - self:   Send own address as the only nameserver.
+             - global: Send addresses from global namerserver-table."
+        DEFVAL { global }
+    ::= { ipDns 2 }
+
+    ipDnsUsePosCache OBJECT-TYPE
+        SYNTAX      INTEGER { no(1), yes(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Decides whether positive dynamic caching is done or not."
+        DEFVAL { yes }
+    ::= { ipDns 3 }
+
+    ipDnsUseNegCache OBJECT-TYPE
+        SYNTAX      INTEGER { no(1), yes(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Decides whether negative dynamic caching is done or not."
+        DEFVAL { yes }
+    ::= { ipDns 4 }
+
+    ipDnsMaxCacheSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines maximum number of dynamic DNS-table-entries. If this
+             limit is reached, the least recently used dynamic entry is
+             discarded if a new one is to be added."
+        DEFVAL { 100 }
+    ::= { ipDns 5 }
+
+    ipDnsPositiveTtl OBJECT-TYPE
+        SYNTAX      INTEGER
+	UNITS	    "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Time-to-live in seconds reported for positive static entries."
+        DEFVAL { 86400 }
+    ::= { ipDns 6 }
+
+    ipDnsNegativeTtl OBJECT-TYPE
+        SYNTAX      INTEGER
+	UNITS	    "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Time-to-live in seconds reported for negative static entries,
+             and initial time-to-live for negative dynamic cache-entries."
+        DEFVAL { 300 }
+    ::= { ipDns 7 }
+
+    ipDnsDefaultIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Interface-index (if not -1) of DHCP/IPCP-assigned nameserver that
+             should be used as fallback for DNS-forwarding if not found by
+             other mechanism (e.g. manually configured global nameserver or
+             address/interface specified by application or
+             wildcard-domain-forwarding-entry)."
+        DEFVAL { -1 }
+    ::= { ipDns 8 }
+
+    ipDnsNumReceives OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets received."
+    ::= { ipDns 9 }
+
+    ipDnsNumInvalids OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of invalid packets received."
+    ::= { ipDns 10 }
+
+    ipDnsNumRequests OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of questions received. If a packet is received,
+             this variable is incremented by the number of question
+             records contained in the packet."
+    ::= { ipDns 11 }
+
+    ipDnsNumCacheHits OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of times a question could be answered
+             immediately due to a cache entry."
+        DEFVAL { -1 }
+    ::= { ipDns 12 }
+
+    ipDnsNumForwards OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of questions forwarded to other nameservers."
+    ::= { ipDns 13 }
+
+    ipDnsNumOks OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of requests answered successfully."
+    ::= { ipDns 14 }
+
+    ipDnsNumFails OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of requests answered with a SERVFAIL packet."
+    ::= { ipDns 15 }
+
+    ipDnsDynamicGlobals OBJECT-TYPE
+        SYNTAX      INTEGER { yes(1), no(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Determines if 'automatic' entries (see ipDnsServerCfgMode)
+             are stored in global nameserver-table:
+             - yes: Make 'automatic' nameserver-entries.
+             - no:  Do NOT make 'automatic' nameserver-entries."
+        DEFVAL { yes }
+    ::= { ipDns 17 }
+
+-- **********************************************************************
+-- *    ipDnsTable  TABLE
+-- **********************************************************************
+ipDnsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDnsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDns 16 }
+
+    ipDnsEntry OBJECT-TYPE
+    SYNTAX      IpDnsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    INDEX { ipDnsEntName }
+    ::= { ipDnsTable 1 }
+
+    IpDnsEntry ::=
+    SEQUENCE {
+        ipDnsEntName        DisplayString,
+        ipDnsEntIpaddr      IpAddress,
+        ipDnsEntIfIndex     INTEGER,
+        ipDnsEntResponse    INTEGER,
+        ipDnsEntStatic      INTEGER,
+        ipDnsEntTtl         INTEGER,
+        ipDnsEntLru         INTEGER,
+        ipDnsEntHash        INTEGER,
+        ipDnsEntRefCount    INTEGER,
+        ipDnsEntNameServer  IpAddress,
+        ipDnsEntNameServ2   IpAddress,
+        ipDnsEntIpaddr2     IpAddress,
+        ipDnsEntIpaddr3     IpAddress
+    }
+
+    ipDnsEntName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { "" }
+    ::= { ipDnsEntry 1 }
+
+    ipDnsEntIpaddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDnsEntry 2 }
+
+    ipDnsEntIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { -1 }
+    ::= { ipDnsEntry 3 }
+
+    ipDnsEntResponse OBJECT-TYPE
+        SYNTAX      INTEGER { ignore(1), negative(2), positive(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { positive }
+    ::= { ipDnsEntry 4 }
+
+    ipDnsEntStatic OBJECT-TYPE
+        SYNTAX      INTEGER { no(1), yes(2), delete(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { yes }
+    ::= { ipDnsEntry 5 }
+
+    ipDnsEntTtl OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { 86400 }
+    ::= { ipDnsEntry 6 }
+
+    ipDnsEntLru OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDnsEntry 7 }
+
+    ipDnsEntHash OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDnsEntry 8 }
+
+    ipDnsEntRefCount OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDnsEntry 9 }
+
+    ipDnsEntNameServer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { '00000000'H }
+    ::= { ipDnsEntry 10 }
+
+    ipDnsEntNameServ2 OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+        DEFVAL { '00000000'H }
+    ::= { ipDnsEntry 11 }
+
+    ipDnsEntIpaddr2 OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDnsEntry 12 }
+
+    ipDnsEntIpaddr3 OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Legacy: Replaced by ipDnsStaticTable & ipDnsDynamicTable."
+    ::= { ipDnsEntry 13 }
+
+-- **********************************************************************
+-- *    ipDnsStaticTable  TABLE
+-- **********************************************************************
+ipDnsStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDnsStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Contains administrative (static) DNS-entries. Four different
+             entry-types are allowed.
+             1) 'Positive' entries store names and addresses for building
+                related A/AAAA/PTR-resource-records.
+             2) 'Negative' (and 'ignore') entries store 'invalid' names for
+                rejecting (or ignoring) related queries/questions.
+             3) 'Wildcard' entries store 'name-patterns' instead of names.
+                There are two different sub-types.
+             3a) 'Wildcard-domain-forwarding' entries store nameserver-
+                 interfaces/addresses for forwarding related queries.
+             3b) 'Wildcard-non-forwarding' entries store addresses for
+                 building related A/AAAA/PTR-resource-records. They are
+                 similar to entries of type 1 but are matching not with a
+                 single name but with any name of specified pattern."
+    ::= { ipDns 18 }
+
+    ipDnsStaticEntry OBJECT-TYPE
+    SYNTAX      IpDnsStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { ipDnsStaticEntIndex }
+    ::= { ipDnsStaticTable 1 }
+
+    IpDnsStaticEntry ::=
+    SEQUENCE {
+        ipDnsStaticEntIndex               INTEGER,
+        ipDnsStaticEntName                DisplayString,
+        ipDnsStaticEntIpaddrType          InetAddressType,
+        ipDnsStaticEntIpaddr              InetAddress,
+        ipDnsStaticEntResponse            INTEGER,
+        ipDnsStaticEntIfIndex             INTEGER,
+        ipDnsStaticEntNameServerAddrType  InetAddressType,
+        ipDnsStaticEntNameServerAddr      InetAddress,
+        ipDnsStaticEntNameServ2AddrType   InetAddressType,
+        ipDnsStaticEntNameServ2Addr       InetAddress,
+        ipDnsStaticEntFullName            DisplayString,
+        ipDnsStaticEntHash                INTEGER,
+        ipDnsStaticEntSourceIfIndex       INTEGER
+    }
+
+    ipDnsStaticEntIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Unique index for unambiguous SNMP-addressing, automatically
+             updated to next free/unused value if initialised to 0."
+    ::= { ipDnsStaticEntry 1 }
+
+    ipDnsStaticEntName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "For 'wildcard' entries, specifies name-pattern with leading '*.'
+             substring. (Any further '*' characters in pattern have NO special
+             meaning.) Entry matches if no other (more specific) cache-entries
+             match and if query/question-name is equal to or sub-domain of
+             specified name-pattern.
+             For all other entries, specifies related DNS-name. If contains
+             dots then is treated as full domain-names. Otherwise is treated
+             as simple name to be extended by globally configured domain-name
+             from admin-table.
+             For any entries (wildcard or not), name is automatically copied
+             to 'FullName' field and completed there (i.e. top-domain added
+             for simple names, missing trailing dots added for any names)."
+        DEFVAL { "" }
+    ::= { ipDnsStaticEntry 2 }
+
+    ipDnsStaticEntIpaddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP-version (ipv4 or ipv6) for ipDnsStaticEntIpaddr.
+             Relevant only for 'positive' entries, excluding such for
+             wildcard-domain-forwarding.
+             Remark: Values 'unknown', 'ipv4z', 'ipv6z', 'dns' are inherited
+                     from InetAddressType but are NOT allowed here."
+    ::= { ipDnsStaticEntry 3 }
+
+    ipDnsStaticEntIpaddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IPv4/IPv6-address to be used for name/address-resolution.
+             Relevant only for 'positive' entries, excluding such for
+             wildcard-domain-forwarding."
+    ::= { ipDnsStaticEntry 4 }
+
+    ipDnsStaticEntResponse OBJECT-TYPE
+        SYNTAX      INTEGER { ignore(1), negative(2), positive(3), delete(4) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Field serves multiple purposes.
+             'delete' means that entry shall be removed.
+             Any other value specifies entry-type.
+             'ignore'/'negative' means that queries for specified name shall
+             be ignored/rejected.
+             'positive' means that entry is either 'normal' cache-entry or
+             wildcard (if name starts with '*.'). Normal entries store name
+             and address for building related A/AAAA/PTR-resource-records, and
+             wildcards are used for either doing the same thing for any name
+             of specified pattern or for forwarding queries for certain
+             domains and their sub-domains to other nameservers."
+        DEFVAL { positive }
+    ::= { ipDnsStaticEntry 5 }
+
+    ipDnsStaticEntIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Relevant only for wildcard-domain-forwarding entries with
+             DHCP/IPCP-assigned nameservers (i.e. address not known at
+             configuration-time).
+             Should be set to -1 (unspecified) otherwise.
+             Tells interface-index of nameserver-entry for forwarding matching
+             queries/questions.
+             If wildcard-domain-forwarding-entry does NOT specify nameservers
+             (neither by address nor by interface) then matching queries are
+             forwarded to ANY nameservers from global table."
+        DEFVAL { -1 }
+    ::= { ipDnsStaticEntry 6 }
+
+    ipDnsStaticEntNameServerAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP-version (ipv4 or ipv6) for ipDnsStaticEntNameServerAddr.
+             Relevant only for wildcard-domain-forwarding entries with
+             statically configured nameservers.
+             Remark: Values 'unknown', 'ipv4z', 'ipv6z', 'dns' are inherited
+                     from InetAddressType but are NOT allowed here."
+    ::= { ipDnsStaticEntry 7 }
+
+    ipDnsStaticEntNameServerAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Relevant only for wildcard-domain-forwarding-entries with
+             statically configured nameservers. Should be set to 0
+             (unspecified) otherwise.
+             Tells IPv4/IPv6-address of primary nameserver for forwarding
+             matching queries.
+             If wildcard-domain-forwarding-entry does NOT specify nameservers
+             (neither by address nor by interface) then matching queries are
+             forwarded to ANY nameservers from global table."
+    ::= { ipDnsStaticEntry 8 }
+
+    ipDnsStaticEntNameServ2AddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP-version (ipv4 or ipv6) for ipDnsStaticEntNameServ2Addr.
+             Relevant only for wildcard-domain-forwarding-entries with
+             statically configured nameservers.
+             Remark: Values 'unknown', 'ipv4z', 'ipv6z', 'dns' are inherited
+                     from InetAddressType but are NOT allowed here."
+    ::= { ipDnsStaticEntry 9 }
+
+    ipDnsStaticEntNameServ2Addr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Relevant only for wildcard-domain-forwarding-entries with
+             statically configured nameservers. Should be set to 0
+             (unspecified) otherwise.
+             Tells IPv4/IPv6-address of secondary nameserver for forwarding
+             matching queries."
+    ::= { ipDnsStaticEntry 10 }
+
+    ipDnsStaticEntFullName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Automatically generated: Full DNS-name or name-pattern, derived
+             from administrative 'Name' field."
+        DEFVAL { "" }
+    ::= { ipDnsStaticEntry 11 }
+
+    ipDnsStaticEntHash OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Automatically generated: Hash-value of name-field.
+             Relevant only for non-wildcard-entries."
+    ::= { ipDnsStaticEntry 12 }
+
+    ipDnsStaticEntSourceIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "If set it determines the source intertacce index from which the
+             question was received. In this case it's an additional but
+             optional selector. If this selector doesn't match this entry
+             will not be taken into the account."
+        DEFVAL { 0 }
+    ::= { ipDnsStaticEntry 13 }
+
+-- **********************************************************************
+-- *    ipDnsDynamicTable  TABLE
+-- **********************************************************************
+ipDnsDynamicTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDnsDynamicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Contains dynamic (cached) DNS-entries. Two different entry-types
+             are possible.
+             1) 'Positive' entries store names and addresses for building
+                related A/AAAA/PTR-resource-records.
+             2) 'Negative' entries store info that records of specified type
+                (A or AAAA) cannot be retrieved for specified name. This info
+                can be learned either 'explicitly' (by related error-reply) or
+                'implicitly' (by timeout of related forwarded query/question).
+                At present, if negative entries exist for BOTH record-types
+                for same name then whole NAME is considered 'invalid'."
+    ::= { ipDns 19 }
+
+    ipDnsDynamicEntry OBJECT-TYPE
+    SYNTAX      IpDnsDynamicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { ipDnsDynamicEntIndex }
+    ::= { ipDnsDynamicTable 1 }
+
+    IpDnsDynamicEntry ::=
+    SEQUENCE {
+        ipDnsDynamicEntIndex          INTEGER,
+        ipDnsDynamicEntName           DisplayString,
+        ipDnsDynamicEntIpaddrType     InetAddressType,
+        ipDnsDynamicEntIpaddr         InetAddress,
+        ipDnsDynamicEntResponse       INTEGER,
+        ipDnsDynamicEntIfIndex        INTEGER,
+        ipDnsDynamicEntNsAddrType     InetAddressType,
+        ipDnsDynamicEntNsAddr         InetAddress,
+        ipDnsDynamicEntAuthoritative  INTEGER,
+        ipDnsDynamicEntRecursion      INTEGER,
+        ipDnsDynamicEntAuthenticated  INTEGER,
+        ipDnsDynamicEntTtl            INTEGER,
+        ipDnsDynamicEntHash           INTEGER
+    }
+
+    ipDnsDynamicEntIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique index for unambiguous SNMP-addressing."
+    ::= { ipDnsDynamicEntry 1 }
+
+    ipDnsDynamicEntName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Full DNS-name (with trailing dot)."
+        DEFVAL { "" }
+    ::= { ipDnsDynamicEntry 2 }
+
+    ipDnsDynamicEntIpaddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "For positive entries, stores IP-version (ipv4 or ipv6) for
+             ipDnsDynamicEntIpaddr.
+             For negative entries, specifies type (dns or ipv4/ipv6) of
+             negative info. dns means that whole name is invalid. ipv4/ipv6
+             means that name is valid but no A/AAAA-records exist for it.
+             Remark: Values 'unknown', 'ipv4z', 'ipv6z' are inherited from
+                     InetAddressType but are NOT allowed here."
+    ::= { ipDnsDynamicEntry 3 }
+
+    ipDnsDynamicEntIpaddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IPv4/IPv6-address to be used for building A/AAAA/PTR-records.
+             Relevant only for positive entries."
+    ::= { ipDnsDynamicEntry 4 }
+
+    ipDnsDynamicEntResponse OBJECT-TYPE
+        SYNTAX      INTEGER {
+            negative-imp(1),
+            negative-exp(2),
+            positive(3),
+            delete(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Field serves multiple purposes.
+             'delete' means that entry shall be removed.
+             Any other value specifies entry-type.
+             'positive' means that entry stores name and address for building
+             related A/AAAA/PTR-resource-records.
+             'negative-imp'/'negative-exp' means that no resource-records
+             can be retrieved for specified name and type (see 'IpaddrType'
+             field). This info may have been learned from explicit ('exp')
+             negative reply or implicitly ('imp') from timeout of earlier
+             forwarded query/question."
+        DEFVAL { positive }
+    ::= { ipDnsDynamicEntry 5 }
+
+    ipDnsDynamicEntIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of forward-interface where cached info was learned."
+        DEFVAL { -1 }
+    ::= { ipDnsDynamicEntry 6 }
+
+    ipDnsDynamicEntNsAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP-version (ipv4 or ipv6) for ipDnsDynamicEntNsAddr.
+             Remark: Values 'unknown', 'ipv4z', 'ipv6z', 'dns' are inherited
+                     from InetAddressType but are NOT allowed here."
+    ::= { ipDnsDynamicEntry 7 }
+
+    ipDnsDynamicEntNsAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IPv4/IPv6-address of forward-server that was queried for cached
+             info."
+    ::= { ipDnsDynamicEntry 8 }
+
+    ipDnsDynamicEntAuthoritative OBJECT-TYPE
+        SYNTAX      INTEGER { yes(1), no(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Authoritative-answer-status (AA-flag) taken from cached response
+             ('no' in timeout-case)."
+        DEFVAL { no }
+    ::= { ipDnsDynamicEntry 9 }
+
+    ipDnsDynamicEntRecursion OBJECT-TYPE
+        SYNTAX      INTEGER { available(1), not-available(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Recursion-availability-status (RA-flag) taken from cached
+             response ('not-available' in timeout-case)."
+        DEFVAL { not-available }
+    ::= { ipDnsDynamicEntry 10 }
+
+    ipDnsDynamicEntAuthenticated OBJECT-TYPE
+        SYNTAX      INTEGER { yes(1), no(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Authenticated-data-status (AD-flag) taken from cached response
+             ('no' in timeout-case)."
+        DEFVAL { no }
+    ::= { ipDnsDynamicEntry 11 }
+
+    ipDnsDynamicEntTtl OBJECT-TYPE
+        SYNTAX      INTEGER
+	UNITS	    "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remaining time-to-live of this entry in seconds."
+    ::= { ipDnsDynamicEntry 12 }
+
+    ipDnsDynamicEntHash OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Automatically generated: Hash-value of name-field."
+    ::= { ipDnsDynamicEntry 13 }
+
+-- **********************************************************************
+-- *    ipDnsServerCfgTable  TABLE
+-- **********************************************************************
+ipDnsServerCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDnsServerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Contains manually configured nameserver-addresses and
+             automatically added entries for DHCP/IPCP-assigned nameservers."
+    ::= { ipDns 32 }
+
+    ipDnsServerCfgEntry OBJECT-TYPE
+    SYNTAX      IpDnsServerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { ipDnsServerCfgIndex }
+    ::= { ipDnsServerCfgTable 1 }
+
+    IpDnsServerCfgEntry ::=
+    SEQUENCE {
+        ipDnsServerCfgIndex             	INTEGER,
+        ipDnsServerCfgAdminStatus       	INTEGER,
+        ipDnsServerCfgMode              	INTEGER,
+        ipDnsServerCfgPriority          	INTEGER,
+        ipDnsServerCfgPrimaryAddress    	IpAddress,
+        ipDnsServerCfgSecondaryAddress  	IpAddress,
+        ipDnsServerCfgIfIndex           	INTEGER,
+
+
+
+
+
+
+        ipDnsServerCfgDescription		DisplayString
+
+    }
+
+    ipDnsServerCfgIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Unique index for unambiguous SNMP-addressing."
+    ::= { ipDnsServerCfgEntry 1 }
+
+    ipDnsServerCfgAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2), delete(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administrative status of this entry."
+        DEFVAL { enabled }
+    ::= { ipDnsServerCfgEntry 2 }
+
+    ipDnsServerCfgMode OBJECT-TYPE
+        SYNTAX      INTEGER { manual(1), automatic(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies whether nameserver-addresses are configured manually
+             or updated automatically (see ipDnsDynamicGlobals) with each
+             IPCP/DHCP-negotiation."
+        DEFVAL { manual }
+    ::= { ipDnsServerCfgEntry 3 }
+
+    ipDnsServerCfgPriority OBJECT-TYPE
+        SYNTAX      INTEGER(0..9)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Relative priority (0 is highest) of this entry."
+        DEFVAL { 0 }
+    ::= { ipDnsServerCfgEntry 4 }
+
+    ipDnsServerCfgPrimaryAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP-address of primary nameserver.
+             Relevant only for manual entries (0 for automatic ones)."
+    ::= { ipDnsServerCfgEntry 5 }
+
+    ipDnsServerCfgSecondaryAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP-address of secondary nameserver.
+             Relevant only for manual entries (0 for automatic ones)."
+    ::= { ipDnsServerCfgEntry 6 }
+
+    ipDnsServerCfgIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Index of interface where nameservers are DHCP/IPCP-assigned.
+             Relevant only for automatic entries (-1 for manual ones)."
+        DEFVAL { -1 }
+    ::= { ipDnsServerCfgEntry 7 }
+
+    ipDnsServerCfgDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Optional textual description for this nameserver-entry."
+    ::= { ipDnsServerCfgEntry 8 }
+
+
+-- **********************************************************************
+-- *    ipDnsServerOperTable  TABLE
+-- **********************************************************************
+ipDnsServerOperTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDnsServerOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Contains one operational version for each parent-entry in
+             ipDnsServerCfgTable."
+    ::= { ipDns 33 }
+
+    ipDnsServerOperEntry OBJECT-TYPE
+    SYNTAX      IpDnsServerOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { ipDnsServerOperParentIndex }
+    ::= { ipDnsServerOperTable 1 }
+
+    IpDnsServerOperEntry ::=
+    SEQUENCE {
+        ipDnsServerOperParentIndex       	INTEGER,
+        ipDnsServerOperOperStatus        	INTEGER,
+        ipDnsServerOperMode              	INTEGER,
+        ipDnsServerOperPriority          	INTEGER,
+        ipDnsServerOperPrimaryAddress    	IpAddress,
+        ipDnsServerOperSecondaryAddress  	IpAddress,
+        ipDnsServerOperIfIndex           	INTEGER,
+        ipDnsServerOperNumRequests       	INTEGER,
+        ipDnsServerOperNumPosReplies     	INTEGER,
+        ipDnsServerOperNumNegReplies		INTEGER
+    }
+
+    ipDnsServerOperParentIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Copied from ipDnsServerCfgIndex of parent-entry."
+    ::= { ipDnsServerOperEntry 1 }
+
+    ipDnsServerOperOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2), dormant(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Operation-status of this entry, depending on
+             ipDnsServerCfgAdminStatus of parent-entry and on
+             ifOperStatus if ipDnsServerOperIfIndex specified."
+        DEFVAL { disabled }
+    ::= { ipDnsServerOperEntry 2 }
+
+    ipDnsServerOperMode OBJECT-TYPE
+        SYNTAX      INTEGER { manual(1), automatic(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Copied from ipDnsServerCfgMode of parent-entry."
+        DEFVAL { manual }
+    ::= { ipDnsServerOperEntry 3 }
+
+    ipDnsServerOperPriority OBJECT-TYPE
+        SYNTAX      INTEGER(0..9)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Copied from ipDnsServerCfgPriority of parent-entry."
+        DEFVAL { 0 }
+    ::= { ipDnsServerOperEntry 4 }
+
+    ipDnsServerOperPrimaryAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "In manual case, copied frome ipDnsServerCfgPrimaryAddress of
+             parent-entry.
+             In automatic case, initialised to 0 and updated via DHCP/IPCP."
+    ::= { ipDnsServerOperEntry 5 }
+
+    ipDnsServerOperSecondaryAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "In manual case, copied frome ipDnsServerCfgSecondaryAddress of
+             parent-entry.
+             In automatic case, initialised to 0 and updated via DHCP/IPCP."
+    ::= { ipDnsServerOperEntry 6 }
+
+    ipDnsServerOperIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Copied from ipDnsServerCfgIfIndex of parent-entry."
+    ::= { ipDnsServerOperEntry 7 }
+
+    ipDnsServerOperNumRequests OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of sent requests."
+    ::= { ipDnsServerOperEntry 8 }
+
+    ipDnsServerOperNumPosReplies OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of received positive replies."
+    ::= { ipDnsServerOperEntry 9 }
+
+    ipDnsServerOperNumNegReplies OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of received negative replies."
+    ::= { ipDnsServerOperEntry 10 }
+
+
+-- **********************************************************************
+-- *    ipDnsLocalTable  TABLE
+-- **********************************************************************
+ipDnsLocalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDnsLocalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Contains pseudo-administrative DNS-entries generated by local
+             services (e.g. DHCPv6). Definition is almost identical to
+             'ipDnsStaticTable' but entries are not stored in non-volatile
+             memory or in MIB-config-files."
+    ::= { ipDns 34 }
+
+    ipDnsLocalEntry OBJECT-TYPE
+    SYNTAX      IpDnsLocalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { ipDnsLocalEntIndex }
+    ::= { ipDnsLocalTable 1 }
+
+    IpDnsLocalEntry ::=
+    SEQUENCE {
+        ipDnsLocalEntIndex               INTEGER,
+        ipDnsLocalEntName                DisplayString,
+        ipDnsLocalEntIpaddrType          InetAddressType,
+        ipDnsLocalEntIpaddr              InetAddress,
+        ipDnsLocalEntResponse            INTEGER,
+        ipDnsLocalEntIfIndex             INTEGER,
+        ipDnsLocalEntNameServerAddrType  InetAddressType,
+        ipDnsLocalEntNameServerAddr      InetAddress,
+        ipDnsLocalEntNameServ2AddrType   InetAddressType,
+        ipDnsLocalEntNameServ2Addr       InetAddress,
+        ipDnsLocalEntFullName            DisplayString,
+        ipDnsLocalEntHash                INTEGER
+    }
+
+    ipDnsLocalEntIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntIndex'."
+    ::= { ipDnsLocalEntry 1 }
+
+    ipDnsLocalEntName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntName'."
+        DEFVAL { "" }
+    ::= { ipDnsLocalEntry 2 }
+
+    ipDnsLocalEntIpaddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntIpaddrType'"
+    ::= { ipDnsLocalEntry 3 }
+
+    ipDnsLocalEntIpaddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntIpaddr'."
+    ::= { ipDnsLocalEntry 4 }
+
+    ipDnsLocalEntResponse OBJECT-TYPE
+        SYNTAX      INTEGER { ignore(1), negative(2), positive(3), delete(4) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntResponse'."
+        DEFVAL { positive }
+    ::= { ipDnsLocalEntry 5 }
+
+    ipDnsLocalEntIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntIfIndex'."
+        DEFVAL { -1 }
+    ::= { ipDnsLocalEntry 6 }
+
+    ipDnsLocalEntNameServerAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntNameServerAddrType'."
+    ::= { ipDnsLocalEntry 7 }
+
+    ipDnsLocalEntNameServerAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntNameServerAddr'."
+    ::= { ipDnsLocalEntry 8 }
+
+    ipDnsLocalEntNameServ2AddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntNameServ2AddrType'."
+    ::= { ipDnsLocalEntry 9 }
+
+    ipDnsLocalEntNameServ2Addr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntNameServ2Addr'."
+    ::= { ipDnsLocalEntry 10 }
+
+    ipDnsLocalEntFullName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntFullName'."
+        DEFVAL { "" }
+    ::= { ipDnsLocalEntry 11 }
+
+    ipDnsLocalEntHash OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "See definition of 'ipDnsStaticEntHash'."
+    ::= { ipDnsLocalEntry 12 }
+
+END

@@ -1,0 +1,356 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $Revision: 1.16 $ 
+
+BIANCA-BRICK-ALIVE-MIB DEFINITIONS ::= BEGIN
+
+
+	IMPORTS
+	    NetworkAddress, IpAddress, Counter, Gauge, TimeTicks,
+	    enterprises
+		FROM RFC1155-SMI
+
+            Date, HexValue
+                FROM BINTEC-MIB
+
+	    OBJECT-TYPE
+		FROM RFC-1212;
+
+
+	--  MIB-II (same prefix as MIB-I)
+	bintec 		OBJECT IDENTIFIER ::= { enterprises 272 }
+	bibo		OBJECT IDENTIFIER ::= { bintec 4 }
+	alive		OBJECT IDENTIFIER 
+	::= { bibo 36 }
+
+    -- Alive Group
+
+    -- Management Information for alive surveillance on BIANCA/BRICK
+
+
+        aliveTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AliveEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The aliveTable contains entries defining any kind of
+		 surveillance. It is a more general version of
+		 ipHostsAliveTable that only deals with reachability of hosts
+		 via ICMP messages. Additionally interfaces can now be
+		 monitored, further extensions are possible in future."
+	::= { alive 1 }
+
+	aliveEntry OBJECT-TYPE
+            SYNTAX  AliveEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { aliveIfIndex }
+              ::= { aliveTable 1 }
+
+	AliveEntry ::=
+            SEQUENCE {
+		aliveSurveillance		INTEGER,
+                aliveIfIndex 			INTEGER,
+		aliveState			INTEGER,
+		aliveTrigger			INTEGER,
+		aliveAction			INTEGER,
+		aliveFirstIfIndex		INTEGER,
+		aliveIfIndexRange		INTEGER,
+		aliveTaskId			INTEGER,
+		aliveMasterProto		INTEGER,
+		aliveMasterVrId			INTEGER,
+		aliveMasterBrrpState		INTEGER,
+		aliveSlaveProto			INTEGER,
+		aliveSlaveVrId			INTEGER,
+		aliveSlaveBrrpState		INTEGER,
+		aliveSlaveBrrpDecrPrio	INTEGER
+            }
+
+	aliveSurveillance OBJECT-TYPE
+            SYNTAX  INTEGER {
+		interface(1),
+		ping(2),
+		brrp(3)
+	    }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies what kind of event may trigger an alive entry.
+		 Being a generalisation of MIB table ipHostsAliveTable the
+		 latter table may be replaced by it.  Possible values are:
+
+		 o interface - the interface operation status is monitored.
+		 o ping - the reachablity is monitored via ICMP echo requests.
+		 o brrp - monitoring via the Bintec Router Redundancy Protocol
+		          which is a derivate of the popular VRRP (RFC 2338).
+
+		 The default value is interface.
+		"
+	    DEFVAL { interface }
+	::= { aliveEntry 1 }
+
+	aliveIfIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The index of interface to monitor the operation status.
+		 Like referenced in the ifTable.
+		 Applicable for surveillance mode 'interface'.
+		"
+	::= { aliveEntry 2 }
+
+	aliveState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		      up(1),
+		      down(2),
+		      unknown(3)
+		    }
+	    ACCESS  read-only
+	    STATUS  mandatory
+            DESCRIPTION
+		"The state of the watched entity.
+		 Possible values are 'unknown', 'up' or 'down'.
+		 This value is not used for surveillance mode 'brrp'.
+
+		 The default value is 'unknown'.
+		"
+            DEFVAL { unknown }
+	::= { aliveEntry 3 }
+
+	aliveTrigger OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		      up(1),
+		      down(2)
+		    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+            DESCRIPTION
+		"The variable trigger defines on change to what state
+		 (depending on the surveillance mode) the defined action
+		 is performed.
+		 Possible values are 'up' or 'down'.
+		"
+	    DEFVAL { up }
+	::= { aliveEntry 4 }
+
+	aliveAction OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		      up(1),
+		      down(2),
+		      none(4),
+		      delete(255)
+		    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+            DESCRIPTION
+		"This action is performed upon status change of the
+		 respective entity to the given trigger condition.
+		 Possible actions are 'up', 'down' or 'none'.
+
+		 The default value is 'none'.
+		"
+            DEFVAL { none }
+	::= { aliveEntry 5 }
+
+	aliveFirstIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The first interface index affected by the action.
+		 This value is not used for surveillance mode 'brrp'.
+		"
+	::= { aliveEntry 6 }
+
+	aliveIfIndexRange OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"A range of interface indexes affected by the action
+		 counted from aliveFirstIfIndex. Value '0' means that
+		 only interface aliveFirstIfIndex is affected.
+		 This value is not used for surveillance mode 'brrp'.
+
+		 The default value is 0.
+		"
+	    DEFVAL { 0 }
+	::= { aliveEntry 7 }
+
+	aliveTaskId OBJECT-TYPE
+	    SYNTAX  INTEGER (1..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The id of the task definition used exclusively for
+		 table sorting purposes (multiple instances are possible).
+
+		 The default value is 1.
+		"
+	    DEFVAL { 1 }
+	::= { aliveEntry 8 }
+
+	aliveMasterProto OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		      brrp(1),
+		      ifstat(2),
+		      ping(3)
+		    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The protocol used for interface keepalive monitoring.
+		 Possible values are:
+
+		 o brrp - monitoring via the Bintec Router Redundancy Protocol
+		          which is a derivate of the popular VRRP (RFC 2338).
+		 o ifstat - the interface operation status is monitored.
+		 o ping - the reachablity is monitored via ICMP echo requests.
+
+		 The default value is 'brrp'.
+		"
+	    DEFVAL { brrp }
+	::= { aliveEntry 9 }
+
+	aliveMasterVrId OBJECT-TYPE
+	    SYNTAX  INTEGER (1..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The id of the virtual router used for monitoring
+		 the interface.  The associated BRRP configuration
+		 is stored in the biboBrrpOperTable.
+		"
+	    DEFVAL { 1 }
+	::= { aliveEntry 10 }
+
+	aliveMasterBrrpState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		      initialize(1),
+		      backup(2),
+		      master(3),
+		      any(4)
+		    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The operation state of the virtual router which triggers
+		 the specified action on the slave BRRP virtual router.
+		 The states 'initialize', 'backup' and 'master' are
+		 identical to the definition from RFC 2338.
+
+		 The special state 'any' should be used in conjunction with
+		 aliveSlaveBrrpState_sync for a synchronized operation of
+		 the MASTER and BACKUP virtual router.
+
+		 The default value is 'any'.
+		"
+	    DEFVAL { any }
+	::= { aliveEntry 11 }
+
+	aliveSlaveProto OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		brrp(1),
+		ifstat(2),
+		ping(3)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The protocol used for the slave (or backup) interface
+		 (or virtual router) keepalive operation status switching.
+
+		 o brrp - monitoring via the Bintec Router Redundancy Protocol
+		          which is a derivate of the popular VRRP (RFC 2338).
+		 o ifstat - the interface operation status is monitored.
+		 o ping - the reachablity is monitored via ICMP echo requests.
+
+		 The default value is 'brrp'.
+		"
+	    DEFVAL { brrp }
+	::= { aliveEntry 12 }
+
+	aliveSlaveVrId OBJECT-TYPE
+	    SYNTAX  INTEGER (1..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The virtual router id used for interface admin status
+		 switching.  The associated BRRP configuration is stored
+		 in the biboBrrpOperTable.
+		"
+	    DEFVAL { 1 }
+	::= { aliveEntry 13 }
+
+	aliveSlaveBrrpState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		      down(1),
+		      up(2),
+		      sync(3),
+		      decrPrio(4)
+		    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The admin state of the virtual router controlling the
+		 slave interface.
+
+		 down(1) -- the virtual routes enters the initialize state
+		 up(2)   -- the virtual router switches to the backup or
+		            master state according to the basic configuration
+		            found in the biboBrrpOperTable.
+		 sync(3) -- the virtual router tries to enter the same actual
+		            state as the master. If this is impossible both
+		            (master and slave) enter the initalize state.
+		 decrPrio(4) -- the virtual router stays in the 'up' state,
+		            but its VRRP priority is decremented by 
+		            'aliveSlaveBrrpDecrPrio' (see biboBrrpOperPriority
+		            and biboBrrpOperDecrPrio to know the 'real' priority)
+
+		 The default value is 'sync'.
+		"
+	    DEFVAL { sync }
+	::= { aliveEntry 14 }
+
+	aliveSlaveBrrpDecrPrio OBJECT-TYPE
+	    SYNTAX  INTEGER (1..254)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This value is used to decrement 'biboBrrpOperPriority' when
+		 virtual router state switches from 'up' to 'decrPrio'
+		 (see 'aliveSlaveBrrpState')
+
+		 It is used again to increment 'biboBrrpOperPriority' when
+		 the virtual router state switches from 'decrPrio' to 'up'
+		 (see 'aliveSlaveBrrpState')
+
+		 If this value changes while router is in state decrPrio, the
+		 old value is internally stored so that the correct inverse
+		 operation can be performed once condition for decremented
+		 priority becomes false again.
+
+		 Default value is '10'.
+		"
+	    DEFVAL { 10 }
+	::= { aliveEntry 15 }
+
+
+END

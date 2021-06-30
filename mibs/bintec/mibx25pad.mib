@@ -1,0 +1,625 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibx25pad,v $ 
+-- $Revision: 1.13 $ 
+
+BIANCA-BRICK-X25PAD-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            Counter, TimeTicks, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+ 
+            Date, HexValue
+                FROM BINTEC-MIB
+
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    x25		OBJECT IDENTIFIER
+	::= { bibo 6 }
+
+
+    -- X.25 Group
+
+    -- Management Information for the X.25-PAD Subsystem of the BIANCA/BRICK
+
+	x25PadProfileTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF X25PadProfileEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This Table contains entries for the pad profiles. For PPP 
+		 connections, pad profiles are assigned to incoming connections
+		 via the isdnDispatchTable. For outgoing connections, the
+		 profile is assigned by the biboPppTable. Profile 0 is used as
+		 default profile for ppp." 
+	::= { x25 8 }
+
+	x25PadProfileEntry OBJECT-TYPE
+	    SYNTAX  X25PadProfileEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Entries can only be created and deleted manually."
+	    INDEX   { x25PadProNumber }
+	::= { x25PadProfileTable 1 }
+
+	X25PadProfileEntry ::=
+	    SEQUENCE {
+		x25PadProNumber				INTEGER,
+		x25PadProState				INTEGER,
+		x25PadProAutoCallDstAddr		DisplayString,
+		x25PadProEscape				INTEGER,
+		x25PadProEcho				INTEGER,
+		x25PadProForwardChar			INTEGER,
+		x25PadProIdleTimer			INTEGER,
+		x25PadProDevControl			INTEGER,
+		x25PadProSigControl			INTEGER,
+		x25PadProBrkControl			INTEGER,
+		x25PadProDiscard			INTEGER,
+		x25PadProCRPadding			INTEGER,
+		x25PadProLineFold			INTEGER,
+		x25PadProFlowControl			INTEGER,
+		x25PadProLFInsert			INTEGER,
+		x25PadProLFPadding			INTEGER,
+		x25PadProEdit				INTEGER,
+		x25PadProCharDel			INTEGER,
+		x25PadProLineDel			INTEGER,
+		x25PadProLineDisp			INTEGER,
+		x25PadProSigEdit			INTEGER,
+		x25PadProEchoMask			INTEGER,
+		x25PadProParity				INTEGER,
+		x25PadProPageWait			INTEGER,
+		x25PadProXCharDel			INTEGER,
+		x25PadProXLineDel			INTEGER,
+		x25PadProXLineDisp			INTEGER,
+		x25PadProXForwardChar1			INTEGER,
+		x25PadProXForwardChar2			INTEGER,
+		x25PadProXParity			INTEGER,
+		x25PadProXDelay				INTEGER,
+		x25PadProXLFInsert			INTEGER,
+		x25PadProIdent				DisplayString,
+		x25PadProTermAfterCall			INTEGER,
+		x25PadProIgnoreX29			INTEGER
+	}
+
+	x25PadProNumber OBJECT-TYPE
+	    SYNTAX  INTEGER (0..99)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The unique number of the profile."
+	::= { x25PadProfileEntry 1 }
+
+	x25PadProState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			valid(1), delete(2)
+	    }	
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The State of the profile."
+	    DEFVAL  { valid }
+	::= { x25PadProfileEntry 2 }
+
+	x25PadProAutoCallDstAddr OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    
+	    DESCRIPTION
+		"When this object is set to a non-empty string, a
+		 call will automatically be established to this
+		 PAD address."
+	::= { x25PadProfileEntry 3 }
+
+	x25PadProEscape OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one. This parameter defines a
+		 character on its receipt the PAD alternates the state
+		 from data-transfer in connection-in-progress. This allows the
+		 start-stop mode DTE to initiate an escape from the
+		 data-transfer state or the connection-in-progress state in 
+		 order to send PAD command signals. The value 0 means that
+		 the escape from data-transfer state and recall of the PAD is
+		 not possible. The value 1 means that the escape is possible by
+		 character DLE(Ctrl-P). The values 32-126 mean that the escape 
+		 is possible by graphic character defined by the user."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 4 }
+	
+	x25PadProEcho OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	    		no-echo(256),
+			echo(1)
+	    }		
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter two. This parameter determines
+		 whether the echo mode is off or on. The selection of the
+		 characters to be echoed is dependent on the value of
+		 parameter EchoMask."
+	    DEFVAL  { no-echo }
+	::= { x25PadProfileEntry 5 }
+
+
+	x25PadProForwardChar OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter three. This parameter defines a
+		 character. On its receipt the PAD forwards the previously 
+		 received data from start-stop DTE as packet. The value 0 means
+		 no data forwarding character."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 6 }
+
+	x25PadProIdleTimer OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of parameter four. This parameter allows the
+		 selection of the duration of an interval between successive
+		 characters received from the start-stop DTE which, when
+		 exceeded, will cause the PAD to terminate the assembly of
+		 a packet and to forward it. The value 0 will indicate that
+		 no data forwarding on time-out is required. A value between
+		 1 and 255 will indicate the value of the delay in twentieths
+		 of a second."
+	    DEFVAL  { 5 }
+	::= { x25PadProfileEntry 7 }
+
+	x25PadProDevControl OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+	    		no-use(256),
+			use-only-data-transfer(1),
+			use(2)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter five. This parameter allows for
+		 flow control between the PAD and the start-stop DTE. The PAD
+		 indicates whether it is ready or not to accept characters
+		 from the start-stop DTE by transmitting special characters.
+		 These characters are used to switch an ancillary transmitting
+		 device on (X-ON; DC1) and off (X-OFF; DC3). The value 0 means
+		 no use of DC1 and DC3. Value 1 indicates the use of DC1 and
+		 DC3 on data-transfer. Value 2 means the use of DC1 and DC3 on
+		 data-transfer and command state."
+	    DEFVAL  { no-use }
+	::= { x25PadProfileEntry 8 }
+
+	x25PadProSigControl OBJECT-TYPE
+	    SYNTAX  INTEGER (0..7)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter six. This parameter provides the
+		 start-stop DTE with the ability to decide whether or not and
+		 in what format PAD service signals are transmitted. The value
+		 0 means no service signals are transmitted to the start-stop
+		 DTE. Value 1 indicates service signals other than the prompt
+		 PAD service signal are transmitted in the standard format. The
+		 value 4 indicates prompt PAD service signal is transmitted in
+		 the standard format. The value 5 is a combination of value 1
+		 and value 4, i.e. all service signals including prompt are
+		 transmitted in standard format. The transmission of service
+		 signals is controlled by values 0, 1, 4, 5."
+	    DEFVAL  { 1 }
+	::= { x25PadProfileEntry 9 }
+
+	x25PadProBrkControl OBJECT-TYPE
+	    SYNTAX  INTEGER (0..21)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter seven. This parameter allows the
+		 selection of the operation of the PAD after the receipt of a
+		 BREAK-signal from the start-stop DTE in data-transfer state.
+		 The value 0 indicates no operation. Value 1 means that the
+		 PAD sends an interrupt packet to packet mode DTE or other PAD.
+		 Value 2 indicates RESET but the PAD remains in data-transfer
+		 state. Value 4 means that the PAD sends an indication of a
+		 BREAK-message to packet mode DTE or other PAD. Value 8
+		 indicates escape from data-transfer state. Value 16 determines
+		 discard output to start-stop DTE."
+	    DEFVAL  { 8 }
+	::= { x25PadProfileEntry 10 }
+
+	x25PadProDiscard OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	    		normal-data-delivery(256),
+			discard-output(1)
+	    } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter eight. This parameter provides for
+		 a PAD to discard the content of user sequences in packets upon
+		 request rather than disassembling and transmitting these to
+		 the start-stop DTE."
+	    DEFVAL  { normal-data-delivery }
+	::= { x25PadProfileEntry 11 }
+
+	x25PadProCRPadding OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter nine. This parameter provides for
+		 the automatic insertion by the PAD of padding characters in
+		 the character stream transmitted to the start-stop DTE after
+		 the occurrence of a carriage return character. This allows
+		 for the printing mechanism for the start-stop DTE to perform
+		 the carriage return function correctly. A value between 0
+		 and 255 will indicate the number of padding characters. When
+		 this parameter is 0, there will be no padding except that PAD
+		 service signals will contain a number of padding characters
+		 according to the data rate of the start-stop DTE."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 12 }
+
+	x25PadProLineFold OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter ten. This parameter provides for
+		 the automatic insertion by the PAD of appropriate format
+		 effectors in the character stream transmitted to the
+		 start-stop DTE. The predetermined maximum number of graphic
+		 characters per line may be set. Tha value 0 means no line
+		 folding. A value between 1 and 255 will indicate the number
+		 of graphic characters per line that will be transmitted by
+		 the PAD without inserting appropriate format effectors."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 13 }
+	
+	x25PadProFlowControl OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			no-use-DC1-DC3(256), 
+			use-DC1-DC3(1)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter twelve. It allows for flow control
+		 between the start-stop DTE and the PAD. The start-stop DTE
+		 indicates whether it is ready or not to accept characters
+		 from the PAD by transmitting special characters."
+	    DEFVAL  { no-use-DC1-DC3 }
+	::= { x25PadProfileEntry 14 }
+
+	x25PadProLFInsert OBJECT-TYPE
+	    SYNTAX  INTEGER (0..7) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter thirteen. It provides for the
+		 automatic insertion by the PAD of a linefeed character in
+		 the character stream to or from the start-stop DTE after
+		 each carriage return character. It applies only in the
+		 data-transfer state."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 15 }
+
+	x25PadProLFPadding OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter fourteen. It provides for the
+		 automatic insertion by the PAD of padding characters in the
+		 character stream transmitted to the start-stop DTE after the
+		 occurrence of a linefeed character. It applies only in the
+		 data-transfer state. A value between 0 and 255 will indicate
+		 the number of padding characters."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 16 }
+
+	x25PadProEdit OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			no-editing-user-data(256), 
+			editing-user-data(1)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter fifteen. It determines, whether
+		 editing of user data in data-transfer state is possible or
+		 not. The value 1 suspends data forwarding on full packet
+		 until the editing buffer is full and data forwarding on idle
+		 timer period expiry. The value of parameter 4 remains
+		 unchanged. During the PAD command state the editing function
+		 is always available."
+	    DEFVAL  { no-editing-user-data }
+	::= { x25PadProfileEntry 17 }
+
+	x25PadProCharDel OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter sixteen. This parameter provides
+		 for character delete editing capabilities in the data-transfer
+		 state for the start-stop DTE. The character defined by the
+		 user for character delete is the binary respresentation of the
+		 decimal value in accordance with IA5."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 18 }
+
+	x25PadProLineDel OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter seventeen. This parameter provides
+		 for line delete editing capabilities in the data-transfer
+		 state for the start-stop DTE. The character defined by the
+		 user for line delete is the binary respresentation of the
+		 decimal value in accordance with IA5."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 19 }
+
+	x25PadProLineDisp OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter eighteen. This parameter provides
+		 for line display editing capabilities in the data-transfer
+		 state for the start-stop DTE. The character defined by the
+		 user for line display is the binary respresentation of the
+		 decimal value in accordance with IA5."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 20 }
+
+	x25PadProSigEdit OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+		-- no-editing PAD service signals (0),
+		-- editing PAD service signals for printing terminals (1),
+		-- editing PAD service signals for display terminals (2),
+		-- editing PAD service signals using one character
+		-- from the range of IA5 (8, 32-126)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter nineteen. It provides the start-
+		 stop DTE with the ability to decide whether or not editing PAD
+		 service signals are transmitted and which format should be
+		 used. This parameter does not apply if the value of parameter
+		 6 is set to 0."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 21 }
+
+	x25PadProEchoMask OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	   	-- no echo mask; all characters echoed (0),
+		-- no echo of character CR (1),
+		-- no echo of character LF (2),
+		-- no echo of characters VT, HT, FF (4),
+		-- no echo of characters BEL, BS (8),
+		-- no echo of characters ESC, ENQ (16),
+		-- no echo of characters ACK, NAK, STX, SOH, EOT, ETB,ETX (32),
+		-- no echo of editing characters as designed by 
+		-- parameters 16, 17 and 18 (64),
+		-- no echo of all other characters in columns 0 and 1
+		-- of IA5 not mentioned above, and character DEL (128)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter twenty. When ECHO is enabled,
+		 it allows selected defined sets of characters received from
+		 the start-stop DTE not to be transmitted back to the
+		 start-stop DTE. Value 64 does not apply if editing is not
+		 enabled. If parameter 5, 12, 22 is set to a non-zero value,
+		 then DC1 and DC3 are not echoed. The PAD recall character
+		 specified by the value of parameter 1 is not echoed. It does
+		 not apply if parameter 2 is set to 0."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 22 }
+
+	x25PadProParity OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			no-parity(256), 
+			parity-checking(1), 
+			parity-generation(2), 
+			parity-checking-generation(3)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter twenty one. It allows the PAD to
+		 check parity in the data stream from the start-stop DTE and/or
+		 generate parity in the data stream to the start-stop DTE.
+		 Characters generated by the PAD itself (e.g., PAD service
+		 signals) have even parity when this parameter is set to zero
+		 unless the parity is determined by alternate means."
+	    DEFVAL  { no-parity }
+	::= { x25PadProfileEntry 23 }
+
+	x25PadProPageWait OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter twenty two. It allows the PAD to
+		 suspend transmission of additional characters to the start-
+		 stop DTE after specified number of linefeed characters have
+		 been transmitted by the PAD. Value 0 determines page wait
+		 disabled. A value between 1 and 255 will indicate page wait
+		 condition after n-linefeed characters are sent by the PAD to
+		 the start-stop DTE."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 24 }
+
+	x25PadProXCharDel OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of parameter one hundered eighteen. This parameter
+		 is a repeating of parameter sixteen."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 25 }
+
+	x25PadProXLineDel OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of parameter one hundered nineteen. This parameter
+		 is a repeating of parameter seventeen."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 26 }
+
+	x25PadProXLineDisp OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one hundered twenty. This parameter
+		 is a repeating of parameter eighteen."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 27 }
+
+	x25PadProXForwardChar1 OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one hundered twenty one. This
+		 parameter allows predefinition of one data forwarding 
+		 character in addition to parameter three."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 28 }
+
+	x25PadProXForwardChar2 OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one hundered twenty two. This
+		 parameter allows predefinition of one data forwarding 
+		 character in addition to parameter three."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 29 }
+
+	x25PadProXParity OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			no-parity(256), 
+			parity-checking-generation(1), 
+			parity-generation(2), 
+			parity-checking(3) 
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one hundered twenty three. This
+		 corresponds to the parameter twenty one, but the meaning of
+		 values 1 and 3 are interchanged."
+	    DEFVAL  { no-parity }
+	::= { x25PadProfileEntry 30 }
+
+	x25PadProXDelay OBJECT-TYPE
+	    SYNTAX  INTEGER (0..255)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one hundered twenty five. This
+		 parameter determines how long data forwarding ist delayed, 
+		 wenn it synces with a data entry."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 31 }
+
+	x25PadProXLFInsert OBJECT-TYPE
+	    SYNTAX  INTEGER (0..7) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The value of the parameter one hundered twenty six. This is a
+		 repeating of parameter thirteen."
+	    DEFVAL  { 0 }
+	::= { x25PadProfileEntry 32 }
+
+
+	x25PadProIdent OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    
+	    DESCRIPTION
+		"PAD Identification String, that is sent to start-stop
+		 DTE, when PAD is started."
+	::= { x25PadProfileEntry 33 }
+
+	x25PadProTermAfterCall OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			yes(1), no(2)
+	    }	
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Terminate the PAD after X25 Call cleared"
+	    DEFVAL  { no }
+	::= { x25PadProfileEntry 34 }
+
+	x25PadProIgnoreX29 OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			yes(1), no(2)
+	    }	
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Ignore all X.29 messages"
+	    DEFVAL  { no }
+	::= { x25PadProfileEntry 35 }
+
+END

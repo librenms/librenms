@@ -1,0 +1,1033 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibcapi,v $ 
+-- $Revision: 1.28 $ 
+
+BIANCA-BRICK-CAPI-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            Counter, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+
+            BitValue, HexValue
+                FROM BINTEC-MIB
+
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    capi	OBJECT IDENTIFIER 
+	::= { bibo 7 }
+
+
+    -- CAPI Group
+
+    -- Management Information for the CAPI Subsystem of the BIANCA/BRICK
+
+        capiApplTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiApplEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The capiApplTable contains information for all currently
+                registered CAPI 1.1 and CAPI 2.0 applications, and their
+                respective CAPI_REGISTER information.
+
+                Creating entries: Entries are created automatically by
+                the system. After receiving an appropriate
+                CAPI_REGISTER call, the system 'registers' the 
+                application, and assigns it a unique capiApplNumber.
+
+                Deleting entries: Once an application releases, entries
+                are automatically removed by the system."
+	::= { capi 1 }
+
+	capiApplEntry OBJECT-TYPE
+            SYNTAX  CapiApplEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiApplNumber }
+              ::= { capiApplTable 1 }
+
+	CapiApplEntry ::=
+            SEQUENCE {
+                capiApplNumber			INTEGER,
+		capiApplVersion			INTEGER,
+		capiApplByteOrder		INTEGER,
+		capiApplRegMsgCnt		INTEGER,
+		capiApplRegLevel3Cnt		INTEGER,
+		capiApplRegDblkCnt		INTEGER,
+		capiApplRegDblkSize		INTEGER,
+		capiApplInfoStr			DisplayString	
+            }
+
+	capiApplNumber OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Identification number of the registered application."
+	::= { capiApplEntry 1 }
+
+	capiApplVersion OBJECT-TYPE
+            SYNTAX  INTEGER { capi11(1), capi20(2) }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The version number of the registered application."
+	    DEFVAL { capi20 }
+	::= { capiApplEntry 2 }
+
+	capiApplByteOrder OBJECT-TYPE
+            SYNTAX  INTEGER { 
+		little-endian(1), 
+		big-endian(2),
+		undef(3)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The byte order used by the application."
+	    DEFVAL { little-endian }
+	::= { capiApplEntry 3 }
+
+	capiApplRegLevel3Cnt OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "CAPI_REGISTER: The number of level 3 connections
+                this application accepts."
+	::= { capiApplEntry 4 }
+
+	capiApplRegMsgCnt OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "CAPI_REGISTER: The number of registered CAPI
+                messages this application accepts."
+	::= { capiApplEntry 5 }
+
+	capiApplRegDblkCnt OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "CAPI_REGISTER: The number of registered B3 data
+                blocks this application accepts."
+	::= { capiApplEntry 6 }
+
+	capiApplRegDblkSize OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "CAPI_REGISTER: The size of registered B3 data
+                blocks this application accepts."
+	::= { capiApplEntry 7 }
+
+	capiApplInfoStr OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Information string of CAPI instance: IP address and TCP port
+                 of connecting system and user name if any."
+	::= { capiApplEntry 8 }
+
+        capiListenTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiListenEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The capiListenTable contains the listen settings for each
+                CAPI application.
+
+                Creating entries: Entries can only be created by the
+                system and is performed automatically upon receiving a
+                CAPI_LISTEN_REQ message.
+
+                Deleting entries: Entries are automatically removed
+                by the system once the application releases."
+	::= { capi 2 }
+                
+
+	capiListenEntry OBJECT-TYPE
+            SYNTAX  CapiListenEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiListenApplication }
+              ::= { capiListenTable 1 }
+
+	CapiListenEntry ::=
+            SEQUENCE {
+                capiListenApplication		INTEGER,
+		capiListenController		HexValue,
+		capiListenServiceMask		HexValue,
+		capiListenEazMask		HexValue,
+		capiListenInfoMask		HexValue,
+		capiListenCipMask		HexValue,
+		capiListenCipMask2		HexValue
+            }
+
+	capiListenApplication OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The application-number (capiApplNumber)."
+	::= { capiListenEntry 1 }
+
+	capiListenController OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The ISDN controller number. This value refers to the
+                isdnStkNumber."
+	::= { capiListenEntry 2 }
+
+	capiListenServiceMask OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The bit mask of CAPI 1.1 listen services. Specifies
+                which 1TR6 services to listen for (CAPI 1.1 only)."
+	::= { capiListenEntry 3 }
+
+	capiListenEazMask OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The bit mask of CAPI 1.1 listen-EAZs (CAPI 1.1 only)."
+	::= { capiListenEntry 4 }
+
+	capiListenInfoMask OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The bit mask of the CAPI 1.1/2.0 listen InfoMask setting.  
+                The purpose of infomask is to specify the type of 
+                information for a physical connection or controller which
+                will be provided by CAPI."
+	::= { capiListenEntry 5 }
+
+	capiListenCipMask OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The bit mask of CAPI 2.0 listen CIPMask. The purpose
+                of the CIPMask parameter is to select basic classes of 
+                incoming calls. CAPI 2.0 applications only."
+	::= { capiListenEntry 6 }
+
+	capiListenCipMask2 OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The bit mask of CAPI 2.0 listen CIPMask."
+	::= { capiListenEntry 7 }
+
+
+        capiPlciTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiPlciEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The capiPlciTable contains information for each currently
+                connected CAPI application (i.e. has a Physical Link
+                Connection Identifier associated with it).
+
+                Creating entries: Entries can only be made by the 
+                system. Upon receiving a CAPI_CONNECT_REQ (or
+                CAPI_CONNECT_IND) message, the system assigns a
+                unique PLCI (capiPlciNumber) and an entry is made.
+
+                Deleting entries: Entries are automatically deleted by
+                the system once a CAPI_DISCONNECT_RESP message
+                is received."
+	::= { capi 3 }
+
+	capiPlciEntry OBJECT-TYPE
+            SYNTAX  CapiPlciEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiPlciNumber }
+              ::= { capiPlciTable 1 }
+
+	CapiPlciEntry ::=
+            SEQUENCE {
+                capiPlciNumber			HexValue,
+		capiPlciApplication		INTEGER,
+		capiPlciController		HexValue,
+		capiPlciState			INTEGER,
+		capiPlciSelectB2Proto		INTEGER,
+		capiPlciSelectB2Dlpd		OCTET STRING,
+		capiPlciSelectB3Proto		INTEGER,
+		capiPlciSelectB3Ncpd		OCTET STRING,
+		capiPlciB1Proto			INTEGER,
+		capiPlciB1Config		OCTET STRING,	
+		capiPlciB2Proto			INTEGER,
+		capiPlciB2Config		OCTET STRING,
+		capiPlciB3Proto			INTEGER,
+		capiPlciB3Config		OCTET STRING,
+		capiPlciInfoMask		HexValue,
+		capiPlciCipValue		INTEGER
+            }
+
+	capiPlciNumber OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                " The PLCI (physical link connection identifier) of the
+                application."
+	::= { capiPlciEntry 1 }
+
+	capiPlciApplication OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The application-number (capiApplNumber)."
+	::= { capiPlciEntry 2 }
+
+	capiPlciController OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The ISDN controller number. This value refers to the
+                isdnStkNumber."
+	::= { capiPlciEntry 3 }
+
+	capiPlciState OBJECT-TYPE
+            SYNTAX  INTEGER { 
+		    p-0(1), p-1(2), p-2(3), 
+		    p-3(4), p-4(5), p-5(6), 
+		    p-6(7), p-7(8), p-act(9) 
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The current link state as described in the CAPI state
+                diagram."
+	    DEFVAL { p-0 }
+	::= { capiPlciEntry 4 }
+
+	capiPlciSelectB2Proto OBJECT-TYPE
+            SYNTAX  INTEGER {
+		undef(1),
+		x75(2), hdlccrc(3), trans(4),
+		sdlc(5), x75btx(6), fax(7), lapd(8),
+		v110trans(9), v110sdlc(10), v110x75(11),
+		txonly(12), modem(241), v110sync(242)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The current B2 protocol setting (CAPI 1.1 applications
+                only)."
+	    DEFVAL { undef }
+	::= { capiPlciEntry 5 }
+
+	capiPlciSelectB2Dlpd OBJECT-TYPE
+            SYNTAX  OCTET STRING 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current B2 protocol descriptor. DLPD = data link 
+                protocol descriptor (CAPI 1.1 applications only)."
+	::= { capiPlciEntry 6 }
+
+	capiPlciSelectB3Proto OBJECT-TYPE
+            SYNTAX  INTEGER {
+		undef(1),
+		t70nl(2), iso8208(3), t90(4),
+		trans(5), t30(6)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current B3 protocol setting (CAPI 1.1 applications 
+                only)."
+	    DEFVAL { undef }
+	::= { capiPlciEntry 7 }
+
+	capiPlciSelectB3Ncpd OBJECT-TYPE
+            SYNTAX  OCTET STRING 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The current B3 Ncpd setting. NCPD = network control
+                protocol descriptor (CAPI 1.1 applications only)."
+	::= { capiPlciEntry 8 }
+
+	capiPlciB1Proto OBJECT-TYPE
+            SYNTAX  INTEGER {
+		undef(1),
+		hdlc(2), trans(3), v110trans(4),
+		v110hdlc(5), faxg3(6), hdlcinv(7),
+		hdlc56(8), modemneg(9), modemasync(10),
+		modemsync(11)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current CAPI 2.0 B1 protocol setting."
+	    DEFVAL { undef }
+	::= { capiPlciEntry 9 }
+
+	capiPlciB1Config OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current CAPI 2.0 B1 protocol configuration setting."
+	::= { capiPlciEntry 10 }
+
+	capiPlciB2Proto OBJECT-TYPE
+            SYNTAX  INTEGER {
+		undef(1),
+		x75(2), trans(3), sdlc(4),
+		lapd(5), t30(6), ppp(7), 
+		transerr(8), modem(9)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current CAPI 2.0 B2 protocol setting."
+	    DEFVAL { undef }
+	::= { capiPlciEntry 11 }
+
+	capiPlciB2Config OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current CAPI 2.0 B2 protocol configuration setting."
+	::= { capiPlciEntry 12 }
+
+	capiPlciB3Proto OBJECT-TYPE
+            SYNTAX  INTEGER {
+		undef(1),
+		trans(2), t90(3), iso8208(4),
+		x25dce(5), t30(6), t30ext(7),
+		modem(9)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current CAPI 2.0 B3 protocol setting."
+	    DEFVAL { undef }
+	::= { capiPlciEntry 13 }
+
+	capiPlciB3Config OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Current CAPI 2.0 B3 protocol configuration setting."
+	::= { capiPlciEntry 14 }
+
+	capiPlciCipValue OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The current CIPValue setting."
+	::= { capiPlciEntry 15 }
+
+	capiPlciInfoMask OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The current InfoMask setting."
+	::= { capiPlciEntry 16 }
+
+        capiNcciTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiNcciEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The capiNcciTable contains information for each CAPI
+                NCCI (network control connection identifier). An NCCI
+                describes a logical connection on level 3. Several NCCIs
+                operating on the same PLCI may exist.
+
+                Creating entries: As soon as a CAPI_CONNECT_B3_REQ
+                (or CAPI_CONNECT_B3_IND) message is received,
+                the system creates an entry by assigning the 
+                application a unique capiNcciNumber.
+
+                Deleting entries: Entries are automatically deleted by
+                the system once a CAPI_DISCONNECT_B3_RESP 
+                message is received."
+	::= { capi 4 }
+
+	capiNcciEntry OBJECT-TYPE
+            SYNTAX  CapiNcciEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiNcciNumber }
+              ::= { capiNcciTable 1 }
+
+	CapiNcciEntry ::=
+            SEQUENCE {
+                capiNcciNumber			HexValue,
+		capiNcciApplication		INTEGER,
+		capiNcciPlci			HexValue,
+		capiNcciState			INTEGER
+            }
+
+	capiNcciNumber OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The NCCI number assigned by the system."
+	::= { capiNcciEntry 1 }
+
+	capiNcciApplication OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The application number (capiApplNumber)."
+	::= { capiNcciEntry 2 }
+
+	capiNcciPlci OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The CAPI PLCI number (capiPlciNumber)."
+	::= { capiNcciEntry 3 }
+
+	capiNcciState OBJECT-TYPE
+            SYNTAX  INTEGER { 
+		    n-0(1), n-1(2), n-2(3), 
+		    n-3(4), n-4(5), n-5(6), 
+		    n-act(7) 
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The current state of the NCCI, as described in the
+                CAPI state diagram."
+	    DEFVAL { n-0 }
+	::= { capiNcciEntry 4 }
+
+        capiInfoTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiInfoEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The capiInfoTable contains the last 10 CAPI info codes
+                and their message identifiers for where the error occured.
+                The most recent message is at inx 09 with older messages
+                rolling off the top of the table, i.e. inx 00.
+                
+                Creating entries: Entries are created automatically by
+                the system once a CAPI info code is received by a 
+                registered application.
+
+                Deleting entries: Entries are removed automatically
+                by the system."
+	::= { capi 5 }
+
+	capiInfoEntry OBJECT-TYPE
+            SYNTAX  CapiInfoEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiInfoApplication }
+              ::= { capiInfoTable 1 }
+
+	CapiInfoEntry ::=
+            SEQUENCE {
+		capiInfoApplication		INTEGER,
+		capiInfoPlci			HexValue,
+		capiInfoNcci			HexValue,
+		capiInfoC1Command		INTEGER,
+		capiInfoC2Command		INTEGER,
+		capiInfoSubCommand		INTEGER,
+                capiInfoNumber			HexValue
+            }
+
+	capiInfoApplication OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The application number (capiApplNumber)."
+	::= { capiInfoEntry 1 }
+
+	capiInfoPlci OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The CAPI PLCI number (capiPlciNumber)."
+	::= { capiInfoEntry 2 }
+
+	capiInfoNcci OBJECT-TYPE
+            SYNTAX  HexValue
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The NCCI number (capiNcciNumber)."
+	::= { capiInfoEntry 3 }
+
+	capiInfoC1Command OBJECT-TYPE
+            SYNTAX  INTEGER {
+		resetb3(1),    connect(2),    conact(3),
+	        disc(4),       listen(5),     param(6),
+		info(7),       data(8),       conninfo(9),   
+		dtmf(10),      selb2(64),     selb3(128),    
+		listenb3(129), conb3(130),    conb3act(131), 
+		discb3(132),   b3param(133),  datab3(134),   
+		handset(135)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The CAPI 1.1 command where the info occurred."
+	    DEFVAL { info }
+	::= { capiInfoEntry 4 }
+
+	capiInfoC2Command OBJECT-TYPE
+            SYNTAX  INTEGER {
+		alert(1),      connect(2),    conact(3),
+		disc(4),       listen(5),     info(8),
+		selectb(65),   facility(128), conb3(130),
+		conb3act(131), discb3(132),   datab3(134),
+		resetb3(135),  conb3t90(136), manufact(255)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The CAPI 2.0 command where the info occurred."
+	    DEFVAL { info }
+	::= { capiInfoEntry 5 }
+
+	capiInfoSubCommand OBJECT-TYPE
+            SYNTAX  INTEGER { 
+		req(1), conf(2), ind(3), resp(4)
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The CAPI 1.1/2.0 subcommand."
+	    DEFVAL { ind }
+	::= { capiInfoEntry 6 }
+
+	capiInfoNumber OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The info value as specified in the CAPI 1.1/2.0 
+                specification. See the Software Reference Manual for a 
+		listing of CAPI 1.1 and CAPI 2.0 info values."
+	::= { capiInfoEntry 7 }
+
+        capiConfigTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiConfigEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The capiConfigTable contains configuration information
+                for each ISDN stack. Setting these fields is optional, and
+                is not required.
+
+                Creating entries: Entries are created automatically by
+                the system when a new ISDN stack is initialised in the 
+                isdnStkTable.
+
+                Deleting entries: An entry can be removed by assigning
+                the value `delete' to its capiConfigFaxG3RcvSpeed object.
+		It can be removed only if there is no entry with it's
+		capiConfigStkNumber in the isdnStkTable."
+	::= { capi 6 }
+
+	capiConfigEntry OBJECT-TYPE
+            SYNTAX  CapiConfigEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiConfigStkNumber }
+              ::= { capiConfigTable 1 }
+
+	CapiConfigEntry ::=
+            SEQUENCE {
+		capiConfigStkNumber			INTEGER,
+		capiConfigFaxG3RcvSpeed			INTEGER,
+		capiConfigFaxG3ECM			INTEGER,
+		capiConfigFaxG3Header			INTEGER,
+		capiConfigVoiceCoding			INTEGER,
+		capiConfigSendAlerting			INTEGER,
+		capiConfigV42bis			INTEGER,
+		capiConfigModemDefault			INTEGER,
+		capiConfigFaxModulation                 INTEGER,
+		capiConfigFax12000                      INTEGER,
+		capiConfigFaxTXLevel                    INTEGER
+            }
+
+	capiConfigStkNumber OBJECT-TYPE
+            SYNTAX  INTEGER (0..31)
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The isdnStkNumber this configuration belongs to."
+	::= { capiConfigEntry 1 }
+
+	capiConfigFaxG3RcvSpeed OBJECT-TYPE
+            SYNTAX  INTEGER {
+		r4800(1), r7200(2), r9600(3), r14400(4), maximum(5), 
+		not-available(6), delete(7)
+	    }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The G3 facsimile receive speed. For CM-EBRI this
+                should be set to maximum.
+		Set this field to `delete' to remove this entry.
+		The entry can be deleted only if there is no entry 
+		with it's capiConfigStkNumber in the isdnStkTable."
+	    DEFVAL { maximum }
+	::= { capiConfigEntry 2 }
+
+	capiConfigFaxG3ECM OBJECT-TYPE
+            SYNTAX  INTEGER { on(1), off(2), not-available(3) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies whether ECM (error correction mode)
+                should be used for G3 facsimile transmissions."
+	    DEFVAL { on }
+	::= { capiConfigEntry 3 }
+
+	capiConfigFaxG3Header OBJECT-TYPE
+            SYNTAX  INTEGER {
+		logo-header(1), no-logo(2), no-header(3), not-available(4)
+	    }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies whether the header-line and logo 
+                ('BIANCA/FAX'), should appear on outgoing facsimiles. The
+                value 'logo_header' allows the header-line and the logo
+                to be printed on the top of each page."
+	    DEFVAL  { logo-header }
+	::= { capiConfigEntry 4 }
+
+	capiConfigVoiceCoding OBJECT-TYPE
+            SYNTAX  INTEGER { normal(1), reverse(2) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Switches the bit order for voice-data."
+	    DEFVAL { reverse }
+	::= { capiConfigEntry 5 }
+
+	capiConfigSendAlerting OBJECT-TYPE
+            SYNTAX  INTEGER { never(1), ever(2), voice-only(3) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "For CAPI 1.1 this specifies when the CAPI server
+                should send alert messages for incoming calls."
+	    DEFVAL  { voice-only }
+	::= { capiConfigEntry 6 }
+
+	capiConfigV42bis OBJECT-TYPE
+            SYNTAX  INTEGER { on(1), off(2), not-available(3) } 
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies whether V.42bis data compression should be
+                used. If data compression is activated here,the receiving
+                or sending side is first queried whether it supports data
+                compression. The BRICK supports V.42bis data 
+                compression using up to 2 B-channels."
+	    DEFVAL { off }
+	::= { capiConfigEntry 7 }
+
+	capiConfigModemDefault OBJECT-TYPE
+            SYNTAX  INTEGER { modem-profile-1(1), modem-profile-2(2),
+			      modem-profile-3(3), modem-profile-4(4),
+			      modem-profile-5(5), modem-profile-6(6),
+			      modem-profile-7(7), modem-profile-8(8)}
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies the modem profile of the mdmProfileTable
+		which contains the default modem parameters to use
+		for modem connections."
+	    DEFVAL { modem-profile-1 }
+	::= { capiConfigEntry 8 }
+
+	capiConfigFaxModulation OBJECT-TYPE
+
+            SYNTAX  INTEGER { v17(1), v33(2), v29(3), v17s(5), v33s(6) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Set the default transmission protocol for fax.
+		  - v17  max. 14400 Bps new standard
+		  - v33  max. 14000 Bps early standard
+		  - v29  max.  9600 Bps fax standard
+		  - v17s v17 with Swiss capability
+		  - v33s v33 with Swiss capability"
+	    DEFVAL { v17 }
+	::= { capiConfigEntry 9 }
+
+	capiConfigFax12000 OBJECT-TYPE
+            SYNTAX  INTEGER { on(1), off(2)}
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Enable or disable the 12000Bps Mode for fax transmission.
+		 A lot of fax receivers have problems with this tranmission
+		 mode. Default value is off"
+	    DEFVAL { off }
+	::= { capiConfigEntry 10 }
+
+	capiConfigFaxTXLevel OBJECT-TYPE
+            SYNTAX  INTEGER { db0(1), db3(2),db6(3),db9(4),db12(5),db15(6)}
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+	    	"Set the transmit level to -x dB db0 = 0dB, db3 = -3dB.
+		 In Germany -6dB (db6) is normally used for facsimile
+		 transmission."
+	    DEFVAL { db6 }
+	::= { capiConfigEntry 11 }
+	
+        capiMultiControllerTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CapiMultiControllerEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"This table contains mappings between controller numbers 
+		used by CAPI applications and the ISDN stacks available on 
+		the BRICK (i.e., the Number field of the isdnStkTable). 
+		The Version field specifies whether an entry applies to 
+		CAPI 1.1 or CAPI 2.0 applications.
+
+		If a CAPI 1.1 entry is not defined, CAPI 1.1 applications 
+		can only use isdnStkNumber N if N is the controller number
+		requested by the application.
+
+		If a CAPI 2.0 entry is not defined, CAPI 2.0 applications 
+		can only use isdnStkNumber N-1 if N is the controller number 
+		requested by the application.
+
+                Creating entries: Entries are created by assigning a
+                value to the capiControllerNumber object.
+ 
+                Deleting entries: An entry can be removed by assigning
+                the value `delete' to its capiControllerVersion object."
+	::= { capi 7 }
+
+	capiMultiControllerEntry OBJECT-TYPE
+            SYNTAX  CapiMultiControllerEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { capiControllerNumber }
+              ::= { capiMultiControllerTable 1 }
+
+	CapiMultiControllerEntry ::=
+            SEQUENCE {
+		capiControllerNumber		INTEGER,
+		capiControllerStkMask		BitValue,
+		capiControllerVersion		INTEGER
+            }
+
+	capiControllerNumber OBJECT-TYPE
+            SYNTAX  INTEGER (0..31)
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The controller number requested by the CAPI application."
+	::= { capiMultiControllerEntry 1 }
+
+	capiControllerStkMask OBJECT-TYPE
+            SYNTAX  BitValue
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+		"This binary number defines the ISDN stack(s) to use for
+		the specified CAPI 1.1 or CAPI 2.0 applications.
+		For example; `Number=1 StkMask=0b1111 Version=capi20' means: 
+		allow CAPI 2.0 applications requesting ISDN controller 1 to 
+		use the ISDN stacks with IsdnStkNumber 0 - 3 on the BRICK."
+	    -- DEFVAL  { 'FFFFFFFF'H }
+	    DEFVAL  { 4294967295 }
+	::= { capiMultiControllerEntry 2 }
+
+	capiControllerVersion OBJECT-TYPE
+            SYNTAX  INTEGER { capi11(1), capi20(2), delete(3) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies which CAPI applications (CAPI version 1.1, or 2.0)
+		this entry applies to.
+		
+		Set this field to `delete' to delete this entry."
+	    DEFVAL  { capi11 }
+	::= { capiMultiControllerEntry 3 }
+
+
+
+          
+	capiAdminStatus  OBJECT-TYPE
+	   SYNTAX  INTEGER {
+	   	enable(1),
+		disable(2)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+	    	"Enable or disable CAPI"
+	    DEFVAL { enable }
+	::= { capi 9 }
+
+	 capiTcpNoDelay  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	   	enable(1),
+		disable(2)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    DESCRIPTION
+	    	"Enable or Disable TCP Nagle Algorithm for CAPI.
+		    disable: Normal operation with Nagle support.
+		    enable : Disable Nagle TCP Algorithm.
+		Enable TcpNoDelay increases Network load and decrease
+		delay of TCP packages. On CAPI Applications with small
+		Data packages this option may increase transmission rate."
+	    DEFVAL { disable }
+	::= { capi 10 }
+
+	capiFaxG3Header  OBJECT-TYPE
+            SYNTAX  INTEGER {
+		logo-header(1), 
+		no-logo(2), 
+		no-header(3),
+		not-available(4),
+		specify(5)
+	    }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies whether the header-line and logo 
+                ('BIANCA/FAX'), should appear on outgoing facsimiles. The
+                value 'logo_header' allows the header-line and the logo
+                to be printed on the top of each page."
+	    DEFVAL  { specify }
+	::= { capi 11 }
+
+	capiX25DefWinSize  OBJECT-TYPE
+            SYNTAX  INTEGER (1..7)
+            
+	    ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Specifies the X.25 default Windowsize used in
+		 ISO8208 (X.25 DTE <-> DTE) Filetransferprotocol. 
+		 Applications such as OFTP normally uses 7 but 
+		 some Applications did not use X.25 negotiation, 
+		 so the CAPI uses here a default from 2 and the 
+		 connection is closed by a X.25 Reset. Setting 
+		 this value to 7 is not standard but useful for
+		 the customer to avoid this error."
+	    DEFVAL  { 2 }
+	::= { capi 12 }
+
+
+END

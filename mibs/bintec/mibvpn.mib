@@ -1,0 +1,705 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+
+BIANCA-BRICK-PPTP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            IpAddress, Counter, TimeTicks, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+ 
+            OBJECT-TYPE
+                FROM RFC-1212
+
+            vpn
+                FROM BINTEC-MIB;
+
+    -- PPTP
+
+	pptpProfileTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF PptpProfileEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The pptpProfileTable contains parameters for the
+		 Point-to-Point Tunneling Protocol (PPTP) according
+		 RFC 2637. Entries are removed by setting an entry's
+		 pptpProfileKeepalive object to 'delete'."
+		::= { vpn 1 }
+
+	pptpProfileEntry OBJECT-TYPE
+	    SYNTAX  PptpProfileEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	    INDEX   { pptpProfileId }
+	::= { pptpProfileTable 1 }
+
+	PptpProfileEntry ::=
+	    SEQUENCE {
+		pptpProfileId				INTEGER,
+		pptpProfileKeepalive			INTEGER,
+		pptpProfileMaxRequests			INTEGER,
+		pptpProfileMaxBlockTime			INTEGER,
+		pptpProfileMaxAckTimeout		INTEGER,
+		pptpProfileReassemblyTimeout		INTEGER,
+		pptpProfileMaxSWin			INTEGER,
+		pptpProfileXmitWaitTime			INTEGER,
+		pptpProfileMaxCtlConn			INTEGER,
+		pptpProfileGreWindowAdaption		INTEGER,
+		pptpProfileHost				DisplayString,
+		pptpProfileVendor			DisplayString,
+		pptpProfileFirmRev			INTEGER
+	    }
+
+	pptpProfileId OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The profile ID of the PPTP profile."
+	    DEFVAL { 0 }
+	::= { pptpProfileEntry 1 }
+
+	pptpProfileKeepalive OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		on(1), 
+		off(2),
+		delete(3)
+	    } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"When set to on(1), PPTP echo requests as described in
+	 	 RFC 2637 are sent in regular intervals during the connection.
+		 If set to off(2), no PPTP echo requests will be performed,
+		 delete(3) determines the entry is marked for discard."
+	    DEFVAL { 2 }
+	::= { pptpProfileEntry 2 }
+
+	pptpProfileMaxRequests OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The maximum number of outstanding PPTP echo replies, until
+		 the PPTP control connection is droped and all associated
+		 calls are terminated."
+	    DEFVAL { 5 }
+	::= { pptpProfileEntry 3 }
+
+	pptpProfileMaxBlockTime OBJECT-TYPE
+	    SYNTAX  INTEGER (0..10000)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Maximum time (in msec) the GRE Send Window is blocked. 
+		 If the GRE Send Window is full, no packets can be forwarded 
+		 and the Maximum Time is passed, the GRE Send Window is 
+		 resetted to prevent unsolvable situations."
+	    DEFVAL { 0 }
+	::= { pptpProfileEntry 4 }
+
+	pptpProfileMaxAckTimeout OBJECT-TYPE
+	    SYNTAX  INTEGER (2000..5000)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Maximum value the adaptive Acknowledgment Timeout (in msec) 
+		 can reach while it is calculated. According to RFC 2637."
+	    DEFVAL { 5000 }
+	::= { pptpProfileEntry 5 }
+
+	pptpProfileReassemblyTimeout OBJECT-TYPE
+	    SYNTAX  INTEGER (100..1000)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Maximum time (in msec) for rearranging out-of-sequence packets.
+		 After this time outstanding packets will be supposed missing."
+	    DEFVAL { 200 }
+	::= { pptpProfileEntry 6 }
+
+	pptpProfileMaxSWin OBJECT-TYPE
+	    SYNTAX  INTEGER (0..256)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Maximum GRE send window size"
+	    DEFVAL { 0 }
+	::= { pptpProfileEntry 7 }
+
+	pptpProfileXmitWaitTime OBJECT-TYPE
+	    SYNTAX  INTEGER (0..32)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Wait time (in msec) before transmitting data."
+	    DEFVAL { 32 }
+	::= { pptpProfileEntry 8 }
+
+        pptpProfileMaxCtlConn OBJECT-TYPE
+            SYNTAX  INTEGER (1..1024)
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Defines the maximum number of incoming PPTP control
+		 connections per remote IP address."
+            DEFVAL { 1 }
+        ::= { pptpProfileEntry 9 }
+
+        pptpProfileGreWindowAdaption OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		enabled(1), 
+		disabled(2)
+	    } 
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Enables/disables the sliding GRE window algorithm."
+            DEFVAL { enabled }
+        ::= { pptpProfileEntry 10 }
+
+        pptpProfileHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Specific name of the PAC or PNS being used for the
+		 PPTP Start Control Connection  Request/Reply."
+        ::= { pptpProfileEntry 11 }
+
+        pptpProfileVendor OBJECT-TYPE
+	    SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Vendor specific string describing the type of PAC
+                 or PNS being used for the PPTP Start Control Connection
+		 Request/Reply."
+        ::= { pptpProfileEntry 12 }
+
+        pptpProfileFirmRev OBJECT-TYPE
+            SYNTAX  INTEGER (-1..999)
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+		"This variable contains the firmware revision number of the
+		 issuing PAC or PNS. If not specified (set to 0) the global
+		 Firmware Revision will be propagated."
+        ::= { pptpProfileEntry 13 }
+
+
+	pptpCtlConnTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF PptpCtlConnEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The pptpCtlConnTable displays all currently active PPTP
+                dontrol connections Only the system can add or remove entries
+		to this table.
+
+                Creating entries: Entries are added when an outgoing
+                or incoming TCP connection (port 1723) is established.
+
+                Deleting entries: Entries are removed once the 
+                respective PPTP control connection is disconnected."
+	::= { vpn 2 }
+
+	pptpCtlConnEntry OBJECT-TYPE
+	    SYNTAX  PptpCtlConnEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	    INDEX   { pptpCtlConnOriginator }
+	::= { pptpCtlConnTable 1 }
+
+	PptpCtlConnEntry ::=
+	    SEQUENCE {
+		pptpCtlConnOriginator			INTEGER,
+		pptpCtlConnAge				TimeTicks,
+		pptpCtlConnState			INTEGER,
+		pptpCtlConnRemoteIpAddress		IpAddress,
+		pptpCtlConnLocalIpAddress		IpAddress,
+		pptpCtlConnVersion			INTEGER,
+		pptpCtlConnHost				DisplayString,
+		pptpCtlConnVendor			DisplayString,
+		pptpCtlConnFirmRev			INTEGER,
+		pptpCtlConnMaxChan			INTEGER,
+		pptpCtlConnOutgoingCalls		Counter,
+		pptpCtlConnIncomingCalls		Counter,
+		pptpCtlConnOutgoingFails		Counter,
+		pptpCtlConnIncomingFails		Counter,
+		pptpCtlConnEchoReqSent			Counter,
+		pptpCtlConnEchoReqRcvd			Counter,
+		pptpCtlConnEchoRepSent			Counter,
+		pptpCtlConnEchoRepRcvd			Counter,
+		pptpCtlConnEchoReqPending		Counter
+	    }
+
+	pptpCtlConnOriginator OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		local(1), remote(2) 
+	    } 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The originator of the PPTP control connection."
+	::= { pptpCtlConnEntry 1 }
+
+	pptpCtlConnAge OBJECT-TYPE
+	    SYNTAX  TimeTicks 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The age of the PPTP control connection. The format is
+		 in hh:mm:ss.00."
+	::= { pptpCtlConnEntry 2 }
+
+	pptpCtlConnState OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		idle(1),
+		wait-ctl-reply(2),
+		established(3),
+		wait-stop-reply(4),
+		close(5),
+		delete(6)
+	    } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The state of the PPTP control connection according RFC 2637."
+	    DEFVAL { idle }
+	::= { pptpCtlConnEntry 3 }
+
+	pptpCtlConnRemoteIpAddress OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The IP address of the remote PPTP tunnel endpoint."
+	::= { pptpCtlConnEntry 4 }
+
+	pptpCtlConnLocalIpAddress OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The IP address of the local PPTP tunnel endpoint."
+	::= { pptpCtlConnEntry 5 }
+
+	pptpCtlConnVersion OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This variable contains the negotiated PPTP version."
+	::= { pptpCtlConnEntry 6 }
+
+	pptpCtlConnHost OBJECT-TYPE
+            SYNTAX  DisplayString
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"DNS name of the issuing PAC or PNS."
+	::= { pptpCtlConnEntry 7 }
+
+	pptpCtlConnVendor OBJECT-TYPE
+            SYNTAX  DisplayString
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Vendor specific string describing the type of PAC
+                 or PNS being used on remote side."
+	::= { pptpCtlConnEntry 8 }
+
+	pptpCtlConnFirmRev OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This variable contains the firmware revision number of the
+		 issuing PAC or PNS."
+	::= { pptpCtlConnEntry 9 }
+
+        pptpCtlConnMaxChan OBJECT-TYPE                  
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+                
+            DESCRIPTION
+                "The maximum number of individual PPP sessions for this
+		 PPTP control connection."
+        ::= { pptpCtlConnEntry 10 }
+
+        pptpCtlConnOutgoingCalls OBJECT-TYPE                  
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+                
+            DESCRIPTION
+                "The number of currently established individual outgoing
+		 PPP sessions for this PPTP control connection."
+        ::= { pptpCtlConnEntry 11 }
+
+        pptpCtlConnIncomingCalls OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+                
+            DESCRIPTION
+                "The number of currently established individual incoming
+                 PPP sessions for this PPTP control connection."
+        ::= { pptpCtlConnEntry 12 }
+
+        pptpCtlConnOutgoingFails OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of failed outgoing PPP sessions for this
+		 PPTP control connection."
+        ::= { pptpCtlConnEntry 13 }
+
+        pptpCtlConnIncomingFails OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of failed incoming PPP sessions for this
+                 PPTP control connection."
+        ::= { pptpCtlConnEntry 14 }
+
+        pptpCtlConnEchoReqSent OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of PPTP Echo-Request packets sent for this
+		 PPTP control connection."
+        ::= { pptpCtlConnEntry 15 }
+
+        pptpCtlConnEchoReqRcvd OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of PPTP Echo-Request packets received for this
+                 PPTP control connection."
+        ::= { pptpCtlConnEntry 16 }
+
+        pptpCtlConnEchoRepSent OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of PPTP Echo-Reply packets sent for this
+                 PPTP control connection."
+        ::= { pptpCtlConnEntry 17 }
+                                            
+        pptpCtlConnEchoRepRcvd OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of PPTP Echo-Reply packets received for this
+                 PPTP control connection."
+        ::= { pptpCtlConnEntry 18 }
+
+        pptpCtlConnEchoReqPending OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The number of currently unanswered PPTP Echo-Request packets
+		 for this PPTP control connection."
+        ::= { pptpCtlConnEntry 19 }
+
+
+
+	pptpCallTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF PptpCallEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The pptpCallTable displays all currently active PPTP
+                calls (incoming and outgoing). Only the system can add
+                or remove entries to this table.
+
+                Creating entries: Entries are added when an outgoing
+                call is made or when an incoming call is connected.
+
+                Deleting entries: Entries are removed once the 
+                respective call is disconnected."
+	::= { vpn 3 }
+
+	pptpCallEntry OBJECT-TYPE
+	    SYNTAX  PptpCallEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	    INDEX   { pptpCallType }
+	::= { pptpCallTable 1 }
+
+	PptpCallEntry ::=
+	    SEQUENCE {
+		pptpCallType				INTEGER,
+		pptpCallDirection			INTEGER,
+		pptpCallAge				TimeTicks,
+		pptpCallState				INTEGER,
+		pptpCallRemoteIpAddress			IpAddress,
+		pptpCallLocalIpAddress			IpAddress,
+		pptpCallReceivedPackets			Counter,
+		pptpCallReceivedOctets			Counter,
+		pptpCallReceivedErrors			Counter,
+		pptpCallTransmitPackets			Counter,
+		pptpCallTransmitOctets			Counter,
+		pptpCallTransmitErrors			Counter,
+		pptpCallInfo                            DisplayString,
+		pptpCallLocId				INTEGER,
+		pptpCallRemId				INTEGER,
+		pptpCallSerial				INTEGER,
+		pptpCallSWin				INTEGER,
+		pptpCallGreWindowAdaption		INTEGER,
+		pptpCallAssociatedIfIndex		INTEGER
+	    }
+
+	pptpCallType OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		pac(1), pns(2) 
+	    } 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The PPTP call type."
+	    DEFVAL { pac }
+	::= { pptpCallEntry 1 }
+
+	pptpCallDirection OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		incoming(1), 
+		outgoing(2)
+	    } 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Direction of the PPTP call, incoming(1) or outgoing(2)."
+	    DEFVAL { outgoing }
+	::= { pptpCallEntry 2 }
+
+	pptpCallAge OBJECT-TYPE
+	    SYNTAX  TimeTicks 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The age of the call. For outgoing calls, the time since
+                the call began, or for incoming calls, the time since the
+                call was received. The format is in hh:mm:ss.00."
+	::= { pptpCallEntry 3 }
+
+	pptpCallState OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		idle(1),
+		wait-cs-ans(2),
+		wait-reply(3),
+		wait-connect(4), 
+		established(5),
+		wait-disc(6),
+		close(7),
+		delete(8)
+	    } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The state of the PPTP call according RFC 2637."
+	    DEFVAL { idle }
+	::= { pptpCallEntry 4 }
+
+	pptpCallRemoteIpAddress OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The called (for outgoing calls) or calling IP address
+		(for incoming calls)."
+	::= { pptpCallEntry 5 }
+
+	pptpCallLocalIpAddress OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The calling (for outgoing calls) or called IP address
+		(for incoming calls)."
+	::= { pptpCallEntry 6 }
+
+	pptpCallReceivedPackets OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Count of received valid GRE-encapsulated packets."
+	::= { pptpCallEntry 7 }
+
+	pptpCallReceivedOctets OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Count of received valid Octets."
+	::= { pptpCallEntry 8 }
+
+	pptpCallReceivedErrors OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Count of received invalid GRE-encapsulated packets."
+	::= { pptpCallEntry 9 }
+
+	pptpCallTransmitPackets OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Count of transmitted GRE-encapsulated packets."
+	::= { pptpCallEntry 10 }
+
+	pptpCallTransmitOctets OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Count of transmitted Octets."
+	::= { pptpCallEntry 11 }
+
+	pptpCallTransmitErrors OBJECT-TYPE
+	    SYNTAX  Counter
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Count of transmit errors."
+	::= { pptpCallEntry 12 }
+
+        pptpCallInfo OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Additional information to identify the PPTP call."
+        ::= { pptpCallEntry 13 }
+
+        pptpCallLocId OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory                           
+                
+            DESCRIPTION
+                "The local PPTP call ID assigned by remote."
+        ::= { pptpCallEntry 14 }
+            
+        pptpCallRemId OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory                           
+                
+            DESCRIPTION
+                "The locally assigned remote PPTP call ID."
+        ::= { pptpCallEntry 15 }
+
+        pptpCallSerial OBJECT-TYPE                       
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+                
+            DESCRIPTION 
+                "The unique Call Serial Number. Unlike the Call ID,
+		 both the PNS and PAC associate the same Call Serial
+		 Number with a given session"
+        ::= { pptpCallEntry 16 }
+
+        pptpCallSWin OBJECT-TYPE                  
+            SYNTAX  INTEGER (0..256)
+            ACCESS  read-only
+            STATUS  mandatory
+        
+            DESCRIPTION
+                "The negotiated GRE send window size"
+        ::= { pptpCallEntry 17 }
+            
+        pptpCallGreWindowAdaption OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		enabled(1), 
+		disabled(2)
+	    } 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Displays wether the sliding GRE window algorithm is enabled
+		 or disabled."
+        ::= { pptpCallEntry 18 }
+
+        pptpCallAssociatedIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The index of the associated virtual interface."
+        ::= { pptpCallEntry 19 }
+
+
+
+-- obsolete	pptpCreditsTable OBJECT-TYPE ::= { vpn 4 }
+
+END

@@ -1,0 +1,5939 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2006-2014 bintec elmeg GmbH
+-- $RCSfile: mib-wlc,v $
+-- $Revision: 1.42.2.15 $
+-- $Date: 2018-02-06 10:08:32 $
+---------------------------------------------------------------------------
+
+BIANCA-BRICK-WIRELESS-CONTROLLER-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+        enterprises
+                FROM RFC1155-SMI
+        IpAddress, enterprises
+                FROM RFC1155-SMI
+        MacAddress, DisplayString
+                FROM SNMPv2-TC
+        bibo, BitValue, Date
+                FROM BINTEC-MIB
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Counter32, Counter64,
+	TimeTicks, Unsigned32
+                FROM SNMPv2-SMI
+        TRAP-TYPE
+                FROM RFC-1215
+        TruthValue, RowStatus
+                FROM SNMPv2-TC
+        ifIndex 
+                FROM IF-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB;
+
+wlanControllerMIB MODULE-IDENTITY
+    LAST-UPDATED "201701090000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail: info@bintec-elmeg.com
+             Web: www.bintec-elmeg.com
+            "
+    DESCRIPTION
+            "MIB for WLAN controller"
+    REVISION "200912160000Z"
+    DESCRIPTION
+            "Wireless LAN Controller MIB."
+    REVISION "201202150000Z"
+    DESCRIPTION
+            "Change Default SSID from Funkwerk-ec to default."
+    REVISION "201303050000Z"
+    DESCRIPTION
+            "Added airtime fairness, band steering and blacklisting."
+    REVISION "201308160000Z"
+    DESCRIPTION
+            "Added support for CAPWAP auto configuration."
+    ::= { bibo 61 }
+
+    wlc    OBJECT IDENTIFIER
+    ::= { wlanControllerMIB 1 }
+
+    -- Interfaces Group
+
+    -- Management Information for the WLAN Subsystem
+
+-- **********************************************************************
+-- *  Textual conventions
+-- **********************************************************************
+    WlanRSSI ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+	    "This type is used to represent receiver input levels in dBm."
+	SYNTAX INTEGER (-110..0)
+
+    WlanRate ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+	    "This type is used to represent WLAN data rates in 500 Kbps units."
+	SYNTAX INTEGER (0..600)
+
+
+-- **********************************************************************
+-- *    wlcACTable  TABLE
+-- **********************************************************************
+wlcAC OBJECT IDENTIFIER
+    ::= { wlc 1 }
+
+    
+    wlcACAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { master(1), slave(2), disabled(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global AC switch, that defines the role of this device.
+	    "
+    DEFVAL { disabled }
+    ::= { wlcAC 1 }
+
+    wlcACOperStatus OBJECT-TYPE
+        SYNTAX INTEGER { master(1), slave(2), disabled(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the current  
+	     AC operation state.
+	    "
+    DEFVAL { disabled }
+    ::= { wlcAC 2 }
+
+    wlcACMaxNoWTP OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max number of WTPs that the AC can handle.
+	    "
+    DEFVAL { 0 } 
+    ::= { wlcAC 3 }
+
+    wlcACIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interface index where the AC is listening.
+	    "
+    DEFVAL { 0 } 
+    ::= { wlcAC 4 }
+
+    wlcACDebugLevel OBJECT-TYPE
+        SYNTAX INTEGER { off(1), normal(2), verbose(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "WLAN Controller degugging verbosity level. With a higher value
+             more debugging information will be created.
+	     Default is normal(2).
+	    "
+    DEFVAL { normal } 
+    ::= { wlcAC 5 }
+
+    wlcACAction OBJECT-TYPE
+        SYNTAX INTEGER { idle(1), 
+                        channel-selecting(2), 
+                        start-scanning(3), 
+                        scanning(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting this variable to channel_selecting(2) a successive
+             channel reallocation is issued.
+             Setting this variable to start_scanning(3) a successive
+             neighborhood scan on all active radios is initialised.
+             After all radios are set to client mode it is switched to
+             scanning(4) by system. On all operations switching back to idle(1)
+             indicates that the operation has finished.
+             Default is idle(1).
+            "
+    DEFVAL { idle }
+    ::= { wlcAC 6 }
+    
+    wlcACInitType OBJECT-TYPE
+        SYNTAX INTEGER { simultaneous(1), successive(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable indicates whether initialisation of WTPs is
+            done simultaneous(1) (more than one is initialised at the
+            same time) or successive(2) (one after the other).
+            Default is simultaneous(1).
+            "
+    DEFVAL { simultaneous }
+    ::= { wlcAC 7 }
+
+    wlcACNoSimultaneousInit OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute defines how many WTPs can be initialised
+             simultaneously in wlcACInitType_simultaneous.
+             A value of 0 defines that all WTPs can be initialised at the same time.
+             Default is 10.
+            "
+    DEFVAL { 10 }
+    ::= { wlcAC 8 }
+
+    wlcACStatisticsTimer OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This timer defines the interval statistics are sent from WTP to AC.
+            Default is 30.
+            "
+    DEFVAL { 30 }
+    ::= { wlcAC 9 }
+
+    wlcACBintecConfigTimer OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This timer defines how long a WTP waits for the next bintec config
+            message before it supposes the AC to be down.
+            Default is 10.
+            "
+    DEFVAL { 10 }
+    ::= { wlcAC 10 }
+
+    wlcACLostACLifetime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This timer defines in seconds how long a WTP still hold its configuration
+            after he has lost the connection to its AC.
+            The value -1 means endless. Default is 0, which means the WTP reboots
+            immediately after loosing the connection.
+            "
+    DEFVAL { 0 }
+    ::= { wlcAC 11 }
+
+    wlcACLedMode OBJECT-TYPE
+        SYNTAX INTEGER { normal(1), minimal(2), off(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Choose one of the following LED-Modes for all manages WTPs: 
+            normal : LEDs work normal, 
+            minimal : only Status-LED blinks once in a second, 
+            off := LEDs are off.
+            "
+    DEFVAL { normal }
+    ::= { wlcAC 12 }
+
+    wlcACScanResultsMaxAge OBJECT-TYPE
+	SYNTAX 	        INTEGER
+	UNITS           "seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	    "If a scan result wasn't seen for so many seconds,
+	    it will be removed from wlcScanResultsTable."
+	DEFVAL { 3600 }
+	::= { wlcAC 13 }
+
+-- **********************************************************************
+-- *    wlcACAddressTable  TABLE
+-- **********************************************************************
+wlcACAddressTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcACAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table lists the IP address type 
+	     and the IP address of the AC 
+            "
+    ::= { wlc 2 }
+
+    wlcACAddressEntry OBJECT-TYPE
+    SYNTAX  WlcACAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX { wlcACAddressIndex }
+    ::= { wlcACAddressTable 1 }
+
+    WlcACAddressEntry ::=
+    SEQUENCE {
+        wlcACAddressIndex 	INTEGER,
+	wlcACAddressInetType 	InetAddressType,
+	wlcACAddressInetAddress	IpAddress,
+        wlcACAddressAdminStatus INTEGER
+    }
+    
+    wlcACAddressIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of an accessible AC.
+	    "
+    ::= { wlcACAddressEntry 1 }
+
+    wlcACAddressInetType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "IP address type.
+	     Possible values are:
+	    	-unknown(0): an unknown address type
+		-ipv4(1)   : an IPv4 address
+		-ipv6(2)   : an IPv6 address
+		-ipv4z(3)  : a non-global IPv4 address including a zone
+                     	     index
+		-ipv6z(4)  : a non-global IPv6 address including a zone
+                     	     index
+		-dns(16)   : a DNS domain name
+	    "
+    ::= { wlcACAddressEntry 2 }
+
+    wlcACAddressInetAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address of the accessbile AC.
+	    "
+    ::= { wlcACAddressEntry 3 }
+    
+    wlcACAddressAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable, disable or delete the requested AC address.
+	    "
+        DEFVAL { enabled }
+    ::= { wlcACAddressEntry 4 }
+
+-- **********************************************************************
+-- *    wlcWTPTable  TABLE
+-- **********************************************************************
+wlcWTPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWTPEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcWTPTable contains information relating to the WTPs
+	     currently managed by our Access Controller (AC).
+	     Each entry corresponds to a managed Wireless Termination Point
+             (WTP). Entries can be added or deleted by the user.
+            "
+    ::= { wlc 3 }
+
+    wlcWTPEntry OBJECT-TYPE
+    SYNTAX  WlcWTPEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX { wlcWTPIndex }
+    ::= { wlcWTPTable 1 }
+
+    WlcWTPEntry ::=
+    SEQUENCE {
+        wlcWTPIndex 		 INTEGER,
+        wlcWTPAdminStatus        INTEGER,
+        wlcWTPOperStatus         INTEGER,
+        wlcWTPMacAddress         MacAddress,
+	wlcWTPDescription 	 DisplayString,
+	wlcWTPName		 DisplayString,
+	wlcWTPLocation		 DisplayString,
+	wlcWTPAdminSwVer	 DisplayString,
+        wlcWTPEncryption         INTEGER,
+	wlcWTPTriggerStat	 INTEGER,
+	wlcWTPsecIndex		 INTEGER,
+	wlcWTPauthEapolIndex	 INTEGER,
+	wlcWTPglobalIndex	 INTEGER,
+	wlcWTPradiusSrvIndex	 INTEGER,
+	wlcWTPlogHostIndex	 INTEGER,
+--	wlcWTPscheduleIndex	 INTEGER,
+	wlcWTPlocalServicesIndex INTEGER,
+	wlcWTPpresenceProfIndex INTEGER
+    }
+    
+    wlcWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index for the WTP.
+	    "
+    ::= { wlcWTPEntry 1 }
+
+    wlcWTPAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable, disable or delete the requested WTP.
+	    "
+        DEFVAL { enabled }
+    ::= { wlcWTPEntry 2 }
+ 
+    wlcWTPOperStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), 
+                        enabled(2), 
+                        initialising(3), 
+                        no-license-available(4) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This notification shows if the WTP
+	     is currently operative.
+	    "
+        DEFVAL { disabled }
+    ::= { wlcWTPEntry 3 }
+     
+    wlcWTPMacAddress OBJECT-TYPE
+        SYNTAX MacAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "First ethernet MAC address of the WTP.
+	"
+    ::= { wlcWTPEntry 4 }
+    
+   wlcWTPDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 5 }
+
+    wlcWTPName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Name of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 6 }
+
+    wlcWTPLocation OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Location of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 7 }
+
+    wlcWTPAdminSwVer OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable displays the current software version
+	     of each WTP
+	    "
+    ::= { wlcWTPEntry 8 }
+
+    wlcWTPEncryption OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable or disable the encryption between AC and WTP.
+	    "
+	DEFVAL { enabled }
+    ::= { wlcWTPEntry 9 }
+
+    wlcWTPTriggerStat OBJECT-TYPE
+        SYNTAX INTEGER { idle(1), update(2)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting this variable to update(2) the WTP is triggered to send
+            statistics (VSS, ACLDenied, stations, ...). 
+            After the trigger is sent it is switched back to idle(1).
+            Default is idle(1).
+	    "
+	DEFVAL { idle }
+    ::= { wlcWTPEntry 10 }
+
+    wlcWTPsecIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured secIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 11 }
+
+    wlcWTPauthEapolIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured EapolIndex
+	     of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 12 }
+
+    wlcWTPglobalIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured globalIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 13 }
+
+    wlcWTPradiusSrvIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured radiusSrvIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 14 }
+
+    wlcWTPlogHostIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured logHostIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 15 }
+
+-- disabled until needed: wlcWTPscheduleIndex { wlcWTPEntry 16 }
+
+    wlcWTPlocalServicesIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured localServicesIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcWTPEntry 17 }
+
+-- OBSOLETED wlcWTPMaxRetransmit	::= { wlcWTPEntry 18 }
+-- OBSOLETED wlcWTPRetransmitInterval	::= { wlcWTPEntry 19 }
+-- OBSOLETED wlcWTPEchoInterval		::= { wlcWTPEntry 20 }
+-- OBSOLETED wlcWTPStatisticsTimer	::= { wlcWTPEntry 21 }
+-- OBSOLETED wlcWTPBintecConfigTimer	::= { wlcWTPEntry 22 }
+
+    wlcWTPpresenceProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Sets the Presence Analytics profile for this WTP."
+    ::= { wlcWTPEntry 23 }
+
+-- **********************************************************************
+-- *    wlcWTPMaintenanceTable  TABLE
+-- **********************************************************************
+wlcWTPMaintenanceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWTPMaintenanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table delivers maintenance/debugging actions 
+	     executed on the WTP
+            "
+    ::= { wlc 4 }
+
+    wlcWTPMaintenanceEntry OBJECT-TYPE
+    SYNTAX  WlcWTPMaintenanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX { wlcWTPMaintenanceIndex }
+    ::= { wlcWTPMaintenanceTable 1 }
+
+    WlcWTPMaintenanceEntry ::=
+    SEQUENCE {
+	wlcWTPMaintenanceIndex		INTEGER,
+        wlcWTPMaintenanceState          INTEGER,
+        wlcWTPMaintenanceCommand        INTEGER,
+        wlcWTPMaintenanceURL	        DisplayString
+    }
+    
+    wlcWTPMaintenanceIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Index of WTP to be addressed with maintenance command.
+	    "
+    ::= { wlcWTPMaintenanceEntry 1 }
+     
+    wlcWTPMaintenanceState OBJECT-TYPE
+        SYNTAX INTEGER { idle(1), 
+                         start(2), 
+                         running(3), 
+                         done(4),
+                         error(5),
+                         stopped(6),
+                         rebooting(7),
+                         delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable displays the current maintenance state 
+	     of each WTP:
+		idle:      idle state
+		start:     start maintenance event (get state file or do update)
+		running:   maintenance event is running
+		rebooting: WTP is rebooting with new image,
+	        done:      maintenance event successfully finished
+		error:     an error occured,
+		stopped:   WTP already has the image version
+		delete:    delete maintenance event.
+	    "
+        DEFVAL { idle }
+    ::= { wlcWTPMaintenanceEntry 2 }
+
+   
+    wlcWTPMaintenanceCommand OBJECT-TYPE
+        SYNTAX INTEGER { state(1),
+                         software(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Type of action performed on WTP
+	     software: software update
+	     state: get state file
+	    "
+        DEFVAL { software }
+    ::= { wlcWTPMaintenanceEntry 3 }
+    
+    wlcWTPMaintenanceURL OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Contains URL of the http or tftp server.
+	     Depending on wlcWTPMaintenanceCommand it serves for either
+	     destination (command state) or source (command software).
+	    "
+    ::= { wlcWTPMaintenanceEntry 4 }
+    
+-- removed: wlcWTPMaintenanceOptions ::= { wlcWTPMaintenanceEntry 5 }
+    
+-- **********************************************************************
+-- *    wlcSecProfileTable  TABLE
+-- **********************************************************************
+wlcSecProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcSecProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcSecProfileTable describes profiles 
+	     for different security settings.
+            "
+    ::= { wlc 5 }
+
+    wlcSecProfileEntry OBJECT-TYPE
+    SYNTAX  WlcSecProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX { wlcSecProfileIndex }
+    ::= { wlcSecProfileTable 1 }
+
+    WlcSecProfileEntry ::=
+    SEQUENCE {
+	wlcSecProfileIndex		INTEGER,
+        wlcSecProfileAdminStatus        INTEGER,
+        wlcSecProfileAdminCommunity	DisplayString,
+	wlcSecProfileReadCommunity	DisplayString,
+	wlcSecProfileWriteCommunity	DisplayString
+    }
+    
+    wlcSecProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of a security profile.
+	    "
+    ::= { wlcSecProfileEntry 1 }
+
+    wlcSecProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable or delete the requestes security profile.
+	    "
+        DEFVAL { enabled }
+    ::= { wlcSecProfileEntry 2 }
+
+    wlcSecProfileAdminCommunity OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Community name used for admin access.
+	    "
+    ::= { wlcSecProfileEntry 3 }
+
+    wlcSecProfileReadCommunity OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Community name used for read-only access.
+	    "
+    ::= { wlcSecProfileEntry 4 }
+
+    wlcSecProfileWriteCommunity OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Community name used for read-write access.
+	    "
+    ::= { wlcSecProfileEntry 5 }
+
+-- **********************************************************************
+-- *    wlcRadiusSrvTable  TABLE
+-- **********************************************************************
+wlcRadiusSrvTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcRadiusSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table combines WTP with the RADIUS service profile.
+            "
+    ::= { wlc 6 }
+
+    wlcRadiusSrvEntry OBJECT-TYPE
+    SYNTAX  WlcRadiusSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcRadiusSrvIndex }
+    ::= { wlcRadiusSrvTable 1 }
+
+    WlcRadiusSrvEntry ::=
+    SEQUENCE {
+        wlcRadiusSrvIndex 	INTEGER,
+        wlcRadiusSrvAdminStatus INTEGER,
+	wlcRadiusSrvProfIndex 	INTEGER
+    }
+ 
+    wlcRadiusSrvIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable contains the unique WTP index.
+	    "
+    ::= { wlcRadiusSrvEntry 1 }
+
+    wlcRadiusSrvAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable or delete the RADIUS service profile
+	 from the requested WTP.
+        "
+        DEFVAL { enabled }
+   ::= { wlcRadiusSrvEntry 2 }
+
+
+    wlcRadiusSrvProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable contains the unique RADIUS
+	     service profile index.
+	    "
+    ::= { wlcRadiusSrvEntry 3 }
+
+-- **********************************************************************
+-- *    wlcRadiusSrvProfileTable  TABLE
+-- **********************************************************************
+wlcRadiusSrvProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcRadiusSrvProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcRadiusSrvProfileTable describes different 
+	     RADIUS service profiles. 
+            "
+    ::= { wlc 7 }
+
+    wlcRadiusSrvProfileEntry OBJECT-TYPE
+    SYNTAX  WlcRadiusSrvProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcRadiusSrvProfileIndex }
+    ::= { wlcRadiusSrvProfileTable 1 }
+
+    WlcRadiusSrvProfileEntry ::=
+    SEQUENCE {
+        wlcRadiusSrvProfileIndex 	    INTEGER,
+        wlcRadiusSrvProfileAddressType      InetAddressType,
+	wlcRadiusSrvProfileAddress	    IpAddress,
+	wlcRadiusSrvProfilePort		    INTEGER,
+	wlcRadiusSrvProfileSecret	    DisplayString,
+	wlcRadiusSrvProfilePriority	    INTEGER,
+	wlcRadiusSrvProfileTimeout	    INTEGER,
+	wlcRadiusSrvProfileRetries	    INTEGER,
+	wlcRadiusSrvProfileState	    INTEGER,
+	wlcRadiusSrvProfileKeepAlive	    TruthValue 
+    }
+    
+    wlcRadiusSrvProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of a RADIUS service profile.
+	    "
+    ::= { wlcRadiusSrvProfileEntry 1 }
+
+    wlcRadiusSrvProfileAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address type of the requested RADIUS service
+	     can be:
+	        -unknown(0): an unknown address type
+		-ipv4(1)   : an IPv4 address
+		-ipv6(2)   : an IPv6 address
+		-ipv4z(3)  : a non-global IPv4 address including a zone
+                     	     index
+		-ipv6z(4)  : a non-global IPv6 address including a zone
+                     	     index
+		-dns(16)   : a DNS domain name
+	    "
+    ::= { wlcRadiusSrvProfileEntry 2 }
+
+    wlcRadiusSrvProfileAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The RADIUS Server IP Address.
+	    "
+    ::= { wlcRadiusSrvProfileEntry 3 }
+
+    wlcRadiusSrvProfilePort OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The RADIUS server authentication port.
+	     Please notice that RFC2138 assigns ports 1812 and 1813
+	     for authentication and accounting, respectively. Many
+	     RADIUS servers still use the formerly assigned ports 1645
+	     and 1646 instead. The default value is 1812.
+	    "
+        DEFVAL { 1812 }
+    ::= { wlcRadiusSrvProfileEntry 4 }
+
+    wlcRadiusSrvProfileSecret OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The shared secret between RADIUS server and Brick.
+	    "
+    ::= { wlcRadiusSrvProfileEntry 5 }
+
+    wlcRadiusSrvProfilePriority OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The RADIUS server with the lowest priority is the first
+	     used for request. If there is no response (see also the
+	     values Timeout and Retries) the RADIUS server with the
+	     next lowest priority will be used.
+	    "
+    ::= { wlcRadiusSrvProfileEntry 6 }
+
+    wlcRadiusSrvProfileTimeout OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The amount of milliseconds (1/1000s) waiting for an
+	     outstanding request.
+	    "
+    ::= { wlcRadiusSrvProfileEntry 7 }
+
+    wlcRadiusSrvProfileRetries OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of retries sent for each request, until the
+	     server state is set to inactive. Default value is 1.
+	     To prevent the radiusSrvState ever switch to inactive,
+	     set this value to 0.
+	    "
+	DEFVAL { 1 }
+    ::= { wlcRadiusSrvProfileEntry 8 }
+
+    wlcRadiusSrvProfileState OBJECT-TYPE
+        SYNTAX  INTEGER {
+            active(1),
+            inactive(2),
+            disabled(3),
+            delete(32)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When operational, the server state is active(1).
+	     If the RADIUS server does not respond, its state is set
+	     to inactive(2). The administrator can set the state
+	     manually to disabled(3), or delete(32) the entry.
+	    "
+        DEFVAL { active }
+    ::= { wlcRadiusSrvProfileEntry 9 }
+
+    wlcRadiusSrvProfileKeepAlive OBJECT-TYPE
+        SYNTAX  TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enables the periodicaly keep alive check of 'inactive'
+	     (see radiusSrvState) server.
+	    "
+        DEFVAL { true } 
+    ::= { wlcRadiusSrvProfileEntry 10 }
+
+-- **********************************************************************
+-- *    wlcAuthEapolProfileTable  TABLE
+-- **********************************************************************
+wlcAuthEapolProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcAuthEapolProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcRadiusSrvProfileTable describes 
+	     different auth eapol profiles.
+            "
+    ::= { wlc 8 }
+
+    wlcAuthEapolProfileEntry OBJECT-TYPE
+    SYNTAX  WlcAuthEapolProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcAuthEapolProfileIndex }
+    ::= { wlcAuthEapolProfileTable 1 }
+
+    WlcAuthEapolProfileEntry ::=
+    SEQUENCE {
+        wlcAuthEapolProfileIndex 		INTEGER,
+        wlcAuthEapolProfileAdminStatus          INTEGER,
+	wlcAuthEapolProfilePTK1Timeout		INTEGER,
+	wlcAuthEapolProfilePTK3Timeout		INTEGER,
+	wlcAuthEapolProfileGTKTimeout		INTEGER,
+	wlcAuthEapolProfilePairwiseUpdateCount	INTEGER,
+	wlcAuthEapolProfileGroupUpdateCount     INTEGER,
+	wlcAuthEapolProfileAuthPeriod		INTEGER,
+	wlcAuthEapolProfileQuietPeriod		INTEGER,
+	wlcAuthEapolProfileTxPeriod		INTEGER,
+	wlcAuthEapolProfileSuppTimeout		INTEGER,
+	wlcAuthEapolProfileReAuthPeriod		INTEGER,
+	wlcAuthEapolProfileReAuthEnabled	TruthValue,
+	wlcAuthEapolProfileMaxReq		INTEGER,
+	wlcAuthEapolProfileKeyTxEnabled		TruthValue
+    }
+    
+    wlcAuthEapolProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of a auth eapol profile.
+	    "
+    ::= { wlcAuthEapolProfileEntry 1 }
+
+    wlcAuthEapolProfileAdminStatus OBJECT-TYPE
+       SYNTAX INTEGER { enabled(1), delete(32) }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+       "Enable or delete the requested auth eapol profile.
+       "
+       DEFVAL { enabled }
+    ::= { wlcAuthEapolProfileEntry 2 }
+
+    wlcAuthEapolProfilePTK1Timeout OBJECT-TYPE
+        SYNTAX INTEGER (100..30000)
+        UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time after which the first EAPOL-key Message in the pairwise 
+	     temporal key negotiation phase (PTK1) is retransmitted if
+	     there is no reply from supplicant.
+	     Time can be changed in steps of 100 milliseconds.
+	    "
+        DEFVAL { 100 }
+    ::= { wlcAuthEapolProfileEntry 3 }
+
+    
+    wlcAuthEapolProfilePTK3Timeout OBJECT-TYPE
+        SYNTAX INTEGER (100..30000)
+        UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time after which the third EAPOL-key Message in the pairwise 
+	     temporal key negotiation phase (PTK3) is retransmitted if
+	     there is no reply from supplicant.
+	     Time can be changed in steps of 100 milliseconds.
+	    "
+        DEFVAL { 100 }
+    ::= { wlcAuthEapolProfileEntry 4 }
+
+    
+    wlcAuthEapolProfileGTKTimeout OBJECT-TYPE
+        SYNTAX INTEGER (100..30000)
+        UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time after which the first EAPOL-key Message in the group 
+	     temporal key negotiation phase (GTK) is retransmitted if
+	     there is no reply from supplicant.
+	     Time can be changed in steps of 100 milliseconds.
+	    "
+        DEFVAL { 500 }
+    ::= { wlcAuthEapolProfileEntry 5 }
+
+    
+    wlcAuthEapolProfilePairwiseUpdateCount OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of times EAPOL Message 1 and Message 3 in the 
+	     pairwise temporal key negotiation phase (PTK) will be 
+	     retried.
+	    "
+        DEFVAL { 3 }
+    ::= { wlcAuthEapolProfileEntry 6 }
+
+    
+    wlcAuthEapolProfileGroupUpdateCount OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of times Message 1 in the group temporal key 
+	     negotiation phase (GTK) will be retried.
+	    "
+        DEFVAL { 3 }
+    ::= { wlcAuthEapolProfileEntry 7 }
+
+    
+    wlcAuthEapolProfileAuthPeriod OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time after a disassociation/deauthentication
+	     should be committed by the client if there is no 
+	     EAPOL Message from authenticator.
+	     Time can be changed in steps of 1 seconds.
+	    "
+        DEFVAL { 30 } 
+    ::= { wlcAuthEapolProfileEntry 8 }
+
+    
+    wlcAuthEapolProfileQuietPeriod OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Period of time during which the authenticator will 
+	     not attempt to acquire a supplicant.
+	     Time can be changed in steps of 1 seconds.
+ 	     Default value is 60 seconds.
+	    "
+        DEFVAL { 60 }
+    ::= { wlcAuthEapolProfileEntry 9 }
+
+    
+    wlcAuthEapolProfileTxPeriod OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A period used by the authenticator PAE state machine 
+	     to determine when an EAPOL PDU is to be transmitted.
+	     Time can be changed in steps of 1 seconds.
+ 	     Default value is 30 seconds.
+	    "
+        DEFVAL { 30 }
+    ::= { wlcAuthEapolProfileEntry 10 }
+
+    
+    wlcAuthEapolProfileSuppTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..3600)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A timeout used by the backend authentication state machine 
+	     in order to determine timeout conditions in the exchanges 
+	     between the authenticator and the supplicant.
+	     Time can be changed in steps of 1 seconds.
+ 	     Default value is 30 seconds.
+	    "
+        DEFVAL { 30 }
+    ::= { wlcAuthEapolProfileEntry 11 }
+
+    
+    wlcAuthEapolProfileReAuthPeriod OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A period used by the reauthentication timer state machine 
+	     to determine when reauthentication of the supplicant takes place.
+	     Time can be changed in steps of 1 seconds.
+ 	     Default value is 3600 seconds.
+	    "
+        DEFVAL { 3600 }
+    ::= { wlcAuthEapolProfileEntry 12 }
+
+    
+    wlcAuthEapolProfileReAuthEnabled OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state variable reAuthEnabled controls
+	     whether periodic reauthentication takes place.
+ 	     Default value is false.
+	    "
+        DEFVAL { false }
+    ::= { wlcAuthEapolProfileEntry 13 }
+
+    
+    wlcAuthEapolProfileMaxReq OBJECT-TYPE
+        SYNTAX INTEGER (1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of times that the state machine will 
+	     retransmit an EAP Request packet to the supplicant before 
+	     it times out the authentication session.
+ 	     Default value is 2.
+	    "
+        DEFVAL { 2 }
+    ::= { wlcAuthEapolProfileEntry 14 }
+
+    
+    wlcAuthEapolProfileKeyTxEnabled OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The EAPOL protocol optionally supports the transmission
+	     of global key information from the Authenticator to the 
+	     Supplicant, following a successful authentication exchange, 
+	     in circumstances in which encryption is available between 
+	     the Supplicant and Authenticator systems (e.g., where 
+	     encryption is used on an 802.11 association between a 
+	     station and an access point). The use of this facility is 
+	     controlled by the KeyTransmissionEnabled parameter. A 
+	     value of TRUE allows key information to be transmitted 
+	     following authorization; a value of FALSE disables the 
+	     key transmission capability.
+
+             Default value is false.
+	    "
+        DEFVAL { false }
+    ::= { wlcAuthEapolProfileEntry 15 }
+
+-- **********************************************************************
+-- *    wlcWTPGlobalProfileTable  TABLE
+-- **********************************************************************
+wlcWTPGlobalProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWTPGlobalProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table cotains WTP debug level settings 
+            "
+    ::= { wlc 9 }
+
+    wlcWTPGlobalProfileEntry OBJECT-TYPE
+    SYNTAX  WlcWTPGlobalProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcWTPGlobalProfileIndex }
+    ::= { wlcWTPGlobalProfileTable 1 }
+
+    WlcWTPGlobalProfileEntry ::=
+    SEQUENCE {
+        wlcWTPGlobalProfileIndex 	INTEGER,
+	wlcWTPGlobalProfileDebugType	INTEGER,
+	wlcWTPGlobalProfileDebugLevel	INTEGER,
+        wlcWTPGlobalProfileAdminStatus  INTEGER
+    }
+    
+    wlcWTPGlobalProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of a global profile.
+	    "
+    ::= { wlcWTPGlobalProfileEntry 1 }  
+ 
+    wlcWTPGlobalProfileDebugType OBJECT-TYPE
+        SYNTAX INTEGER {
+	    common(1),
+	    authentication(2),
+            access-point(3),
+	    bridge(4),
+	    client(5),
+            lowlevel(6),
+	    all(7)
+	}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Wireless LAN Controler degugging type. With type common(1) debugging messages
+             of authentication, access_point, bridge and client 
+             handling will be shown. With type 
+             authentication(2) only messages concerning the authentication 
+             handling (mainly WPA) will be shown. With type access_point(3)
+             only messages concerning the access_point handling
+             will be shown. With type bridge(4) only messages concerning
+             the bridge handling will be shown. With type client(5) only
+             messages concerning the client (wlanIfType == client) will be
+             shown. With type lowlevel(6) messages concerning the 802.11 layer
+             and lowlevel driver handling will be shown. With type all(7) all
+             messages of all types will be shown. Default is common(1).
+             Additionally within all types messages concerning generally WLAN
+             handling will be shown.
+	    "
+        DEFVAL { common }
+    ::= { wlcWTPGlobalProfileEntry 3 }
+    
+    wlcWTPGlobalProfileDebugLevel OBJECT-TYPE
+        SYNTAX INTEGER { quiet(1), normal(2), verbose(3), very-verbose(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "WLC degugging verbosity level. With a higher value
+             more debugging information will be created.
+	     Default is normal(2).
+	    "
+        DEFVAL { normal }
+    ::= { wlcWTPGlobalProfileEntry 4 }
+    
+    wlcWTPGlobalProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { unmanaged(1), managed(2), delete(32) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "WLC global AdminStatus. The AP could be used
+             unmanaged(1) and must therefore be configured directly 
+             or managed(2) by a WLAN controller. Delete(32) deletes the
+	     required profile.
+	     Default is managed(1).
+	    "
+        DEFVAL { managed }
+    ::= { wlcWTPGlobalProfileEntry 5 }
+
+-- **********************************************************************
+-- *    wlcLogHostTable  TABLE
+-- **********************************************************************
+wlcLogHostTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcLogHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table combines WTP with the log host profile.
+            "
+    ::= { wlc 10 }
+
+    wlcLogHostEntry OBJECT-TYPE
+    SYNTAX  WlcLogHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcLogHostIndex }
+    ::= { wlcLogHostTable 1 }
+
+    WlcLogHostEntry ::=
+    SEQUENCE {
+        wlcLogHostIndex 	INTEGER,
+        wlcLogHostAdminStatus   INTEGER,
+	wlcLogHostProfIndex 	INTEGER
+    }
+ 
+    wlcLogHostIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The wlcLogHostIndex is the unique WTP index.
+	    "
+    ::= { wlcLogHostEntry 1 }
+   
+    wlcLogHostAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable or delete the log host profile
+	 from the requested WTP.
+        "
+        DEFVAL { enabled }
+    ::= { wlcLogHostEntry 2 }
+
+    wlcLogHostProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable contains the unique 
+	     log host profile index.
+	    "
+    ::= { wlcLogHostEntry 3 }
+
+-- **********************************************************************
+-- *    wlcLogHostProfileTable  TABLE
+-- **********************************************************************
+wlcLogHostProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcLogHostProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcLogHostProfileTable contains profiles 
+	     to list hosts which are to receive syslog messages.
+	     This table also defines which types and levels of
+	     messages to send.
+            "
+    ::= { wlc 11 }
+
+    wlcLogHostProfileEntry OBJECT-TYPE
+    SYNTAX  WlcLogHostProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcLogHostProfileIndex }
+    ::= { wlcLogHostProfileTable 1 }
+
+    WlcLogHostProfileEntry ::=
+    SEQUENCE {
+        wlcLogHostProfileIndex 		INTEGER,
+	wlcLogHostProfileAddrType       InetAddressType,
+        wlcLogHostProfileAddr  		IpAddress,
+	wlcLogHostProfileLevel 		INTEGER,
+	wlcLogHostProfileFacility	INTEGER,
+	wlcLogHostProfileType		INTEGER,
+	wlcLogHostProfileTimestamp	INTEGER,
+	wlcLogHostProfileMethod		INTEGER
+    }
+    
+    wlcLogHostProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of a loghost profile
+	    "
+    ::= { wlcLogHostProfileEntry 1 }
+
+    wlcLogHostProfileAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address type of the requested loghost.
+	     could be:
+	        -unknown(0): an unknown address type
+		-ipv4(1)   : an IPv4 address
+		-ipv6(2)   : an IPv6 address
+		-ipv4z(3)  : a non-global IPv4 address including a zone
+                     	     index
+		-ipv6z(4)  : a non-global IPv6 address including a zone
+                     	     index
+		-dns(16)   : a DNS domain name
+	    "
+    ::= { wlcLogHostProfileEntry 2 }
+ 
+    wlcLogHostProfileAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "IP Address where syslog messages are sent. If the
+	     facility is set to memory or console, this field is
+	     not used.
+	    "
+    ::= { wlcLogHostProfileEntry 3 }
+    
+    wlcLogHostProfileLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+            emerg(1),
+            alert(2),
+            crit(3),
+            err(4),
+            warning(5),
+            notice(6),
+            info(7),
+            debug(8),
+            delete(32)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Priorities lower than or equal to this level are sent to
+	     loghost.
+             The delete priority is used to discard the whole entry.
+	    "
+        DEFVAL { info }
+    ::= { wlcLogHostProfileEntry 4 }
+    
+    wlcLogHostProfileFacility OBJECT-TYPE
+        SYNTAX  INTEGER {
+            local0(1),
+            local1(2),
+            local2(3),
+            local3(4),
+            local4(5),
+            local5(6),
+            local6(7),
+            local7(8)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The facility used for the syslog messages being generated.
+	    "
+        DEFVAL { local0 }
+    ::= { wlcLogHostProfileEntry 5 }
+    
+    wlcLogHostProfileType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            system(1),
+            acct(2),
+            all(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The subject of the messages that are to be generated. system
+             means all subjects except accounting, all means all subjects.
+	    "
+        DEFVAL { all }
+    ::= { wlcLogHostProfileEntry 6 }
+    
+    wlcLogHostProfileTimestamp OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none(1),
+            time(2),
+            all(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object describes the format of the timestamp.
+	        none(1)  = no timestamp,
+		time(2)  = only time is printed,
+		all(3)   = date and time is printed.
+	    "
+        DEFVAL { all }
+    ::= { wlcLogHostProfileEntry 7 }
+    
+    wlcLogHostProfileMethod OBJECT-TYPE
+        SYNTAX  INTEGER {
+            udp(1),
+            tcp(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object provides protocol for sending syslog messages:
+	        udp(1)  = udp
+		tcp(2)  = tcp
+	    "
+        DEFVAL { udp }
+    ::= { wlcLogHostProfileEntry 8 }
+
+-- disabled until supported: wlcScheduleTable { wlc 12 }
+-- disabled until supported: wlcScheduleProfileTable { wlc 13 }
+
+-- **********************************************************************
+-- *    wlcLocalServicesTable  TABLE
+-- **********************************************************************
+wlcLocalServicesTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcLocalServicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table combines WTP with the local services profile.
+            "
+    ::= { wlc 14 }
+
+    wlcLocalServicesEntry OBJECT-TYPE
+    SYNTAX  WlcLocalServicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcLocalServicesIndex }
+    ::= { wlcLocalServicesTable 1 }
+
+    WlcLocalServicesEntry ::=
+    SEQUENCE {
+        wlcLocalServicesIndex 		INTEGER,
+        wlcLocalServicesAdminStatus     INTEGER,
+	wlcLocalServicesProfIndex	INTEGER
+    }
+ 
+    wlcLocalServicesIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable contains the unique WTP index.
+	    "
+    ::= { wlcLocalServicesEntry 1 }
+   
+     wlcLocalServicesAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable or delete the local services profile
+	 from the requested WTP
+        "
+        DEFVAL { enabled }
+    ::= { wlcLocalServicesEntry 2 }
+
+    wlcLocalServicesProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable contains the unique RADIUS
+	     service profile index.
+	    "
+    ::= { wlcLocalServicesEntry 3 }
+
+-- **********************************************************************
+-- *    wlcLocalServicesProfileTable  TABLE
+-- **********************************************************************
+wlcLocalServicesProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcLocalServicesProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains configuration profiles for 
+	     local services (e.g. httpd, sshd) on the WTP.
+            "
+    ::= { wlc 15 }
+
+    wlcLocalServicesProfileEntry OBJECT-TYPE
+    SYNTAX  WlcLocalServicesProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcLocalServicesProfileIndex }
+    ::= { wlcLocalServicesProfileTable 1 }
+
+    WlcLocalServicesProfileEntry ::=
+    SEQUENCE {
+	wlcLocalServicesProfileIndex		INTEGER,
+        wlcLocalServicesProfileAdminStatus      INTEGER,
+	wlcLocalServicesProfileName		DisplayString,
+	wlcLocalServicesProfilePort		INTEGER,
+	wlcLocalServicesProfilePortRange	INTEGER,
+        wlcLocalServicesProfileProtocol         INTEGER
+    }
+    
+    wlcLocalServicesProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique local services profile index
+	    "
+    ::= { wlcLocalServicesProfileEntry 1 }
+   
+    wlcLocalServicesProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The administrative status of this entry.
+	     The entry can be enabled(1), disabled(2) or set to delete(32)
+	     and is therefore deleted.
+	     Default is enabled(1).
+	    "
+        DEFVAL { enabled }
+    ::= { wlcLocalServicesProfileEntry 2 }
+
+    wlcLocalServicesProfileName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The name of the ServicesProfile entry.
+	    "
+    ::= { wlcLocalServicesProfileEntry 3 }
+    
+    wlcLocalServicesProfilePort OBJECT-TYPE
+        SYNTAX INTEGER ( -1..65535 )
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port number. 
+	    "
+    ::= { wlcLocalServicesProfileEntry 4 }
+    
+    wlcLocalServicesProfilePortRange OBJECT-TYPE
+        SYNTAX INTEGER ( 1..65536 )
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port range.
+	    "
+    ::= { wlcLocalServicesProfileEntry 5 }
+    
+    wlcLocalServicesProfileProtocol OBJECT-TYPE
+        SYNTAX INTEGER {
+            icmp(1),
+            igmp(2),
+            ip(4),
+            tcp(6),
+            udp(17),
+            udptcp(253),
+            any(254),
+            dont-verify(256)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The protocol type of this entry.
+	    "
+        DEFVAL { udptcp }
+    ::= { wlcLocalServicesProfileEntry 6 }
+	
+-- **********************************************************************
+-- *    wlcWlanIfTable  TABLE
+-- **********************************************************************
+wlcWlanIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWlanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcWlanIfTable contains all WLAN interfaces of each WTP 
+             with their configured profiles.
+            "
+    ::= { wlc 16 }
+
+    wlcWlanIfEntry OBJECT-TYPE
+    SYNTAX  WlcWlanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcWlanIfIndex }
+    ::= { wlcWlanIfTable 1 }
+
+    WlcWlanIfEntry ::=
+    SEQUENCE {
+        wlcWlanIfIndex 			INTEGER,
+        wlcWlanIfWTPIndex		INTEGER,
+        wlcWlanIfWTPMacAddress          MacAddress,
+	wlcWlanIfProfIndex		INTEGER,
+	wlcWlanIfType			INTEGER,
+	wlcWlanIfChannel		INTEGER,
+	wlcWlanIfAutoSelectedChannel	INTEGER,
+	wlcWlanIfSecondaryChannel	INTEGER,
+	wlcWlanIfAutoSecondaryChannel	INTEGER,
+	wlcWlanIfTxPower		INTEGER,
+        wlcWlanIfClientScanState        INTEGER,
+	wlcWlanIfClientIndex		INTEGER,
+        wlcWlanIfHWIndex                INTEGER,
+        wlcWlanIfRadioIndexWTP          INTEGER,
+        wlcWlanIfRadioNumber            INTEGER
+    }
+    
+    wlcWlanIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique index which is incremented for each new WLAN interface entry.
+	    "
+    ::= { wlcWlanIfEntry 1 }
+    
+    wlcWlanIfWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The wlcWlanIfWTPIndex is the uniqe WTP index
+	     see wlcWTPIndex.
+	    "
+    ::= { wlcWlanIfEntry 2 }
+	
+    wlcWlanIfWTPMacAddress OBJECT-TYPE
+        SYNTAX MacAddress 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "wlcWlanIfWTPMacAddress is the first ethernet 
+	     MAC address of the WTP.
+	    "
+    ::= { wlcWlanIfEntry 3 }
+	    
+    wlcWlanIfProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The wlcWlanIfProfIndex is the configured WLAN interface profile.
+	     See wlcWlanIfProfileIndex.
+	    "
+    ::= { wlcWlanIfEntry 4 }
+	    
+    wlcWlanIfType OBJECT-TYPE
+        SYNTAX INTEGER { off(1), 
+                         access-point(2), 
+                         client(3),
+                         default(7), 
+                         delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The current WLAN physical interface type for the WTP
+	         off(1)		 interface disabled
+	         access-point(2) access point
+	         client(3)	 client mode
+	         default(4)	 the type of the corresponding wlcWlanIfProfile
+	         delete(32)      delete
+	    "
+        DEFVAL { default }
+    ::= { wlcWlanIfEntry 5 }
+	    
+    wlcWlanIfChannel OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The physical channel.
+	    "
+    ::= { wlcWlanIfEntry 6 }
+	    
+    wlcWlanIfAutoSelectedChannel OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The auto selected channel.
+	    "
+    ::= { wlcWlanIfEntry 7 }  
+
+    wlcWlanIfSecondaryChannel OBJECT-TYPE
+        SYNTAX INTEGER { below(1), above(2), default(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The wlcWlanIfSecondaryChannel describes 
+	     if the secondary channel (40Mhz bandwidth) is below(1) or above(2)
+	     of the current selected channel.
+	    "
+	DEFVAL { below }
+    ::= { wlcWlanIfEntry 8 }
+	    
+    wlcWlanIfAutoSecondaryChannel OBJECT-TYPE
+        SYNTAX INTEGER { below(1), above(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The wlcWlanIfAutoSecondaryChannel describes 
+	     if the secondary channel (40Mhz bandwidth) is below(1) or above(2)
+	     of the auto selected channel.
+	    "
+	DEFVAL { below }
+    ::= { wlcWlanIfEntry 9 }
+	    
+    wlcWlanIfTxPower OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "dBm"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Transmitter output power in dBm.
+	    "
+    ::= { wlcWlanIfEntry 10 }
+    
+    wlcWlanIfClientScanState OBJECT-TYPE
+       SYNTAX INTEGER { idle(1), scanning(2), update(3) }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+	    "This attribute holds the foreground scanning status.
+	     Writing scanning(2) in idle state triggers a new 
+	     foreground scan cycle. All entries for this client 
+	     interface in the wlcScanResultsTable are removed.
+	     When the WLAN client has finished scanning, the attribute 
+	     changes back to idle(1), wlcScanResultsTable is
+	     updated automatically.
+	     To update wlcScanResultsTable without triggering a new 
+	     foreground scan, you can write update(3) to this attribute. 
+	     This causes wlcScanResultsTable to be updated immedieately, 
+	     reflecting any changes detected by automatic backgound scanning. 
+	     After wlcScanResultsTable is updated, the value switches back 
+	     to state idle(1).
+	     Any attempt to write different values, or to write values in a 
+	     state different from idle(1), is ignored.
+	    "
+       DEFVAL { idle }
+    ::= { wlcWlanIfEntry 11 }
+
+    wlcWlanIfClientIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Index pointer to the wlcClientProfileTable.
+	    "
+    ::= { wlcWlanIfEntry 12 }
+
+    wlcWlanIfHWIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Index pointer to the wlcWlanHWTable.
+	    "
+    ::= { wlcWlanIfEntry 13 }
+	    
+    wlcWlanIfRadioIndexWTP OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "WLAN interface index on the WTP.
+	    "
+    ::= { wlcWlanIfEntry 14 }
+
+    wlcWlanIfRadioNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The radio number.
+	    "
+        DEFVAL { 0 }
+    ::= { wlcWlanIfEntry 15 }
+
+-- **********************************************************************
+-- *    wlcWlanIfProfileTable  TABLE
+-- **********************************************************************
+wlcWlanIfProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWlanIfProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains WLAN interface profiles.
+            "
+    ::= { wlc 17 }
+
+    wlcWlanIfProfileEntry OBJECT-TYPE
+    SYNTAX  WlcWlanIfProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcWlanIfProfileIndex }
+    ::= { wlcWlanIfProfileTable 1 }
+
+    WlcWlanIfProfileEntry ::=
+    SEQUENCE {
+        wlcWlanIfProfileIndex 			INTEGER,
+	wlcWlanIfProfileName                    DisplayString,
+        wlcWlanIfProfileType			INTEGER,
+	wlcWlanIfProfileMode			INTEGER,
+	wlcWlanIfProfileSpeed			INTEGER,
+	wlcWlanIfProfileSkipChannels24GHz	BITS,
+	wlcWlanIfProfileSkipChannels5GHz	BITS,
+	wlcWlanIfProfileRtsThreshold		INTEGER,
+	wlcWlanIfProfileFragmentationThreshold	INTEGER,
+	wlcWlanIfProfileBurst			INTEGER,
+	wlcWlanIfProfileCountry			DisplayString,
+	wlcWlanIfProfileBand			INTEGER,
+	wlcWlanIfProfileAckWindow		INTEGER,
+	wlcWlanIfProfileBeaconPeriod		INTEGER,
+	wlcWlanIfProfileDTIMPeriod		INTEGER,
+	wlcWlanIfProfileSpatialStreams		INTEGER,
+	wlcWlanIfProfileGreenfield		TruthValue,
+	wlcWlanIfProfileShortGI			TruthValue,
+	wlcWlanIfProfileRxSTBC			TruthValue,
+	wlcWlanIfProfileTxSTBC			TruthValue,
+	wlcWlanIfProfileFortyMHzOperation	TruthValue,
+	wlcWlanIfProfileShortRetry		INTEGER,
+	wlcWlanIfProfileLongRetry		INTEGER,
+	wlcWlanIfProfileBgScanning              INTEGER,
+	wlcWlanIfProfileAirtimeFairness         INTEGER,
+	wlcWlanIfProfileBandwidth               INTEGER,
+	wlcWlanIfProfilePresenceAnalytics       INTEGER,
+	wlcWlanIfProfileACSOnBlocker            INTEGER
+    }
+    
+    wlcWlanIfProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique index of a WIFI interface profile.
+	    "
+    ::= { wlcWlanIfProfileEntry 1 }
+	    
+    wlcWlanIfProfileName OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The name of the requested profile.
+	    "
+    ::= { wlcWlanIfProfileEntry 2 }
+	
+    wlcWlanIfProfileType OBJECT-TYPE
+        SYNTAX INTEGER { off(1),
+                         access-point(2),
+                         client(3),
+                         delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The WLAN physical interface type:
+	         off(1)			interface disabled
+	         access-point(2)	access point
+	         client(3)		client mode
+	         delete(32)		delete
+	    "
+        DEFVAL { off }
+    ::= { wlcWlanIfProfileEntry 3 }
+	
+    wlcWlanIfProfileMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            m802-11b(1),
+            m802-11g(2),
+            m802-11mixed(3),
+            m802-11mixed-long(4),
+            m802-11mixed-short(5),
+            m802-11a(6),
+            m802-11bgn(7),
+            m802-11gn(8),
+            m802-11n(10),
+            m802-11an(11),
+            m802-11abg(12),
+            m802-11abgn(13),
+            m802-11agn(14),
+            m802-11anac(15),
+            m802-11nac(16),
+            m802-11ac(17)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Mixed and compatibility modes between various 802.11 substandards.
+	    "
+        DEFVAL { m802-11bgn }
+    ::= { wlcWlanIfProfileEntry 4 }
+
+    wlcWlanIfProfileSpeed OBJECT-TYPE
+        SYNTAX  INTEGER {
+            s1mbit(1),
+            s2mbit(2),
+            s5mbit(3),
+            s6mbit(4),
+            s9mbit(5),
+            s11mbit(6),
+            s12mbit(7),
+            s18mbit(8),
+            s24mbit(9),
+            s36mbit(10),
+            s48mbit(11),
+            s54mbit(12),
+            sMCS0-HT(13),
+            sMCS1-HT(14),
+            sMCS2-HT(15),
+            sMCS3-HT(16),
+            sMCS4-HT(17),
+            sMCS5-HT(18),
+            sMCS6-HT(19),
+            sMCS7-HT(20),
+            sMCS8-HT(21),
+            sMCS9-HT(22),
+            sMCS10-HT(23),
+            sMCS11-HT(24),
+            sMCS12-HT(25),
+            sMCS13-HT(26),
+            sMCS14-HT(27),
+            sMCS15-HT(28),
+
+            auto(31),
+
+            sMCS16-HT(32),
+            sMCS17-HT(33),
+            sMCS18-HT(34),
+            sMCS19-HT(35),
+            sMCS20-HT(36),
+            sMCS21-HT(37),
+            sMCS22-HT(38),
+            sMCS23-HT(39)
+
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The value defines the bitrate or the coding scheme to use for data frames.
+	     Default value auto(31) enables automatic rate adaption.
+	    "
+        DEFVAL { auto }
+    ::= { wlcWlanIfProfileEntry 5 }
+
+	wlcWlanIfProfileSkipChannels24GHz OBJECT-TYPE
+        SYNTAX BITS {
+		  channel-1(0),
+		  channel-2(1),
+		  channel-3(2),
+		  channel-4(3),
+		  channel-5(4),
+		  channel-6(5),
+		  channel-7(6),
+		  channel-8(7),
+		  channel-9(8),
+		  channel-10(9),
+		  channel-11(10),
+		  channel-12(11),
+		  channel-13(12),
+		  channel-14(13)
+		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "If a bit is set the according channel will be skipped from
+	     the channel scan list (channel 1-14 for 2.4 GHz).
+	     Default is scan channels 1, 6 and 11.
+	    "
+	DEFVAL { { channel-2, channel-3, channel-4, channel-5, channel-7, channel-8, channel-9, channel-10, channel-12, channel-13, channel-14 } } 
+    ::= { wlcWlanIfProfileEntry 6 }
+
+	wlcWlanIfProfileSkipChannels5GHz OBJECT-TYPE
+        SYNTAX BITS {
+		  channel-36(0),
+		  channel-40(1),
+		  channel-44(2),
+		  channel-48(3),
+		  channel-52(4),
+		  channel-56(5),
+		  channel-60(6),
+		  channel-64(7),
+		  channel-100(8),
+		  channel-104(9),
+		  channel-108(10),
+		  channel-112(11),
+		  channel-116(12),
+		  channel-120(13),
+		  channel-124(14),
+		  channel-128(15),
+		  channel-132(16),
+		  channel-136(17),
+		  channel-140(18),
+		  channel-149(19),
+		  channel-153(20),
+		  channel-157(21),
+		  channel-161(23),
+		  channel-165(24),
+                  channel-169(25),
+		  channel-173(26)
+		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "If a bit is set the accordingly channel will be skipped from
+	     the channel scan list (channel 36-173 for 5 GHz).
+	     Default is scan all channels except 120, 124 and 128.
+	    "
+	DEFVAL { { channel-120, channel-124, channel-128 } }
+    ::= { wlcWlanIfProfileEntry 7 }
+
+    wlcWlanIfProfileRtsThreshold OBJECT-TYPE
+        SYNTAX INTEGER (1..2347)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute shall indicate the number of octets in an
+	     MPDU, below which an RTS/CTS handshake shall not be
+	     performed, except as RTS/CTS is used as a cross modulation
+	     protection mechanism. An RTS/CTS
+	     handshake shall be performed at the beginning of any frame
+	     exchange sequence where the MPDU is of type Data or
+	     Management, the MPDU has an individual address in the
+	     Address1 field, and the length of the MPDU is greater than
+	     this threshold. Setting this attribute to be larger than the
+	     maximum MSDU size shall have the effect of turning off the
+	     RTS/CTS handshake for frames of Data or Management type
+	     transmitted by this STA. Setting this attribute to one 
+	     shall have the effect of turning on the RTS/CTS handshake
+	     for all frames of Data or Management type transmitted by
+	     this STA. The default value of this attribute shall be
+	     2347.
+	    "
+        DEFVAL { 2347 }
+    ::= { wlcWlanIfProfileEntry 8 }
+
+    wlcWlanIfProfileFragmentationThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute shall specify the current maximum size, in
+	     octets, of the PSDU that may be delivered to the PHY.
+	     This maximum size does not apply in the case of A-MPDU. An
+	     MSDU, A-MSDU or MMPDU shall be broken into fragments if its
+	     size exceeds the value of this attribute after adding MAC
+	     headers and trailers. An MSDU, A-MSDU or MMPDU shall be
+	     fragmented when the resulting frame has an individual address
+	     in the Address1 field, and the length of the frame is larger
+	     than this threshold. The default value for this attribute
+	     shall be the lesser of 8000 or the aMPDUMaxLength or the
+	     aPSDUMaxLength of the attached PHY and shall never exceed the
+	     lesser of 8000 or the aMPDUMaxLength or the
+	     aPSDUMaxLength of the attached PHY. The value of this
+	     attribute shall never be less than 256.
+	     Default is 2346.
+	    "
+        DEFVAL { 2346 }
+    ::= { wlcWlanIfProfileEntry 9 }
+
+    wlcWlanIfProfileBurst OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Sending wireless frames without backoff time.
+	    "
+	DEFVAL { disabled }
+    ::= { wlcWlanIfProfileEntry 10 }
+
+    wlcWlanIfProfileCountry OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..3))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute identifies the country in which the station is operating.
+	     The first two octets of this string are the two character country code as
+	     described in document ISO/IEC 3166-1. The third octet shall be one of the
+	     following:
+	     1. an ASCII space character, if the regulations under which the
+	     station is operating encompass all environments in the country,
+	     2. an ASCII 'O' character, if the regulations under which the
+	     station is operating are for an Outdoor environment only, or
+	     3. an ASCII 'I' character, if the regulations under which the
+	     station is operating are for an Indoor environment only.
+	    "
+        DEFVAL { "DE " }
+    ::= { wlcWlanIfProfileEntry 11 }
+
+    wlcWlanIfProfileBand OBJECT-TYPE
+        SYNTAX INTEGER { b24-GHz(1), b5-GHz(2), b58-GHz(3), b24-5-GHz(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Frequency band. 'b24-GHz' -> 2.4 GHz band, 'b5-GHz' -> 5 GHz band,
+	     'b58-GHz' -> 5.8 GHz band, 'b24-5-GHz' -> 2.4 GHz and 5 GHz band.
+	    "
+        DEFVAL { b24-GHz }
+    ::= { wlcWlanIfProfileEntry 12 }
+
+    wlcWlanIfProfileAckWindow OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS "microseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Additional 802.11 ACK timeout in microseconds.
+	     This must be set to non-zero value for radio distances 
+	     larger than about 700m.
+	     Recommended setting is about 10 microseconds per kilometer.
+	    "
+        DEFVAL { 0 }
+    ::= { wlcWlanIfProfileEntry 13 }
+
+    wlcWlanIfProfileBeaconPeriod OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the number of TU that this 
+	     BSS uses for scheduling Beacon transmissions.
+	    "
+        DEFVAL { 100 } 
+    ::= { wlcWlanIfProfileEntry 14 }
+
+    wlcWlanIfProfileDTIMPeriod OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The number of DTIM intervals between 
+	     the start of CFPs for this BSS.
+	    "
+        DEFVAL { 2 }
+    ::= { wlcWlanIfProfileEntry 15 }
+
+    wlcWlanIfProfileSpatialStreams OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute indicates the maximum number of spatial
+	     streams enabled. The default value of this attribute is 3.
+	    "
+        DEFVAL { 3 }
+    ::= { wlcWlanIfProfileEntry 16 }
+
+	wlcWlanIfProfileGreenfield OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the HT Greenfield
+	     option is enabled. The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanIfProfileEntry 17 }
+
+	wlcWlanIfProfileShortGI OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the Short Guard
+	     option is enabled for 40 MHz operation. The default value of this attribute
+	     is TRUE.
+	    "
+        DEFVAL { true }
+    ::= { wlcWlanIfProfileEntry 18 }
+
+	wlcWlanIfProfileRxSTBC OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the entity's
+	     capability of receiving frames that are sent using the Space-Time Block Code
+	     (STBC) is enabled. The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanIfProfileEntry 19 }
+
+	wlcWlanIfProfileTxSTBC OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the entity's
+	     capability of transmitting frames using Space-Time Block Code (STBC) option
+	     is enabled. The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanIfProfileEntry 20 }
+
+	wlcWlanIfProfileFortyMHzOperation OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the 40 MHz
+	     Operation is enabled. The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanIfProfileEntry 21 }
+
+	wlcWlanIfProfileShortRetry OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute shall indicate the maximum number of
+	     transmission attempts of a frame, the length of which is less
+	     than or equal to dot11RTSThreshold, that shall be made before a
+	     failure condition is indicated. The default value of this
+	     attribute shall be 7.
+	    "
+        DEFVAL { 7 } 
+    ::= { wlcWlanIfProfileEntry 22 }
+
+	wlcWlanIfProfileLongRetry OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute shall indicate the maximum number of
+	     transmission attempts of a frame, the length of which is
+	     greater than dot11RTSThreshold, that shall be made before a
+	     failure condition is indicated. The default value of this
+	     attribute shall be 4.
+	    "
+        DEFVAL { 4 }
+    ::= { wlcWlanIfProfileEntry 23 }
+	
+    wlcWlanIfProfileBgScanning OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Enable/disable background-scanning.
+	    "
+        DEFVAL { disabled }
+    ::= { wlcWlanIfProfileEntry 24 }
+
+    wlcWlanIfProfileAirtimeFairness OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "If AirtimeFairness is enabled(1), background or best-effort traffic
+	    sent from AP to STA is fairly scheduled among all stations
+	    associated to this radio profile, in respect of airtime usage.
+	    The default value of this attribute is enabled(1)."
+        DEFVAL { disabled }
+    ::= { wlcWlanIfProfileEntry 25 }
+
+    wlcWlanIfProfileBandwidth OBJECT-TYPE
+        SYNTAX INTEGER { unused(1), b20MHz(2), b40MHz(3), b80MHz(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+            "This attribute configures the maximum bandwidth. If this
+             value is not equal to unused(1), this variable overwrite
+             the value of wlcWlanIfProfileFortyMHzOperation."
+        DEFVAL { unused }
+    ::= { wlcWlanIfProfileEntry 26}
+
+    wlcWlanIfProfilePresenceAnalytics OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/disable WLAN probe capturing on this interface."
+        DEFVAL { disabled }
+    ::= { wlcWlanIfProfileEntry 27 } 
+
+    wlcWlanIfProfileACSOnBlocker OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When enabled(1), the radio module will switch to a new channel
+             on presence of a blocking signal."
+        DEFVAL { enabled }
+    ::= { wlcWlanIfProfileEntry 28 }
+
+-- **********************************************************************
+-- *    wlcClientProfileTable  TABLE
+-- **********************************************************************
+wlcClientProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcClientProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains WTP radio client profiles.
+            "
+    ::= { wlc 18 }
+
+    wlcClientProfileEntry OBJECT-TYPE
+    SYNTAX  WlcClientProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcClientProfileIndex }
+    ::= { wlcClientProfileTable 1 }
+
+    WlcClientProfileEntry ::=
+    SEQUENCE {
+        wlcClientProfileIndex 		INTEGER,
+	wlcClientProfileScanPeriodAMin	INTEGER,
+	wlcClientProfileScanPeriodAMax	INTEGER,
+	wlcClientProfileScanPeriodMin	INTEGER,
+	wlcClientProfileScanPeriodMax	INTEGER,
+	wlcClientProfileAdminStatus	INTEGER
+    }
+    
+    wlcClientProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique Client profile index.
+	    "
+    ::= { wlcClientProfileEntry 1 }
+	    
+    wlcClientProfileScanPeriodAMin OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Minimum time in ms to spend on a frequency when active
+	     scanning.  
+	     Default is 10ms.
+	    "
+        DEFVAL { 10 }
+    ::= { wlcClientProfileEntry 2 }
+	    
+    wlcClientProfileScanPeriodAMax OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Maximum time in ms to spend on a frequency when active
+	     scanning.  
+	     Default is 40ms.
+	    "
+        DEFVAL { 40 }
+    ::= { wlcClientProfileEntry 3 }
+	    
+    wlcClientProfileScanPeriodMin OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Minimum time in ms to spend on a frequency when passive
+	     scanning.  
+	     Default is 20ms.
+	    "
+        DEFVAL { 20 }
+    ::= { wlcClientProfileEntry 4 }
+	    
+    wlcClientProfileScanPeriodMax OBJECT-TYPE
+        SYNTAX INTEGER
+	UNITS  "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Maximum time in ms to spend on a frequency when passive
+	     scanning.  
+	     Default is 120ms.
+	    "
+        DEFVAL { 120 }
+    ::= { wlcClientProfileEntry 5 }
+	    
+    wlcClientProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Enable or delte the requested WLAN client profile.
+	    "
+        DEFVAL { enabled }
+    ::= { wlcClientProfileEntry 7 }
+	
+-- **********************************************************************
+-- *    wlcVSSTable  TABLE
+-- **********************************************************************
+wlcVSSTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcVSSEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table combines WTP with the VSS profile.
+            "
+    ::= { wlc 19 }
+
+    wlcVSSEntry OBJECT-TYPE
+    SYNTAX  WlcVSSEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcVSSIndex }
+    ::= { wlcVSSTable 1 }
+
+    WlcVSSEntry ::=
+    SEQUENCE {
+        wlcVSSIndex 		INTEGER,
+	wlcVSSwlanIfIndex	INTEGER,
+	wlcVSSProfIndex		INTEGER,
+	wlcVSSAdminStatus	INTEGER
+    }
+    
+    wlcVSSIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This variable contains a unique index.
+	    "
+    ::= { wlcVSSEntry 1 }
+	    
+    wlcVSSwlanIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This variable is the WLAN interface of the requested 
+	     WTP WLAN interface.
+	    "
+    ::= { wlcVSSEntry 2 }
+	    
+    wlcVSSProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This variable contains the unique
+	     VSS profile index.
+	    "
+    ::= { wlcVSSEntry 3 }
+	    
+    wlcVSSAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2), default(3), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Enable or delete the VSS profile
+	     from the requested WTP.
+	    "
+        DEFVAL { default }
+    ::= { wlcVSSEntry 4 }
+		    
+-- **********************************************************************
+-- *    wlcVSSProfileTable  TABLE
+-- **********************************************************************
+wlcVSSProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcVSSProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains different 
+	     VSS setting profiles.
+            "
+    ::= { wlc 20 }
+
+    wlcVSSProfileEntry OBJECT-TYPE
+    SYNTAX  WlcVSSProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcVSSProfileIndex }
+    ::= { wlcVSSProfileTable 1 }
+
+    WlcVSSProfileEntry ::=
+    SEQUENCE {
+        wlcVSSProfileIndex 			INTEGER,
+	wlcVSSProfileId			        DisplayString,
+	wlcVSSProfileName                       DisplayString,
+        wlcVSSProfileAdminStatus		INTEGER,
+	wlcVSSProfileSecurity			INTEGER,
+	wlcVSSProfileDefaultKey			INTEGER,
+	wlcVSSProfileKey1			OCTET STRING,
+	wlcVSSProfileKey2			OCTET STRING,
+	wlcVSSProfileKey3			OCTET STRING,
+	wlcVSSProfileKey4			OCTET STRING,
+	wlcVSSProfileTotal			INTEGER,
+	wlcVSSProfileSoftTotal			INTEGER,
+	wlcVSSProfileMAC			TruthValue,
+	wlcVSSProfileLocal			TruthValue,
+	wlcVSSProfileHidden			TruthValue,
+	wlcVSSProfileWPAUnicastCipher		BITS,
+	wlcVSSProfileRSNUnicastCipher		BITS,
+	wlcVSSProfileWpaMixedMode		INTEGER,
+	wlcVSSProfileRsnPreauthentication	TruthValue,
+	wlcVSSProfileWMM			TruthValue,
+	wlcVSSProfileARPProcessing		TruthValue,
+	wlcVSSProfileVlanId			INTEGER,
+	wlcVSSProfileBandSteeringPreference	INTEGER,
+	wlcVSSProfileBlacklist			INTEGER,
+	wlcVSSProfileUAPSD                      INTEGER,
+	wlcVSSProfileStaTxShaping		INTEGER,
+	wlcVSSProfileStaRxShaping		INTEGER,
+	wlcVSSProfileStaTimeout			INTEGER,
+	wlcVSSProfileIgmpSnooping		INTEGER,
+    wlcVSSProfileRSSIThresholdValue	INTEGER,
+	wlcVSSProfileRSSIThresholdGraceTime INTEGER
+    }
+    
+    wlcVSSProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique VSS profile index.
+	    "
+    ::= { wlcVSSProfileEntry 1 }
+	    
+    wlcVSSProfileId OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This attribute reflects the Service Set ID used
+	     in the DesiredSSID parameter of the most recent
+	     MLME scan request.
+	    "
+        DEFVAL { "default" }
+    ::= { wlcVSSProfileEntry 2 }
+	    
+    wlcVSSProfileName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The VSS profile name.
+	    "
+        DEFVAL { "" }
+    ::= { wlcVSSProfileEntry 3 }
+	    
+    wlcVSSProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Enable, disable or delete the requested VSS profile.
+	    "
+        DEFVAL { enabled }
+    ::= { wlcVSSProfileEntry 4 }
+    
+    wlcVSSProfileSecurity OBJECT-TYPE
+        SYNTAX  INTEGER { none(1), wep40(2), wep104(3), wpa-psk(4),
+                          wpa(5), wpa2(6) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Security Option which will be used.
+            wep40 and wep104:= WEP-Authentication
+            wpa-psk := WPA-Authentication with PSK
+            wpa := WPA-Authentication with radius (802.1X)
+            wpa2 := OBSOLETE and not used anymore!
+	    "
+        DEFVAL { none }
+    ::= { wlcVSSProfileEntry 5 }
+	    
+    wlcVSSProfileDefaultKey OBJECT-TYPE
+        SYNTAX  INTEGER { key1(1), key2(2), key3(3), key4(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Default key for WEP encryption.
+	    "
+        DEFVAL { key1 }
+    ::= { wlcVSSProfileEntry 6 }
+	    
+    wlcVSSProfileKey1 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Key string for WEP key no. 1. 
+	     Also used for WPA passphrase.
+	    "
+    ::= { wlcVSSProfileEntry 7 }
+	    
+    wlcVSSProfileKey2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Key string for WEP key no. 2.
+	    "
+    ::= { wlcVSSProfileEntry 8 }
+	    
+    wlcVSSProfileKey3 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Key string for WEP key no. 3.
+	    "
+    ::= { wlcVSSProfileEntry 9 }
+	    
+    wlcVSSProfileKey4 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Key string for WEP key no. 4.
+	    "
+    ::= { wlcVSSProfileEntry 10 }
+	    
+    wlcVSSProfileTotal OBJECT-TYPE
+        SYNTAX INTEGER (1..256)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The number of allowed clients of the requested VSS.
+	    "
+        DEFVAL { 32 }
+    ::= { wlcVSSProfileEntry 11 }
+	    
+    wlcVSSProfileMAC OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "MAC Media Access Control via MAC Address.
+	    "
+        DEFVAL { false }
+    ::= { wlcVSSProfileEntry 12 }
+	    
+    wlcVSSProfileLocal OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Routing between connected Clients.
+	    "
+        DEFVAL { false }
+    ::= { wlcVSSProfileEntry 13 }
+	    
+    wlcVSSProfileHidden OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Define whether SSID is hidden (true) or not (false).
+	     Default value is false.
+	    "
+        DEFVAL { false }
+    ::= { wlcVSSProfileEntry 14 }
+	    
+    wlcVSSProfileWPAUnicastCipher OBJECT-TYPE
+        SYNTAX BITS {
+		  tkip(1),
+		  aes(2)
+		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The set of unicast ciphers used for WPA.
+	    "
+        DEFVAL { {aes} }
+    ::= { wlcVSSProfileEntry 15 }
+	    
+    wlcVSSProfileRSNUnicastCipher OBJECT-TYPE
+        SYNTAX BITS {
+		  tkip(1),
+		  aes(2)
+		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The set of unicast ciphers used for RSN.
+	    "
+        DEFVAL { {aes} }
+    ::= { wlcVSSProfileEntry 16 }
+	    
+    wlcVSSProfileWpaMixedMode OBJECT-TYPE
+        SYNTAX  INTEGER { wpa(1), wpa2(2), wpaandwpa2(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Allows mixed operation of WPA and WPA2 by value wpaandwpa2(3)
+	     (default value).
+	     For tightened security, value wpa2(2) can be selected.
+	     The value wpa(1) is available for some older clients with drivers
+	     that are unable to deal with WPA2 information elements.
+	    "
+        DEFVAL { wpa2 }
+    ::= { wlcVSSProfileEntry 17 }
+	    
+    wlcVSSProfileRsnPreauthentication OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "When this object is set to TRUE, this shall indicate that RSNA
+	     preauthentication is enabled on this entity.
+	     This object requires that dot11RSNAEnabled also be set to TRUE.
+	    "
+        DEFVAL { true }
+    ::= { wlcVSSProfileEntry 18 }
+	    
+    wlcVSSProfileWMM OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This object defines whether WMM (Wi-Fi Multimedia) 
+	     is active for this service set. 
+	     Depending on the WLAN hardware and driver, WMM might 
+	     only be allowed for one service set, i.e. enabling WMM for one 
+	     service set disables WMM for all other service sets.
+	    "
+	DEFVAL { true }
+    ::= { wlcVSSProfileEntry 19 }
+	    
+    wlcVSSProfileARPProcessing OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This object defines whether ARP processing 
+	     is active for this service set or not. 
+	     ARP processing is a feature to reduce the number
+	     of ARP broadcast packets. If the AP finds the 
+	     requested IP address in the node table it exchanges 
+	     the broadcast MAC address by the unicast MAC address
+	     of the client. 
+	     Default is false.
+	    "
+	DEFVAL { false }
+    ::= { wlcVSSProfileEntry 20 }
+	    
+    wlcVSSProfileVlanId OBJECT-TYPE
+        SYNTAX INTEGER (0..4095)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The VLAN-Tag-Id used for the virtual interface.
+	    "
+    ::= { wlcVSSProfileEntry 21 }
+
+    wlcVSSProfileSoftTotal OBJECT-TYPE
+        SYNTAX INTEGER (1..256)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "If wlcVSSProfileSoftTotal STAs are connected to this VSS, 
+	    subsequent association attempts will be rejected with BUSY.
+	    If a STA still tries to associate within 30sec, the association
+	    request will be accepted."
+        DEFVAL { 28 }
+    ::= { wlcVSSProfileEntry 22 }
+
+    wlcVSSProfileBandSteeringPreference OBJECT-TYPE
+	SYNTAX	INTEGER { none(1), bs-24GHz(2), bs-5GHz(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Define the preferred band for Band Steering.  
+		none   : no preference (default)
+		b24-GHz: prefer 2,4 GHz
+		b5-GHz : prefer 5 GHz"
+	DEFVAL { none }
+    ::= { wlcVSSProfileEntry 23 }	
+
+    wlcVSSProfileBlacklist OBJECT-TYPE
+    	SYNTAX INTEGER { enable(1), disable(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Enable or disable blacklisting via MAC addresses."
+	DEFVAL { disable }
+    ::= { wlcVSSProfileEntry 24 }
+
+    wlcVSSProfileUAPSD OBJECT-TYPE
+    	SYNTAX INTEGER { enable(1), disable(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Enable or disable UAPSD"
+	DEFVAL { enable }
+    ::= { wlcVSSProfileEntry 25 }
+
+    wlcVSSProfileStaRxShaping OBJECT-TYPE
+    	SYNTAX INTEGER 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "STA to AP bandwidth limitation per associated station. The value
+	    is given in bits per seconds, -1 is unlimited (default)"
+	DEFVAL { -1 }
+    ::= { wlcVSSProfileEntry 26 }
+
+    wlcVSSProfileStaTxShaping OBJECT-TYPE
+    	SYNTAX INTEGER 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "AP to STA bandwidth limitation per associated station. The value
+	    is given in bits per seconds, -1 is unlimited (default)"
+	DEFVAL { -1 }
+    ::= { wlcVSSProfileEntry 27 }
+
+    wlcVSSProfileStaTimeout OBJECT-TYPE
+        SYNTAX INTEGER (10..86400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Defines the maximum lifetime that an idle station is kept in the
+             stations table. A station is called 'idle' when it doesn't send
+             any traffic to the AP."
+        DEFVAL { 600 }
+    ::= { wlcVSSProfileEntry 28 }       
+
+    wlcVSSProfileIgmpSnooping OBJECT-TYPE
+	SYNTAX INTEGER { disabled(1), enabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+	DESCRIPTION
+	    "This object enables or disables IGMP Snooping for a VSS.
+	     If enabled(2), the VSS listens to IGMP packets of all
+	     connected STAs and transmits only the IPv4 multicast traffic
+	     to STAs which are multicast group members These IPv4
+	     multicast traffic is converted to unicast frames. Packets
+	     with a destination IP address in 224.0.0.0/24 are always
+	     forwarded unmodified to all connected STAs."
+        DEFVAL { disabled }
+    ::= { wlcVSSProfileEntry 29 }       
+
+    wlcVSSProfileRSSIThresholdValue OBJECT-TYPE
+        SYNTAX INTEGER ( -110..0 )
+        UNITS "dBm"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Defines the signal threshold used to disassociate all the stations with
+             lesser signal than the defined value."
+        DEFVAL { -110 }
+    ::= { wlcVSSProfileEntry 30 }
+
+    wlcVSSProfileRSSIThresholdGraceTime OBJECT-TYPE
+        SYNTAX INTEGER ( 0..60 )
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The stations with RSSI lower than the threshold will be dropped after
+             exhausting this amount of time. If 0, the stations will be dropped
+             immediately"
+        DEFVAL { 5 }
+    ::= { wlcVSSProfileEntry 31 }
+
+-- **********************************************************************
+-- *    wlcACLProfileTable  TABLE
+-- **********************************************************************
+wlcACLProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcACLProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains different ACL profiles.
+	     The WLAN Access List is based on MAC Addresses.
+            "
+    ::= { wlc 21 }
+
+    wlcACLProfileEntry OBJECT-TYPE
+    SYNTAX  WlcACLProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcACLProfileIndex, wlcACLProfileAddress }
+    ::= { wlcACLProfileTable 1 }
+
+    WlcACLProfileEntry ::=
+    SEQUENCE {
+	wlcACLProfileIndex              INTEGER,
+	wlcACLProfileAddress            MacAddress,
+	wlcACLProfileAdminStatus        INTEGER
+		
+    }
+    
+    wlcACLProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The variable is the unique profile index.
+	    "
+    ::= { wlcACLProfileEntry 1 }
+	  
+    wlcACLProfileAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The MAC Address for the accepted client.
+	    "
+    ::= { wlcACLProfileEntry 2 }
+	  
+    wlcACLProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(1), enabled(2), delete(32) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Enable, disable or delete the requested 
+	     ACL profile entry.
+	    "
+	DEFVAL { enabled }
+    ::= { wlcACLProfileEntry 3 }
+	
+-- **********************************************************************
+-- *    wlcACStatTable  TABLE
+-- **********************************************************************
+wlcACStat OBJECT IDENTIFIER
+    ::= { wlc 22 }
+    
+    wlcACStatNoWTPManaged OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of managed WTPs.
+	    "
+    ::= { wlcACStat 1 }
+
+    wlcACStatNoWTPDiscovered OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discovered WTPs.
+	    "
+    ::= { wlcACStat 2 }
+
+    wlcACStatTxPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of transmitted packets.
+	    "
+    ::= { wlcACStat 3 }
+	
+    wlcACStatTxBytes OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of transmitted bytes.
+	    "
+    ::= { wlcACStat 4 }
+	
+    wlcACStatRxPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of received packets.
+	    "
+    ::= { wlcACStat 5 }
+	
+    wlcACStatRxBytes OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of received bytes.
+	    "
+    ::= { wlcACStat 6 }
+		
+    wlcACStatRetransmissions OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of retransmissions.
+	    "
+    ::= { wlcACStat 7 }
+	
+-- **********************************************************************
+-- *    wlcWTPInfoTable  TABLE
+-- **********************************************************************
+wlcWTPInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWTPInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The table contains different information of each WTP.
+            "
+    ::= { wlc 23 }
+
+    wlcWTPInfoEntry OBJECT-TYPE
+    SYNTAX  WlcWTPInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcWTPInfoIndex }
+    ::= { wlcWTPInfoTable 1 }
+
+    WlcWTPInfoEntry ::=
+    SEQUENCE {
+        wlcWTPInfoIndex 	INTEGER,
+	wlcWTPInfoWTPIndex	INTEGER,
+	wlcWTPInfoMacAddress    MacAddress,
+	wlcWTPInfoState	        INTEGER,
+	wlcWTPInfoDevice        DisplayString,
+        wlcWTPInfoSerialNo      DisplayString,
+        wlcWTPInfoSwVer	DisplayString,
+        wlcWTPInfoInetAddressType   InetAddressType,
+        wlcWTPInfoInetAddress       IpAddress,
+	wlcWTPInfoNoRadios	INTEGER,
+	wlcWTPInfoConnectTime	TimeTicks,
+	wlcWTPInfoRxPackets	Counter32,
+	wlcWTPInfoRxBytes	Counter32,
+	wlcWTPInfoTxPackets	Counter32,
+	wlcWTPInfoTxBytes	Counter32,
+        wlcWTPInfoRetransmissions   Counter32,
+        wlcWTPInfoLastSeen      Date
+    }
+
+    wlcWTPInfoIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Unique WTP information index.
+	    "
+    ::= { wlcWTPInfoEntry 1 }
+	    
+    wlcWTPInfoWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Unique WTP index.
+	    "
+    ::= { wlcWTPInfoEntry 2 }
+    
+    wlcWTPInfoMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The first ethernet MAC address of the WTPs. 
+	    "
+    ::= { wlcWTPInfoEntry 3 }
+	    
+    wlcWTPInfoState OBJECT-TYPE
+        SYNTAX INTEGER {
+		idle(1),
+		discovery(2),
+		authorize(3),
+		join(4),
+		configure(5),
+		mib-configure(6),
+		data-check(7),
+		run(8),
+		reset(9),
+		lostac(10)
+	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Reflects the current (CAPWAP) state of the WTP.
+	         idle(1) - WTP is idle (isn't seen by AC)
+	         discovery(2) - WTP is discovered by AC
+	         authorize(3) - WTP is waiting to be authorized by AC 
+	         join(4) - WTP send join request to AC
+	         configure(5) - AC replied to join and send configure request
+	         mib-configure(6) - WTP retrieves configuration from AC
+	         data-check(7) - WTP is (re)configuring itself
+	         run(8) - WTP has finished configuration and is now managed
+	         reset(9) - WTP will be resetted (reboot).
+		 lostac(10) - The WTP lost the connection to its AC (see: wlcACLostACLifeTime)
+	     Default is idle(1).
+	    "
+        DEFVAL { idle }
+    ::= { wlcWTPInfoEntry 4 }
+	    
+    wlcWTPInfoDevice OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The official WTP device name.
+	    "
+    ::= { wlcWTPInfoEntry 5 }
+	    
+   wlcWTPInfoSerialNo OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The unique serial number of the WTP
+	    "
+    ::= { wlcWTPInfoEntry 6 }
+    
+    wlcWTPInfoSwVer OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Current software version of the WTP
+	    "
+    ::= { wlcWTPInfoEntry 7 }
+			    
+    wlcWTPInfoInetAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The IP address type of the WTP.
+	     It is one of:
+	        -unknown(0): an unknown address type
+	        -ipv4(1)   : an IPv4 address
+	        -ipv6(2)   : an IPv6 address
+	        -ipv4z(3)  : a non-global IPv4 address including a zone
+                     	     index
+	        -ipv6z(4)  : a non-global IPv6 address including a zone
+                     	     index
+	        -dns(16)   : a DNS domain name
+	    "
+    ::= { wlcWTPInfoEntry 8 }
+		    
+    wlcWTPInfoInetAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "IP address of the requested WTP.
+	    "
+    ::= { wlcWTPInfoEntry 9 }
+	    
+    wlcWTPInfoNoRadios OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of radios that the device has.
+	    "
+    ::= { wlcWTPInfoEntry 10 }
+	    
+    wlcWTPInfoConnectTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute records the time since last state change.
+	    "
+    ::= { wlcWTPInfoEntry 11 }
+	    
+    wlcWTPInfoTxPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The transmitted packets of the requested WTP.
+	    "
+    ::= { wlcWTPInfoEntry 12 }
+	    
+    wlcWTPInfoTxBytes OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of transmitted bytes of the requested WTP.
+	    "
+    ::= { wlcWTPInfoEntry 13 }
+	    
+    wlcWTPInfoRxPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of received packets of the requested WTP.
+	    "
+    ::= { wlcWTPInfoEntry 14 }
+	    
+    wlcWTPInfoRxBytes OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of received bytes of the requested WTP.
+	    "
+    ::= { wlcWTPInfoEntry 15 }
+	    
+    wlcWTPInfoRetransmissions OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of retransmissions of the requested WTP.
+	    "
+    ::= { wlcWTPInfoEntry 16 }
+
+    wlcWTPInfoLastSeen OBJECT-TYPE
+        SYNTAX Date
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "On Ac this is the timestamp of the last receved CAPWAP UDP 
+             packet from that WTP.
+             On WTP this is the timestamp of the last received CAPWAP UDP
+             packet from AC.
+	    "
+    ::= { wlcWTPInfoEntry 17 }
+
+
+-- **********************************************************************
+-- *    wlcWlanHWTable  TABLE
+-- **********************************************************************
+wlcWlanHWTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWlanHWEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table lists all features of supported wireless cards.
+            "
+    ::= { wlc 24 }
+
+    wlcWlanHWEntry OBJECT-TYPE
+    SYNTAX  WlcWlanHWEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcWlanHWIndex }
+    ::= { wlcWlanHWTable 1 }
+
+    WlcWlanHWEntry ::=
+    SEQUENCE {
+        wlcWlanHWIndex 			INTEGER,
+	wlcWlanHWName			DisplayString,
+	wlcWlanHWTxPowerSteps		DisplayString,
+	wlcWlanHWShortRetries		TruthValue,
+	wlcWlanHWLongRetries		TruthValue,
+	wlcWlanHWFragmentationThreshold	TruthValue,
+	wlcWlanHWNoSpatialRx		INTEGER,
+	wlcWlanHWNoSpatialTx		INTEGER,
+	wlcWlanHWBands			BITS,
+	wlcWlanHWModes			BITS,
+	wlcWlanHWBandwidth		TruthValue,
+	wlcWlanHWShortGI		TruthValue,
+	wlcWlanHWGreenfield		TruthValue,
+	wlcWlanHWRxSTBC			TruthValue,
+	wlcWlanHWTxSTBC			TruthValue,
+        wlcWlanHWSkipModes              BITS,
+	wlcWlanHWSupportedBandwidth	BITS,
+	wlcWlanHWRateControl	TruthValue
+    }
+    
+    wlcWlanHWIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Unique WLAN hardware index.
+	    "
+    ::= { wlcWlanHWEntry 1 }
+	    
+    wlcWlanHWName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Name of the WLAN hardware.
+	    "
+    ::= { wlcWlanHWEntry 2 }
+	    
+    wlcWlanHWTxPowerSteps OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The steps of the TX power the wireless card supports.
+	    "
+    ::= { wlcWlanHWEntry 3 }
+	    
+    wlcWlanHWShortRetries OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable says if the wireless card supports 
+	     the configuration of the short retry value or not.
+	     Default is false.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 4 }
+	    
+    wlcWlanHWLongRetries OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable says if the wireless card supports 
+	     the configuration of the long retry value or not.
+	     Default is false.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 5 }
+	    
+    wlcWlanHWFragmentationThreshold OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable says if the wireless card supports 
+	     the configuration of the fragmentation threshold 
+	     value or not.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 6 }
+	    
+    wlcWlanHWNoSpatialRx OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute indicates the number of receivable spatial
+	     streams.
+	    "
+    ::= { wlcWlanHWEntry 7 }
+	    
+    wlcWlanHWNoSpatialTx OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute indicates the maximum of transmittable spatial
+	     streams.
+	    "
+    ::= { wlcWlanHWEntry 8 }
+	    
+    wlcWlanHWBands OBJECT-TYPE
+        SYNTAX BITS{
+		  band24(0),
+		  band5(1),
+		  band58(2)
+		}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The supported WLAN bands.
+	    "
+        DEFVAL { {} }
+    ::= { wlcWlanHWEntry 9 }
+	    
+    wlcWlanHWModes OBJECT-TYPE
+        SYNTAX BITS{
+		  m802-11a(0),
+		  m802-11b(1),
+		  m802-11g(2),
+		  m802-11n(3),
+		  m802-11ac(4)
+		}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The Supported WLAN modes.
+	    "
+        DEFVAL { {m802-11b} }
+    ::= { wlcWlanHWEntry 10 }
+	    
+    wlcWlanHWBandwidth OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The supported bandwidth capabilities of the radio.
+	     In case of false only 20MHz bandwidth is supported.
+	     In case of true also 40MHz bandwidth is supported.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 11 }
+	    
+    wlcWlanHWShortGI OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the Short Guard
+	     option is implemented. The default value of this
+	     attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 12 }
+	    
+    wlcWlanHWGreenfield OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the HT Greenfield
+	     option is implemented. The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 13 }
+	    
+    wlcWlanHWRxSTBC OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the entity is
+	     capable of receiving frames that are sent using the Space-Time Block Code
+	     (STBC). The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 14 }
+	    
+    wlcWlanHWTxSTBC OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute, when TRUE, indicates that the entity is
+	     capable of transmitting frames using Space-Time Block Code (STBC) option.
+	     The default value of this attribute is FALSE.
+	    "
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 15 }
+
+     wlcWlanHWSkipModes OBJECT-TYPE
+        SYNTAX      BITS { ap24ghz(0), ap5ghz(1), client24ghz(2), client5ghz(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+	    "This variable says which modes of the WlanIfSkipChannels the wireless card supports.
+	    "
+        DEFVAL { {} }
+    ::= { wlcWlanHWEntry 16 }
+
+    wlcWlanHWSupportedBandwidth OBJECT-TYPE
+        SYNTAX      BITS { b20MHz(0), b40MHz(1), b80MHz(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This attribute reports the bandwidth operation modes, which are supported.
+            "
+        DEFVAL { {} }
+    ::= { wlcWlanHWEntry 17 }
+
+    wlcWlanHWRateControl OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "When true, this radio module allows the customization of the non HT-data rates 
+             by mean of the 'wlcRateControl' table."
+        DEFVAL { false }
+    ::= { wlcWlanHWEntry 18 }
+
+-- **********************************************************************
+-- *    wlcWlanIfStatTable  TABLE
+-- **********************************************************************
+wlcWlanIfStatTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcWlanIfStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains the current settings and statistics of each
+	     WLAN interface.
+            "
+    ::= { wlc 25 }
+
+    wlcWlanIfStatEntry OBJECT-TYPE
+    SYNTAX  WlcWlanIfStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcWlanIfStatIndex }
+    ::= { wlcWlanIfStatTable 1 }
+
+    WlcWlanIfStatEntry ::=
+    SEQUENCE {
+        wlcWlanIfStatIndex 	        INTEGER,
+	wlcWlanIfStatChannel		INTEGER,
+	wlcWlanIfStatSecondaryChannel	INTEGER,
+	wlcWlanIfStatAddress		MacAddress,
+	wlcWlanIfStatType               INTEGER,
+        wlcWlanIfStatBand		INTEGER,
+	wlcWlanIfStatMode		INTEGER,
+	wlcWlanIfStatTxPower		INTEGER,
+	wlcWlanIfStatFortyMHzOperation	TruthValue,
+	wlcWlanIfStatShortGI		TruthValue,
+	wlcWlanIfStatNoSpatialEnabled	INTEGER,
+	wlcWlanIfStatGreenfield		TruthValue,
+	wlcWlanIfStatTxPackets		Counter32,
+	wlcWlanIfStatTxBytes		Counter32,
+	wlcWlanIfStatTxDropped		Counter32,
+	wlcWlanIfStatRxPackets		Counter32,
+	wlcWlanIfStatRxBytes		Counter32,
+	wlcWlanIfStatRxErrors		Counter32,
+	wlcWlanIfStatAssociated		INTEGER,
+	wlcWlanIfStatOperState	        TruthValue,
+	wlcWlanIfStatRadarDetects	Counter32,
+	wlcWlanIfStatBandwidth		INTEGER,
+	wlcWlanIfStatChannelUtil	INTEGER
+    }
+    
+    wlcWlanIfStatIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Uniqe WLAN interface statistic index.
+	    "
+    ::= { wlcWlanIfStatEntry 1 }
+	    
+    wlcWlanIfStatChannel OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Current selected channel of the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 2 }
+	    
+    wlcWlanIfStatSecondaryChannel OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Current secondary channel of the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 3 }
+	    
+    wlcWlanIfStatAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The MAC address of the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 4 }
+		    
+    wlcWlanIfStatType OBJECT-TYPE
+        SYNTAX INTEGER { off(1),
+                        access-point(2),
+                        client(3),
+                        delete(32) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The type which is setup for the requested WLAN interface.
+	    "
+	DEFVAL { off }
+    ::= { wlcWlanIfStatEntry 5 }
+	    
+    wlcWlanIfStatBand OBJECT-TYPE
+        SYNTAX INTEGER { b24-GHz(1), b5-GHz(2), b58-GHz(3), b24-5-GHz(4) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The current operation band of the requested WLAN interface.
+	    "
+	DEFVAL { b24-GHz }
+    ::= { wlcWlanIfStatEntry 6 }
+	    
+    wlcWlanIfStatMode OBJECT-TYPE
+		SYNTAX  INTEGER { 
+		  m802-11b(1), 
+		  m802-11g(2), 
+		  m802-11mixed(3), 
+		  m802-11mixed-long(4), 
+		  m802-11mixed-short(5), 
+		  m802-11a(6),
+		  m802-11bgn(7),
+		  m802-11gn(8),
+		  m802-11n(10),
+		  m802-11an(11),
+		  m802-11abg(12),
+		  m802-11abgn(13),
+		  m802-11agn(14),
+		  m802-11anac(15),
+		  m802-11nac(16),
+		  m802-11ac(17)
+		}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The current operation mode of the requested WLAN interface.
+	    "
+	DEFVAL { m802-11bgn }
+    ::= { wlcWlanIfStatEntry 7 }
+	    
+    wlcWlanIfStatTxPower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The current transmit power of the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 8 }
+	    
+    wlcWlanIfStatFortyMHzOperation OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable is TRUE if the requested WLAN interface currently
+	     operates with 40MHz bandwidth.
+	    "
+    ::= { wlcWlanIfStatEntry 9 }
+	    
+    wlcWlanIfStatShortGI OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable is TRUE if the short guard interval is currently
+	     enabled on the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 10 }
+	    
+    wlcWlanIfStatNoSpatialEnabled OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of enabled spatial stream on the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 11 }
+	    
+    wlcWlanIfStatGreenfield OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable is TRUE if the green field option is currently
+	     enabled on the requested WLAN interface.
+	    "
+    ::= { wlcWlanIfStatEntry 12 }
+	    
+    wlcWlanIfStatTxPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of transmitted packets.
+	    "
+    ::= { wlcWlanIfStatEntry 13 }
+	    
+    wlcWlanIfStatTxBytes OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of transmitted bytes.
+	    "
+    ::= { wlcWlanIfStatEntry 14 }
+	    
+    wlcWlanIfStatTxDropped OBJECT-TYPE
+        SYNTAX Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of dropped packets in transmit direction.
+	    "
+    ::= { wlcWlanIfStatEntry 15 }
+	    
+    wlcWlanIfStatRxPackets OBJECT-TYPE
+        SYNTAX Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of received packets.
+	    "
+    ::= { wlcWlanIfStatEntry 16 }
+	    
+    wlcWlanIfStatRxBytes OBJECT-TYPE
+        SYNTAX Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of received bytes.
+	    "
+    ::= { wlcWlanIfStatEntry 17 }
+	    
+    wlcWlanIfStatRxErrors OBJECT-TYPE
+        SYNTAX Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable is counting packets 
+	     that were not received correctly.
+	    "
+    ::= { wlcWlanIfStatEntry 18 }
+	    
+    wlcWlanIfStatAssociated OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of currently associated clients.
+	    "
+    ::= { wlcWlanIfStatEntry 19 }
+		    
+    wlcWlanIfStatOperState OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute reflects the operational state of 
+	     the corresponding WLAN card.
+	     'true' -> radio is enabled, 'false' -> radio is disabled.
+	    "
+	DEFVAL { false }
+    ::= { wlcWlanIfStatEntry 20 }
+
+    wlcWlanIfStatRadarDetects OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Number of Radar events detected by this WLAN interface.
+        "    
+    ::= { wlcWlanIfStatEntry 21 } 
+
+    wlcWlanIfStatBandwidth OBJECT-TYPE
+        SYNTAX INTEGER { unused(1), b20MHz(2), b40MHz(3), b80MHz(4) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "This attribute reflects the current bandwidth. 
+	     It is an replacement for the obsolete 
+	     wlcWlanIfStatFortyMHzOperation column."
+        DEFVAL { unused }
+    ::= { wlcWlanIfStatEntry 22 }
+	
+    wlcWlanIfStatChannelUtil OBJECT-TYPE
+        SYNTAX INTEGER (0 .. 100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           "Channel utilization in percentage."
+    ::= { wlcWlanIfStatEntry 23 }
+
+-- **********************************************************************
+-- *    wlcVSSStatTable  TABLE
+-- **********************************************************************
+wlcVSSStatTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcVSSStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains statistic information about each VSS.
+            "
+    ::= { wlc 26 }
+
+    wlcVSSStatEntry OBJECT-TYPE
+    SYNTAX  WlcVSSStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcVSSStatVSSIndex }
+    ::= { wlcVSSStatTable 1 }
+
+    WlcVSSStatEntry ::=
+    SEQUENCE {
+        wlcVSSStatVSSIndex	INTEGER,
+	wlcVSSStatCurrent	INTEGER,
+	wlcVSSStatBytesTx	Counter32,
+	wlcVSSStatBytesRx	Counter32,
+	wlcVSSStatBSSID		MacAddress,
+        wlcVSSStatOperState 	TruthValue,
+	wlcVSSStatSoftTotalDenied   INTEGER,
+	wlcVSSStatBSMovements	    INTEGER,
+	wlcVSSStatClearCounter	    INTEGER,
+	wlcVSSStatTotalDenied       INTEGER,
+	wlcVSSStatRSSIThresholdPurges	INTEGER
+    }
+    
+    wlcVSSStatVSSIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The unique VSS index.
+	    "
+    ::= { wlcVSSStatEntry 1 }
+	    
+    wlcVSSStatCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Number of currently associated stations.
+	    "
+    ::= { wlcVSSStatEntry 2 }
+	    
+    wlcVSSStatBytesTx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Transmitted Bytes.
+	    "
+    ::= { wlcVSSStatEntry 3 }
+	    
+    wlcVSSStatBytesRx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Received Bytes.
+	    "
+    ::= { wlcVSSStatEntry 4 }
+	    
+    wlcVSSStatBSSID OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This object contains the current BSSID for the service set.
+	    "
+    ::= { wlcVSSStatEntry 5 }
+
+    wlcVSSStatOperState OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This object contains the current OperState for the service set.
+	    "
+    ::= { wlcVSSStatEntry 6 }
+
+    wlcVSSStatSoftTotalDenied OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "Number of rejected clients due to wlcVSSProfileSoftTotal limit."
+    ::= { wlcVSSStatEntry 7 }
+
+    wlcVSSStatBSMovements OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "Number of clients moved to other band by band steering mechanism."
+    ::= { wlcVSSStatEntry 8 }
+
+    wlcVSSStatClearCounter OBJECT-TYPE
+	SYNTAX INTEGER { counting(1), clearing(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "counting := accounting is active, 
+	    clearing := clear all statistics"
+	DEFVAL { counting }
+    ::= { wlcVSSStatEntry 9 }
+
+    wlcVSSStatTotalDenied OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "Number of rejected clients due to wlcVSSProfileTotal limit."
+    ::= { wlcVSSStatEntry 10 }
+
+	wlcVSSStatRSSIThresholdPurges OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of dissociated clients due to low RSSI."
+	::= { wlcVSSStatEntry 11 }
+
+-- **********************************************************************
+-- *    wlcScanResultsTable  TABLE
+-- **********************************************************************
+wlcScanResultsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcScanResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains the list of BSS entries found by foreground 
+	     or background scanning.
+            "
+    ::= { wlc 27 }
+
+    wlcScanResultsEntry OBJECT-TYPE
+    SYNTAX  WlcScanResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcScanResultsIndex, wlcScanResultswlanIfIndex }
+    ::= { wlcScanResultsTable 1 }
+
+    WlcScanResultsEntry ::=
+    SEQUENCE {
+        wlcScanResultsIndex 		INTEGER,
+	wlcScanResultswlanIfIndex	INTEGER,
+	wlcScanResultsBSSID		MacAddress,
+	wlcScanResultsRSSI		WlanRSSI,
+	wlcScanResultsSSID		DisplayString,
+	wlcScanResultsChannel		INTEGER,
+	wlcScanResultsPrivacy		INTEGER,
+	wlcScanResultsType		INTEGER,
+	wlcScanResultsWPAUnicastCipher	BITS,
+	wlcScanResultsRSNUnicastCipher	BITS,
+        wlcScanResultsAPType            INTEGER,
+        wlcScanResultsLastSeen          Date,
+        wlcScanResultsBandwidth         INTEGER,
+        wlcScanResultsFirstChannel0     INTEGER,
+        wlcScanResultsFirstChannel1     INTEGER
+
+    }
+    
+    wlcScanResultsIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+
+        DESCRIPTION
+	    "Auxiliary index for different BSS entries.
+	    "
+    ::= { wlcScanResultsEntry 1 }
+	    
+    wlcScanResultswlanIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Index of WLAN Interface the scan results belong to.
+	    "
+    ::= { wlcScanResultsEntry 2 }
+	    
+    wlcScanResultsBSSID OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "BSSID of this BSS.
+	    "
+    ::= { wlcScanResultsEntry 3 }
+	    
+    wlcScanResultsRSSI OBJECT-TYPE
+        SYNTAX WlanRSSI
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Receive signal strength of this BSS.
+	    "
+    ::= { wlcScanResultsEntry 4 }
+	    
+    wlcScanResultsSSID OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "SSID aka network name of this BSS. 
+	     If broadcasting of SSID is disabled on this 
+	     BSS, this string may be empty.
+	    "
+    ::= { wlcScanResultsEntry 5 }
+	    
+    wlcScanResultsChannel OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+
+        DESCRIPTION
+	    "The channel where this BSS send its beacons on.
+	    "
+    ::= { wlcScanResultsEntry 6 }
+	    
+    wlcScanResultsPrivacy OBJECT-TYPE
+        SYNTAX INTEGER { 
+            none (1),
+            wep(2),
+            wpa-psk(3),
+            wpaandwpa2-psk(4),
+            wpa2-psk(5),
+            wpa-enterprise(6),
+            wpaandwpa2-enterprise(7),
+            wpa2-enterprise(8)}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the privacy type of the
+	     scanned device.
+	    "
+        DEFVAL { none }
+    ::= { wlcScanResultsEntry 7 }
+	    
+    wlcScanResultsType OBJECT-TYPE
+        SYNTAX INTEGER { access-point(1), ad-hoc(2)}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the device type of the
+	     scanned device.
+	    "
+        DEFVAL { access-point }
+    ::= { wlcScanResultsEntry 8 }
+	    
+    wlcScanResultsWPAUnicastCipher OBJECT-TYPE
+	SYNTAX BITS {  
+		cipher-none(0),
+		cipher-wep40(1),
+		cipher-wep104(2),
+		cipher-tkip(3),
+		cipher-aes(4)
+	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the WPA unicast ciphers of the
+	     scanned device.
+	    "
+        DEFVAL { {cipher-none} }
+    ::= { wlcScanResultsEntry 9 }
+	    
+    wlcScanResultsRSNUnicastCipher OBJECT-TYPE
+	SYNTAX BITS {  
+		cipher-none(0),
+		cipher-wep40(1),
+		cipher-wep104(2),
+		cipher-tkip(3),
+		cipher-aes(4)
+	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the RSN unicast ciphers of the
+	     scanned device.
+	    "
+        DEFVAL { {cipher-none} }
+    ::= { wlcScanResultsEntry 10 }
+		    
+    wlcScanResultsAPType OBJECT-TYPE
+	SYNTAX INTEGER { own(1), 
+                        neighborhood(2), 
+                        rogue(3), 
+                        own-manipulated(4),
+			knownneighbor (5),
+			knownrogue (6) } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the type of the scanned access point.
+	     'own' -> managed AP, 'neighborhood' -> neighborhood AP
+	     'rogue' -> foreign AP but with one of our SSIDs, 
+	     'own-manipulated' -> managed AP but with manipulated configuration.
+	     'knownneighbor' -> a neigborhood AP but well known by wlcKnownAPTable
+	     'knownrogue' -> foreign AP with one of our SSIDs but is well known
+	      by wlcKnownAPTable
+	    "
+        DEFVAL { own }
+    ::= { wlcScanResultsEntry 11 }
+			    
+    wlcScanResultsLastSeen OBJECT-TYPE
+	SYNTAX Date 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains that time when an access point or client was 
+	     seen for the last time.
+	    "
+    ::= { wlcScanResultsEntry 12 }
+
+    wlcScanResultsBandwidth  OBJECT-TYPE
+	SYNTAX INTEGER {
+			b20MHz(1),
+			b40MHz(2),
+			b80MHz(3),
+			b80MHzand80MHz(4),
+			b160MHz(5)
+		    }
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "Used bandwidth of this BSS."
+	DEFVAL { b20MHz }
+    ::= { wlcScanResultsEntry 13 }
+
+    wlcScanResultsFirstChannel0  OBJECT-TYPE
+	SYNTAX INTEGER (1 .. 256)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "First channel in ieee notation of the first band."
+    ::= { wlcScanResultsEntry 14 }
+
+    wlcScanResultsFirstChannel1  OBJECT-TYPE
+	SYNTAX INTEGER (0 .. 256)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "First channel in ieee notation of the second band.
+	    This is used on 80MHz+80MHz in .11ac mode. 
+	    Value 0, if this field is not used."
+	DEFVAL { 0 }
+    ::= { wlcScanResultsEntry 15 }
+
+
+-- **********************************************************************
+-- *    wlcStationTable  TABLE
+-- **********************************************************************
+wlcStationTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcStationEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcStationTable contains information relating to the 
+             clients currently associated to our WTPs.
+             Each entry corresponds to
+             an associated client station (STA). 
+             Entries cannot be added or deleted by the user. 
+            "
+    ::= { wlc 28 }
+
+    wlcStationEntry OBJECT-TYPE
+    SYNTAX  WlcStationEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcStationIndex, wlcStationVSSIndex }
+    ::= { wlcStationTable 1 }
+
+    WlcStationEntry ::=
+    SEQUENCE {
+        wlcStationIndex 		INTEGER,
+	wlcStationVSSIndex		INTEGER,
+	wlcStationAddress		MacAddress,
+	wlcStationInetAddressType	InetAddressType,
+	wlcStationInetAddress		IpAddress,
+	wlcStationState 		INTEGER,
+	wlcStationSecurity		INTEGER,
+	wlcStationMSDUTx		Counter32,
+	wlcStationMSDURx		Counter32,
+	wlcStationBytesTx		Counter32,
+	wlcStationBytesRx		Counter32,
+	wlcStationRate			WlanRate,
+	wlcStationSignal		WlanRSSI,
+	wlcStationRSSI1			WlanRSSI,
+	wlcStationRSSI2			WlanRSSI,
+	wlcStationRSSI3			WlanRSSI,
+	wlcStationNoise			WlanRSSI,
+	wlcStationUpTime		Counter32,
+	wlcStationRxBW40		TruthValue,
+	wlcStationRxShortGI		TruthValue,
+	wlcStationTxBW40		TruthValue,
+	wlcStationTxShortGI		TruthValue,
+	wlcStationTxFrames11		Counter32,
+	wlcStationTxFrames24		Counter32,
+	wlcStationTxFrames54		Counter32,
+	wlcStationTxFramesMCS3		Counter32,
+	wlcStationTxFramesMCS7		Counter32,
+	wlcStationTxFramesMCS11		Counter32,
+	wlcStationTxFramesMCS15		Counter32,
+	wlcStationRxFrames11		Counter32,
+	wlcStationRxFrames24		Counter32,
+	wlcStationRxFrames54		Counter32,
+	wlcStationRxFramesMCS3		Counter32,
+	wlcStationRxFramesMCS7		Counter32,
+	wlcStationRxFramesMCS11		Counter32,
+	wlcStationRxFramesMCS15		Counter32,
+	wlcStationRxAirtime		Counter64,
+	wlcStationTxAirtime		Counter64,
+	wlcStationLastSeen		Date,
+	wlcStationRxDiscards		Counter32,
+	wlcStationTxDiscards		Counter32
+    }
+    
+    wlcStationIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Unique station index.
+	    "
+    ::= { wlcStationEntry 1 }
+	    
+    wlcStationVSSIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The interface index of the associated Service Set.
+	    "
+    ::= { wlcStationEntry 2 }
+	    
+    wlcStationAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "MAC Address of the Assigned STA.
+	    "
+    ::= { wlcStationEntry 3 }
+	    
+    wlcStationInetAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The IP address type of the STA.
+	    "
+    ::= { wlcStationEntry 4 }
+	    
+    wlcStationInetAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the IP address of the client.
+	     It is only available if any IP frames have been 
+	     received from the client.
+	    "
+    ::= { wlcStationEntry 5 }
+	    
+    wlcStationState OBJECT-TYPE
+       SYNTAX  INTEGER {
+           none(1),
+           associating(2),
+           associated(3),
+           authenticate(4),
+           authenticated(5),
+           delete(8)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "The current state of the station.
+	    "
+        DEFVAL { none }
+    ::= { wlcStationEntry 6 }
+	    
+    wlcStationSecurity OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none(1),
+            wep40(2),
+            wep104(3),
+            wpa-psk(4),
+            wpa(5),
+            wpa2(6)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The Security Option of the Station.
+	    "
+        DEFVAL { none }
+    ::= { wlcStationEntry 7 }
+	    
+    wlcStationMSDUTx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute counts the total number of 
+	     packets transmitted to this station.
+	    "
+    ::= { wlcStationEntry 8 }
+	    
+    wlcStationMSDURx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute counts the total number of 
+	     packets received from this station.
+	    "
+    ::= { wlcStationEntry 9 }
+	    
+    wlcStationBytesTx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute counts the total number of 
+	     octets transmitted to this station.
+	    "
+    ::= { wlcStationEntry 10 }
+	    
+    wlcStationBytesRx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute counts the total number of 
+	     octets received from this station.
+	    "
+    ::= { wlcStationEntry 11 }
+	    
+    wlcStationRate OBJECT-TYPE
+        SYNTAX WlanRate
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute reflects the data rate of the latest 
+	     packet received from this station, in 500 kbps units.
+	    "
+    ::= { wlcStationEntry 12 }
+	    
+    wlcStationSignal OBJECT-TYPE
+        SYNTAX WlanRSSI
+	UNITS  "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the received signal strength in dBm.
+	    "
+    ::= { wlcStationEntry 13 }
+	    
+    wlcStationRSSI1 OBJECT-TYPE
+        SYNTAX WlanRSSI
+	UNITS  "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the received signal strength at the 
+	     first receiver in dBm. The value 0 indicates no connection.
+	    "
+    ::= { wlcStationEntry 14 }
+	    
+    wlcStationRSSI2 OBJECT-TYPE
+        SYNTAX WlanRSSI
+	UNITS  "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the received signal strength at the 
+	     second receiver in dBm. The value 0 indicates no connection
+	     or no second receiver present.
+	    "
+    ::= { wlcStationEntry 15 }
+	    
+    wlcStationRSSI3 OBJECT-TYPE
+        SYNTAX WlanRSSI
+	UNITS  "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the received signal strength at the 
+	     third receiver in dBm. The value 0 indicates no connection 
+	     or no third receiver present.
+	    "
+    ::= { wlcStationEntry 16 }
+	    
+    wlcStationNoise OBJECT-TYPE
+        SYNTAX WlanRSSI
+	UNITS  "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the measured noise level in dBm, or 
+	     0 if no connection can be established.
+	    "
+    ::= { wlcStationEntry 17 }
+	    
+    wlcStationUpTime OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "s"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute records the system uptime at the moment 
+	     the client successfully finished association.
+	    "
+    ::= { wlcStationEntry 18 }
+	    
+    wlcStationRxBW40 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows if the station is able to receive pakets 
+	     with 40MHz bandwidth.
+	    "
+    ::= { wlcStationEntry 19 }
+	    
+    wlcStationRxShortGI OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows if the station is able to receive pakets 
+	     with short guard interval.
+	    "
+    ::= { wlcStationEntry 20 }
+	    
+    wlcStationTxBW40 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows if the station is able to transmit pakets 
+	     with 40 MHz bandwidth.
+	    "
+    ::= { wlcStationEntry 21 }
+	    
+    wlcStationTxShortGI OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows if the station is able to transmit pakets 
+	     with  short guard interval.
+	    "
+    ::= { wlcStationEntry 22 }
+
+	    
+    wlcStationTxFrames11 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of data
+	     frames that were transmitted at 11 Mbps.
+	    "
+    ::= { wlcStationEntry 23 }
+	    
+    wlcStationTxFrames24 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of data
+	     frames that were transmitted at 24 Mbps.
+	    "
+    ::= { wlcStationEntry 24 }
+	    
+    wlcStationTxFrames54 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of data
+	     frames that were transmitted at 54 Mbps.
+	    "
+    ::= { wlcStationEntry 25 }
+	    
+    wlcStationTxFramesMCS3 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were transmitted at MCS 3.
+	    "
+    ::= { wlcStationEntry 26 }
+	    
+    wlcStationTxFramesMCS7 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were transmitted at MCS 7.
+	    "
+    ::= { wlcStationEntry 27 }
+	    
+    wlcStationTxFramesMCS11 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were transmitted at MCS 11.
+	    "
+    ::= { wlcStationEntry 28 }
+	    
+    wlcStationTxFramesMCS15 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were transmitted at MCS 15.
+	    "
+    ::= { wlcStationEntry 29 }
+	    
+    wlcStationRxFrames11 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of data
+	     frames that were received at 11 Mbps.
+	    "
+    ::= { wlcStationEntry 30 }
+	    
+    wlcStationRxFrames24 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of data
+	     frames that were received at 24 Mbps.
+	    "
+    ::= { wlcStationEntry 31 }
+	    
+    wlcStationRxFrames54 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of data
+	     frames that were received at 54 Mbps.
+	    "
+    ::= { wlcStationEntry 32 }
+	    
+    wlcStationRxFramesMCS3 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were received at MCS 3.
+	    "
+    ::= { wlcStationEntry 33 }
+	    
+    wlcStationRxFramesMCS7 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were received at MCS 7.
+	    "
+    ::= { wlcStationEntry 34 }
+	    
+    wlcStationRxFramesMCS11 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were received at MCS 11.
+	    "
+    ::= { wlcStationEntry 35 }
+	    
+    wlcStationRxFramesMCS15 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This attribute shows the number of HT data
+	     frames that were received at MCS 15.
+	    "
+    ::= { wlcStationEntry 36 }
+		    
+    wlcStationRxAirtime OBJECT-TYPE
+        SYNTAX Counter64
+	UNITS  "microseconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Accumulated estimated time in microseconds for all 
+	     unidirectional frames received from this station.
+	    "
+    ::= { wlcStationEntry 37 }
+	    
+    wlcStationTxAirtime OBJECT-TYPE
+        SYNTAX Counter64
+	UNITS  "microseconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Accumulated estimated time in microseconds for all
+	     unidirectional frames transmitted to this station.
+	    "
+    ::= { wlcStationEntry 38 }
+
+    wlcStationLastSeen OBJECT-TYPE
+	SYNTAX  Date
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	    "Timestamp of the last received frame by this Station"
+	DEFVAL { 0 }
+    ::= { wlcStationEntry 39 }
+
+    wlcStationRxDiscards OBJECT-TYPE
+        SYNTAX Counter32
+	UNITS  "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Count of discarded bytes due to bandwidth limitation."
+    ::= { wlcStationEntry 40 }
+
+    wlcStationTxDiscards OBJECT-TYPE
+        SYNTAX Counter32
+	UNITS  "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Count of discarded bytes due to bandwidth limitation."
+    ::= { wlcStationEntry 41 }
+
+-- **********************************************************************
+-- *    wlcACLDeniedTable  TABLE
+-- **********************************************************************
+wlcACLDeniedTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcACLDeniedEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Contains all MAC Addresses of denied clients.
+            "
+    ::= { wlc 29 }
+
+    wlcACLDeniedEntry OBJECT-TYPE
+    SYNTAX  WlcACLDeniedEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcACLDeniedIndex }
+    ::= { wlcACLDeniedTable 1 }
+
+    WlcACLDeniedEntry ::=
+    SEQUENCE {
+        wlcACLDeniedIndex 	INTEGER,
+	wlcACLDeniedVSSIndex	INTEGER,
+	wlcACLDeniedAddress	MacAddress,
+	wlcACLDeniedCount	Counter32,
+	wlcACLDeniedAge	        Counter32	
+    }
+    
+    wlcACLDeniedIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "Unique index of the denied client.
+	    "
+    ::= { wlcACLDeniedEntry 1 }
+	    
+    wlcACLDeniedVSSIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "VSS interface index where the denied client blongs to.
+	    "
+    ::= { wlcACLDeniedEntry 2 }
+	    
+    wlcACLDeniedAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The MAC Address of the denied Client.
+	    "
+    ::= { wlcACLDeniedEntry 3 }
+	    
+    wlcACLDeniedCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The count of detected denials of this MAC Address.
+	    "
+    ::= { wlcACLDeniedEntry 4 }
+	    
+    wlcACLDeniedAge OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The Age of the last denial.
+	    "
+    ::= { wlcACLDeniedEntry 5 }
+
+-- **********************************************************************
+-- *    wlcKnownAPTable  TABLE
+-- **********************************************************************
+wlcKnownAPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcKnownAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains a list of known AP's and how
+	     they should be handled.
+            "
+    ::= { wlc 30 }
+
+    wlcKnownAPEntry OBJECT-TYPE
+    SYNTAX  WlcKnownAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcKnownAPBSSID }
+    ::= { wlcKnownAPTable 1 }
+
+    WlcKnownAPEntry ::=
+    SEQUENCE {
+	wlcKnownAPBSSID	    	MacAddress,
+        wlcKnownAPLastSeen	Date,
+	wlcKnownAPType		INTEGER,
+	wlcKnownAPDescription	DisplayString
+    }
+    
+    wlcKnownAPBSSID OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+	    "The BSSID of the rouge AP.
+	    "
+    ::= { wlcKnownAPEntry 1 }
+	    
+    wlcKnownAPLastSeen OBJECT-TYPE
+        SYNTAX Date
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "The timestamp, when this known AP was last seen.
+	    "
+	DEFVAL { 0 }
+    ::= { wlcKnownAPEntry 2 }
+
+    wlcKnownAPType OBJECT-TYPE
+	SYNTAX INTEGER {
+                        neighborhood(2), 
+                        rogue(3),
+			delete(15) }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+	    "This attribute contains the type of the well known AP. If it is set to 
+	     'neighborhood' but the found AP is also a rogue the rogue message will still
+	     be displayed. If it is set to 'rogue' no message for either neighborhood or
+	     rogue appears. Set this value to 'delete' to remove this entry.
+	    "
+        DEFVAL { rogue }
+    ::= { wlcKnownAPEntry 3 }
+	    
+    wlcKnownAPDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+	    "A user defined description for this known AP.
+	    "
+    ::= { wlcKnownAPEntry 4 }
+
+--- ***************************************************************************
+--- * wlcVSSAuthProfileTable
+--- ***************************************************************************
+
+wlcVSSAuthProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WlcVSSAuthProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This table contains the different VSS Authentication profiles."
+    ::= { wlc 31 }
+
+    wlcVSSAuthProfileEntry OBJECT-TYPE
+	SYNTAX WlcVSSAuthProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { wlcVSSAuthProfileWlcVSSProfIndex }
+	::= { wlcVSSAuthProfileTable 1 }
+
+	WlcVSSAuthProfileEntry ::=
+	SEQUENCE {
+	    wlcVSSAuthProfileWlcVSSProfIndex	INTEGER,
+	    wlcVSSAuthProfileReAuthPeriod	INTEGER,
+	    wlcVSSAuthProfileGroupRekeyStrict	TruthValue,
+	    wlcVSSAuthProfileGroupRekeyTime	INTEGER,
+	    wlcVSSAuthProfileBlacklistTrials	INTEGER,
+	    wlcVSSAuthProfileBlacklistTime	INTEGER,
+	    wlcVSSAuthProfileBlacklistDuration	Unsigned32,
+	    wlcVSSAuthProfileRowStatus		RowStatus
+	}
+
+    wlcVSSAuthProfileWlcVSSProfIndex OBJECT-TYPE
+    	SYNTAX INTEGER
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "Reference to VSS Profile entry (wlcVSSProfileIndex) this
+	    authentication parameters correspond to."
+    ::= { wlcVSSAuthProfileEntry 1 }
+
+    wlcVSSAuthProfileReAuthPeriod OBJECT-TYPE
+	SYNTAX INTEGER ( 0..86400 )
+    	UNITS "seconds"
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "EAP reauthentication period in seconds (0=disabled)."
+	DEFVAL { 3600 }
+   ::= { wlcVSSAuthProfileEntry 2 }
+
+   wlcVSSAuthProfileGroupRekeyStrict OBJECT-TYPE
+   	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "Rekey GTK when any STA that possesses the current GTK is leaving
+	    the BSS."
+	DEFVAL { false }
+    ::= { wlcVSSAuthProfileEntry 3 }
+
+    wlcVSSAuthProfileGroupRekeyTime OBJECT-TYPE
+	SYNTAX INTEGER ( 1..604800)
+	UNITS "seconds"
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "Time interval for rekeying GTK in seconds."
+	DEFVAL { 86400 }
+    ::= { wlcVSSAuthProfileEntry 4 }
+
+    wlcVSSAuthProfileBlacklistTrials OBJECT-TYPE
+    	SYNTAX INTEGER
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The number of failed authentication trials per
+	    wlcVSSAuthProfileBlacklistTime before a station is stored into the
+	    dynamic blacklist."
+	DEFVAL { 10 }
+    ::= { wlcVSSAuthProfileEntry 5 }
+
+    wlcVSSAuthProfileBlacklistTime OBJECT-TYPE
+	SYNTAX INTEGER
+	UNITS "seconds"
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	   "The time within a station may perform wlcVSSAuthPRofileBlacklistTrials
+	   failed authentication trials, before it is temporatily blacklisted."
+	DEFVAL { 60 }
+    ::= { wlcVSSAuthProfileEntry 6 }
+
+    wlcVSSAuthProfileBlacklistDuration OBJECT-TYPE
+	SYNTAX Unsigned32
+	UNITS "seconds"
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The time a station is kept in the dynamic blacklist after too many
+	    failed authentication attempts. A value of 0 indicates forever."
+	DEFVAL { 500 }
+    ::= { wlcVSSAuthProfileEntry 7 }
+
+    wlcVSSAuthProfileRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The row-status of a wlcvssauth profile entry."
+	DEFVAL { createAndWait }
+	::= { wlcVSSAuthProfileEntry 8 }
+
+
+--- ***************************************************************************
+--- * wlcStaticBlacklistProfileTable
+--- ***************************************************************************
+
+wlcStaticBlacklistProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WlcStaticBlacklistProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The wlcStaticBlacklistProfile contains information about stations that are
+    blacklisted due to administrative actions."
+    ::= { wlc 32 }
+
+    wlcStaticBlacklistProfileEntry OBJECT-TYPE
+	SYNTAX WlcStaticBlacklistProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { wlcStaticBlacklistProfileVSSProfIndex,
+	    wlcStaticBlacklistProfileSTAMac  }
+    ::= { wlcStaticBlacklistProfileTable 1 }
+
+    WlcStaticBlacklistProfileEntry ::= 
+        SEQUENCE {
+	    wlcStaticBlacklistProfileSTAMac		MacAddress,
+	    wlcStaticBlacklistProfileVSSProfIndex	INTEGER,
+	    wlcStaticBlacklistProfileRowStatus		RowStatus
+	}
+
+    wlcStaticBlacklistProfileSTAMac OBJECT-TYPE
+	SYNTAX MacAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The MAC address of the station to blacklist."
+	::= { wlcStaticBlacklistProfileEntry 1 }
+
+    wlcStaticBlacklistProfileVSSProfIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The SSID (wlcVSSProfileIndex) this blacklist entry is
+	    associated to."
+	::= { wlcStaticBlacklistProfileEntry 2 }
+
+    wlcStaticBlacklistProfileRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The row-status of a blacklist entry."
+	DEFVAL { createAndWait }
+	::= { wlcStaticBlacklistProfileEntry 3 }
+
+--- ***************************************************************************
+--- * wlcDynamicBlacklistProfileTable
+--- ***************************************************************************
+wlcDynamicBlacklistProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WlcDynamicBlacklistProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The wlcDynamicBlacklistProfile contains information about stations that
+    are blacklisted as a countermeasure to inappropriate behaviour."
+    ::= { wlc 33 }
+
+    wlcDynamicBlacklistProfileEntry OBJECT-TYPE
+    	SYNTAX WlcDynamicBlacklistProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { wlcDynamicBlacklistProfileVSSProfIndex,
+	    wlcDynamicBlacklistProfileSTAMac }
+    ::= { wlcDynamicBlacklistProfileTable 1 }
+
+    WlcDynamicBlacklistProfileEntry ::=
+    	SEQUENCE {
+	    wlcDynamicBlacklistProfileSTAMac	MacAddress,
+	    wlcDynamicBlacklistProfileVSSProfIndex	INTEGER,
+	    wlcDynamicBlacklistProfileFirstSeen 	Date,
+	    wlcDynamicBlacklistProfileLastSeen		Date,
+	    wlcDynamicBlacklistProfileLastRSSI	INTEGER,
+	    wlcDynamicBlacklistProfileReason	INTEGER,
+	    wlcDynamicBlacklistProfileWTPIndex	INTEGER,
+	    wlcDynamicBlacklistProfileRowStatus RowStatus
+	}
+
+
+    wlcDynamicBlacklistProfileSTAMac OBJECT-TYPE
+        SYNTAX MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The MAC address of the station that is blacklisted."
+    ::= { wlcDynamicBlacklistProfileEntry 1 }
+
+    wlcDynamicBlacklistProfileVSSProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The SSID on a specific WTP (wlcVSSIndex) a station belongs to."
+    ::= { wlcDynamicBlacklistProfileEntry 2 }
+
+    wlcDynamicBlacklistProfileFirstSeen OBJECT-TYPE
+	SYNTAX Date
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The 1st time a blacklisted station drew attention."
+    ::= { wlcDynamicBlacklistProfileEntry 3 }
+    
+    wlcDynamicBlacklistProfileLastSeen OBJECT-TYPE
+	SYNTAX Date
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The last time a blacklisted station drew attention."
+    ::= { wlcDynamicBlacklistProfileEntry 4 }
+
+    wlcDynamicBlacklistProfileReason OBJECT-TYPE
+	SYNTAX INTEGER {
+	    badauth(1),
+	    invalidFrame(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The reason why a station is blacklisted."
+	DEFVAL { badauth }
+    ::= { wlcDynamicBlacklistProfileEntry 5 }
+
+    wlcDynamicBlacklistProfileLastRSSI OBJECT-TYPE
+        SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"RSSI of station it annoyed last time."
+    ::= { wlcDynamicBlacklistProfileEntry 6 }
+
+    wlcDynamicBlacklistProfileWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The WTP the station was blacklisted at."
+    ::= { wlcDynamicBlacklistProfileEntry 7}
+
+    wlcDynamicBlacklistProfileRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"The row status of the blacklist entry.
+	Although the conceptual row is not creatable by the user,
+	one is able to set the row to notInService."
+	DEFVAL { createAndWait }
+    ::= { wlcDynamicBlacklistProfileEntry 8 }
+
+--- ***************************************************************************
+--- * wlcVSSBadAuthAcctTable
+--- ***************************************************************************
+
+wlcVSSBadAuthAcctTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WlcVSSAuthAcctEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    	"The wlcAuthAcct contains some authentication accounting parameters for a
+    	wlcVSS."
+    ::= { wlc 34 }
+
+    wlcVSSBadAuthAcctEntry OBJECT-TYPE
+    	SYNTAX WlcVSSAuthAcctEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { wlcVSSBadAuthAcctWlcVSSProfIndex, wlcVSSBadAuthAcctSTAMac }
+    ::= { wlcVSSBadAuthAcctTable 1 }
+
+    WlcVSSAuthAcctEntry ::=
+	SEQUENCE {
+	    wlcVSSBadAuthAcctWlcVSSProfIndex	INTEGER,
+	    wlcVSSBadAuthAcctSTAMac	MacAddress,
+	    wlcVSSBadAuthAcctTime1stFail	Date,
+	    wlcVSSBadAuthAcctTimeLastFail	Date,
+	    wlcVSSBadAuthAcctNumFailAttempts INTEGER,
+	    wlcVSSBadAuthAcctLastRSSI    	INTEGER,
+	    wlcVSSBadAuthAcctWTPIndex	INTEGER
+	}
+
+    wlcVSSBadAuthAcctWlcVSSProfIndex OBJECT-TYPE
+    	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Reference to wlcVSSProfile entry this authentication accounting
+	    information corresponds to."
+	::= { wlcVSSBadAuthAcctEntry 1 }
+
+    wlcVSSBadAuthAcctSTAMac OBJECT-TYPE
+        SYNTAX MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The MAC address of the station the failed authentication attempts
+	    are originating from."
+	::= { wlcVSSBadAuthAcctEntry 2 }
+
+    wlcVSSBadAuthAcctTime1stFail OBJECT-TYPE
+        SYNTAX Date
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Timestamp of the first failed authentication attempt. This entry
+	    is deleted after 1 hour of inactivity."
+	::= { wlcVSSBadAuthAcctEntry 3 }
+
+    wlcVSSBadAuthAcctTimeLastFail OBJECT-TYPE
+        SYNTAX Date
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Timestamp of the last failed authentication attempt."
+	::= { wlcVSSBadAuthAcctEntry 4 }
+
+    wlcVSSBadAuthAcctNumFailAttempts OBJECT-TYPE
+        SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The number of failed authentication attempts from a given station
+	    on a given wlcVSS since the first failed authentication attempt
+	    within an hour."
+	::= { wlcVSSBadAuthAcctEntry 5 }
+
+    wlcVSSBadAuthAcctLastRSSI OBJECT-TYPE
+    	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The last RSSI of the station with failing authentication."
+	::= { wlcVSSBadAuthAcctEntry 6 }
+
+    wlcVSSBadAuthAcctWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The last WTP a station with failing to authenticate was seen."
+	::= { wlcVSSBadAuthAcctEntry 7 }
+
+-- **********************************************************************
+-- *    wlcAutoSelectorTable  TABLE
+-- **********************************************************************
+wlcAutoSelectorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcAutoSelectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The table defines a selector to lookup a WTP in the wlcAutoWTPTable.
+	     See wlcAutoWTPSelectorIndex.
+            "
+    ::= { wlc 35 }
+
+    wlcAutoSelectorEntry OBJECT-TYPE
+    SYNTAX  WlcAutoSelectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcAutoSelectorIndex }
+    ::= { wlcAutoSelectorTable 1 }
+
+    WlcAutoSelectorEntry ::=
+    SEQUENCE {
+        wlcAutoSelectorIndex 	INTEGER,
+	wlcAutoSelectorMacAddress	MacAddress,
+        wlcAutoSelectorInetAddressType	InetAddressType,
+        wlcAutoSelectorInetAddress		IpAddress,
+        wlcAutoSelectorInetMask		IpAddress,
+        wlcAutoSelectorAdminStatus 	INTEGER
+    }
+
+    wlcAutoSelectorIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique selector index.
+	    "
+    ::= { wlcAutoSelectorEntry 1 }
+
+    wlcAutoSelectorMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Selector: ethernet MAC address of the WTP. 
+	     The address 00:00:00:00:00:00 matches for any MAC address.
+	    "
+    ::= { wlcAutoSelectorEntry 2 }
+
+    wlcAutoSelectorInetAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Selector: IP address type.
+	     It may be one of:
+	        -unknown(0): means that any IP address matches
+	        -ipv4(1)   : an IPv4 address
+	        -ipv6(2)   : an IPv6 address
+	     All other values are not supported and treated like unknown.
+	    "
+    ::= { wlcAutoSelectorEntry 3 }
+
+    wlcAutoSelectorInetAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Selector: IP address.
+	    "
+    ::= { wlcAutoSelectorEntry 4 }
+
+    wlcAutoSelectorInetMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Selector: IP netmask.
+	    "
+    ::= { wlcAutoSelectorEntry 5 }
+
+    wlcAutoSelectorAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER { enabled(1), disabled(2), delete(3) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	    "Delete the requested selector.
+	    "
+	DEFVAL { enabled }
+    ::= { wlcAutoSelectorEntry 6 }
+
+-- **********************************************************************
+-- *    wlcAutoWTPTable  TABLE
+-- **********************************************************************
+wlcAutoWTPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcAutoWTPEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The table defines auto configuration of each WTP.
+            "
+    ::= { wlc 36 }
+
+    wlcAutoWTPEntry OBJECT-TYPE
+    SYNTAX  WlcAutoWTPEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcAutoWTPIndex }
+    ::= { wlcAutoWTPTable 1 }
+
+    WlcAutoWTPEntry ::=
+    SEQUENCE {
+        wlcAutoWTPIndex 	INTEGER,
+	wlcAutoWTPSelectorIndex	INTEGER,
+	wlcAutoWTPLocation	 DisplayString,
+	wlcAutoWTPDescription	 DisplayString,
+	wlcAutoWTPsecIndex	INTEGER,
+	wlcAutoWTPlocalServicesIndex	INTEGER,
+	wlcAutoWTPAdminStatus	INTEGER
+    }
+
+    wlcAutoWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique index.
+	    "
+    ::= { wlcAutoWTPEntry 1 }
+
+    wlcAutoWTPSelectorIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Configured Selector index.
+	     See wlcAutoSelectorIndex.
+	    "
+    ::= { wlcAutoWTPEntry 2 }
+
+    wlcAutoWTPLocation OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Location of the requested WTP.
+	    "
+    ::= { wlcAutoWTPEntry 3 }
+
+    wlcAutoWTPDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description of the requested WTP.
+	    "
+    ::= { wlcAutoWTPEntry 4 }
+
+    wlcAutoWTPsecIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured secIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcAutoWTPEntry 5 }
+
+    wlcAutoWTPlocalServicesIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shows the currently configured localServicesIndex 
+	     of the requested WTP.
+	    "
+    ::= { wlcAutoWTPEntry 6 }
+
+    wlcAutoWTPAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER { enabled(1), disabled(2), delete(3) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	    "Delete the requested auto WTP.
+	    "
+	DEFVAL { enabled }
+    ::= { wlcAutoWTPEntry 7 }
+
+-- **********************************************************************
+-- *    wlcAutoVSSTable  TABLE
+-- **********************************************************************
+wlcAutoVSSTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcAutoVSSEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table combines auto configured WTP with the VSS profile.
+            "
+    ::= { wlc 37 }
+
+    wlcAutoVSSEntry OBJECT-TYPE
+    SYNTAX  WlcAutoVSSEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcAutoVSSIndex }
+    ::= { wlcAutoVSSTable 1 }
+
+    WlcAutoVSSEntry ::=
+    SEQUENCE {
+        wlcAutoVSSIndex 	INTEGER,
+	wlcAutoVSSwlanIfIndex	INTEGER,
+	wlcAutoVSSProfIndex	INTEGER,
+	wlcAutoVSSAdminStatus	INTEGER
+    }
+
+    wlcAutoVSSIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique index.
+	    "
+    ::= { wlcAutoVSSEntry 1 }
+
+    wlcAutoVSSwlanIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "WLAN interface of the requested WTP WLAN interface.
+	     See wlcAutoWlanIfIndex.
+	    "
+    ::= { wlcAutoVSSEntry 2 }
+
+    wlcAutoVSSProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This variable contains the unique VSS profile index.
+	     See wlcVSSProfIndex.
+	    "
+    ::= { wlcAutoVSSEntry 3 }
+
+    wlcAutoVSSAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER { enabled(1), disabled(2), delete(3) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	    "Delete the requested VSS.
+	    "
+	DEFVAL { enabled }
+    ::= { wlcAutoVSSEntry 4 }    
+
+-- **********************************************************************
+-- *    wlcAutoWlanIfTable  TABLE
+-- **********************************************************************
+wlcAutoWlanIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WlcAutoWlanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlcAutoWlanIfTable contains all auto configured WLAN
+	     interfaces of each WTP with their configured profiles.
+            "
+    ::= { wlc 38 }
+
+    wlcAutoWlanIfEntry OBJECT-TYPE
+    SYNTAX  WlcAutoWlanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    ""
+    INDEX   { wlcAutoWlanIfIndex }
+    ::= { wlcAutoWlanIfTable 1 }
+
+    WlcAutoWlanIfEntry ::=
+    SEQUENCE {
+        wlcAutoWlanIfIndex 	INTEGER,
+	wlcAutoWlanIfWTPIndex	INTEGER,
+	wlcAutoWlanIfRadioNo	INTEGER,
+	wlcAutoWlanIfProfIndex	INTEGER,
+	wlcAutoWlanIfClientIndex	INTEGER,
+	wlcAutoWlanIfAdminStatus	INTEGER
+    }
+
+    wlcAutoWlanIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Unique index.
+	    "
+    ::= { wlcAutoWlanIfEntry 1 }
+
+    wlcAutoWlanIfWTPIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Configured WTP index.
+	     See wlcAutoWTPIndex.
+	    "
+    ::= { wlcAutoWlanIfEntry 2 }
+
+    wlcAutoWlanIfRadioNo OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Radio number to match.
+	    "
+    ::= { wlcAutoWlanIfEntry 3 }
+
+    wlcAutoWlanIfProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Configured WLAN interface profile index.
+	     See wlcWlanIfProfileIndex.
+	    "
+    ::= { wlcAutoWlanIfEntry 4 }
+
+    wlcAutoWlanIfClientIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Index pointer to the wlcClientProfileTable.
+	    "
+    ::= { wlcAutoWlanIfEntry 5 }
+
+    wlcAutoWlanIfAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER { enabled(1), disabled(2), delete(3) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	    "Delete the requested WlanIf.
+	    "
+	DEFVAL { enabled }
+    ::= { wlcAutoWlanIfEntry 6 }
+
+-- **********************************************************************
+-- *    wlcPresenceProfileTable TABLE
+-- **********************************************************************
+
+wlcPresenceProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WlcPresenceProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Contains the global configuration of the Presence Analytics daemon."
+    ::= { wlc 39 }
+
+    wlcPresenceProfileEntry OBJECT-TYPE
+        SYNTAX WlcPresenceProfileEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        ""
+        INDEX { wlcPresenceProfileIndex }
+    ::= { wlcPresenceProfileTable 1 } 
+
+    WlcPresenceProfileEntry ::= 
+        SEQUENCE {
+            wlcPresenceProfileIndex			INTEGER,
+            wlcPresenceProfileAdminStatus		INTEGER,
+            wlcPresenceProfileOrgSecret			DisplayString,
+            wlcPresenceProfileCollectionInterval	INTEGER,
+            wlcPresenceProfileMaxElem			INTEGER,
+            wlcPresenceProfileDebugLevel		INTEGER
+        }
+
+    wlcPresenceProfileIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index."
+    ::= { wlcPresenceProfileEntry 1 }
+
+    wlcPresenceProfileAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2), delete(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Activates or deactivates Presence Analytics daemon. Note that
+	     Presence Analytics must be enabled per-interface by means
+             of 'wlcWlanIfPresence' field."
+        DEFVAL { disabled }
+    ::= { wlcPresenceProfileEntry 2 }
+
+    wlcPresenceProfileOrgSecret OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Customer-specific secret. This secret is used to anonymize
+             the client MAC addresses as part of the cryptographic
+             mechanism"
+    ::= { wlcPresenceProfileEntry 3 }
+
+    wlcPresenceProfileCollectionInterval OBJECT-TYPE
+        SYNTAX INTEGER (5..86400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The interval in seconds to contact the collection servers."
+        DEFVAL { 30 }
+    ::= { wlcPresenceProfileEntry 4 }
+
+    wlcPresenceProfileMaxElem OBJECT-TYPE
+        SYNTAX INTEGER (256..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Maximum number of probes kept in memory. When the buffer
+             is full, the oldest entry is deleted."
+        DEFVAL { 512 }
+    ::= { wlcPresenceProfileEntry 5 }
+
+    wlcPresenceProfileDebugLevel OBJECT-TYPE
+        SYNTAX INTEGER { quiet (1), normal(2), verbose(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Defines the verbosity of the debugging utility for this daemon.
+             Level 'verbose' shows the maximum amount of debugging information
+	     that can be generated by the daemon."
+        DEFVAL { normal }
+    ::= { wlcPresenceProfileEntry 6 } 
+
+-- **********************************************************************
+-- *    wlcPresenceServerTable TABLE
+-- **********************************************************************
+
+wlcPresenceServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WlcPresenceServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Contains all collection servers defined by the user."
+    ::= { wlc 40 }
+
+    wlcPresenceServerEntry OBJECT-TYPE
+        SYNTAX WlcPresenceServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        ""
+        INDEX { wlcPresenceServerIndex }
+    ::= { wlcPresenceServerTable 1 }
+
+    WlcPresenceServerEntry ::=
+        SEQUENCE {
+            wlcPresenceServerIndex	INTEGER,
+            wlcPresenceServerProfIndex	INTEGER,
+            wlcPresenceServerAddress	DisplayString,
+            wlcPresenceServerSecret	DisplayString,
+            wlcPresenceServerValidator	DisplayString,
+            wlcPresenceServerRowStatus	RowStatus
+        }
+
+    wlcPresenceServerIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Unique index of the server."
+    ::= { wlcPresenceServerEntry 1 }
+
+    wlcPresenceServerProfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Index of the 'wlcPresenceProfile' entry used for this server."
+    ::= { wlcPresenceServerEntry 2 }
+
+    wlcPresenceServerAddress OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Collection server address. The server address starts with
+             'http' or 'https', providing this last option security
+             mechanisms, followed by an IP address or a domain name with
+             an optional port number separated by a colon. An aditional
+             resource address can be appended at the end of this field."
+    ::= { wlcPresenceServerEntry 3 }
+
+    wlcPresenceServerSecret OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Secret string used by the collection server for accepting
+             incoming messages."
+    ::= { wlcPresenceServerEntry 4 }
+
+    wlcPresenceServerValidator OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Organization-specific validator string. The one provided
+             by the collection server must match this one."
+    ::= { wlcPresenceServerEntry 5 }
+
+    wlcPresenceServerRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The row-status of a server entry."
+        DEFVAL { createAndWait }
+    ::= { wlcPresenceServerEntry 6 }
+
+-- **********************************************************************
+-- *    wlcRateControlTable  TABLE
+-- **********************************************************************
+
+    wlcRateControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF WlcRateControlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Allows to define a 'Rate Control' that applies to a VSS 
+            profile"
+    ::= { wlc 41 }
+
+    wlcRateControlEntry OBJECT-TYPE
+        SYNTAX WlcRateControlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        ""
+        INDEX { wlcRateControlIndex }
+    ::= { wlcRateControlTable 1 }
+
+    WlcRateControlEntry ::=
+        SEQUENCE {
+            wlcRateControlIndex INTEGER,
+            wlcRateControlSupported24Ghz BITS,
+            wlcRateControlBasic24Ghz BITS,
+            wlcRateControlSupported5Ghz BITS,
+            wlcRateControlBasic5Ghz BITS,
+            wlcRateControlRowStatus RowStatus
+        }
+
+    wlcRateControlIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Reference to the associated VSS profile entry."
+    ::= { wlcRateControlEntry 1 }
+
+    wlcRateControlSupported24Ghz OBJECT-TYPE
+        SYNTAX BITS {
+            s1mbit(0),
+            s2mbit(1),
+            s5mbit(2),
+            s6mbit(3),
+            s9mbit(4),
+            s11mbit(5),
+            s12mbit(6),
+            s18mbit(7),
+            s24mbit(8),
+            s36mbit(9),
+            s48mbit(10),
+            s54mbit(11)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+             "Defines the list in Mb/s of non-HT data rates at which the
+              stations may transmit data in the 2,4 Ghz band."
+        DEFVAL { {
+            s1mbit,
+            s2mbit,
+            s5mbit,
+            s6mbit,
+            s9mbit,
+            s11mbit,
+            s12mbit,
+            s18mbit,
+            s24mbit,
+            s36mbit,
+            s48mbit,
+            s54mbit
+        } }
+    ::= { wlcRateControlEntry 2 }
+
+    wlcRateControlBasic24Ghz OBJECT-TYPE
+        SYNTAX BITS {
+            s1mbit(0),
+            s2mbit(1),
+            s5mbit(2),
+            s6mbit(3),
+            s9mbit(4),
+            s11mbit(5),
+            s12mbit(6),
+            s18mbit(7),
+            s24mbit(8),
+            s36mbit(9),
+            s48mbit(10),
+            s54mbit(11)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Defines the subset of the basic rates that are announced by
+            the AP in the 2,4 Ghz band. For each basic rate, the
+            corresponding supported rate must be present. The lowest
+            value of this list will be used as the multicast and broadcast 
+            frame rates."
+        DEFVAL { {
+            s1mbit,
+            s2mbit,
+            s5mbit,
+            s11mbit
+        } }
+    ::= { wlcRateControlEntry 3 }
+
+    wlcRateControlSupported5Ghz OBJECT-TYPE
+        SYNTAX BITS {
+            s6mbit(0),
+            s9mbit(1),
+            s12mbit(2),
+            s18mbit(3),
+            s24mbit(4),
+            s36mbit(5),
+            s48mbit(6),
+            s54mbit(7)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+             "Defines the list in Mb/s of non-HT data rates at which the
+              stations may transmit data in the 5 Ghz band."
+        DEFVAL { {
+            s6mbit,
+            s9mbit,
+            s12mbit,
+            s18mbit,
+            s24mbit,
+            s36mbit,
+            s48mbit,
+            s54mbit
+        } }
+    ::= { wlcRateControlEntry 4 }
+
+    wlcRateControlBasic5Ghz OBJECT-TYPE
+        SYNTAX BITS {
+            s6mbit(0),
+            s9mbit(1),
+            s12mbit(2),
+            s18mbit(3),
+            s24mbit(4),
+            s36mbit(5),
+            s48mbit(6),
+            s54mbit(7)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Defines the subset of the basic rates that are announced by
+            the AP in the 5 Ghz band. For each basic rate, the
+            corresponding supported rate must be present. The lowest
+            value of this list will be used as the multicast and broadcast 
+            frame rates."
+        DEFVAL { {
+            s6mbit,
+            s12mbit,
+            s24mbit
+        } }
+    ::= { wlcRateControlEntry 5 }
+
+    wlcRateControlRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The current status of row."
+        DEFVAL { createAndWait }
+    ::= { wlcRateControlEntry 6 }
+
+-- **********************************************************************
+-- *    End of wlcRateControlTable  TABLE
+-- **********************************************************************
+
+END
