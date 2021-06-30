@@ -369,6 +369,9 @@
         "snmp_max_oid": {
             "type": "string"
         },
+        "snmp_out_of_order_oids": {
+            "type": "boolean"
+        },
         "ifXmcbc": {
             "type": "boolean"
         },

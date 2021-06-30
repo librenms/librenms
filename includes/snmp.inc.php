@@ -129,6 +129,10 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null, $strIndexing = null)
 {
+    if (Config::getOsSetting($device['os'], 'snmp_out_of_order_oids') == true) {
+        $options = (array) $options;
+        array_push($options, '-Cc');
+    }
     if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'snmp_bulk', true) == false)) {
         $snmpcmd = [Config::get('snmpwalk')];
     } else {
