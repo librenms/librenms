@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2021 Maikel de Boer
+ * @author     Maikel de Boer <maikel@loopodoopo.nl>
  */
 
 namespace LibreNMS\OS;
