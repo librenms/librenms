@@ -9,7 +9,7 @@ foreach ($controller_array as $controller) {
     // Discover the chassis
     $entity_array[] = [
         'entPhysicalIndex'        => 200 + $controller['adapterID-AIT'],
-    'entPhysicalParentRelPos' => $controller['adapterID-AIT'],
+        'entPhysicalParentRelPos' => $controller['adapterID-AIT'],
         'entPhysicalDescr'        => '/C' . $controller['adapterID-AIT'],
         'entPhysicalClass'        => 'port',
         'entPhysicalModelName'    => $controller['productName'],
@@ -28,7 +28,7 @@ foreach ($bbus as $bbu) {
         'entPhysicalModelName'    => $bbu['deviceName'],
         'entPhysicalSerialNum'    => $bbu['serialNumber'],
         'entPhysicalContainedIn'  => 200 + $bbu['adpID'],
-    'entPhysicalIsFRU'        => 'true',
+        'entPhysicalIsFRU'        => 'true',
         'entPhysicalFirmwareRev'  => $bbu['firmwareStatus'],
     ];
 }
@@ -37,8 +37,8 @@ foreach ($enclosures as $enclosure) {
     // Discover the chassis
     $entity_array[] = [
         'entPhysicalIndex'        => 210 + $enclosure['deviceId'],
-    'entPhysicalMfgName'      => $enclosure['slotCount'],
-    'entPhysicalParentRelPos' => $enclosure['deviceId'],
+        'entPhysicalMfgName'      => $enclosure['slotCount'],
+        'entPhysicalParentRelPos' => $enclosure['deviceId'],
         'entPhysicalDescr'        => '/C' . $enclosure['adapterID-CDIT'] . '/E' . $enclosure['deviceId'],
         'entPhysicalClass'        => 'chassis',
         'entPhysicalModelName'    => $enclosure['productID'],
@@ -52,14 +52,14 @@ foreach ($enclosures as $enclosure) {
 foreach ($drives as $drive) {
     // Discover the chassis
     $entity_array[] = [
-    'entPhysicalIndex'        => 500 + $drive['enclDeviceId'] * 100 + $drive['physDevID'],
-    'entPhysicalParentRelPos' => $drive['slotNumber'],
+        'entPhysicalIndex'        => 500 + $drive['enclDeviceId'] * 100 + $drive['physDevID'],
+        'entPhysicalParentRelPos' => $drive['slotNumber'],
         'entPhysicalDescr'        => '/C' . $drive['adpID-PDT'] . '/E' . $drive['enclDeviceId'] . '/S' . $drive['slotNumber'],
         'entPhysicalClass'        => 'drive',
         'entPhysicalModelName'    => $drive['pdProductID'],
         'entPhysicalSerialNum'    => $drive['pdSerialNumber'],
         'entPhysicalContainedIn'  => 210 + $drive['enclDeviceId'],
-    'entPhysicalIsFRU'        => 'true',
+        'entPhysicalIsFRU'        => 'true',
         'entPhysicalFirmwareRev'  => $drive['pdFwversion'],
     ];
 }
