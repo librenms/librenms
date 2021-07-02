@@ -1,3 +1,3 @@
 <?php
 
-echo view('plugins.test.plugin');
+echo 'Well done, the plugin system is up and running';
