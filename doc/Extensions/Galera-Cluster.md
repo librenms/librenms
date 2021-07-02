@@ -11,7 +11,7 @@ randomly choose a working node to read and write requests to.
 
 
 For more information see
-<https://laravel.com/docs/8.x/database#read-and-write-connections>
+<https://laravel.com/docs/database#read-and-write-connections>
 
 
 ## Getting Started
@@ -64,11 +64,14 @@ Change the following values for your environment.
 ## Edit LibreNMS .env
 
 LibreNMS supports up to 9 galera nodes, you define these nodes in the .env file. For each node we have the ability to define if this librenms installation/poller is able to write, read or both to that node. 
+The galera nodes you define here can be the same or differnt for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too. 
 
 * DB_HOST is always set to read/write.
 * DB_HOST must be set, however, it does not have to be the same on each poller, it can be different as long as it's part of the same galera cluster.
 * If the node that is set to DB_HOST is down, things like ```lnms db``` command no longer work, as they only use DB_HOST and don't failover to other nodes. 
 * Set DB_CONNECTION=mysql_cluster to enable
+* DB_STICKY can be used if you are pulling out of sync data form the database in a read request. For more information see
+<https://laravel.com/docs/database#the-sticky-option>
 
 The below example setting up 5 nodes
 
@@ -81,6 +84,7 @@ DB_HOST_R5=192.168.1.39
 DB_HOST_W2=192.168.1.36
 DB_HOST_W3=192.168.1.37
 
+DB_STICKY=true
 DB_CONNECTION=mysql_cluster
 DB_DATABASE=librenms
 DB_USERNAME=librenms
