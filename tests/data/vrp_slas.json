@@ -1,0 +1,73 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.291",
+                    "sysDescr": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.170 (S5720 V200R019C10SPC500) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": null,
+                    "version": "5.170 (V200R019C10SPC500) [6]",
+                    "hardware": "S5720-56C-PWR-EI-AC",
+                    "features": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "slas": {
+        "discovery": {
+            "slas": [
+                {
+                    "sla_nr": 1696157968,
+                    "owner": "Admin1",
+                    "tag": "TEST_Local",
+                    "rtt_type": "icmpAppl",
+                    "rtt": null,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 3165814157,
+                    "owner": "Admin2",
+                    "tag": "TEST_Lnms_Neg",
+                    "rtt_type": "icmpAppl",
+                    "rtt": null,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "slas": [
+                {
+                    "sla_nr": 1696157968,
+                    "owner": "Admin1",
+                    "tag": "TEST_Local",
+                    "rtt_type": "icmpAppl",
+                    "rtt": 2,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 3165814157,
+                    "owner": "Admin2",
+                    "tag": "TEST_Lnms_Neg",
+                    "rtt_type": "icmpAppl",
+                    "rtt": 4,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        }
+    }
+}

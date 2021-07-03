@@ -117,7 +117,7 @@ if ($vars['id']) {
         }
 
         // These Types have more graphs. Display a sub-page
-        if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter') || ($sla['rtt_type'] == 'IcmpEcho') || ($sla['rtt_type'] == 'IcmpTimeStamp')) {
+        if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter') || ($sla['rtt_type'] == 'IcmpEcho') || ($sla['rtt_type'] == 'IcmpTimeStamp') || ($sla['rtt_type'] == 'icmpAppl')) {
             $name = '<a href="' . \LibreNMS\Util\Url::generate($vars, ['tab' => 'slas', 'id' => $sla['sla_id']]) . '">' . $name . '</a>';
         } else {
             $name = htmlentities($name);
