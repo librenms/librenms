@@ -269,7 +269,7 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
                 echo "<i class='fa fa-arrow-right fa-lg' style='color:green' aria-hidden='true'></i> ";
             }
 
-            echo '<b>' . generate_port_link($link_if, makeshortif($link_if['label'])) . ' on ' . generate_device_link($link_if, shorthost($link_if['hostname']));
+            echo '<b>' . generate_port_link($link_if, makeshortif($link_if['label'])) . ' on ' . generate_device_link($link_if);
 
             if ($int_links_v6[$int_link]) {
                 echo " <b style='color: #a10000;'>v6</b>";
