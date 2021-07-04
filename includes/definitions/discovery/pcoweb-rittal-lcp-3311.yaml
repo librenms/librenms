@@ -1,0 +1,414 @@
+mib: CAREL-RITTAL-LCP-3311-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: lcpSetpoint
+                    value: lcpSetpoint
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.48.{{ $index }}'
+                    descr: LCP setpoint
+                    index: 'lcpSetpoint.{{ $index }}'
+                -
+                    oid: inputTemperatureAverage
+                    value: inputTemperatureAverage
+                    divisor: 10
+                    group: Input
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.21.{{ $index }}'
+                    descr: Average input temperature
+                    index: 'inputTemperatureAverage.{{ $index }}'
+                -
+                    oid: outputTemperatureAverage
+                    value: outputTemperatureAverage
+                    divisor: 10
+                    group: Output
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.22.{{ $index }}'
+                    descr: Average output temperature
+                    index: 'outputTemperatureAverage.{{ $index }}'
+                -
+                    oid: inputTemperatureTopSensor
+                    value: inputTemperatureTopSensor
+                    divisor: 10
+                    group: Input
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.6.{{ $index }}'
+                    descr: Top sensor input temperature
+                    index: 'inputTemperatureTopSensor.{{ $index }}'
+                -
+                    oid: inputTemperatureMidSensor
+                    value: inputTemperatureMidSensor
+                    divisor: 10
+                    group: Input
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.7.{{ $index }}'
+                    descr: Mid sensor input temperature
+                    index: 'inputTemperatureMidSensor.{{ $index }}'
+                -
+                    oid: inputTemperatureBottomSensor
+                    value: inputTemperatureBottomSensor
+                    divisor: 10
+                    group: Input
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.8.{{ $index }}'
+                    descr: Bottom sensor input temperature
+                    index: 'inputTemperatureBottomSensor.{{ $index }}'
+                -
+                    oid: outputTemperatureTopSensor
+                    value: outputTemperatureTopSensor
+                    divisor: 10
+                    group: Output
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.2.{{ $index }}'
+                    descr: Top sensor output temperature
+                    index: 'outputTemperatureTopSensor.{{ $index }}'
+                -
+                    oid: outputTemperatureMidSensor
+                    value: outputTemperatureMidSensor
+                    divisor: 10
+                    group: Output
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.3.{{ $index }}'
+                    descr: Mid sensor output temperature
+                    index: 'outputTemperatureMidSensor.{{ $index }}'
+                -
+                    oid: outputTemperatureBottomSensor
+                    value: outputTemperatureBottomSensor
+                    divisor: 10
+                    group: Output
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.4.{{ $index }}'
+                    descr: Bottom sensor output temperature
+                    index: 'outputTemperatureBottomSensor.{{ $index }}'
+                -
+                    oid: driverTemperature
+                    value: driverTemperature
+                    divisor: 10
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.4.{{ $index }}'
+                    descr: Power+ driver temperature
+                    index: 'driverTemperature.{{ $index }}'
+                -
+                    oid: compressorDischargeTemperature
+                    value: compressorDischargeTemperature
+                    divisor: 10
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.9.{{ $index }}'
+                    descr: Compressor discharge temperature
+                    index: 'compressorDischargeTemperature.{{ $index }}'
+                -
+                    oid: compressorSuctionTemperature
+                    value: compressorSuctionTemperature
+                    divisor: 10
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.10.{{ $index }}'
+                    descr: Compressor suction temperature
+                    index: 'compressorSuctionTemperature.{{ $index }}'
+                -
+                    oid: evaporatorTemperature
+                    value: evaporatorTemperature
+                    divisor: 10
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.13.{{ $index }}'
+                    descr: Evaporator temperature
+                    index: 'evaporatorTemperature.{{ $index }}'
+                -
+                    oid: condensingTemperature
+                    value: condensingTemperature
+                    divisor: 10
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.14.{{ $index }}'
+                    descr: Condensor temperature
+                    index: 'condensingTemperature.{{ $index }}'
+        pressure:
+            data:
+                -
+                    oid: compressorDischargePressure
+                    value: compressorDischargePressure
+                    multiplier: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.11.{{ $index }}'
+                    descr: Compressor discharge pressure
+                    index: 'compressorDischargePressure.{{ $index }}'
+                -
+                    oid: compressorSuctionPressure
+                    value: compressorSuctionPressure
+                    multiplier: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.12.{{ $index }}'
+                    descr: Compressor suction pressure
+                    index: 'compressorSuctionPressure.{{ $index }}'
+        cooling:
+        # LCP DX has a max cooling capacity of 12Kw. Measurement is done in %
+            data:
+                -
+                    oid: coolingCapacity
+                    value: coolingCapacity
+                    multiplier: 120
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.16.{{ $index }}'
+                    descr: Free cooling capacity
+                    index: 'coolingCapacity.{{ $index }}'
+                    low_warn_limit: 1500
+                    low_limit: 1000
+        fanspeed:
+            data:
+                -
+                    oid: fanSpeedRpm
+                    value: fanSpeedRpm
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.29.{{ $index }}'
+                    descr: Fan speed
+                    index: 'fanSpeedRpm.{{ $index }}'
+                    warn_limit: 3000
+                    high_limit: 3500
+                -
+                    oid: compressorRotorSpeed
+                    value: compressorRotorSpeed
+                    divisor: 60
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.45.{{ $index }}'
+                    descr: Compressor rotor speed
+                    index: 'compressorRotorSpeed.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: compressorMotorCurrent
+                    value: compressorMotorCurrent
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.46.{{ $index }}'
+                    descr: Compressor motor current
+                    index: 'compressorMotorCurrent.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: dcBusVoltage
+                    value: dcBusVoltage
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.5.{{ $index }}'
+                    descr: Power+ DC voltage
+                    index: 'dcBusVoltage.{{ $index }}'
+                -
+                    oid: motorVoltage
+                    value: motorVoltage
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.6.{{ $index }}'
+                    descr: Motor voltage
+                    index: 'motorVoltage.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: unitOnOff
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
+                    descr: Unit state
+                    index: 'unitOnOff.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'off' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'on' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'energy-save' }
+                        - { value: 3, generic: 0, graph: 0, descr: 'auto' }
+                -
+                    oid: driverPowerStatus
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
+                    descr: Power+ drive status
+                    index: 'driverPowerStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'stop' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'run' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: inverterOnOff
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.17.{{ $index }}'
+                    descr: Inverter state
+                    index: 'inverterOnOff.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'off' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'on' }
+                -
+                    oid: envelopeZone
+                    group: Unit
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.14.{{ $index }}'
+                    descr: Cooling envelope zone
+                    index: 'envelopeZone.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'maximum compression ratio' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'maximum discharge power' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'current limit' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'maximum suction power' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'minimum compression ratio' }
+                        - { value: 6, generic: 1, graph: 0, descr: 'minimum delta power' }
+                        - { value: 7, generic: 1, graph: 0, descr: 'minimum discharge power' }
+                        - { value: 8, generic: 1, graph: 0, descr: 'minimum suction power' }
+                -
+                    oid: compressorOverloadAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.2.{{ $index }}'
+                    descr: Compressor overload
+                    index: 'compressorOverloadAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: highPressureAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.3.{{ $index }}'
+                    descr: High pressure
+                    index: 'highPressureAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: inverterAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.1.{{ $index }}'
+                    descr: Inverter
+                    index: 'inverterAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: driveAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.12.{{ $index }}'
+                    descr: Power+ drive
+                    index: 'driveAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: generalAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.23.{{ $index }}'
+                    descr: General alarm
+                    index: 'generalAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorEnvelopeAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.30.{{ $index }}'
+                    descr: Compressor envelope
+                    index: 'compressorEnvelopeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorStartupFailureAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.31.{{ $index }}'
+                    descr: Compressor startup (max retries)
+                    index: 'compressorStartupFailureAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: maxDischargeTemperatureAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.33.{{ $index }}'
+                    descr: Maximum discharge temperature
+                    index: 'maxDischargeTemperatureAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorDeltaPressureAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.35.{{ $index }}'
+                    descr: Compressor delta pressure
+                    index: 'compressorDeltaPressureAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: oilReturnAlarm
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.36.{{ $index }}'
+                    descr: Oil return (lubrication issue)
+                    index: 'oilReturnAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: outputTemperatureTopProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.38.{{ $index }}'
+                    descr: Output top probe
+                    index: 'outputTemperatureTopProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: outputTemperatureMidProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.39.{{ $index }}'
+                    descr: Output mid probe
+                    index: 'outputTemperatureMidProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: outputTemperatureBottomProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.40.{{ $index }}'
+                    descr: Output bottom probe
+                    index: 'outputTemperatureBottomProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: inputTemperatureTopProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.42.{{ $index }}'
+                    descr: Input top probe
+                    index: 'inputTemperatureTopProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: inputTemperatureMidProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.43.{{ $index }}'
+                    descr: Input mid probe
+                    index: 'inputTemperatureMidProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: inputTemperatureBottomProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.44.{{ $index }}'
+                    descr: Input bottom probe
+                    index: 'inputTemperatureBottomProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorDischargeTemperatureProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.45.{{ $index }}'
+                    descr: Compressor discharge temperature probe
+                    index: 'compressorDischargeTemperatureProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorSuctionTemperatureProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.46.{{ $index }}'
+                    descr: Compressor suction temperature probe
+                    index: 'compressorSuctionTemperatureProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorDischargePressureProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.47.{{ $index }}'
+                    descr: Compressor discharge pressure probe
+                    index: 'compressorDischargePressureProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                -
+                    oid: compressorSuctionPressureProbeAlarm
+                    group: Probes
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.48.{{ $index }}'
+                    descr: Compressor suction pressure probe
+                    index: 'compressorSuctionPressureProbeAlarm.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }

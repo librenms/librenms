@@ -1,0 +1,767 @@
+-- *****************************************************************
+--  CAREL-RITTAL-LCP-3311-MIB
+--  MIB for rittal 3311 lcp chillers using a carel pcoweb card (SK 3311.320)
+--
+-- June, 2021 Gregory Bers, Limburg, Belgium
+--  
+-- System OID found under .1.3.6.1.2.1.1.2.0
+-- 
+-- Documentation: https://github.com/epiecs/carel-pco-mibs
+--
+-- PCO settings
+-- System OID:		1.3.6.1.4.1.9839.2606.1
+-- Enterprise OID:	9839.2606
+-- *****************************************************************
+
+CAREL-RITTAL-LCP-3311-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, enterprises, OBJECT-TYPE, Integer32
+				FROM SNMPv2-SMI
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC        
+        ;
+
+carel	MODULE-IDENTITY
+		LAST-UPDATED "202106290000Z"
+		ORGANIZATION "Epiecs"
+                CONTACT-INFO
+			"EPIECS
+                        epiecs.be
+
+			Email:	gregorybers@epiecs.be"
+		DESCRIPTION
+			"Custom MIB for Rittal LCP 3311 chillers connected to a pco web card"
+
+		REVISION
+			"202106290000Z"
+
+		DESCRIPTION
+			"First draft containing the values outlined in the 3311.320 docs 
+                        https://www.rittal.com/imf/none/3_4342/3311320_Instructions_spec__EN"
+
+	::= { enterprises 9839 }
+
+-- tree under 9839
+     rittal                      OBJECT IDENTIFIER ::= { carel 2606 }
+       rittalLCP3311               OBJECT IDENTIFIER ::= { rittal 2 }
+         sensors                     OBJECT IDENTIFIER ::= { rittalLCP3311 1 }
+           digital                   OBJECT IDENTIFIER ::= { sensors  1 }
+           analog                    OBJECT IDENTIFIER ::= { sensors  2 }
+           integer                   OBJECT IDENTIFIER ::= { sensors  3 }
+
+-- 
+-- object groups
+-- 
+
+-- integerSensors OBJECT-GROUP
+--     OBJECTS { fanSpeedPercent, fanSpeedRpm }
+--     STATUS  current
+--     DESCRIPTION
+--             "A collection of all sensors providing integer values"
+--     ::= { integer 1 }
+
+-- 
+-- conversions
+-- 
+
+DivBy10 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Fixed point, one decimal"
+    SYNTAX       Integer32
+
+-- 
+-- digital objects
+-- 
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.2
+compressorOverloadAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor overload alarm
+                ok (0),
+		alarm (1)"
+	::= { digital 2 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.3
+highPressureAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "High pressure alarm
+                ok (0),
+		alarm (1)"
+	::= { digital 3 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.8
+remoteOnOff               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Remote On/Off
+                off (0),
+		on (1)"
+	::= { digital 8 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.11
+inverterAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Inverter alarm
+                ok (0),
+		alarm (1)"
+	::= { digital 11 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.12
+driveAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Power+ drive off-line alarm
+                ok (0),
+		alarm (1)"
+	::= { digital 12 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.17
+inverterOnOff               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Inverter On/Off
+                off (0),
+		on (1)"
+	::= { digital 17 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.23
+generalAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "General alarm
+                ok (0),
+		alarm (1)"
+	::= { digital 23 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.29
+resetAllAlarms               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		no (0),
+		yes (1)
+	}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	  "Reset all alarms
+                no (0),
+		yes (1)"
+	::= { digital 29 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.30
+compressorEnvelopeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor forced off working out envelope
+                ok (0),
+		alarm (1)"
+	::= { digital 30 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.31
+compressorStartupFailureAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor startup failure alarm, reached max retries
+                ok (0),
+		alarm (1)"
+	::= { digital 31 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.33
+maxDischargeTemperatureAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Maximum discharge temperature has been reached
+                ok (0),
+		alarm (1)"
+	::= { digital 33 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.35
+compressorDeltaPressureAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Delta pressure too big to startup compressor
+                ok (0),
+		alarm (1)"
+	::= { digital 35 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.36
+oilReturnAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Oil return alarm for when the compressor is running. Lubrication issue.
+                ok (0),
+		alarm (1)"
+	::= { digital 36 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.38
+outputTemperatureTopProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Top output temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 38 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.39
+outputTemperatureMidProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Mid output temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 39 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.40
+outputTemperatureBottomProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Bottom output temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 40 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.42
+inputTemperatureTopProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Top input temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 42 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.43
+inputTemperatureMidProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Mid input temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 43 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.44
+inputTemperatureBottomProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Bottom input temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 44 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.45
+compressorDischargeTemperatureProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor discharge temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 45 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.46
+compressorSuctionTemperatureProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor suction temperature probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 46 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.47
+compressorDischargePressureProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor discharge pressure probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 47 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.48
+compressorSuctionPressureProbeAlarm               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		alarm (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor suction pressure probe broken
+                ok (0),
+		alarm (1)"
+	::= { digital 48 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.1.100
+reboot               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		no (0),
+		yes (1)
+	}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	  "Reboot the system
+                no (0),
+		yes (1)"
+	::= { digital 100 }
+
+-- 
+-- integer objects
+-- 
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.1
+compressorRotorSpeedHz            OBJECT-TYPE
+	SYNTAX		INTEGER (0..9999)
+        UNITS           "Hz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor rotor speed in Hz"
+	::= { integer 1 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.2
+driverPowerStatus               OBJECT-TYPE
+	SYNTAX		INTEGER {
+		stop (1),
+		run (2),
+		alarm (3)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Driver power status
+                stop (1),
+		run (2),
+		alarm (3)"
+	::= { integer 2 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.3
+currentErrorCode                OBJECT-TYPE
+	SYNTAX		INTEGER (0..99)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Current error code"
+	::= { integer 3 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.4
+driverTemperature               OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Driver Power+ Temperature"
+	::= { integer 4 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.5
+dcBusVoltage               OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "V"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Power+ DC Voltage"
+	::= { integer 5 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.6
+motorVoltage               OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "V"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Motor Voltage"
+	::= { integer 6 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.7
+powerRequest               OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Request of power for inverter after envelop"
+	::= { integer 7 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.13
+unitOnOff               OBJECT-TYPE
+	SYNTAX		INTEGER {
+                off (0),
+		on (1),
+		energy-save (2),
+		auto (3)
+        }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	  "Unit on/off state
+          off (0),
+          on (1),
+          energy-save (2),
+          auto (3)
+          "
+	::= { integer 13 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.14
+envelopeZone               OBJECT-TYPE
+	SYNTAX		INTEGER {
+                ok (0),
+		maximum-compression-ratio (1),
+		maximum-discharge-power (2),
+		current-limit (3),
+		maximum-suction-power(4),
+		minimum-compression-ratio (5),
+		minimum-delta-power (6),
+		minimum-discharge-power(7),
+		minimum-suction-power (8)
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "envelope zone
+          ok (0),
+	  maximum compression ratio (1),
+	  maximum discharge power (2),
+	  current limit (3),
+	  maximum suction power(4),
+	  minimum compression ratio (5),
+	  minimum delta power (6),
+	  minimum discharge power(7),
+	  minimum suction power (8)
+          "
+	::= { integer 14 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.16
+coolingCapacity               OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+        UNITS           "%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Actual EVD valve cooling capacity"
+	::= { integer 16 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.17
+evdValveSteps               OBJECT-TYPE
+	SYNTAX		INTEGER (0..540)
+        UNITS           "steps"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "EVD valve steps position"
+	::= { integer 17 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.28
+fanSpeedPercent                 OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+        UNITS           "%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "The fan speed percentage"
+	::= { integer 28 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.29
+fanSpeedRpm                     OBJECT-TYPE
+	SYNTAX		INTEGER (0..3700)
+        UNITS           "rpm"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "The fan speed rpm"
+	::= { integer 29 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.3.30
+evdValveOpening               OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+        UNITS           "%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Actual EVD valve opening"
+	::= { integer 30 }
+
+--
+-- analog objects
+--
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.2
+outputTemperatureTopSensor       OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Top sensor output temperature in Celcius"
+	::= { analog 2 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.3
+outputTemperatureMidSensor       OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Mid sensor output temperature in Celcius"
+	::= { analog 3 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.4
+outputTemperatureBottomSensor    OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Bottom sensor output temperature in Celcius"
+	::= { analog 4 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.6
+inputTemperatureTopSensor       OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Top sensor input temperature in Celcius"
+	::= { analog 6 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.7
+inputTemperatureMidSensor       OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Mid sensor input temperature in Celcius"
+	::= { analog 7 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.8
+inputTemperatureBottomSensor    OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Bottom sensor input temperature in Celcius"
+	::= { analog 8 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.9
+compressorDischargeTemperature  OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor discharge temperature"
+	::= { analog 9 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.10
+compressorSuctionTemperature    OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor suction temperature"
+	::= { analog 10 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.11
+compressorDischargePressure  OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "bar"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor discharge pressure"
+	::= { analog 11 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.12
+compressorSuctionPressure    OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "bar"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor suction pressure"
+	::= { analog 12 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.13
+evaporatorTemperature    OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Evaporator temperature from Low pressure conversion"
+	::= { analog 13 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.14
+condensingTemperature  OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Condensing temperature from High pressure conversion"
+	::= { analog 14 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.21
+inputTemperatureAverage         OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Average input temperature in Celcius"
+	::= { analog 21 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.22
+outputTemperatureAverage        OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Average output temperature in Celcius"
+	::= { analog 22 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.45
+compressorRotorSpeed        OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "rps"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor rotor speed"
+	::= { analog 45 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.46
+compressorMotorCurrent        OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "A"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	  "Compressor motor current"
+	::= { analog 46 }
+
+        --  .1.3.6.1.4.1.9839.2606.2.1.2.48
+lcpSetpoint        OBJECT-TYPE
+	SYNTAX		DivBy10
+        UNITS           "C"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	  "Main LCP setpoint"
+	::= { analog 48 }
+
+END
