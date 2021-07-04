@@ -62,7 +62,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $device['group_name'] = 'General';
     }
     $response[] = [
-        'hostname'              => generate_device_link($device, format_hostname($device), ['tab' => 'graphs', 'group' => 'poller']),
+        'hostname'              => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
         'last_polled'           => $device['last_polled'],
         'poller_group'          => $device['group_name'],
         'location'              => $device['location'],
