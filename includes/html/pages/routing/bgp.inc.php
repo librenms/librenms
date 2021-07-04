@@ -312,7 +312,7 @@ if (! Auth::user()->hasGlobalRead()) {
         unset($sep);
 
         echo '  <td></td>
-            <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, shorthost($peer['hostname']), ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
+            <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
             <td width=150>' . $peeraddresslink . "</td>
             <td width=50><b>$peer_type</b></td>
