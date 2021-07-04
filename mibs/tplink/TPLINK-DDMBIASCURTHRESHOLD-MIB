@@ -1,0 +1,99 @@
+   TPLINK-DDMBIASCURTHRESHOLD-MIB DEFINITIONS ::= BEGIN
+
+         IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE
+          	  	        FROM SNMPv2-SMI
+          	ifIndex
+						FROM RFC1213-MIB
+			DisplayString
+						FROM SNMPv2-TC
+			tplinkDdmManageMIBObjects
+						FROM TPLINK-DDMMANAGE-MIB;
+						
+		   		ddmBiasCurThreshold MODULE-IDENTITY  
+				    LAST-UPDATED    "200908270000Z"
+				    ORGANIZATION    "TPLINK"
+				    CONTACT-INFO		"www.tplink.com"
+				    DESCRIPTION			"The config of DDM bias current threshold."
+				    REVISION        "200908270000Z"
+				    DESCRIPTION			"Initial version of this MIB module."
+				    ::= { tplinkDdmManageMIBObjects 4 } 
+			 												
+				ddmBiasCurThresholdTable OBJECT-TYPE
+					SYNTAX SEQUENCE OF DDMBiasCurThresholdEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A table that is used to configure the DDM Bias Current Threshold for specific ports on the Switch."
+					::= { ddmBiasCurThreshold 1 }
+				
+				ddmBiasCurThresholdEntry OBJECT-TYPE
+					SYNTAX			DDMBiasCurThresholdEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A list of information for every port."	
+					INDEX { ifIndex }
+					::= { ddmBiasCurThresholdTable 1 }
+					
+				DDMBiasCurThresholdEntry ::=
+				SEQUENCE
+				{
+                    ddmBiasCurThresholdPort				DisplayString(SIZE(0..255)),
+					ddmBiasCurThresholdHighAlarm		OCTET STRING(SIZE(0..30)),
+					ddmBiasCurThresholdLowAlarm			OCTET STRING(SIZE(0..30)),
+					ddmBiasCurThresholdHighWarn			OCTET STRING(SIZE(0..30)),
+					ddmBiasCurThresholdLowWarn			OCTET STRING(SIZE(0..30)),
+					ddmBiasCurThresholdPortLAG			OCTET STRING(SIZE(0..30))
+				}
+				         
+				ddmBiasCurThresholdPort OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..255))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the port number."
+					::= { ddmBiasCurThresholdEntry 1 }
+
+				ddmBiasCurThresholdHighAlarm OBJECT-TYPE
+					SYNTAX 				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the highest threshold for the alarm."
+					::= { ddmBiasCurThresholdEntry 2 }
+				
+				ddmBiasCurThresholdLowAlarm OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the lowest threshold for the alarm."
+					::=	{ ddmBiasCurThresholdEntry 3 }
+		        
+				ddmBiasCurThresholdHighWarn OBJECT-TYPE
+					SYNTAX 				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the highest threshold for the warning."
+					::= { ddmBiasCurThresholdEntry 4 }
+				
+				ddmBiasCurThresholdLowWarn OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the lowest threshold for the warning."
+					::=	{ ddmBiasCurThresholdEntry 5 }
+
+				ddmBiasCurThresholdPortLAG OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the lag number of the port."
+					::= { ddmBiasCurThresholdEntry 6 }
+																			
+END
+					
