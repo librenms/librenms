@@ -40,9 +40,9 @@ foreach (dbFetchRows($sql, [$device_id]) as $stp_ports_db) {
         'state'              => $stp_ports_db['state'],
         'enable'             => $stp_ports_db['enable'],
         'pathCost'           => $stp_ports_db['pathCost'],
-        'designatedRoot'     => ($root_device ? generate_device_link($root_device, $root_device['hostname']) : \LibreNMS\Util\Rewrite::readableOUI($stp_ports_db['designatedRoot'])) . '<br>' . \LibreNMS\Util\Rewrite::readableMac($stp_ports_db['designatedRoot']),
+        'designatedRoot'     => ($root_device ? generate_device_link($root_device) : \LibreNMS\Util\Rewrite::readableOUI($stp_ports_db['designatedRoot'])) . '<br>' . \LibreNMS\Util\Rewrite::readableMac($stp_ports_db['designatedRoot']),
         'designatedCost'     => $stp_ports_db['designatedCost'],
-        'designatedBridge'   => ($bridge_device ? generate_device_link($bridge_device, $bridge_device['hostname']) : \LibreNMS\Util\Rewrite::readableOUI($stp_ports_db['designatedBridge'])) . '<br>' . \LibreNMS\Util\Rewrite::readableMac($stp_ports_db['designatedBridge']),
+        'designatedBridge'   => ($bridge_device ? generate_device_link($bridge_device) : \LibreNMS\Util\Rewrite::readableOUI($stp_ports_db['designatedBridge'])) . '<br>' . \LibreNMS\Util\Rewrite::readableMac($stp_ports_db['designatedBridge']),
         'designatedPort'     => $stp_ports_db['designatedPort'],
         'forwardTransitions' => $stp_ports_db['forwardTransitions'],
     ];
