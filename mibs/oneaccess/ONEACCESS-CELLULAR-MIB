@@ -1,0 +1,500 @@
+--          *****************************
+--          *                           *
+--          *         ONEOS MIB         *
+--          *                           *
+--          *****************************
+--
+--          ONEOS_MIB_STD_V05.2.R001_E002
+--
+--          Creation date : 16/04/2009
+--
+--          Compatibility with ONEOS_V31
+--
+--          Compatibility with ONEOS_V32
+--
+--          Compatibility with ONEOS_V42
+--
+
+     ONEACCESS-CELLULAR-MIB    DEFINITIONS ::= BEGIN
+
+--------------------------------------------------------------------
+-- Imports
+--------------------------------------------------------------------
+     IMPORTS
+        DisplayString
+			FROM SNMPv2-TC
+        MODULE-IDENTITY, OBJECT-TYPE,Integer32,Unsigned32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        oacExpIMCellRadio,oacMIBModules
+            FROM ONEACCESS-GLOBAL-REG;
+
+
+--------------------------------------------------------------------
+-- Module Entity
+--------------------------------------------------------------------
+     oacCellularMIBModule MODULE-IDENTITY
+		LAST-UPDATED "201310150000Z"
+        ORGANIZATION " OneAccess "
+         CONTACT-INFO
+           "Pascal KESTELOOT
+            Postal: ONE ACCESS
+                    381 Avenue du General de Gaulle
+                    92140 Clamart, France
+            FRANCE
+
+            Tel: (+33) 01 41 87 70 00
+            Fax: (+33) 01 41 87 74 00
+
+            E-mail: pascal.kesteloot@oneaccess-net.com"
+
+
+      DESCRIPTION   "Add cellular equipment and network info"
+      REVISION      "201404070000Z"
+  
+      DESCRIPTION   "Add RSSI table"
+      REVISION      "201310150000Z"
+
+      DESCRIPTION   "Contact updated"
+    	REVISION      "201110270000Z"
+
+		DESCRIPTION   "Fixed some minor corrections."
+      REVISION      "201007080001Z"
+			
+	   DESCRIPTION   "This MIB module describes Cellular Radio Managed objects."
+
+    ::= { oacMIBModules 1000 }
+
+
+--------------------------------------------------------------------
+-- Entry Point (cf. ONEACCESS-GLOBAL-REG.mib)
+--------------------------------------------------------------------
+
+oacCellRadioRssi OBJECT IDENTIFIER ::= { oacExpIMCellRadio 1 }
+
+
+-------------------------------------------------------------------------------------------
+-- RSSI Last Hour Table
+-------------------------------------------------------------------------------------------
+
+oacCellRssiLastHourTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OacCellRssiLastHourEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "RSSI values of the last hour."
+     ::= { oacCellRadioRssi 1 }
+     
+oacCellRssiLastHourEntry OBJECT-TYPE
+        SYNTAX OacCellRssiLastHourEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index into the table oacCellRssiLastHour"
+        INDEX { oacCellRssiLastHourMinutes }
+::= { oacCellRssiLastHourTable 1 }
+
+OacCellRssiLastHourEntrySyntax ::= SEQUENCE
+  {
+  oacCellRssiLastHourMinutes  Unsigned32,
+  oacCellRssiLastHourMin      Integer32,
+  oacCellRssiLastHourAvg      Integer32,
+  oacCellRssiLastHourMax      Integer32
+  }
+
+oacCellRssiLastHourMinutes OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Timestamp (in minutes)"
+     ::= { oacCellRssiLastHourEntry 1 }
+     
+oacCellRssiLastHourMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Minimum"
+     ::= { oacCellRssiLastHourEntry 2 }
+     
+oacCellRssiLastHourAvg OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Average"
+     ::= { oacCellRssiLastHourEntry 3 }
+
+oacCellRssiLastHourMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Maximum"
+     ::= { oacCellRssiLastHourEntry 4 }
+
+
+-------------------------------------------------------------------------------------------
+-- RSSI Last Day Table
+-------------------------------------------------------------------------------------------
+
+oacCellRssiLastDayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OacCellRssiLastDayEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "RSSI values of the last day."
+     ::= { oacCellRadioRssi 2 }
+     
+oacCellRssiLastDayEntry OBJECT-TYPE
+        SYNTAX OacCellRssiLastDayEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index into the table oacCellRssiLastDay"
+        INDEX { oacCellRssiLastDayHours }
+::= { oacCellRssiLastDayTable 1 }
+
+OacCellRssiLastDayEntrySyntax ::= SEQUENCE
+  {
+  oacCellRssiLastDayHours  Unsigned32,
+  oacCellRssiLastDayMin    Integer32,
+  oacCellRssiLastDayAvg    Integer32,
+  oacCellRssiLastDayMax    Integer32
+  }
+
+oacCellRssiLastDayHours OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Timestamp (in hours)"
+     ::= { oacCellRssiLastDayEntry 1 }
+     
+oacCellRssiLastDayMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Minimum"
+     ::= { oacCellRssiLastDayEntry 2 }
+     
+oacCellRssiLastDayAvg OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Average"
+     ::= { oacCellRssiLastDayEntry 3 }
+
+oacCellRssiLastDayMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Maximum"
+     ::= { oacCellRssiLastDayEntry 4 }
+
+
+-------------------------------------------------------------------------------------------
+-- RSSI Last Month Table
+-------------------------------------------------------------------------------------------
+
+oacCellRssiLastMonthTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OacCellRssiLastMonthEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "RSSI values of the last month."
+     ::= { oacCellRadioRssi 3 }
+     
+oacCellRssiLastMonthEntry OBJECT-TYPE
+        SYNTAX OacCellRssiLastMonthEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index into the table oacCellRssiLastMonth"
+        INDEX { oacCellRssiLastMonthDays }
+::= { oacCellRssiLastMonthTable 1 }
+
+OacCellRssiLastMonthEntrySyntax ::= SEQUENCE
+  {
+  oacCellRssiLastMonthDays  Unsigned32,
+  oacCellRssiLastMonthMin   Integer32,
+  oacCellRssiLastMonthAvg   Integer32,
+  oacCellRssiLastMonthMax   Integer32
+  }
+
+oacCellRssiLastMonthDays OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Timestamp (in days)"
+     ::= { oacCellRssiLastMonthEntry 1 }
+     
+oacCellRssiLastMonthMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Minimum"
+     ::= { oacCellRssiLastMonthEntry 2 }
+     
+oacCellRssiLastMonthAvg OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Average"
+     ::= { oacCellRssiLastMonthEntry 3 }
+
+oacCellRssiLastMonthMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSSI Maximum"
+     ::= { oacCellRssiLastMonthEntry 4 }
+
+-------------------------------------------------------------------------------------------
+-- ModuleTable
+-------------------------------------------------------------------------------------------
+oacCellRadioModuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OacCellRadioModuleEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of cellular modules."
+     ::= { oacExpIMCellRadio 2 }
+oacCellRadioModuleEntry OBJECT-TYPE
+        SYNTAX OacCellRadioModuleEntrySyntax
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index into the table oacCellRadioModule"
+        INDEX { oacCellModuleIndex }
+::= { oacCellRadioModuleTable 1 }
+OacCellRadioModuleEntrySyntax ::= SEQUENCE
+  {
+  oacCellModuleIndex                Unsigned32,
+  oacCellManufacturer               DisplayString,
+  oacCellEquipment                  DisplayString,
+  oacCellBootRevision               DisplayString,
+  oacCellRevision                   DisplayString,
+  oacCellIMEI                       DisplayString,
+  oacCellMEID                       DisplayString,
+  oacCellSIMStatus                  DisplayString,
+  oacCellIMSI                       DisplayString,
+  oacCellICCI                       DisplayString,
+  oacCellPinStatus                  DisplayString,
+  oacCellSelectedOperator           DisplayString,
+  oacCellSignalStrength             Integer32,
+  oacCellEcIo                       Integer32,
+  oacCellRSRQ                       Integer32, 
+  oacCellRSRP                       Integer32,
+  oacCellSNR                        Integer32, 
+  oacCellRadioAccessTechnology      DisplayString,
+  oacCellCircuitSwitchedState       DisplayString,
+  oacCellPacketSwitchedState        DisplayString,
+  oacCellResetOnLossOfRegistration  Unsigned32,
+  oacCellResetOnFailedRegistration  Unsigned32,
+  oacCellHardwareReset              Unsigned32,
+  oacCellLAC                        DisplayString,
+  oacCellCellID                     DisplayString,
+  oacCellTAC                        DisplayString,
+  oacCellPLMN                       DisplayString
+  }
+oacCellModuleIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index"
+     ::= { oacCellRadioModuleEntry 1 }
+oacCellManufacturer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Manufacturer identification"
+     ::= { oacCellRadioModuleEntry 10 }
+oacCellEquipment OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Equipment information"
+     ::= { oacCellRadioModuleEntry 11 }
+oacCellBootRevision OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Boot revision identification"
+     ::= { oacCellRadioModuleEntry 12 }
+oacCellRevision OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Revision identification"
+     ::= { oacCellRadioModuleEntry 13 }
+oacCellIMEI OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Equipment information (IMEI)"
+     ::= { oacCellRadioModuleEntry 14 }
+oacCellMEID OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "CDMA Mobile Equipment Id (MEID)"
+     ::= { oacCellRadioModuleEntry 15 }
+oacCellSIMStatus OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SIM card status"
+     ::= { oacCellRadioModuleEntry 20 }
+oacCellIMSI OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SIM International Mobile Subscriber Identity IMSI"
+     ::= { oacCellRadioModuleEntry 21 }
+oacCellICCI OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Integrated Circuit Card ID"
+     ::= { oacCellRadioModuleEntry 22 }
+oacCellPinStatus OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "PIN code status"
+     ::= { oacCellRadioModuleEntry 30 }
+oacCellSelectedOperator OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current selected operator"
+     ::= { oacCellRadioModuleEntry 40 }
+oacCellSignalStrength OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Signal strength (dBm)"
+     ::= { oacCellRadioModuleEntry 41 }
+oacCellEcIo OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total Ec/Io"
+     ::= { oacCellRadioModuleEntry 42 }
+oacCellRSRQ OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSRQ (dB)"
+     ::= { oacCellRadioModuleEntry 43 }
+oacCellRSRP OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RSRP (dBm)"
+     ::= { oacCellRadioModuleEntry 44 }
+oacCellSNR OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SNR (dB)"
+     ::= { oacCellRadioModuleEntry 45 }
+oacCellRadioAccessTechnology OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current radio access technology"
+     ::= { oacCellRadioModuleEntry 46 }
+oacCellCircuitSwitchedState OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Circuit-switched register state"
+     ::= { oacCellRadioModuleEntry 47 }
+oacCellPacketSwitchedState OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet-switched attach state"
+     ::= { oacCellRadioModuleEntry 48 }
+oacCellResetOnLossOfRegistration OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Reset on loss of GPRS registration"
+     ::= { oacCellRadioModuleEntry 60 }
+oacCellResetOnFailedRegistration OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Reset on failed initial registration"
+     ::= { oacCellRadioModuleEntry 61 }
+oacCellHardwareReset OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Hardware reset of modem"
+     ::= { oacCellRadioModuleEntry 62 }
+oacCellLAC OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Location Area Code (LAC)"
+     ::= { oacCellRadioModuleEntry 70 }
+oacCellCellID OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cell ID"
+     ::= { oacCellRadioModuleEntry 71 }
+oacCellTAC OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Tracking Area Code (TAC)"
+     ::= { oacCellRadioModuleEntry 72 }
+oacCellPLMN OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Public Land Mobile Network (PLMN = MCC+MNC)"
+     ::= { oacCellRadioModuleEntry 73 }
+END
+--
