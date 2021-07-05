@@ -275,8 +275,8 @@ modules:
                     descr: General alarm
                     index: 'generalAlarm.{{ $index }}'
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'ok' }
                 -
                     oid: compressorEnvelopeAlarm
                     group: Alarms
