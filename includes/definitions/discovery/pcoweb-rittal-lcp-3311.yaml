@@ -224,14 +224,14 @@ modules:
                     index: 'envelopeZone.{{ $index }}'
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 1, graph: 0, descr: 'maximum compression ratio' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'maximum discharge power' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'current limit' }
-                        - { value: 4, generic: 1, graph: 0, descr: 'maximum suction power' }
-                        - { value: 5, generic: 1, graph: 0, descr: 'minimum compression ratio' }
-                        - { value: 6, generic: 1, graph: 0, descr: 'minimum delta power' }
-                        - { value: 7, generic: 1, graph: 0, descr: 'minimum discharge power' }
-                        - { value: 8, generic: 1, graph: 0, descr: 'minimum suction power' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'maximum compression ratio' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'maximum discharge power' }
+                        - { value: 3, generic: 0, graph: 0, descr: 'current limit' }
+                        - { value: 4, generic: 0, graph: 0, descr: 'maximum suction power' }
+                        - { value: 5, generic: 0, graph: 0, descr: 'minimum compression ratio' }
+                        - { value: 6, generic: 0, graph: 0, descr: 'minimum delta power' }
+                        - { value: 7, generic: 0, graph: 0, descr: 'minimum discharge power' }
+                        - { value: 8, generic: 0, graph: 0, descr: 'minimum suction power' }
                 -
                     oid: compressorOverloadAlarm
                     group: Alarms
