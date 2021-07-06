@@ -22,7 +22,9 @@ IMPORTS
     vtVcPathParentIfIndex, vtVcPathIndex,
     e1t1ParentIfIndex, e1t1Index,
     e3t3ParentIfIndex, e3t3Index,
-    cmFlowEntry
+    cmFlowEntry, cmEthernetTrafficPortIndex,
+    cmFlowPointIndex, f3FpQosShaperIndex,
+    f3FpQosPolicerIndex, f3AclRuleIndex
              FROM  CM-FACILITY-MIB
     f3LagIndex
              FROM F3-LAG-MIB
@@ -37,22 +39,54 @@ IMPORTS
 
 
 cmPerformanceMIB MODULE-IDENTITY
-    LAST-UPDATED    "201205180000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202101270000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Performance Monitoring MIB definitions 
              used by the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201205180000Z"
+             Copyright (C) ADVA."
+    REVISION        "202101270000Z"
     DESCRIPTION
             "
+            Notes from release 202005120000Z,
+              (1) Added cmEthernetTrafficPortStatsRLBC,
+                  cmEthernetTrafficPortStatsROPT,
+                  cmEthernetTrafficPortStatsROPR,
+                  cmEthernetTrafficPortStatsRTemp
+                  columns to cmEthernetTrafficPortStatsTable.
+
+              (2) Added cmEthernetTrafficPortHistoryRLBC,
+                  cmEthernetTrafficPortHistoryROPT,
+                  cmEthernetTrafficPortHistoryROPR,
+                  cmEthernetTrafficPortHistoryRTemp
+                  columns to cmEthernetTrafficPortHistoryTable.
+
+            Notes from release 201711300000Z,
+              (1)Added following objects
+                 cmFlowPointStatsAclDropNoMatch,
+                 cmFlowPointStatsAclRuleDrop,
+                 cmFlowPointHistoryAclDropNoMatch,
+                 cmFlowPointHistoryAclRuleDrop,
+            Notes from release 201711270000Z,
+              (1)Added following objects
+                 cmEthernetTrafficPortStatsDroppedFragmented,
+                 cmEthernetTrafficPortHistoryDroppedFragmented
+            Notes from release 201706120000Z,
+              (1)Added following objects
+                 cmFlowPointStatsEfFramesDiscarded,
+                 cmFlowPointStatsEfBytesDiscarded,
+                 cmFlowPointHistoryEfFramesDiscarded,
+                 cmFlowPointHistoryEfBytesDiscarded
             Notes from release 201307220000Z,
               (1)Added following objects
                  cmEthernetAccPortStatsIBRMaxRx,
@@ -537,7 +571,7 @@ cmEthernetAccPortStatsOPT OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Transmit (in dBm) for the physical layer.  This is 
+         "Optical Power Transmitted (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Access Port is fiber."
      ::= { cmEthernetAccPortStatsEntry 33 }
 
@@ -546,7 +580,7 @@ cmEthernetAccPortStatsOPR OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Receive (in dBm) for the physical layer.  This is 
+         "Optical Power Received (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Access Port is fiber."
      ::= { cmEthernetAccPortStatsEntry 34 }
 
@@ -1059,7 +1093,7 @@ cmEthernetAccPortHistoryOPT OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Transmit (in dBm) for the physical layer.  This is 
+         "Optical Power Transmitted (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Access Port is fiber."
      ::= { cmEthernetAccPortHistoryEntry 33 }
 
@@ -1068,7 +1102,7 @@ cmEthernetAccPortHistoryOPR OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Receive (in dBm) for the physical layer.  This is 
+         "Optical Power Received (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Access Port is fiber."
      ::= { cmEthernetAccPortHistoryEntry 34 }
 
@@ -1357,7 +1391,7 @@ cmEthernetAccPortThresholdVarOprVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power received (in dbM), beyond which 
+        "Variance in the Optical Power Received (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { cmEthernetAccPortThresholdVarEntry 1 }
 
@@ -1366,7 +1400,7 @@ cmEthernetAccPortThresholdVarOptVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power transmitted (in dbM), beyond which 
+        "Variance in the Optical Power Transmitted (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { cmEthernetAccPortThresholdVarEntry 2 }
 
@@ -1722,7 +1756,7 @@ cmEthernetNetPortStatsOPT OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Transmit (in dBm) for the physical layer.  This is 
+         "Optical Power Transmitted (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Network Port is fiber."
      ::= { cmEthernetNetPortStatsEntry 33 }
 
@@ -1731,7 +1765,7 @@ cmEthernetNetPortStatsOPR OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Receive (in dBm) for the physical layer.  This is 
+         "Optical Power Received (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Network Port is fiber."
      ::= { cmEthernetNetPortStatsEntry 34 }
 
@@ -2255,7 +2289,7 @@ cmEthernetNetPortHistoryOPT OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Transmit (in dBm) for the physical layer.  This is 
+         "Optical Power Transmitted (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Network Port is fiber."
      ::= { cmEthernetNetPortHistoryEntry 33 }
 
@@ -2264,7 +2298,7 @@ cmEthernetNetPortHistoryOPR OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Receive (in dBm) for the physical layer.  This is 
+         "Optical Power Received (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Network Port is fiber."
      ::= { cmEthernetNetPortHistoryEntry 34 }
 
@@ -2562,7 +2596,7 @@ cmEthernetNetPortThresholdVarOprVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power received (in dbM), beyond which 
+        "Variance in the Optical Power Received (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { cmEthernetNetPortThresholdVarEntry 1 }
 
@@ -2571,7 +2605,7 @@ cmEthernetNetPortThresholdVarOptVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power transmitted (in dbM), beyond which 
+        "Variance in the Optical Power Transmitted (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { cmEthernetNetPortThresholdVarEntry 2 }
 
@@ -4694,7 +4728,28 @@ CmEthernetTrafficPortStatsEntry ::= SEQUENCE {
     cmEthernetTrafficPortStatsUAS                   PerfCounter64,
     cmEthernetTrafficPortStatsTemp                  Integer32,
     cmEthernetTrafficPortStatsLkupFails             PerfCounter64,
-    cmEthernetTrafficPortStatsPSC                   PerfCounter64
+    cmEthernetTrafficPortStatsPSC                   PerfCounter64,
+
+-- new 9.1.1 release columns
+
+    cmEthernetTrafficPortStatsL2PTRxFramesEncap     PerfCounter64,
+    cmEthernetTrafficPortStatsL2PTTxFramesDecap     PerfCounter64,
+    cmEthernetTrafficPortStatsIBRMaxRx              PerfCounter64,
+    cmEthernetTrafficPortStatsIBRMaxTx              PerfCounter64,
+    cmEthernetTrafficPortStatsIBRMinRx              PerfCounter64,
+    cmEthernetTrafficPortStatsIBRMinTx              PerfCounter64,
+    cmEthernetTrafficPortStatsIBRRx                 PerfCounter64,
+    cmEthernetTrafficPortStatsIBRTx                 PerfCounter64,
+    cmEthernetTrafficPortStatsFmcd                  PerfCounter64,
+    cmEthernetTrafficPortStatsFbcd                  PerfCounter64,
+    cmEthernetTrafficPortStatsAclDropNoMatch        PerfCounter64,
+    cmEthernetTrafficPortStatsAclFwd2Cpu            PerfCounter64,
+    cmEthernetTrafficPortStatsDhcpDropNoAssocIf     PerfCounter64,
+    cmEthernetTrafficPortStatsDroppedFragmented     PerfCounter64,
+    cmEthernetTrafficPortStatsRLBC                  Integer32,
+    cmEthernetTrafficPortStatsROPT                  Integer32,
+    cmEthernetTrafficPortStatsROPR                  Integer32,
+    cmEthernetTrafficPortStatsRTemp                 Integer32
 }
 
 cmEthernetTrafficPortStatsIndex OBJECT-TYPE
@@ -4965,7 +5020,7 @@ cmEthernetTrafficPortStatsOPT OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Transmit (in dBm) for the physical layer.  This is 
+         "Optical Power Transmitted (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Port is fiber."
      ::= { cmEthernetTrafficPortStatsEntry 33 }
 
@@ -4974,7 +5029,7 @@ cmEthernetTrafficPortStatsOPR OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Receive (in dBm) for the physical layer.  This is 
+         "Optical Power Received (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Port is fiber."
      ::= { cmEthernetTrafficPortStatsEntry 34 }
 
@@ -5053,6 +5108,153 @@ cmEthernetTrafficPortStatsPSC OBJECT-TYPE
          "Proctetion Switch Count."
      ::= { cmEthernetTrafficPortStatsEntry 43 }
 
+cmEthernetTrafficPortStatsL2PTRxFramesEncap OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of Layer 2 Protocol Tunneling Recevied Frames Encapsulated."
+     ::= { cmEthernetTrafficPortStatsEntry 44 }
+
+cmEthernetTrafficPortStatsL2PTTxFramesDecap OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of Layer 2 Protocol Tunneling Transmitted Frames De-encapsulated."
+     ::= { cmEthernetTrafficPortStatsEntry 45 }
+
+cmEthernetTrafficPortStatsIBRMaxRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum bits received on a port in any 1-sec with the PM interval."
+     ::= { cmEthernetTrafficPortStatsEntry 46 }
+     
+cmEthernetTrafficPortStatsIBRMaxTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum bits transmitted on a port in any 1-sec with the PM interval."
+     ::= { cmEthernetTrafficPortStatsEntry 47 }
+
+cmEthernetTrafficPortStatsIBRMinRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Minimum bits received on a port in any 1-sec with the PM interval"
+     ::= { cmEthernetTrafficPortStatsEntry 48 }
+
+cmEthernetTrafficPortStatsIBRMinTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Minimum bits transmitted on a port in any 1-sec with the PM interval"
+     ::= { cmEthernetTrafficPortStatsEntry 49 }
+
+cmEthernetTrafficPortStatsIBRRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bits received in the most recent 1-sec"
+     ::= { cmEthernetTrafficPortStatsEntry 50 }
+     
+cmEthernetTrafficPortStatsIBRTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bits transmitted in the most recent 1-sec"
+     ::= { cmEthernetTrafficPortStatsEntry 51 }
+
+cmEthernetTrafficPortStatsFmcd OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The frame of multicast drop."
+     ::= { cmEthernetTrafficPortStatsEntry 52 }
+
+cmEthernetTrafficPortStatsFbcd OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The frame of broadcast drop."
+     ::= { cmEthernetTrafficPortStatsEntry 53 }
+
+cmEthernetTrafficPortStatsAclDropNoMatch OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of L3 control protocol frames dropped due to no acl rule match."
+     ::= { cmEthernetTrafficPortStatsEntry 54 }
+
+cmEthernetTrafficPortStatsAclFwd2Cpu OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of L3 Control protocol frames foward to cpu."
+     ::= { cmEthernetTrafficPortStatsEntry 55 }
+
+cmEthernetTrafficPortStatsDhcpDropNoAssocIf OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of DHCP packets dropped by CPU due to no associated Traffic IP Interface found."
+     ::= { cmEthernetTrafficPortStatsEntry 56 }
+
+cmEthernetTrafficPortStatsDroppedFragmented OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of L3 control protocol frames dropped due to packet fragmentation."
+     ::= { cmEthernetTrafficPortStatsEntry 57 }
+
+cmEthernetTrafficPortStatsRLBC OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Laser Bias Current (in mA) for the remote physical layer.  This is
+          applicable only if the media type for the Port is fiber."
+     ::= { cmEthernetTrafficPortStatsEntry 58 }
+
+cmEthernetTrafficPortStatsROPT OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Optical Power Transmitted (in dBm) for the remote physical layer.  This is 
+          applicable only if the media type for the Port is fiber."
+     ::= { cmEthernetTrafficPortStatsEntry 59 }
+
+cmEthernetTrafficPortStatsROPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Optical Power Received (in dBm) for the remote physical layer.  This is 
+          applicable only if the media type for the Port is fiber."
+     ::= { cmEthernetTrafficPortStatsEntry 60 }
+
+cmEthernetTrafficPortStatsRTemp OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The temperature of the remote physical layer when media type is fiber."
+     ::= { cmEthernetTrafficPortStatsEntry 61 }
+
 --
 -- Agg Ethernet Port History Table
 --
@@ -5119,7 +5321,29 @@ CmEthernetTrafficPortHistoryEntry ::= SEQUENCE {
     cmEthernetTrafficPortHistoryUAS                   PerfCounter64,
     cmEthernetTrafficPortHistoryTemp                  Integer32,
     cmEthernetTrafficPortHistoryLkupFails             PerfCounter64,
-    cmEthernetTrafficPortHistoryPSC                   PerfCounter64
+    cmEthernetTrafficPortHistoryPSC                   PerfCounter64,
+
+-- new 9.1.1 release columns
+
+    cmEthernetTrafficPortHistoryL2PTRxFramesEncap       PerfCounter64,
+    cmEthernetTrafficPortHistoryL2PTTxFramesDecap       PerfCounter64,
+    cmEthernetTrafficPortHistoryIBRMaxRx                PerfCounter64,
+    cmEthernetTrafficPortHistoryIBRMaxTx                PerfCounter64,
+    cmEthernetTrafficPortHistoryIBRMinRx                PerfCounter64,
+    cmEthernetTrafficPortHistoryIBRMinTx                PerfCounter64,
+    cmEthernetTrafficPortHistoryIBRRx                   PerfCounter64,
+    cmEthernetTrafficPortHistoryIBRTx                   PerfCounter64,
+    cmEthernetTrafficPortHistoryFmcd                    PerfCounter64,
+    cmEthernetTrafficPortHistoryFbcd                    PerfCounter64,
+    cmEthernetTrafficPortHistoryAclDropNoMatch          PerfCounter64,
+    cmEthernetTrafficPortHistoryAclFwd2Cpu              PerfCounter64,
+    cmEthernetTrafficPortHistoryDhcpDropNoAssocIf       PerfCounter64,
+    cmEthernetTrafficPortHistoryDroppedFragmented       PerfCounter64,
+    cmEthernetTrafficPortHistoryRLBC                    Integer32,
+    cmEthernetTrafficPortHistoryROPT                    Integer32,
+    cmEthernetTrafficPortHistoryROPR                    Integer32,
+    cmEthernetTrafficPortHistoryRTemp                   Integer32
+
 }
 
 cmEthernetTrafficPortHistoryIndex OBJECT-TYPE
@@ -5388,7 +5612,7 @@ cmEthernetTrafficPortHistoryOPT OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Transmit (in dBm) for the physical layer.  This is 
+         "Optical Power Transmitted (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Port is fiber."
      ::= { cmEthernetTrafficPortHistoryEntry 33 }
 
@@ -5397,7 +5621,7 @@ cmEthernetTrafficPortHistoryOPR OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS     current
      DESCRIPTION
-         "Optical Power Receive (in dBm) for the physical layer.  This is 
+         "Optical Power Received (in dBm) for the physical layer.  This is 
           applicable only if the media type for the Port is fiber."
      ::= { cmEthernetTrafficPortHistoryEntry 34 }
 
@@ -5475,6 +5699,153 @@ cmEthernetTrafficPortHistoryPSC OBJECT-TYPE
      DESCRIPTION
          "Protection Switch Count."
      ::= { cmEthernetTrafficPortHistoryEntry 43 }
+
+cmEthernetTrafficPortHistoryL2PTRxFramesEncap OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of Layer 2 Protocol Tunneling Recevied Frames Encapsulated."
+     ::= { cmEthernetTrafficPortHistoryEntry 44 }
+
+cmEthernetTrafficPortHistoryL2PTTxFramesDecap OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of Layer 2 Protocol Tunneling Transmitted Frames De-encapsulated."
+     ::= { cmEthernetTrafficPortHistoryEntry 45 }
+
+cmEthernetTrafficPortHistoryIBRMaxRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum bits received on a port in any 1-sec with the PM interval."
+     ::= { cmEthernetTrafficPortHistoryEntry 46 }
+     
+cmEthernetTrafficPortHistoryIBRMaxTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum bits transmitted on a port in any 1-sec with the PM interval."
+     ::= { cmEthernetTrafficPortHistoryEntry 47 }
+
+cmEthernetTrafficPortHistoryIBRMinRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Minimum bits received on a port in any 1-sec with the PM interval"
+     ::= { cmEthernetTrafficPortHistoryEntry 48 }
+
+cmEthernetTrafficPortHistoryIBRMinTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Minimum bits transmitted on a port in any 1-sec with the PM interval"
+     ::= { cmEthernetTrafficPortHistoryEntry 49 }
+
+cmEthernetTrafficPortHistoryIBRRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bits received in the most recent 1-sec"
+     ::= { cmEthernetTrafficPortHistoryEntry 50 }
+     
+cmEthernetTrafficPortHistoryIBRTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bits transmitted in the most recent 1-sec"
+     ::= { cmEthernetTrafficPortHistoryEntry 51 }
+     
+cmEthernetTrafficPortHistoryFmcd OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frame of multicast drop"
+     ::= { cmEthernetTrafficPortHistoryEntry 52 }
+
+cmEthernetTrafficPortHistoryFbcd OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frame of broadcast drop."
+     ::= { cmEthernetTrafficPortHistoryEntry 53 }
+
+cmEthernetTrafficPortHistoryAclDropNoMatch OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of L3 control protocol frames dropped due to acl no match."
+     ::= { cmEthernetTrafficPortHistoryEntry 54 }
+
+cmEthernetTrafficPortHistoryAclFwd2Cpu OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of L3 Control protocol frames foward to cpu."
+     ::= { cmEthernetTrafficPortHistoryEntry 55 }
+
+cmEthernetTrafficPortHistoryDhcpDropNoAssocIf OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of DHCP packets dropped by CPU due to no associated Traffic IP Interface found."
+     ::= { cmEthernetTrafficPortHistoryEntry 56 }
+
+cmEthernetTrafficPortHistoryDroppedFragmented OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Counter of L3 control protocol frames dropped due to packet fragmentation."
+     ::= { cmEthernetTrafficPortHistoryEntry 57 }
+
+cmEthernetTrafficPortHistoryRLBC OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Laser Bias Current (in mA) for the remote physical layer.  This is
+          applicable only if the media type for the Port is fiber."
+     ::= { cmEthernetTrafficPortHistoryEntry 58 }
+
+cmEthernetTrafficPortHistoryROPT OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Optical Power Transmitted (in dBm) for the remote physical layer.  This is 
+          applicable only if the media type for the Port is fiber."
+     ::= { cmEthernetTrafficPortHistoryEntry 59 }
+
+cmEthernetTrafficPortHistoryROPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Optical Power Received (in dBm) for the remote physical layer.  This is 
+          applicable only if the media type for the Port is fiber."
+     ::= { cmEthernetTrafficPortHistoryEntry 60 }
+
+cmEthernetTrafficPortHistoryRTemp OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The temperature of the remote physical layer when media type is fiber."
+     ::= { cmEthernetTrafficPortHistoryEntry 61 }
 
 --
 -- Agg Ethernet Port Threshold Table
@@ -5590,7 +5961,7 @@ cmEthernetTrafficPortThresholdVarOprVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power received (in dbM), beyond which 
+        "Variance in the Optical Power Received (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { cmEthernetTrafficPortThresholdVarEntry 1 }
 
@@ -5599,7 +5970,7 @@ cmEthernetTrafficPortThresholdVarOptVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power transmitted (in dbM), beyond which 
+        "Variance in the Optical Power Transmitted (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { cmEthernetTrafficPortThresholdVarEntry 2 }
 
@@ -5649,7 +6020,30 @@ CmFlowPointStatsEntry ::= SEQUENCE {
     cmFlowPointStatsFMCD                  PerfCounter64,
     cmFlowPointStatsFBCD                  PerfCounter64,
     cmFlowPointStatsBT                    PerfCounter64,
-    cmFlowPointStatsFLD                   PerfCounter64
+    cmFlowPointStatsFLD                   PerfCounter64,
+
+-- new 9.1.1 xgpro columns
+
+    cmFlowPointStatsIBRMax                PerfCounter64,
+    cmFlowPointStatsIBRRlMax              PerfCounter64,
+    cmFlowPointStatsIBRMin                PerfCounter64,
+    cmFlowPointStatsIBRRlMin              PerfCounter64,
+    cmFlowPointStatsIBR                   PerfCounter64,
+    cmFlowPointStatsIBRRl                 PerfCounter64,
+    cmFlowPointStatsFdRxFb                PerfCounter64,
+    cmFlowPointStatsFdTxFb                PerfCounter64,
+    cmFlowPointStatsFdicd                 PerfCounter64,
+    cmFlowPointStatsNumLearnTableFlushes  PerfCounter64,
+
+-- Elephant Flow Management
+
+    cmFlowPointStatsEfFramesDiscarded     PerfCounter64,
+    cmFlowPointStatsEfBytesDiscarded      PerfCounter64,
+
+-- ACL related stats
+
+    cmFlowPointStatsAclDropNoMatch        PerfCounter64,
+    cmFlowPointStatsAclRuleDrop           PerfCounter64
 }
 
 cmFlowPointStatsIndex OBJECT-TYPE
@@ -5847,6 +6241,120 @@ cmFlowPointStatsFLD OBJECT-TYPE
          "The number of frames dropped in STM1-4-ET or FE-36E card in egress direction."
      ::= { cmFlowPointStatsEntry 24 }
 
+cmFlowPointStatsIBRMax OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Maximum."
+     ::= { cmFlowPointStatsEntry 25 }
+
+cmFlowPointStatsIBRRlMax OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Maximum - Rate Limited."
+     ::= { cmFlowPointStatsEntry 26 }
+
+cmFlowPointStatsIBRMin OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum."
+     ::= { cmFlowPointStatsEntry 27 }
+
+cmFlowPointStatsIBRRlMin OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum - Rate Limited."
+     ::= { cmFlowPointStatsEntry 28 }
+
+cmFlowPointStatsIBR OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum."
+     ::= { cmFlowPointStatsEntry 29 }
+
+cmFlowPointStatsIBRRl OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum - Rate Limited."
+     ::= { cmFlowPointStatsEntry 30 }
+
+cmFlowPointStatsFdRxFb OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Frames Dropped RX - Flowpoint Blocked."
+     ::= { cmFlowPointStatsEntry 31 }
+
+cmFlowPointStatsFdTxFb OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Frames Dropped TX - Flowpoint Blocked."
+     ::= { cmFlowPointStatsEntry 32 }
+
+cmFlowPointStatsFdicd OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Frames Dropped - Ingress COS Disabled."
+     ::= { cmFlowPointStatsEntry 33 }
+
+cmFlowPointStatsNumLearnTableFlushes OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of learning table flushes."
+     ::= { cmFlowPointStatsEntry 34 }
+
+cmFlowPointStatsEfFramesDiscarded OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the frames discarded due to Elephant Flow
+          rate limiting."
+     ::= { cmFlowPointStatsEntry 35 }
+
+cmFlowPointStatsEfBytesDiscarded OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the bytes discarded due to Elephant Flow
+          rate limiting."
+     ::= { cmFlowPointStatsEntry 36 }
+
+cmFlowPointStatsAclDropNoMatch OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of dropped packets due to no match in ACL rule."
+     ::= { cmFlowPointStatsEntry 37 }
+
+cmFlowPointStatsAclRuleDrop OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of dropped packets in ACL rule."
+     ::= { cmFlowPointStatsEntry 38 }
+
 --
 -- Agg Ethernet Flow History Table
 --
@@ -5893,7 +6401,30 @@ CmFlowPointHistoryEntry ::= SEQUENCE {
     cmFlowPointHistoryFMCD                PerfCounter64,
     cmFlowPointHistoryFBCD                PerfCounter64,
     cmFlowPointHistoryBT                  PerfCounter64,
-    cmFlowPointHistoryFLD                 PerfCounter64
+    cmFlowPointHistoryFLD                 PerfCounter64,
+
+-- new 9.1.1 xgpro columns
+
+    cmFlowPointHistoryIBRMax                PerfCounter64,
+    cmFlowPointHistoryIBRRlMax              PerfCounter64,
+    cmFlowPointHistoryIBRMin                PerfCounter64,
+    cmFlowPointHistoryIBRRlMin              PerfCounter64,
+    cmFlowPointHistoryIBR                   PerfCounter64,
+    cmFlowPointHistoryIBRRl                 PerfCounter64,
+    cmFlowPointHistoryFdRxFb                PerfCounter64,
+    cmFlowPointHistoryFdTxFb                PerfCounter64,
+    cmFlowPointHistoryFdicd                 PerfCounter64,
+    cmFlowPointHistoryNumLearnTableFlushes  PerfCounter64,
+
+-- Elephant Flow Management
+
+    cmFlowPointHistoryEfFramesDiscarded     PerfCounter64,
+    cmFlowPointHistoryEfBytesDiscarded      PerfCounter64,
+
+-- ACL related stats
+
+    cmFlowPointHistoryAclDropNoMatch        PerfCounter64,
+    cmFlowPointHistoryAclRuleDrop           PerfCounter64
 }
 
 cmFlowPointHistoryIndex OBJECT-TYPE
@@ -6090,6 +6621,120 @@ cmFlowPointHistoryFLD OBJECT-TYPE
      DESCRIPTION
          "The number of frames dropped in STM1-4-ET or FE-36E card in egress direction."
      ::= { cmFlowPointHistoryEntry 24 }
+
+cmFlowPointHistoryIBRMax OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Maximum."
+     ::= { cmFlowPointHistoryEntry 25 }
+
+cmFlowPointHistoryIBRRlMax OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Maximum - Rate Limited."
+     ::= { cmFlowPointHistoryEntry 26 }
+
+cmFlowPointHistoryIBRMin OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum."
+     ::= { cmFlowPointHistoryEntry 27 }
+
+cmFlowPointHistoryIBRRlMin OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum - Rate Limited."
+     ::= { cmFlowPointHistoryEntry 28 }
+
+cmFlowPointHistoryIBR OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum."
+     ::= { cmFlowPointHistoryEntry 29 }
+
+cmFlowPointHistoryIBRRl OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instantaneous Bit Rate Minimum - Rate Limited."
+     ::= { cmFlowPointHistoryEntry 30 }
+
+cmFlowPointHistoryFdRxFb OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Frames Dropped RX - Flowpoint Blocked."
+     ::= { cmFlowPointHistoryEntry 31 }
+
+cmFlowPointHistoryFdTxFb OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Frames Dropped TX - Flowpoint Blocked."
+     ::= { cmFlowPointHistoryEntry 32 }
+
+cmFlowPointHistoryFdicd OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Frames Dropped - Ingress COS Disabled."
+     ::= { cmFlowPointHistoryEntry 33 }
+
+cmFlowPointHistoryNumLearnTableFlushes OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of learning table flushes."
+     ::= { cmFlowPointHistoryEntry 34 }
+
+cmFlowPointHistoryEfFramesDiscarded OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the frames discarded due to Elephant Flow
+          rate limiting."
+     ::= { cmFlowPointHistoryEntry 35 }
+
+cmFlowPointHistoryEfBytesDiscarded OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the bytes discarded due to Elephant Flow
+          rate limiting."
+     ::= { cmFlowPointHistoryEntry 36 }
+
+cmFlowPointHistoryAclDropNoMatch OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of dropped packets due to no match in ACL rule."
+     ::= { cmFlowPointHistoryEntry 37 }
+
+cmFlowPointHistoryAclRuleDrop OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of dropped packets in ACL rule."
+     ::= { cmFlowPointHistoryEntry 38 }
 
 --
 -- Agg FlowPoint Threshold Table
@@ -11354,7 +11999,7 @@ ocnStmThresholdVarOprVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power received (in dbM), beyond which 
+        "Variance in the Optical Power Received (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { ocnStmThresholdVarEntry 1 }
 
@@ -11363,7 +12008,7 @@ ocnStmThresholdVarOptVariance OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-        "Variance in the Optical Power transmitted (in dbM), beyond which 
+        "Variance in the Optical Power Transmitted (in dbM), beyond which 
          threshold crossing alert will be generated."
     ::= { ocnStmThresholdVarEntry 2 }
 
@@ -11379,6 +12024,1609 @@ cmPerQueryGenControl OBJECT-TYPE
     DESCRIPTION
             "This object describes whether report the cmPerQueryGenTrap. Its default value is enable."
     ::= { cmPerfScalarObjects 1 }
+
+--
+-- Flow Point QoS Shaper Current Statistics Table
+--
+
+f3FpQosShaperStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FpQosShaperStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of  FlowPoint QOS Shaper statistics.  
+             These reflect the current data."
+    ::= { cmPerfObjects 64 }
+
+f3FpQosShaperStatsEntry OBJECT-TYPE
+    SYNTAX      F3FpQosShaperStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FpQosShaperStatsTable.
+             Entries exist in this table for each FlowPoint QoS Shaper."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex,
+            cmFlowPointIndex, f3FpQosShaperIndex, 
+            f3FpQosShaperStatsIndex }
+    ::= { f3FpQosShaperStatsTable 1 }
+
+F3FpQosShaperStatsEntry ::= SEQUENCE {
+    f3FpQosShaperStatsIndex             Integer32,
+    f3FpQosShaperStatsIntervalType      CmPmIntervalType,
+    f3FpQosShaperStatsValid             TruthValue,
+    f3FpQosShaperStatsAction            CmPmBinAction,
+    f3FpQosShaperStatsBT                PerfCounter64,
+    f3FpQosShaperStatsBTD               PerfCounter64,
+    f3FpQosShaperStatsFD                PerfCounter64,
+    f3FpQosShaperStatsFTD               PerfCounter64,
+    f3FpQosShaperStatsABRRL             PerfCounter64,
+    f3FpQosShaperStatsBREDD             PerfCounter64,
+    f3FpQosShaperStatsFREDD             PerfCounter64
+}
+
+f3FpQosShaperStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this QOS Shaper statistics entry.
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3FpQosShaperStatsEntry 1 }
+
+f3FpQosShaperStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Interval over which Performance Monitoring data is collected."
+    ::= { f3FpQosShaperStatsEntry 2 }
+
+f3FpQosShaperStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3FpQosShaperStatsEntry 3 }
+
+f3FpQosShaperStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3FpQosShaperStatsEntry 4 }
+
+f3FpQosShaperStatsBT OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bytes Transmitted."
+     ::= { f3FpQosShaperStatsEntry 5 }
+
+f3FpQosShaperStatsBTD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bytes Tail Dropped."
+     ::= { f3FpQosShaperStatsEntry 6 }
+
+f3FpQosShaperStatsFD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Dequeued."
+     ::= { f3FpQosShaperStatsEntry 7 }
+
+f3FpQosShaperStatsFTD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Tail Dropped."
+     ::= { f3FpQosShaperStatsEntry 8 }
+
+f3FpQosShaperStatsABRRL OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Bit Rate - Rate Limited."
+     ::= { f3FpQosShaperStatsEntry 9 }
+
+f3FpQosShaperStatsBREDD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bytes Random Early Discard, Dropped."
+     ::= { f3FpQosShaperStatsEntry 10 }
+
+f3FpQosShaperStatsFREDD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Random Early Discard, Dropped."
+     ::= { f3FpQosShaperStatsEntry 11 }
+
+--
+-- Flow Point QoS Shaper History Statistics Table
+--
+
+f3FpQosShaperHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FpQosShaperHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of  FlowPoint QOS Shaper statistics.  
+             These reflect the history data."
+    ::= { cmPerfObjects 65 }
+
+f3FpQosShaperHistoryEntry OBJECT-TYPE
+    SYNTAX      F3FpQosShaperHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FpQosShaperHistoryTable.
+             Entries exist in this table for each FlowPoint QoS Shaper."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex,
+            cmFlowPointIndex, f3FpQosShaperIndex, 
+            f3FpQosShaperStatsIndex, f3FpQosShaperHistoryIndex }
+    ::= { f3FpQosShaperHistoryTable 1 }
+
+F3FpQosShaperHistoryEntry ::= SEQUENCE {
+    f3FpQosShaperHistoryIndex             Integer32,
+    f3FpQosShaperHistoryTime              DateAndTime,
+    f3FpQosShaperHistoryValid             TruthValue,
+    f3FpQosShaperHistoryAction            CmPmBinAction,
+    f3FpQosShaperHistoryBT                PerfCounter64,
+    f3FpQosShaperHistoryBTD               PerfCounter64,
+    f3FpQosShaperHistoryFD                PerfCounter64,
+    f3FpQosShaperHistoryFTD               PerfCounter64,
+    f3FpQosShaperHistoryABRRL             PerfCounter64,
+    f3FpQosShaperHistoryBREDD             PerfCounter64,
+    f3FpQosShaperHistoryFREDD             PerfCounter64
+}
+
+f3FpQosShaperHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this QOS Shaper statistics entry."
+    ::= { f3FpQosShaperHistoryEntry 1 }
+
+f3FpQosShaperHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3FpQosShaperHistoryEntry 2 }
+
+f3FpQosShaperHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3FpQosShaperHistoryEntry 3 }
+
+f3FpQosShaperHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3FpQosShaperHistoryEntry 4 }
+
+f3FpQosShaperHistoryBT OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bytes Transmitted."
+     ::= { f3FpQosShaperHistoryEntry 5 }
+
+f3FpQosShaperHistoryBTD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bytes Tail Dropped."
+     ::= { f3FpQosShaperHistoryEntry 6 }
+
+f3FpQosShaperHistoryFD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Dequeued."
+     ::= { f3FpQosShaperHistoryEntry 7 }
+
+f3FpQosShaperHistoryFTD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Tail Dropped."
+     ::= { f3FpQosShaperHistoryEntry 8 }
+
+f3FpQosShaperHistoryABRRL OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Bit Rate - Rate Limited."
+     ::= { f3FpQosShaperHistoryEntry 9 }
+
+f3FpQosShaperHistoryBREDD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Bytes Random Early Discard, Dropped."
+     ::= { f3FpQosShaperHistoryEntry 10 }
+
+f3FpQosShaperHistoryFREDD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Random Early Discard, Dropped."
+     ::= { f3FpQosShaperHistoryEntry 11 }
+
+--
+-- Flow Point QoS Shaper Threshold Table
+--
+
+f3FpQosShaperThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FpQosShaperThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of  FlowPoint
+             QoS Shaper Thresholds."
+    ::= { cmPerfObjects 66 }
+
+f3FpQosShaperThresholdEntry OBJECT-TYPE
+    SYNTAX      F3FpQosShaperThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FpQosShaperThresholdTable."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex,
+            cmFlowPointIndex, f3FpQosShaperIndex, 
+            f3FpQosShaperStatsIndex, f3FpQosShaperThresholdIndex }
+    ::= { f3FpQosShaperThresholdTable 1 }
+
+F3FpQosShaperThresholdEntry ::= SEQUENCE {
+    f3FpQosShaperThresholdIndex       Integer32,
+    f3FpQosShaperThresholdInterval    CmPmIntervalType,
+    f3FpQosShaperThresholdVariable    VariablePointer,
+    f3FpQosShaperThresholdValueLo     Unsigned32,
+    f3FpQosShaperThresholdValueHi     Unsigned32,
+    f3FpQosShaperThresholdMonValue    Counter64
+}
+
+f3FpQosShaperThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3FpQosShaperThresholdTable."
+    ::= { f3FpQosShaperThresholdEntry 1 }
+
+f3FpQosShaperThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3FpQosShaperThresholdEntry 2 }
+
+f3FpQosShaperThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3FpQosShaperThresholdEntry 3 }
+
+f3FpQosShaperThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3FpQosShaperThresholdEntry 4 }
+
+f3FpQosShaperThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3FpQosShaperThresholdEntry 5 }
+
+f3FpQosShaperThresholdMonValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3FpQosShaperThresholdVariable."
+    ::= { f3FpQosShaperThresholdEntry 6 }
+
+--
+-- Flow Point QoS Policer Current Statistics Table
+--
+
+f3FpQosPolicerStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FpQosPolicerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of  FlowPoint QOS Policer statistics.  
+             These reflect the current data."
+    ::= { cmPerfObjects 67 }
+
+f3FpQosPolicerStatsEntry OBJECT-TYPE
+    SYNTAX      F3FpQosPolicerStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FpQosPolicerStatsTable.
+             Entries exist in this table for each  FlowPoint QoS Policer."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cmFlowPointIndex, f3FpQosPolicerIndex, f3FpQosPolicerStatsIndex }
+    ::= { f3FpQosPolicerStatsTable 1 }
+
+F3FpQosPolicerStatsEntry ::= SEQUENCE {
+    f3FpQosPolicerStatsIndex           Integer32,
+    f3FpQosPolicerStatsIntervalType    CmPmIntervalType,
+    f3FpQosPolicerStatsValid           TruthValue,
+    f3FpQosPolicerStatsAction          CmPmBinAction,
+    f3FpQosPolicerStatsFMG             PerfCounter64,
+    f3FpQosPolicerStatsFMY             PerfCounter64,
+    f3FpQosPolicerStatsFMRD            PerfCounter64,
+    f3FpQosPolicerStatsBytesIn         PerfCounter64,
+    f3FpQosPolicerStatsBytesOut        PerfCounter64,
+    f3FpQosPolicerStatsABR             PerfCounter64
+}
+
+f3FpQosPolicerStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+            this QOS Policer statistics entry.
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3FpQosPolicerStatsEntry 1 }
+
+f3FpQosPolicerStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Interval over which Performance Monitoring data is collected."
+    ::= { f3FpQosPolicerStatsEntry 2 }
+
+f3FpQosPolicerStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3FpQosPolicerStatsEntry 3 }
+
+f3FpQosPolicerStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3FpQosPolicerStatsEntry 4 }
+
+f3FpQosPolicerStatsFMG OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Marked Green."
+     ::= { f3FpQosPolicerStatsEntry 5 }
+
+f3FpQosPolicerStatsFMY OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Marked Yellow."
+     ::= { f3FpQosPolicerStatsEntry 6 }
+
+f3FpQosPolicerStatsFMRD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Marked Red and Discarded."
+     ::= { f3FpQosPolicerStatsEntry 7 }
+
+f3FpQosPolicerStatsBytesIn OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of bytes received by the Policer."
+     ::= { f3FpQosPolicerStatsEntry 8 }
+
+f3FpQosPolicerStatsBytesOut OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of bytes transmitted by the Policer."
+     ::= { f3FpQosPolicerStatsEntry 9 }
+
+f3FpQosPolicerStatsABR OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Bit Rate  on the Policer."
+     ::= { f3FpQosPolicerStatsEntry 10 }
+
+--
+-- Flow Point QoS Policer History Statistics Table
+--
+
+f3FpQosPolicerHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FpQosPolicerHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of  FlowPoint QOS Policer statistics.  
+             These reflect the history data."
+    ::= { cmPerfObjects 68 }
+
+f3FpQosPolicerHistoryEntry OBJECT-TYPE
+    SYNTAX      F3FpQosPolicerHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FpQosPolicerHistoryTable.
+             Entries exist in this table for each  FlowPoint QoS Policer."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cmFlowPointIndex, f3FpQosPolicerIndex, 
+            f3FpQosPolicerStatsIndex, f3FpQosPolicerHistoryIndex }
+    ::= { f3FpQosPolicerHistoryTable 1 }
+
+F3FpQosPolicerHistoryEntry ::= SEQUENCE {
+    f3FpQosPolicerHistoryIndex           Integer32,
+    f3FpQosPolicerHistoryTime            DateAndTime,
+    f3FpQosPolicerHistoryValid           TruthValue,
+    f3FpQosPolicerHistoryAction          CmPmBinAction,
+    f3FpQosPolicerHistoryFMG             PerfCounter64,
+    f3FpQosPolicerHistoryFMY             PerfCounter64,
+    f3FpQosPolicerHistoryFMRD            PerfCounter64,
+    f3FpQosPolicerHistoryBytesIn         PerfCounter64,
+    f3FpQosPolicerHistoryBytesOut        PerfCounter64,
+    f3FpQosPolicerHistoryABR             PerfCounter64
+}
+
+f3FpQosPolicerHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this QOS Policer history entry."
+    ::= { f3FpQosPolicerHistoryEntry 1 }
+
+f3FpQosPolicerHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3FpQosPolicerHistoryEntry 2 }
+
+f3FpQosPolicerHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3FpQosPolicerHistoryEntry 3 }
+
+f3FpQosPolicerHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3FpQosPolicerHistoryEntry 4 }
+
+f3FpQosPolicerHistoryFMG OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Marked Green."
+     ::= { f3FpQosPolicerHistoryEntry 5 }
+
+f3FpQosPolicerHistoryFMY OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Marked Yellow."
+     ::= { f3FpQosPolicerHistoryEntry 6 }
+
+f3FpQosPolicerHistoryFMRD OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Frames Marked Red and Discarded."
+     ::= { f3FpQosPolicerHistoryEntry 7 }
+
+f3FpQosPolicerHistoryBytesIn OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of bytes received by the Policer."
+     ::= { f3FpQosPolicerHistoryEntry 8 }
+
+f3FpQosPolicerHistoryBytesOut OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of bytes transmitted by the Policer."
+     ::= { f3FpQosPolicerHistoryEntry 9 }
+
+f3FpQosPolicerHistoryABR OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Bit Rate  on the Policer."
+     ::= { f3FpQosPolicerHistoryEntry 10 }
+
+--
+-- Flow Point QoS Policer Threshold Table
+--
+
+f3FpQosPolicerThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FpQosPolicerThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of QOS
+             Policer Thresholds."
+    ::= { cmPerfObjects 69 }
+
+f3FpQosPolicerThresholdEntry OBJECT-TYPE
+    SYNTAX      F3FpQosPolicerThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FpQosPolicerThresholdTable."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cmFlowPointIndex, f3FpQosPolicerIndex, 
+            f3FpQosPolicerStatsIndex, f3FpQosPolicerThresholdIndex }
+    ::= { f3FpQosPolicerThresholdTable 1 }
+
+F3FpQosPolicerThresholdEntry ::= SEQUENCE {
+    f3FpQosPolicerThresholdIndex       Integer32,
+    f3FpQosPolicerThresholdInterval    CmPmIntervalType,
+    f3FpQosPolicerThresholdVariable    VariablePointer,
+    f3FpQosPolicerThresholdValueLo     Unsigned32,
+    f3FpQosPolicerThresholdValueHi     Unsigned32,
+    f3FpQosPolicerThresholdMonValue    Counter64
+}
+
+f3FpQosPolicerThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3FpQosPolicerThresholdTable."
+    ::= { f3FpQosPolicerThresholdEntry 1 }
+
+f3FpQosPolicerThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3FpQosPolicerThresholdEntry 2 }
+
+f3FpQosPolicerThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3FpQosPolicerThresholdEntry 3 }
+
+f3FpQosPolicerThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3FpQosPolicerThresholdEntry 4 }
+
+f3FpQosPolicerThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3FpQosPolicerThresholdEntry 5 }
+
+f3FpQosPolicerThresholdMonValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3FpQosPolicerThresholdVariable."
+    ::= { f3FpQosPolicerThresholdEntry 6 }
+
+--
+-- L2 acl rule Current Statistics Table
+--
+f3AclRuleStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3AclRuleStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of L2 acl rule related statistics.  
+             These reflect the current data."
+    ::= { cmPerfObjects 70 }
+
+f3AclRuleStatsEntry OBJECT-TYPE
+    SYNTAX      F3AclRuleStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3AclRuleStatsTable.
+             Entries exist in this table for each Acl rule."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cmFlowPointIndex, f3AclRuleIndex, f3AclRuleStatsIndex }
+    ::= { f3AclRuleStatsTable 1 }
+
+F3AclRuleStatsEntry ::= SEQUENCE {
+    f3AclRuleStatsIndex               Integer32,
+    f3AclRuleStatsIntervalType        CmPmIntervalType,
+    f3AclRuleStatsValid               TruthValue,
+    f3AclRuleStatsAction              CmPmBinAction,
+    f3AclRuleStatsRuleMatch           PerfCounter64
+}
+
+f3AclRuleStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this L2 flow point statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3AclRuleStatsEntry 1 }
+
+f3AclRuleStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Interval over which Performance Monitoring data is collected."
+    ::= { f3AclRuleStatsEntry 2 }
+
+f3AclRuleStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3AclRuleStatsEntry 3 }
+
+f3AclRuleStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3AclRuleStatsEntry 4 }
+
+f3AclRuleStatsRuleMatch OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets matching the ACL rule."
+     ::= { f3AclRuleStatsEntry 5 }
+
+--
+-- L2 acl rule history Statistics Table
+--
+f3AclRuleHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3AclRuleHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of L2 acl rule related history statistics.  
+             These reflect the history data."
+    ::= { cmPerfObjects 71 }
+
+f3AclRuleHistoryEntry OBJECT-TYPE
+    SYNTAX      F3AclRuleHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3AclRuleHistoryTable.
+             Entries exist in this table for each L2 acl rule."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cmFlowPointIndex, f3AclRuleIndex, f3AclRuleStatsIndex, f3AclRuleHistoryIndex }
+    ::= { f3AclRuleHistoryTable 1 }
+
+F3AclRuleHistoryEntry ::= SEQUENCE {
+    f3AclRuleHistoryIndex               Integer32,
+    f3AclRuleHistoryTime                DateAndTime,
+    f3AclRuleHistoryValid               TruthValue,
+    f3AclRuleHistoryAction              CmPmBinAction,
+    f3AclRuleHistoryRuleMatch           PerfCounter64
+}
+
+f3AclRuleHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this L2 flow point statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3AclRuleHistoryEntry 1 }
+
+f3AclRuleHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3AclRuleHistoryEntry 2 }
+
+f3AclRuleHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3AclRuleHistoryEntry 3 }
+
+f3AclRuleHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3AclRuleHistoryEntry 4 }
+
+f3AclRuleHistoryRuleMatch OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets matching acl rule."
+     ::= { f3AclRuleHistoryEntry 5 }
+
+--
+-- L2 acl rule Threshold Table
+--
+f3AclRuleThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3AclRuleThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of L2 acl rule Thresholds."
+    ::= { cmPerfObjects 72 }
+
+f3AclRuleThresholdEntry OBJECT-TYPE
+    SYNTAX      F3AclRuleThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3AclRuleThresholdTable."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cmFlowPointIndex, f3AclRuleIndex, f3AclRuleStatsIndex, 
+            f3AclRuleThresholdIndex }
+    ::= { f3AclRuleThresholdTable 1 }
+
+F3AclRuleThresholdEntry ::= SEQUENCE {
+    f3AclRuleThresholdIndex       Integer32,
+    f3AclRuleThresholdInterval    CmPmIntervalType,
+    f3AclRuleThresholdVariable    VariablePointer,
+    f3AclRuleThresholdValueLo     Unsigned32,
+    f3AclRuleThresholdValueHi     Unsigned32,
+    f3AclRuleThresholdMonValue    Counter64
+}
+
+f3AclRuleThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3AclRuleThresholdTable."
+    ::= { f3AclRuleThresholdEntry 1 }
+
+f3AclRuleThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3AclRuleThresholdEntry 2 }
+
+f3AclRuleThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3AclRuleThresholdEntry 3 }
+
+f3AclRuleThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3AclRuleThresholdEntry 4 }
+
+f3AclRuleThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3AclRuleThresholdEntry 5 }
+
+f3AclRuleThresholdMonValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3AclRuleThresholdVariable."
+    ::= { f3AclRuleThresholdEntry 6 }
+
+
+--
+-- Ethernet Network Port XDSL Related Current Statistics Table
+--
+cmEthernetNetPortXdslStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmEthernetNetPortXdslStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Access Port XDSL related statistics.  
+             These reflect the current data."
+    ::= { cmPerfObjects 73 }
+
+cmEthernetNetPortXdslStatsEntry OBJECT-TYPE
+    SYNTAX      CmEthernetNetPortXdslStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmEthernetNetPortXdslStatsTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetNetPortStatsEntry }
+    ::= { cmEthernetNetPortXdslStatsTable 1 }
+
+CmEthernetNetPortXdslStatsEntry ::= SEQUENCE {
+    cmEthernetNetPortStatsXdslUsPkt                  PerfCounter64,
+    cmEthernetNetPortStatsXdslUsCrcError             PerfCounter64,
+    cmEthernetNetPortStatsXdslDsPkt                  PerfCounter64,
+    cmEthernetNetPortStatsXdslUsFecs                 PerfCounter64,
+    cmEthernetNetPortStatsXdslDsFecs                 PerfCounter64,
+    cmEthernetNetPortStatsXdslUsEs                   PerfCounter64,
+    cmEthernetNetPortStatsXdslDsEs                   PerfCounter64,
+    cmEthernetNetPortStatsXdslUsSes                  PerfCounter64,
+    cmEthernetNetPortStatsXdslDsSes                  PerfCounter64,
+    cmEthernetNetPortStatsXdslUsLoss                 PerfCounter64,
+    cmEthernetNetPortStatsXdslDsLoss                 PerfCounter64,
+    cmEthernetNetPortStatsXdslDsUas                  PerfCounter64,
+    cmEthernetNetPortStatsXdslUsCv                   PerfCounter64,
+    cmEthernetNetPortStatsXdslDsCv                   PerfCounter64,
+    cmEthernetNetPortStatsXdslUsFec                  PerfCounter64,
+    cmEthernetNetPortStatsXdslDsFec                  PerfCounter64,
+    cmEthernetNetPortStatsXdslDsFullInits            PerfCounter64,
+    cmEthernetNetPortStatsXdslUsFullInits            PerfCounter64
+}
+
+cmEthernetNetPortStatsXdslUsPkt OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream packets."
+     ::= { cmEthernetNetPortXdslStatsEntry 1 }
+
+cmEthernetNetPortStatsXdslUsCrcError OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream CRC error packets."
+     ::= { cmEthernetNetPortXdslStatsEntry 2 }
+     
+cmEthernetNetPortStatsXdslDsPkt OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream packets."
+     ::= { cmEthernetNetPortXdslStatsEntry 3 }
+     
+cmEthernetNetPortStatsXdslUsFecs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream FECS (FEC error seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 4 }
+     
+cmEthernetNetPortStatsXdslDsFecs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream FECS (FEC error seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 5 }
+     
+cmEthernetNetPortStatsXdslUsEs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream ES (Errored Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 6 }
+     
+cmEthernetNetPortStatsXdslDsEs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream ES (Errored Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 7 }
+     
+cmEthernetNetPortStatsXdslUsSes OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream SES (Severely Errored Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 8 }
+     
+cmEthernetNetPortStatsXdslDsSes OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream SES (Severely Errored Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 9 }
+     
+cmEthernetNetPortStatsXdslUsLoss OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream LOSS (LOS Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 10 }
+     
+cmEthernetNetPortStatsXdslDsLoss OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream LOSS (LOS Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 11 }
+     
+cmEthernetNetPortStatsXdslDsUas OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream UAS (Unavailable Seconds)."
+     ::= { cmEthernetNetPortXdslStatsEntry 12 }
+     
+cmEthernetNetPortStatsXdslUsCv OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream CV (CRC errors)."
+     ::= { cmEthernetNetPortXdslStatsEntry 13 }
+     
+cmEthernetNetPortStatsXdslDsCv OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream CV (CRC errors)."
+     ::= { cmEthernetNetPortXdslStatsEntry 14 }
+     
+cmEthernetNetPortStatsXdslUsFec OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream FEC (FEC errors)."
+     ::= { cmEthernetNetPortXdslStatsEntry 15 }
+     
+cmEthernetNetPortStatsXdslDsFec OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream FEC (FEC errors)."
+     ::= { cmEthernetNetPortXdslStatsEntry 16 }
+     
+cmEthernetNetPortStatsXdslDsFullInits OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream Full Inits."
+     ::= { cmEthernetNetPortXdslStatsEntry 17 }
+     
+cmEthernetNetPortStatsXdslUsFullInits OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream Full Inits."
+     ::= { cmEthernetNetPortXdslStatsEntry 18 }
+
+
+--
+-- Ethernet Network Port XDSL Related History Statistics Table
+--
+cmEthernetNetPortXdslHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmEthernetNetPortXdslHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Access Port XDSL related statistics.  
+             These reflect the current data."
+    ::= { cmPerfObjects 74 }
+
+cmEthernetNetPortXdslHistoryEntry OBJECT-TYPE
+    SYNTAX      CmEthernetNetPortXdslHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmEthernetNetPortXdslHistoryTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetNetPortHistoryEntry }
+    ::= { cmEthernetNetPortXdslHistoryTable 1 }
+
+CmEthernetNetPortXdslHistoryEntry ::= SEQUENCE {
+    cmEthernetNetPortHistoryXdslUsPkt                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsCrcError             PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsPkt                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsFecs                 PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsFecs                 PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsEs                   PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsEs                   PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsSes                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsSes                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsLoss                 PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsLoss                 PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsUas                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsCv                   PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsCv                   PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsFec                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsFec                  PerfCounter64,
+    cmEthernetNetPortHistoryXdslDsFullInits            PerfCounter64,
+    cmEthernetNetPortHistoryXdslUsFullInits            PerfCounter64
+}
+
+cmEthernetNetPortHistoryXdslUsPkt OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream packets."
+     ::= { cmEthernetNetPortXdslHistoryEntry 1 }
+
+cmEthernetNetPortHistoryXdslUsCrcError OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream CRC error packets."
+     ::= { cmEthernetNetPortXdslHistoryEntry 2 }
+     
+cmEthernetNetPortHistoryXdslDsPkt OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream packets."
+     ::= { cmEthernetNetPortXdslHistoryEntry 3 }
+     
+cmEthernetNetPortHistoryXdslUsFecs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream FECS (FEC error seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 4 }
+     
+cmEthernetNetPortHistoryXdslDsFecs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream FECS (FEC error seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 5 }
+     
+cmEthernetNetPortHistoryXdslUsEs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream ES (Errored Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 6 }
+     
+cmEthernetNetPortHistoryXdslDsEs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream ES (Errored Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 7 }
+     
+cmEthernetNetPortHistoryXdslUsSes OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream SES (Severely Errored Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 8 }
+     
+cmEthernetNetPortHistoryXdslDsSes OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream SES (Severely Errored Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 9 }
+     
+cmEthernetNetPortHistoryXdslUsLoss OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream LOSS (LOS Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 10 }
+     
+cmEthernetNetPortHistoryXdslDsLoss OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream LOSS (LOS Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 11 }
+     
+cmEthernetNetPortHistoryXdslDsUas OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream UAS (Unavailable Seconds)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 12 }
+     
+cmEthernetNetPortHistoryXdslUsCv OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream CV (CRC errors)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 13 }
+     
+cmEthernetNetPortHistoryXdslDsCv OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream CV (CRC errors)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 14 }
+     
+cmEthernetNetPortHistoryXdslUsFec OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream FEC (FEC errors)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 15 }
+     
+cmEthernetNetPortHistoryXdslDsFec OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream FEC (FEC errors)."
+     ::= { cmEthernetNetPortXdslHistoryEntry 16 }
+     
+cmEthernetNetPortHistoryXdslDsFullInits OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Down stream Full Inits."
+     ::= { cmEthernetNetPortXdslHistoryEntry 17 }
+     
+cmEthernetNetPortHistoryXdslUsFullInits OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "xDSL Up stream Full Inits."
+     ::= { cmEthernetNetPortXdslHistoryEntry 18 }
+
+
+--
+-- Card Current Statistics Table
+--
+f3CardStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3CardStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Card related statistics.  
+             These reflect the current data."
+    ::= { cmPerfObjects 75 }
+
+f3CardStatsEntry OBJECT-TYPE
+    SYNTAX      F3CardStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3CardStatsTable.
+             Entries exist in this table for each Card."
+    INDEX { neIndex, shelfIndex, slotIndex, 
+            f3CardStatsIndex }
+    ::= { f3CardStatsTable 1 }
+
+F3CardStatsEntry ::= SEQUENCE {
+    f3CardStatsIndex               Integer32,
+    f3CardStatsIntervalType        CmPmIntervalType,
+    f3CardStatsValid               TruthValue,
+    f3CardStatsAction              CmPmBinAction,
+    f3CardStatsACU                 Integer32,
+    f3CardStatsMCU                 Integer32,
+    f3CardStatsICU                 Integer32,
+    f3CardStatsAMU                 Integer32,
+    f3CardStatsMMU                 Integer32,
+    f3CardStatsIMU                 Integer32
+}
+
+f3CardStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Card statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3CardStatsEntry 1 }
+
+f3CardStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Interval over which Performance Monitoring data is collected."
+    ::= { f3CardStatsEntry 2 }
+
+f3CardStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3CardStatsEntry 3 }
+
+f3CardStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3CardStatsEntry 4 }
+
+f3CardStatsACU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average CPU usage."
+     ::= { f3CardStatsEntry 5 }
+
+f3CardStatsMCU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum CPU usage."
+     ::= { f3CardStatsEntry 6 }
+     
+f3CardStatsICU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instant CPU usage."
+     ::= { f3CardStatsEntry 7 }
+
+f3CardStatsAMU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average memory usage."
+     ::= { f3CardStatsEntry 8 }
+
+f3CardStatsMMU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum memory usage."
+     ::= { f3CardStatsEntry 9 }
+     
+f3CardStatsIMU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instant memory usage."
+     ::= { f3CardStatsEntry 10 }
+
+
+--
+-- Card history Statistics Table
+--
+f3CardHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3CardHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Card related history statistics.  
+             These reflect the history data."
+    ::= { cmPerfObjects 76 }
+
+f3CardHistoryEntry OBJECT-TYPE
+    SYNTAX      F3CardHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3CardHistoryTable.
+             Entries exist in this table for each card."
+    INDEX { neIndex, shelfIndex, slotIndex,  
+            f3CardStatsIndex, f3CardHistoryIndex }
+    ::= { f3CardHistoryTable 1 }
+
+F3CardHistoryEntry ::= SEQUENCE {
+    f3CardHistoryIndex               Integer32,
+    f3CardHistoryTime                DateAndTime,
+    f3CardHistoryValid               TruthValue,
+    f3CardHistoryAction              CmPmBinAction,
+    f3CardHistoryACU                 Integer32,
+    f3CardHistoryMCU                 Integer32,
+    f3CardHistoryICU                 Integer32,
+    f3CardHistoryAMU                 Integer32,
+    f3CardHistoryMMU                 Integer32,
+    f3CardHistoryIMU                 Integer32
+}
+
+f3CardHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this card statistics entry."
+    ::= { f3CardHistoryEntry 1 }
+
+f3CardHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3CardHistoryEntry 2 }
+
+f3CardHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3CardHistoryEntry 3 }
+
+f3CardHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3CardHistoryEntry 4 }
+
+f3CardHistoryACU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average CPU usage."
+     ::= { f3CardHistoryEntry 5 }
+
+f3CardHistoryMCU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum CPU usage."
+     ::= { f3CardHistoryEntry 6 }
+
+f3CardHistoryICU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instant CPU usage."
+     ::= { f3CardHistoryEntry 7 }
+
+f3CardHistoryAMU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average memory usage."
+     ::= { f3CardHistoryEntry 8 }
+
+f3CardHistoryMMU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Maximum memory usage."
+     ::= { f3CardHistoryEntry 9 }
+
+f3CardHistoryIMU OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Instant memory usage."
+     ::= { f3CardHistoryEntry 10 }
+
+
+--
+-- Card Threshold Table
+--
+f3CardThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3CardThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of Card Thresholds."
+    ::= { cmPerfObjects 77 }
+
+f3CardThresholdEntry OBJECT-TYPE
+    SYNTAX      F3CardThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3CardThresholdTable."
+    INDEX { neIndex, shelfIndex, slotIndex, 
+            f3CardStatsIndex, 
+            f3CardThresholdIndex }
+    ::= { f3CardThresholdTable 1 }
+
+F3CardThresholdEntry ::= SEQUENCE {
+    f3CardThresholdIndex       Integer32,
+    f3CardThresholdInterval    CmPmIntervalType,
+    f3CardThresholdVariable    VariablePointer,
+    f3CardThresholdValueLo     Unsigned32,
+    f3CardThresholdValueHi     Unsigned32,
+    f3CardThresholdMonValue    Counter64
+}
+
+f3CardThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3CardThresholdTable."
+    ::= { f3CardThresholdEntry 1 }
+
+f3CardThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3CardThresholdEntry 2 }
+
+f3CardThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3CardThresholdEntry 3 }
+
+f3CardThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3CardThresholdEntry 4 }
+
+f3CardThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3CardThresholdEntry 5 }
+
+f3CardThresholdMonValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3CardThresholdVariable."
+    ::= { f3CardThresholdEntry 6 }
+
 
 ---
 ---Notifications
@@ -11675,6 +13923,67 @@ cmPerQueryGenTrap NOTIFICATION-TYPE
             Note: only when cmPerQueryGenControl is enabled, this trap will be reported."
   ::= { cmPerfNotifications 20 }
 
+f3FpQosShaperThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3FpQosShaperThresholdIndex,
+                f3FpQosShaperThresholdInterval,
+                f3FpQosShaperThresholdVariable,
+                f3FpQosShaperThresholdValueLo,
+                f3FpQosShaperThresholdValueHi,
+                f3FpQosShaperThresholdMonValue  
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an Ethernet Traffic Port Flowpoint QOS Shaper is crossed."
+  ::= { cmPerfNotifications 21 }  
+
+f3FpQosPolicerThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3FpQosPolicerThresholdIndex,
+                f3FpQosPolicerThresholdInterval,
+                f3FpQosPolicerThresholdVariable,
+                f3FpQosPolicerThresholdValueLo,
+                f3FpQosPolicerThresholdValueHi,
+                f3FpQosPolicerThresholdMonValue  
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an Ethernet Traffic Port Flowpoint QOS Policer is crossed."
+  ::= { cmPerfNotifications 22 }  
+
+f3AclRuleThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3AclRuleThresholdIndex,
+                f3AclRuleThresholdInterval,
+                f3AclRuleThresholdVariable,
+                f3AclRuleThresholdValueLo,
+                f3AclRuleThresholdValueHi,
+                f3AclRuleThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an ACL Rule is crossed."
+  ::= { cmPerfNotifications 23 }  
+
+f3CardThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3CardThresholdIndex,
+                f3CardThresholdInterval,
+                f3CardThresholdVariable,
+                f3CardThresholdValueLo,
+                f3CardThresholdValueHi,
+                f3CardThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on a card is crossed."
+  ::= { cmPerfNotifications 24 }  
+
+
 --
 -- Conformance
 --
@@ -11690,7 +13999,7 @@ cmPerfCompliance MODULE-COMPLIANCE
         MANDATORY-GROUPS {
               cmPerfObjectGroup, cmPerfNotifGroup,
               ethernetAccessPortPMGroup, ethernetNetworkPortPMGroup,
-              trafficPMGroup
+              trafficPMGroup, f3AclRulePerfGroup
         }
     ::= { cmPerfCompliances 1 }
 
@@ -11719,7 +14028,7 @@ cmPerfObjectGroup OBJECT-GROUP
         cmEthernetAccPortStatsIBRMaxRx, cmEthernetAccPortStatsIBRMaxTx,
         cmEthernetAccPortStatsIBRMinRx, cmEthernetAccPortStatsIBRMinTx,
         cmEthernetAccPortStatsIBRRx, cmEthernetAccPortStatsIBRTx,
-        
+
         cmEthernetAccPortHistoryIndex, cmEthernetAccPortHistoryTime,
         cmEthernetAccPortHistoryValid, cmEthernetAccPortHistoryAction,
         cmEthernetAccPortHistoryESBF, cmEthernetAccPortHistoryESBP,
@@ -11925,6 +14234,22 @@ cmPerfObjectGroup OBJECT-GROUP
         cmEthernetTrafficPortStatsABRTx,cmEthernetTrafficPortStatsATFD,
         cmEthernetTrafficPortStatsUAS,
         cmEthernetTrafficPortStatsTemp,cmEthernetTrafficPortStatsLkupFails,
+        cmEthernetTrafficPortStatsL2PTRxFramesEncap,
+        cmEthernetTrafficPortStatsL2PTTxFramesDecap,
+        cmEthernetTrafficPortStatsIBRMaxRx,
+        cmEthernetTrafficPortStatsIBRMaxTx,
+        cmEthernetTrafficPortStatsIBRMinRx,
+        cmEthernetTrafficPortStatsIBRMinTx,
+        cmEthernetTrafficPortStatsIBRRx,
+        cmEthernetTrafficPortStatsIBRTx,
+        cmEthernetTrafficPortStatsFmcd,
+        cmEthernetTrafficPortStatsFbcd,
+        cmEthernetTrafficPortStatsAclDropNoMatch,
+        cmEthernetTrafficPortStatsAclFwd2Cpu,
+        cmEthernetTrafficPortStatsDhcpDropNoAssocIf,
+        cmEthernetTrafficPortStatsDroppedFragmented,
+        cmEthernetTrafficPortStatsRLBC, cmEthernetTrafficPortStatsROPT,
+        cmEthernetTrafficPortStatsROPR, cmEthernetTrafficPortStatsRTemp,
         
         cmEthernetTrafficPortHistoryIndex,cmEthernetTrafficPortHistoryTime,
         cmEthernetTrafficPortHistoryValid,cmEthernetTrafficPortHistoryAction,
@@ -11948,6 +14273,21 @@ cmPerfObjectGroup OBJECT-GROUP
         cmEthernetTrafficPortHistoryABRTx,cmEthernetTrafficPortHistoryATFD,
         cmEthernetTrafficPortHistoryUAS,
         cmEthernetTrafficPortHistoryTemp,cmEthernetTrafficPortHistoryLkupFails,
+        cmEthernetTrafficPortHistoryL2PTRxFramesEncap,
+        cmEthernetTrafficPortHistoryL2PTTxFramesDecap,
+        cmEthernetTrafficPortHistoryIBRMaxRx,
+        cmEthernetTrafficPortHistoryIBRMaxTx,
+        cmEthernetTrafficPortHistoryIBRMinRx,
+        cmEthernetTrafficPortHistoryIBRMinTx,
+        cmEthernetTrafficPortHistoryIBRRx,
+        cmEthernetTrafficPortHistoryIBRTx,
+        cmEthernetTrafficPortHistoryFmcd,
+        cmEthernetTrafficPortHistoryFbcd,
+        cmEthernetTrafficPortHistoryAclDropNoMatch,
+        cmEthernetTrafficPortHistoryAclFwd2Cpu,
+        cmEthernetTrafficPortHistoryDhcpDropNoAssocIf,
+        cmEthernetTrafficPortHistoryRLBC, cmEthernetTrafficPortHistoryROPT,
+        cmEthernetTrafficPortHistoryROPR, cmEthernetTrafficPortHistoryRTemp,
         
         cmEthernetTrafficPortThresholdIndex,cmEthernetTrafficPortThresholdInterval,
         cmEthernetTrafficPortThresholdVariable,cmEthernetTrafficPortThresholdValueLo,
@@ -12262,7 +14602,8 @@ cmPerfNotifGroup NOTIFICATION-GROUP
         stsVcPathThresholdCrossingAlert,
         vtVcPathThresholdCrossingAlert,
         e1t1ThresholdCrossingAlert,
-        e3t3ThresholdCrossingAlert
+        e3t3ThresholdCrossingAlert,
+        f3CardThresholdCrossingAlert
     }
     STATUS  current
     DESCRIPTION
@@ -12297,7 +14638,7 @@ ethernetAccessPortPMGroup OBJECT-GROUP
         cmEthernetAccPortStatsIBRMaxRx, cmEthernetAccPortStatsIBRMaxTx,
         cmEthernetAccPortStatsIBRMinRx, cmEthernetAccPortStatsIBRMinTx,
         cmEthernetAccPortStatsIBRRx, cmEthernetAccPortStatsIBRTx,   
-        cmEthernetAccPortStatsLkupFails,     
+        cmEthernetAccPortStatsLkupFails,
 
         cmEthernetAccPortHistoryIndex, cmEthernetAccPortHistoryTime,
         cmEthernetAccPortHistoryValid, cmEthernetAccPortHistoryAction,
@@ -12366,7 +14707,7 @@ ethernetNetworkPortPMGroup OBJECT-GROUP
         cmEthernetNetPortStatsIBRMaxRx, cmEthernetNetPortStatsIBRMaxTx,
         cmEthernetNetPortStatsIBRMinRx, cmEthernetNetPortStatsIBRMinTx,
         cmEthernetNetPortStatsIBRRx, cmEthernetNetPortStatsIBRTx, 
-        cmEthernetNetPortStatsLkupFails,       
+        cmEthernetNetPortStatsLkupFails,
 
         cmEthernetNetPortHistoryIndex, cmEthernetNetPortHistoryTime,
         cmEthernetNetPortHistoryValid, cmEthernetNetPortHistoryAction,
@@ -12394,7 +14735,7 @@ ethernetNetworkPortPMGroup OBJECT-GROUP
         cmEthernetNetPortHistoryIBRMaxRx, cmEthernetNetPortHistoryIBRMaxTx,
         cmEthernetNetPortHistoryIBRMinRx, cmEthernetNetPortHistoryIBRMinTx,
         cmEthernetNetPortHistoryIBRRx, cmEthernetNetPortHistoryIBRTx,      
-        cmEthernetNetPortHistoryLkupFails,  
+        cmEthernetNetPortHistoryLkupFails,
 
         cmEthernetNetPortThresholdIndex, cmEthernetNetPortThresholdInterval,
         cmEthernetNetPortThresholdVariable, cmEthernetNetPortThresholdValueLo,
@@ -12779,6 +15120,21 @@ flowPointPmGroup OBJECT-GROUP
         cmFlowPointStatsBT,
         cmFlowPointStatsFLD,
         
+        cmFlowPointStatsIBRMax,
+        cmFlowPointStatsIBRRlMax,
+        cmFlowPointStatsIBRMin,
+        cmFlowPointStatsIBRRlMin,
+        cmFlowPointStatsIBR,
+        cmFlowPointStatsIBRRl,
+        cmFlowPointStatsFdRxFb,
+        cmFlowPointStatsFdTxFb,
+        cmFlowPointStatsFdicd,
+        cmFlowPointStatsNumLearnTableFlushes,
+        cmFlowPointStatsEfFramesDiscarded,
+        cmFlowPointStatsEfBytesDiscarded,
+        cmFlowPointStatsAclDropNoMatch,
+        cmFlowPointStatsAclRuleDrop,
+        
         cmFlowPointHistoryIndex,cmFlowPointHistoryTime,
         cmFlowPointHistoryValid,cmFlowPointHistoryAction,
         cmFlowPointHistoryL2CPFD,cmFlowPointHistoryABRRx,
@@ -12796,6 +15152,21 @@ flowPointPmGroup OBJECT-GROUP
         cmFlowPointHistoryFBCD,
         cmFlowPointHistoryBT,
         cmFlowPointHistoryFLD,
+        
+        cmFlowPointHistoryIBRMax,
+        cmFlowPointHistoryIBRRlMax,
+        cmFlowPointHistoryIBRMin,
+        cmFlowPointHistoryIBRRlMin,
+        cmFlowPointHistoryIBR,
+        cmFlowPointHistoryIBRRl,
+        cmFlowPointHistoryFdRxFb,
+        cmFlowPointHistoryFdTxFb,
+        cmFlowPointHistoryFdicd,
+        cmFlowPointHistoryNumLearnTableFlushes,
+        cmFlowPointHistoryEfFramesDiscarded,
+        cmFlowPointHistoryEfBytesDiscarded,
+        cmFlowPointHistoryAclDropNoMatch,
+        cmFlowPointHistoryAclRuleDrop,
         
         cmFlowPointThresholdIndex,cmFlowPointThresholdInterval,
         cmFlowPointThresholdVariable,cmFlowPointThresholdValueLo,
@@ -12829,5 +15200,289 @@ flowPointPmGroup OBJECT-GROUP
     DESCRIPTION
         "A collection of objects used to manage ocn stm threshold variable."
     ::= { cmPerfGroups 15 }
+
+ f3FpQosShaperPerfGroup OBJECT-GROUP
+    OBJECTS {
+        f3FpQosShaperStatsIndex,
+        f3FpQosShaperStatsIntervalType,
+        f3FpQosShaperStatsValid,
+        f3FpQosShaperStatsAction,
+        f3FpQosShaperStatsBT,
+        f3FpQosShaperStatsBTD,
+        f3FpQosShaperStatsFD,
+        f3FpQosShaperStatsFTD,
+        f3FpQosShaperStatsABRRL,
+        f3FpQosShaperStatsBREDD,
+        f3FpQosShaperStatsFREDD,
+    
+        f3FpQosShaperHistoryIndex,
+        f3FpQosShaperHistoryTime,
+        f3FpQosShaperHistoryValid,
+        f3FpQosShaperHistoryAction,
+        f3FpQosShaperHistoryBT,
+        f3FpQosShaperHistoryBTD,
+        f3FpQosShaperHistoryFD,
+        f3FpQosShaperHistoryFTD,
+        f3FpQosShaperHistoryABRRL,
+        f3FpQosShaperHistoryBREDD,
+        f3FpQosShaperHistoryFREDD,
+    
+        f3FpQosShaperThresholdIndex,
+        f3FpQosShaperThresholdInterval,
+        f3FpQosShaperThresholdVariable,
+        f3FpQosShaperThresholdValueLo,
+        f3FpQosShaperThresholdValueHi,
+        f3FpQosShaperThresholdMonValue    
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the flow point qos shaper pm."
+    ::= { cmPerfGroups 16 }
+    
+ f3FpQosPolicerPerfGroup OBJECT-GROUP
+    OBJECTS {
+        f3FpQosPolicerStatsIndex,
+        f3FpQosPolicerStatsIntervalType,
+        f3FpQosPolicerStatsValid,
+        f3FpQosPolicerStatsAction,
+        f3FpQosPolicerStatsFMG,
+        f3FpQosPolicerStatsFMY,
+        f3FpQosPolicerStatsFMRD,
+        f3FpQosPolicerStatsBytesIn,
+        f3FpQosPolicerStatsBytesOut,
+        f3FpQosPolicerStatsABR,
+
+        f3FpQosPolicerHistoryIndex,
+        f3FpQosPolicerHistoryTime,
+        f3FpQosPolicerHistoryValid,
+        f3FpQosPolicerHistoryAction,
+        f3FpQosPolicerHistoryFMG,
+        f3FpQosPolicerHistoryFMY,
+        f3FpQosPolicerHistoryFMRD,
+        f3FpQosPolicerHistoryBytesIn,
+        f3FpQosPolicerHistoryBytesOut,
+        f3FpQosPolicerHistoryABR,
+
+        f3FpQosPolicerThresholdIndex,
+        f3FpQosPolicerThresholdInterval,
+        f3FpQosPolicerThresholdVariable,
+        f3FpQosPolicerThresholdValueLo,
+        f3FpQosPolicerThresholdValueHi,
+        f3FpQosPolicerThresholdMonValue    
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the flow point qos policer pm."
+    ::= { cmPerfGroups 17 }
+
+ cmEthernetTrafficPortPerfGroup OBJECT-GROUP
+    OBJECTS {
+        cmEthernetTrafficPortStatsIndex, cmEthernetTrafficPortStatsIntervalType,
+        cmEthernetTrafficPortStatsValid, cmEthernetTrafficPortStatsAction,
+        cmEthernetTrafficPortStatsESBF, cmEthernetTrafficPortStatsESBP,
+        cmEthernetTrafficPortStatsESBS, cmEthernetTrafficPortStatsESC,
+        cmEthernetTrafficPortStatsESCAE, cmEthernetTrafficPortStatsESDE,
+        cmEthernetTrafficPortStatsESF, cmEthernetTrafficPortStatsESFS,
+        cmEthernetTrafficPortStatsESJ, cmEthernetTrafficPortStatsESMF,
+        cmEthernetTrafficPortStatsESMP, cmEthernetTrafficPortStatsESO,
+        cmEthernetTrafficPortStatsESOF, cmEthernetTrafficPortStatsESOP,
+        cmEthernetTrafficPortStatsESP, cmEthernetTrafficPortStatsESP64,
+        cmEthernetTrafficPortStatsESP65, cmEthernetTrafficPortStatsESP128,
+        cmEthernetTrafficPortStatsESP256, cmEthernetTrafficPortStatsESP512,
+        cmEthernetTrafficPortStatsESP1024, cmEthernetTrafficPortStatsESP1519,
+        cmEthernetTrafficPortStatsESUF, cmEthernetTrafficPortStatsESUP,
+        cmEthernetTrafficPortStatsL2CPFD,
+        cmEthernetTrafficPortStatsL2CPFP, cmEthernetTrafficPortStatsLES,
+        cmEthernetTrafficPortStatsLBC, cmEthernetTrafficPortStatsOPT,
+        cmEthernetTrafficPortStatsOPR, cmEthernetTrafficPortStatsAUFD,
+        cmEthernetTrafficPortStatsAPFD, cmEthernetTrafficPortStatsABRRx,
+        cmEthernetTrafficPortStatsABRTx,cmEthernetTrafficPortStatsATFD,
+        cmEthernetTrafficPortStatsUAS,
+        cmEthernetTrafficPortStatsTemp,cmEthernetTrafficPortStatsLkupFails,
+        cmEthernetTrafficPortStatsL2PTRxFramesEncap,
+        cmEthernetTrafficPortStatsL2PTTxFramesDecap,
+        cmEthernetTrafficPortStatsIBRMaxRx,
+        cmEthernetTrafficPortStatsIBRMaxTx,
+        cmEthernetTrafficPortStatsIBRMinRx,
+        cmEthernetTrafficPortStatsIBRMinTx,
+        cmEthernetTrafficPortStatsIBRRx,
+        cmEthernetTrafficPortStatsIBRTx,
+        cmEthernetTrafficPortStatsFmcd,
+        cmEthernetTrafficPortStatsFbcd,
+        cmEthernetTrafficPortStatsAclDropNoMatch,
+        cmEthernetTrafficPortStatsAclFwd2Cpu,
+        cmEthernetTrafficPortStatsDhcpDropNoAssocIf,
+        cmEthernetTrafficPortStatsDroppedFragmented,
+        cmEthernetTrafficPortStatsRLBC, cmEthernetTrafficPortStatsROPT,
+        cmEthernetTrafficPortStatsROPR, cmEthernetTrafficPortStatsRTemp,
+
+        cmEthernetTrafficPortHistoryIndex,cmEthernetTrafficPortHistoryTime,
+        cmEthernetTrafficPortHistoryValid,cmEthernetTrafficPortHistoryAction,
+        cmEthernetTrafficPortHistoryESBF,cmEthernetTrafficPortHistoryESBP,
+        cmEthernetTrafficPortHistoryESBS,cmEthernetTrafficPortHistoryESC,
+        cmEthernetTrafficPortHistoryESCAE,cmEthernetTrafficPortHistoryESDE,
+        cmEthernetTrafficPortHistoryESF,cmEthernetTrafficPortHistoryESFS,
+        cmEthernetTrafficPortHistoryESJ,cmEthernetTrafficPortHistoryESMF,
+        cmEthernetTrafficPortHistoryESMP,cmEthernetTrafficPortHistoryESO,
+        cmEthernetTrafficPortHistoryESOF,cmEthernetTrafficPortHistoryESOP,
+        cmEthernetTrafficPortHistoryESP,cmEthernetTrafficPortHistoryESP64,
+        cmEthernetTrafficPortHistoryESP65,cmEthernetTrafficPortHistoryESP128,
+        cmEthernetTrafficPortHistoryESP256,cmEthernetTrafficPortHistoryESP512,
+        cmEthernetTrafficPortHistoryESP1024,cmEthernetTrafficPortHistoryESP1519,
+        cmEthernetTrafficPortHistoryESUF,cmEthernetTrafficPortHistoryESUP,
+        cmEthernetTrafficPortHistoryL2CPFD,
+        cmEthernetTrafficPortHistoryL2CPFP,cmEthernetTrafficPortHistoryLES,
+        cmEthernetTrafficPortHistoryLBC,cmEthernetTrafficPortHistoryOPT,
+        cmEthernetTrafficPortHistoryOPR,cmEthernetTrafficPortHistoryAUFD,
+        cmEthernetTrafficPortHistoryAPFD,cmEthernetTrafficPortHistoryABRRx,
+        cmEthernetTrafficPortHistoryABRTx,cmEthernetTrafficPortHistoryATFD,
+        cmEthernetTrafficPortHistoryUAS,
+        cmEthernetTrafficPortHistoryTemp,cmEthernetTrafficPortHistoryLkupFails,      
+        cmEthernetTrafficPortHistoryL2PTRxFramesEncap,
+        cmEthernetTrafficPortHistoryL2PTTxFramesDecap,
+        cmEthernetTrafficPortHistoryIBRMaxRx,
+        cmEthernetTrafficPortHistoryIBRMaxTx,
+        cmEthernetTrafficPortHistoryIBRMinRx,
+        cmEthernetTrafficPortHistoryIBRMinTx,
+        cmEthernetTrafficPortHistoryIBRRx,
+        cmEthernetTrafficPortHistoryIBRTx,
+        cmEthernetTrafficPortHistoryFmcd,
+        cmEthernetTrafficPortHistoryFbcd,
+        cmEthernetTrafficPortHistoryAclDropNoMatch,
+        cmEthernetTrafficPortHistoryAclFwd2Cpu,
+        cmEthernetTrafficPortHistoryDhcpDropNoAssocIf,
+        cmEthernetTrafficPortHistoryDroppedFragmented,
+        cmEthernetTrafficPortHistoryRLBC, cmEthernetTrafficPortHistoryROPT,
+        cmEthernetTrafficPortHistoryROPR, cmEthernetTrafficPortHistoryRTemp,
+        
+        cmEthernetTrafficPortThresholdIndex,cmEthernetTrafficPortThresholdInterval,
+        cmEthernetTrafficPortThresholdVariable,cmEthernetTrafficPortThresholdValueLo,
+        cmEthernetTrafficPortThresholdValueHi,cmEthernetTrafficPortThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the flow point qos policer pm."
+    ::= { cmPerfGroups 18 }
+
+ f3AclRulePerfGroup OBJECT-GROUP
+    OBJECTS {
+        f3AclRuleStatsIndex,
+        f3AclRuleStatsIntervalType,
+        f3AclRuleStatsValid,
+        f3AclRuleStatsAction,
+        f3AclRuleStatsRuleMatch,
+
+        f3AclRuleHistoryIndex,
+        f3AclRuleHistoryTime,
+        f3AclRuleHistoryValid,
+        f3AclRuleHistoryAction,
+        f3AclRuleHistoryRuleMatch,
+
+        f3AclRuleThresholdIndex,
+        f3AclRuleThresholdInterval,
+        f3AclRuleThresholdVariable,
+        f3AclRuleThresholdValueLo,
+        f3AclRuleThresholdValueHi,
+        f3AclRuleThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the ACL Rule pm."
+    ::= { cmPerfGroups 19 }
+
+cmXgProPerfNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cmEthernetTrafficPortThresholdCrossingAlert,
+        cmFlowPointThresholdCrossingAlert,
+        f3FpQosShaperThresholdCrossingAlert,
+        f3FpQosPolicerThresholdCrossingAlert,
+        f3AclRuleThresholdCrossingAlert
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications related to FSP150CC XGPRO
+             Threshold Crossing Alerts."
+    ::= { cmPerfGroups 20 }
+
+ cmEthernetNetPortXdslPerfGroup OBJECT-GROUP
+    OBJECTS {
+        cmEthernetNetPortStatsXdslUsPkt,
+        cmEthernetNetPortStatsXdslUsCrcError,
+        cmEthernetNetPortStatsXdslDsPkt,
+        cmEthernetNetPortStatsXdslUsFecs,
+        cmEthernetNetPortStatsXdslDsFecs,
+        cmEthernetNetPortStatsXdslUsEs,
+        cmEthernetNetPortStatsXdslDsEs,
+        cmEthernetNetPortStatsXdslUsSes,
+        cmEthernetNetPortStatsXdslDsSes,
+        cmEthernetNetPortStatsXdslUsLoss,
+        cmEthernetNetPortStatsXdslDsLoss,
+        cmEthernetNetPortStatsXdslDsUas,
+        cmEthernetNetPortStatsXdslUsCv,
+        cmEthernetNetPortStatsXdslDsCv,
+        cmEthernetNetPortStatsXdslUsFec,
+        cmEthernetNetPortStatsXdslDsFec,
+        cmEthernetNetPortStatsXdslDsFullInits,
+        cmEthernetNetPortStatsXdslUsFullInits,
+        
+        cmEthernetNetPortHistoryXdslUsPkt,
+        cmEthernetNetPortHistoryXdslUsCrcError,
+        cmEthernetNetPortHistoryXdslDsPkt,
+        cmEthernetNetPortHistoryXdslUsFecs,
+        cmEthernetNetPortHistoryXdslDsFecs,
+        cmEthernetNetPortHistoryXdslUsEs,
+        cmEthernetNetPortHistoryXdslDsEs,
+        cmEthernetNetPortHistoryXdslUsSes,
+        cmEthernetNetPortHistoryXdslDsSes,
+        cmEthernetNetPortHistoryXdslUsLoss,
+        cmEthernetNetPortHistoryXdslDsLoss,
+        cmEthernetNetPortHistoryXdslDsUas,
+        cmEthernetNetPortHistoryXdslUsCv,
+        cmEthernetNetPortHistoryXdslDsCv,
+        cmEthernetNetPortHistoryXdslUsFec,
+        cmEthernetNetPortHistoryXdslDsFec,
+        cmEthernetNetPortHistoryXdslDsFullInits,
+        cmEthernetNetPortHistoryXdslUsFullInits
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the XDSL related pm of network port."
+    ::= { cmPerfGroups 21 }
+
+ f3CardPerfGroup OBJECT-GROUP
+    OBJECTS {
+        f3CardStatsIndex,
+        f3CardStatsIntervalType,
+        f3CardStatsValid,
+        f3CardStatsAction,
+        f3CardStatsACU,
+        f3CardStatsMCU,
+        f3CardStatsICU,
+        f3CardStatsAMU,
+        f3CardStatsMMU,
+        f3CardStatsIMU,
+        
+        f3CardHistoryIndex,
+        f3CardHistoryTime,
+        f3CardHistoryValid,
+        f3CardHistoryAction,
+        f3CardHistoryACU,
+        f3CardHistoryMCU,
+        f3CardHistoryICU,
+        f3CardHistoryAMU,
+        f3CardHistoryMMU,
+        f3CardHistoryIMU,
+        
+        f3CardThresholdIndex,
+        f3CardThresholdInterval,
+        f3CardThresholdVariable,
+        f3CardThresholdValueLo,
+        f3CardThresholdValueHi,
+        f3CardThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the card pm."
+    ::= { cmPerfGroups 22 }
 
 END
