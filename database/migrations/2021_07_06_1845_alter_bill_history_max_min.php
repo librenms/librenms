@@ -26,7 +26,7 @@ class AlterBillHistoryMaxMin extends Migration
      */
     public function down()
     {
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('bill_history', function (Blueprint $table) {
             $table->dropColumn(['bill_max_in', 'bill_max_out']);
         });
     }
