@@ -6,7 +6,8 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
     Gauge32, Counter32
              FROM SNMPv2-SMI
-    RowStatus, StorageType, TEXTUAL-CONVENTION, TruthValue
+    RowStatus, StorageType, TEXTUAL-CONVENTION, TruthValue,
+    VariablePointer
              FROM SNMPv2-TC
     fsp150cm
              FROM ADVA-MIB
@@ -14,25 +15,42 @@ IMPORTS
     OspfAuthenticationType, ospfNbrEntry
              FROM OSPF-MIB
     cmIpInterfaceEntry, ipManagementTunnelEntry
-             FROM CM-IP-MIB;
+             FROM CM-IP-MIB
+    F3DisplayString
+             FROM CM-COMMON-MIB;
 
 f3OspfMIB MODULE-IDENTITY
-    LAST-UPDATED        "201410060000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED        "201802130000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Jakub Nadolski
-                     ADVA Optical Networking, Inc.
-                Tel: +48 58 7716 421
-             E-mail: jnadolski@advaoptical.com
-             Postal: ul. Slaska 35
-                     81-310 Gdynia, Poland"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the OSPF MIB definitions 
              used by the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201410060000Z"
+             Copyright (C) ADVA."
+    REVISION        "201802130000Z"
     DESCRIPTION
         "
+         Notes from release 201802130000Z
+         (1) added the following attributes to f3OspfRouterTable
+             f3OspfRouterRipRedistributionEnabled,f3OspfRouterRipMetricType,f3OspfRouterRipMetric,
+             f3OspfRouterAsbrStatus
+         (2) obsoleted f3OspfRouterMetricType, f3OspfRouterMetric, f3OspfRouterRedistributionType
+         (3) added the following attributes to f3OspfIpInterfaceExtTable
+             f3OspfIpInterfaceExtOspfEnabled,f3OspfIpInterfaceExtOspfAreaId,f3OspfIpInterfaceExtPassiveEnabled
+         (4) obsoleted f3OspfIpInterfaceExtStatus,f3OspfIpInterfaceExtAreaId
+         (5) added the following attributes to f3OspfIpMgmtTunnelExtTable
+             f3OspfIpMgmtTunnelExtOspfEnabled,f3OspfIpMgmtTunnelExtOspfAreaId,f3OspfIpMgmtTunnelExtPassiveEnabled
+         (6) added two new tables: f3OspfLoopbackInterfaceExtTable, f3OspfAreaInterfaceTable
+ 
          Notes from release 201410060000Z,
          (1) MIB version ready for release FSP150CC 6.6.CC."
 
@@ -138,7 +156,11 @@ F3OspfRouterEntry ::= SEQUENCE {
     f3OspfRouterNumAttachedAreas            Unsigned32,
     f3OspfRouterAreaBdrRtrStatus            TruthValue,
     f3OspfRouterStorageType                 StorageType,
-    f3OspfRouterRowStatus                   RowStatus
+    f3OspfRouterRowStatus                   RowStatus,
+    f3OspfRouterRipRedistributionEnabled    TruthValue,
+    f3OspfRouterRipMetricType               OspfMetricType,    
+    f3OspfRouterRipMetric                   Integer32,
+    f3OspfRouterAsbrStatus                  TruthValue
 }
 
 f3OspfRouterIndex OBJECT-TYPE
@@ -156,7 +178,7 @@ f3OspfRouterIndex OBJECT-TYPE
 f3OspfRouterMetricType OBJECT-TYPE
     SYNTAX        OspfMetricType
     MAX-ACCESS    read-create
-    STATUS        current
+    STATUS        obsolete
     DESCRIPTION
          "The metric type can be specified to define how the cost of 
          redistributed routes are to be calculated. This attribute must 
@@ -166,7 +188,7 @@ f3OspfRouterMetricType OBJECT-TYPE
 f3OspfRouterMetric OBJECT-TYPE
     SYNTAX        Integer32 (0..16777214)
     MAX-ACCESS    read-create
-    STATUS        current
+    STATUS        obsolete
     DESCRIPTION
          "The metric value to use as the default cost to be
          associated with any redistributed routes. This attribute must be set
@@ -176,7 +198,7 @@ f3OspfRouterMetric OBJECT-TYPE
 f3OspfRouterRedistributionType OBJECT-TYPE
     SYNTAX        OspfRedistributionType
     MAX-ACCESS    read-create
-    STATUS        current
+    STATUS        obsolete
     DESCRIPTION
          "The redistribution type is used to enable redistribution of routes of
          a specified protocol."
@@ -228,6 +250,43 @@ f3OspfRouterRowStatus OBJECT-TYPE
          the associated instance of this object is equal to active(1)."
     ::= { f3OspfRouterEntry 8 }
 
+f3OspfRouterRipRedistributionEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The redistribution control is used to enable redistribution of RIP routes."
+    ::= { f3OspfRouterEntry 9 }
+
+f3OspfRouterRipMetricType OBJECT-TYPE
+    SYNTAX        OspfMetricType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The metric type can be specified to define how the cost of 
+         redistributed RIP routes are to be calculated. This attribute must 
+         be set to zero if f3OspfRipRouterMetric has been specified."
+    ::= { f3OspfRouterEntry 10 }
+
+f3OspfRouterRipMetric OBJECT-TYPE
+    SYNTAX        Integer32 (0..16777214)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The metric value to use as the default cost to be
+         associated with any redistributed RIP routes. This attribute must be set
+         to zero if the f3OspfRouterRipMetricType has been specified"
+    ::= { f3OspfRouterEntry 11 }
+
+f3OspfRouterAsbrStatus OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "A flag to note whether this router is an Autonomous System
+         Border Router."
+    ::= { f3OspfRouterEntry 12 }
+    
 
 --
 --  OSPF Area Table
@@ -259,7 +318,8 @@ F3OspfAreaEntry ::= SEQUENCE {
     f3OspfAreaSpfRuns                           Counter32,
     f3OspfAreaLsaCount                          Gauge32,
     f3OspfAreaStorageType                       StorageType,
-    f3OspfAreaRowStatus                         RowStatus
+    f3OspfAreaRowStatus                         RowStatus,
+    f3OspfAreaInterfaceList                     F3DisplayString
 }
 
 f3OspfAreaId OBJECT-TYPE
@@ -346,7 +406,15 @@ f3OspfAreaRowStatus OBJECT-TYPE
         The f3OspfAreaRowStatus object may be modified if
         the associated instance of this object is equal to active(1)."
     ::= { f3OspfAreaEntry 8 }
-    
+
+f3OspfAreaInterfaceList OBJECT-TYPE
+    SYNTAX      F3DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object only used to display trap and interface list.
+          Interfaces can be added via f3OspfAreaInterfaceTable." 
+    ::= { f3OspfAreaEntry 9 }    
 
 --
 --  OSPF IP Interface Ext Table
@@ -381,13 +449,16 @@ F3OspfIpInterfaceExtEntry ::= SEQUENCE {
     f3OspfIpInterfaceExtRtrPriority                DesignatedRouterPriority,
     f3OspfIpInterfaceExtCost                       Integer32,
     f3OspfIpInterfaceExtAuthType                   OspfAuthenticationType,
-    f3OspfIpInterfaceExtAuthKey                    OCTET STRING
+    f3OspfIpInterfaceExtAuthKey                    OCTET STRING,
+    f3OspfIpInterfaceExtOspfEnabled                TruthValue,
+    f3OspfIpInterfaceExtOspfAreaId                 AreaID,
+    f3OspfIpInterfaceExtPassiveEnabled             TruthValue
 }
     
 f3OspfIpInterfaceExtStatus OBJECT-TYPE
-    SYNTAX      OspfState  
+    SYNTAX      OspfState   
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The OSPF admin status for the IP Interface."
     DEFVAL { enabled }
@@ -396,7 +467,7 @@ f3OspfIpInterfaceExtStatus OBJECT-TYPE
 f3OspfIpInterfaceExtAreaId OBJECT-TYPE
     SYNTAX      AreaID
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The Area ID with which this IP Interface is associated."
     DEFVAL { '00000000'H }
@@ -491,6 +562,30 @@ f3OspfIpInterfaceExtAuthKey OBJECT-TYPE
     DEFVAL { '0000000000000000'H }
     ::= { f3OspfIpInterfaceExtEntry 10 }
 
+f3OspfIpInterfaceExtOspfEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF status for the IP Interface."
+    ::= { f3OspfIpInterfaceExtEntry 11 }
+ 
+f3OspfIpInterfaceExtOspfAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Area ID with which this IP Interface is associated."
+    ::= { f3OspfIpInterfaceExtEntry 12 }
+
+f3OspfIpInterfaceExtPassiveEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF status for the IP Interface."
+    DEFVAL { false }
+    ::= { f3OspfIpInterfaceExtEntry 13 }
 
 --
 --  OSPF IP Management Tunnel Ext Table
@@ -525,7 +620,10 @@ F3OspfIpMgmtTunnelExtEntry ::= SEQUENCE {
     f3OspfIpMgmtTunnelExtRtrPriority                DesignatedRouterPriority,
     f3OspfIpMgmtTunnelExtCost                       Integer32,
     f3OspfIpMgmtTunnelExtAuthType                   OspfAuthenticationType,
-    f3OspfIpMgmtTunnelExtAuthKey                    OCTET STRING
+    f3OspfIpMgmtTunnelExtAuthKey                    OCTET STRING,
+    f3OspfIpMgmtTunnelExtOspfEnabled                TruthValue,
+    f3OspfIpMgmtTunnelExtOspfAreaId                 AreaID,
+    f3OspfIpMgmtTunnelExtPassiveEnabled             TruthValue
 }
     
 f3OspfIpMgmtTunnelExtStatus OBJECT-TYPE
@@ -636,6 +734,31 @@ f3OspfIpMgmtTunnelExtAuthKey OBJECT-TYPE
     DEFVAL { '0000000000000000'H }
     ::= { f3OspfIpMgmtTunnelExtEntry 10 }
 
+f3OspfIpMgmtTunnelExtOspfEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF status for the Management Tunnel."
+    ::= { f3OspfIpMgmtTunnelExtEntry 11 }
+ 
+f3OspfIpMgmtTunnelExtOspfAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Area ID with which this Management Tunnel is associated."
+    ::= { f3OspfIpMgmtTunnelExtEntry 12 }
+
+f3OspfIpMgmtTunnelExtPassiveEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF Passive mode for the Management Tunnel."
+    DEFVAL { false }
+    ::= { f3OspfIpMgmtTunnelExtEntry 13 }
+
 
 --
 --  OSPF Neighbor Ext Table
@@ -670,6 +793,115 @@ f3OspfNbrExtRole OBJECT-TYPE
         "The OSPF role for this neighbor router."
     ::= { f3OspfNbrExtEntry 1 }
 
+--
+--  OSPF Loopback IP Interface Ext Table
+--
+
+f3OspfLoopbackInterfaceExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfLoopbackInterfaceExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to OSPF Interface
+            configuration purposes. This table extends cmIpInterfaceTable 
+            from CM-IP-MIB."
+    ::= { f3OspfConfigObjects 6 }
+
+f3OspfLoopbackInterfaceExtEntry OBJECT-TYPE
+    SYNTAX      F3OspfLoopbackInterfaceExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfLoopbackInterfaceExtTable."
+    AUGMENTS { ipLoopbackInterfaceEntry }
+    ::= { f3OspfLoopbackInterfaceExtTable 1 }
+
+F3OspfLoopbackInterfaceExtEntry ::= SEQUENCE {
+    f3OspfLoopbackInterfaceExtStatus    TruthValue,
+    f3OspfLoopbackInterfaceExtAreaId    AreaID
+}
+
+f3OspfLoopbackInterfaceExtStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF admin status for the Loopback Interface."
+    ::= { f3OspfLoopbackInterfaceExtEntry 1 }
+ 
+f3OspfLoopbackInterfaceExtAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Area ID with which this Loopback Interface is associated."
+    ::= { f3OspfLoopbackInterfaceExtEntry 2 }
+
+--
+--  OSPF Area Interface List Table
+--
+
+f3OspfAreaInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfAreaInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Interfaces associated
+             with an OSPF Area."
+    ::= { f3OspfConfigObjects 7 }
+
+f3OspfAreaInterfaceEntry OBJECT-TYPE
+    SYNTAX      F3OspfAreaInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfAreaInterfaceTable."
+    INDEX { f3OspfAreaId, f3OspfAreaInterface }
+    ::= { f3OspfAreaInterfaceTable 1 }
+
+F3OspfAreaInterfaceEntry ::= SEQUENCE {
+    f3OspfAreaInterface                         VariablePointer,
+    f3OspfAreaInterfaceStorageType              StorageType,
+    f3OspfAreaInterfaceRowStatus                RowStatus
+}
+
+f3OspfAreaInterface OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "The interface associated with the OSPF area."
+    ::= { f3OspfAreaInterfaceEntry 1}
+
+f3OspfAreaInterfaceStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of storage configured for this entry."
+    ::= { f3OspfAreaInterfaceEntry 2 }
+
+f3OspfAreaInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+          	An entry MUST NOT exist in the active state unless all
+          	objects in the entry have an appropriate value, as described
+          	in the description clause for each writable object.
+
+          	The values of f3VrfTrafficIpIfMemberRowStatus supported are
+          	createAndGo(4) and destroy(6).  All mandatory attributes
+          	must be specified in a single SNMP SET request with
+          	f3VrfTrafficIpIfMemberRowStatus value as createAndGo(4).
+          	Upon successful row creation, this object has a
+          	value of active(1).
+
+          	The f3OspfAreaInterfaceRowStatus object may be modified if
+          	the associated instance of this object is equal to active(1)."
+    ::= { f3OspfAreaInterfaceEntry 3 }
+
 
 --
 -- Conformance
@@ -685,7 +917,8 @@ f3OspfCompliance MODULE-COMPLIANCE
         MANDATORY-GROUPS {
               f3OspfRouterGroup, f3OspfAreaGroup,
               f3OspfIpInterfaceExtGroup, f3OspfIpMgmtTunnelExtGroup,
-              f3OspfNbrExtGroup
+              f3OspfNbrExtGroup, f3OspfLoopbackInterfaceExtGroup,
+              f3OspfAreaInterfaceGroup
         }
     ::= { f3OspfCompliances 1 }
 
@@ -697,7 +930,11 @@ f3OspfRouterGroup OBJECT-GROUP
         f3OspfRouterNumAttachedAreas,
         f3OspfRouterAreaBdrRtrStatus,
         f3OspfRouterStorageType,
-        f3OspfRouterRowStatus
+        f3OspfRouterRowStatus,
+        f3OspfRouterRipRedistributionEnabled,
+        f3OspfRouterRipMetricType,
+        f3OspfRouterRipMetric,
+        f3OspfRouterAsbrStatus
     }
     STATUS  current
     DESCRIPTION
@@ -706,13 +943,15 @@ f3OspfRouterGroup OBJECT-GROUP
 
 f3OspfAreaGroup OBJECT-GROUP
     OBJECTS {
+        f3OspfAreaId,
         f3OspfAreaType,
         f3OspfAreaAuthType,
         f3OspfAreaDefaultCost,
         f3OspfAreaSpfRuns,
         f3OspfAreaLsaCount,
         f3OspfAreaStorageType,
-        f3OspfAreaRowStatus
+        f3OspfAreaRowStatus,
+        f3OspfAreaInterfaceList
     }
     STATUS  current
     DESCRIPTION
@@ -730,7 +969,10 @@ f3OspfIpInterfaceExtGroup OBJECT-GROUP
         f3OspfIpInterfaceExtRtrPriority,
         f3OspfIpInterfaceExtCost,
         f3OspfIpInterfaceExtAuthType,
-        f3OspfIpInterfaceExtAuthKey
+        f3OspfIpInterfaceExtAuthKey,
+        f3OspfIpInterfaceExtOspfEnabled,
+        f3OspfIpInterfaceExtOspfAreaId,
+        f3OspfIpInterfaceExtPassiveEnabled
     }
     STATUS  current
     DESCRIPTION
@@ -749,7 +991,10 @@ f3OspfIpMgmtTunnelExtGroup OBJECT-GROUP
         f3OspfIpMgmtTunnelExtRtrPriority,
         f3OspfIpMgmtTunnelExtCost,
         f3OspfIpMgmtTunnelExtAuthType,
-        f3OspfIpMgmtTunnelExtAuthKey
+        f3OspfIpMgmtTunnelExtAuthKey,
+        f3OspfIpMgmtTunnelExtOspfEnabled,
+        f3OspfIpMgmtTunnelExtOspfAreaId,
+        f3OspfIpMgmtTunnelExtPassiveEnabled
     }
     STATUS  current
     DESCRIPTION
@@ -766,5 +1011,28 @@ f3OspfNbrExtGroup OBJECT-GROUP
              "A collection of objects used to manage OSPF configuration
               of OSPF Neighbor."
     ::= { f3OspfGroups 5 }
+
+f3OspfLoopbackInterfaceExtGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfLoopbackInterfaceExtStatus,
+        f3OspfLoopbackInterfaceExtAreaId
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage OSPF configuration
+              of IP loopback interface"
+    ::= { f3OspfGroups 6 }
+
+f3OspfAreaInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfAreaInterface,
+        f3OspfAreaInterfaceStorageType,
+        f3OspfAreaInterfaceRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage configuration
+              of OSPF area interfaces"
+    ::= { f3OspfGroups 7 }
 
 END
