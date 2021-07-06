@@ -188,9 +188,9 @@ modules:
             data:
                 -
                     oid: unitOnOff
-                    group: Unit
+                    group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
-                    descr: Unit state
+                    descr: Unit
                     index: 'unitOnOff.{{ $index }}'
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'off' }
@@ -199,7 +199,7 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: 'auto' }
                 -
                     oid: driverPowerStatus
-                    group: Unit
+                    group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
                     descr: Power+ drive status
                     index: 'driverPowerStatus.{{ $index }}'
@@ -209,16 +209,16 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inverterOnOff
-                    group: Unit
+                    group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.17.{{ $index }}'
-                    descr: Inverter state
+                    descr: Inverter
                     index: 'inverterOnOff.{{ $index }}'
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'off' }
                         - { value: 1, generic: 0, graph: 0, descr: 'on' }
                 -
                     oid: envelopeZone
-                    group: Unit
+                    group: Operating envelop
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.14.{{ $index }}'
                     descr: Cooling envelope zone
                     index: 'envelopeZone.{{ $index }}'
@@ -234,7 +234,7 @@ modules:
                         - { value: 8, generic: 0, graph: 0, descr: 'minimum suction power' }
                 -
                     oid: compressorOverloadAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.2.{{ $index }}'
                     descr: Compressor overload
                     index: 'compressorOverloadAlarm.{{ $index }}'
@@ -243,7 +243,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: highPressureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.3.{{ $index }}'
                     descr: High pressure
                     index: 'highPressureAlarm.{{ $index }}'
@@ -252,7 +252,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inverterAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.11.{{ $index }}'
                     descr: Inverter
                     index: 'inverterAlarm.{{ $index }}'
@@ -261,7 +261,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: driveAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.12.{{ $index }}'
                     descr: Power+ drive
                     index: 'driveAlarm.{{ $index }}'
@@ -284,7 +284,7 @@ modules:
                     descr: Current Error code
                     index: 'currentErrorCode.{{ $index }}'
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }    
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }    
                         - { value: 2, generic: 2, graph: 0, descr: 'ALA02 - Probe B2 faulty or disconnected' } 
                         - { value: 3, generic: 2, graph: 0, descr: 'ALA03 - Probe B3 faulty or disconnected' } 
                         - { value: 4, generic: 2, graph: 0, descr: 'ALA04 - Probe B4 faulty or disconnected' } 
@@ -319,7 +319,7 @@ modules:
                         - { value: 33, generic: 2, graph: 0, descr: 'ALW04 - Max temperature (warning)' }
                 -
                     oid: compressorEnvelopeAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.30.{{ $index }}'
                     descr: Compressor envelope
                     index: 'compressorEnvelopeAlarm.{{ $index }}'
@@ -328,7 +328,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorStartupFailureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.31.{{ $index }}'
                     descr: Compressor startup (max retries)
                     index: 'compressorStartupFailureAlarm.{{ $index }}'
@@ -337,7 +337,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: maxDischargeTemperatureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.33.{{ $index }}'
                     descr: Maximum discharge temperature
                     index: 'maxDischargeTemperatureAlarm.{{ $index }}'
@@ -346,7 +346,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorDeltaPressureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.35.{{ $index }}'
                     descr: Compressor delta pressure
                     index: 'compressorDeltaPressureAlarm.{{ $index }}'
@@ -355,7 +355,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: oilReturnAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.36.{{ $index }}'
                     descr: Oil return (lubrication issue)
                     index: 'oilReturnAlarm.{{ $index }}'
@@ -364,7 +364,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: outputTemperatureTopProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.38.{{ $index }}'
                     descr: Output top probe
                     index: 'outputTemperatureTopProbeAlarm.{{ $index }}'
@@ -373,7 +373,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: outputTemperatureMidProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.39.{{ $index }}'
                     descr: Output mid probe
                     index: 'outputTemperatureMidProbeAlarm.{{ $index }}'
@@ -382,7 +382,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: outputTemperatureBottomProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.40.{{ $index }}'
                     descr: Output bottom probe
                     index: 'outputTemperatureBottomProbeAlarm.{{ $index }}'
@@ -391,7 +391,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inputTemperatureTopProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.42.{{ $index }}'
                     descr: Input top probe
                     index: 'inputTemperatureTopProbeAlarm.{{ $index }}'
@@ -400,7 +400,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inputTemperatureMidProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.43.{{ $index }}'
                     descr: Input mid probe
                     index: 'inputTemperatureMidProbeAlarm.{{ $index }}'
@@ -409,7 +409,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inputTemperatureBottomProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.44.{{ $index }}'
                     descr: Input bottom probe
                     index: 'inputTemperatureBottomProbeAlarm.{{ $index }}'
@@ -418,7 +418,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorDischargeTemperatureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.45.{{ $index }}'
                     descr: Compressor discharge temperature probe
                     index: 'compressorDischargeTemperatureProbeAlarm.{{ $index }}'
@@ -427,7 +427,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorSuctionTemperatureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.46.{{ $index }}'
                     descr: Compressor suction temperature probe
                     index: 'compressorSuctionTemperatureProbeAlarm.{{ $index }}'
@@ -436,7 +436,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorDischargePressureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.47.{{ $index }}'
                     descr: Compressor discharge pressure probe
                     index: 'compressorDischargePressureProbeAlarm.{{ $index }}'
@@ -445,7 +445,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorSuctionPressureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.48.{{ $index }}'
                     descr: Compressor suction pressure probe
                     index: 'compressorSuctionPressureProbeAlarm.{{ $index }}'
