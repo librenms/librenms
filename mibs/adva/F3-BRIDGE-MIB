@@ -14,30 +14,39 @@ IMPORTS
              FROM  CM-COMMON-MIB 
     neIndex, shelfIndex, slotIndex, networkElementEntry
              FROM CM-ENTITY-MIB
-    cmFlowEntry, cmEthernetAccPortIndex, cmFlowIndex, cmMPFlowIndex
+    cmFlowEntry, cmEthernetAccPortIndex, 
+    cmFlowIndex, cmMPFlowIndex, cmFlowPointEntry
              FROM CM-FACILITY-MIB
     cmFlowStatsEntry, cmFlowHistoryEntry
              FROM CM-PERFORMANCE-MIB;
 
 f3BridgeMIB MODULE-IDENTITY
-    LAST-UPDATED        "201209130000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED        "201905220000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Jakub Zalewski
-                     ADVA Optical Networking, Inc.
-                Tel: +48 58 7716 411
-             E-mail: jzalewski@advaoptical.com
-             Postal: ul. Slaska 35/37
-                     81-310 Gdynia, Poland"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Bridge MIB definitions 
              used by the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201210090000Z"
+             Copyright (C) ADVA."
+    REVISION        "201905220000Z"
     DESCRIPTION
         "
+         Notes from release 201905220000Z,
+         (1) Added f3EncapFlowPointLearningConfigTable
+
+         Notes from release 201606070000Z,
+         (1) Added f3FlowPointLearningConfigTable
          Notes from release 201210090000Z,
-         (1)MIB version ready for release FSP150CC 5.6CC." 
+         (1)MIB version ready for release FSP150CC 5.6CC."
 
     ::= {fsp150cm 26}    
 
@@ -468,11 +477,10 @@ f3MPFlowStaticFwdFP OBJECT-TYPE
 
 f3MPFlowStaticFwdControlAction OBJECT-TYPE
     SYNTAX      LearningAction
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-         "The action is read only as Forward that means the MAC 
-         address is always forwarded." 
+         "This object allows configuring the action for this Forwarding Entry." 
     ::= { f3MPFlowStaticFwdEntry 3 }
 
 f3MPFlowStaticFwdValid OBJECT-TYPE
@@ -975,6 +983,128 @@ f3FlowLearningHistoryMacTableDiscards OBJECT-TYPE
     ::= { f3FlowLearningHistoryEntry 5 }
 
 --
+-- Flowpoint table extension for Learning Control configuration
+--
+f3FlowPointLearningConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowPointLearningConfigEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends f3FlowPointTable to provide parameters for MAC Table control
+             configuration."
+    ::= { f3BridgeConfigObjects 10 }
+
+f3FlowPointLearningConfigEntry  OBJECT-TYPE
+    SYNTAX      F3FlowPointLearningConfigEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FlowPointLearningConfigTable."
+    AUGMENTS { cmFlowPointEntry }
+    ::= { f3FlowPointLearningConfigTable 1 }
+
+F3FlowPointLearningConfigEntry ::= SEQUENCE {
+    f3FlowPointLearningConfigLearningEnabled       TruthValue,
+    f3FlowPointLearningConfigMaxFwdEntries         Integer32,
+    f3FlowPointLearningConfigProtectLearningCtrl   ProtectLearningControl,
+    f3FlowPointLearningConfigAction                FlowLearningConfigAction
+}
+
+f3FlowPointLearningConfigLearningEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on this Flowpoint."
+    ::= { f3FlowPointLearningConfigEntry 1 }
+
+f3FlowPointLearningConfigMaxFwdEntries OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring the maximum number of Forwarding Entries 
+          on this Flowpoint."
+    ::= { f3FlowPointLearningConfigEntry 2 }
+
+f3FlowPointLearningConfigProtectLearningCtrl OBJECT-TYPE
+    SYNTAX        ProtectLearningControl
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on this Flowpoint."
+    ::= { f3FlowPointLearningConfigEntry 3 }
+
+f3FlowPointLearningConfigAction OBJECT-TYPE
+    SYNTAX        FlowLearningConfigAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This objects allows performing user action on Flow Learning Table."
+    ::= { f3FlowPointLearningConfigEntry 4 }
+
+--
+-- Encap Flowpoint table extension for Learning Control configuration
+--
+f3EncapFlowPointLearningConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EncapFlowPointLearningConfigEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends f3EncapFlowPointTable to provide parameters for MAC Table control
+             configuration."
+    ::= { f3BridgeConfigObjects 11 }
+
+f3EncapFlowPointLearningConfigEntry  OBJECT-TYPE
+    SYNTAX      F3EncapFlowPointLearningConfigEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EncapFlowPointLearningConfigTable."
+    AUGMENTS { cmEncapFlowPointEntry }
+    ::= { f3EncapFlowPointLearningConfigTable 1 }
+
+F3EncapFlowPointLearningConfigEntry ::= SEQUENCE {
+    f3EncapFlowPointLearningConfigLearningEnabled       TruthValue,
+    f3EncapFlowPointLearningConfigMaxFwdEntries         Integer32,
+    f3EncapFlowPointLearningConfigProtectLearningCtrl   ProtectLearningControl,
+    f3EncapFlowPointLearningConfigAction                FlowLearningConfigAction
+}
+
+f3EncapFlowPointLearningConfigLearningEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on this Encap Flowpoint."
+    ::= { f3EncapFlowPointLearningConfigEntry 1 }
+
+f3EncapFlowPointLearningConfigMaxFwdEntries OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring the maximum number of Forwarding Entries 
+          on this Flowpoint."
+    ::= { f3EncapFlowPointLearningConfigEntry 2 }
+
+f3EncapFlowPointLearningConfigProtectLearningCtrl OBJECT-TYPE
+    SYNTAX        ProtectLearningControl
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on this Encap Flowpoint."
+    ::= { f3EncapFlowPointLearningConfigEntry 3 }
+
+f3EncapFlowPointLearningConfigAction OBJECT-TYPE
+    SYNTAX        FlowLearningConfigAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This objects allows performing user action on Flow Learning Table."
+    ::= { f3EncapFlowPointLearningConfigEntry 4 }
+
+--
 -- Conformance
 --
 f3BridgeCompliances OBJECT IDENTIFIER ::= {f3BridgeConformance 1}
@@ -1125,6 +1255,29 @@ f3NetworkElementBridgeParamsGroup OBJECT-GROUP
     DESCRIPTION
              "A collection of objects used to manage the f3FwdTSizeProfileGroup."
     ::= { f3BridgeGroups 10 }
+    
+f3FlowPointLearningConfigGroup OBJECT-GROUP
+    OBJECTS {
+    f3FlowPointLearningConfigLearningEnabled,
+    f3FlowPointLearningConfigMaxFwdEntries,
+    f3FlowPointLearningConfigProtectLearningCtrl,
+    f3FlowPointLearningConfigAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Learning Config group."
+    ::= { f3BridgeGroups 11 }
+
+f3EncapFlowPointLearningConfigGroup OBJECT-GROUP
+    OBJECTS {
+    f3EncapFlowPointLearningConfigLearningEnabled,
+    f3EncapFlowPointLearningConfigMaxFwdEntries,
+    f3EncapFlowPointLearningConfigProtectLearningCtrl,
+    f3EncapFlowPointLearningConfigAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Learning Config group."
+    ::= { f3BridgeGroups 12 }
 
 END
-
