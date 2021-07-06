@@ -29,28 +29,48 @@ IMPORTS
 
 
 cmServiceAssuranceMIB MODULE-IDENTITY
-    LAST-UPDATED    "201111220000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "201912010000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Service Assurance MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201111220000Z"
+             Copyright (C) ADVA."
+    REVISION        "201912010000Z"
     DESCRIPTION
         "
+         Notes from release 201912010000Z
+         (1) Added ecpaControlMonitorPortType
+          
          Notes from release 201607310000Z
-         (i)Added the following objects for EsaProbeCOSConfigEntry:
+         (1)Added the following objects for EsaProbeCOSConfigEntry:
             - esaProbeCOSConfigSoamPmExtAvailFlrThreshold
             - esaProbeCOSConfigSoamPmExtFlrDeltaTNumLmPdus
             - esaProbeCOSConfigSoamPmExtConDeltaTsForAvail
 
+         Notes from release 201509200000Z
+         (1)Added new objects to ecpaControlTable:
+            - ecpaControlEcpaType                     
+         (2)Added new objects to ecpaConfigStreamTable:
+            - ecpaConfigStreamUdpControl
+            - ecpaConfigStreamUdpSrcPort
+            - ecpaConfigStreamUdpDstPort
+         (3)Added new objects to ecpaTestStreamTable:
+            - ecpaTestStreamUdpControl
+            - ecpaTestStreamUdpSrcPort
+            - ecpaTestStreamUdpDstPort
+         (3)Added new enumeration:    
+            - EcpaType
+            
          Notes from release 201302130000Z
          (i)Added the following objects:
             - esaProbeAlias                     
@@ -159,6 +179,24 @@ EcpaTestType ::= TEXTUAL-CONVENTION
                   duration(1),
                   numframes(2),
                   continuous(3)
+                 }   
+                 
+EcpaType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "ECPA Type."
+    SYNTAX       INTEGER {
+                  regular(1),
+                  enhanced(2)
+                 }
+
+EcpaMonitorPortType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "ECPA Monitor Port Type."
+    SYNTAX       INTEGER {
+                  any(1),
+                  source(2)
                  }
 
 EcpaControlAction ::= TEXTUAL-CONVENTION
@@ -385,7 +423,9 @@ EcpaControlEntry ::= SEQUENCE {
     ecpaControlAction               EcpaControlAction,
     ecpaControlTestStatus           EcpaTestStatus,
     ecpaControlStorageType          StorageType,
-    ecpaControlRowStatus            RowStatus
+    ecpaControlRowStatus            RowStatus,
+    ecpaControlEcpaType             EcpaType,
+    ecpaControlMonitorPortType      EcpaMonitorPortType
 }
 
 ecpaControlIndex OBJECT-TYPE
@@ -558,7 +598,23 @@ ecpaControlRowStatus OBJECT-TYPE
 
             The ecpaControlRowStatus object may be modified if
             the associated instance of this object is equal to active(1)."
-    ::= { ecpaControlEntry 14 }
+    ::= { ecpaControlEntry 14 }  
+    
+ecpaControlEcpaType OBJECT-TYPE
+    SYNTAX      EcpaType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "ECPA test can run in a regular mode(1) or enhaced mode (2)."
+    ::= { ecpaControlEntry 15 }
+
+ecpaControlMonitorPortType OBJECT-TYPE
+    SYNTAX      EcpaMonitorPortType 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "ECPA monitor port type."
+    ::= { ecpaControlEntry 16 }
 
 --
 --  Etherjack Connection Performance Analyzer Stream Table
@@ -610,7 +666,10 @@ EcpaConfigStreamEntry ::= SEQUENCE {
     ecpaConfigStreamDestIpV4Address          IpAddress,
     ecpaConfigStreamDestIpV6Address          Ipv6Address,
     ecpaConfigStreamUsePortSourceMAC         TruthValue,
-    ecpaConfigStreamRateHi                   Unsigned32
+    ecpaConfigStreamRateHi                   Unsigned32,
+    ecpaConfigStreamUdpControl               TruthValue,
+    ecpaConfigStreamUdpSrcPort               Integer32,
+    ecpaConfigStreamUdpDstPort               Integer32
 }
 
 ecpaConfigStreamIndex OBJECT-TYPE
@@ -894,7 +953,31 @@ ecpaConfigStreamRateHi OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The object enables specification of the higher 32 bits of the traffic generation rate."
-    ::= { ecpaConfigStreamEntry 29 }
+    ::= { ecpaConfigStreamEntry 29 } 
+    
+ecpaConfigStreamUdpControl OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object enables or disables UDP header."
+    ::= { ecpaConfigStreamEntry 30 } 
+    
+ecpaConfigStreamUdpSrcPort OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "When UDP control is enabled, this object provides the UDP source port. Otherwize it is ignored."
+    ::= { ecpaConfigStreamEntry 31 } 
+    
+ecpaConfigStreamUdpDstPort OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "When UDP control is enabled, this object provides the UDP destination port. Otherwize it is ignored."
+    ::= { ecpaConfigStreamEntry 32 }
 
 --- ECPA Test Streams Table
 ecpaTestStreamTable OBJECT-TYPE
@@ -971,7 +1054,11 @@ EcpaTestStreamEntry ::= SEQUENCE {
     ecpaTestStreamDestIpV4Address                IpAddress,
     ecpaTestStreamDestIpV6Address                Ipv6Address,
     ecpaTestStreamConfigChanged                  TruthValue,
-    ecpaTestStreamRateHi                         Unsigned32
+    ecpaTestStreamRateHi                         Unsigned32,
+    ecpaTestStreamUdpControl                     TruthValue,
+    ecpaTestStreamUdpSrcPort                     Integer32,
+    ecpaTestStreamUdpDstPort                     Integer32
+
 }
 
 ecpaTestStreamIndex OBJECT-TYPE
@@ -1483,7 +1570,31 @@ ecpaTestStreamRateHi OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The object enables specification of the higher 32 bits of the traffic generation rate."
-    ::= { ecpaTestStreamEntry 54 }
+    ::= { ecpaTestStreamEntry 54 } 
+    
+ecpaTestStreamUdpControl OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object enables or disables UDP header."
+    ::= { ecpaTestStreamEntry 55 } 
+    
+ecpaTestStreamUdpSrcPort OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "When UDP control is enabled, this object provides the UDP source port. Otherwize it is ignored."
+    ::= { ecpaTestStreamEntry 56 } 
+    
+ecpaTestStreamUdpDstPort OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "When UDP control is enabled, this object provides the UDP destination port. Otherwize it is ignored."
+    ::= { ecpaTestStreamEntry 57 }  
 
 --
 -- ESA Probe Table
@@ -2527,7 +2638,7 @@ esaReflectorAlias    OBJECT-TYPE
          "This object allows SNMP management entities to provide an
           alias for an ESA Reflector."
      ::= { esaReflectorEntry 18 }
-    
+
 --
 -- ESA Probe Current Statistics Table
 --
@@ -4170,10 +4281,10 @@ esaProbeDistStatsConfigEntry  OBJECT-TYPE
     ::= { esaProbeDistStatsConfigTable 1 }
 
 EsaProbeDistStatsConfigEntry ::= SEQUENCE {
-    esaProbeDistStatsConfigIndex           Integer32,
-    esaProbeDistStatsConfigType            EsaProbeDistStatsType,
-    esaProbeDistStatsConfigMinVal          Integer32,
-    esaProbeDistStatsConfigMaxVal          Integer32,
+    esaProbeDistStatsConfigIndex         Integer32,
+    esaProbeDistStatsConfigType          EsaProbeDistStatsType,
+    esaProbeDistStatsConfigMinVal        Integer32,
+    esaProbeDistStatsConfigMaxVal        Integer32,
     esaProbeDistStatsConfigNumBins         Unsigned32,
     esaProbeDistStatsConfigLowBoundOfBin1  Integer32,
     esaProbeDistStatsConfigLowBoundOfBin2  Integer32,
@@ -6343,7 +6454,7 @@ cmServAssuranceObjectGroup OBJECT-GROUP
         ecpaControlNumFrames, ecpaControlDuration, 
         ecpaControlInjectorDirection, ecpaControlMonitorDirection,
         ecpaControlStream1, ecpaControlStream2, ecpaControlStream3,
-        ecpaControlAction, ecpaControlTestStatus,
+        ecpaControlAction, ecpaControlTestStatus, ecpaControlEcpaType, ecpaControlMonitorPortType,
     
         ecpaConfigStreamIndex, ecpaConfigStreamName, ecpaConfigStreamFrameSize,
         ecpaConfigStreamRate, ecpaConfigStreamPayloadType,
@@ -6359,6 +6470,7 @@ cmServAssuranceObjectGroup OBJECT-GROUP
         ecpaConfigStreamInnerVlan2Prio, ecpaConfigStreamInnerVlan2EtherType,
         ecpaConfigStreamDestIpV4Address, ecpaConfigStreamDestIpV6Address,
         ecpaConfigStreamUsePortSourceMAC, ecpaConfigStreamRateHi,
+        ecpaConfigStreamUdpControl, ecpaConfigStreamUdpSrcPort, ecpaConfigStreamUdpDstPort,
     
         ecpaTestStreamIndex, ecpaTestStreamSourcePort,
         ecpaTestStreamName, ecpaTestStreamFrameSize, ecpaTestStreamRate,
@@ -6386,6 +6498,7 @@ cmServAssuranceObjectGroup OBJECT-GROUP
         ecpaTestStreamInnerVlan2Id, ecpaTestStreamInnerVlan2Prio,
         ecpaTestStreamInnerVlan2EtherType, ecpaTestStreamDestIpV4Address,
         ecpaTestStreamDestIpV6Address, ecpaTestStreamConfigChanged, ecpaTestStreamRateHi,
+        ecpaTestStreamUdpControl, ecpaTestStreamUdpSrcPort, ecpaTestStreamUdpDstPort, 
 
         esaProbeIndex, esaProbeName, esaProbeSourcePort, 
         esaProbeAssocSchedGroup, esaProbeDirection,
@@ -6551,7 +6664,7 @@ cmEcpaGroup OBJECT-GROUP
         ecpaControlInjectorDirection, ecpaControlMonitorDirection,
         ecpaControlStream1, ecpaControlStream2, ecpaControlStream3,
         ecpaControlAction, ecpaControlTestStatus, ecpaControlStorageType,
-        ecpaControlRowStatus,
+        ecpaControlRowStatus, ecpaControlEcpaType,
     
         ecpaConfigStreamIndex, ecpaConfigStreamName, ecpaConfigStreamFrameSize,
         ecpaConfigStreamRate, ecpaConfigStreamPayloadType,
@@ -6566,7 +6679,8 @@ cmEcpaGroup OBJECT-GROUP
         ecpaConfigStreamInnerVlan2Enabled, ecpaConfigStreamInnerVlan2Id,
         ecpaConfigStreamInnerVlan2Prio, ecpaConfigStreamInnerVlan2EtherType,
         ecpaConfigStreamDestIpV4Address, ecpaConfigStreamDestIpV6Address,
-        ecpaConfigStreamUsePortSourceMAC, ecpaConfigStreamRateHi,
+        ecpaConfigStreamUsePortSourceMAC, ecpaConfigStreamRateHi, 
+        ecpaConfigStreamUdpControl, ecpaConfigStreamUdpSrcPort, ecpaConfigStreamUdpDstPort, 
     
         ecpaTestStreamIndex, ecpaTestStreamSourcePort,
         ecpaTestStreamName, ecpaTestStreamFrameSize, ecpaTestStreamRate,
@@ -6594,7 +6708,7 @@ cmEcpaGroup OBJECT-GROUP
         ecpaTestStreamInnerVlan2Id, ecpaTestStreamInnerVlan2Prio,
         ecpaTestStreamInnerVlan2EtherType, ecpaTestStreamDestIpV4Address,
         ecpaTestStreamDestIpV6Address, ecpaTestStreamConfigChanged, 
-        ecpaTestStreamRateHi
+        ecpaTestStreamRateHi, ecpaTestStreamUdpControl, ecpaTestStreamUdpSrcPort, ecpaTestStreamUdpDstPort
     }
     STATUS  current
     DESCRIPTION
