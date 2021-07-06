@@ -1,4 +1,4 @@
-os: arista_mos
+os: arista-mos
 text: 'Arista MOS'
 type: network
 icon: arista
@@ -11,14 +11,3 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.43191.1.6.7
-poller_modules:
-    wireless: false
-    ipmi: false
-    applications: false
-    services: false
-    ntp: false
-discovery_modules:
-    cisco-vrf-lite: false
-    services: false
-    ntp: false
-    wireless: false
