@@ -102,8 +102,6 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
         // Go get some data from the device.
         $data = snmpwalk_group($device, 'pingCtlRowStatus', 'DISMAN-PING-MIB', 2);
         $data = snmpwalk_group($device, 'jnxPingLastTestResultTable', 'JUNIPER-PING-MIB', 2, $data);
-        // $data = snmpwalk_group($device, 'jnxPingLastTestResultSentProbes', 'JUNIPER-PING-MIB', 2, $data);
-        // $data = snmpwalk_group($device, 'jnxPingLastTestResultAvgRttUs', 'JUNIPER-PING-MIB', 2, $data);
 
         // Get the needed information
         foreach ($slas as $sla) {
