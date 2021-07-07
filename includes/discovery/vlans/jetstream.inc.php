@@ -29,14 +29,34 @@
 // tested on: T1600G-28TS 3.0; T2600G-18TS 2.0;
 //
 // todo: detect LAG ports ??? now parser assume that there is no LAG port
+// 2021-06-07: Added Vlan parsing on LAG ports
 //
 
 if (! function_exists('jetstreamExpand')) {
-    function jetstreamExpand($var)
-    {
-        $arr = explode(',', trim($var)); //array of x/y/a-z
+    function jetstreamExpand($var) {
 
         unset($result);
+
+        if ($pos=strpos($var, ',LAG')) {			// if input string contains 'LAG'
+            $lag=str_replace('LAG', '', substr($var, $pos+1));	// get the LAG ports in form of '1,2,4-8'
+            $var=substr($var, 0, $pos );			// prepare & save $var for further processing
+
+            $arr = explode(',', trim($lag)); //array of x,y,a-z
+            foreach ($arr as $element) {
+                $element = trim($element);
+                if (strpos($element, '-') !== false) {
+                    $tmp = explode('-', $element); // left part is a start port, right is the end number of the serie
+                    for ($i = $tmp[0]; $i <= $tmp[1]; $i++) {
+                        $result[] = 'LAG'.$i;
+                    }
+                } else {
+                    $result[] = 'LAG'.$element;
+                }
+            }
+        }
+
+        $arr = explode(',', trim($var)); //array of x/y/a-z
+
         foreach ($arr as $element) {
             $element = trim($element);
             if (strpos($element, '-') !== false) {
@@ -78,7 +98,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
             if ($vlan_data['vlan_name'] != $jet_vlan_data['dot1qVlanDescription']) {
                 $vlan_upd['vlan_name'] = $jet_vlan_data['dot1qVlanDescription'];
-                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['jet_vlan_id']]);
+                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
                 log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device, 'vlan');
                 echo 'U';
             } else {
