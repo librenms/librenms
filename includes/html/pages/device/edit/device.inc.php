@@ -121,7 +121,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo \LibreNMS\Util\Clean::html($device['hostname'], []); ?> />
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value="<?php echo \LibreNMS\Util\Clean::html($device['hostname'], []); ?>" />
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
