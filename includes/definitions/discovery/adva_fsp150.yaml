@@ -80,8 +80,8 @@ modules:
                         - { value: 288, generic: 3, graph: 0, descr: 'Loopback Active' }
                         - { value: 347, generic: 2, graph: 0, descr: 'Key Exchange Failed' }
                         - { value: 348, generic: 2, graph: 0, descr: 'Key Exchange Auth Password Missing' }
-                        - { value: 390, generic: 2, graph: 0, descr: 'Key Exchange Stop' }
                         - { value: 389, generic: 2, graph: 0, descr: 'Power No Input 2' }
+                        - { value: 390, generic: 2, graph: 0, descr: 'Key Exchange Stop' }
                         - { value: 403, generic: 3, graph: 0, descr: 'HTTPS SSL Certificate Expired' }
                         - { value: 409, generic: 2, graph: 0, descr: 'Fan Fail' }
                         - { value: 417, generic: 2, graph: 0, descr: 'PSU A Input Fail' }
