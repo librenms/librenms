@@ -18,7 +18,7 @@
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
 
 $neType = $pre_cache['adva_fsp150'][1]['neType'];
-if ($neType == 'ccxg116pro' || $neType == 'ccxg116proH' || $neType == 'ccxg120pro' || $neType == 'aggregation')  {
+if ($neType == 'ccxg116pro' || $neType == 'ccxg116proH' || $neType == 'ccxg120pro' || $neType == 'aggregation') {
     $pre_cache['adva_fsp150_ports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetTrafficPortTable', $pre_cache['adva_fsp150_ports'], 'CM-FACILITY-MIB', null, '-OQUbs');
 } else {
     $pre_cache['adva_fsp150_ports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetNetPortTable', $pre_cache['adva_fsp150_ports'], 'CM-FACILITY-MIB', null, '-OQUbs');
