@@ -56,6 +56,7 @@ class UserController extends Controller
         return view('user.index', [
             'users' => User::orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
+            'twofactor' => UserPref::query()->where('pref', 'twofactor')->get('user_id'),
         ]);
     }
 

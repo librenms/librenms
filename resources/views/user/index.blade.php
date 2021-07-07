@@ -22,6 +22,9 @@
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
                     @endif
+                    @if(\LibreNMS\Config::get('twofactor'))
+                    <th data-column-id="twofactor" data-formatter="twofactor">@lang('2FA')</th>
+                    @endif
                     <th data-column-id="descr">@lang('Description')</th>
                     <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
                 </tr>
@@ -37,6 +40,15 @@
                             <td>{{ $user->email }}</td>
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
+                            @endif
+                            @if(\LibreNMS\Config::get('twofactor'))
+                            <td>
+                                @foreach( $twofactor as $twofactor_entry )
+                                    @if( $twofactor_entry->user_id == $user->user_id )
+                                    1
+                                    @endif
+                                @endforeach
+                            </td>
                             @endif
                             <td>{{ $user->descr }}</td>
                             <td></td>
@@ -60,6 +72,11 @@
                             return '<span class="fa fa-fw fa-check text-success"></span>';
                         } else {
                             return '<span class="fa fa-fw fa-close text-danger"></span>';
+                        }
+                    },
+                    twofactor: function (column, row) {
+                        if(row['twofactor'] == 1) {
+                            return '<span class="fa fa-fw fa-check text-success"></span>';
                         }
                     },
                     actions: function (column, row) {
