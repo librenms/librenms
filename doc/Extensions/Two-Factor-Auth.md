@@ -13,7 +13,8 @@ passcode in addition to their password to obtain access to the account.
 LibreNMS has a RFC4226 conformant implementation of both Time and Counter
 based One-Time-Passwords. It also allows the administrator to
 configure a throttle time to enforce after 3 failures exceeded. Unlike
-RFC4226 suggestions, this throttle time will not stack on the amount of failures.
+RFC4226 suggestions, this throttle time will not stack on the amount of
+failures.
 
 ## Types
 
