@@ -3,8 +3,8 @@ path: blob/master/doc/
 
 # Features
 
-Here's a brief list of supported features, some might be missing.
-If you think something is missing, feel free to ask us.
+Here's a brief list of supported features, some might be missing. If
+you think something is missing, feel free to ask us.
 
 * Auto discovery
 * Alerting
