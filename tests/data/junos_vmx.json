@@ -12554,7 +12554,30 @@
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "slas": [
+                {
+                    "sla_nr": 664440489,
+                    "owner": "test-rpm3",
+                    "tag": "timestamp",
+                    "rtt_type": "IcmpTimeStamp",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 1077751536,
+                    "owner": "test-rpm",
+                    "tag": "internet",
+                    "rtt_type": "IcmpEcho",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        }
     },
     "sensors": {
         "discovery": {
