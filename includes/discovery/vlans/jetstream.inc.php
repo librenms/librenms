@@ -52,7 +52,7 @@ if (! function_exists('jetstreamExpand')) {
         foreach ($ports[1] as $index => $start) {
             $end = $ports[2][$index] ?: $start;
             for ($i = $start; $i <= $end; $i++) {
-            $result[] = '1/0/' . $i; //need to be in form 1/0/x
+                $result[] = '1/0/' . $i; //need to be in form 1/0/x
             }
         }
 
