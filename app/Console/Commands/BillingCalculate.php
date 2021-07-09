@@ -156,6 +156,7 @@ class BillingCalculate extends Command
                 $i++;
             }
         }
+
         return 0;
     }
 }
