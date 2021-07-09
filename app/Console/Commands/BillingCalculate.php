@@ -7,7 +7,6 @@ use App\Models\BillHistory;
 use Illuminate\Console\Command;
 use LibreNMS\Util\Number;
 
-
 require_once base_path() . '/includes/init.php';
 
 class BillingCalculate extends Command
@@ -43,14 +42,12 @@ class BillingCalculate extends Command
      */
     public function handle()
     {
-
         if ($this->option('r')) {
             $this->info("Clearing history table.\n");
             BillHistory::truncate();
-
         }
         //get all bills and order by bill_id
-        foreach (Bill::orderBy("bill_id")->get() as $bill) {
+        foreach (Bill::orderBy('bill_id')->get() as $bill) {
             $this->info(str_pad($bill->bill_id . ' ' . $bill->bill_name, 30) . " \n");
             $i = 0;
             while ($i <= 24) {
@@ -106,7 +103,7 @@ class BillingCalculate extends Command
                             'rate_average_out' => $rate_data['rate_average_out'],
                             'bill_last_calc' => ['NOW()'],
                         ];
-                        Bill::where("bill_id", $bill->bill_id)->update($update);
+                        Bill::where('bill_id', $bill->bill_id)->update($update);
                         $this->info('Updated!');
                     }
                     if ($check['bill_id'] == $bill['bill_id']) {
@@ -126,7 +123,7 @@ class BillingCalculate extends Command
                             'bill_percent' => $percent,
                             'updated' => ['NOW()'],
                         ];
-                        BillHistory::where("bill_hist_id", $check->bill_hist_id)->update($update);
+                        BillHistory::where('bill_hist_id', $check->bill_hist_id)->update($update);
                         $this->info('Updated history!');
                     } else {
                         $update = [
