@@ -42,13 +42,9 @@
                             <td>{{ $user->enabled }}</td>
                             @endif
                             @if(\LibreNMS\Config::get('twofactor'))
-                            <td>
-                                @foreach( $twofactor as $twofactor_entry )
-                                    @if( $twofactor_entry->user_id == $user->user_id )
-                                    1
-                                    @endif
-                                @endforeach
-                            </td>
+                                @if(isset($twofactor[$user->user_id]))
+                                <td>{{ $twofactor[$user->user_id]->pref }}</td>
+                                @endif
                             @endif
                             <td>{{ $user->descr }}</td>
                             <td></td>
@@ -75,7 +71,7 @@
                         }
                     },
                     twofactor: function (column, row) {
-                        if(row['twofactor'] == 1) {
+                        if(row['twofactor'] == 'twofactor') {
                             return '<span class="fa fa-fw fa-check text-success"></span>';
                         }
                     },
