@@ -33,7 +33,7 @@ $components = $components[$device['device_id']];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = [];
-$types = ['f5-ltm-vs', 'f5-ltm-bwc', 'f5-ltm-pool', 'f5-ltm-poolmember'];
+$types = ['f5-ltm-vs', 'f5-ltm-poolmember'];
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -46,8 +46,8 @@ $components = $keep;
 // Only collect SNMP data if we have enabled components
 if (! empty($components)) {
     // Let's gather the stats..
-    f5_stats['ltmVirtualServStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12', 0);
-    f5_stats['ltmPoolMemberStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.11', 0);
+    $f5_stats['ltmVirtualServStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12', 0);
+    $f5_stats['ltmPoolMemberStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.11', 0);
 
     // and check the status
     $f5_stats['ltmVsStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
@@ -89,8 +89,7 @@ if (! empty($components)) {
                 $array['status'] = 0;
                 $array['error'] = '';
             }
-        } 
-        elseif ($type == 'f5-ltm-poolmember') {
+        } elseif ($type == 'f5-ltm-poolmember') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('currconns', 'GAUGE', 0);
 
