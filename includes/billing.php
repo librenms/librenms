@@ -75,7 +75,7 @@ function getValue($host, $port, $id, $inout)
     $device = dbFetchRow('SELECT * from `devices` WHERE `hostname` = ? LIMIT 1', [$host]);
     $value = snmp_get($device, $oid, '-Oqv');
 
-    if (! is_numeric($value)) {
+    if (!is_numeric($value)) {
         $oid = 'IF-MIB::if' . $inout . 'Octets.' . $id;
         $value = snmp_get($device, $oid, '-Oqv');
     }
@@ -87,7 +87,7 @@ function getLastPortCounter($port_id, $bill_id)
 {
     $return = [];
     $row = dbFetchRow('SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?', [$port_id, $bill_id]);
-    if (! is_null($row)) {
+    if (!is_null($row)) {
         $return['timestamp'] = $row['timestamp'];
         $return['in_counter'] = $row['in_counter'];
         $return['in_delta'] = $row['in_delta'];
@@ -105,7 +105,7 @@ function getLastMeasurement($bill_id)
 {
     $return = [];
     $row = dbFetchRow('SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1', [$bill_id]);
-    if (! is_null($row)) {
+    if (!is_null($row)) {
         $return['delta'] = $row['delta'];
         $return['delta_in'] = $row['delta_in'];
         $return['delta_out'] = $row['delta_out'];
@@ -261,7 +261,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
     $tot_data = [];
     $ticks = [];
 
-    if (! isset($reducefactor) || ! is_numeric($reducefactor) || $reducefactor < 1) {
+    if (!isset($reducefactor) || !is_numeric($reducefactor) || $reducefactor < 1) {
         // Auto calculate reduce factor
         $expectedpoints = ceil(($to - $from) / 300);
         $desiredpoints = 400;
@@ -272,7 +272,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
 
     foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $row) {
         $timestamp = $row['formatted_date'];
-        if (! $first) {
+        if (!$first) {
             $first = $timestamp;
         }
 
@@ -304,7 +304,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         }
     }//end foreach
 
-    if (! empty($iter_in)) {  // Write last element
+    if (!empty($iter_in)) {  // Write last element
         $out_data[$i] = round(($iter_out / $iter_period), 2);
         $in_data[$i] = round(($iter_in / $iter_period), 2);
         $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
@@ -312,19 +312,19 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         $i++;
     }
     $result = [
-        'from'          => $from,
-        'to'            => $to,
-        'first'         => $first,
-        'last'          => $last,
+        'from' => $from,
+        'to' => $to,
+        'first' => $first,
+        'last' => $last,
 
-        'in_data'       => $in_data,
-        'out_data'      => $out_data,
-        'tot_data'      => $tot_data,
-        'ticks'         => $ticks,
+        'in_data' => $in_data,
+        'out_data' => $out_data,
+        'tot_data' => $tot_data,
+        'ticks' => $ticks,
 
-        'rate_95th'     => $bill_data['rate_95th'],
-        'rate_average'  => $bill_data['rate_average'],
-        'bill_type'     => $bill_data['bill_type'],
+        'rate_95th' => $bill_data['rate_95th'],
+        'rate_average' => $bill_data['rate_average'],
+        'bill_type' => $bill_data['bill_type'],
     ];
 
     if ($period) {
@@ -382,14 +382,14 @@ function getHistoricTransferGraphData($bill_id)
     $graph_name = 'Historical bandwidth over the last 12 billing periods';
 
     return [
-        'graph_name'        => $graph_name,
-        'in_data'           => $in_data,
-        'out_data'          => $out_data,
-        'tot_data'          => $tot_data,
-        'allow_data'        => $allow_data,
-        'ave_data'          => $ave_data,
-        'overuse_data'      => $overuse_data,
-        'ticklabels'        => $ticklabels,
+        'graph_name' => $graph_name,
+        'in_data' => $in_data,
+        'out_data' => $out_data,
+        'tot_data' => $tot_data,
+        'allow_data' => $allow_data,
+        'ave_data' => $ave_data,
+        'overuse_data' => $overuse_data,
+        'ticklabels' => $ticklabels,
     ];
 }
 
@@ -404,7 +404,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         $from = $histrow['from'];
         $to = $histrow['to'];
     } else {
-        if (! is_numeric($from) || ! is_numeric($to)) {
+        if (!is_numeric($from) || !is_numeric($to)) {
             exit('Must supply from and to if bill_hist_id is not supplied');
         }
     }
@@ -461,14 +461,14 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
     $graph_name = date('M j g:ia', $from) . ' - ' . date('M j g:ia', $to);
 
     return [
-        'graph_name'        => $graph_name,
-        'in_data'           => $in_data,
-        'out_data'          => $out_data,
-        'tot_data'          => $tot_data,
-        'allow_data'        => $allow_data,
-        'ave_data'          => $ave_data,
-        'overuse_data'      => $overuse_data,
-        'ticklabels'        => $ticklabels,
+        'graph_name' => $graph_name,
+        'in_data' => $in_data,
+        'out_data' => $out_data,
+        'tot_data' => $tot_data,
+        'allow_data' => $allow_data,
+        'ave_data' => $ave_data,
+        'overuse_data' => $overuse_data,
+        'ticklabels' => $ticklabels,
     ];
 }
 //end getBillingBandwidthGraphData

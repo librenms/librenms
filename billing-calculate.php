@@ -8,14 +8,15 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
-require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
+require __DIR__ . '/vendor/autoload.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
+
 use Illuminate\Support\Facades\Artisan;
 
 $options = getopt('r');
-$command = [ $_SERVER['argv'][0],"billing:calculate"];
+$command = [$_SERVER['argv'][0], "billing:calculate"];
 if (isset($options['r'])) {
-     array_push($command,"--r");
+    array_push($command, "--r");
 }
 
 // Check that we don't run this as the wrong user and break the install

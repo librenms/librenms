@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BillHistory extends Model
 {
-    protected  $table = "bill_history";
+    protected $table = "bill_history";
     public $timestamps = false;
 
     use HasFactory;

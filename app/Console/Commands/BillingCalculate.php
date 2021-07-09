@@ -9,6 +9,7 @@ use LibreNMS\Util\Number;
 
 
 require_once base_path() . '/includes/init.php';
+
 class BillingCalculate extends Command
 {
     /**
@@ -43,7 +44,7 @@ class BillingCalculate extends Command
     public function handle()
     {
 
-        if($this->option('r')){
+        if ($this->option('r')) {
             $this->info("Clearing history table.\n");
             BillHistory::truncate();
 
@@ -93,60 +94,60 @@ class BillingCalculate extends Command
 
                     if ($i == '0') {
                         $update = [
-                            'rate_95th'        => $rate_data['rate_95th'],
-                            'rate_95th_in'     => $rate_data['rate_95th_in'],
-                            'rate_95th_out'    => $rate_data['rate_95th_out'],
-                            'dir_95th'         => $rate_data['dir_95th'],
-                            'total_data'       => $rate_data['total_data'],
-                            'total_data_in'    => $rate_data['total_data_in'],
-                            'total_data_out'   => $rate_data['total_data_out'],
-                            'rate_average'     => $rate_data['rate_average'],
-                            'rate_average_in'  => $rate_data['rate_average_in'],
+                            'rate_95th' => $rate_data['rate_95th'],
+                            'rate_95th_in' => $rate_data['rate_95th_in'],
+                            'rate_95th_out' => $rate_data['rate_95th_out'],
+                            'dir_95th' => $rate_data['dir_95th'],
+                            'total_data' => $rate_data['total_data'],
+                            'total_data_in' => $rate_data['total_data_in'],
+                            'total_data_out' => $rate_data['total_data_out'],
+                            'rate_average' => $rate_data['rate_average'],
+                            'rate_average_in' => $rate_data['rate_average_in'],
                             'rate_average_out' => $rate_data['rate_average_out'],
-                            'bill_last_calc'   => ['NOW()'],
+                            'bill_last_calc' => ['NOW()'],
                         ];
                         Bill::where("bill_id", $bill->bill_id)->update($update);
                         $this->info('Updated!');
                     }
                     if ($check['bill_id'] == $bill['bill_id']) {
                         $update = [
-                            'rate_95th'        => $rate_data['rate_95th'],
-                            'rate_95th_in'     => $rate_data['rate_95th_in'],
-                            'rate_95th_out'    => $rate_data['rate_95th_out'],
-                            'dir_95th'         => $rate_data['dir_95th'],
-                            'rate_average'     => $rate_data['rate_average'],
-                            'rate_average_in'  => $rate_data['rate_average_in'],
+                            'rate_95th' => $rate_data['rate_95th'],
+                            'rate_95th_in' => $rate_data['rate_95th_in'],
+                            'rate_95th_out' => $rate_data['rate_95th_out'],
+                            'dir_95th' => $rate_data['dir_95th'],
+                            'rate_average' => $rate_data['rate_average'],
+                            'rate_average_in' => $rate_data['rate_average_in'],
                             'rate_average_out' => $rate_data['rate_average_out'],
-                            'traf_total'       => $rate_data['total_data'],
-                            'traf_in'          => $rate_data['total_data_in'],
-                            'traf_out'         => $rate_data['total_data_out'],
-                            'bill_used'        => $used,
-                            'bill_overuse'     => $overuse,
-                            'bill_percent'     => $percent,
-                            'updated'          => ['NOW()'],
+                            'traf_total' => $rate_data['total_data'],
+                            'traf_in' => $rate_data['total_data_in'],
+                            'traf_out' => $rate_data['total_data_out'],
+                            'bill_used' => $used,
+                            'bill_overuse' => $overuse,
+                            'bill_percent' => $percent,
+                            'updated' => ['NOW()'],
                         ];
-                        BillHistory::where("bill_hist_id",$check->bill_hist_id)->update($update);
+                        BillHistory::where("bill_hist_id", $check->bill_hist_id)->update($update);
                         $this->info('Updated history!');
                     } else {
                         $update = [
-                            'rate_95th'        => $rate_data['rate_95th'],
-                            'rate_95th_in'     => $rate_data['rate_95th_in'],
-                            'rate_95th_out'    => $rate_data['rate_95th_out'],
-                            'dir_95th'         => $rate_data['dir_95th'],
-                            'rate_average'     => $rate_data['rate_average'],
-                            'rate_average_in'  => $rate_data['rate_average_in'],
+                            'rate_95th' => $rate_data['rate_95th'],
+                            'rate_95th_in' => $rate_data['rate_95th_in'],
+                            'rate_95th_out' => $rate_data['rate_95th_out'],
+                            'dir_95th' => $rate_data['dir_95th'],
+                            'rate_average' => $rate_data['rate_average'],
+                            'rate_average_in' => $rate_data['rate_average_in'],
                             'rate_average_out' => $rate_data['rate_average_out'],
-                            'traf_total'       => $rate_data['total_data'],
-                            'traf_in'          => $rate_data['total_data_in'],
-                            'traf_out'         => $rate_data['total_data_out'],
-                            'bill_datefrom'    => $datefrom,
-                            'bill_dateto'      => $dateto,
-                            'bill_type'        => $type,
-                            'bill_allowed'     => $allowed,
-                            'bill_used'        => $used,
-                            'bill_overuse'     => $overuse,
-                            'bill_percent'     => $percent,
-                            'bill_id'          => $bill['bill_id'],
+                            'traf_total' => $rate_data['total_data'],
+                            'traf_in' => $rate_data['total_data_in'],
+                            'traf_out' => $rate_data['total_data_out'],
+                            'bill_datefrom' => $datefrom,
+                            'bill_dateto' => $dateto,
+                            'bill_type' => $type,
+                            'bill_allowed' => $allowed,
+                            'bill_used' => $used,
+                            'bill_overuse' => $overuse,
+                            'bill_percent' => $percent,
+                            'bill_id' => $bill['bill_id'],
                         ];
                         BillHistory::insert($update);
 //                        dbInsert($update, 'bill_history');
