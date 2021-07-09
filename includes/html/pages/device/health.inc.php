@@ -25,80 +25,77 @@ $type_text['overview'] = 'Overview';
  */
 
 $main_sensors = ['storage' => 'Storage',
-		 'ucd_diskio' => 'Disk I/O',
-		 'mempools' => 'Memory pools',
-		 'processors' => 'Processors'];
+                 'ucd_diskio' => 'Disk I/O',
+                 'mempools' => 'Memory pools',
+                 'processors' => 'Processors'];
 
-foreach (array_keys($main_sensors) as $health)
-{
-    $count = dbFetchCell('select count(*) from ' . $health . ' WHERE device_id = ?', [$device['device_id']]);
-    if ($count > 0) {
-	$datas[] = $health;
-	$type_text[$health] = $main_sensors[$health];
+foreach (array_keys($main_sensors) as $health) {
+    if (dbFetchCell('select count(*) from ' . $health . ' WHERE device_id = ?', [$device['device_id']])) {
+        $datas[] = $health;
+        $type_text[$health] = $main_sensors[$health];
     }
 }
 
-/*
- * Sensors
- */
+	/*
+	 * Sensors
+	 */
 
-foreach (Sensor::getTypes() as $sensor)
-{
-    if (Sensor::where('device_id', $device['device_id'])
-	      ->where('sensor_class', $sensor)
-	      ->count()) {
-	$datas[] = $sensor;
-	$type_text[$sensor] = Sensor::$text[$sensor];
-    }
-}
-
+	foreach (Sensor::getTypes() as $sensor) {
+	    if (Sensor::where('device_id', $device['device_id'])
+                      ->where('sensor_class', $sensor)
+                      ->count()) {
+                $datas[] = $sensor;
+                $type_text[$sensor] = Sensor::$text[$sensor];
+	    }
+	}
 
 
-$type_text['qfp'] = 'QFP';
+
+	$type_text['qfp'] = 'QFP';
 
 
-$link_array = [
-    'page'   => 'device',
-    'device' => $device['device_id'],
-    'tab'    => 'health',
-];
+	$link_array = [
+	    'page'   => 'device',
+	    'device' => $device['device_id'],
+	    'tab'    => 'health',
+	];
 
-print_optionbar_start();
+	print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>Health</span> &#187; ";
+	echo "<span style='font-weight: bold;'>Health</span> &#187; ";
 
-if (! $vars['metric']) {
-    $vars['metric'] = 'overview';
-}
+	if (! $vars['metric']) {
+	    $vars['metric'] = 'overview';
+	}
 
-unset($sep);
-foreach ($datas as $type) {
-    echo $sep;
-    if ($vars['metric'] == $type) {
-        echo '<span class="pagemenu-selected">';
-    }
+	unset($sep);
+	foreach ($datas as $type) {
+	    echo $sep;
+	    if ($vars['metric'] == $type) {
+		echo '<span class="pagemenu-selected">';
+	    }
 
-    echo generate_link($type_text[$type], $link_array, ['metric' => $type]);
-    if ($vars['metric'] == $type) {
-        echo '</span>';
-    }
+	    echo generate_link($type_text[$type], $link_array, ['metric' => $type]);
+	    if ($vars['metric'] == $type) {
+		echo '</span>';
+	    }
 
-    $sep = ' | ';
-}
+	    $sep = ' | ';
+	}
 
-print_optionbar_end();
+	print_optionbar_end();
 
-$metric = basename($vars['metric']);
-if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
-    include "includes/html/pages/device/health/$metric.inc.php";
-} else {
-    foreach ($datas as $type) {
-        if ($type != 'overview') {
-	    $graph_title = $type_text[$type];
-	    $graph_array['type'] = 'device_' . $type;
-	    include 'includes/html/print-device-graph.php';
-        }
-    }
-}
+	$metric = basename($vars['metric']);
+	if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
+	    include "includes/html/pages/device/health/$metric.inc.php";
+	} else {
+	    foreach ($datas as $type) {
+		if ($type != 'overview') {
+                    $graph_title = $type_text[$type];
+                    $graph_array['type'] = 'device_' . $type;
+                    include 'includes/html/print-device-graph.php';
+		}
+	    }
+	}
 
-$pagetitle[] = 'Health';
+	$pagetitle[] = 'Health';
