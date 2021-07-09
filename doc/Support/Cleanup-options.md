@@ -32,7 +32,7 @@ updated for the set amount of days automatically - only enable this if
 you are comfortable with that happening. (All active RRD files are
 updated every polling period.)
 
-# Ports Purge
+## Ports Purge
 
 Over time as you add devices some interfaces will need to be purged as
 they are set to be ignored or bad interfaces or marked as deleted.

@@ -1,7 +1,7 @@
 source: Support/1-Minute-Polling.md
 path: blob/master/doc/
 
-# Information
+# 1-Minute Polling
 
 We now have support for polling data at intervals to fit your needs.
 
@@ -35,7 +35,7 @@ for step and heartbeat intervals:
 - Heartbeat is how long to wait for data before registering a null
   value, i.e 120 seconds.
 
-# Converting existing RRD files
+## Converting existing RRD files
 
 We provide a basic script to convert the default rrd files we generate
 to utilise your configured step and heartbeat values. Please do ensure
