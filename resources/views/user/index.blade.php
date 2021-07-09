@@ -22,9 +22,9 @@
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
                     @endif
-                    @if(\LibreNMS\Config::get('twofactor'))
+                    @config('twofactor')
                     <th data-column-id="twofactor" data-formatter="twofactor">@lang('2FA')</th>
-                    @endif
+                    @endconfig
                     <th data-column-id="descr">@lang('Description')</th>
                     <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
                 </tr>
