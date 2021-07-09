@@ -10,7 +10,7 @@ that are constantly being made to InfluxDB itself then we cannot
 guarantee that your data will be ok so enabling this support is at
 your own risk!
 
-# Requirements
+## Requirements
 
 - InfluxDB >= 0.94
 - Grafana
@@ -19,7 +19,7 @@ your own risk!
 The setup of the above is completely out of scope here and we aren't
 really able to provide any help with this side of things.
 
-# What you don't get
+## What you don't get
 
 - Pretty graphs, this is why at present you need Grafana. You need to
   build your own graphs within Grafana.
@@ -29,7 +29,7 @@ really able to provide any help with this side of things.
 RRD will continue to function as normal so LibreNMS itself should
 continue to function as normal.
 
-# Configuration
+## Configuration
 
 ```php
 $config['influxdb']['enable'] = true;

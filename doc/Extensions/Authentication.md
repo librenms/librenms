@@ -1,12 +1,12 @@
 source: Extensions/Authentication.md
 path: blob/master/doc/
 
-# Authentication modules
+# Authentication Options
 
 LibreNMS supports multiple authentication modules along with [Two Factor Auth](Two-Factor-Auth.md).
 Here we will provide configuration details for these modules.
 
-# Available authentication modules
+## Available authentication modules
 
 - MySQL: [mysql](#mysql-authentication)
 
@@ -25,7 +25,7 @@ Here we will provide configuration details for these modules.
 ⚠️ **When enabling a new authentication module, the local users will no
 longer be available to log in.**
 
-# Enable authentication module
+## Enable authentication module
 
 To enable a particular authentication module you need to set this up
 in config.php. Please note that only ONE module can be
@@ -36,7 +36,7 @@ the same time.
 $config['auth_mechanism'] = "mysql";
 ```
 
-# User levels and User account type
+## User levels and User account type
 
 - 1: **Normal User**: You will need to assign device / port
   permissions for users at this level.
@@ -51,7 +51,7 @@ $config['auth_mechanism'] = "mysql";
 **Note** Oxidized configs can often contain sensitive data. Because of
 that only Administrator account type can see configs.
 
-# Note for SELinux users
+## Note for SELinux users
 
 When using SELinux on the LibreNMS server, you need to allow Apache
 (httpd) to connect LDAP/Active Directory server, this is disabled by
@@ -62,7 +62,7 @@ resources with this command:
 setsebool -P httpd_can_connect_ldap=1
 ```
 
-# Testing authentication
+## Testing authentication
 
 You can test authentication with this script:
 
@@ -72,7 +72,7 @@ You can test authentication with this script:
 
 Enable debug output to troubleshoot issues
 
-# MySQL Authentication
+## MySQL Authentication
 
 Config option: `mysql`
 
@@ -86,7 +86,7 @@ DB_USERNAME=DBUSER
 DB_PASSWORD="DBPASS"
 ```
 
-# Active Directory Authentication
+## Active Directory Authentication
 
 Config option: `active_directory`
 
@@ -97,7 +97,7 @@ If you have issues with secure LDAP try setting
 `$config['auth_ad_check_certificates']` to `0`, this will ignore
 certificate errors.
 
-## Require actual membership of the configured groups
+### Require actual membership of the configured groups
 
 If you set `$config['auth_ad_require_groupmembership']` to 1, the
 authenticated user has to be a member of the specific group.
@@ -105,7 +105,7 @@ Otherwise all users can authenticate, and will be either level 0 or
 you may set `$config['auth_ad_global_read']` to 1 and all users will
 have read only access unless otherwise specified.
 
-## Old account cleanup
+### Old account cleanup
 
 Cleanup of old accounts is done by checking the authlog. You will need
 to set the number of days when old accounts will be purged
@@ -115,7 +115,7 @@ Please ensure that you set the `$config['authlog_purge']` value to be
 greater than `$config['active_directory']['users_purge']` otherwise old
 users won't be removed.
 
-## Sample configuration
+### Sample configuration
 
 ```php
 $config['auth_mechanism'] = 'active_directory';
@@ -139,7 +139,7 @@ and `ad-usergroup` with your standard user group. It is __highly
 suggested__ to create a bind user, otherwise "remember me", alerting
 users, and the API will not work.
 
-## Active Directory redundancy
+### Active Directory redundancy
 
 You can set two Active Directory servers by editing the
 `$config['auth_ad_url']` like this example:
@@ -148,7 +148,7 @@ You can set two Active Directory servers by editing the
 $config['auth_ad_url'] = "ldaps://dc1.example.com ldaps://dc2.example.com";
 ```
 
-## Active Directory LDAP filters
+### Active Directory LDAP filters
 
 You can add an LDAP filter to be ANDed with the builtin user filter (`(sAMAccountName=$username)`).
 
@@ -163,14 +163,14 @@ This yields `(&(objectclass=user)(sAMAccountName=$username))` for the
 user filter and `(&(objectclass=group)(sAMAccountName=$group))` for
 the group filter.
 
-# LDAP Authentication
+## LDAP Authentication
 
 Config option: `ldap`
 
 Install __php_ldap__ or __php7.0-ldap__, making sure to install the
 same version as PHP.
 
-## Standard config
+### Standard config
 
 ```php
 $config['auth_mechanism'] = 'ldap';
@@ -182,7 +182,7 @@ $config['auth_ldap_groups']['pfy']['level'] = 5;                // set pfy group
 $config['auth_ldap_groups']['support']['level'] = 1;            // set support group as a normal user
 ```
 
-## Additional options (usually not needed)
+### Additional options (usually not needed)
 
 ```php
 $config['auth_ldap_version'] = 3; # v2 or v3
@@ -198,7 +198,7 @@ $config['auth_ldap_userlist_filter'] = 'service=informatique'; // Replace 'servi
 $config['auth_ldap_wildcard_ou'] = false; // Search for user matching user name independently of OU set in auth_ldap_suffix. Useful if your users are in different OU. Bind username, if set, still user auth_ldap_suffix
 ```
 
-## LDAP bind user (optional)
+### LDAP bind user (optional)
 
 If your ldap server does not allow anonymous bind, it is highly
 suggested to create a bind user, otherwise "remember me", alerting
@@ -210,7 +210,7 @@ $config['auth_ldap_binduser'] = 'ldapbind'; // will use auth_ldap_prefix and aut
 $config['auth_ldap_bindpassword'] = 'password';
 ```
 
-## LDAP server redundancy
+### LDAP server redundancy
 
 You can set two LDAP servers by editing the
 `$config['auth_ldap_server']` like this example:
@@ -249,7 +249,7 @@ $config['auth_ldap_groups'] = [
 ];
 ```
 
-# Radius Authentication
+## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
 successfully. User level 1 is assigned to those accounts so you will
@@ -265,7 +265,7 @@ $config['radius']['users_purge']   = 14;  // Purge users who haven't logged in f
 $config['radius']['default_level'] = 1;  // Set the default user level when automatically creating a user.
 ```
 
-## Old account cleanup
+### Old account cleanup
 
 Cleanup of old accounts is done by checking the authlog. You will need
 to set the number of days when old accounts will be purged
@@ -275,7 +275,7 @@ Please ensure that you set the `$config['authlog_purge']` value to be
 greater than `$config['radius']['users_purge']` otherwise old users
 won't be removed.
 
-# HTTP Authentication
+## HTTP Authentication
 
 Config option: `http-auth`
 
@@ -293,7 +293,7 @@ $config['http_auth_guest'] = "guest";
 
 This will then assign the userlevel for guest to all authenticated users.
 
-## HTTP Authentication / AD Authorization
+### HTTP Authentication / AD Authorization
 
 Config option: `ad-authorization`
 
@@ -326,7 +326,7 @@ $config['auth_ad_bindpassword'] = "ad_bindpassword";
 $config['auth_ldap_cache_ttl']  = 300;
 ```
 
-## HTTP Authentication / LDAP Authorization
+### HTTP Authentication / LDAP Authorization
 
 Config option: `ldap-authorization`
 
@@ -347,14 +347,14 @@ To disabled this caching (highly discourage) set this option to 0.
 $config['auth_ldap_cache_ttl'] = 300;
 ```
 
-# View/embedded graphs without being logged into LibreNMS
+## View/embedded graphs without being logged into LibreNMS
 
 ```php
 $config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
-# Single Sign-on
+## Single Sign-on
 
 The single sign-on mechanism is used to integrate with third party
 authentication providers that are managed outside of LibreNMS - such
@@ -376,7 +376,7 @@ about validating the configuration - if it finds that certain values
 in the configuration are not set, it will reject access rather than
 try and guess.
 
-## Basic Configuration
+### Basic Configuration
 
 To get up and running, all you need to do is configure the following values:
 
@@ -398,7 +398,7 @@ This happens to mimic the behaviour of [http-auth](#http-auth), so if
 this is the kind of setup you want, you're probably better of just
 going and using that mechanism.
 
-## Security
+### Security
 
 If there is a proxy involved (e.g. EZProxy, Azure AD Application
 Proxy, NGINX, mod_proxy) it's ___essential___ that you have some means
@@ -423,9 +423,9 @@ This configuration item should contain an array with a list of IP
 addresses or CIDR prefixes that are allowed to connect to LibreNMS and
 supply environment variables or headers.
 
-## Advanced Configuration Options
+### Advanced Configuration Options
 
-### User Attribute
+#### User Attribute
 
 If for some reason your relying party doesn't store the username in
 ___REMOTE\_USER___, you can override this choice.
@@ -440,7 +440,7 @@ user - it's a special case. If you're using something different you
 need to figure out of the ___HTTP\____ prefix is required or not
 yourself.
 
-### Automatic User Create/Update
+#### Automatic User Create/Update
 
 These are enabled by default:
 
@@ -466,15 +466,15 @@ $config['sso']['realname_attr'] = "displayName";
 $config['sso']['descr_attr']    = "unscoped-affiliation
 ```
 
-### Group Strategies
+#### Group Strategies
 
-#### Static
+##### Static
 
 As used above, ___static___ gives every single user the same privilege
 level. If you're working with a small team, or don't need access
 control, this is probably suitable.
 
-#### Attribute
+##### Attribute
 
 ```php
 $config['sso']['group_strategy'] = "attribute";
@@ -488,7 +488,7 @@ the name of the attribute that the Relying Party exposes to LibreNMS -
 as long as ___sso\_mode___ is correctly set, the mechanism should find
 the value.
 
-#### Group Map
+##### Group Map
 
 This is the most flexible (and complex) way of assigning privileges.
 
@@ -518,7 +518,7 @@ $config['sso']['group_filter']  = "/librenms-(.*)/i";
 
 This filter causes the mechanism to only consider groups matching a regular expression.
 
-### Logout Behaviour
+#### Logout Behaviour
 
 LibreNMS has no capability to log out a user authenticated via Single
 Sign-On - that responsibility falls to the Relying Party.
@@ -532,7 +532,7 @@ $config['post_logout_action'] = '/Shibboleth.sso/Logout';
 
 This option functions independently of the Single Sign-on mechanism.
 
-## Complete Configuration
+### Complete Configuration
 
 This configuration works on my deployment with a Shibboleth relying
 party, injecting environment variables, with the IDP supplying a list
