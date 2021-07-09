@@ -1,6 +1,8 @@
 source: Support/Configuration.md
 path: blob/master/doc/
 
+# Configuration Docs
+
 LibreNMS configuration is a set of key values.
 
 The config is stored in two places:
@@ -21,13 +23,13 @@ The LibreNMS uses dot notation for config items:
 > option.  Without that option input is checked for correctness, that does not
 > mean it is not possible to set bad values.  Please report missing settings.
 
-# CLI
+## CLI
 `lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).  
 `lnms config:set` will set the config setting in the database.  Calling `lnms config:set` on a setting with no value will reset it to the default value.
 
 If you set up bash completion, you can use tab completion to find config settings.
 
-## Examples
+### Examples
 
 ```bash
 lnms config:get snmp.community
@@ -73,7 +75,7 @@ lnms config:get snmp.community --json
 ```
 
 
-# Directories
+## Directories
 
 ```php
 $config['temp_dir'] = "/tmp";
@@ -88,7 +90,7 @@ $config['log_dir'] = "/opt/librenms/logs";
 
 Log files created by LibreNMS will be stored within this directory.
 
-# Database config
+## Database config
 
 Set these variables either in .env or in the environment.
 
@@ -111,22 +113,22 @@ Use a unix socket:
 DB_SOCKET=/run/mysqld/mysqld.sock
 ```
 
-# Core
+## Core
 
-## PHP Settings
+### PHP Settings
 
 You can change the memory limits for php within `config.php`. The
 value is in Megabytes and should just be an int value:
 
 `$config['php_memory_limit'] = 128;`
 
-## Programs
+### Programs
 
 A lot of these are self explanatory so no further information may be
 provided. Any extensions that have dedicated  documentation page will
 be linked to rather than having the config provided.
 
-### RRDTool
+#### RRDTool
 
 > You can configure these options within the WebUI now, please avoid
 > setting these options within config.php
@@ -140,7 +142,7 @@ $config['rrdtool'] = "/usr/bin/rrdtool";
 Please see [1 Minute polling](1-Minute-Polling.md) for information on
 configuring your install to record data more frequently.
 
-### fping
+#### fping
 
 ```php
 $config['fping']                     = "/usr/bin/fping";
@@ -190,7 +192,7 @@ $config['icmp_check'] = false;
 If you would like to do this on a per device basis then you can do so
 under Device -> Edit -> Misc -> Disable ICMP Test? On
 
-### traceroute
+#### traceroute
 
 LibreNMS uses traceroute / traceroute6 to record debug information
 when a device is down due to icmp AND you have
@@ -201,7 +203,7 @@ $config['traceroute']  = '/usr/bin/traceroute';
 $config['traceroute6'] = '/usr/bin/traceroute6';
 ```
 
-### SNMP
+#### SNMP
 
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
@@ -225,7 +227,7 @@ $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
 
-# Authentication
+## Authentication
 
 Generic Authentication settings.
 
@@ -233,7 +235,7 @@ Generic Authentication settings.
 $config['password']['min_length'] = 8;  // password minimum length for auth that allows user creation
 ```
 
-# Proxy support
+## Proxy support
 
 For alerting and the callback functionality, we support the use of a
 http proxy setting. These can be any one of the following:
@@ -250,11 +252,11 @@ http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
 
-# RRDCached
+## RRDCached
 
 Please refer to [RRDCached](../Extensions/RRDCached.md)
 
-# WebUI Settings
+## WebUI Settings
 
 ```php
 $config['base_url'] = "http://demo.librenms.org";
@@ -500,7 +502,7 @@ can disable this with the following config:
 $config['allow_duplicate_sysName'] = false;
 ```
 
-# Global poller and discovery modules
+## Global poller and discovery modules
 
 Generally, it is a better to set these [per
 OS](../Developing/os/Settings.md#poller-and-discovery-modules) or
@@ -511,7 +513,7 @@ $config['discovery_modules']['arp-table'] = true;
 $config['poller_modules']['bgp-peers']    = false;
 ```
 
-# SNMP Settings
+## SNMP Settings
 
 Default SNMP options including retry and timeout settings and also
 default version and port.
@@ -548,11 +550,11 @@ $config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) 
 $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 ```
 
-# Auto discovery settings
+## Auto discovery settings
 
 Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
-# Email configuration
+## Email configuration
 
 > You can configure these options within the WebUI now, please avoid
 > setting these options within config.php
@@ -575,15 +577,15 @@ What type of mail transport to use for delivering emails. Valid
 options for `email_backend` are mail, sendmail or smtp. The varying
 options after that are to support the different transports.
 
-# Alerting
+## Alerting
 
 Please refer to [Alerting](../Alerting/index.md)
 
-# Billing
+## Billing
 
 Please refer to [Billing](../Extensions/Billing-Module.md)
 
-# Global module support
+## Global module support
 
 ```php
 $config['enable_bgp']                   = 1; # Enable BGP session collection and display
@@ -594,7 +596,7 @@ $config['enable_vrfs']                  = 1; # Enable VRFs
 $config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
 ```
 
-# Port extensions
+## Port extensions
 
 Please refer to [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
@@ -607,9 +609,9 @@ $config['enable_ports_poe']             = 0;
 
 Enable / disable additional port statistics.
 
-# External integration
+## External integration
 
-## Rancid
+### Rancid
 
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
@@ -621,11 +623,11 @@ Rancid configuration, `rancid_configs` is an array containing all of
 the locations of your rancid files. Setting `rancid_ignorecomments`
 will disable showing lines that start with #
 
-## Oxidized
+### Oxidized
 
 Please refer to [Oxidized](../Extensions/Oxidized.md)
 
-## CollectD
+### CollectD
 
 ```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
@@ -666,15 +668,15 @@ Specify the location of the collectd unix socket. Using a socket
 allows the collectd graphs to be flushed to disk before being
 drawn. Be sure that your web server has permissions to write to this socket.
 
-## Smokeping
+### Smokeping
 
 Please refer to [Smokeping](../Extensions/Smokeping.md)
 
-## NFSen
+### NFSen
 
 Please refer to [NFSen](../Extensions/NFSen.md)
 
-## Location mapping
+### Location mapping
 
 If you just want to set GPS coordinates on a location, you should
 visit Devices > Geo Locations > All Locations and edit the coordinates
@@ -706,7 +708,7 @@ and keeps Rack/Room/Building information intact after the substitution.
 The above are examples, these will rewrite device snmp locations so
 you don't need to configure full location within snmp.
 
-# Interfaces to be ignored
+## Interfaces to be ignored
 
 Interfaces can be automatically ignored during discovery by modifying
 bad_if\* entries in a default array, unsetting a default array and
@@ -753,7 +755,7 @@ $config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
 
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
 
-# Interfaces that shouldn't be ignored
+## Interfaces that shouldn't be ignored
 
 Examples:
 
@@ -767,7 +769,7 @@ as well which would stop that port from being ignored. i.e. if bad_if
 and good_if both contained FastEthernet then ports with this value in
 the ifDescr will be valid.
 
-# Interfaces to be rewritten
+## Interfaces to be rewritten
 
 ```php
 $config['rewrite_if']['cpu'] = 'Management Interface';
@@ -778,7 +780,7 @@ Entries defined in `rewrite_if` are being replaced completely.
 Entries defined in `rewrite_if_regexp` only replace the match.
 Matches are compared case-insensitive.
 
-# Entity sensors to be ignored
+## Entity sensors to be ignored
 
 Some devices register bogus sensors as they are returned via SNMP but
 either don't exist or just don't return data. This allows you to
@@ -790,7 +792,7 @@ $config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
 $config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
 ```
 
-# Entity sensors limit values
+## Entity sensors limit values
 
 Vendors may give some limit values (or thresholds) for the discovered
 sensors. By default, when no such value is given, both high and low
@@ -803,7 +805,7 @@ these are not provided by the vendor, the guess method can be disabled:
 $config['sensors']['guess_limits'] = false;
 ```
 
-# Ignoring Health Sensors
+## Ignoring Health Sensors
 
 It is possible to filter some sensors from the configuration:
 
@@ -831,7 +833,7 @@ $config['os']['vrp']['disabled_sensors']['current'] = true;
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
-# Storage configuration
+## Storage configuration
 
 Mounted storage / mount points to ignore in discovery and polling.
 
@@ -870,15 +872,15 @@ $config['storage_perc_warn'] = 60;
 $config['os']['linux']['storage_perc_warn'] = 60;
 ```
 
-# IRC Bot
+## IRC Bot
 
 Please refer to [IRC Bot](../Extensions/IRC-Bot.md)
 
-# Authentication
+## Authentication
 
 Please refer to [Authentication](../Extensions/Authentication.md)
 
-# Cleanup options
+## Cleanup options
 
 These options rely on daily.sh running from cron as per the installation instructions.
 
@@ -900,11 +902,11 @@ automatically purged. You can alter these individually. values are in days.
 > directory automatically - only enable this if you are comfortable
 > with that happening.
 
-# Syslog options
+## Syslog options
 
 Please refer to [Syslog](../Extensions/Syslog.md)
 
-# Virtualization
+## Virtualization
 
 ```php
 $config['enable_libvirt'] = 1;
@@ -927,7 +929,7 @@ to indicate how you connect to libvirt.  You also need to:
 To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
 `virsh -c xen+ssh://vmhost list` as your librenms polling user.
 
-# BGP Support
+## BGP Support
 
 ```php
 $config['astext']['65332'] = "Cymru FullBogon Feed";
@@ -935,11 +937,11 @@ $config['astext']['65332'] = "Cymru FullBogon Feed";
 
 You can use this array to rewrite the description of ASes that you have discovered.
 
-# Auto updates
+## Auto updates
 
 Please refer to [Updating](../General/Updating.md)
 
-# IPMI
+## IPMI
 
 Setup the types of IPMI protocols to test a host for and in what
 order. Don't forget to install ipmitool on the monitoring host.
@@ -952,13 +954,13 @@ $config['ipmi']['type'][] = "imb";
 $config['ipmi']['type'][] = "open";
 ```
 
-# Distributed poller settings
+## Distributed poller settings
 
 Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
 
-# API Settings
+## API Settings
 
-# CORS Support
+## CORS Support
 
 <https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS>
 

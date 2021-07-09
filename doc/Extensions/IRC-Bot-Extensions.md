@@ -1,7 +1,7 @@
 source: Extensions/IRC-Bot-Extensions.md
 path: blob/master/doc/
 
-# Quick Guide
+# IRC Bot Extensions
 
 Okay this is a very quick walk-through in writing your own `commands` for the IRC-Bot.
 
@@ -28,11 +28,11 @@ To enable your command, edit your `config.php` and add something like this:
 
 See: [Example](#example)
 
-# Functions and Attributes
+## Functions and Attributes
 
 ... that are accessible from within an extension
 
-## Functions
+### Functions
 
 Function( (Type) $Variable [= Default] [,...] ) | Returns | Description
 --- | --- | ---
@@ -47,7 +47,7 @@ Function( (Type) $Variable [= Default] [,...] ) | Returns | Description
 `$this->read( (string) $Buffer )` | `String/Boolean` | Returns a `line` from given `$Buffer` or `false` if there's nothing suitable inside the Buffer. Please use `$this->getData()` for handler-safe data retrieval.
 `$this->respond( (string) $Message )` | `Boolean` | Responds to the `request` auto-detecting channel or private message.
 
-## Attributes
+### Attributes
 
 Attribute | Type | Description
 --- | --- | ---
@@ -66,7 +66,7 @@ Attribute | Type | Description
 `$this->tick` | `Int` | Interval to check buffers in microseconds.
 `$this->user` | `Array` | Array containing details about the `user` that sent the `request`.
 
-# Example
+## Example
 
 `includes/ircbot/join-ng.inc.php`
 
