@@ -41,11 +41,11 @@
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
                             @endif
-                            @if(\LibreNMS\Config::get('twofactor'))
-                                @if(isset($twofactor[$user->user_id]))
-                                <td>{{ $twofactor[$user->user_id]->pref }}</td>
+                            @config('twofactor')
+                                @if(app('App\Models\UserPref')->getPref($user, 'twofactor'))
+                                <td>1</td>
                                 @endif
-                            @endif
+                            @endconfig
                             <td>{{ $user->descr }}</td>
                             <td></td>
                         </tr>
@@ -71,7 +71,7 @@
                         }
                     },
                     twofactor: function (column, row) {
-                        if(row['twofactor'] == 'twofactor') {
+                        if(row['twofactor'] == 1) {
                             return '<span class="fa fa-fw fa-check text-success"></span>';
                         }
                     },

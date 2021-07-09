@@ -54,9 +54,8 @@ class UserController extends Controller
         $this->authorize('manage', User::class);
 
         return view('user.index', [
-            'users' => User::orderBy('username')->get(),
+            'users' => User::with('preferences')->orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
-            'twofactor' => UserPref::get()->where('pref', 'twofactor')->keyBy('user_id'),
         ]);
     }
 
