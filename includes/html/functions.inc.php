@@ -828,10 +828,10 @@ function alert_details($details)
                     'tab' => 'apps',
                     'app' => $tmp_alerts['app_type'],
                 ]) . "'>";
-            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= $tmp_alerts['app_type'];
             $fault_detail .= '</a>';
 
-            $fault_detail .= ' => ' . $tmp_alerts['value'];
+            $fault_detail .= ' => ' . $tmp_alerts['app_status'];
             $fallback = false;
         }
 
