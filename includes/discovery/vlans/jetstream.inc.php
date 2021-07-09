@@ -36,7 +36,6 @@
 if (! function_exists('jetstreamExpand')) {
     function jetstreamExpand($var)
     {
-
         unset($result);
 
         preg_match_all('/LAG(\d+)(?:-(\d+))?/', $var, $lags);
