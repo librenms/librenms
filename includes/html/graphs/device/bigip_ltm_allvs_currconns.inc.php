@@ -30,7 +30,7 @@ $count = 0;
 foreach ($components as $compid => $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
-    $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
+    $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash, 'currconns']);
     if (Rrd::checkRrdExists($rrd_filename)) {
         // Grab a colour from the array.
         if (isset($colours[$colcount])) {

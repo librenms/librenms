@@ -51,7 +51,7 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
 
         $label = $comp['label'];
         $hash = $comp['hash'];
-        $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
+        $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash, 'currconns']);
         if (Rrd::checkRrdExists($rrd_filename)) {
             d_echo("\n  Adding PM: " . $label . "\t+ added to the graph");
 

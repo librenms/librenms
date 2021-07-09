@@ -24,7 +24,7 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
-    $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash]);
+    $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash, 'currconns']);
     if (Rrd::checkRrdExists($rrd_filename)) {
         require 'includes/html/graphs/common.inc.php';
         $ds = 'currconns';
