@@ -95,7 +95,7 @@ return [
                     env('DB_HOST_W7', ''),
                     env('DB_HOST_W8', ''),
                     env('DB_HOST_W9', ''),
-               ],
+                ],
             ],
             'sticky' => env('DB_STICKY', null),
             'driver' => 'mysql',
