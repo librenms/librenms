@@ -25,10 +25,12 @@ $type_text['overview'] = 'Overview';
  * Main Sensors
  */
 
-$main_sensors = ['storage' => 'Storage',
-                 'ucd_diskio' => 'Disk I/O',
-                 'mempools' => 'Memory pools',
-                 'processors' => 'Processors', ];
+$main_sensors = [
+    'storage' => 'Storage',
+    'ucd_diskio' => 'Disk I/O',
+    'mempools' => 'Memory pools',
+    'processors' => 'Processors',
+];
 
 foreach (array_keys($main_sensors) as $health) {
     if (dbFetchCell('select count(*) from ' . $health . ' WHERE device_id = ?', [$device['device_id']])) {
