@@ -31,44 +31,28 @@
 // todo: detect LAG ports ??? now parser assume that there is no LAG port
 // 2021-06-07: Added Vlan parsing on LAG ports
 //
+//SNMP input example STRING: '1/0/1-2,1/0/4-6,1/0/25,LAG1-3,LAG5'
 
 if (! function_exists('jetstreamExpand')) {
-    function jetstreamExpand($var) {
+    function jetstreamExpand($var)
+    {
 
         unset($result);
 
-        if ($pos=strpos($var, ',LAG')) {			// if input string contains 'LAG'
-            $lag=str_replace('LAG', '', substr($var, $pos+1));	// get the LAG ports in form of '1,2,4-8'
-            $var=substr($var, 0, $pos );			// prepare & save $var for further processing
+        preg_match_all('/LAG(\d+)(?:-(\d+))?/', $var, $lags);
 
-            $arr = explode(',', trim($lag)); //array of x,y,a-z
-            foreach ($arr as $element) {
-                $element = trim($element);
-                if (strpos($element, '-') !== false) {
-                    $tmp = explode('-', $element); // left part is a start port, right is the end number of the serie
-                    for ($i = $tmp[0]; $i <= $tmp[1]; $i++) {
-                        $result[] = 'LAG'.$i;
-                    }
-                } else {
-                    $result[] = 'LAG'.$element;
-                }
+        foreach ($lags[1] as $index => $start) {
+            $end = $lags[2][$index] ?: $start;
+            for ($i = $start; $i <= $end; $i++) {
+                $result[] = 'LAG' . $i; //need to be in form LAGx
             }
         }
 
-        $arr = explode(',', trim($var)); //array of x/y/a-z
-
-        foreach ($arr as $element) {
-            $element = trim($element);
-            if (strpos($element, '-') !== false) {
-                $tmp = explode('-', $element); // left part is a fully defined port, right is the end number of the serie
-                $port_start_array = explode('/', $tmp[0]);
-                $port_id = trim(array_pop($port_start_array)); // $port_start_array is "[x, y]", $port_id is "a";
-
-                for ($i = $port_id; $i <= $tmp[1]; $i++) {
-                    $result[] = implode('/', array_merge($port_start_array, [$i]));
-                }
-            } else {
-                $result[] = $element;
+        preg_match_all('/1\/0\/(\d+)(?:-(\d+))?/', $var, $ports);
+        foreach ($ports[1] as $index => $start) {
+            $end = $ports[2][$index] ?: $start;
+            for ($i = $start; $i <= $end; $i++) {
+            $result[] = '1/0/' . $i; //need to be in form 1/0/x
             }
         }
 
