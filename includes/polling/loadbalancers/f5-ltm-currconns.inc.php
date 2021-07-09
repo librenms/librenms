@@ -46,24 +46,8 @@ $components = $keep;
 // Only collect SNMP data if we have enabled components
 if (! empty($components)) {
     // Let's gather the stats..
-    $f5_stats['ltmVirtualServStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6', 0);
-    $f5_stats['ltmVirtualServStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8', 0);
-    $f5_stats['ltmVirtualServStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
-    $f5_stats['ltmVirtualServStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
-    $f5_stats['ltmVirtualServStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
-    $f5_stats['ltmVirtualServStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12', 0);
-
-    $f5_stats['ltmBwcEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.7', 0);
-    $f5_stats['ltmBwcEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.4', 0);
-    $f5_stats['ltmBwcEntryBytesDropped'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.6', 0);
-    $f5_stats['ltmBwcEntryBytesPassed'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.5', 0);
-
-    $f5_stats['ltmPoolMemberStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.5', 0);
-    $f5_stats['ltmPoolMemberStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.7', 0);
-    $f5_stats['ltmPoolMemberStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.6', 0);
-    $f5_stats['ltmPoolMemberStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.8', 0);
-    $f5_stats['ltmPoolMemberStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.10', 0);
-    $f5_stats['ltmPoolMemberStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.11', 0);
+    f5_stats['ltmVirtualServStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12', 0);
+    f5_stats['ltmPoolMemberStatEntryCurrconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.11', 0);
 
     // and check the status
     $f5_stats['ltmVsStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
@@ -72,11 +56,6 @@ if (! empty($components)) {
     $f5_stats['ltmPoolMbrStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.5', 0);
     $f5_stats['ltmPoolMbrStatusEntryAvail'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.6', 0);
     $f5_stats['ltmPoolMbrStatusEntryMsg'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.8', 0);
-
-    $f5_stats['ltmPoolEntryMinup'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.4', 0);
-    $f5_stats['ltmPoolEntryMinupstatus'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
-    $f5_stats['ltmPoolEntryMinupaction'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
-    $f5_stats['ltmPoolEntryCurrentup'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {
