@@ -44,6 +44,38 @@ class Sensor extends DeviceRelatedModel
         'percent'              => 'percent',
     ];
 
+    public static $text = [
+        'airflow'              => 'Airflow',
+        'ber'                  => 'Bit Error Rate',
+        'charge'               => 'Battery Charge',
+        'chromatic_dispersion' => 'Chromatic Dispersion',
+        'cooling'              => 'Cooling',
+        'count'                => 'Count',
+        'current'              => 'Current',
+        'dbm'                  => 'dBm',
+        'delay'                => 'Delay',
+        'eer'                  => 'Energy Efficiency Ratio',
+        'fanspeed'             => 'Fanspeed',
+        'frequency'            => 'Frequency',
+        'humidity'             => 'Humidity',
+        'load'                 => 'Load',
+        'loss'                 => 'Loss',
+        'power'                => 'Power',
+        'power_consumed'       => 'Power Consumed',
+        'power_factor'         => 'Power Factor',
+        'pressure'             => 'Pressure',
+        'quality_factor'       => 'Quality factor',
+        'runtime'              => 'Runtime remaining',
+        'signal'               => 'Signal',
+        'snr'                  => 'SNR',
+        'state'                => 'State',
+        'temperature'          => 'Temperature',
+        'tv_signal'            => 'TV signal',
+        'voltage'              => 'Voltage',
+        'waterflow'            => 'Water Flow Rate',
+        'percent'              => 'Percent',
+    ];
+
     // ---- Helper Functions ----
 
     public function classDescr()
