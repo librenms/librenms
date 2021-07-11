@@ -36,22 +36,14 @@
 if (! function_exists('jetstreamExpand')) {
     function jetstreamExpand($var)
     {
-        unset($result);
+        $result = [];
 
-        preg_match_all('/LAG(\d+)(?:-(\d+))?/', $var, $lags);
+        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', $var, $lags);
 
-        foreach ($lags[1] as $index => $start) {
-            $end = $lags[2][$index] ?: $start;
+        foreach ($lags[2] as $index => $start) {
+            $end = $lags[3][$index] ?: $start;
             for ($i = $start; $i <= $end; $i++) {
-                $result[] = 'LAG' . $i; //need to be in form LAGx
-            }
-        }
-
-        preg_match_all('/1\/0\/(\d+)(?:-(\d+))?/', $var, $ports);
-        foreach ($ports[1] as $index => $start) {
-            $end = $ports[2][$index] ?: $start;
-            for ($i = $start; $i <= $end; $i++) {
-                $result[] = '1/0/' . $i; //need to be in form 1/0/x
+                $result[] = $lags[1][$index] . $i; //need to be in form LAGx or 1/0/x
             }
         }
 
