@@ -361,7 +361,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => '驗證記錄項目大於 (天)',
+            'description' => '驗證記錄項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -369,7 +369,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => '裝置效能項目大於 (天)',
+            'description' => '裝置效能項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'distributed_poller' => [
@@ -446,7 +446,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => '事件記錄大於 (天)',
+            'description' => '事件記錄大於',
             'help' => '由 daily.sh 進行清理作業',
         ],
         'favicon' => [
@@ -708,7 +708,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '連接埠大於 (天)',
+            'description' => '連接埠大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -748,7 +748,7 @@ return [
             ],
         ],
         'route_purge' => [
-            'description' => '路由記錄大於 (天)',
+            'description' => '路由記錄大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -764,7 +764,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD 檔案項目大於 (天)',
+            'description' => 'RRD 檔案項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -868,7 +868,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog 項目大於 (天)',
+            'description' => 'Syslog 項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [
