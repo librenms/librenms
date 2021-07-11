@@ -42,7 +42,7 @@
                             <td>{{ $user->enabled }}</td>
                             @endif
                             @config('twofactor')
-                                @if(app('App\Models\UserPref')->getPref($user, 'twofactor'))
+                                @if(\App\Models\UserPref::getPref($user, 'twofactor'))
                                 <td>1</td>
                                 @endif
                             @endconfig
