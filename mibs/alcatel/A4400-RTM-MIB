@@ -1,7 +1,14 @@
 -- Alcatel-Lucent OXE Real-Time Monitoring MIB
--- Revision: 1.2
--- Date: 2008/09/11
+-- Revision: 1.3
+-- Date: 2019/03/28
 -- Feature Internal Reference - 3EU_29000_0125_DTZZA (External Specification)
+--      @RA CROXE-2975 Bamini Pandian 19/01/2018
+--          [Feature] SNMP Counters for trunking
+--              @@
+--      @CROXE-12083    Bamini PANDIAN / Kiruba Perumal 02/04/2019
+--              GE: SNMP RTM: Wrong and outdated information in MIB file / OXE / R12.3 m4.302.1.a
+--              @@
+--
 
 A4400-RTM-MIB DEFINITIONS ::= BEGIN
 
@@ -11,168 +18,314 @@ IMPORTS
         a4400CPU FROM A4400-CPU-MIB
 ;
 
-ipDomainTable	OBJECT-TYPE
-		SYNTAX SEQUENCE OF IpDomainEntry
+ipDomainTable   OBJECT-TYPE
+                SYNTAX SEQUENCE OF IpDomainEntry
         ACCESS read-only
-		STATUS current
-		DESCRIPTION
-			"Table for IP Domains."
-		::= { a4400CPU 3 }
+                STATUS current
+                DESCRIPTION
+                        "Table for IP Domains."
+                ::= { a4400CPU 3 }
 
 ipDomainEntry OBJECT-TYPE
-	SYNTAX IpDomainEntry
-	ACCESS read-only
-	STATUS current
-	INDEX { ipDomain }
+        SYNTAX IpDomainEntry
+        ACCESS read-only
+        STATUS current
+        INDEX { ipDomain }
     ::= { ipDomainTable 1 }
 
 IpDomainEntry ::= SEQUENCE {
-	ipDomain INTEGER,
-	confAvailable INTEGER,
-	confBusy INTEGER,
-	confOutOfOrder INTEGER,
-	dspRessAvailable INTEGER,
-	dspRessBusy INTEGER,
-	dspRessOutOfService INTEGER,
-	dspRessOverrun INTEGER,
-	cacAllowed INTEGER,
-	cacUsed INTEGER,
-	cacOverrun INTEGER,
+        ipDomain INTEGER,
+        confAvailable INTEGER,
+        confBusy INTEGER,
+        confOutOfOrder INTEGER,
+        dspRessAvailable INTEGER,
+        dspRessBusy INTEGER,
+        dspRessOutOfService INTEGER,
+        dspRessOverrun INTEGER,
+        cacAllowed INTEGER,
+        cacUsed INTEGER,
+        cacOverrun INTEGER,
 }
 
 ipDomain OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"IP Domain number as found in MAO."
-	::= { ipDomainEntry 1 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IP Domain number as found in MAO."
+        ::= { ipDomainEntry 1 }
 
 confAvailable OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Conference circuits available for given IP Domain"
-	::= { ipDomainEntry 2 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Conference circuits available for given IP Domain"
+        ::= { ipDomainEntry 2 }
 
 confBusy OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Conference circuits busy for given IP Domain"
-	::= { ipDomainEntry 3 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Conference circuits busy for given IP Domain"
+        ::= { ipDomainEntry 3 }
 
 confOutOfOrder OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Conference circuits out of order for given IP Domain"
-	::= { ipDomainEntry 4 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Conference circuits out of order for given IP Domain"
+        ::= { ipDomainEntry 4 }
 
 dspRessAvailable OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Compressors available for given IP Domain"
-	::= { ipDomainEntry 5 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Compressors available for given IP Domain"
+        ::= { ipDomainEntry 5 }
 
 dspRessBusy OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Compressors busy for given IP Domain"
-	::= { ipDomainEntry 6 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Compressors busy for given IP Domain"
+        ::= { ipDomainEntry 6 }
 
 dspRessOutOfService OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Compressors out of order for given IP Domain"
-	::= { ipDomainEntry 7 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Compressors out of order for given IP Domain"
+        ::= { ipDomainEntry 7 }
 
 dspRessOverrun OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Cumulated compressors overrun for given IP Domain"
-	::= { ipDomainEntry 8 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Cumulated compressors overrun for given IP Domain"
+        ::= { ipDomainEntry 8 }
 
 cacAllowed OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Number of allowed external communications for given IP Domain"
-	::= { ipDomainEntry 9 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of allowed external communications for given IP Domain"
+        ::= { ipDomainEntry 9 }
 
 cacUsed OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Current number of external communications for given IP Domain"
-	::= { ipDomainEntry 10 }
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Current number of external communications for given IP Domain"
+        ::= { ipDomainEntry 10 }
 
 cacOverrun OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"Cumulated CAC overrun since system startup for given IP Domain"
-	::= { ipDomainEntry 11 }
-
-pbxRole	OBJECT-TYPE
-        SYNTAX INTEGER {
-		       INDETERMINATE(0),
-		       MAIN(1),
-		       STAND-BY(2),
-		       ACTIVE-PCS(3),
-		       INACTIVE-PCS(4),
-		}
+        SYNTAX INTEGER
         ACCESS read-only
-		STATUS current
-		DESCRIPTION
-			"The PBX role."
-		::= { a4400CPU 4 }
+        STATUS current
+        DESCRIPTION
+                "Cumulated CAC overrun since system startup for given IP Domain"
+        ::= { ipDomainEntry 11 }
+
+pbxRole OBJECT-TYPE
+        SYNTAX INTEGER {
+                       INDETERMINATE(0),
+                       MAIN(1),
+                       STAND-BY(2),
+                       ACTIVE-PCS(3),
+                       INACTIVE-PCS(4),
+                }
+        ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The PBX role."
+                ::= { a4400CPU 4 }
 
 sipRegSets   OBJECT-TYPE
                 SYNTAX INTEGER
                 ACCESS read-only
-		STATUS current
-		DESCRIPTION
-			"Registered SIP sets."
-		::= { a4400CPU 5 }
+                STATUS current
+                DESCRIPTION
+                        "Registered SIP sets."
+                ::= { a4400CPU 5 }
 
 sipUnregSets   OBJECT-TYPE
                 SYNTAX INTEGER
                 ACCESS read-only
-		STATUS current
-		DESCRIPTION
-			"Unregistered SIP sets."
-		::= { a4400CPU 6 }
+                STATUS current
+                DESCRIPTION
+                        "Unregistered SIP sets."
+                ::= { a4400CPU 6 }
 
 setsInService   OBJECT-TYPE
                 SYNTAX INTEGER
                 ACCESS read-only
-		STATUS current
-		DESCRIPTION
-			"Number of sets in service."
-		::= { a4400CPU 7 }
+                STATUS current
+                DESCRIPTION
+                        "Number of sets in service."
+                ::= { a4400CPU 7 }
 
 setsOutOfService   OBJECT-TYPE
                 SYNTAX INTEGER
                 ACCESS read-only
-		STATUS current
-		DESCRIPTION
-			"Number of sets out of service."
-		::= { a4400CPU 8 }
+                STATUS current
+                DESCRIPTION
+                        "Number of sets out of service."
+                ::= { a4400CPU 8 }
+trunkTable      OBJECT-TYPE
+                SYNTAX SEQUENCE OF TrunkEntry
+        ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Table for Trunks."
+                ::= { a4400CPU 9 }
+
+trunkEntry OBJECT-TYPE
+        SYNTAX TrunkEntry
+        ACCESS read-only
+        STATUS current
+        INDEX { trunkid }
+    ::= { trunkTable 1 }
+
+TrunkEntry ::= SEQUENCE {
+        trunkid INTEGER,
+        trunkname DisplayString,
+        crystalno INTEGER,
+        couplerno INTEGER,
+        trunktype INTEGER,
+        nodepbx INTEGER,
+        freechan INTEGER,
+        busychan INTEGER,
+        ooschan INTEGER,
+        trunkstatus INTEGER,
+        cumuloos INTEGER,
+        cumuloverrun INTEGER,
+}
+
+trunkid OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Trunk number as found in MAO."
+        ::= { trunkEntry 1 }
+
+trunkname OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Name of the Trunk as found in MAO."
+        ::= { trunkEntry 2 }
+
+crystalno OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Crystal number as found in MAO"
+        ::= { trunkEntry 3 }
+
+couplerno OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Coupler number as found in MAO"
+        ::= { trunkEntry 4 }
+
+trunktype OBJECT-TYPE
+        SYNTAX INTEGER {
+                        BCA(0),
+                        T2(1),
+                        T2COMP(2),
+                        T2IP(3),
+                        T2ATM(4),
+                        T2BBC2(5),
+                        T2SIP(6),
+                        T2IPPR(7),
+                        T2(8),
+                        MIXTE(9),
+                        T0(10),
+                        DPNSS(11),
+                        DASS2(12),
+                        BCAADDON(13),
+                        T2HYBRID(14),
+                        LIALDE(15),
+                        T1(16),                                                                        
+                }
+    ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Type of the Trunk as found in MAO"
+        ::= { trunkEntry 5 }
+
+
+nodepbx OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Node number where the trunk exists"
+        ::= { trunkEntry 6 }
+
+freechan OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Available free channnels for given Trunk"
+        ::= { trunkEntry 7 }
+
+busychan OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Used (Busy) channnels for given Trunk"
+        ::= { trunkEntry 8 }
+
+ooschan OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Out Of Service channnels for given Trunk"
+        ::= { trunkEntry 9 }
+
+trunkstatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                       OOS(0),
+                       INS(1),                 
+                }
+    ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Status of the trunk group."
+        ::= { trunkEntry 10 }
+
+cumuloos OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Cummulated Number of OOS Channels"
+        ::= { trunkEntry 11 }
+
+cumuloverrun OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Cumulated Number of failed outgoing calls (oos/hs)"
+        ::= { trunkEntry 12 }
 
 END
-
