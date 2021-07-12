@@ -8,8 +8,8 @@ abstract class Plugin
 {
     public function __construct()
     {
-	$this->name = self::className();
-	View::addLocation(base_path("html/plugins/" . self::className() . "/ressources/views"));
+        $this->name = self::className();
+        View::addLocation(base_path('html/plugins/' . self::className() . '/ressources/views'));
     }
 
     final protected static function viewPath()
