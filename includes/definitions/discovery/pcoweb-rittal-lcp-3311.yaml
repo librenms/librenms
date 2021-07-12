@@ -10,6 +10,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.48.{{ $index }}'
                     descr: LCP setpoint
                     index: 'lcpSetpoint.{{ $index }}'
+                    low_limit: 150
+                    high_limit: 280
                 -
                     oid: inputTemperatureAverage
                     value: inputTemperatureAverage
@@ -18,7 +20,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.21.{{ $index }}'
                     descr: Average input temperature
                     index: 'inputTemperatureAverage.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
+                    # Temps according to ASHRAE standards
                     oid: outputTemperatureAverage
                     value: outputTemperatureAverage
                     divisor: 10
@@ -26,6 +33,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.22.{{ $index }}'
                     descr: Average output temperature
                     index: 'outputTemperatureAverage.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: inputTemperatureTopSensor
                     value: inputTemperatureTopSensor
@@ -34,6 +45,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.6.{{ $index }}'
                     descr: Top sensor input temperature
                     index: 'inputTemperatureTopSensor.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
                     oid: inputTemperatureMidSensor
                     value: inputTemperatureMidSensor
@@ -42,6 +57,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.7.{{ $index }}'
                     descr: Mid sensor input temperature
                     index: 'inputTemperatureMidSensor.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
                     oid: inputTemperatureBottomSensor
                     value: inputTemperatureBottomSensor
@@ -50,6 +69,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.8.{{ $index }}'
                     descr: Bottom sensor input temperature
                     index: 'inputTemperatureBottomSensor.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
                     oid: outputTemperatureTopSensor
                     value: outputTemperatureTopSensor
@@ -58,6 +81,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.2.{{ $index }}'
                     descr: Top sensor output temperature
                     index: 'outputTemperatureTopSensor.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: outputTemperatureMidSensor
                     value: outputTemperatureMidSensor
@@ -66,6 +93,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.3.{{ $index }}'
                     descr: Mid sensor output temperature
                     index: 'outputTemperatureMidSensor.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: outputTemperatureBottomSensor
                     value: outputTemperatureBottomSensor
@@ -74,6 +105,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.4.{{ $index }}'
                     descr: Bottom sensor output temperature
                     index: 'outputTemperatureBottomSensor.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: driverTemperature
                     value: driverTemperature
@@ -82,6 +117,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.4.{{ $index }}'
                     descr: Power+ driver temperature
                     index: 'driverTemperature.{{ $index }}'
+                    low_limit: 10
+                    low_warn_limit: 20
+                    warn_limit: 100
+                    high_limit: 120
                 -
                     oid: compressorDischargeTemperature
                     value: compressorDischargeTemperature
@@ -90,6 +129,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.9.{{ $index }}'
                     descr: Compressor discharge temperature
                     index: 'compressorDischargeTemperature.{{ $index }}'
+                    low_limit: 30
+                    low_warn_limit: 50
+                    warn_limit: 880
+                    high_limit: 900
                 -
                     oid: compressorSuctionTemperature
                     value: compressorSuctionTemperature
@@ -98,6 +141,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.10.{{ $index }}'
                     descr: Compressor suction temperature
                     index: 'compressorSuctionTemperature.{{ $index }}'
+                    low_limit: 30
+                    low_warn_limit: 50
+                    warn_limit: 880
+                    high_limit: 900
                 -
                     oid: evaporatorTemperature
                     value: evaporatorTemperature
@@ -106,6 +153,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.13.{{ $index }}'
                     descr: Evaporator temperature
                     index: 'evaporatorTemperature.{{ $index }}'
+                    low_limit: -100
+                    low_warn_limit: -80
+                    warn_limit: 150
+                    high_limit: 200
                 -
                     oid: condensingTemperature
                     value: condensingTemperature
@@ -114,6 +165,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.14.{{ $index }}'
                     descr: Condensor temperature
                     index: 'condensingTemperature.{{ $index }}'
+                    low_limit: 30
+                    low_warn_limit: 50
+                    warn_limit: 450
+                    high_limit: 500
+
         pressure:
             data:
                 -
@@ -123,6 +179,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.11.{{ $index }}'
                     descr: Compressor discharge pressure
                     index: 'compressorDischargePressure.{{ $index }}'
+                    warn_limit: 2800
+                    high_limit: 2900
                 -
                     oid: compressorSuctionPressure
                     value: compressorSuctionPressure
@@ -130,6 +188,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.12.{{ $index }}'
                     descr: Compressor suction pressure
                     index: 'compressorSuctionPressure.{{ $index }}'
+                    warn_limit: 2800
+                    high_limit: 2900
         cooling:
         # LCP DX has a max cooling capacity of 12Kw. Measurement is done in %
             data:
@@ -140,8 +200,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.16.{{ $index }}'
                     descr: Free cooling capacity
                     index: 'coolingCapacity.{{ $index }}'
-                    low_warn_limit: 1500
                     low_limit: 1000
+                    low_warn_limit: 1500
         fanspeed:
             data:
                 -
@@ -150,15 +210,19 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.29.{{ $index }}'
                     descr: Fan speed
                     index: 'fanSpeedRpm.{{ $index }}'
-                    warn_limit: 3000
-                    high_limit: 3500
+                    warn_limit: 3400
+                    high_limit: 3600
                 -
-                    oid: compressorRotorSpeed
-                    value: compressorRotorSpeed
-                    divisor: 60
-                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.45.{{ $index }}'
+                    # See documentation pg 47
+                    oid: compressorRotorSpeedHz
+                    value: compressorRotorSpeedHz
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.1.{{ $index }}'
                     descr: Compressor rotor speed
                     index: 'compressorRotorSpeed.{{ $index }}'
+                    low_limit: 500
+                    low_warn_limit: 1000
+                    warn_limit: 6000
+                    high_limit: 6500
         current:
             data:
                 -
@@ -177,6 +241,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.5.{{ $index }}'
                     descr: Power+ DC voltage
                     index: 'dcBusVoltage.{{ $index }}'
+                    low_limit: 500
+                    low_warn_limit: 510
+                    warn_limit: 565
+                    high_limit: 570
                 -
                     oid: motorVoltage
                     value: motorVoltage
@@ -184,13 +252,17 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.6.{{ $index }}'
                     descr: Motor voltage
                     index: 'motorVoltage.{{ $index }}'
+                    low_limit: 20
+                    low_warn_limit: 50
+                    warn_limit: 265
+                    high_limit: 270
         state:
             data:
                 -
                     oid: unitOnOff
-                    group: Unit
+                    group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
-                    descr: Unit state
+                    descr: Unit
                     index: 'unitOnOff.{{ $index }}'
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'off' }
@@ -199,7 +271,7 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: 'auto' }
                 -
                     oid: driverPowerStatus
-                    group: Unit
+                    group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
                     descr: Power+ drive status
                     index: 'driverPowerStatus.{{ $index }}'
@@ -209,32 +281,32 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inverterOnOff
-                    group: Unit
+                    group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.17.{{ $index }}'
-                    descr: Inverter state
+                    descr: Inverter
                     index: 'inverterOnOff.{{ $index }}'
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'off' }
                         - { value: 1, generic: 0, graph: 0, descr: 'on' }
                 -
                     oid: envelopeZone
-                    group: Unit
+                    group: Operating envelop
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.14.{{ $index }}'
                     descr: Cooling envelope zone
                     index: 'envelopeZone.{{ $index }}'
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 1, graph: 0, descr: 'maximum compression ratio' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'maximum discharge power' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'current limit' }
-                        - { value: 4, generic: 1, graph: 0, descr: 'maximum suction power' }
-                        - { value: 5, generic: 1, graph: 0, descr: 'minimum compression ratio' }
-                        - { value: 6, generic: 1, graph: 0, descr: 'minimum delta power' }
-                        - { value: 7, generic: 1, graph: 0, descr: 'minimum discharge power' }
-                        - { value: 8, generic: 1, graph: 0, descr: 'minimum suction power' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'maximum compression ratio' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'maximum discharge power' }
+                        - { value: 3, generic: 0, graph: 0, descr: 'current limit' }
+                        - { value: 4, generic: 0, graph: 0, descr: 'maximum suction power' }
+                        - { value: 5, generic: 0, graph: 0, descr: 'minimum compression ratio' }
+                        - { value: 6, generic: 0, graph: 0, descr: 'minimum delta power' }
+                        - { value: 7, generic: 0, graph: 0, descr: 'minimum discharge power' }
+                        - { value: 8, generic: 0, graph: 0, descr: 'minimum suction power' }
                 -
                     oid: compressorOverloadAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.2.{{ $index }}'
                     descr: Compressor overload
                     index: 'compressorOverloadAlarm.{{ $index }}'
@@ -243,7 +315,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: highPressureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.3.{{ $index }}'
                     descr: High pressure
                     index: 'highPressureAlarm.{{ $index }}'
@@ -252,8 +324,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inverterAlarm
-                    group: Alarms
-                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.1.{{ $index }}'
+                    group: Component alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.11.{{ $index }}'
                     descr: Inverter
                     index: 'inverterAlarm.{{ $index }}'
                     states:
@@ -261,7 +333,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: driveAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.12.{{ $index }}'
                     descr: Power+ drive
                     index: 'driveAlarm.{{ $index }}'
@@ -275,11 +347,51 @@ modules:
                     descr: General alarm
                     index: 'generalAlarm.{{ $index }}'
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'ok' }
+                -
+                    oid: currentErrorCode
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.3.{{ $index }}'
+                    descr: Current Error code
+                    index: 'currentErrorCode.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }    
+                        - { value: 2, generic: 2, graph: 0, descr: 'ALA02 - Probe B2 faulty or disconnected' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'ALA03 - Probe B3 faulty or disconnected' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'ALA04 - Probe B4 faulty or disconnected' }
+                        - { value: 5, generic: 2, graph: 0, descr: 'ALA05 - Probe B5 faulty or disconnected' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'ALA06 - Probe B6 faulty or disconnected' }
+                        - { value: 7, generic: 2, graph: 0, descr: 'ALA07 - Probe B7 faulty or disconnected' }
+                        - { value: 8, generic: 2, graph: 0, descr: 'ALA08 - Probe B8 faulty or disconnected' }
+                        - { value: 9, generic: 2, graph: 0, descr: 'ALA09 - Probe B9 faulty or disconnected' }
+                        - { value: 10, generic: 2, graph: 0, descr: 'ALA10 - Probe B10 faulty or disconnected' }
+                        - { value: 11, generic: 2, graph: 0, descr: 'ALA11 - Probe B11 faulty or disconnected' }
+                        - { value: 12, generic: 2, graph: 0, descr: 'ALA12 - Probe B12 faulty or disconnected' }
+                        - { value: 13, generic: 2, graph: 0, descr: 'ALB01 - High pressure' }
+                        - { value: 14, generic: 2, graph: 0, descr: 'ALB02 - High pressure compressor 1 by transducer' }
+                        - { value: 15, generic: 2, graph: 0, descr: 'ALB03 - Low pressure compressor/compressors by transducer' }
+                        - { value: 16, generic: 2, graph: 0, descr: 'ALC01 - Compressor 1 overload or inverter alarm' }
+                        - { value: 17, generic: 2, graph: 0, descr: 'ALC03 - Envelope alarm zone' }
+                        - { value: 18, generic: 2, graph: 0, descr: 'ALC04 - Compressor start failure' }
+                        - { value: 19, generic: 2, graph: 0, descr: 'ALC05 - High discharge gas temperature' }
+                        - { value: 20, generic: 2, graph: 0, descr: 'ALC06 - Low pressure differential (insufficient lubrication)' }
+                        - { value: 21, generic: 2, graph: 0, descr: 'ALF01 - Fan overload' }
+                        - { value: 22, generic: 2, graph: 0, descr: 'ALD02 - Sensor failure' }
+                        - { value: 23, generic: 2, graph: 0, descr: 'ALD03 - EEV motor error' }
+                        - { value: 24, generic: 2, graph: 0, descr: 'ALD04 - Low superheat' }
+                        - { value: 25, generic: 2, graph: 0, descr: 'ALD05 - Low suction temperature' }
+                        - { value: 26, generic: 2, graph: 0, descr: 'ALD06 - Low evaporation temperature' }
+                        - { value: 27, generic: 2, graph: 0, descr: 'ALD07 - High evaporation temperature' }
+                        - { value: 28, generic: 2, graph: 0, descr: 'ALD08 - High condensing temperature' }
+                        - { value: 29, generic: 2, graph: 0, descr: 'ALD09 - Driver offline' }
+                        - { value: 30, generic: 2, graph: 0, descr: 'ALL01 - Power+ offline' }
+                        - { value: 31, generic: 2, graph: 0, descr: 'ALL02 - Power+ Generic Alarm' }
+                        - { value: 32, generic: 2, graph: 0, descr: 'ALL99 - Unexpected inverter stop' }
+                        - { value: 33, generic: 2, graph: 0, descr: 'ALW04 - Max temperature (warning)' }
                 -
                     oid: compressorEnvelopeAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.30.{{ $index }}'
                     descr: Compressor envelope
                     index: 'compressorEnvelopeAlarm.{{ $index }}'
@@ -288,7 +400,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorStartupFailureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.31.{{ $index }}'
                     descr: Compressor startup (max retries)
                     index: 'compressorStartupFailureAlarm.{{ $index }}'
@@ -297,7 +409,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: maxDischargeTemperatureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.33.{{ $index }}'
                     descr: Maximum discharge temperature
                     index: 'maxDischargeTemperatureAlarm.{{ $index }}'
@@ -306,7 +418,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorDeltaPressureAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.35.{{ $index }}'
                     descr: Compressor delta pressure
                     index: 'compressorDeltaPressureAlarm.{{ $index }}'
@@ -315,7 +427,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: oilReturnAlarm
-                    group: Alarms
+                    group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.36.{{ $index }}'
                     descr: Oil return (lubrication issue)
                     index: 'oilReturnAlarm.{{ $index }}'
@@ -324,7 +436,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: outputTemperatureTopProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.38.{{ $index }}'
                     descr: Output top probe
                     index: 'outputTemperatureTopProbeAlarm.{{ $index }}'
@@ -333,7 +445,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: outputTemperatureMidProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.39.{{ $index }}'
                     descr: Output mid probe
                     index: 'outputTemperatureMidProbeAlarm.{{ $index }}'
@@ -342,7 +454,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: outputTemperatureBottomProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.40.{{ $index }}'
                     descr: Output bottom probe
                     index: 'outputTemperatureBottomProbeAlarm.{{ $index }}'
@@ -351,7 +463,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inputTemperatureTopProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.42.{{ $index }}'
                     descr: Input top probe
                     index: 'inputTemperatureTopProbeAlarm.{{ $index }}'
@@ -360,7 +472,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inputTemperatureMidProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.43.{{ $index }}'
                     descr: Input mid probe
                     index: 'inputTemperatureMidProbeAlarm.{{ $index }}'
@@ -369,7 +481,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: inputTemperatureBottomProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.44.{{ $index }}'
                     descr: Input bottom probe
                     index: 'inputTemperatureBottomProbeAlarm.{{ $index }}'
@@ -378,7 +490,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorDischargeTemperatureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.45.{{ $index }}'
                     descr: Compressor discharge temperature probe
                     index: 'compressorDischargeTemperatureProbeAlarm.{{ $index }}'
@@ -387,7 +499,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorSuctionTemperatureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.46.{{ $index }}'
                     descr: Compressor suction temperature probe
                     index: 'compressorSuctionTemperatureProbeAlarm.{{ $index }}'
@@ -396,7 +508,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorDischargePressureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.47.{{ $index }}'
                     descr: Compressor discharge pressure probe
                     index: 'compressorDischargePressureProbeAlarm.{{ $index }}'
@@ -405,7 +517,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
                     oid: compressorSuctionPressureProbeAlarm
-                    group: Probes
+                    group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.48.{{ $index }}'
                     descr: Compressor suction pressure probe
                     index: 'compressorSuctionPressureProbeAlarm.{{ $index }}'

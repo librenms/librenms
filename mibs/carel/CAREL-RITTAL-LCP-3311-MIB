@@ -87,7 +87,7 @@ compressorOverloadAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor overload alarm
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 2 }
 
@@ -101,7 +101,7 @@ highPressureAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "High pressure alarm
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 3 }
 
@@ -129,7 +129,7 @@ inverterAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Inverter alarm
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 11 }
 
@@ -143,7 +143,7 @@ driveAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Power+ drive off-line alarm
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 12 }
 
@@ -171,8 +171,8 @@ generalAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "General alarm
-                ok (0),
-		alarm (1)"
+        alarm (0),
+		ok (1)"
 	::= { digital 23 }
 
         --  .1.3.6.1.4.1.9839.2606.2.1.1.29
@@ -199,7 +199,7 @@ compressorEnvelopeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor forced off working out envelope
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 30 }
 
@@ -213,7 +213,7 @@ compressorStartupFailureAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor startup failure alarm, reached max retries
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 31 }
 
@@ -227,7 +227,7 @@ maxDischargeTemperatureAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Maximum discharge temperature has been reached
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 33 }
 
@@ -241,7 +241,7 @@ compressorDeltaPressureAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Delta pressure too big to startup compressor
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 35 }
 
@@ -255,7 +255,7 @@ oilReturnAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Oil return alarm for when the compressor is running. Lubrication issue.
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 36 }
 
@@ -269,7 +269,7 @@ outputTemperatureTopProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Top output temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 38 }
 
@@ -283,7 +283,7 @@ outputTemperatureMidProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Mid output temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 39 }
 
@@ -297,7 +297,7 @@ outputTemperatureBottomProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Bottom output temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 40 }
 
@@ -311,7 +311,7 @@ inputTemperatureTopProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Top input temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 42 }
 
@@ -325,7 +325,7 @@ inputTemperatureMidProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Mid input temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 43 }
 
@@ -339,7 +339,7 @@ inputTemperatureBottomProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Bottom input temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 44 }
 
@@ -353,7 +353,7 @@ compressorDischargeTemperatureProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor discharge temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 45 }
 
@@ -367,7 +367,7 @@ compressorSuctionTemperatureProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor suction temperature probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 46 }
 
@@ -381,7 +381,7 @@ compressorDischargePressureProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor discharge pressure probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 47 }
 
@@ -395,7 +395,7 @@ compressorSuctionPressureProbeAlarm               OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 	  "Compressor suction pressure probe broken
-                ok (0),
+        ok (0),
 		alarm (1)"
 	::= { digital 48 }
 
@@ -445,7 +445,41 @@ driverPowerStatus               OBJECT-TYPE
 
         --  .1.3.6.1.4.1.9839.2606.2.1.3.3
 currentErrorCode                OBJECT-TYPE
-	SYNTAX		INTEGER (0..99)
+	SYNTAX		INTEGER {
+		OK (0),
+		ALA02 (2),
+		ALA03 (3),
+		ALA04 (4),
+		ALA05 (5),
+		ALA06 (6),
+		ALA07 (7),
+		ALA08 (8),
+		ALA09 (9),
+		ALA10 (10),
+		ALA11 (11),
+		ALA12 (12),
+		ALB01 (13),
+		ALB02 (14),
+		ALB03 (15),
+		ALC01 (16),
+		ALC03 (17),
+		ALC04 (18),
+		ALC05 (19),
+		ALC06 (20),
+		ALF01 (21),
+		ALD02 (22),
+		ALD03 (23),
+		ALD04 (24),
+		ALD05 (25),
+		ALD06 (26),
+		ALD07 (27),
+		ALD08 (28),
+		ALD09 (29),
+		ALL01 (30),
+		ALL02 (31),
+		ALL99 (32),
+		ALW04 (33)
+	}
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
@@ -514,7 +548,7 @@ unitOnOff               OBJECT-TYPE
         --  .1.3.6.1.4.1.9839.2606.2.1.3.14
 envelopeZone               OBJECT-TYPE
 	SYNTAX		INTEGER {
-                ok (0),
+        ok (0),
 		maximum-compression-ratio (1),
 		maximum-discharge-power (2),
 		current-limit (3),
