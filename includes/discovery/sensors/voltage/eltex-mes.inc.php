@@ -42,10 +42,10 @@ if ($oids) {
 
             // type6 = voltage
             if ($type == 6) {
-                $descr_oid = '1.0.8802.1.1.2.1.3.7.1.3.'.$ifIndex;
+                $descr_oid = '1.0.8802.1.1.2.1.3.7.1.3.' . $ifIndex;
                 $descr = trim(snmp_get($device, $descr_oid, '-Oqv', ''), '"');
                 $value = $value / $divisor;
-                discover_sensor($valid['sensor'], 'voltage', $device, $split, 'SfpVolt'.$ifIndex, 'eltex-mes', 'SfpVolt-'.$descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+                discover_sensor($valid['sensor'], 'voltage', $device, $split, 'SfpVolt' . $ifIndex, 'eltex-mes', 'SfpVolt-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
             }
         }
     }
