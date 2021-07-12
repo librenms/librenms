@@ -10,6 +10,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.48.{{ $index }}'
                     descr: LCP setpoint
                     index: 'lcpSetpoint.{{ $index }}'
+                    low_limit: 150
+                    high_limit: 280
                 -
                     oid: inputTemperatureAverage
                     value: inputTemperatureAverage
@@ -18,7 +20,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.21.{{ $index }}'
                     descr: Average input temperature
                     index: 'inputTemperatureAverage.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
+                    # Temps according to ASHRAE standards
                     oid: outputTemperatureAverage
                     value: outputTemperatureAverage
                     divisor: 10
@@ -26,6 +33,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.22.{{ $index }}'
                     descr: Average output temperature
                     index: 'outputTemperatureAverage.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: inputTemperatureTopSensor
                     value: inputTemperatureTopSensor
@@ -34,6 +45,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.6.{{ $index }}'
                     descr: Top sensor input temperature
                     index: 'inputTemperatureTopSensor.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
                     oid: inputTemperatureMidSensor
                     value: inputTemperatureMidSensor
@@ -42,6 +57,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.7.{{ $index }}'
                     descr: Mid sensor input temperature
                     index: 'inputTemperatureMidSensor.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
                     oid: inputTemperatureBottomSensor
                     value: inputTemperatureBottomSensor
@@ -50,6 +69,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.8.{{ $index }}'
                     descr: Bottom sensor input temperature
                     index: 'inputTemperatureBottomSensor.{{ $index }}'
+                    low_limit: -140
+                    low_warn_limit: -100
+                    warn_limit: 400
+                    high_limit: 440
                 -
                     oid: outputTemperatureTopSensor
                     value: outputTemperatureTopSensor
@@ -58,6 +81,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.2.{{ $index }}'
                     descr: Top sensor output temperature
                     index: 'outputTemperatureTopSensor.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: outputTemperatureMidSensor
                     value: outputTemperatureMidSensor
@@ -66,6 +93,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.3.{{ $index }}'
                     descr: Mid sensor output temperature
                     index: 'outputTemperatureMidSensor.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: outputTemperatureBottomSensor
                     value: outputTemperatureBottomSensor
@@ -74,6 +105,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.4.{{ $index }}'
                     descr: Bottom sensor output temperature
                     index: 'outputTemperatureBottomSensor.{{ $index }}'
+                    low_limit: 150
+                    low_warn_limit: 160
+                    warn_limit: 280
+                    high_limit: 300
                 -
                     oid: driverTemperature
                     value: driverTemperature
@@ -82,6 +117,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.4.{{ $index }}'
                     descr: Power+ driver temperature
                     index: 'driverTemperature.{{ $index }}'
+                    low_limit: 10
+                    low_warn_limit: 20
+                    warn_limit: 100
+                    high_limit: 120
                 -
                     oid: compressorDischargeTemperature
                     value: compressorDischargeTemperature
@@ -90,6 +129,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.9.{{ $index }}'
                     descr: Compressor discharge temperature
                     index: 'compressorDischargeTemperature.{{ $index }}'
+                    low_limit: 30
+                    low_warn_limit: 50
+                    warn_limit: 880
+                    high_limit: 900
                 -
                     oid: compressorSuctionTemperature
                     value: compressorSuctionTemperature
@@ -98,6 +141,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.10.{{ $index }}'
                     descr: Compressor suction temperature
                     index: 'compressorSuctionTemperature.{{ $index }}'
+                    low_limit: 30
+                    low_warn_limit: 50
+                    warn_limit: 880
+                    high_limit: 900
                 -
                     oid: evaporatorTemperature
                     value: evaporatorTemperature
@@ -106,6 +153,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.13.{{ $index }}'
                     descr: Evaporator temperature
                     index: 'evaporatorTemperature.{{ $index }}'
+                    low_limit: -100
+                    low_warn_limit: -80
+                    warn_limit: 150
+                    high_limit: 200
                 -
                     oid: condensingTemperature
                     value: condensingTemperature
@@ -114,6 +165,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.14.{{ $index }}'
                     descr: Condensor temperature
                     index: 'condensingTemperature.{{ $index }}'
+                    low_limit: 30
+                    low_warn_limit: 50
+                    warn_limit: 450
+                    high_limit: 500
+
         pressure:
             data:
                 -
@@ -123,6 +179,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.11.{{ $index }}'
                     descr: Compressor discharge pressure
                     index: 'compressorDischargePressure.{{ $index }}'
+                    warn_limit: 2800
+                    high_limit: 2900
                 -
                     oid: compressorSuctionPressure
                     value: compressorSuctionPressure
@@ -130,6 +188,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.12.{{ $index }}'
                     descr: Compressor suction pressure
                     index: 'compressorSuctionPressure.{{ $index }}'
+                    warn_limit: 2800
+                    high_limit: 2900
         cooling:
         # LCP DX has a max cooling capacity of 12Kw. Measurement is done in %
             data:
@@ -140,8 +200,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.16.{{ $index }}'
                     descr: Free cooling capacity
                     index: 'coolingCapacity.{{ $index }}'
-                    low_warn_limit: 1500
                     low_limit: 1000
+                    low_warn_limit: 1500
         fanspeed:
             data:
                 -
@@ -150,15 +210,19 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.29.{{ $index }}'
                     descr: Fan speed
                     index: 'fanSpeedRpm.{{ $index }}'
-                    warn_limit: 3000
-                    high_limit: 3500
+                    warn_limit: 3400
+                    high_limit: 3600
                 -
-                    oid: compressorRotorSpeed
-                    value: compressorRotorSpeed
-                    divisor: 60
-                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.45.{{ $index }}'
+                    # See documentation pg 47
+                    oid: compressorRotorSpeedHz
+                    value: compressorRotorSpeedHz
+                    num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.1.{{ $index }}'
                     descr: Compressor rotor speed
                     index: 'compressorRotorSpeed.{{ $index }}'
+                    low_limit: 500
+                    low_warn_limit: 1000
+                    warn_limit: 6000
+                    high_limit: 6500
         current:
             data:
                 -
@@ -177,6 +241,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.5.{{ $index }}'
                     descr: Power+ DC voltage
                     index: 'dcBusVoltage.{{ $index }}'
+                    low_limit: 500
+                    low_warn_limit: 510
+                    warn_limit: 565
+                    high_limit: 570
                 -
                     oid: motorVoltage
                     value: motorVoltage
@@ -184,6 +252,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.6.{{ $index }}'
                     descr: Motor voltage
                     index: 'motorVoltage.{{ $index }}'
+                    low_limit: 20
+                    low_warn_limit: 50
+                    warn_limit: 265
+                    high_limit: 270
         state:
             data:
                 -
