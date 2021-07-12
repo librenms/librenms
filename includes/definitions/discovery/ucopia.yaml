@@ -12,7 +12,7 @@ modules:
                 -
                     oid: highAvailabilityStatus
                     value: highAvailabilityStatus
-                    num_oid: '.1.3.6.1.4.1.31218.3.7.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.3.7.{{ $index }}'
                     descr: 'High Availability Status'
                     index: 'highAvailabilityStatus.{{ $index }}'
                     state_name: highAvailabilityStatus
@@ -25,7 +25,7 @@ modules:
                 -
                     oid: debugValue
                     value: debugValue
-                    num_oid: '.1.3.6.1.4.1.31218.3.2.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.3.2.{{ $index }}'
                     descr: 'Debug Value'
                     index: 'debugValue.{{ $index }}'
                     state_name: debugValue
@@ -41,7 +41,7 @@ modules:
                 -
                     oid: webServerService
                     value: webServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.1.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.1.{{ $index }}'
                     descr: 'Web Server Status'
                     index: 'webServerService.{{ $index }}'
                     state_name: webServerService
@@ -52,7 +52,7 @@ modules:
                 -
                     oid: sqlServerService
                     value: sqlServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.2.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.2.{{ $index }}'
                     descr: 'SQL Server Status'
                     index: 'sqlServerService.{{ $index }}'
                     state_name: sqlServerService
@@ -63,7 +63,7 @@ modules:
                 -
                     oid: urlSnifferService
                     value: urlSnifferService
-                    num_oid: '.1.3.6.1.4.1.31218.4.3.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.3.{{ $index }}'
                     descr: 'URL Sniffer Status'
                     index: 'urlSnifferService.{{ $index }}'
                     state_name: urlSnifferService
@@ -74,7 +74,7 @@ modules:
                 -
                     oid: portalService
                     value: portalService
-                    num_oid: '.1.3.6.1.4.1.31218.4.4.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.4.{{ $index }}'
                     descr: 'Portal Status'
                     index: 'portalService.{{ $index }}'
                     state_name: portalService
@@ -85,7 +85,7 @@ modules:
                 -
                     oid: webProxyService
                     value: webProxyService
-                    num_oid: '.1.3.6.1.4.1.31218.4.5.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.5.{{ $index }}'
                     descr: 'Web Proxy Status'
                     index: 'webProxyService.{{ $index }}'
                     state_name: webProxyService
@@ -96,7 +96,7 @@ modules:
                 -
                     oid: autodisconnectService
                     value: autodisconnectService
-                    num_oid: '.1.3.6.1.4.1.31218.4.6.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.6.{{ $index }}'
                     descr: 'Auto Disconnect Status'
                     index: 'autodisconnectService.{{ $index }}'
                     state_name: autodisconnectService
@@ -107,7 +107,7 @@ modules:
                 -
                     oid: printingServerService
                     value: printingServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.7.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.7.{{ $index }}'
                     descr: 'Printing Server Status'
                     index: 'printingServerService.{{ $index }}'
                     state_name: printingServerService
@@ -118,7 +118,7 @@ modules:
                 -
                     oid: dhcpServerService
                     value: dhcpServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.8.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.8.{{ $index }}'
                     descr: 'DHCP Server Status'
                     index: 'dhcpServerService.{{ $index }}'
                     state_name: dhcpServerService
@@ -129,7 +129,7 @@ modules:
                 -
                     oid: dnsServerService
                     value: dnsServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.9.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.9.{{ $index }}'
                     descr: 'DNS Server Status'
                     index: 'dnsServerService.{{ $index }}'
                     state_name: dnsServerService
@@ -140,7 +140,7 @@ modules:
                 -
                     oid: staticIpManagerService
                     value: staticIpManagerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.10.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.10.{{ $index }}'
                     descr: 'Static IP Manager Status'
                     index: 'staticIpManagerService.{{ $index }}'
                     state_name: staticIpManagerService
@@ -151,7 +151,7 @@ modules:
                 -
                     oid: highAvailabilityService
                     value: highAvailabilityService
-                    num_oid: '.1.3.6.1.4.1.31218.4.11.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.11.{{ $index }}'
                     descr: 'High Availability Service Status'
                     index: 'highAvailabilityService.{{ $index }}'
                     state_name: highAvailabilityService
@@ -162,7 +162,7 @@ modules:
                 -
                     oid: ldapDirectoryService
                     value: ldapDirectoryService
-                    num_oid: '.1.3.6.1.4.1.31218.4.12.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.12.{{ $index }}'
                     descr: 'LDAP Directory Status'
                     index: 'ldapDirectoryService.{{ $index }}'
                     state_name: ldapDirectoryService
@@ -173,7 +173,7 @@ modules:
                 -
                     oid: ldapReplicationManagerService
                     value: ldapReplicationManagerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.13.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.13.{{ $index }}'
                     descr: 'LDAP Replication Manager Status'
                     index: 'ldapReplicationManagerService.{{ $index }}'
                     state_name: ldapReplicationManagerService
@@ -184,7 +184,7 @@ modules:
                 -
                     oid: timeServerService
                     value: timeServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.14.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.14.{{ $index }}'
                     descr: 'NTP Status'
                     index: 'timeServerService.{{ $index }}'
                     state_name: timeServerService
@@ -195,7 +195,7 @@ modules:
                 -
                     oid: radiusServerService
                     value: radiusServerService
-                    num_oid: '.1.3.6.1.4.1.31218.4.15.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.15.{{ $index }}'
                     descr: 'RADIUS Status'
                     index: 'radiusServerService.{{ $index }}'
                     state_name: radiusServerService
@@ -206,7 +206,7 @@ modules:
                 -
                     oid: sambaService
                     value: sambaService
-                    num_oid: '.1.3.6.1.4.1.31218.4.16.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.16.{{ $index }}'
                     descr: 'SAMBA Status'
                     index: 'sambaService.{{ $index }}'
                     state_name: sambaService
@@ -217,7 +217,7 @@ modules:
                 -
                     oid: sshService
                     value: sshService
-                    num_oid: '.1.3.6.1.4.1.31218.4.17.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.17.{{ $index }}'
                     descr: 'SSH Status'
                     index: 'sshService.{{ $index }}'
                     state_name: sshService
@@ -228,7 +228,7 @@ modules:
                 -
                     oid: syslogService
                     value: syslogService
-                    num_oid: '.1.3.6.1.4.1.31218.4.18.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.18.{{ $index }}'
                     descr: 'Syslog Status'
                     index: 'syslogService.{{ $index }}'
                     state_name: syslogService
@@ -239,7 +239,7 @@ modules:
                 -
                     oid: syslogService
                     value: usersLogService
-                    num_oid: '.1.3.6.1.4.1.31218.4.19.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.19.{{ $index }}'
                     descr: 'Users Log Status'
                     index: 'usersLogService.{{ $index }}'
                     state_name: usersLogService
@@ -250,7 +250,7 @@ modules:
                 -
                     oid: pmsClientService
                     value: pmsClientService
-                    num_oid: '.1.3.6.1.4.1.31218.4.20.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.4.20.{{ $index }}'
                     descr: 'PMSClient Status'
                     index: 'pmsClientService.{{ $index }}'
                     state_name: pmsClientService
@@ -262,7 +262,7 @@ modules:
             data:
                 -
                     oid: totalConnectedUsers
-                    num_oid: '.1.3.6.1.4.1.31218.3.1.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.3.1.{{ $index }}'
                     index: 'totalConnectedUsers.{{ $index }}'
                     descr: Connected Users
                     high_limit: licenseUsers
@@ -271,7 +271,7 @@ modules:
             data:
                 -
                     oid: cpuTemperature
-                    num_oid: '.1.3.6.1.4.1.31218.3.3.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.3.3.{{ $index }}'
                     index: 'cpuTemperature.{{ $index }}'
                     descr: CPU Temperature
                     skip_values:
@@ -281,7 +281,7 @@ modules:
                             value: ''
                 -
                     oid: diskTemperature
-                    num_oid: '.1.3.6.1.4.1.31218.3.4.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.31218.3.4.{{ $index }}'
                     index: 'diskTemperature.{{ $index }}'
                     descr: Disk Temperature
                     skip_values:
