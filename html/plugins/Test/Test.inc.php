@@ -1,3 +1,3 @@
 <?php
-
-echo view('plugins.test.plugin');
+$plugin = new LibreNMS\Plugins\Test();
+$plugin->plugin();
