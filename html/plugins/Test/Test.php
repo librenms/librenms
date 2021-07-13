@@ -15,7 +15,7 @@ class Test extends Plugin
     }
 
     /* Default defined in abstract Plugin class  */
-    public function plugin()
+    public function settings()
     {
         $name = self::className();
         echo view(self::viewPath(), compact('name'));
