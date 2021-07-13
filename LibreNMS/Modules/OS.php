@@ -57,6 +57,8 @@ class OS implements Module
         } else {
             // legacy poller files
             global $graphs, $device;
+            $location = null;
+
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
