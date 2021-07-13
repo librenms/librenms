@@ -443,7 +443,7 @@ class IRCBot
     private function handleCommand()
     {
         $this->command = str_replace(':.', '', $this->command);
-        $tmp = explode(':.' . $this->command . ' ', $this->data); /* @phpstan-ignore-line */
+        $tmp = explode(':.' . $this->command . ' ', $this->data);
         $this->user = $this->getAuthdUser();
         $this->log('isAuthd-1? ' . $this->isAuthd());
         if (! $this->isAuthd() && (isset($this->config['irc_auth']))) {
