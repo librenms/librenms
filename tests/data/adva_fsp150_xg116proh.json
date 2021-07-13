@@ -8,11 +8,11 @@
                     "sysDescr": "FSP150CC-XG116PRO (H)",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "XG116Pro(H) 1.01",
+                    "hardware": "XG116Pro(H)",
                     "features": null,
                     "os": "adva_fsp150",
                     "type": "network",
-                    "serial": "LBADVA71210900990",
+                    "serial": null,
                     "icon": "adva.svg",
                     "location": "<private>"
                 }
