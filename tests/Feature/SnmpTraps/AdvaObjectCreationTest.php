@@ -69,7 +69,7 @@ F3-LAG-MIB::f3LagFrameDistAlgorithm.1.1 activeStandby
 F3-LAG-MIB::f3LagMode.1.1 active-standby
 F3-LAG-MIB::f3LagLacpControl.1.1 true
 F3-LAG-MIB::f3LagCcmDefectsDetectionEnabled.1.1 false
-F3-LAG-MIB::f3LagName.1.1
+F3-LAG-MIB::f3LagName.1.1 
 F3-LAG-MIB::f3LagEntry.14.1.1 \"B0 00 \"
 RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 08 3A 2B 00 2D 06 00 \"
 ADVA-MIB::neEventLogIndex.110 110

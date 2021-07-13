@@ -56,7 +56,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePortNumber 0
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogEventType activityLog
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourceType event
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText 
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
@@ -132,7 +132,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePortNumber $portNum
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogEventType activityLog
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourceType event
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText 
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
