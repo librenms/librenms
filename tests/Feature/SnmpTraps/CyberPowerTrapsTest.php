@@ -34,8 +34,7 @@ class CyberPowerTrapsTest extends SnmpTrapTestCase
 {
     public function testCpUpsOverload()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -55,8 +54,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsDiagFailed()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -76,8 +74,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsDischarged()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -97,8 +94,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsOnBattery()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -118,8 +114,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpLowBattery()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -139,8 +134,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpPowerRestored()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -160,8 +154,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsDiagPassed()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -181,8 +174,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpRtnLowBattery()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -202,8 +194,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsTurnedOff()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -223,8 +214,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsSleeping()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -244,8 +234,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsWokeUp()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -265,8 +254,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsRebootStarted()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -286,8 +274,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsOverTemp()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -307,8 +294,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpRtnOverTemp()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -328,8 +314,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpRtOverLoad()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -349,8 +334,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpRtnDischarged()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -370,8 +354,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsChargerFailure()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -391,8 +374,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpRtnChargerFailure()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -412,8 +394,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
     public function testCpUpsBatteryNotPresent()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162

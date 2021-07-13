@@ -34,7 +34,7 @@ class RuckusSzClusterStateTest extends SnmpTrapTestCase
 {
     public function testClusterInMaintenance()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -55,7 +55,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName.0 \"$device->hostname\"";
 
     public function testClusterInService()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

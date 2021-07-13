@@ -32,7 +32,7 @@ class AdvaObjectCreationTest extends SnmpTrapTestCase
 {
     public function testUserCreation()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -56,7 +56,7 @@ ADVA-MIB::neEventLogTimeStamp.91 2018-12-10,8:55:41.1,-6:0";
 
     public function testLagCreation()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -71,7 +71,7 @@ F3-LAG-MIB::f3LagFrameDistAlgorithm.1.1 activeStandby
 F3-LAG-MIB::f3LagMode.1.1 active-standby
 F3-LAG-MIB::f3LagLacpControl.1.1 true
 F3-LAG-MIB::f3LagCcmDefectsDetectionEnabled.1.1 false
-F3-LAG-MIB::f3LagName.1.1 
+F3-LAG-MIB::f3LagName.1.1
 F3-LAG-MIB::f3LagEntry.14.1.1 \"B0 00 \"
 RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 08 3A 2B 00 2D 06 00 \"
 ADVA-MIB::neEventLogIndex.110 110

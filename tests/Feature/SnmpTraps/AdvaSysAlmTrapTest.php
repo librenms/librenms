@@ -32,7 +32,7 @@ class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
     public function testCriticalAlarm()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -57,7 +57,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Critical alarm test\"";
 
     public function testMajorAlarm()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -82,7 +82,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Major alarm test\"";
 
     public function testMinorAlarm()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -107,7 +107,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Minor alarm test\"";
 
     public function testClearedAlarm()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

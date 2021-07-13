@@ -37,7 +37,7 @@ class MgmtTrapNmsEventTest extends SnmpTrapTestCase
 {
     public function testEvent()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -56,7 +56,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePortNumber 0
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogEventType activityLog
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourceType event
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText 
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
@@ -73,7 +73,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
     //Test alarm with addtional text supplied.
     public function testEventAddText()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -110,7 +110,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
     //Event trap on a specific port
     public function testEventPort()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -132,7 +132,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePortNumber $portNum
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogEventType activityLog
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourceType event
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText 
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";

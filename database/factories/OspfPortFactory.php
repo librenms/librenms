@@ -22,10 +22,10 @@ class OspfPortFactory extends Factory
     public function definition()
     {
         return [
-            'id' => $this->faker->randomDigit,
-            'ospf_port_id' => $this->faker->randomDigit,
+            'id' => $this->faker->randomDigit(),
+            'ospf_port_id' => $this->faker->randomDigit(),
             'ospfIfIpAddress' => $this->faker->ipv4,
-            'ospfAddressLessIf' => $this->faker->randomDigit,
+            'ospfAddressLessIf' => $this->faker->randomDigit(),
             'ospfIfAreaId' => '0.0.0.0',
         ];
     }

@@ -34,8 +34,8 @@ class FgTrapIpsTest extends SnmpTrapTestCase
 {
     public function testIpsAnomaly()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -56,7 +56,7 @@ FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg.0 tcp_src_session";
 
     public function testIpsPkgUdate()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -74,8 +74,8 @@ SNMPv2-MIB::sysName.0 $device->hostname";
 
     public function testIpsSignature()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

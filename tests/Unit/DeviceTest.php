@@ -36,7 +36,7 @@ class DeviceTest extends DBTestCase
 
     public function testFindByHostname()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $found = Device::findByHostname($device->hostname);
         $this->assertNotNull($found);
@@ -63,7 +63,7 @@ class DeviceTest extends DBTestCase
 
     public function testFindIpButNoPort()
     {
-        $ipv4 = Ipv4Address::factory()->create();
+        $ipv4 = Ipv4Address::factory()->create(); /** @var Ipv4Address $ipv4 */
         Port::destroy($ipv4->port_id);
 
         $found = Device::findByIp($ipv4->ipv4_address);
@@ -72,7 +72,7 @@ class DeviceTest extends DBTestCase
 
     public function testFindByIp()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
 
         $found = Device::findByIp($device->ip);
         $this->assertNotNull($found);
@@ -82,7 +82,7 @@ class DeviceTest extends DBTestCase
     public function testFindByIpHostname()
     {
         $ip = '192.168.234.32';
-        $device = Device::factory()->create(['hostname' => $ip]);
+        $device = Device::factory()->create(['hostname' => $ip]); /** @var Device $device */
 
         $found = Device::findByIp($ip);
         $this->assertNotNull($found);
@@ -91,10 +91,11 @@ class DeviceTest extends DBTestCase
 
     public function testFindByIpThroughPort()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make();
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(); /** @var Port $port */
         $device->ports()->save($port);
-        $ipv4 = Ipv4Address::factory()->make(); // test ipv4 lookup of device
+        // test ipv4 lookup of device
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
         $port->ipv4()->save($ipv4);
 
         $found = Device::findByIp($ipv4->ipv4_address);

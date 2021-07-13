@@ -37,7 +37,7 @@ class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
 {
     public function testAlarmClear()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -56,7 +56,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSourcePortNumber 0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogProbableCause other
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSeverity cleared
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSpecificProblem $specific
-EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText 
+EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAlarmType synthesisAlarm
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogTime 2020-8-19,14:21:2.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
@@ -74,7 +74,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
     //Test alarm with addtional text supplied.
     public function testAlarmAddText()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -112,7 +112,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
     //Alarm is on a specific port
     public function testAlarmPort()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -135,7 +135,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSourcePortNumber $portNum
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogProbableCause $probCause
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSeverity critical
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSpecificProblem $specific
-EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText 
+EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAlarmType integrityViolation
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogTime 2020-8-19,14:20:54.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0

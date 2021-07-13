@@ -34,8 +34,8 @@ class VmwHBTest extends SnmpTrapTestCase
 {
     public function testVmwVmHBLostTrap()
     {
-        $device = Device::factory()->create();
-        $guest = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Device::factory()->create(); /** @var Device $guest */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
@@ -56,8 +56,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmHBDetectedTrap()
     {
-        $device = Device::factory()->create();
-        $guest = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Device::factory()->create(); /** @var Device $guest */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162

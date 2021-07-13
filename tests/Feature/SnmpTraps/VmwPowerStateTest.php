@@ -35,8 +35,8 @@ class VmwPowerStateTest extends SnmpTrapTestCase
 {
     public function testVmwVmPoweredOffTrap()
     {
-        $device = Device::factory()->create();
-        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]); /** @var Vminfo $guest */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
@@ -57,8 +57,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmPoweredONTrap()
     {
-        $device = Device::factory()->create();
-        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]); /** @var Vminfo $guest */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
@@ -79,8 +79,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmSuspendedTrap()
     {
-        $device = Device::factory()->create();
-        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]); /** @var Vminfo $guest */
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
