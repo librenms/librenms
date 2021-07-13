@@ -1,7 +1,6 @@
 <div style="text-align: center;">
     <form class="form-inline" id="customrange">
-	<input type="hidden" id="selfaction" value="<?php echo url()->current(); ?>">
-	<?php echo csrf_field(); ?>
+	<input type="hidden" id="selfaction" value="<?php echo Str::finish(Request::url(), '/'); ?>">
 	<div class="form-group">
 	    <label for="dtpickerfrom">From</label>
 	    <input type="text"
