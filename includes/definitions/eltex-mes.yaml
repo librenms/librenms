@@ -18,30 +18,24 @@ mib_dir: eltex
 
 poller_modules:
     bgp-peers: false
-    hr-mib: false
     ntp: false
     ospf: false
     ucd-diskio: false
     ucd-mib: false
     applications: false
     wireless: false
-    stp: false
 
 discovery_modules:
     bgp-peers: false
-    hr-mib: false
     ntp: false
     ospf: false
     ucd-diskio: false
     ucd-mib: false
     applications: false
     wireless: false
-    stp: false
 
 bad_iftype:
     - tunnel
     - softwareLoopback
     - propVirtual
     - propPointToPointSerial
-bad_ifOperStatus_regexp:
-    - "/^notPresent/"
