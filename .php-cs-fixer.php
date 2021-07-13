@@ -7,21 +7,21 @@ $rules = [
     'array_syntax' => ['syntax' => 'short'],
     'binary_operator_spaces' => [
         'default' => 'single_space',
-        'operators' => ['=>' => null]
+        'operators' => ['=>' => null],
     ],
     'blank_line_after_namespace' => true,
     'blank_line_after_opening_tag' => true,
     'blank_line_before_statement' => [
-        'statements' => ['return']
+        'statements' => ['return'],
     ],
     'braces' => true,
     'cast_spaces' => true,
     'class_attributes_separation' => [
-        'elements' => ['method']
+        'elements' => ['method' => 'one'],
     ],
     'class_definition' => true,
     'concat_space' => [
-        'spacing' => 'one'
+        'spacing' => 'one',
     ],
     'declare_equal_normalize' => true,
     'elseif' => true,
@@ -30,6 +30,7 @@ $rules = [
     'fully_qualified_strict_types' => true, // added by Shift
     'function_declaration' => true,
     'function_typehint_space' => true,
+    'general_phpdoc_tag_rename' => true,
     'heredoc_to_nowdoc' => true,
     'include' => true,
     'increment_style' => ['style' => 'post'],
@@ -37,7 +38,7 @@ $rules = [
     'linebreak_after_opening_tag' => true,
     'line_ending' => true,
     'lowercase_cast' => true,
-    'lowercase_constants' => true,
+    'constant_case' => true,
     'lowercase_keywords' => true,
     'lowercase_static_reference' => true, // added from Symfony
     'magic_method_casing' => true, // added from Symfony
@@ -51,7 +52,7 @@ $rules = [
             'throw',
             'use',
             'use_trait',
-        ]
+        ],
     ],
     'no_blank_lines_after_class_opening' => true,
     'no_blank_lines_after_phpdoc' => true,
@@ -61,11 +62,11 @@ $rules = [
     'no_leading_import_slash' => true,
     'no_leading_namespace_whitespace' => true,
     'no_mixed_echo_print' => [
-        'use' => 'echo'
+        'use' => 'echo',
     ],
     'no_multiline_whitespace_around_double_arrow' => true,
     'multiline_whitespace_before_semicolons' => [
-        'strategy' => 'no_multi_line'
+        'strategy' => 'no_multi_line',
     ],
     'no_short_bool_cast' => true,
     'no_singleline_whitespace_before_semicolons' => true,
@@ -84,20 +85,21 @@ $rules = [
     'normalize_index_brace' => true,
     'not_operator_with_successor_space' => true,
     'object_operator_without_whitespace' => true,
-    'ordered_imports' => ['sortAlgorithm' => 'alpha'],
+    'ordered_imports' => ['sort_algorithm' => 'alpha'],
     'phpdoc_indent' => true,
-    'phpdoc_inline_tag' => true,
+    'phpdoc_inline_tag_normalizer' => true,
     'phpdoc_no_access' => true,
     'phpdoc_no_package' => true,
     'phpdoc_no_useless_inheritdoc' => true,
     'phpdoc_scalar' => true,
     'phpdoc_single_line_var_spacing' => true,
     'phpdoc_summary' => false,
+    'phpdoc_tag_type' => true,
     'phpdoc_to_comment' => false, // TODO: Enable?
     'phpdoc_trim' => true,
     'phpdoc_types' => true,
     'phpdoc_var_without_name' => true,
-    'psr4' => false, // TODO: Enable?
+    'psr_autoloading' => false, // TODO: Enable?
     'self_accessor' => false, // TODO: Enable?
     'short_scalar_cast' => true,
     'simplified_null_return' => false, // disabled by Shift
@@ -107,7 +109,7 @@ $rules = [
     'single_import_per_statement' => true,
     'single_line_after_imports' => true,
     'single_line_comment_style' => [
-        'comment_types' => ['hash']
+        'comment_types' => ['hash'],
     ],
     'single_quote' => true,
     'space_after_semicolon' => true,
@@ -115,11 +117,11 @@ $rules = [
     'switch_case_semicolon_to_colon' => true,
     'switch_case_space' => true,
     'ternary_operator_spaces' => true,
-    'trailing_comma_in_multiline_array' => true,
+    'trailing_comma_in_multiline' => true,
     'trim_array_spaces' => true,
     'unary_operator_spaces' => true,
     'visibility_required' => [
-        'elements' => ['method', 'property']
+        'elements' => ['property', 'method', 'const'],
     ],
     'whitespace_after_comma_in_array' => true,
 ];
@@ -134,8 +136,7 @@ $finder = Finder::create()
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
-return Config::create()
+return (new Config)
     //->setRiskyAllowed(true)
     ->setFinder($finder)
     ->setRules($rules);
-
