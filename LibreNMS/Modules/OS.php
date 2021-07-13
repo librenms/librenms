@@ -51,7 +51,7 @@ class OS implements Module
 
     public function poll(\LibreNMS\OS $os)
     {
-        $deviceModel = $os->getDevice();
+        $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
             $os->pollOS();
         } else {
