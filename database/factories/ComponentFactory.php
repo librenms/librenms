@@ -22,7 +22,7 @@ class ComponentFactory extends Factory
     public function definition()
     {
         return [
-            'device_id' => $this->faker->randomDigit,
+            'device_id' => $this->faker->randomDigit(),
             'type' => $this->faker->regexify('[A-Za-z0-9]{4,20}'),
         ];
     }

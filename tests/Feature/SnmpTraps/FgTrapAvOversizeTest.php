@@ -33,8 +33,7 @@ class FgTrapAvOversizeTest extends SnmpTrapTestCase
 {
     public function testAvOversize()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81

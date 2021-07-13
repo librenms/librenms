@@ -34,8 +34,7 @@ class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
     public function testConfigChangeTrap()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -55,8 +54,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX22
 
     public function testConfigRollbackTrap()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
