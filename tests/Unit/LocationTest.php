@@ -52,7 +52,6 @@ class LocationTest extends TestCase
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->make(); /** @var Location $location */
-
         $device->override_sysLocation = true;
         $device->setLocation($location->location);
         $this->assertNull($device->location);
@@ -96,7 +95,6 @@ class LocationTest extends TestCase
         Config::set('geoloc.dns', false);
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->withCoordinates()->make(); /** @var Location $location */
-
         $device->setLocation($location);
         $this->assertEquals($location->location, $device->location->location);
         $this->assertEquals($location->location, $device->location->display());
@@ -110,7 +108,6 @@ class LocationTest extends TestCase
         $device = Device::factory()->make(); /** @var Device $device */
         $locationOne = Location::factory()->withCoordinates()->make(); /** @var Location $locationOne */
         $locationTwo = Location::factory(['location' => $locationOne->location])->withCoordinates()->make(); /** @var Location $locationTwo */
-
         $device->setLocation($locationOne);
         $this->assertEquals($locationOne->lat, $device->location->lat);
         $this->assertEquals($locationOne->lng, $device->location->lng);
@@ -141,7 +138,6 @@ class LocationTest extends TestCase
         Config::set('geoloc.dns', true);
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->withCoordinates()->make(); /** @var Location $location */
-
         $this->mock(Dns::class, function (MockInterface $mock) use ($location) {
             $mock->shouldReceive('getCoordinates')->once()->andReturn($location->only(['lat', 'lng']));
         });
@@ -162,7 +158,6 @@ class LocationTest extends TestCase
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->withCoordinates()->make(); /** @var Location $location */
-
         $this->mock(Geocoder::class, function (MockInterface $mock) use ($location) {
             $mock->shouldReceive('getCoordinates')->once()->andReturn($location->only(['lat', 'lng']));
         });
@@ -192,7 +187,6 @@ class LocationTest extends TestCase
         $location_fixed = Location::factory()->withCoordinates()->make(); /** @var Location $location_fixed */
         $location_api = Location::factory()->withCoordinates()->make(); /** @var Location $location_api */
         $location_dns = Location::factory()->withCoordinates()->make(); /** @var Location $location_dns */
-
         Config::set('geoloc.dns', true);
         $this->mock(Dns::class, function (MockInterface $mock) use ($location_dns) {
             $mock->shouldReceive('getCoordinates')->times(3)->andReturn(

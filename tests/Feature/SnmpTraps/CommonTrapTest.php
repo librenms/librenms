@@ -71,7 +71,6 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
     public function testGenericTrap()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -91,7 +90,6 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
     public function testAuthorization()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -109,7 +107,6 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
     public function testBridgeNewRoot()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
@@ -127,7 +124,6 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
     public function testBridgeTopologyChanged()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
@@ -145,7 +141,6 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::topologyChange";
     public function testColdStart()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:1:12.7
@@ -163,7 +158,6 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart";
     public function testWarmStart()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:2:12.7
@@ -181,7 +175,6 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::warmStart";
     public function testEntityDatabaseChanged()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35

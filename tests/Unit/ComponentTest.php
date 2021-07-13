@@ -38,7 +38,6 @@ class ComponentTest extends DBTestCase
     public function testDeleteComponent()
     {
         $target = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $target */
-
         $this->assertTrue(\App\Models\Component::where('id', $target->id)->exists(), 'Failed to create component, this shouldn\'t happen');
 
         $component = new Component();

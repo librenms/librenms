@@ -32,10 +32,12 @@ class Ipv4AddressFactory extends Factory
             'ipv4_prefixlen' => $prefix,
             'port_id' => function () {
                 $port = Port::factory()->create(); /** @var Port $port */
+
                 return $port->port_id;
             },
             'ipv4_network_id' => function () use ($ip) {
                 $ipv4 = Ipv4Network::factory()->create(['ipv4_network' => $ip->getNetworkAddress() . '/' . $ip->cidr]); /** @var Ipv4Address $ipv4 */
+
                 return $ipv4->ipv4_network_id;
             },
         ];

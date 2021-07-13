@@ -29,7 +29,6 @@ class LoginTest extends DuskTestCase
             $user = User::factory()->create([
                 'password' => password_hash($password, PASSWORD_DEFAULT),
             ]); /** @var User $user */
-
             $browser->visit(new LoginPage())
                 ->type('username', $user->username)
                 ->type('password', 'wrong_password')

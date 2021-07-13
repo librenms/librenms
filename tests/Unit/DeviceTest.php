@@ -37,7 +37,6 @@ class DeviceTest extends DBTestCase
     public function testFindByHostname()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $found = Device::findByHostname($device->hostname);
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
@@ -73,7 +72,6 @@ class DeviceTest extends DBTestCase
     public function testFindByIp()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $found = Device::findByIp($device->ip);
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
@@ -83,7 +81,6 @@ class DeviceTest extends DBTestCase
     {
         $ip = '192.168.234.32';
         $device = Device::factory()->create(['hostname' => $ip]); /** @var Device $device */
-
         $found = Device::findByIp($ip);
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');

@@ -36,7 +36,6 @@ class JnxBgpM2Test extends SnmpTrapTestCase
     public function testBgpPeerUnknown()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91

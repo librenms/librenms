@@ -33,7 +33,6 @@ class AdvaStateChangeTrapTest extends SnmpTrapTestCase
     public function testAccessPortChg()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68
@@ -57,7 +56,6 @@ ADVA-MIB::neEventLogTimeStamp.48 2018-12-10,11:20:40.7,-6:0";
     public function testNetworkPortChg()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68
@@ -81,7 +79,6 @@ ADVA-MIB::neEventLogTimeStamp.19 2018-12-10,11:17:7.9,-6:0";
     public function testFlowStateChg()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68

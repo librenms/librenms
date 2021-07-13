@@ -34,7 +34,6 @@ class TrippliteTrapTest extends SnmpTrapTestCase
     public function testTlpNotificationsAlarmEntryAdded()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:46024->[1.1.1.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:55:34.92
@@ -63,7 +62,6 @@ TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a";
     public function testTlpNotificationsAlarmEntryRemoved()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $trapText = "$device->hostname
 UDP: [$device->ip]:46024->[1.1.1.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:56:40.26

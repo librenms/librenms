@@ -138,6 +138,7 @@ class TopDevicesController extends WidgetController
             ->when($settings['device_group'], function ($query) use ($settings) {
                 /** @var Builder<\App\Models\DeviceRelatedModel> $query */
                 $inDeviceGroup = $query->inDeviceGroup($settings['device_group']); /** @var Builder $inDeviceGroup */
+
                 return $inDeviceGroup;
             });
     }

@@ -39,7 +39,6 @@ class OspfNbrStateChangeTest extends SnmpTrapTestCase
     public function testOspfNbrDown()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
@@ -71,7 +70,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfNbrFull()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'down']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
@@ -103,7 +101,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfNbrOther()
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
