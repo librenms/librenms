@@ -27,7 +27,7 @@ abstract class Plugin
         echo view(self::viewPath(), compact('name'));
     }
 
-    public function plugin()
+    public function settings()
     {
         $name = self::className();
         echo view(self::viewPath(), compact('name'));
