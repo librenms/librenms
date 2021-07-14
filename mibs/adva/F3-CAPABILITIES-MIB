@@ -13,22 +13,37 @@ IMPORTS
              FROM  CM-COMMON-MIB;
 
 f3CapabilityMIB  MODULE-IDENTITY
-    LAST-UPDATED    "201107080000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202002180000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Capabilities MIB definitions used by 
              the F3 (FSP150CC) product lines.
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201107080000Z"
+             Copyright (C) ADVA."
+    REVISION        "202002180000Z"
     DESCRIPTION
         "
+         Notes from release 202002180000Z
+              - Added f3Rfc2544Capabilities
+
+         Notes from release 201903110000Z
+              - Added f3NidXG118PROACSHCapabilities
+ 
+         Notes from release 201809240000Z
+              - Added f3NidXG118PROSHCapabilities
+ 
+         Notes from release 201804190000Z
+              - Added f3NidXG116PROHCapabilities
+ 
          Notes from release 201107080000Z
                -Added capabilities for 
                     ethernetNTEGE206CardFineGrainedPmInterval,
@@ -900,14 +915,6 @@ f3CommonVendorSpecificCapabilities  AGENT-CAPABILITIES
           ACCESS     not-implemented
           DESCRIPTION "neStorageAvailable is not implemented"
 
-      -- {fsp150cm 2}
-      SUPPORTS CM-SYSTEM-MIB   
-      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
-
-          VARIATION   tftpEnabled
-          ACCESS      read-only
-          DESCRIPTION "tftp is enabled by default and it is restricted to read-only"
-
       -- {fsp150cm 6}
       SUPPORTS CM-ALARM-MIB 
       INCLUDES { cmAlmObjectGroup, cmAlmNotifGroup }
@@ -985,7 +992,8 @@ f3FacilityCapabilities  AGENT-CAPABILITIES
                  ethernetMgmtPortGroup, bitsPortGroup, 
                  trafficGroup, prioMapGroup, pcpEncodeGroup, cpdV2Group,
                  f3Gps10MhzPortGroup, f3PulsePerSecondPortGroup, 
-                 f3TimeOfDayPortGroup }
+                 f3TimeOfDayPortGroup, f3PolicerEnvelopeGroup, cmNetPortExpDeGroup,
+                 cmNetPortIpPrecDeGroup, cmNetPortEncapPcpDeGroup }
           VARIATION  cmEthernetAccPortLinkLossFwdSignalType
           ACCESS     read-only
           DESCRIPTION "Deprecated object - not supported."
@@ -2725,7 +2733,8 @@ f3PortMirrorCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS F3-PORTMIRROR-MIB
       INCLUDES { f3MirrorSessionGroup, f3PortMirrorAccPortExtGroup,
-                 f3MonitorPortStatsGroup, f3MirrorSessionStatsTable }
+                 f3MonitorPortStatsGroup, f3MirrorSessionStatsTable,
+                 f3PortMirrorEgressMonitorFpGroup, f3PortMirrorAclRuleGroup }
 
     ::= {f3CapabilityDefinitions 50}
 
@@ -3252,6 +3261,9 @@ f3Nid112ProCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe112ProCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 55}
 
@@ -3263,6 +3275,9 @@ f3Nid112ProMCapabilities  AGENT-CAPABILITIES
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe112ProMCardGroup }
 
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+
     ::= {f3CapabilityDefinitions 56}
 
 f3Nid114ProCapabilities  AGENT-CAPABILITIES
@@ -3272,6 +3287,9 @@ f3Nid114ProCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe114ProCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 57}
 
@@ -3282,6 +3300,9 @@ f3Nid114ProCCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe114ProCCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 58}
 
@@ -3292,6 +3313,9 @@ f3Nid114ProSHCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe114ProSHCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 59}
 
@@ -3302,6 +3326,9 @@ f3Nid114ProCSHCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe114ProCSHCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 60}
 
@@ -3312,6 +3339,9 @@ f3Nid114ProHECapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe114ProHECardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 61}
 
@@ -3322,19 +3352,22 @@ f3Nid112ProHCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe112ProHCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 62}
 
 f3ConnectGuardCapabilities  AGENT-CAPABILITIES
     PRODUCT-RELEASE  "F3- family of products"
     STATUS           current
-    DESCRIPTION      "SNMP vendor specific Connect Guard capabilities for F3 product" 
+    DESCRIPTION      "SNMP vendor specific Connect Guard capabilities for F3 product"
 
       SUPPORTS F3-CONNECTGUARD-MIB
       INCLUDES { f3ConnectGuardObjectsGroup, f3ConnectGuardPerfGroup }
 
       SUPPORTS IEEE8021-SECY-MIB
-      INCLUDES { secyIfCtrlGroup, secyTxSCGroup, secyTxSAGroup, secyRxSCGroup, 
+      INCLUDES { secyIfCtrlGroup, secyTxSCGroup, secyTxSAGroup, secyRxSCGroup,
                  secyRxSAGroup, secyCipherSuiteGroup, secyTxSAStatsGroup, secyRxSAStatsGroup,
                  secyTxSCStatsGroup, secyRxSCStatsGroup, secyStatsGroup }
 
@@ -3415,10 +3448,54 @@ f3ConnectGuardCapabilities  AGENT-CAPABILITIES
 f3L3Capabilities  AGENT-CAPABILITIES
     PRODUCT-RELEASE  "F3- family of products"
     STATUS           current
-    DESCRIPTION      "SNMP vendor specific L3 capabilities for F3 product" 
+    DESCRIPTION      "SNMP vendor specific L3 Service Model capabilities for F3 XG products"
 
       SUPPORTS F3-L3-MIB
       INCLUDES { f3L3ObjectsGroup, f3L3PerfGroup }
+
+      VARIATION  f3VrfIpVersion
+      ACCESS     not-implemented
+      DESCRIPTION "f3VrfIpVersion is not supported"
+        
+      VARIATION  f3VrfPingIpv6Destination
+      ACCESS     not-implemented
+      DESCRIPTION "f3VrfPingIpv6Destination is not supported"
+        
+      VARIATION  f3VrfTraceRouteIpv6Destination
+      ACCESS     not-implemented
+      DESCRIPTION "f3VrfTraceRouteIpv6Destination is not supported"
+
+      VARIATION  cmL3QosPolicerStatsFMYD
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosPolicerStatsFMYD is not supported"
+        
+      VARIATION  cmL3QosPolicerHistoryFMYD
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosPolicerHistoryFMYD is not supported"
+        
+      VARIATION  cmL3QosShaperStatsBR
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosShaperStatsBR is not supported"
+        
+      VARIATION  cmL3QosShaperStatsFR
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosShaperStatsFR is not supported"
+        
+      VARIATION  cmL3QosShaperStatsABRRLR
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosShaperStatsABRRLR is not supported"
+              
+      VARIATION  cmL3QosShaperHistoryBR
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosShaperHistoryBR is not supported"
+        
+      VARIATION  cmL3QosShaperHistoryFR
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosShaperHistoryFR is not supported"
+        
+      VARIATION  cmL3QosShaperHistoryABRRLR
+      ACCESS     not-implemented
+      DESCRIPTION "cmL3QosShaperHistoryABRRLR is not supported"
 
     ::= {f3CapabilityDefinitions 64}
 
@@ -3430,6 +3507,9 @@ f3Nid114GCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS CM-ENTITY-MIB
       INCLUDES { nteGe114GCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
 
     ::= {f3CapabilityDefinitions 65}
 
@@ -3444,7 +3524,87 @@ f3BfdCapabilities  AGENT-CAPABILITIES
 
       SUPPORTS BFD-STD-MIB
       INCLUDES { bfdSessionGroup, bfdSessionReadOnlyGroup, 
-                 bfdSessionPerfGroup, bfdSessionPerfHCGroup }
+                 bfdSessionPerfGroup }
+                 
+      VARIATION  bfdAdminStatus
+      ACCESS     not-implemented
+      DESCRIPTION "bfdAdminStatus is not implemented"
+        
+      VARIATION  bfdOperStatus
+      ACCESS     not-implemented
+      DESCRIPTION "bfdOperStatus is not implemented"
+        
+      VARIATION  bfdNotificationsEnable
+      ACCESS     not-implemented
+      DESCRIPTION "bfdNotificationsEnable is not implemented"
+        
+      VARIATION  bfdSessIndexNext
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessIndexNext is not implemented"
+
+      VARIATION  bfdSessEchoSourceUdpPort
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessEchoSourceUdpPort is not implemented"
+      
+      VARIATION  bfdSessOperStatus
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessOperStatus is not implemented"
+    
+      VARIATION  bfdSessDemandModeDesiredFlag
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessDemandModeDesiredFlag is not implemented"
+    
+      VARIATION  bfdSessControlPlaneIndepFlag
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessControlPlaneIndepFlag is not implemented"
+    
+      VARIATION  bfdSessGTSM
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessGTSM is not implemented"
+    
+      VARIATION  bfdSessGTSMTTL
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessGTSMTTL is not implemented"
+
+      VARIATION  bfdSessReqMinEchoRxInterval
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessReqMinEchoRxInterval is not implemented"
+       
+      VARIATION  bfdSessNegotiatedEchoInterval
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessNegotiatedEchoInterval is not implemented"
+        
+      VARIATION  bfdSessAuthPresFlag
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessAuthPresFlag is not implemented"
+
+      VARIATION  bfdSessAuthenticationType
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessAuthenticationType is not implemented"
+
+      VARIATION  bfdSessAuthenticationKeyID
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessAuthenticationKeyID is not implemented"
+        
+      VARIATION  bfdSessPerfEchoPktIn
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessPerfEchoPktIn is not implemented"
+
+      VARIATION  bfdSessPerfEchoPktOut
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessPerfEchoPktOut is not implemented"
+        
+      VARIATION  bfdSessPerfEchoPktDrop
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessPerfEchoPktDrop is not implemented"
+        
+      VARIATION  bfdSessPerfEchoPktDropLastTime
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessPerfEchoPktDropLastTime is not implemented"
+        
+      VARIATION  bfdSessPerfDiscTime
+      ACCESS     not-implemented
+      DESCRIPTION "bfdSessPerfDiscTime is not implemented"
 
     ::= {f3CapabilityDefinitions 66}
 
@@ -3476,5 +3636,736 @@ f3FpmCapabilities  AGENT-CAPABILITIES
                  f3FpmPerfNotifGroup }
 
     ::= {f3CapabilityDefinitions 68}
+
+f3Nid114ProVMHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProVMH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGE114ProVmHCardGroup }
+
+    ::= {f3CapabilityDefinitions 69}
+
+f3Nid114ProVMCHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProVMCH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGE114ProVmCHCardGroup }
+
+    ::= {f3CapabilityDefinitions 70}
+
+f3Nid114ProVMCSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProVMCSH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGE114ProVmCSHCardGroup }
+
+    ::= {f3CapabilityDefinitions 71}
+
+f3NidGe101ProCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE101Pro for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe101ProCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+
+    ::= {f3CapabilityDefinitions 72}
+
+f3NidGo102ProSCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Go102ProS for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGo102ProSCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+
+    ::= {f3CapabilityDefinitions 73}
+
+f3NidGo102ProSPCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Go102ProSP for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGo102ProSPCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+
+    ::= {f3CapabilityDefinitions 74}
+
+f3NidCx101Pro30ACapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Pro Cx101Pro30a for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteCx101Pro30ACardGroup }
+
+    ::= {f3CapabilityDefinitions 75}
+
+f3NidCx102Pro30ACapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Cx102Pro30a for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteCx102Pro30ACardGroup }
+
+    ::= {f3CapabilityDefinitions 76}
+
+f3IpfixCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific IPFIX for F3 product family." 
+
+      SUPPORTS F3-IPFIX-MIB
+      INCLUDES { f3IPFIXGroup }
+
+    ::= {f3CapabilityDefinitions 77}
+
+f3VxlanCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Vxlan for F3 product family." 
+
+      SUPPORTS F3-VXLAN-MIB
+      INCLUDES { f3VXLANConfigGroup }
+
+    ::= {f3CapabilityDefinitions 78}
+
+f3GreCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GRE for F3 product family." 
+
+      SUPPORTS F3-GRE-MIB
+      INCLUDES { f3GreConfigGroup }
+
+    ::= {f3CapabilityDefinitions 79}
+    
+f3NtpCapabilities  AGENT-CAPABILITIES 
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific NTP capabilities for F3 product" 
+
+      SUPPORTS F3-NTP-MIB
+      INCLUDES { f3NtpObjectGroup, f3NtpPerfObjectGroup }
+
+    ::= {f3CapabilityDefinitions 80}
+    
+f3ElpCapabilities  AGENT-CAPABILITIES 
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific ELP capabilities for F3 product" 
+
+      SUPPORTS F3-ELP-MIB
+      INCLUDES { f3ElpGroupGroup, f3ElpUnitGroup, f3ElpUnitStatsGroup }
+
+    ::= {f3CapabilityDefinitions 81}
+
+f3NidXG116PROCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 products - XG116PRO"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteXg116ProCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG116PROCardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 82}
+
+f3NidXG120PROCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 products - XG120PRO"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteXg120ProCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG120PROCardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 83}
+
+f3FacilityCapabilitiesXGPRO  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Facility capabilities for the F3 XGPRO products"
+
+      -- {fsp150cm 4}
+      SUPPORTS CM-FACILITY-MIB   
+      INCLUDES { ethernetMgmtPortGroup, cmEthernetTrafficPortPcpGroup, 
+                 cmEthernetTrafficPortGroup, cmFlowPointGroup, 
+                 cmPrioMapV2ProfileGroup, cmPrioMapV2IngressPrioMappingGroup, 
+                 cmEthernetTrafficPortJdsuExtGroup, f3FpQosShaperGroup, 
+                 f3FpQosPolicerGroup, cpdV2TrafficPortGroup, 
+                 cmMPFlowGroup, cmMPFlowMemberGroup, f3AclRuleGroup, 
+                 f3EthernetTrafficPortExpDeGroup, cmTrafficPortQosShaperGroup }
+
+          VARIATION cmEthernetTrafficPortIngressPrioMapMode
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortIngressPrioMapMode is not supported"
+
+          VARIATION cmEthernetTrafficPortSvcType
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortSvcType is not supported"
+          
+          VARIATION cmEthernetTrafficPortTagFrameControl
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortTagFrameControl is not supported"
+          
+          VARIATION cmEthernetTrafficPortSfpLaserWaveLengthPicometer
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortSfpLaserWaveLengthPicometer is not supported"
+          
+          VARIATION cmEthernetTrafficPortRowStatus
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortRowStatus is not supported"
+          
+          VARIATION cmEthernetTrafficPortDeleteEntitiesAction
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortDeleteEntitiesAction is not supported"
+          
+          VARIATION cmEthernetTrafficPortMaxMpFpNum
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortMaxMpFpNum is not supported"
+          
+          VARIATION cmEthernetTrafficPortJdsuLoopbackEnabled
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortJdsuLoopbackEnabled is not supported"
+          
+          VARIATION cmEthernetTrafficPortJdsuLoopbackVlanId
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortJdsuLoopbackVlanId is not supported"
+
+          VARIATION cmEthernetTrafficPortMcastRateLimitEnabled
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortMcastRateLimitEnabled is not supported"
+
+          VARIATION cmEthernetTrafficPortMcastRateLimitSpeedLo
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortMcastRateLimitSpeedLo is not supported"
+          
+          VARIATION cmEthernetTrafficPortMcastRateLimitSpeedHi
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortMcastRateLimitSpeedHi is not supported"
+          
+          VARIATION cmEthernetTrafficPortBcastRateLimitEnabled
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortBcastRateLimitEnabled is not supported"
+          
+          VARIATION cmEthernetTrafficPortBcastRateLimitSpeedLo
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortBcastRateLimitSpeedLo is not supported"
+          
+          VARIATION cmEthernetTrafficPortBcastRateLimitSpeedHi
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortBcastRateLimitSpeedHi is not supported"
+          
+          VARIATION cmEthernetTrafficPortCombinedRateLimitEnabled
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortCombinedRateLimitEnabled is not supported"
+          
+          VARIATION cmEthernetTrafficPortCombinedRateLimitSpeedLo
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortCombinedRateLimitSpeedLo is not supported"
+          
+          VARIATION cmEthernetTrafficPortCombinedRateLimitSpeedHi
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortCombinedRateLimitSpeedHi is not supported"
+          
+          VARIATION cmEthernetTrafficPortIngressCOSPriority
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortIngressCOSPriority is not supported"
+          
+          VARIATION cmEthernetTrafficPortIngressPopPriorityVidEnabled
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortIngressPopPriorityVidEnabled is not supported"
+          
+          VARIATION cmEthernetTrafficPortEgressPopPriorityVidEnabled
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortEgressPopPriorityVidEnabled is not supported"
+          
+          VARIATION cmEthernetTrafficPortPriorityVlanId
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortPriorityVlanId is not supported"
+
+          VARIATION cmFlowPointColorMarkingSupported
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointColorMarkingSupported is not supported"
+          
+          VARIATION cmFlowPointAssociatedAclProfile
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointAssociatedAclProfile is not supported"
+          
+          VARIATION cmFlowPointWfqQid
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointWfqQid is not supported"
+          
+          VARIATION cmFlowPointWfqOutPriority
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointWfqOutPriority is not supported"
+
+      -- {fsp150cm 5}
+      SUPPORTS CM-PERFORMANCE-MIB   
+      INCLUDES { cmXgProPerfNotifGroup, cmEthernetTrafficPortPerfGroup,
+                 flowPointPmGroup, f3FpQosShaperPerfGroup, 
+                 f3FpQosPolicerPerfGroup, f3AclRulePerfGroup }
+
+          VARIATION cmEthernetTrafficPortStatsATFD
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsATFD is not supported"
+
+          VARIATION cmEthernetTrafficPortStatsPSC
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsPSC is not supported"
+          
+          VARIATION cmEthernetTrafficPortStatsFmcd
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsFmcd is not supported"
+
+          VARIATION cmEthernetTrafficPortStatsFbcd
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsFbcd is not supported"
+
+          VARIATION cmEthernetTrafficPortStatsAclDropNoMatch
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsAclDropNoMatch is not supported"
+
+          VARIATION cmEthernetTrafficPortStatsAclFwd2Cpu
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsAclFwd2Cpu is not supported"
+
+          VARIATION cmEthernetTrafficPortStatsDhcpDropNoAssocIf
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortStatsDhcpDropNoAssocIf is not supported"
+
+
+          VARIATION cmEthernetTrafficPortHistoryATFD
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryATFD is not supported"
+
+          VARIATION cmEthernetTrafficPortHistoryPSC
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryPSC is not supported"
+          
+          VARIATION cmEthernetTrafficPortHistoryFmcd
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryFmcd is not supported"
+
+          VARIATION cmEthernetTrafficPortHistoryFbcd
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryFbcd is not supported"
+
+          VARIATION cmEthernetTrafficPortHistoryAclDropNoMatch
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryAclDropNoMatch is not supported"
+
+          VARIATION cmEthernetTrafficPortHistoryAclFwd2Cpu
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryAclFwd2Cpu is not supported"
+
+          VARIATION cmEthernetTrafficPortHistoryDhcpDropNoAssocIf
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetTrafficPortHistoryDhcpDropNoAssocIf is not supported"
+
+
+          VARIATION cmFlowPointStatsFREDD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsFREDD is not supported"
+          
+          VARIATION cmFlowPointStatsFACLD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsFACLD is not supported"
+
+          VARIATION cmFlowPointStatsFMYD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsFMYD is not supported"
+          
+          VARIATION cmFlowPointStatsFMGD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsFMGD is not supported"
+
+          VARIATION cmFlowPointStatsFD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsFD is not supported"
+
+          VARIATION cmFlowPointStatsBT
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsBT is not supported"
+
+          VARIATION cmFlowPointStatsFLD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointStatsFLD is not supported"
+          
+
+          VARIATION cmFlowPointHistoryFREDD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryFREDD is not supported"
+          
+          VARIATION cmFlowPointHistoryFACLD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryFACLD is not supported"
+
+          VARIATION cmFlowPointHistoryFMYD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryFMYD is not supported"
+          
+          VARIATION cmFlowPointHistoryFMGD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryFMGD is not supported"
+
+          VARIATION cmFlowPointHistoryFD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryFD is not supported"
+
+          VARIATION cmFlowPointHistoryBT
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryBT is not supported"
+
+          VARIATION cmFlowPointHistoryFLD
+          ACCESS    not-implemented
+          DESCRIPTION "cmFlowPointHistoryFLD is not supported"
+
+      ::= {f3CapabilityDefinitions 84}
+
+f3EoMplsCapabilitiesXG  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific EoMpls for the F3 XG products." 
+
+      SUPPORTS F3-EOMPLS-MIB
+      INCLUDES { f3EoMplsConfigGroup }
+
+          VARIATION f3NetPortExtEoMplsSrcIp
+          ACCESS    not-implemented
+          DESCRIPTION "f3NetPortExtEoMplsSrcIp is not supported"
+
+          VARIATION f3EoMplsPwEncapsulationEntity
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwEncapsulationEntity is not supported"
+          
+          VARIATION f3EoMplsPwDSCPMapControl
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwDSCPMapControl is not supported"
+
+          VARIATION f3EoMplsPwStatsIndex
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwStatsIndex is not supported"
+          
+          VARIATION f3EoMplsPwStatsIntervalType
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwStatsIntervalType is not supported"
+
+          VARIATION f3EoMplsPwStatsValid
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwStatsValid is not supported"
+          
+          VARIATION f3EoMplsPwStatsAction
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwStatsAction is not supported"
+
+          VARIATION f3EoMplsPwStatsTtlEqual0Drop
+          ACCESS    not-implemented
+          DESCRIPTION " is not supported"
+
+          VARIATION f3EoMplsPwHistoryIndex
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwHistoryIndex is not supported"
+
+          VARIATION f3EoMplsPwHistoryTime
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwHistoryTime is not supported"
+          
+          VARIATION f3EoMplsPwHistoryValid
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwHistoryValid is not supported"
+          
+          VARIATION f3EoMplsPwHistoryAction
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwHistoryAction is not supported"
+
+          VARIATION f3EoMplsPwHistoryTtlEqual0Drop
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwHistoryTtlEqual0Drop is not supported"
+          
+          VARIATION f3EoMplsPwThresholdIndex
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwThresholdIndex is not supported"
+
+          VARIATION f3EoMplsPwThresholdInterval
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwThresholdInterval is not supported"
+
+          VARIATION f3EoMplsPwThresholdVariable
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwThresholdVariable is not supported"
+
+          VARIATION f3EoMplsPwThresholdValueLo
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwThresholdValueLo is not supported"
+
+          VARIATION f3EoMplsPwThresholdValueHi
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwThresholdValueHi is not supported"
+
+          VARIATION f3EoMplsPwThresholdMonValue
+          ACCESS    not-implemented
+          DESCRIPTION "f3EoMplsPwThresholdMonValue is not supported"
+
+    ::= {f3CapabilityDefinitions 85}
+    
+f3Nid112ProVMCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE112ProVM for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGE112ProVmCardGroup }
+
+    ::= {f3CapabilityDefinitions 86}
+
+f3SystemCommonCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific System capabilities for the F3 products"
+
+      SUPPORTS CM-SYSTEM-MIB
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+          
+    ::= {f3CapabilityDefinitions 87}
+
+f3NidXG116PROHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 products - XG116PRO (H)"
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { commonEntityGroup, psuGroup, nteXg116ProHCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only
+          DESCRIPTION "neStorageType is restricted to read-only"
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG116PROHCardFineGrainedPmInterval
+          ACCESS     read-only
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 88}
+
+f3NidGo102ProSMCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Go102ProSM for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGo102ProSMCardGroup }
+      
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+
+    ::= {f3CapabilityDefinitions 89}
+
+f3NidXG118PROSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 products - XG118PRO (SH)"
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { commonEntityGroup, psuGroup, nteXg118ProSHCardGroup, serverCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only
+          DESCRIPTION "neStorageType is restricted to read-only"
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG118PROSHCardFineGrainedPmInterval
+          ACCESS     read-only
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 90}
+
+f3L3CapabilitiesGE  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific L3 Service Model capabilities for F3 GE products"
+
+      SUPPORTS F3-L3-MIB
+      INCLUDES { f3L3ObjectsGroup, f3L3PerfGroup }
+
+    ::= {f3CapabilityDefinitions 91}
+
+
+f3L3TrafficOSPFCapabilties  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Traffic OSPF for the F3 product family."
+
+      SUPPORTS F3-L3-MIB
+      INCLUDES { f3L3TrafficOspfGroup }
+
+    ::= {f3CapabilityDefinitions 92}
+
+f3L3TrafficBGPCapabilties  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Traffic BGP for the F3 product family."
+
+      SUPPORTS F3-L3-MIB
+      INCLUDES { f3L3TrafficBgpGroup }
+
+    ::= {f3CapabilityDefinitions 93}
+
+f3L3TrafficIPv6Capabilities AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Traffic IPv6 for the F3 product family."
+
+      SUPPORTS F3-L3-MIB
+      INCLUDES { f3L3TrafficIPv6Group }
+
+    ::= {f3CapabilityDefinitions 94}
+
+f3NidXG118PROACSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 products - XG118PROAC (SH)"
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { commonEntityGroup, psuGroup, nteXg118ProacSHCardGroup, serverCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only
+          DESCRIPTION "neStorageType is restricted to read-only"
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG118PROACSHCardFineGrainedPmInterval
+          ACCESS     read-only
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 95}
+
+f3Nid114ProVMSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProVMSH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGE114ProVmSHCardGroup }
+
+    ::= {f3CapabilityDefinitions 96}
+
+f3NidGe104Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE104 for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGE104CardGroup }
+
+    ::= {f3CapabilityDefinitions 97}
+
+
+f3NidXG120PROSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 products - XG120PROSH"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteXg120ProSHCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG120PROSHCardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 98}
+
+f3Rfc2544Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Rfc2544 capabilities for F3 product family." 
+
+      SUPPORTS F3-RFC2544-MIB
+      INCLUDES { f3Rfc2544Group }
+
+    ::= {f3CapabilityDefinitions 99}
 
 END

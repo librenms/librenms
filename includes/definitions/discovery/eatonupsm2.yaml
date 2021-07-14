@@ -15,6 +15,30 @@ modules:
                     oid: xupsEnvironment
                     value: xupsEnvAmbientTemp
                     num_oid: '.1.3.6.1.4.1.534.1.6.1.{{ $index }}'
-                    descr: 'Environment'
+                    descr: 'Ambient'
                     index: 'xupsEnvAmbientTemp.{{ $index }}'
-
+                -
+                    oid: xupsEnvironment
+                    value: xupsEnvRemoteTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.5.{{ $index }}'
+                    descr: 'Remote'
+                    index: 'xupsEnvRemoteTemp.{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: xupsEnvironment
+                    value: xupsEnvRemoteHumidity
+                    num_oid: '.1.3.6.1.4.1.534.1.6.6.{{ $index }}'
+                    descr: 'Humidity'
+                    index: 'xupsEnvRemoteHumidity.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: xupsEnvironment
+                    value: xupsContactState
+                    num_oid: '.1.3.6.1.4.1.534.1.6.8.1.3.{{ $index }}'
+                    descr: 'Contact {{ $index }}'
+                    index: 'xupsContactState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: open, graph: 1, generic: 2 }
+                        - { value: 2, descr: closed, graph: 1, generic: 2 }

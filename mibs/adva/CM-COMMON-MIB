@@ -9,22 +9,44 @@ IMPORTS
              FROM  ADVA-MIB;
 
 cmCommonMIB MODULE-IDENTITY
-    LAST-UPDATED    "201607110000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202101270000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Common MIB definitions used by 
              the FSP150CM and FSP150CC product lines. 
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201607110000Z"
+             Copyright (C) ADVA."
+    REVISION        "202101270000Z"
     DESCRIPTION
-            "Notes from release 201611100000Z
+            "
+             Notes from release 202005120000Z,
+             (1) Added TEXTUAL-CONVENTION: SfpIdentifierValue.
+
+             Notes from release 201908140000Z
+             (1) add xg120Proac product
+
+             Notes from release 201903110000Z
+             (1) add xg118ProacSH product
+
+             Notes from release 201809240000Z
+             (1) add xg118ProSH product
+
+             Notes from release 201807260000Z
+             (1) add ge102ProH and ge102ProEFMH product
+             
+             Notes from release 201804190000Z
+             (1) add xg116ProH product
+
+             Notes from release 201611100000Z
              (1) add xg116Pro product
              (2) add xg120Pro subproduct  
              Notes from release 201607110000Z
@@ -186,6 +208,33 @@ xg116Pro           OBJECT IDENTIFIER ::= { subproducts 39 }
 
 -- XG120Pro NID product
 xg120Pro           OBJECT IDENTIFIER ::= { subproducts 40 }
+
+-- XG116ProH NID product
+xg116ProH          OBJECT IDENTIFIER ::= { subproducts 41 }
+
+-- ge102ProH NID product
+ge102ProH          OBJECT IDENTIFIER ::= { subproducts 42 }
+
+-- ge102ProEFMH NID product
+ge102ProEFMH       OBJECT IDENTIFIER ::= { subproducts 43 }
+
+-- GO102PROSM NID product
+go102ProSM         OBJECT IDENTIFIER ::= { subproducts 44 }
+
+-- XG118ProSH NID product
+xg118ProSH         OBJECT IDENTIFIER ::= { subproducts 45 }
+
+-- XG118ProSH NID product
+xg118ProacSH       OBJECT IDENTIFIER ::= { subproducts 46 }
+
+-- GE114ProVMSH NID product (GE114ProVMSH with 4 Access Ports with SFPs)
+ge114ProVMSH       OBJECT IDENTIFIER ::= { subproducts 47 } 
+
+-- GE104 NID product (GE104 with 4 Access Ports with SFPs)
+ge104              OBJECT IDENTIFIER ::= { subproducts 48 }
+
+-- XG120ProSH NID product
+xg120ProSH         OBJECT IDENTIFIER ::= { subproducts 49 }
 
 -- 
 -- Textual Conventions 
@@ -398,7 +447,9 @@ EthernetMediaType ::= TEXTUAL-CONVENTION
                    fiber(2),
                    coppersfp(3),  --enumeration added in R4.4CC
                    auto(4),
-                   none(5)
+                   none(5),
+                   xdsl(6),
+                   vmServerBackplane(7)
                  }
 
 PerfCounter64 ::= TEXTUAL-CONVENTION
@@ -483,6 +534,26 @@ SfpConnectorValue ::= TEXTUAL-CONVENTION
                 rj45(16)
               }
 
+SfpIdentifierValue ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+          "This lists the SFP identifier values."
+    SYNTAX    INTEGER {
+                notApplicable(0),
+                unknown(1),
+                gbic(2),
+                modsol(3),
+                sfp(4),
+                xbi300pin(5),
+                xenpak(6),
+                xfp(7),
+                xff(8),
+                xfpE(9),
+                xpak(10),
+                x2(11),
+                vendorSpecific(12)
+              }
+
 RestartType ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
@@ -490,7 +561,10 @@ RestartType ::= TEXTUAL-CONVENTION
     SYNTAX       INTEGER {
                    not-applicable(0),
                    warm-start (1),
-                   cold-start (2)
+                   cold-start (2),
+                   boot-maintenance (3),
+                   boot-normal (4),
+                   boot-pxe (5)
                  }
 
 SfpMediaType ::= TEXTUAL-CONVENTION
@@ -695,7 +769,7 @@ Decimal32 ::= TEXTUAL-CONVENTION
          "The value is encoded in a Decimal32 interchange format.
          The decimal value should be calculated as follows:
 
-         (−1)^sign x 10^(exponent−101) x mantissa
+         (-1)^sign x 10^(exponent-101) x mantissa
 
          The individual components of the equation are coded in two different
          formats depending on the range of the mantissa.
@@ -743,5 +817,15 @@ FlowSecState ::= TEXTUAL-CONVENTION
                    unsecureNormal (3),
                    unsecureBlocked (4)
                   }
+
+UsbOperationalMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Types of usb operational mode."
+    SYNTAX       INTEGER {
+                   cellular-modem(1),
+                   srv-access (2),
+                   nte-access (3)
+                 }
 
 END

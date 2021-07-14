@@ -39,6 +39,7 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
+use Illuminate\Support\Collection;
 
 class ObjectCache
 {
@@ -47,10 +48,13 @@ class ObjectCache
     public static function applications()
     {
         return Cache::remember('ObjectCache:applications_list:' . auth()->id(), self::$cache_time, function () {
-            return Application::hasAccess(auth()->user())
-                ->select('app_type', 'app_state', 'app_instance')
+            $user = auth()->user(); /** @var \App\Models\User $user */
+            $applications = Application::hasAccess($user)
+                ->select(['app_type', 'app_state', 'app_instance'])
                 ->groupBy('app_type', 'app_state', 'app_instance')
-                ->get()
+                ->get(); /** @var Collection $applications */
+
+            return $applications
                 ->sortBy('show_name', SORT_NATURAL | SORT_FLAG_CASE)
                 ->groupBy('app_type');
         });
@@ -59,7 +63,7 @@ class ObjectCache
     public static function routing()
     {
         return Cache::remember('ObjectCache:routing_counts:' . auth()->id(), self::$cache_time, function () {
-            $user = auth()->user();
+            $user = auth()->user(); /** @var \App\Models\User $user */
 
             return [
                 'vrf' => Vrf::hasAccess($user)->count(),
@@ -76,7 +80,8 @@ class ObjectCache
     public static function sensors()
     {
         return Cache::remember('ObjectCache:sensor_list:' . auth()->id(), self::$cache_time, function () {
-            $sensor_classes = Sensor::hasAccess(auth()->user())->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
+            $user = auth()->user(); /** @var \App\Models\User $user */
+            $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
 
             $sensor_menu = [];
             foreach ($sensor_classes as $sensor_model) {
@@ -100,7 +105,7 @@ class ObjectCache
                 ];
             }
 
-            if (PrinterSupply::hasAccess(auth()->user())->exists()) {
+            if (PrinterSupply::hasAccess($user)->exists()) {
                 $sensor_menu[3] = [
                     [
                         'class' => 'toner',

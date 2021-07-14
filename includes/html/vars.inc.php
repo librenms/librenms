@@ -14,11 +14,13 @@ foreach ($_GET as $key => $get_var) {
 }
 
 $base_url = parse_url(Config::get('base_url'));
+$uri = explode('?', $_SERVER['REQUEST_URI'], 2)[0] ?? ''; // remove query, that is handled below with $_GET
+
 // don't parse the subdirectory, if there is one in the path
 if (isset($base_url['path']) && strlen($base_url['path']) > 1) {
-    $segments = explode('/', trim(str_replace($base_url['path'], '', $_SERVER['REQUEST_URI']), '/'));
+    $segments = explode('/', trim(str_replace($base_url['path'], '', $uri), '/'));
 } else {
-    $segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+    $segments = explode('/', trim($uri, '/'));
 }
 
 foreach ($segments as $pos => $segment) {
@@ -49,4 +51,4 @@ foreach ($_POST as $name => $value) {
 }
 
 // don't leak login data
-unset($vars['username'], $vars['password']);
+unset($vars['username'], $vars['password'], $uri, $base_url);

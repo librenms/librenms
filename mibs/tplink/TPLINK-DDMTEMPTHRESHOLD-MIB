@@ -1,0 +1,99 @@
+   TPLINK-DDMTEMPTHRESHOLD-MIB DEFINITIONS ::= BEGIN
+
+         IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE
+          	  	        FROM SNMPv2-SMI
+          	ifIndex
+						FROM RFC1213-MIB
+			DisplayString
+						FROM SNMPv2-TC
+			tplinkDdmManageMIBObjects
+						FROM TPLINK-DDMMANAGE-MIB;
+						
+		   		ddmTempThreshold MODULE-IDENTITY  
+				    LAST-UPDATED    "200908270000Z"
+				    ORGANIZATION    "TPLINK"
+				    CONTACT-INFO		"www.tplink.com"
+				    DESCRIPTION			"The config of DDM temperature threshold."
+				    REVISION        "200908270000Z"
+				    DESCRIPTION			"Initial version of this MIB module."
+				    ::= { tplinkDdmManageMIBObjects 2 } 
+			 												
+				ddmTempThresholdTable OBJECT-TYPE
+					SYNTAX SEQUENCE OF DDMTempThresholdEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A table that is used to configure the DDM Temperature Threshold for specific ports on the Switch."
+					::= { ddmTempThreshold 1 }
+				
+				ddmTempThresholdEntry OBJECT-TYPE
+					SYNTAX			DDMTempThresholdEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A list of information for every port."	
+					INDEX { ifIndex }
+					::= { ddmTempThresholdTable 1 }
+					
+				DDMTempThresholdEntry ::=
+				SEQUENCE
+				{
+                    ddmTempThresholdPort			DisplayString(SIZE(0..255)),
+					ddmTempThresholdHighAlarm		OCTET STRING(SIZE(0..30)),
+					ddmTempThresholdLowAlarm		OCTET STRING(SIZE(0..30)),
+					ddmTempThresholdHighWarn		OCTET STRING(SIZE(0..30)),
+					ddmTempThresholdLowWarn			OCTET STRING(SIZE(0..30)),
+					ddmTempThresholdPortLAG			OCTET STRING(SIZE(0..30))
+				}
+				         
+				ddmTempThresholdPort OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..255))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the port number."
+					::= { ddmTempThresholdEntry 1 }
+
+				ddmTempThresholdHighAlarm OBJECT-TYPE
+					SYNTAX 				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the highest threshold for the alarm."
+					::= { ddmTempThresholdEntry 2 }
+				
+				ddmTempThresholdLowAlarm OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the lowest threshold for the alarm."
+					::=	{ ddmTempThresholdEntry 3 }
+		        
+				ddmTempThresholdHighWarn OBJECT-TYPE
+					SYNTAX 				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the highest threshold for the warning."
+					::= { ddmTempThresholdEntry 4 }
+				
+				ddmTempThresholdLowWarn OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the lowest threshold for the warning."
+					::=	{ ddmTempThresholdEntry 5 }
+
+				ddmTempThresholdPortLAG OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the lag number of the port."
+					::= { ddmTempThresholdEntry 6 }
+																			
+END
+					

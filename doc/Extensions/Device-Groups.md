@@ -1,13 +1,15 @@
 source: Extensions/Device-Groups.md
 path: blob/master/doc/
 
+# Grouping Devices
+
 LibreNMS supports grouping your devices together in much the same way
 as you can configure alerts. This document will hopefully help you get
 started.
 
-# Dynamic Groups
+## Dynamic Groups
 
-## Rule Editor
+### Rule Editor
 
 The rule is based on the MySQL structure your data is in. Such as __tablename.columnname__.
 If you already know the entity you want, you can browse around inside
@@ -25,7 +27,7 @@ If you want to group them by DC, you could use the rule
 `devices.hostname` regex `dc1\..*\.example\.com` (Don't forget to
 escape periods in the regex)
 
-# Static Groups
+## Static Groups
 
 You can create static groups (and convert dynamic groups to static) to
 put specific devices in a group. Just select static as the type and

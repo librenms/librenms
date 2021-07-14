@@ -63,8 +63,8 @@ class PermissionsTest extends TestCase
             return self::devicePermissionData($user);
         });
 
-        $device = Device::factory()->make(['device_id' => 54]);
-        $user = User::factory()->make(['user_id' => 43]);
+        $device = Device::factory()->make(['device_id' => 54]); /** @var Device $device */
+        $user = User::factory()->make(['user_id' => 43]); /** @var User $user */
         $this->assertTrue($perms->canAccessDevice($device, 43));
         $this->assertTrue($perms->canAccessDevice($device, $user));
         $this->assertTrue($perms->canAccessDevice(54, $user));
@@ -88,7 +88,7 @@ class PermissionsTest extends TestCase
         });
 
         $this->assertEquals(collect([54, 32]), $perms->devicesForUser(43));
-        $user = User::factory()->make(['user_id' => 43]);
+        $user = User::factory()->make(['user_id' => 43]); /** @var User $user */
         $this->assertEquals(collect([54, 32]), $perms->devicesForUser($user));
         $this->assertEmpty($perms->devicesForUser(9));
         $this->assertEquals(collect(), $perms->devicesForUser());
@@ -122,8 +122,8 @@ class PermissionsTest extends TestCase
             (object) ['user_id' => 14, 'port_id' => 54],
         ]));
 
-        $port = Port::factory()->make(['port_id' => 54]);
-        $user = User::factory()->make(['user_id' => 43]);
+        $port = Port::factory()->make(['port_id' => 54]); /** @var Port $port */
+        $user = User::factory()->make(['user_id' => 43]); /** @var User $user */
         $this->assertTrue($perms->canAccessPort($port, 43));
         $this->assertTrue($perms->canAccessPort($port, $user));
         $this->assertTrue($perms->canAccessPort(54, $user));
@@ -149,7 +149,7 @@ class PermissionsTest extends TestCase
         ]));
 
         $this->assertEquals(collect([7, 2]), $perms->portsForUser(3));
-        $user = User::factory()->make(['user_id' => 3]);
+        $user = User::factory()->make(['user_id' => 3]); /** @var User $user */
         $this->assertEquals(collect([7, 2]), $perms->portsForUser($user));
         $this->assertEmpty($perms->portsForUser(9));
         $this->assertEquals(collect(), $perms->portsForUser());
@@ -167,8 +167,9 @@ class PermissionsTest extends TestCase
             (object) ['user_id' => 6, 'port_id' => 5],
         ]));
 
+        $port = Port::factory()->make(['port_id' => 7]); /** @var Port $port */
         $this->assertEquals(collect([4, 6]), $perms->usersForPort(5));
-        $this->assertEquals(collect([3]), $perms->usersForPort(Port::factory()->make(['port_id' => 7])));
+        $this->assertEquals(collect([3]), $perms->usersForPort($port));
         $this->assertEquals(collect(), $perms->usersForPort(6));
         $this->assertEmpty($perms->usersForPort(9));
     }
@@ -182,8 +183,8 @@ class PermissionsTest extends TestCase
             (object) ['user_id' => 14, 'bill_id' => 54],
         ]));
 
-        $bill = Bill::factory()->make(['bill_id' => 54]);
-        $user = User::factory()->make(['user_id' => 43]);
+        $bill = Bill::factory()->make(['bill_id' => 54]); /** @var Bill $bill */
+        $user = User::factory()->make(['user_id' => 43]); /** @var User $user */
         $this->assertTrue($perms->canAccessBill($bill, 43));
         $this->assertTrue($perms->canAccessBill($bill, $user));
         $this->assertTrue($perms->canAccessBill(54, $user));
@@ -209,7 +210,7 @@ class PermissionsTest extends TestCase
         ]));
 
         $this->assertEquals(collect([7, 2]), $perms->billsForUser(3));
-        $user = User::factory()->make(['user_id' => 3]);
+        $user = User::factory()->make(['user_id' => 3]); /** @var User $user */
         $this->assertEquals(collect([7, 2]), $perms->billsForUser($user));
         $this->assertEmpty($perms->billsForUser(9));
         $this->assertEquals(collect(), $perms->billsForUser());
@@ -228,7 +229,8 @@ class PermissionsTest extends TestCase
         ]));
 
         $this->assertEquals(collect([4, 6]), $perms->usersForBill(5));
-        $this->assertEquals(collect([3]), $perms->usersForBill(Bill::factory()->make(['bill_id' => 7])));
+        $bill = Bill::factory()->make(['bill_id' => 7]); /** @var Bill $bill */
+        $this->assertEquals(collect([3]), $perms->usersForBill($bill));
         $this->assertEquals(collect(), $perms->usersForBill(6));
         $this->assertEmpty($perms->usersForBill(9));
     }

@@ -54,7 +54,7 @@ class UserController extends Controller
         $this->authorize('manage', User::class);
 
         return view('user.index', [
-            'users' => User::orderBy('username')->get(),
+            'users' => User::with('preferences')->orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
         ]);
     }
@@ -70,7 +70,7 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $tmp_user = new User;
-        $tmp_user->can_modify_passwd = LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
+        $tmp_user->can_modify_passwd = (int) LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
 
         return view('user.create', [
             'user' => $tmp_user,

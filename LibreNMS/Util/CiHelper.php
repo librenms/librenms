@@ -206,7 +206,7 @@ class CiHelper
     {
         $cs_cmd = [
             $this->checkPhpExec('php-cs-fixer'),
-            '--config=.php_cs',
+            '--config=.php-cs-fixer.php',
             'fix',
             '-v',
         ];

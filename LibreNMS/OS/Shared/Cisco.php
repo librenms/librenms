@@ -405,7 +405,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         $device = $this->getDeviceArray();
 
         $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
-        $data = snmpwalk_group($device, 'ttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
+        $data = snmpwalk_group($device, 'rttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
 
         $time_offset = time() - $this->getDevice()->uptime;
 

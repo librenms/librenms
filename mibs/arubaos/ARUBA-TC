@@ -1,4 +1,4 @@
---- ArubaOS 8.5.0.0_70258
+--- ArubaOS 8.8.0.1_80393
 -- vim:set ts=4 sw=4:
 ARUBA-TC DEFINITIONS ::= BEGIN
 
@@ -940,7 +940,8 @@ ArubaThresholdResourceType ::= TEXTUAL-CONVENTION
 					totalTunnelCapacity(3),
 					userCapacity(4),
 					noofAps(5) ,
-					noofLocals(6)
+					noofLocals(6),
+					noofVaps(7)
 				}
 
 ArubaStackState ::= TEXTUAL-CONVENTION
@@ -1137,6 +1138,19 @@ ArubaDual5GMode ::= TEXTUAL-CONVENTION
 	DESCRIPTION
 		"
 		  Dual 5GHz Operating Mode
+		"
+	SYNTAX		INTEGER {
+                            disabled(0),
+                            enabled(1),
+                            unknown(2),
+                            notApplicable(3)
+                       }
+
+ArubaSplit5GMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  Split 5GHz Operating Mode
 		"
 	SYNTAX		INTEGER {
                             disabled(0),
