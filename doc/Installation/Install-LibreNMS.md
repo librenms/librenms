@@ -1,7 +1,9 @@
 source: Installation/Install-LibreNMS.md
 path: blob/master/doc/
 
-# Prepare Linux Server
+# Install LibreNMS
+
+## Prepare Linux Server
 
 You should have an installed Linux server running one of the supported OS.
 Make sure you select your server's OS in the tabbed options below.

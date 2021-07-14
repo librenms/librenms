@@ -391,6 +391,22 @@ if (Config::get('enable_ports_poe')) {
             [$group_id, $if_id] = explode('.', $key);
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
         }
+    } elseif ($device['os'] == 'jetstream') {
+        echo 'tpPoePortConfigEntry';
+        $port_stats_poe = snmpwalk_cache_oid($device, 'tpPoePortConfigEntry', [], 'TPLINK-POWER-OVER-ETHERNET-MIB');
+        $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
+
+        $port_ent_to_if = [];
+        foreach ($ifTable_ifDescr as $if_index => $if_descr) {
+            if (preg_match('/^[a-z]+ethernet \d+\/\d+\/(\d+)$/i', $if_descr['ifDescr'], $matches)) {
+                $port_ent_to_if[$matches[1]] = $if_index;
+            }
+        }
+
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            $if_id = $port_ent_to_if[$p_index];
+            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+        }
     }
 }
 

@@ -1,4 +1,4 @@
---- ArubaOS 8.5.0.0_70258
+--- ArubaOS 8.8.0.1_80393
 -- vim:set ts=4 sw=4: 
 WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 
@@ -57,18 +57,19 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxWlanMIB MODULE-IDENTITY 
-       LAST-UPDATED "1001261806Z"
-       ORGANIZATION "Aruba Wireless Networks"
+       LAST-UPDATED "202008141745Z"
+       ORGANIZATION "Aruba, a Hewlett Packard Enterprise company"
        CONTACT-INFO
-            "Postal:    1322 Crossman Avenue
-                        Sunnyvale, CA 94089	
-            E-mail:     dl-support@arubanetworks.com
-            Phone:      +1 408 227 4500"
+            "Postal:    3333 Scott Blvd,
+                        Santa Clara, CA 95054
+            E-mail:     aruba-ext-eng-reg@hpe.com
+            Phone:      408 227 4500
+            Fax:        408 752 0626"
        DESCRIPTION
            "This MIB module defines MIB objects which provide
             information about the Wireless Management System (WMS) in the 
 			Aruba Controller."
-       REVISION        "1001261806Z"
+       REVISION        "202008141745Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 5 }
@@ -233,7 +234,8 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          wlanAPdot11aAntennaGain10x	Integer32,
          wlanAPdot11gAntennaGain10x	Integer32,
          wlanAPDual5GMode           ArubaEnableValue,
-         wlanAPActiveIpAddress      DisplayString(SIZE(0..45))
+         wlanAPActiveIpAddress      DisplayString(SIZE(0..45)),
+         wlanAPSplit5GMode          ArubaSplit5GMode
    }
 
    	wlanAPMacAddress OBJECT-TYPE
@@ -734,6 +736,16 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             IPv4 or IPv6 Address of the Access Point
             "
         ::= { wlsxWlanAPEntry 49 }
+
+    wlanAPSplit5GMode OBJECT-TYPE
+        SYNTAX       ArubaSplit5GMode
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Split 5GHz Operating Mode 
+            "
+        ::= { wlsxWlanAPEntry 50 }
 
 
 -- Radio table is indexed by the Mac Address of the AP and the type of the
@@ -4085,9 +4097,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    WlanAPRadioStatsEntry ::=
      SEQUENCE {
                  wlanAPRadioRxPkts                      Counter32,
-                 wlanAPRadioRxBytes                     Counter32,
+                 wlanAPRadioRxBytes                     Counter64,
                  wlanAPRadioTxPkts                      Counter32,
-                 wlanAPRadioTxBytes                     Counter32,
+                 wlanAPRadioTxBytes                     Counter64,
                  wlanAPRadioTxDroppedPkts               Counter32,
                  wlanAPRadioTxErrorPkts                 Counter32,
                  wlanAPRadioRxRate                      Gauge32,
@@ -4113,7 +4125,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
         ::= { wlsxWlanAPRadioStatsEntry 1 }
 
    wlanAPRadioRxBytes OBJECT-TYPE
-         SYNTAX       Counter32
+         SYNTAX       Counter64
          MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION
@@ -4135,7 +4147,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
         ::= { wlsxWlanAPRadioStatsEntry 3 }
 
    wlanAPRadioTxBytes OBJECT-TYPE
-         SYNTAX       Counter32
+         SYNTAX       Counter64
          MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION
@@ -4287,11 +4299,11 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
                  wlanAPWiredPortRxPkts                      Counter32,
                  wlanAPWiredPortRxDroppedPkts               Counter32,
                  wlanAPWiredPortRxErrors                    Counter32,
-                 wlanAPWiredPortRxBytes                     Counter32,
+                 wlanAPWiredPortRxBytes                     Counter64,
                  wlanAPWiredPortTxPkts                      Counter32,
                  wlanAPWiredPortTxDroppedPkts               Counter32,
                  wlanAPWiredPortTxErrors                    Counter32,
-                 wlanAPWiredPortTxBytes                     Counter32,
+                 wlanAPWiredPortTxBytes                     Counter64,
                  wlanAPWiredPortRxRate                      Gauge32,
                  wlanAPWiredPortTxRate                      Gauge32,
                  wlanAPWiredPortSpeed                       ArubaPortSpeed
@@ -4351,7 +4363,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
         ::= { wlsxWlanAPWiredPortStatsEntry 5 }
 
    wlanAPWiredPortRxBytes OBJECT-TYPE
-         SYNTAX       Counter32
+         SYNTAX       Counter64
          MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION
@@ -4396,7 +4408,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 
 
    wlanAPWiredPortTxBytes OBJECT-TYPE
-         SYNTAX       Counter32
+         SYNTAX       Counter64
          MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION

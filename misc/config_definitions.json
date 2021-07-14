@@ -620,7 +620,7 @@
             "units": "days",
             "group": "auth",
             "section": "general",
-            "order": 3,
+            "order": 4,
             "type": "integer"
         },
         "authlog_purge": {
@@ -3737,7 +3737,7 @@
             "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.",
             "group": "auth",
             "section": "general",
-            "order": 4,
+            "order": 5,
             "type": "text"
         },
         "mac_oui.enabled": {
@@ -4220,7 +4220,7 @@
             "type": "integer",
             "group": "auth",
             "section": "general",
-            "order": 5
+            "order": 6
         },
         "peering_descr": {
             "default": [
@@ -4670,7 +4670,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 6,
+            "order": 7,
             "type": "boolean"
         },
         "rancid_ignorecomments": {
@@ -5203,10 +5203,18 @@
             "order": 1
         },
         "twofactor": {
+            "default": "false",
             "type": "boolean",
             "group": "auth",
             "section": "general",
             "order": 1
+        },
+        "twofactor_lock": {
+            "default": "0",
+            "type": "integer",
+            "group": "auth",
+            "section": "general",
+            "order": 2
         },
         "unix-agent-connection-time-out": {
             "default": 10,

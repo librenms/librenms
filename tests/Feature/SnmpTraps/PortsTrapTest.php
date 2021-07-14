@@ -35,8 +35,8 @@ class PortsTrapTest extends SnmpTrapTestCase
     public function testLinkDown()
     {
         // make a device and associate a port with it
-        $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "<UNKNOWN>
@@ -65,8 +65,8 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n";
     public function testLinkUp()
     {
         // make a device and associate a port with it
-        $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'down', 'ifOperStatus' => 'down']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'down', 'ifOperStatus' => 'down']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "<UNKNOWN>

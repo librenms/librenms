@@ -1331,6 +1331,14 @@ return [
         'traceroute6' => [
             'description' => 'Path to traceroute6',
         ],
+        'twofactor' => [
+            'description' => 'Two-Factor',
+            'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => 'Two-Factor Throttle Time (seconds)',
+            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
+        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent connection timeout',

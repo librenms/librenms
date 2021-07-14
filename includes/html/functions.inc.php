@@ -828,10 +828,15 @@ function alert_details($details)
                     'tab' => 'apps',
                     'app' => $tmp_alerts['app_type'],
                 ]) . "'>";
-            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= $tmp_alerts['app_type'];
             $fault_detail .= '</a>';
 
-            $fault_detail .= ' => ' . $tmp_alerts['value'];
+            if ($tmp_alerts['app_status']) {
+                $fault_detail .= ' => ' . $tmp_alerts['app_status'];
+            }
+            if ($tmp_alerts['metric']) {
+                $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
+            }
             $fallback = false;
         }
 

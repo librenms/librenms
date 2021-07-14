@@ -59,4 +59,18 @@ if (($device['os'] == 'vrp')) {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(IOS) ';
     }//end if
+} elseif (($device['os'] == 'jetstream')) {
+    if (isset($this_port['tpPoePortStatus'])) {
+        // TP-Link uses .1W for their units; convert to milliwatts.
+        $fields = [
+            'PortPwrAllocated'   => $this_port['tpPoePowerLimit'] * 100,
+            'PortPwrAvailable'   => $this_port['tpPoePowerLimit'] * 100,
+            'PortConsumption'    => $this_port['tpPoePower'] * 100,
+            'PortMaxPwrDrawn'    => $this_port['tpPoePowerLimit'] * 100,
+        ];
+
+        $tags = compact('ifName', 'rrd_name', 'rrd_def');
+        data_update($device, 'poe', $tags, $fields);
+        echo 'PoE(jetstream) ';
+    }
 }

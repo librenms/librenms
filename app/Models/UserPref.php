@@ -36,6 +36,10 @@ class UserPref extends BaseModel
     // ---- Helper Functions ----
     public static function getPref(User $user, $pref)
     {
+        if ($user->relationLoaded('preferences')) {
+            return optional($user->preferences->firstWhere('pref', $pref))->value;
+        }
+
         return $user->preferences()->where('pref', $pref)->value('value');
     }
 

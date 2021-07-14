@@ -37,7 +37,7 @@ class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
 {
     public function testAlarmClear()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -74,7 +74,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
     //Test alarm with addtional text supplied.
     public function testAlarmAddText()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -112,7 +112,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
     //Alarm is on a specific port
     public function testAlarmPort()
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];

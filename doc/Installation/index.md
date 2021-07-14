@@ -28,7 +28,7 @@ We have some pre-built VirtualBox images you can use to get started:
 - [Virtual Machines](Images)
 
 
-### Old Install Docs
+## Old Install Docs
 
 These install docs are no longer updated and may result in an unsuccessful install.
 

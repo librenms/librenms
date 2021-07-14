@@ -16,22 +16,51 @@ IMPORTS
              FROM  ADVA-MIB;
 
 cmIPMIB MODULE-IDENTITY
-    LAST-UPDATED    "201012080000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "201903140000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the IP MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201012080000Z"
+             Copyright (C) ADVA."
+    REVISION        "201903140000Z"
     DESCRIPTION
-            "Notes from release 201407180000Z,
+            "
+            Notes from release 201903140000Z
+              (1) Added cmIpInterfaceGateway to cmIpInterfaceTable
+              (2) Added cmIpv6InterfaceGateway to cmIpv6InterfaceTable
+
+            Notes from release 201904050000Z
+              (1) chaned cmStaticRouteNextHop to RO
+              (2) chaned cmIpv6StaticRouteNextHop to RO
+
+            Notes from release 201902030000Z
+              (1) added cmIpTraceRouteInterface
+              (2) added cmIpv6TraceRouteInterface
+
+           Notes from release 201901300000Z
+              (1) added cmPingInterface            
+            
+            Notes from release 201901070000Z
+              (1) Modified cmStaticRouteNextHop: MAX-ACCESS read-write instead read-only
+              (2) Modified cmIpv6StaticRouteNextHop: MAX-ACCESS read-write instead not-accessible
+
+            Notes from release 201802130000Z
+             (1) added ipLoopbackInterfaceTable
+            Notes from release 201802020000Z,
+             (1) Added cmIpInterfaceDhcpVendorInfoHideControl to cmIpInterfaceTable
+             (2) Added ipManagementTunnelDhcpVendorInfoHideControl to ipManagementTunnelTable
+            
+            Notes from release 201407180000Z,
              (1) Added new IpManagementTunnelType literals:
                  - gcc0based,
                  - gcc1based,
@@ -377,6 +406,59 @@ cmIpManagementTrafficDscp OBJECT-TYPE
         cmIpManagementTrafficDscpEnabled is enabled."
     ::= { cmIpSystemScalars 21 }
 
+cmIpManagementTrafficBridgingInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..15))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to specify the name of
+        the IP interface the IP address of which shall be used as the
+        IP address of the Management Bridge."
+    ::= { cmIpSystemScalars 22 }
+
+cmIpManagementTrafficBridgingIpv4Gateway OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to specify the IPv4 default gateway 
+        for the Management Bridge."
+    ::= { cmIpSystemScalars 23 }
+
+cmIpManagementTrafficBridgingIpv6Gateway OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to specify the IPv6 default gateway 
+        for the Management Bridge."
+    ::= { cmIpSystemScalars 24 }
+
+
+cmPingInterface OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IPV4 Address related interface."
+    ::= { cmIpSystemScalars 25 }
+
+cmIpTraceRouteInterface OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IPV4 Address related interface."
+    ::= { cmIpSystemScalars 26 }
+
+cmIpv6TraceRouteInterface OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IPV6 Address related interface."
+    ::= { cmIpSystemScalars 27 }
+
 cmIpSNMPv1InterfaceName OBJECT-TYPE
     SYNTAX     DisplayString (SIZE (0..15))
     MAX-ACCESS read-write
@@ -447,7 +529,9 @@ CmIpInterfaceEntry ::= SEQUENCE {
         cmIpInterfaceDhcpHostNameType      DHCPHostNameType,
         cmIpInterfaceDhcpVendorInfoEnabled TruthValue,
         cmIpInterfaceDhcpVendorInfoType    DHCPVendorInfoType,
-        cmIpInterfaceDhcpVendorInfo        DisplayString
+        cmIpInterfaceDhcpVendorInfo        DisplayString,
+        cmIpInterfaceDhcpVendorInfoHideControl TruthValue,
+        cmIpInterfaceGateway               IpAddress
     }
 
 cmIpInterfaceName   OBJECT-TYPE
@@ -484,7 +568,7 @@ cmIpInterfaceDhcpEnabled OBJECT-TYPE
 
 cmIpInterfaceMTU OBJECT-TYPE
     SYNTAX   Integer32 (0..1500)
-    MAX-ACCESS read-only
+    MAX-ACCESS read-write
     STATUS   current
     DESCRIPTION
        "IP Interface MTU."
@@ -621,6 +705,22 @@ cmIpInterfaceDhcpVendorInfo OBJECT-TYPE
     DESCRIPTION
        "This object describe the vendor information."
     ::= { cmIpInterfaceEntry 21 }
+
+cmIpInterfaceDhcpVendorInfoHideControl OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp vendor info is hidden or not"
+    ::= { cmIpInterfaceEntry 22 }
+
+cmIpInterfaceGateway OBJECT-TYPE
+    SYNTAX     IpAddress 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object desribes the IPv4 Gateway Address of the management interface on OSA540X."
+    ::= { cmIpInterfaceEntry 23 }
 
 --  FSP150 CM Static Routes Configuration Table
 cmStaticRouteTable OBJECT-TYPE
@@ -978,7 +1078,9 @@ IpManagementTunnelEntry ::= SEQUENCE {
     ipManagementTunnelDhcpHostNameType                DHCPHostNameType,
     ipManagementTunnelDhcpVendorInfoEnabled           TruthValue,
     ipManagementTunnelDhcpVendorInfoType              DHCPVendorInfoType,
-    ipManagementTunnelDhcpVendorInfo                  DisplayString
+    ipManagementTunnelDhcpVendorInfo                  DisplayString,
+    ipManagementTunnelDhcpVendorInfoHideControl       TruthValue,
+    ipManagementTunnelSharedVim                       TruthValue
 }
 
 ipManagementTunnelIndex OBJECT-TYPE
@@ -1019,7 +1121,7 @@ ipManagementTunnelType OBJECT-TYPE
 
 ipManagementTunnelMTU OBJECT-TYPE
     SYNTAX      Integer32 
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
             "This provides the MTU of the Management Tunnel." 
@@ -1364,6 +1466,22 @@ ipManagementTunnelDhcpVendorInfo OBJECT-TYPE
        "This object describe the vendor information."
     ::= { ipManagementTunnelEntry 45 }
 
+ipManagementTunnelDhcpVendorInfoHideControl OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp vendor info is hidden or not."
+    ::= { ipManagementTunnelEntry 46 }
+
+ipManagementTunnelSharedVim OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describes if tunnel share vlan with vim tunnel."
+    ::= { ipManagementTunnelEntry 47 }
+
 cmIpv6InterfaceTable OBJECT-TYPE
     SYNTAX   SEQUENCE OF CmIpv6InterfaceEntry
     MAX-ACCESS not-accessible
@@ -1393,12 +1511,13 @@ CmIpv6InterfaceEntry ::= SEQUENCE {
         cmIpv6DhcpRole                     CmDhcpRole,
         cmIpv6RIPngEnabled                 TruthValue,
         cmIpv6LinkLocAddr                  Ipv6Address,
-        cmIpv6LinkLocAddrPrefixLen         Integer32
+        cmIpv6LinkLocAddrPrefixLen         Integer32,
+        cmIpv6InterfaceGateway             Ipv6Address
     }
 
 cmIpv6InterfaceMTU OBJECT-TYPE
     SYNTAX  Integer32
-    MAX-ACCESS read-only
+    MAX-ACCESS read-write
     STATUS   current
     DESCRIPTION
        "This object describe the MTU for ipv6 address interface."
@@ -1493,6 +1612,13 @@ cmIpv6LinkLocAddrPrefixLen OBJECT-TYPE
        "This object describe Length of link local IPv6 address prefix."
     ::= { cmIpv6InterfaceEntry 12 }
 
+cmIpv6InterfaceGateway OBJECT-TYPE
+    SYNTAX  Ipv6Address
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describes the IPv6 Gateway address for the management interface on OSA540X."
+    ::= { cmIpv6InterfaceEntry 13 }
 
 --  FSP150 CM IPv6 Static Routes Configuration Table
 cmIpv6StaticRouteTable OBJECT-TYPE
@@ -1905,6 +2031,129 @@ cmIpv6OverIpv4PotentialRouterList OBJECT-TYPE
             And its format should be like 'a.b.c.d,e.f.g.h', split by ',' and no breakspace there."
     ::= { cmIpv6OverIpv4TunnelEntry 12 }
 
+
+--
+-- FSP150 IP loopback interface Table
+--
+ipLoopbackInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpLoopbackInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of loopback interace entries in the management plane."
+    ::= { cmIpObjects 11 }
+
+ipLoopbackInterfaceEntry  OBJECT-TYPE
+    SYNTAX      IpLoopbackInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ipLoopbackInterfaceTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { ipLoopbackInterfaceIndex } 
+    ::= { ipLoopbackInterfaceTable 1 }
+
+IpLoopbackInterfaceEntry ::= SEQUENCE {
+    ipLoopbackInterfaceIndex           Integer32,
+    ipLoopbackInterfaceName            DisplayString,
+    ipLoopbackInterfaceIpAddress       IpAddress,
+    ipLoopbackInterfaceMask            IpAddress,
+    ipLoopbackInterfaceStorageType     StorageType,
+    ipLoopbackInterfaceRowStatus       RowStatus,
+    ipLoopbackInterfaceIpMode          IpMode,
+    ipLoopbackInterfaceIpv6Address     Ipv6Address,
+    ipLoopbackInterfaceIpv6AddrPrefixLen Integer32
+}
+
+ipLoopbackInterfaceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A unique integer index value used to uniquely identify
+             a Loopback Interface Entry in the ipLoopbackInterfaceTable."
+    ::= { ipLoopbackInterfaceEntry 1 }
+
+ipLoopbackInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..15))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This allows specification of a unique name which is also used as the name of the IP interface."
+    ::= { ipLoopbackInterfaceEntry 2 }
+
+ipLoopbackInterfaceIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IP Address of the interface."
+        
+    ::= { ipLoopbackInterfaceEntry 3 }
+
+ipLoopbackInterfaceMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IP mask of the interface."        
+    ::= { ipLoopbackInterfaceEntry 4 }
+
+ipLoopbackInterfaceStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { ipLoopbackInterfaceEntry 5 }
+
+ipLoopbackInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of ipLoopbackInterfaceRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            ipLoopbackInterfaceRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The ipLoopbackInterfaceRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+
+    ::= { ipLoopbackInterfaceEntry 6 }
+
+ipLoopbackInterfaceIpMode OBJECT-TYPE
+    SYNTAX     IpMode 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the ip mode for the interface."
+    ::= { ipLoopbackInterfaceEntry 7 }
+
+ipLoopbackInterfaceIpv6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the ipv6 address for the interface."
+    ::= { ipLoopbackInterfaceEntry 8 }
+
+ipLoopbackInterfaceIpv6AddrPrefixLen OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the ipv6 address prefix length for the interface."
+    ::= { ipLoopbackInterfaceEntry 9 }
+
+
 --
 -- Conformance Section
 --
@@ -1925,9 +2174,9 @@ ipGroup OBJECT-GROUP
     OBJECTS {
         cmIpFlushARPCacheAction, cmIpProxyARPEnabled,
         cmIpPingDestination, cmIpInitiatePingAction, 
-        cmIpPingResult, 
+        cmIpPingResult, cmPingInterface, 
         cmIpTraceRouteDestination, cmIpInitiateTraceRouteAction, 
-        cmIpTraceRouteResult, 
+        cmIpTraceRouteResult, cmIpTraceRouteInterface,
         cmIpSNMPv1InterfaceName,
         cmIpSourceAddressType, cmIpSourceAddressInterfaceName,
         cmIpManagementTrafficBridgingEnabled,
@@ -1949,6 +2198,8 @@ ipGroup OBJECT-GROUP
         cmIpInterfaceDhcpVendorInfoEnabled,
         cmIpInterfaceDhcpVendorInfoType,
         cmIpInterfaceDhcpVendorInfo,
+        cmIpInterfaceDhcpVendorInfoHideControl,
+        cmIpInterfaceGateway,
 
         cmStaticRouteDest, cmStaticRouteMask,
         cmStaticRouteNextHop, cmStaticRouteMetric,
@@ -1984,9 +2235,14 @@ ipGroup OBJECT-GROUP
 
         cmIpManagementTrafficDscpEnabled,
         cmIpManagementTrafficDscp,
+        cmIpManagementTrafficBridgingInterface,
+        cmIpManagementTrafficBridgingIpv4Gateway,
+        cmIpManagementTrafficBridgingIpv6Gateway,
         ipManagementTunnelDhcpVendorInfoEnabled,
         ipManagementTunnelDhcpVendorInfoType,
-        ipManagementTunnelDhcpVendorInfo
+        ipManagementTunnelDhcpVendorInfo,
+        ipManagementTunnelDhcpVendorInfoHideControl,
+        ipManagementTunnelSharedVim
     }
     STATUS  current
     DESCRIPTION
@@ -2010,7 +2266,7 @@ ipv6Group OBJECT-GROUP
         cmIpv6RAPrefixLength, cmIpv6StateAddrAutoConfigEnabled,
         cmIpv6DhcpEnabled, cmIpv6DhcpRole,
         cmIpv6RIPngEnabled, cmIpv6LinkLocAddr,
-        cmIpv6LinkLocAddrPrefixLen, cmIpv6StaticRouteDest,
+        cmIpv6LinkLocAddrPrefixLen, cmIpv6InterfaceGateway, cmIpv6StaticRouteDest,
         cmIpv6StaticRoutePrefixLen, cmIpv6StaticRouteNextHop,
         cmIpv6StaticRouteMetric, cmIpv6StaticRouteRowStatus,
         cmIpv6StaticRouteInterface, cmIpv6StaticRouteAdvertise,
@@ -2032,7 +2288,11 @@ ipv6Group OBJECT-GROUP
         cmIpv6OverIpv4TunnelLinkLocalAddress,
         cmIpv60verIpv4TunnelLinkLocalAddrPrefixLen,
         cmIpv6OverIpv4PotentialRouterList, cmIpv6FwdEnabled,
-        cmIpv6ProxyNDPEnabled, cmIpFlushNDPCacheAction, cmIpPtpArpRtrvAction
+        cmIpv6ProxyNDPEnabled, cmIpFlushNDPCacheAction, cmIpPtpArpRtrvAction,
+        ipLoopbackInterfaceIndex,ipLoopbackInterfaceName,ipLoopbackInterfaceIpAddress,
+        ipLoopbackInterfaceMask,ipLoopbackInterfaceStorageType,ipLoopbackInterfaceRowStatus,
+        ipLoopbackInterfaceIpMode,ipLoopbackInterfaceIpv6Address,
+        ipLoopbackInterfaceIpv6AddrPrefixLen
     }
     STATUS  current
     DESCRIPTION

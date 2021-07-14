@@ -38,9 +38,8 @@ class OspfNbrStateChangeTest extends SnmpTrapTestCase
     //Test OSPF neighbor state down trap
     public function testOspfNbrDown()
     {
-        $device = Device::factory()->create();
-
-        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
@@ -70,9 +69,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     //Test OSPF neighbor state full trap
     public function testOspfNbrFull()
     {
-        $device = Device::factory()->create();
-
-        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'down']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'down']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
@@ -102,9 +100,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     //Test OSPF neighbor state trap any other state
     public function testOspfNbrOther()
     {
-        $device = Device::factory()->create();
-
-        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
