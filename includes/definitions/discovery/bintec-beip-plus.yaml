@@ -2,6 +2,7 @@
 modules:
     os:
         version: BIANCA-BRICK-MIB::biboAdmSWVersion.0
+        version_regex: '/(?<version>[V]{1}[.0-9]+)/'
         serial: BIANCA-BRICK-MIB::biboABrdSerialNo.0.0
         hardware: BIANCA-BRICK-MIBRES-MIB::cpuDescr.1.0
     mempools:
