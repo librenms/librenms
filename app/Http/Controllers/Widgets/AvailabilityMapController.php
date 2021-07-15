@@ -183,6 +183,6 @@ class AvailabilityMapController extends WidgetController
             $data[] = $row;
         }
 
-        return [$services, $totals];
+        return [$data, $totals];
     }
 }
