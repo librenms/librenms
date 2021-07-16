@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class Service extends DeviceRelatedModel
+class Service extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'service_id';
@@ -25,7 +25,36 @@ class Service extends DeviceRelatedModel
         'service_name',
     ];
 
+    protected $attributes = [ // default values
+        'ignore' => '0',
+        'disabled' => '0',
+    ];
+
+    protected $casts = [
+        'ignore' => 'integer',
+        'disabled' => 'integer',
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+    }
+
     // ---- Query Scopes ----
+
+    /**
+     * @param  Builder  $query
+     * @param  User  $user
+     * @return Builder
+     */
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        //return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
+    }
 
     /**
      * @param Builder $query
@@ -85,5 +114,43 @@ class Service extends DeviceRelatedModel
     public function scopeIsDisabled($query)
     {
         return $query->where('service_disabled', 1);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsUnknown($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 3],
+        ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsMaintenance($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 3],
+        ]);
+    }
+
+    // ---- Define Relationships ----
+
+    public function devices()
+    {
+        return $this->belongsToMany(\App\Models\Device::class, 'services', 'service_id', 'device_id');
+    }
+
+    public function eventlogs()
+    {
+        return $this->hasMany(\App\Models\Eventlog::class, 'type', 'service');
     }
 }

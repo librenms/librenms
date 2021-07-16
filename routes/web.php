@@ -30,6 +30,20 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
     });
     Route::prefix('services')->name('services.')->group(function () {
+        Route::get('', 'ServiceController@servicesTab')->name('index');
+        Route::get('create', 'ServiceController@create')->name('create');
+        Route::get('{service}/edit', 'ServiceController@edit')->name('edit');
+        Route::put('{service}', 'ServiceController@update')->name('update');
+        Route::post('', 'ServiceController@store')->name('store');
+        Route::get('{service}', 'ServiceController@show')->name('show');
+        Route::delete('{service}', 'ServiceController@destroy')->name('destroy');
+        Route::get('errors', 'ServiceController@errorsTab')->name('errors');
+        Route::get('warnings', 'ServiceController@warningsTab')->name('warnings');
+        Route::get('disabled', 'ServiceController@disabledTab')->name('disabled');
+        Route::get('ignored', 'ServiceController@ignoredTab')->name('ignored');
+        Route::get('unknown', 'ServiceController@unknownTab')->name('unknown');
+        Route::get('maintenance', 'ServiceController@maintenanceTab')->name('maintenance');
+        Route::get('log', 'ServiceController@logTab')->name('log');
         Route::resource('templates', 'ServiceTemplateController');
         Route::post('templates/applyAll', 'ServiceTemplateController@applyAll')->name('templates.applyAll');
         Route::post('templates/apply/{template}', 'ServiceTemplateController@apply')->name('templates.apply');

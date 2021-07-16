@@ -18,6 +18,14 @@
     color: #e30613;
 }
 
+.fa-col-warning {
+    color: #fbff00;
+}
+
+.fa-col-maintenance {
+    color: #6f00ff;
+}
+
 .icon-theme {
     color: black;
 }
