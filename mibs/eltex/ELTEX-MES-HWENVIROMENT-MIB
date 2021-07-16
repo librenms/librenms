@@ -1,0 +1,136 @@
+ELTEX-MES-HWENVIROMENT-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Eltex MES Hardware enviroment definition
+-- Version:    1.3
+-- Date:       27-Jul-2018
+
+IMPORTS
+    eltMes                                 FROM ELTEX-MES
+    OBJECT-TYPE                            FROM SNMPv2-SMI
+    RlEnvMonState, rlEnvMonFanStatusEntry  FROM RADLAN-HWENVIROMENT;
+
+eltMesEnv MODULE-IDENTITY
+    LAST-UPDATED "201807270000Z"
+    ORGANIZATION "Eltex Enterprise Co, Ltd."
+    CONTACT-INFO "www.eltex.nsk.ru"
+    DESCRIPTION
+        "This private MIB module contains Eltex's hardware enviroment definition."
+    REVISION "201807270000Z"
+    DESCRIPTION
+        "Added eltEnvResetButtonMode scalar."
+    REVISION "201710110000Z"
+    DESCRIPTION
+        "Added Eltex's hardware enviroment definition."
+    REVISION "201506110000Z"
+    DESCRIPTION
+        "Initial revision."
+    ::= { eltMes 11 }
+
+--------------------------------------------------------------------------------
+-- eltEnvMonBatteryStatusTable
+--------------------------------------------------------------------------------
+
+eltEnvMonBatteryStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltEnvMonBatteryStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of battery status maintained by the environmental monitor
+             card."
+    ::= { eltMesEnv 1 }
+
+eltEnvMonBatteryStatusEntry OBJECT-TYPE
+    SYNTAX      EltEnvMonBatteryStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the battery status table, representing the status of
+             the associated battery maintained by the environmental monitor."
+    INDEX { eltEnvMonBatteryStatusIndex }
+    ::= { eltEnvMonBatteryStatusTable 1 }
+
+EltEnvMonBatteryStatusEntry ::= SEQUENCE {
+    eltEnvMonBatteryStatusIndex   INTEGER,
+    eltEnvMonBatteryState         RlEnvMonState,
+    eltEnvMonBatteryStatusCharge  INTEGER
+}
+
+eltEnvMonBatteryStatusIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Unique index for the battery being instrumented. This index is for SNMP
+         purposes only, and has no intrinsic meaning."
+    ::= { eltEnvMonBatteryStatusEntry 1 }
+
+eltEnvMonBatteryState OBJECT-TYPE
+    SYNTAX     RlEnvMonState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The mandatory state of the battery being instrumented."
+    ::= { eltEnvMonBatteryStatusEntry 2 }
+
+eltEnvMonBatteryStatusCharge OBJECT-TYPE
+    SYNTAX      INTEGER(0..100 | 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remaining percentage of battery charge. Value of 255 means that this
+         parameter is undefined due to battery not supporting this feature or
+         because it cannot be obtained in current state."
+    ::= { eltEnvMonBatteryStatusEntry 3 }
+
+--
+-- eltEnvResetButtonMode
+--
+
+eltEnvResetButtonMode OBJECT-TYPE
+    SYNTAX  INTEGER { 
+    	enable(0),
+    	disable(1),
+    	reset-only(2)
+    	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Mode of reset button: 0 - Enable, 1 - disable, 2 - reset-only mode"
+    DEFVAL { enable }
+    ::= { eltMesEnv 2 }
+
+
+--
+-- eltEnvMonFanStatusTable
+--
+
+eltEnvMonFanStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltEnvMonFanStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of fan status maintained by the environmental monitor"
+    ::= { eltMesEnv 3 }
+
+eltEnvMonFanStatusEntry OBJECT-TYPE
+    SYNTAX      EltEnvMonFanStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments existing RADLAN table rlEnvMonFanStatusTable"
+    AUGMENTS { rlEnvMonFanStatusEntry }
+    ::= { eltEnvMonFanStatusTable 1 }
+
+EltEnvMonFanStatusEntry ::= SEQUENCE {
+    eltEnvMonFanSpeed    INTEGER
+}
+
+eltEnvMonFanSpeed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter represents the speed of the fan in RPM"
+    ::= { eltEnvMonFanStatusEntry 1 }
+
+END
