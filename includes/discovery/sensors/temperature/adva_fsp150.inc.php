@@ -118,13 +118,14 @@ unset($sensors_adva, $entry);
 
 foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
     if ($entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal') {
+
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.40.' . $index . '.3';
-        $current = snmp_get($device, $oid, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
+        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsTemp'];
+
         if ($current != 0) {
             $entPhysicalIndex = $entry['cmEthernetNetPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
-            $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]);
-
+            $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']);
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
@@ -149,12 +150,11 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
     if ($entry['cmEthernetAccPortMediaType'] && $entry['cmEthernetAccPortMediaType'] == 'fiber' && $entry['cmEthernetAccPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.39.' . $index . '.3';
-        $current = snmp_get($device, $oid, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
+        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetAccPortStatsTemp'];
         if ($current != 0) {
             $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
-            $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]);
-
+            $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']);
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
@@ -179,12 +179,11 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
     if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber' && $entry['cmEthernetTrafficPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.41.' . $index . '.3';
-        $current = snmp_get($device, $oid, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
+        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetTrafficPortStatsTemp'];
         if ($current != 0) {
             $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
-            $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]);
-
+            $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']);
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
