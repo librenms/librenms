@@ -46,28 +46,46 @@ foreach (explode("\n", $oids) as $data) {
     }
 }
 
-$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.2.4.0', '-OsqnU', '');
+// upsHighPrecInputFrequency
+$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.3.4.0', '-OsqnU', '');
 d_echo($oids . "\n");
+$divisor = 10;
+$index = '3.3.4.0';
+
+if (! $oids) {
+    // upsAdvInputFrequency, used in case high precision is not available
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.2.4.0', '-OsqnU', '');
+    d_echo($oids . "\n");
+    $divisor = 1;
+    $index = '3.2.4.0';
+}
 
 if ($oids) {
     echo ' APC In ';
     [$oid,$current] = explode(' ', $oids);
-    $divisor = 1;
     $type = 'apc';
-    $index = '3.2.4.0';
     $descr = 'Input';
-    discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
 }
 
-$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.2.2.0', '-OsqnU', '');
+// upsHighPrecOutputFrequency
+$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.3.2.0', '-OsqnU', '');
 d_echo($oids . "\n");
+$divisor = 10;
+$index = '4.3.2.0';
+
+if (! $oids) {
+    // upsAdvOutputFrequency, used in case high precision is not available
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.2.2.0', '-OsqnU', '');
+    d_echo($oids . "\n");
+    $divisor = 1;
+    $index = '4.2.2.0';
+}
 
 if ($oids) {
     echo ' APC Out ';
     [$oid,$current] = explode(' ', $oids);
-    $divisor = 1;
     $type = 'apc';
-    $index = '4.2.2.0';
     $descr = 'Output';
-    discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
 }
