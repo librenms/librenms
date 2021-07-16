@@ -24,14 +24,14 @@ abstract class Plugin
     public function menu()
     {
         echo view(self::viewPath(), [
-        'title' =>self::className(),
-    ]);
+            'title' =>self::className(),
+        ]);
     }
 
     public function settings()
     {
         echo view(self::viewPath(), [
-        'title' => self::className(),
-    ]);
+            'title' => self::className(),
+        ]);
     }
 }
