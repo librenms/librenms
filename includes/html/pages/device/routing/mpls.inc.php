@@ -472,7 +472,7 @@ if ($vars['view'] == 'saps') {
         echo "<tr bgcolor=$bg_colour>" . '
             <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
             <td>' . generate_port_link($port) . '</td>
-            <td>' . $sap['sapEncapValue'] . '</td>
+            <td>' . $sap['sapDisplayEncapValue'] . '</td>
             <td>' . $sap['sapType'] . '</td>
             <td>' . $sap['sapDescription'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>

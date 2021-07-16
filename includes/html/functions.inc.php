@@ -1406,6 +1406,29 @@ function nfsen_live_dir($hostname)
 }
 
 /**
+ * @params string device id and traffic id
+ * @return string
+ *
+ * Takes a Nokia device id and sap traffic id and transforms it
+ * to the readable sap titile information.
+ */
+function get_sapTitle($device_id, $traffic_id)
+{
+    $sapTrafficInfo = explode('.', $traffic_id);
+    $sapSvcOid = $sapTrafficInfo[0];
+    $sapPortId = $sapTrafficInfo[1];
+    $sapEncapValue = $sapTrafficInfo[2];
+    $sapInfo = dbFetchRow('SELECT * FROM `mpls_saps` WHERE `device_id` = ? AND `svc_oid` = ? AND `sapPortId` = ? AND `sapEncapValue` = ?', [$device_id, $sapSvcOid, $sapPortId, $sapEncapValue]);
+    if ($sapInfo['sapDisplayEncapValue'] != '') {
+        $showSapTitle = $sapInfo['ifName'] . ':' . $sapInfo['sapDisplayEncapValue'];
+    } else {
+        $showSapTitle = $sapInfo['ifName'];
+    }
+
+    return $showSapTitle;
+}
+
+/**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
  * @param $device_id

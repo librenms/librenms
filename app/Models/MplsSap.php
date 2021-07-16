@@ -16,6 +16,7 @@ class MplsSap extends Model implements Keyable
         'sapPortId',
         'ifName',
         'sapEncapValue',
+        'sapDisplayEncapValue',
         'device_id',
         'sapRowStatus',
         'sapType',
