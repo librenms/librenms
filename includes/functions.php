@@ -2048,9 +2048,10 @@ function get_device_oid_limit($device)
  *
  * @param string $table
  * @param string $sql
+ * @param int $count
  * @return int exit code
  */
-function lock_and_purge($table, $sql)
+function lock_and_purge($table, $sql, int $count = 1000)
 {
     $purge_name = $table . '_purge';
     $lock = Cache::lock($purge_name, 86000);
@@ -2059,9 +2060,14 @@ function lock_and_purge($table, $sql)
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
-            if (dbDelete($table, $sql, [$purge_days])) {
-                echo "$name cleared for entries over $purge_days days\n";
+            $sql = $sql . " LIMIT $count";
+            while (true) {
+                // Deletes are done in blocks to avoid a single very large operation.
+                if (! dbDelete($table, $sql, [$purge_days]) > 0) {
+                    break;
+                }
             }
+            echo "$name cleared for entries over $purge_days days\n";
         }
         $lock->release();
 
