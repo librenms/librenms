@@ -501,7 +501,7 @@ class Vrp extends OS implements
                 'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
                 'owner' => $owner,
                 'tag' => $test,
-                'rtt_type' => $sla_config['nqaAdminCtrlType'],
+                'rtt_type' => $sla_config['nqaAdminCtrlType'] ?? '',
                 'rtt' => isset($sla_config['pingResultsAverageRtt']) ? $sla_config['pingResultsAverageRtt'] / 1000 : null,
                 'status' => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
                 'opstatus' => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
