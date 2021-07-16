@@ -118,7 +118,6 @@ unset($sensors_adva, $entry);
 
 foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
     if ($entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal') {
-
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.40.' . $index . '.3';
         $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsTemp'];
 

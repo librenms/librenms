@@ -99,7 +99,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.33.' . $index . '.3';
         $currentRx = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetAccPortStatsOPR'];
         $currentTx = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetAccPortStatsOPT'];
-        
+ 
         if ($currentRx != 0 || $currentTx != 0) {
             $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
