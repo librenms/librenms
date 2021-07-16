@@ -1,4 +1,3 @@
-import pymysql
 import subprocess
 import threading
 import traceback
@@ -6,7 +5,28 @@ from logging import debug, info, error, critical, warning
 from queue import Empty
 from subprocess import CalledProcessError
 
+import pymysql
+
 import LibreNMS
+
+
+class WorkerThread(threading.Thread):
+    def __init__(self, target, name, group, id):
+        thread_name = "{}_{}-{}".format(name, group, id)
+        threading.Thread.__init__(self, None, self._work_loop, thread_name, (group,))
+        self.daemon = True
+        self.poller_group = group
+        self.id = id
+        self._stop_event = threading.Event()
+        self._work_target = target
+
+    def _work_loop(self, *args):
+        debug("Worker started {}".format(self.getName()))
+        while not self._stop_event.is_set():
+            self._work_target(*args)
+
+    def stop(self):
+        self._stop_event.set()
 
 
 class QueueManager:
@@ -37,8 +57,6 @@ class QueueManager:
         self._queue_create_lock = threading.Lock()
         self._lm = lock_manager
 
-        self._stop_event = threading.Event()
-
         info("Groups: {}".format(self.config.group))
         info(
             "{} QueueManager created: {} workers, {}s frequency".format(
@@ -51,55 +69,53 @@ class QueueManager:
         if auto_start:
             self.start()
 
-    def _service_worker(self, queue_id):
-        debug("Worker started {}".format(threading.current_thread().getName()))
-        while not self._stop_event.is_set():
-            debug(
-                "Worker {} checking queue {} ({}) for work".format(
-                    threading.current_thread().getName(),
-                    queue_id,
-                    self.get_queue(queue_id).qsize(),
+    def _service_work(self, queue_id):
+        debug(
+            "Worker {} checking queue {} ({}) for work".format(
+                threading.current_thread().getName(),
+                queue_id,
+                self.get_queue(queue_id).qsize(),
+            )
+        )
+        try:
+            # cannot break blocking request with redis-py, so timeout :(
+            device_id = self.get_queue(queue_id).get(True, 10)
+
+            if (
+                device_id is not None
+            ):  # None returned by redis after timeout when empty
+                debug(
+                    "Worker {} ({}) got work {} ".format(
+                        threading.current_thread().getName(), queue_id, device_id
+                    )
+                )
+                with LibreNMS.TimeitContext.start() as t:
+                    debug("Queues: {}".format(self._queues))
+                    target_desc = (
+                        "{} ({})".format(device_id if device_id else "", queue_id)
+                        if queue_id
+                        else device_id
+                    )
+                    self.do_work(device_id, queue_id)
+
+                    runtime = t.delta()
+                    info(
+                        "Completed {} run for {} in {:.2f}s".format(
+                            self.type, target_desc, runtime
+                        )
+                    )
+                    self.performance.add(runtime)
+        except Empty:
+            pass  # ignore empty queue exception from subprocess.Queue
+        except CalledProcessError as e:
+            error(
+                "{} poller script error! {} returned {}: {}".format(
+                    self.type.title(), e.cmd, e.returncode, e.output
                 )
             )
-            try:
-                # cannot break blocking request with redis-py, so timeout :(
-                device_id = self.get_queue(queue_id).get(True, 10)
-
-                if (
-                    device_id is not None
-                ):  # None returned by redis after timeout when empty
-                    debug(
-                        "Worker {} ({}) got work {} ".format(
-                            threading.current_thread().getName(), queue_id, device_id
-                        )
-                    )
-                    with LibreNMS.TimeitContext.start() as t:
-                        debug("Queues: {}".format(self._queues))
-                        target_desc = (
-                            "{} ({})".format(device_id if device_id else "", queue_id)
-                            if queue_id
-                            else device_id
-                        )
-                        self.do_work(device_id, queue_id)
-
-                        runtime = t.delta()
-                        info(
-                            "Completed {} run for {} in {:.2f}s".format(
-                                self.type, target_desc, runtime
-                            )
-                        )
-                        self.performance.add(runtime)
-            except Empty:
-                pass  # ignore empty queue exception from subprocess.Queue
-            except CalledProcessError as e:
-                error(
-                    "{} poller script error! {} returned {}: {}".format(
-                        self.type.title(), e.cmd, e.returncode, e.output
-                    )
-                )
-            except Exception as e:
-                error("{} poller exception! {}".format(self.type.title(), e))
-                traceback.print_exc()
+        except Exception as e:
+            error("{} poller exception! {}".format(self.type.title(), e))
+            traceback.print_exc()
 
     def post_work(self, payload, queue_id):
         """
@@ -114,41 +130,63 @@ class QueueManager:
             )
         )
 
+    def apply_config(self):
+        self.spawn_workers()
+
     def start(self):
         """
         Start worker threads
         """
-        workers = self.get_poller_config().workers
-        groups = (
-            self.config.group
-            if hasattr(self.config.group, "__iter__")
-            else [self.config.group]
-        )
-        if self.uses_groups:
-            for group in groups:
-                group_workers = max(int(workers / len(groups)), 1)
-                for i in range(group_workers):
-                    thread_name = "{}_{}-{}".format(self.type.title(), group, i + 1)
-                    self.spawn_worker(thread_name, group)
-
-                debug(
-                    "Started {} {} threads for group {}".format(
-                        group_workers, self.type, group
-                    )
-                )
-        else:
-            self.spawn_worker(self.type.title(), 0)
+        self.spawn_workers()
 
     def do_work(self, device_id, group):
         pass
 
-    def spawn_worker(self, thread_name, group):
-        pt = threading.Thread(
-            target=self._service_worker, name=thread_name, args=(group,)
-        )
-        pt.daemon = True
-        self._threads.append(pt)
-        pt.start()
+    def spawn_workers(self):
+        workers = self.get_poller_config().workers
+        current_workers = len(self._threads)
+        if self.uses_groups:
+            groups = (
+                self.config.group
+                if hasattr(self.config.group, "__iter__")
+                else [self.config.group]
+            )
+            workers = max(workers, len(groups))  # at least one worker per group
+
+            if current_workers < workers:
+                # evenly distributed among groups, but don't exceed target workers, minimum 1 per group
+                sequence = groups * int((workers / len(group)) + 1)
+
+                # start with the last group
+                if current_workers > 0:
+                    last_group = self._threads[-1]
+
+
+                i = current_workers
+                while i < workers:
+                    for group in groups:
+                        self.spawn_worker(self.type.title(), group, i + 1)
+                        i += 1
+                        if i >= workers:
+                            break
+
+                debug(
+                    "Started {} {} threads for group {}, total {}".format(
+                        group_workers - current_workers, self.type, group, group_workers
+                    )
+                )
+            elif current_workers > workers:
+                # need to stop extra workers, since we started them by alternating, just remove the newest ones
+                for thread in self._threads[workers:]:
+                    thread.stop()
+        elif current_workers < 1:
+            # if not spawned for single worker queue, spawn
+            self.spawn_worker(self.type.title())
+
+    def spawn_worker(self, type, group=0, id=0):
+        wt = WorkerThread(self._service_work, type, group, id)
+        self._threads.append(wt)
+        wt.start()
 
     def restart(self):
         """
@@ -161,7 +199,8 @@ class QueueManager:
         """
         Stop the worker threads, does not wait for them to finish.
         """
-        self._stop_event.set()
+        for thread in self._threads:
+            thread.stop()
 
     def stop_and_wait(self):
         """
