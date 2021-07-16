@@ -402,12 +402,6 @@ $(function () {
             close: 'fa fa-close'
         }
     });
-    $("#start_recurring_hr").on("dp.change", function (e) {
-        $("#end_recurring_hr").data("DateTimePicker").minDate(e.date);
-    });
-    $("#end_recurring_hr").on("dp.change", function (e) {
-        $("#start_recurring_hr").data("DateTimePicker").maxDate(e.date);
-    });
 });
 
 $("[name='recurring']").bootstrapSwitch();
