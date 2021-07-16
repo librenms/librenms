@@ -11,31 +11,31 @@ class Example extends Plugin
     public function menu()
     {
         echo view(self::viewPath(), [
-	    'title' => self::className(),
-	]);
+        'title' => self::className(),
+    ]);
     }
 
     /* Default defined in abstract Plugin class  */
     public function settings()
     {
         echo view(self::viewPath(), [
-	    'title' => self::className(),
-	]);
+        'title' => self::className(),
+    ]);
     }
 
     public function device_overview_container($device)
     {
         echo view(self::viewPath(), [
-	    'title' =>   self::className(),
-	    'device' => Device::find($device['device_id']),
-	]);
+        'title' =>   self::className(),
+        'device' => Device::find($device['device_id']),
+    ]);
     }
 
     public function port_container($device, $port)
     {
         echo view(self::viewPath(), [
-	    'title' => self::className(),
+        'title' => self::className(),
             'port' => Port::find($port['port_id']),
-	]);
+    ]);
     }
 }
