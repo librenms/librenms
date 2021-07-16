@@ -329,7 +329,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
                             $peer_data = [];
                             $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', $al_descr, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
-			    $al_peer = snmpwalk_cache_multi_oid($device, 'BgpPeerEntry', [],  'BGP4-MIB', 'aos7', '-OQUs');
+                            $al_peer = snmpwalk_cache_multi_oid($device, 'BgpPeerEntry', [],  'BGP4-MIB', 'aos7', '-OQUs');
                             $peer_data['bgpPeerDescr'] = $al_descr[$peer_identifier]['alaBgpPeerName'];
                             $peer_data['bgpPeerState'] = $al_peer[$peer_identifier]['bgpPeerState'];
                             $peer_data['bgpPeerAdminStatus'] = $al_peer[$peer_identifier]['bgpPeerAdminStatus'];
