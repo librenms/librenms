@@ -11,8 +11,8 @@ class Example extends Plugin
     public function menu()
     {
         echo view(self::viewPath(), [
-	    'title' => self::className(),
-	]);
+            'title' => self::className(),
+        ]);
     }
 
     /* Default defined in abstract Plugin class  */
