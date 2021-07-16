@@ -27,6 +27,9 @@ namespace LibreNMS;
 use Exception;
 use Illuminate\Support\Str;
 
+/**
+ * @deprecated Use \Symfony\Component\Process\Process instead.
+ */
 class Proc
 {
     /**
