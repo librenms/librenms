@@ -508,7 +508,6 @@ sudo apt install jq
 ```
 
 2: Copy the shell script to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh -O /etc/snmp/docker-stats.sh
 ```
@@ -519,7 +518,6 @@ chmod +x /etc/snmp/docker-stats.sh
 ```
 
 4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend docker /etc/snmp/docker-stats.sh
 ```
@@ -789,7 +787,8 @@ A small shell script that reports various Freeswitch call status.
 
 ### Agent
 
-1: install the script to your agent
+1: [Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `freeswitch` script to `/usr/lib/check_mk_agent/local/`
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/freeswitch -O /usr/lib/check_mk_agent/local/freeswitch`
 ```
@@ -807,7 +806,7 @@ authentication.
 
 ### SNMP Extend
 
-1: install the script to your agent
+1: Download the script onto the desired host
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/agent-local/freeswitch -O /etc/snmp/freeswitch
 ```
@@ -840,7 +839,6 @@ Extend` heading top of page.
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/gpsd -O /etc/snmp/gpsd
 ```
@@ -908,7 +906,7 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailc
 chmod +x /etc/snmp/mailcow-dockerized-postfix
 ```
 
-> Maybe you will be neeed to install `pflogsumm` on debian based OS. Please check if you have package installed.
+> Maybe you will need to install `pflogsumm` on debian based OS. Please check if you have package installed.
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -927,7 +925,6 @@ Extend` heading top of page.
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
 ```
@@ -1280,7 +1277,6 @@ Shell script to track the OGS/GE jobs running on clusters.
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rocks.sh -O /etc/snmp/rocks.sh
 ```
@@ -1291,7 +1287,6 @@ chmod +x /etc/snmp/rocks.sh
 ```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend ogs /etc/snmp/rocks.sh
 ```
@@ -1321,7 +1316,6 @@ chmod +x /etc/snmp/opensips-stats.sh
 3. Verify it is working by running `/etc/snmp/opensips-stats.sh`
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend opensips /etc/snmp/opensips-stats.sh
 ```
@@ -1339,7 +1333,6 @@ recommended you use an alternative database location
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/osupdate -O /etc/snmp/osupdate
 ```
@@ -1350,7 +1343,6 @@ chmod +x /etc/snmp/osupdate
 ```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend osupdate /etc/snmp/osupdate
 ```
@@ -1433,7 +1425,7 @@ Extend` heading top of page.
 
 ### SNMP Extend
 
-1. install missing packages - Ubuntu is shown below.
+1: Install missing packages - Ubuntu is shown below.
 ```
 apt install libparse-netstat-perl
 apt install libjson-perl
@@ -1572,7 +1564,6 @@ chmod +x /etc/snmp/powerdns.py
 ```
 
 3: Edit your snmpd.conf file and add:
-
 ```
 extend powerdns /etc/snmp/powerdns.py
 ```
@@ -1623,7 +1614,6 @@ chmod +x /etc/snmp/powerdns-recursor
 ```
 
 3: Edit your snmpd.conf file and add:
-
 ```
 extend powerdns-recursor /etc/snmp/powerdns-recursor
 ```
@@ -1647,7 +1637,6 @@ This script uses `rec_control get-all` to collect stats.
 ### SNMP Extend
 
 1: Copy the BASH script to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-dnsdist -O /etc/snmp/powerdns-dnsdist
 ```
@@ -1658,7 +1647,6 @@ chmod +x /etc/snmp/powerdns-dnsdist
 ```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend powerdns-dnsdist /etc/snmp/powerdns-dnsdist
 ```
