@@ -36,6 +36,6 @@ class Example extends Plugin
         echo view(self::viewPath(), [
             'title' => self::className(),
             'port' => Port::find($port['port_id']),
-	]);
+        ]);
     }
 }
