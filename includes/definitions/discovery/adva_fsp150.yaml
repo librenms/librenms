@@ -1,3 +1,4 @@
+mib: F3-ERP-MIB::CM-ALARM-MIB
 modules:
     os:
         hardware:
@@ -6,3 +7,83 @@ modules:
         hardware_template: '{{ ENTITY-MIB::entPhysicalName.1 }} {{ ENTITY-MIB::entPhysicalHardwareRev.1 }}'
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
+    sensors:
+        state:
+            data:
+                -
+                    oid: cmSysCondTable
+                    value: cmSysCondType
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.6.1.3.1.3.{{ $index }}'
+                    descr: 'Alarm(s) : {{ $index }}'
+                    group: Alarm Condition
+                    index: 'cmSysCondType.{{ $index }}'
+                    state_name: cmSysCondType
+                    states:
+                        - { value: 9,   generic: 3, graph: 0, descr: 'Primary NTP Server Failed' }
+                        - { value: 10,   generic: 3, graph: 0, descr: 'Secondary NTP Server Failed' }
+                        - { value: 27,  generic: 2, graph: 0, descr: 'Equipment Fault' }
+                        - { value: 34,  generic: 2, graph: 0, descr: 'PSU A Failed' }
+                        - { value: 35,  generic: 2, graph: 0, descr: 'PSU B Failed' }
+                        - { value: 53,  generic: 2, graph: 0, descr: 'SFP Mismatch' }
+                        - { value: 59,  generic: 2, graph: 0, descr: 'Over Temperature' }
+                        - { value: 60,  generic: 2, graph: 0, descr: 'Under Tempurature' }
+                        - { value: 65,  generic: 2, graph: 0, descr: 'Input Power Fault' }
+                        - { value: 86,  generic: 3, graph: 0, descr: 'SNMP Dying Gasp - Host Unreachable' }
+                        - { value: 90,  generic: 3, graph: 0, descr: 'SFP Non Qualified' }
+                        - { value: 93,  generic: 2, graph: 0, descr: 'Power No Input Unit Fault' }
+                        - { value: 121, generic: 1, graph: 0, descr: 'XFP Mismatch' }
+                        - { value: 122, generic: 3, graph: 0, descr: 'XFP Non Qualified' }
+                        - { value: 125, generic: 2, graph: 0, descr: 'LAG Member Failed' }
+                        - { value: 135, generic: 2, graph: 0, descr: 'DB Corruption' }
+                        - { value: 284, generic: 1, graph: 0, descr: 'XFP Wavelength Mismatch' }
+                        - { value: 288, generic: 3, graph: 0, descr: 'Loopback Active' }
+                        - { value: 347, generic: 2, graph: 0, descr: 'Key Exchange Failed' }
+                        - { value: 348, generic: 2, graph: 0, descr: 'Key Exchange Auth Password Missing' }
+                        - { value: 389, generic: 2, graph: 0, descr: 'Power No Input 2' }
+                        - { value: 390, generic: 2, graph: 0, descr: 'Key Exchange Stop' }
+                        - { value: 403, generic: 3, graph: 0, descr: 'HTTPS SSL Certificate Expired' }
+                        - { value: 409, generic: 2, graph: 0, descr: 'Fan Fail' }
+                        - { value: 417, generic: 2, graph: 0, descr: 'PSU A Input Fail' }
+                        - { value: 418, generic: 3, graph: 0, descr: 'PSU B Input Fail' }
+                        
+                -
+                    oid: f3ErpGroupTable
+                    value: f3ErpGroupNodeState
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.25.1.1.1.24.{{ $index }}'
+                    descr: '{{ $f3ErpGroupUserLabel }}'
+                    group: ERP Status
+                    index: 'f3ErpGroupNodeState.{{ $index }}'
+                    state_name: f3ErpGroupNodeState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'IDLE' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'PROTECTION' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'MANUAL' }
+                        - { value: 4, generic: 3, graph: 0, descr: 'FORCED' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'PENDING' }
+                        
+                -
+                    oid: f3ErpUnitTable
+                    value: f3ErpUnitPortRole
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.25.1.3.1.4.{{ $index }}'
+                    descr: 'Port : {{ $f3ErpUnitPort }}'
+                    group: ERP Node State
+                    index: 'f3ErpUnitPortRole.{{ $index }}'
+                    state_name: f3ErpUnitPortRole
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'NONE' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'NEIGHBOR' }
+                        - { value: 3, generic: 0, graph: 0, descr: 'RPL OWNER' }
+
+                -
+                    oid: f3ErpUnitTable
+                    value: f3ErpUnitPortStatus
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.25.1.3.1.5.{{ $index }}'
+                    descr: 'Port : {{ $f3ErpUnitPort }}'
+                    group: ERP Port Status
+                    index: 'f3ErpUnitPortStatus.{{ $index }}'
+                    state_name: f3ErpUnitPortStatus
+                    states:
+                        - { value: 1,  generic: 0, graph: 0, descr: 'unblocked' }
+                        - { value: 4,  generic: 0, graph: 0, descr: 'blocked RPL' }
+                        - { value: 9,  generic: 1, graph: 0, descr: 'blocked pending' }
+                        - { value: 10, generic: 3, graph: 0, descr: 'subring interconnect' }
