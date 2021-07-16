@@ -20,7 +20,7 @@ config.php
 html/css/custom/*
 html/images/custom/*
 html/plugins/*
-!html/plugins/Test/
+!html/plugins/Example/
 includes/custom/*
 junk
 nbproject

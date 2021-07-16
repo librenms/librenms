@@ -23,13 +23,15 @@ abstract class Plugin
 
     public function menu()
     {
-        $name = self::className();
-        echo view(self::viewPath(), compact('name'));
+        echo view(self::viewPath(), [
+	    'title' =>self::className();
+	]);
     }
 
     public function settings()
     {
-        $name = self::className();
-        echo view(self::viewPath(), compact('name'));
+        echo view(self::viewPath(), [
+	    'title' => self::className(),
+	]);
     }
 }

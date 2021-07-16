@@ -3,10 +3,10 @@
 	<div class="col-md-12">
 	    <div class="panel panel-default panel-condensed">
 		<div class="panel-heading">
-		    <strong>{{ $name }}</strong>
+		    <strong>{{ $title }} plugin in "Port" tab</strong>
 		</div>
-		Example plugin in "Device - Overview" tab <br>
-		{{ $device->hostname }}
+		Example display in Port tab</br>
+		{{ $port->device->hostname }}
 	    </div>
 	</div>
     </div>
