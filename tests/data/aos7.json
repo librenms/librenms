@@ -79777,8 +79777,8 @@
                     "bgpPeerOutUpdates": 16,
                     "bgpPeerInTotalMessages": 582973,
                     "bgpPeerOutTotalMessages": 666695,
-                    "bgpPeerFsmEstablishedTime": 5671697,
-                    "bgpPeerInUpdateElapsedTime": 4020,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
                     "vrfLocalAs": null
@@ -79799,8 +79799,8 @@
                     "bgpPeerOutUpdates": 5903,
                     "bgpPeerInTotalMessages": 573537,
                     "bgpPeerOutTotalMessages": 669768,
-                    "bgpPeerFsmEstablishedTime": 5670824,
-                    "bgpPeerInUpdateElapsedTime": 5671281,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
                     "vrfLocalAs": null
@@ -79821,8 +79821,8 @@
                     "bgpPeerOutUpdates": 2,
                     "bgpPeerInTotalMessages": 326855,
                     "bgpPeerOutTotalMessages": 368877,
-                    "bgpPeerFsmEstablishedTime": 9518460,
-                    "bgpPeerInUpdateElapsedTime": 6290,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
                     "vrfLocalAs": null
@@ -79843,8 +79843,8 @@
                     "bgpPeerOutUpdates": 7438,
                     "bgpPeerInTotalMessages": 317272,
                     "bgpPeerOutTotalMessages": 372651,
-                    "bgpPeerFsmEstablishedTime": 9518454,
-                    "bgpPeerInUpdateElapsedTime": 9518677,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
                     "vrfLocalAs": null

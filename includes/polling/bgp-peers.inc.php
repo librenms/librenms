@@ -337,9 +337,9 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data['bgpPeerOutUpdates'] = $al_peer[$peer_identifier]['bgpPeerOutUpdates'];
                             $peer_data['bgpPeerInTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerInTotalMessages'];
                             $peer_data['bgpPeerOutTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerOutTotalMessages'];
-                            $peer_data['bgpPeerFsmEstablishedTime'] = $al_peer[$peer_identifier]['bgpPeerFsmEstablishedTime'];
-                            $peer_data['bgpPeerInUpdateElapsedTime'] = $al_peer[$peer_identifier]['bgpPeerInUpdateElapsedTime'];
-                            $peer_data['bgpPeerLastErrorCode'] = $al_peer[$peer_identifier]['bgpPeerLastError'];
+                        //    $peer_data['bgpPeerFsmEstablishedTime'] = $al_peer[$peer_identifier]['bgpPeerFsmEstablishedTime'];
+                        //    $peer_data['bgpPeerInUpdateElapsedTime'] = $al_peer[$peer_identifier]['bgpPeerInUpdateElapsedTime'];
+                        //    $peer_data['bgpPeerLastErrorCode'] = $al_peer[$peer_identifier]['bgpPeerLastError'];
                         } elseif ($device['os_group'] == 'cisco') {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';
