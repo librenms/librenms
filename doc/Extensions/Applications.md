@@ -159,7 +159,11 @@ to LibreNMS devices)
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -O /etc/snmp/apache-stats.py
 ```
 
-2: Make the script executable (chmod +x /etc/snmp/apache-stats.py)
+2: Make the script executable
+
+```
+chmod +x /etc/snmp/apache-stats.py
+```
 
 3: Create the cache directory, '/var/cache/librenms/' and make sure
 that it is owned by the user running the SNMP daemon.
@@ -221,7 +225,11 @@ to `/etc/snmp/` on your asterisk server.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/asterisk -O /etc/snmp/asterisk
 ```
 
-2: Run `chmod +x /etc/snmp/asterisk`
+2: Make the script executable
+
+```
+chmod +x /etc/snmp/asterisk
+```
 
 3: Configure `ASCLI` in the script.
 
@@ -251,7 +259,11 @@ to `/etc/snmp/backupninja.py` on your backuped server.
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backupninja.py -O /etc/snmp/backupninja.py`
 ```
-2: Make the script executable: `chmod +x /etc/snmp/backupninja.py`
+2: Make the script executable:
+```
+chmod +x /etc/snmp/backupninja.py
+```
+
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
@@ -365,7 +377,10 @@ Extend` heading top of page.
 already and copy the script to `/usr/lib/check_mk_agent/local/bind`
 via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/bind -O /usr/lib/check_mk_agent/local/bind`
 
-2: Run `chmod +x /usr/lib/check_mk_agent/local/bind`
+2: Make the script executable
+```
+chmod +x /usr/lib/check_mk_agent/local/bind
+```
 
 3: Set the variable 'agent' to '1' in the config.
 
@@ -397,7 +412,10 @@ Optional you can define a port. By default it checks on port 443.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/certificate.py -O /etc/snmp/certificate.py
 ```
 
-2. Run `chmod +x /etc/snmp/certificate.py`
+2. Make the script executable
+```
+chmod +x /etc/snmp/certificate.py
+```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
@@ -418,7 +436,10 @@ Further details: <https://getchip.com/pages/chip>
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chip.sh -O /etc/snmp/power-stat.sh
 ```
 
-2: Run `chmod +x /etc/snmp/power-stat.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/power-stat.sh
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -447,8 +468,10 @@ Under Ubuntu/Debian just run `apt install dhcpd-pools`
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
 ```
 
-2: Run `chmod +x /etc/snmp/dhcp.py`
-
+2: Make the script executable
+```
+chmod +x /etc/snmp/dhcp.py
+```
 
 3: edit a config file:
 
@@ -485,16 +508,16 @@ sudo apt install jq
 ```
 
 2: Copy the shell script to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh -O /etc/snmp/docker-stats.sh
 ```
 
-3: Run `chmod +x /etc/snmp/docker-stats.sh`
-
+3: Make the script executable
+```
+chmod +x /etc/snmp/docker-stats.sh
+```
 
 4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend docker /etc/snmp/docker-stats.sh
 ```
@@ -516,7 +539,10 @@ A small shell script that checks your system's available random entropy.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/entropy.sh -O /etc/snmp/entropy.sh
 ```
 
-2: Run `chmod +x /etc/snmp/entropy.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/entropy.sh
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -542,7 +568,10 @@ SNMP extend script to get your exim stats data into your host.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/exim-stats.sh -O /etc/snmp/exim-stats.sh
 ```
 
-2: Run `chmod +x /etc/snmp/exim-stats.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/exim-stats.sh
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -573,7 +602,10 @@ Extend` heading top of page.
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/fail2ban
 ```
 
-2: Run `chmod +x /etc/snmp/fail2ban`
+2: Make the script executable
+```
+chmod +x /etc/snmp/fail2ban
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -630,7 +662,10 @@ script it self at the top.
 https://github.com/librenms/librenms-agent/raw/master/snmp/fbsdnfsclient
 -O /etc/snmp/fbsdnfsclient`
 
-2: Run `chmod +x /etc/snmp/fbsdnfsclient`
+2: Make the script executable
+```
+chmod +x /etc/snmp/fbsdnfsclient
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -652,7 +687,10 @@ Extend` heading top of page.
 https://github.com/librenms/librenms-agent/raw/master/snmp/fbsdnfsserver
 -O /etc/snmp/fbsdnfsserver`
 
-2: Run `chmod +x /etc/snmp/fbsdnfsserver`
+2: Make the script executable
+```
+chmod +x /etc/snmp/fbsdnfsserver
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -703,7 +741,10 @@ Change if you've modified this.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /etc/snmp/freeradius.sh
 ```
 
-2: Run `chmod +x /etc/snmp/freeradius.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/freeradius.sh
+```
 
 3: If you've made any changes to the FreeRADIUS status_server config
 (secret key, port, etc.) edit freeradius.sh and adjust the config
@@ -723,13 +764,15 @@ Extend` heading top of page.
 
 ### Agent
 
-1: [Install the agent](Agent-Setup.md) on this device if it isn't
-already and copy the script to
-`/usr/lib/check_mk_agent/local/freeradius.sh` via `wget
-https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh
--O /usr/lib/check_mk_agent/local/freeradius.sh`
+1: Install the script to your agent
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /usr/lib/check_mk_agent/local/freeradius.sh`
+```
 
-2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius.sh`
+2: Make the script executable
+```
+chmod +x /usr/lib/check_mk_agent/local/freeradius.sh
+```
 
 3: If you've made any changes to the FreeRADIUS status_server config
 (secret key, port, etc.) edit freeradius.sh and adjust the config
@@ -744,12 +787,16 @@ A small shell script that reports various Freeswitch call status.
 
 ### Agent
 
-1: [Install the agent](Agent-Setup.md) on your Freeswitch server if it
-isn't already
+1: [Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `freeswitch` script to `/usr/lib/check_mk_agent/local/`
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/freeswitch -O /usr/lib/check_mk_agent/local/freeswitch`
+```
 
-2: Copy the [freeswitch
-script](https://github.com/librenms/librenms-agent/blob/master/agent-local/freeswitch)
-to `/usr/lib/check_mk_agent/local/`
+2: Make the script executable
+```
+chmod +x /usr/lib/check_mk_agent/local/freeswitch
+```
 
 3: Configure `FSCLI` in the script. You may also have to create an
 `/etc/fs_cli.conf` file if your `fs_cli` command requires
@@ -759,11 +806,15 @@ authentication.
 
 ### SNMP Extend
 
-1: Copy the [freeswitch
-script](https://github.com/librenms/librenms-agent/blob/master/agent-local/freeswitch)
-to `/etc/snmp/` on your Freeswitch server.
+1: Download the script onto the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/agent-local/freeswitch -O /etc/snmp/freeswitch
+```
 
-2: Run `chmod +x /etc/snmp/freeswitch`
+2: Make the script executable
+```
+chmod +x /etc/snmp/freeswitch
+```
 
 3: Configure `FSCLI` in the script. You may also have to create an
 `/etc/fs_cli.conf` file if your `fs_cli` command requires
@@ -788,12 +839,14 @@ Extend` heading top of page.
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/gpsd -O /etc/snmp/gpsd
 ```
 
-2: Run `chmod +x /etc/snmp/gpsd`
+2: Make the script executable
+```
+chmod +x /etc/snmp/gpsd
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -826,7 +879,10 @@ Shell script that reports load average/memory/open-files stats of Icecast
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh
 ```
 
-2: Make the script executable `chmod +x /etc/snmp/icecast-stats.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/icecast-stats.sh
+```
 
 3. Verify it is working by running `/etc/snmp/icecast-stats.sh`
 
@@ -845,9 +901,12 @@ extend icecast /etc/snmp/icecast-stats.sh
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailcow-dockerized-postfix -O /etc/snmp/mailcow-dockerized-postfix
 ```
 
-2: Run `chmod +x /etc/snmp/mailcow-dockerized-postfix`
+2: Make the script executable
+```
+chmod +x /etc/snmp/mailcow-dockerized-postfix
+```
 
-> Maybe you will be neeed to install `pflogsumm` on debian based OS. Please check if you have package installed.
+> Maybe you will need to install `pflogsumm` on debian based OS. Please check if you have package installed.
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -866,12 +925,14 @@ Extend` heading top of page.
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
 ```
 
-2: Run `chmod +x /etc/snmp/mailscanner.php`
+2: Make the script executable
+```
+chmod +x /etc/snmp/mailscanner.php
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -897,7 +958,10 @@ This shell script checks mdadm health and array data
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
 ```
 
-2: Run `chmod +x /etc/snmp/mdadm`
+2: Make the script executable
+```
+chmod +x /etc/snmp/mdadm
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -923,7 +987,10 @@ under `SNMP Extend` heading top of page.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
 ```
 
-2: Make the script executable: `chmod +x /etc/snmp/memcached`
+2: Make the script executable:
+```
+chmod +x /etc/snmp/memcached
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -941,14 +1008,22 @@ Extend` heading top of page.
 
 ### Agent
 
-1. Install the script to your agent: `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/munin
-   -O /usr/lib/check_mk_agent/local/munin`
-1. Make the script executable (`chmod +x
-   /usr/lib/check_mk_agent/local/munin`)
-1. Create the munin scripts dir: `mkdir -p
-   /usr/share/munin/munin-scripts`
-1. Install your munin scripts into the above directory.
+1. Install the script to your agent:
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/munin -O /usr/lib/check_mk_agent/local/munin
+```
+
+2. Make the script executable
+```
+chmod +x /usr/lib/check_mk_agent/local/munin
+```
+
+3. Create the munin scripts dir:
+```
+mkdir -p /usr/share/munin/munin-scripts
+```
+
+4. Install your munin scripts into the above directory.
 
 To create your own custom munin scripts, please see this example:
 
@@ -1069,7 +1144,10 @@ location /nginx-status {
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nginx -O /etc/snmp/nginx
 ```
 
-2: Run `chmod +x /etc/snmp/nginx`
+2. Make the script executable
+```
+chmod +x /etc/snmp/nginx
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1116,7 +1194,10 @@ A shell script that gets stats from ntp client.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client -O /etc/snmp/ntp-client
 ```
 
-2: Run `chmod +x /etc/snmp/ntp-client`
+2. Make the script executable
+```
+chmod +x /etc/snmp/ntp-client
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1142,7 +1223,10 @@ A shell script that gets stats from ntp server (ntpd).
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-server.sh -O /etc/snmp/ntp-server.sh
 ```
 
-2: Run `chmod +x /etc/snmp/ntp-server.sh`
+2. Make the script executable
+```
+chmod +x /etc/snmp/ntp-server.sh
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1164,7 +1248,10 @@ Extend` heading top of page.
 https://github.com/librenms/librenms-agent/raw/master/snmp/nvidia -O
 /etc/snmp/nvidia`
 
-2: Run `chmod +x /etc/snmp/nvidia`
+2. Make the script executable
+```
+chmod +x /etc/snmp/nvidia
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -1190,15 +1277,16 @@ Shell script to track the OGS/GE jobs running on clusters.
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rocks.sh -O /etc/snmp/rocks.sh
 ```
 
-2: Run `chmod +x /etc/snmp/rocks.sh`
+2. Make the script executable
+```
+chmod +x /etc/snmp/rocks.sh
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend ogs /etc/snmp/rocks.sh
 ```
@@ -1215,16 +1303,19 @@ Script that reports load-average/memory/open-files stats of Opensips
 
 ### SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensips-stats.sh
-   -O /etc/snmp/opensips-stats.sh`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensips-stats.sh -O /etc/snmp/opensips-stats.sh
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/opensips-stats.sh`
+2: Make the script executable:
+```
+chmod +x /etc/snmp/opensips-stats.sh
+```
 
 3. Verify it is working by running `/etc/snmp/opensips-stats.sh`
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend opensips /etc/snmp/opensips-stats.sh
 ```
@@ -1242,15 +1333,16 @@ recommended you use an alternative database location
 ### SNMP Extend
 
 1: Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/osupdate -O /etc/snmp/osupdate
 ```
 
-2: Run `chmod +x /etc/snmp/osupdate`
+2. Make the script executable
+```
+chmod +x /etc/snmp/osupdate
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend osupdate /etc/snmp/osupdate
 ```
@@ -1272,11 +1364,15 @@ Extend` heading top of page.
 
 ### SNMP Extend
 
-1: Copy the shell script, phpfpmsp, to the desired host. `wget
-   https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp
-   -O /etc/snmp/phpfpmsp`
+1: Copy the shell script, phpfpmsp, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp
+```
 
-2: Run `chmod +x /etc/snmp/phpfpmsp`
+2. Make the script executable
+```
+chmod +x /etc/snmp/phpfpmsp
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1300,11 +1396,15 @@ Extend` heading top of page.
 
 ### SNMP Extend
 
-1: Copy the shell script, pi-hole, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/pi-hole -O
-/etc/snmp/pi-hole`
+1: Copy the shell script, pi-hole, to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/pi-hole -O /etc/snmp/pi-hole
+```
 
-2: Run `chmod +x /etc/snmp/pi-hole`
+2. Make the script executable
+```
+chmod +x /etc/snmp/pi-hole
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -1325,8 +1425,7 @@ Extend` heading top of page.
 
 ### SNMP Extend
 
-Ubuntu is shown below.
-
+1: Install missing packages - Ubuntu is shown below.
 ```
 apt install libparse-netstat-perl
 apt install libjson-perl
@@ -1334,12 +1433,14 @@ apt install libjson-perl
 
 2: Copy the Perl script to the desired host (the host must be added to
    LibreNMS devices)
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/portactivity -O /etc/snmp/portactivity
 ```
 
-3: Make the script executable. (chmod +x /etc/snmp/portactivity)
+3: Make the script executable
+```
+chmod +x /etc/snmp/portactivity
+```
 
 4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1364,16 +1465,20 @@ Please note that for only TCP[46] services are supported.
 
 ### SNMP Extend
 
-1: Copy the shell script, postfix-queues, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/postfix-queues
--O /etc/snmp/postfix-queues`
+1: Copy the shell script, postfix-queues, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/postfix-queues -O /etc/snmp/postfix-queues
+```
 
-2: Copy the Perl script, postfixdetailed, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/postfixdetailed
--O /etc/snmp/postfixdetailed`
+2: Copy the Perl script, postfixdetailed, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/postfixdetailed -O /etc/snmp/postfixdetailed
+```
 
-3: Make both scripts executable. Run `chmod +x
-/etc/snmp/postfixdetailed /etc/snmp/postfix-queues`
+3: Make both scripts executable
+```
+chmod +x /etc/snmp/postfixdetailed /etc/snmp/postfix-queues
+```
 
 4: Edit your snmpd.conf file and add:
 
@@ -1409,11 +1514,15 @@ Extend` heading top of page.
 
 ### SNMP Extend
 
-1: Copy the shell script, postgres, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O
-/etc/snmp/postgres`
+1: Copy the shell script, postgres, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O /etc/snmp/postgres
+```
 
-2: Run `chmod +x /etc/snmp/postgres`
+2. Make the script executable
+```
+chmod +x /etc/snmp/postgres
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -1444,14 +1553,17 @@ An authoritative DNS server: <https://www.powerdns.com/auth.html>
 
 ### SNMP Extend
 
-1: Copy the shell script, powerdns.py, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns.py
--O /etc/snmp/powerdns.py`
+1: Copy the shell script, powerdns.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns.py -O /etc/snmp/powerdns.py
+```
 
-2: Run `chmod +x /etc/snmp/powerdns.py`
+2. Make the script executable
+```
+chmod +x /etc/snmp/powerdns.py
+```
 
 3: Edit your snmpd.conf file and add:
-
 ```
 extend powerdns /etc/snmp/powerdns.py
 ```
@@ -1491,14 +1603,17 @@ defaults to use http.
 ### SNMP Extend
 
 1: Copy the shell script, powerdns-recursor, to the desired
-host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-recursor
--O /etc/snmp/powerdns-recursor`
+host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-recursor -O /etc/snmp/powerdns-recursor
+```
 
-2: Run `chmod +x /etc/snmp/powerdns-recursor`
+2. Make the script executable
+```
+chmod +x /etc/snmp/powerdns-recursor
+```
 
 3: Edit your snmpd.conf file and add:
-
 ```
 extend powerdns-recursor /etc/snmp/powerdns-recursor
 ```
@@ -1522,15 +1637,16 @@ This script uses `rec_control get-all` to collect stats.
 ### SNMP Extend
 
 1: Copy the BASH script to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-dnsdist -O /etc/snmp/powerdns-dnsdist
 ```
 
-2: Make the script executable (chmod +x /etc/snmp/powerdns-dnsdist)
+2: Make the script executable
+```
+chmod +x /etc/snmp/powerdns-dnsdist
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend powerdns-dnsdist /etc/snmp/powerdns-dnsdist
 ```
@@ -1688,18 +1804,25 @@ systemctl reload snmpd
 
 ## Proxmox
 
-1: For Proxmox 4.4+ install the libpve-apiclient-perl package `apt
-   install libpve-apiclient-perl`
+1: For Proxmox 4.4+ install the libpve-apiclient-perl package
+```
+apt install libpve-apiclient-perl
+```
 
-2: Download the script onto the desired host (the host must be added
-   to LibreNMS devices) `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/proxmox
-   -O /usr/local/bin/proxmox`
+2: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/proxmox -O /usr/local/bin/proxmox
+```
 
-3: Run `chmod +x /usr/local/bin/proxmox`
+3. Make the script executable
+```
+chmod +x /usr/local/bin/proxmox
+```
 
 4: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-   `extend proxmox /usr/local/bin/proxmox`
+```
+extend proxmox /usr/local/bin/proxmox
+```
 
 5: Note: if your snmpd doesn't run as root, you might have to invoke
    the script using sudo and modify the "extend" line
@@ -1722,11 +1845,15 @@ SNMP extend script to get your Puppet Agent data into your host.
 
 ## SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/puppet_agent.py
-   -O /etc/snmp/puppet_agent.py`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/puppet_agent.py -O /etc/snmp/puppet_agent.py
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/puppet_agent.py`
+2: Make the script executable
+```
+chmod +x /etc/snmp/puppet_agent.py
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -1759,11 +1886,15 @@ SNMP extend script to monitor PureFTPd.
 
 ### SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/pureftpd.py
-   -O /etc/snmp/pureftpd.py`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/pureftpd.py -O /etc/snmp/pureftpd.py
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/pureftpd.py`
+2: Make the script executable
+```
+chmod +x /etc/snmp/pureftpd.py
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -1799,11 +1930,15 @@ SNMP extend script to get your PI data into your host.
 
 ### SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/raspberry.sh
-   -O /etc/snmp/raspberry.sh`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/raspberry.sh -O /etc/snmp/raspberry.sh
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/raspberry.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/raspberry.sh
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -1829,11 +1964,15 @@ SNMP extend script to monitor your Redis Server
 
 ### SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/redis.py
-   -O /etc/snmp/redis.py`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/redis.py -O /etc/snmp/redis.py
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/redis.py`
+2: Make the script executable
+```
+chmod +x /etc/snmp/redis.py
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -1855,11 +1994,15 @@ SNMP extend script to monitor your (remote) RRDCached via snmp
 
 ### SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/rrdcached
-   -O /etc/snmp/rrdcached`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/rrdcached -O /etc/snmp/rrdcached
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/rrdcached`
+2: Make the script executable
+```
+chmod +x /etc/snmp/rrdcached
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -1873,14 +2016,15 @@ A small shell script that exportfs SDFS volume info.
 
 ### SNMP Extend
 
-1: Download the script onto the desired host (the host must be added
-   to LibreNMS devices)
-
+1: Download the script onto the desired host
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/sdfsinfo -O /etc/snmp/sdfsinfo
 ```
 
-2: Make the script executable (chmod +x /etc/snmp/sdfsinfo)
+2: Make the script executable
+```
+chmod +x /etc/snmp/sdfsinfo
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1900,14 +2044,18 @@ SNMP extend script to monitor your Seafile Server
 
 ### SNMP Extend
 
-1: Copy the Python script, seafile.py, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/seafile.py -O
-/etc/snmp/seafile.py`
+1: Copy the Python script, seafile.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/seafile.py -O /etc/snmp/seafile.py
+```
 
 Also you have to install the requests Package for Python3.
 Under Ubuntu/Debian just run `apt install python3-requests`
 
-2: Run `chmod +x /etc/snmp/seafile.py`
+2. Make the script executable
+```
+chmod +x /etc/snmp/seafile.py
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -1949,10 +2097,14 @@ hide_monitoring_account = With this Boolean you can hide the Account which you
 ### SNMP Extend
 
 1. Copy the Perl script, smart, to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart
+```
 
-```wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart```
-
-2. Run `chmod +x /etc/snmp/smart`
+2. Make the script executable
+```
+chmod +x /etc/snmp/smart
+```
 
 3. Edit your snmpd.conf file and add:
 
@@ -2118,11 +2270,15 @@ working by running `unbound-control stats`.
 
 ### Option 1: SNMP Extend (Preferred and easiest method)
 
-1: Copy the shell script, unbound, to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O
-/etc/snmp/unbound`
+1: Copy the shell script, unbound, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound
+```
 
-2: Run `chmod +x /etc/snmp/unbound`
+2. Make the script executable
+```
+chmod +x /etc/snmp/unbound
+```
 
 3: Edit your snmpd.conf file and add:
 
@@ -2147,11 +2303,15 @@ A small shell script that exports nut ups status.
 
 ### SNMP Extend
 
-1: Copy the [ups
-   nut](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-nut.sh)
-   to `/etc/snmp/` on your host.
+1: Copy the shell script, unbound, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/ups-nut.sh -O /etc/snmp/ups-nut.sh
+```
 
-2: Make the script executable (chmod +x /etc/snmp/ups-nut.sh)
+2. Make the script executable
+```
+chmod +x /etc/snmp/ups-nut.sh
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -2171,11 +2331,15 @@ A small shell script that exports apcacess ups status.
 
 ### SNMP Extend
 
-1: Copy the [ups
-   apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups)
-   to `/etc/snmp/` on your host.
-
-2: Run `chmod +x /etc/snmp/ups-apcups`
+1: Copy the shell script, unbound, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/ups-apcups -O /etc/snmp/ups-apcups
+```
+   
+2. Make the script executable
+```
+chmod +x /etc/snmp/ups-apcups
+```
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -2202,11 +2366,15 @@ Shell script that reports cpu-load/memory/open-files files stats of Voip Monitor
 
 ### SNMP Extend
 
-1: Download the script onto the desired host. `wget
-   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/voipmon-stats.sh
-   -O /etc/snmp/voipmon-stats.sh`
+1: Download the script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/voipmon-stats.sh -O /etc/snmp/voipmon-stats.sh
+```
 
-2: Make the script executable: `chmod +x /etc/snmp/voipmon-stats.sh`
+2: Make the script executable
+```
+chmod +x /etc/snmp/voipmon-stats.sh
+```
 
 3: Edit your snmpd.conf file (usually `/etc/snmp/voipmon-stats.sh`) and add:
 
