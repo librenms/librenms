@@ -2,7 +2,7 @@
 /*
  * LibreNMS module to display F5 LTM Virtual Server Details
  *
- * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
+ * Copyright (c) 2021 Martin Bergström <martin@bergstr0m.se>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
