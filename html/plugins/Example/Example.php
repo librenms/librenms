@@ -8,34 +8,34 @@ use App\Models\Port;
 class Example extends Plugin
 {
     /* Default defined in abstract Plugin class  */
-    public function menu()
+    public function menuData(): array
     {
-        echo view(self::viewPath(), [
-            'title' => self::className(),
-        ]);
+        return [
+            'title' => $this->className(),
+        ];
     }
 
     /* Default defined in abstract Plugin class  */
-    public function settings()
+    public function settingsData(): array
     {
-        echo view(self::viewPath(), [
-            'title' => self::className(),
-        ]);
+        return [
+            'title' => $this->className(),
+        ];
     }
 
-    public function device_overview_container($device)
+    public function deviceData($device)
     {
-        echo view(self::viewPath(), [
-            'title' =>   self::className(),
-            'device' => Device::find($device['device_id']),
-        ]);
+        return [
+            'title' => $this->className(),
+            'device' => $this->find($device['device_id']),
+        ];
     }
 
-    public function port_container($device, $port)
+    public function portData($device, $port)
     {
-        echo view(self::viewPath(), [
-            'title' => self::className(),
-            'port' => Port::find($port['port_id']),
-        ]);
+        return [
+            'title' => $this->className(),
+            'port' => $this->find($port['port_id']),
+        ];
     }
 }
