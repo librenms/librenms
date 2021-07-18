@@ -14,8 +14,8 @@ class AlterBillHistoryMaxMin extends Migration
     public function up()
     {
         Schema::table('bill_history', function (Blueprint $table) {
-            $table->bigInteger('bill_max_out')->nullable()->after('traf_total');
-            $table->bigInteger('bill_max_in')->nullable()->after('bill_max_out');
+            $table->bigInteger('bill_peak_out')->nullable()->after('traf_total');
+            $table->bigInteger('bill_peak_in')->nullable()->after('bill_peak_out');
         });
     }
 
@@ -27,7 +27,7 @@ class AlterBillHistoryMaxMin extends Migration
     public function down()
     {
         Schema::table('bill_history', function (Blueprint $table) {
-            $table->dropColumn(['bill_max_in', 'bill_max_out']);
+            $table->dropColumn(['bill_peak_in', 'bill_peak_out']);
         });
     }
 }

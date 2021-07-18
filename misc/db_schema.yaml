@@ -313,8 +313,8 @@ bill_history:
     - { Field: traf_in, Type: bigint, 'Null': false, Extra: '' }
     - { Field: traf_out, Type: bigint, 'Null': false, Extra: '' }
     - { Field: traf_total, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: bill_max_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: bill_max_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bill_peak_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bill_peak_in, Type: bigint, 'Null': true, Extra: '' }
     - { Field: pdf, Type: longblob, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bill_hist_id], Unique: true, Type: BTREE }
