@@ -27,7 +27,7 @@ class Example extends Plugin
     {
         return [
             'title' => $this->className(),
-            'device' => $this->find($device['device_id']),
+            'device' => $device->find($device['device_id']),
         ];
     }
 
@@ -35,7 +35,7 @@ class Example extends Plugin
     {
         return [
             'title' => $this->className(),
-            'port' => $this->find($port['port_id']),
+            'port' => $port->find($port['port_id']),
         ];
     }
 }
