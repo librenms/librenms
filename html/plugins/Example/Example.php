@@ -2,9 +2,6 @@
 
 namespace LibreNMS\Plugins;
 
-use App\Models\Device;
-use App\Models\Port;
-
 class Example extends Plugin
 {
     /* Default defined in abstract Plugin class  */
@@ -23,7 +20,7 @@ class Example extends Plugin
         ];
     }
 
-    public function deviceData($device)
+    public function deviceData($device): array
     {
         return [
             'title' => $this->className(),
@@ -31,7 +28,7 @@ class Example extends Plugin
         ];
     }
 
-    public function portData($device, $port)
+    public function portData($device, $port): array
     {
         return [
             'title' => $this->className(),
