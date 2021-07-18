@@ -2,9 +2,9 @@
 
 namespace LibreNMS\Plugins;
 
-use View;
 use App\Models\Device;
 use App\Models\Port;
+use View;
 
 abstract class Plugin
 {
@@ -52,27 +52,27 @@ abstract class Plugin
     {
         return [
             'title' =>$this->className(),
-	];
+        ];
     }
 
     protected function settingsData(): array
     {
         return [
             'title' => $this->className(),
-	];
+        ];
     }
 
     protected function portData(Port $port): array
     {
         return [
             'title' =>$this->className(),
-	];
+        ];
     }
 
     protected function deviceData(Device $device): array
     {
         return [
             'title' => $this->className(),
-	];
+        ];
     }
 }
