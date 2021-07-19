@@ -339,8 +339,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data['bgpPeerOutTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerOutTotalMessages'];
                             $peer_data['bgpPeerFsmEstablishedTime'] = $al_peer[$peer_identifier]['bgpPeerFsmEstablishedTime'];
                             $peer_data['bgpPeerInUpdateElapsedTime'] = $al_peer[$peer_identifier]['bgpPeerInUpdateElapsedTime'];
-			    $peer_data['bgpLocalAddr'] = $al_peer[$peer_identifier]['bgpPeerLocalAddr'];
-			    $peer_data['bgpPeerLastErrorCode'] = $al_peer[$peer_identifier]['bgpPeerLastError'];
+                            $peer_data['bgpLocalAddr'] = $al_peer[$peer_identifier]['bgpPeerLocalAddr'];
+                            $peer_data['bgpPeerLastErrorCode'] = $al_peer[$peer_identifier]['bgpPeerLastError'];
                             $peer_data['bgpPeerRemoteAddr'] = $al_peer[$peer_identifier]['bgpPeerRemoteAddr'];
                         } elseif ($device['os_group'] == 'cisco') {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
