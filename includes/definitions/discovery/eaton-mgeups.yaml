@@ -1,4 +1,4 @@
-mib: MG-SNMP-UPS-MIB:EATON-OIDS:EATON-EMP-MIB
+mib: MG-SNMP-UPS-MIB:EATON-OIDS:EATON-EMP-MIB:XUPS-MIB
 modules:
     os:
         hardware:
@@ -21,8 +21,14 @@ modules:
                     oid: xupsEnvironment
                     value: xupsEnvRemoteTemp
                     num_oid: '.1.3.6.1.4.1.534.1.6.5.{{ $index }}'
-                    descr: 'Environment'
+                    descr: 'Remote'
                     index: 'xupsEnvRemoteTemp.{{ $index }}'
+                -
+                    oid: xupsEnvironment
+                    value: xupsEnvAmbientTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.1.{{ $index }}'
+                    descr: 'Ambient'
+                    index: 'xupsEnvAmbientTemp.{{ $index }}'
         humidity:
             data:
                 -
@@ -173,4 +179,17 @@ modules:
                         - { descr: 'Tolerance Volt. Out', graph: 0, value: 2, generic: 2 }
                         - { descr: 'Tolerance Freq. Out', graph: 0, value: 3, generic: 2 }
                         - { descr: 'No Voltage', graph: 0, value: 4, generic: 2 }
+                -
+                    oid: xupsAlarms
+                    value: xupsAlarms
+                    num_oid: '.1.3.6.1.4.1.534.1.7.1.{{ $index }}'
+                    descr: 'XUPS Alarm'
+                    index: 'xupsAlarms.{{ $index }}'
+                    state_name: xupsAlarms
+                    states:
+                        - { descr: 'No Alarm', graph: 0, value: 0, generic: 0 }
+                        - { descr: 'Alarm raised', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Alarms raised', graph: 0, value: 2, generic: 2 }
+                        - { descr: 'Alarms raised', graph: 0, value: 3, generic: 2 }
+                        - { descr: 'Alarms raised', graph: 0, value: 4, generic: 2 }
 
