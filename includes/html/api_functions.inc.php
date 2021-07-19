@@ -631,6 +631,7 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
             return api_error(500, 'Failed to update existing bgp');
         }
     }
+
     return api_success_noresult(200, 'BGP description for peer ' . $bgp['bgpPeerIdentifier'] . ' on device ' . $bgp['device_id'] . ' updated to ' . $bgp_descr . '.');
 }
 
