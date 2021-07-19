@@ -117,6 +117,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
         Route::get('search/{search}', 'LegacyApiController@search_ports')->name('search_ports');
+        Route::get('mac/{search}', 'LegacyApiController@search_by_mac')->name('search_mac');
         Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
 
