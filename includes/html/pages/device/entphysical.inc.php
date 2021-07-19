@@ -38,7 +38,6 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<strong>' . $ent['entPhysicalParentRelPos'] . '.</strong> ';
         }
 
-
         $display_entPhysicalName = $ent['entPhysicalName'];
         if ($ent['ifIndex']) {
             $interface = get_port_by_ifIndex($device['device_id'], $ent['ifIndex']);
