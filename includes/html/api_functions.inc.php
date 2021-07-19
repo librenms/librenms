@@ -619,9 +619,8 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
 
     // update existing bgp
     if (count($bgps) == 0) {
-        return api_error(404, "BGP peer " . $bgpPeerId . " does not exist");
-    }
-    else if (is_array($bgps) && count($bgps) == 1) {
+        return api_error(404, 'BGP peer ' . $bgpPeerId . ' does not exist');
+    } elseif (is_array($bgps) && count($bgps) == 1) {
         $bgp = $bgps[0];
 
         $update_data = [
@@ -632,7 +631,7 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
             return api_error(500, 'Failed to update existing bgp');
         }
     }
-    return api_success_noresult(200, "BGP description for peer " . $bgp['bgpPeerIdentifier'] . " on device " . $bgp['device_id'] . " updated to " . $bgp_descr . ".");
+    return api_success_noresult(200, 'BGP description for peer ' . $bgp['bgpPeerIdentifier'] . ' on device ' . $bgp['device_id'] . ' updated to ' . $bgp_descr . '.');
 }
 
 function list_cbgp(Illuminate\Http\Request $request)
