@@ -85,7 +85,7 @@ class Fortigate extends Fortinet implements OSPolling
 
     public function discoverWirelessApCount()
     {
-        $oid = '.1.3.6.1.4.1.12356.101.14.2.4.0';
+        $oid = '.1.3.6.1.4.1.12356.101.14.2.5.0';
 
         return [
             new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
