@@ -171,5 +171,5 @@ modules:
                         -
                             oid: entPhysicalName
                             op: 'regex'
-                            value: '/port|Chassis|PS-1/'
+                            value: '/port|Chassis|PS-1|PS-2/'
 
