@@ -17,7 +17,7 @@ abstract class Plugin
     final protected static function prefix()
     {
         View::addLocation(base_path('html/plugins'));
-	
+
         return self::className() . '/resources/views/';
     }
 
