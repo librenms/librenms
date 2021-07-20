@@ -308,7 +308,7 @@ return [
             'help' => 'Anzahl an Tagen welche ein Benutzer eingeloggt bleibt wenn er die Checkbox zum eingeloggt bleiben nutzt',
         ],
         'authlog_purge' => [
-            'description' => 'Entferne Auth log Einträge welche älter sind als (Tage)',
+            'description' => 'Entferne Auth log Einträge welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
         'base_url' => [
@@ -316,7 +316,7 @@ return [
             'help' => 'Sollte nur gesetzt werden wenn man den Zugriff nur über einen bestimmten Hostnamen/Port erlauben möchte',
         ],
         'device_perf_purge' => [
-            'description' => 'Entferne Performanzdaten welche älter sind als (Tage)',
+            'description' => 'Entferne Performanzdaten welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
         'distributed_poller' => [
@@ -393,7 +393,7 @@ return [
             'help' => 'Name benutzt als Teil der "from" E-Mail Adresse',
         ],
         'eventlog_purge' => [
-            'description' => 'Entferne Event Log Daten welche älter sind als (Tage)',
+            'description' => 'Entferne Event Log Daten welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
         'favicon' => [
@@ -586,7 +586,7 @@ return [
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports älter als (days)',
+            'description' => 'Ports älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'public_status' => [
@@ -606,7 +606,7 @@ return [
             'help' => 'Verzeichnis für RRD Dateien.  Standardmässig ist RRD innerhalb des LibreNMS Verzeichnisses.  Eine Änderung verschiebt nicht die vorhandenen RRD Dateien.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Dateien älter als (Tage)',
+            'description' => 'RRD Dateien älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'rrd_rra' => [
@@ -700,7 +700,7 @@ return [
             'description' => 'Filtere Syslog Meldungen beinhaltend',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog Einträge älter als (Tage)',
+            'description' => 'Syslog Einträge älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'title_image' => [

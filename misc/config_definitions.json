@@ -625,6 +625,7 @@
         },
         "authlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 4,
@@ -861,6 +862,7 @@
         },
         "device_perf_purge": {
             "default": 7,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 7,
@@ -1551,6 +1553,7 @@
         },
         "eventlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 0,
@@ -4703,6 +4706,7 @@
         },
         "route_purge": {
             "default": 10,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 2,
@@ -4733,6 +4737,7 @@
             "section": "cleanup",
             "order": 8,
             "default": 0,
+            "units": "days",
             "type": "integer"
         },
         "rrd_rra": {
@@ -5159,9 +5164,10 @@
         },
         "syslog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
-            "order": 2,
+            "order": 1,
             "type": "integer"
         },
         "temp_dir": {
