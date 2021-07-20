@@ -12,7 +12,7 @@ class Example extends Plugin
     {
         return [
             'title' => self::className(),
-//	    'devices' => Device::all();
+            //'devices' => Device::all();
         ];
     }
 }
