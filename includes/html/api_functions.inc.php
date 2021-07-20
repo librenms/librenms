@@ -616,7 +616,7 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid id has been provided');
     }
 
-    $bgps = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeer_id` = ?", [$bgpPeerId]);
+    $bgps = dbFetchRows('SELECT * FROM `bgpPeers` WHERE `bgpPeer_id` = ?', [$bgpPeerId]);
 
     // get description
     $bgp_descr = $data['bgp_descr'];
