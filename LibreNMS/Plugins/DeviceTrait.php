@@ -17,7 +17,7 @@ trait DeviceTrait
     {
         return [
             'title' => self::className(),
-	    'device' => $device,
+            'device' => $device,
         ];
     }
 }
