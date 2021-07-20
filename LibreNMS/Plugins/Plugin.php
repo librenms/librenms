@@ -8,71 +8,41 @@ use View;
 
 abstract class Plugin
 {
-    protected $menu_view = 'menu';
-    protected $settings_view = 'settings';
-    protected $device_view = 'device_overview';
-    protected $port_view = 'port';
-    private $prefix;
+    protected static $menu_view = 'menu';
+    protected static $settings_view = 'settings';
 
-    public function __construct()
-    {
-        View::addLocation(base_path('html/plugins'));
-        $this->prefix = $this->className() . '/resources/views/';
-    }
-
-    final protected function className()
+    final protected static function className()
     {
         return str_replace(__NAMESPACE__ . '\\', '', get_called_class());
     }
 
-    final public function menu()
+    final protected static function prefix()
     {
-        // Workwarround because of static call.
-        $classname = static::class;
-        $class = new $classname();
-        echo view($class->prefix . $class->menu_view, $class->menuData());
+	View::addLocation(base_path('html/plugins'));
+        return self::className() . '/resources/views/';
     }
 
-    final public function settings()
+    final public static function menu()
     {
-        echo view($this->prefix . $this->settings_view, $this->settingsData());
+        echo view(self::prefix() . self::$menu_view, self::menuData());
     }
 
-    final public function device_overview_container($device)
+    final public static function settings()
     {
-        echo view($this->prefix . $this->device_view, $this->deviceData(Device::find($device['id'])));
+        echo view(self::prefix() . self::$settings_view, self::settingsData());
     }
 
-    final public function port_container($device, $port)
-    {
-        echo view($this->prefix . $this->port_view, $this->portData(Port::find($port['id'])));
-    }
-
-    protected function menuData(): array
+    protected static function menuData(): array
     {
         return [
-            'title' =>$this->className(),
+            'title' => self::className(),
         ];
     }
 
-    protected function settingsData(): array
+    protected static function settingsData(): array
     {
         return [
-            'title' => $this->className(),
-        ];
-    }
-
-    protected function portData(Port $port): array
-    {
-        return [
-            'title' =>$this->className(),
-        ];
-    }
-
-    protected function deviceData(Device $device): array
-    {
-        return [
-            'title' => $this->className(),
+            'title' => self::className(),
         ];
     }
 }
