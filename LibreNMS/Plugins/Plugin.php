@@ -2,8 +2,6 @@
 
 namespace LibreNMS\Plugins;
 
-use App\Models\Device;
-use App\Models\Port;
 use View;
 
 abstract class Plugin
@@ -18,7 +16,8 @@ abstract class Plugin
 
     final protected static function prefix()
     {
-	View::addLocation(base_path('html/plugins'));
+        View::addLocation(base_path('html/plugins'));
+	
         return self::className() . '/resources/views/';
     }
 

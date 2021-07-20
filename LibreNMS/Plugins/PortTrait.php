@@ -10,14 +10,14 @@ trait PortTrait
 
     final public static function port_container($device, $port)
     {
-	echo view(self::prefix() . self::$port_view, self::portData(Port::find($port['port_id'])));
+        echo view(self::prefix() . self::$port_view, self::portData(Port::find($port['port_id'])));
     }
 
     protected static function portData(Port $port): array
     {
-	return [
-	    'title' => self::className(),
-	    'port'  => $port,
-	];
+        return [
+            'title' => self::className(),
+            'port'  => $port,
+        ];
     }
 }
