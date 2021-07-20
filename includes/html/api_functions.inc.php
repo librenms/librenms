@@ -612,7 +612,11 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
     $bgp = [];
     //find existing bgp for update
     $bgpPeerId = $request->route('id');
-    $bgps = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeer_id` = $bgpPeerId LIMIT 1");
+    if (! is_numeric($bgpPeerId)) {
+        return api_error(400, 'Invalid id has been provided');
+    }
+
+    $bgps = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeer_id` = ?", [$bgpPeerId]);
 
     // get description
     $bgp_descr = $data['bgp_descr'];
