@@ -7,6 +7,12 @@ function printEntPhysical($device, $ent, $level, $class)
     $ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
 
     foreach ($ents as $ent) {
+        //Let's find if we have any sensors attached to the current entity;
+        //We hit this code for every type of entity because not all vendors have 1 'sensor' entity per sensor
+        $sensors = DeviceCache::getPrimary()->sensors()->where(function (Builder $query) use ($ent) {
+            return $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
+                ->orWhere('sensor_index', $ent['entPhysicalIndex']);
+        })->get();
         echo "
  <li class='$class'>";
 
@@ -20,13 +26,6 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<i class="fa fa-square fa-lg icon-theme" aria-hidden="true"></i> ';
         } elseif ($ent['entPhysicalClass'] == 'sensor') {
             echo '<i class="fa fa-heartbeat fa-lg icon-theme" aria-hidden="true"></i> ';
-            $sensor = DeviceCache::getPrimary()->sensors()->where(function (Builder $query) use ($ent) {
-                return $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
-                    ->orWhere('sensor_index', $ent['entPhysicalIndex']);
-            })->first();
-            if ($sensor) {
-                $link = "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
-            }
         } elseif ($ent['entPhysicalClass'] == 'backplane') {
             echo '<i class="fa fa-bars fa-lg icon-theme" aria-hidden="true"></i> ';
         } elseif ($ent['entPhysicalClass'] == 'stack') {
@@ -39,36 +38,34 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<strong>' . $ent['entPhysicalParentRelPos'] . '.</strong> ';
         }
 
-        if (isset($link)) {
-            echo $link;
-        }
-
+        $display_entPhysicalName = $ent['entPhysicalName'];
         if ($ent['ifIndex']) {
             $interface = get_port_by_ifIndex($device['device_id'], $ent['ifIndex']);
             $interface = cleanPort($interface);
-            $ent['entPhysicalName'] = generate_port_link($interface);
+            $display_entPhysicalName = generate_port_link($interface);
         }
 
-        if ($ent['entPhysicalModelName'] && $ent['entPhysicalName']) {
-            echo '<strong>' . $ent['entPhysicalModelName'] . '</strong> (' . $ent['entPhysicalName'] . ')';
+        if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {
+            echo '<strong>' . $ent['entPhysicalModelName'] . '</strong> (' . $display_entPhysicalName . ')';
         } elseif ($ent['entPhysicalModelName']) {
             echo '<strong>' . $ent['entPhysicalModelName'] . '</strong>';
         } elseif (is_numeric($ent['entPhysicalName']) && $ent['entPhysicalVendorType']) {
             echo '<strong>' . $ent['entPhysicalName'] . ' ' . $ent['entPhysicalVendorType'] . '</strong>';
-        } elseif ($ent['entPhysicalName']) {
-            echo '<strong>' . $ent['entPhysicalName'] . '</strong>';
+        } elseif ($display_entPhysicalName) {
+            echo '<strong>' . $display_entPhysicalName . '</strong>';
         } elseif ($ent['entPhysicalDescr']) {
             echo '<strong>' . $ent['entPhysicalDescr'] . '</strong>';
         }
 
-        if ($ent['entPhysicalClass'] == 'sensor' && isset($sensor)) {
-            echo ' ';
-            echo $sensor->sensor_class == 'state' ? get_state_label($sensor->toArray()) : get_sensor_label_color($sensor->toArray());
-        }
-
-        if (isset($link)) {
-            echo '</a>';
-            unset($link);
+        // Display matching sensor value (without descr, as we have only one)
+        if ($sensors->count() == 1) {
+            foreach ($sensors as $sensor) {
+                echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
+                //echo "<span style='color: #000099;'>" . $sensor->sensor_class . ': ' . $sensor->sensor_descr . '</span>';
+                echo ' ';
+                echo $sensor->sensor_class == 'state' ? get_state_label($sensor->toArray()) : get_sensor_label_color($sensor->toArray());
+                echo '</a>';
+            }
         }
 
         // display entity state
@@ -118,6 +115,19 @@ function printEntPhysical($device, $ent, $level, $class)
             echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
         }
 
+        // Display sensors values with their descr, as we have more than one attached to this entPhysical
+        if ($sensors->count() > 1) {
+            echo "<br>Sensors:<div class='interface-desc' style='margin-left: 20px;'>";
+            foreach ($sensors as $sensor) {
+                $disp_name = str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr);
+                echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
+                echo "<span style='color: #000099;'>" . $disp_name . ' ' . $sensor->sensor_class . '</span>';
+                echo ' ';
+                echo $sensor->sensor_class == 'state' ? get_state_label($sensor->toArray()) : get_sensor_label_color($sensor->toArray());
+                echo '</a><br>';
+            }
+            echo '</div>';
+        }
         echo '</div>';
 
         $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalContainedIn = '" . $ent['entPhysicalIndex'] . "'");
