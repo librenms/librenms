@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Config;
 
 class Plugin extends BaseModel
 {
@@ -41,5 +42,40 @@ class Plugin extends BaseModel
     public function scopeIsActive($query)
     {
         return $query->where('plugin_active', 1);
+    }
+
+    public static function scan_new_plugins()
+    {
+        $countInstalled = 0;
+
+        if (file_exists(Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(Config::get('plugin_dir')), ['..', '.']);
+            $plugin_files = array_diff($plugin_files, self::pluck('plugin_name')->toarray());
+            foreach ($plugin_files as $name) {
+                if (is_dir(Config::get('plugin_dir') . '/' . $name)
+                    && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')
+                    && dbInsert(['plugin_name' => $name, 'plugin_active' => '0'], 'plugins')) {
+                    $countInstalled++;
+                }
+            }
+        }
+
+        return $countInstalled;
+    }
+
+    public static function scan_removed_plugins()
+    {
+        $countRemoved = 0;
+
+        if (file_exists(Config::get('plugin_dir'))) {
+            $plugin_files = scandir(Config::get('plugin_dir'));
+            foreach (self::whereNotIn('plugin_name', $plugin_files)->select('plugin_name')->get() as $plugin) {
+                if (dbDelete('plugins', '`plugin_name` = ?', $plugin->plugin_name)) {
+                    $countRemoved++;
+                }
+            }
+        }
+
+        return  $countRemoved;
     }
 }

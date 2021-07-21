@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Plugins;
 
+use LibreNMS\Config;
 use View;
 
 abstract class Plugin
