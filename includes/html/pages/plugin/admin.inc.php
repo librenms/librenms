@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Plugin;
+
 if (Auth::user()->hasGlobalAdmin()) {
     // Scan for new plugins and add to the database
-    $new_plugins = scan_new_plugins();
-    $removed_plugins = scan_removed_plugins();
+    $new_plugins = Plugin::scan_new_plugins();
+    $removed_plugins = Plugin::scan_removed_plugins();
 
     // Check if we have to toggle enabled / disable a particular module
     $plugin_id = $_POST['plugin_id'];
@@ -27,8 +29,7 @@ $.ajax({
         $(this).html(s);
     }
 });
-</script>
-';
+</script>';
         }
     }//end if?>
 
