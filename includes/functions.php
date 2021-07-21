@@ -320,14 +320,14 @@ function delete_device($id)
     \App\Models\DeviceOutage::where('device_id', $id)->delete();
 
     \App\Models\Port::where('device_id', $id)
-		    ->with('device')
-		    ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
-		    ->chunk(100, function ($ports) use (&$ret) {
-			foreach ($ports as $port) {
-			    $port->delete();
-			    $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
-			}
-		    });
+                    ->with('device')
+                    ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
+                    ->chunk(100, function ($ports) use (&$ret) {
+                        foreach ($ports as $port) {
+                            $port->delete();
+                            $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
+                        }
+                    });
 
     // Remove sensors manually due to constraints
     foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `device_id` = ?', [$id]) as $sensor) {
@@ -1132,14 +1132,14 @@ function device_has_ip($ip)
 {
     if (IPv6::isValid($ip)) {
         $ip_address = \App\Models\Ipv6Address::query()
-					     ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-					     ->with('port.device')
-					     ->first();
+                                             ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
+                                             ->with('port.device')
+                                             ->first();
     } elseif (IPv4::isValid($ip)) {
         $ip_address = \App\Models\Ipv4Address::query()
-					     ->where('ipv4_address', $ip)
-					     ->with('port.device')
-					     ->first();
+                                             ->where('ipv4_address', $ip)
+                                             ->with('port.device')
+                                             ->first();
     }
 
     if (isset($ip_address) && $ip_address->port) {
@@ -1792,8 +1792,10 @@ function device_is_up($device, $record_perf = false)
             if ($device['status'] != $response['status']) {
                 if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
                     // use current time as a starting point when an outage starts
-                    $data = ['device_id' => $device['device_id'],
-                             'going_down' => time(), ];
+                    $data = [
+                        'device_id' => $device['device_id'],
+                        'going_down' => time(), 
+                    ];
                     dbInsert($data, 'device_outages');
                 }
             }
