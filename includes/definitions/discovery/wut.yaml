@@ -9,7 +9,7 @@ modules:
                     oid: wtWebGraphThermHygro
                     value: wtWebGraphThermHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
-                    descr: wtWebGraphThermHygroPortName
+                    descr: 'Environment'
                     index: wtWebGraphThermHygroSensorNo.{{ $index }}
                     skip_values:
                         -
@@ -20,13 +20,13 @@ modules:
                     oid: wtWebGraphThermoHygro
                     value: wtWebGraphThermoHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
-                    descr: wtWebGraphThermoHygroPortName
+                    descr: 'Environment'
                     index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
                         -
-                            oid: wtWebGraphThermoHygroPortName
+                            oid: wtWebGraphThermoHygroSensorNo
                             op: 'not_contains'
-                            value: 'Temp'
+                            value: 1
         humidity:
             options:
                 divisor: 10
@@ -35,7 +35,7 @@ modules:
                     oid: wtWebGraphThermHygro
                     value: wtWebGraphThermHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
-                    descr: wtWebGraphThermHygroPortName
+                    descr: 'Environment'
                     index: wtWebGraphThermHygroSensorNo.{{ $index }}
                     skip_values:
                         -
@@ -45,14 +45,14 @@ modules:
                 -
                     oid: wtWebGraphThermoHygro
                     value: wtWebGraphThermoHygroBinaryTempValue
-                    num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
-                    descr: wtWebGraphThermoHygroPortName
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
+                    descr: 'Environment'
                     index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
                         -
-                            oid: wtWebGraphThermoHygroPortName
+                            oid: wtWebGraphThermoHygroSensorNo
                             op: 'not_contains'
-                            value: 'Feucht'
+                            value: 2
         pressure:
             options:
                 divisor: 100
@@ -61,7 +61,7 @@ modules:
                     oid: wtWebGraphThermoBaro
                     value: wtWebGraphThermoBaroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.16.1.4.1.1.{{ $index }}'
-                    descr: wtWebGraphThermoBaroPortName
+                    descr: 'Environment'
                     index: wtWebGraphThermoBaroSensorNo.{{ $index }}
                     skip_values:
                         -
