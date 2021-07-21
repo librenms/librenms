@@ -20,8 +20,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
         } elseif ($device['os'] === 'firebrick') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
-      //  } elseif ($device['os'] === 'aos7') {
-      //      $peer_data_check = snmpwalk_cache_multi_oid($device, 'alaBgpPeerAS', [], 'ALCATEL-IND1-BGP-MIB', 'aos7');
+        } elseif ($device['os'] === 'aos7') {
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'alaBgpPeerAS', [], 'ALCATEL-IND1-BGP-MIB', 'aos7');
         } elseif ($device['os'] === 'vrp') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
         } elseif ($device['os_group'] == 'cisco') {
@@ -339,7 +339,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data['bgpPeerOutTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerOutTotalMessages'];
                             $peer_data['bgpPeerFsmEstablishedTime'] = $al_peer[$peer_identifier]['bgpPeerFsmEstablishedTime'];
                             $peer_data['bgpPeerInUpdateElapsedTime'] = $al_peer[$peer_identifier]['bgpPeerInUpdateElapsedTime'];
-			    $error_data = explode(' ', $al_peer[$peer_identifier]['bgpPeerLastError']);
+                            $error_data = explode(' ', $al_peer[$peer_identifier]['bgpPeerLastError']);
                             $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
                             $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                         } elseif ($device['os_group'] == 'cisco') {
