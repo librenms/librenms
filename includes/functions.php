@@ -1794,7 +1794,7 @@ function device_is_up($device, $record_perf = false)
                     // use current time as a starting point when an outage starts
                     $data = [
                         'device_id' => $device['device_id'],
-                        'going_down' => time(), 
+                        'going_down' => time(),
                     ];
                     dbInsert($data, 'device_outages');
                 }
