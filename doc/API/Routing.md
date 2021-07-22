@@ -103,6 +103,33 @@ Output:
 }
 ```
 
+### `edit_bgp_descr`
+
+This is a POST type request
+Set the BGP session description by ID
+
+Route: `/api/v0/bgp/:id`
+
+Input:
+
+- id = The id of the BGP Peer Session.
+- bgp_descr = The description for the bgpPeerDescr field on the BGP Session.
+
+Example:
+
+```curl
+curl -v -H 'X-Auth-Token: YOURAPITOKENHERE' --data '{"bgp_descr": "Your description here"}' https://librenms.org/api/v0/bgp/4
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "BGP description for peer X.X.X.X on device 1 updated to Your description here"
+}
+```
+
 ### `list_cbgp`
 
 List the current BGP sessions counters.

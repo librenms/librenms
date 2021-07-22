@@ -602,6 +602,43 @@ function get_bgp(Illuminate\Http\Request $request)
     return api_success($bgp_session, 'bgp_session');
 }
 
+function edit_bgp_descr(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (! $data) {
+        return api_error(500, 'Invalid JSON data');
+    }
+
+    $bgp = [];
+    //find existing bgp for update
+    $bgpPeerId = $request->route('id');
+    if (! is_numeric($bgpPeerId)) {
+        return api_error(400, 'Invalid id has been provided');
+    }
+
+    $bgps = dbFetchRows('SELECT * FROM `bgpPeers` WHERE `bgpPeer_id` = ?', [$bgpPeerId]);
+
+    // get description
+    $bgp_descr = $data['bgp_descr'];
+
+    // update existing bgp
+    if (count($bgps) == 0) {
+        return api_error(404, 'BGP peer ' . $bgpPeerId . ' does not exist');
+    } elseif (is_array($bgps) && count($bgps) == 1) {
+        $bgp = $bgps[0];
+
+        $update_data = [
+            'bgpPeerDescr' => $bgp_descr,
+        ];
+        $update = dbUpdate($update_data, 'bgpPeers', 'bgpPeer_id=?', [$bgpPeerId]);
+        if ($update === false || $update < 0) {
+            return api_error(500, 'Failed to update existing bgp');
+        }
+    }
+
+    return api_success_noresult(200, 'BGP description for peer ' . $bgp['bgpPeerIdentifier'] . ' on device ' . $bgp['device_id'] . ' updated to ' . $bgp_descr . '.');
+}
+
 function list_cbgp(Illuminate\Http\Request $request)
 {
     $sql = '';
