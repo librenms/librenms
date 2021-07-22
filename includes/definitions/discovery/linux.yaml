@@ -1,0 +1,142 @@
+mib: LSI-MegaRAID-SAS-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: adapterPropertiesTable
+                    value: temperatureROC
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.42.{{ $index }}'
+                    index: 'controllertemp.{{ $index }}'
+                    group: 'RAID Controller {{ $adapterID-APT }}'
+                    descr: 'Controller'
+                -
+                    oid: bbuTable
+                    value: temperature
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.6.2.1.16.{{ $index }}'
+                    index: 'bbutemp.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID }}'
+                    descr: 'BBU'
+                -
+                    oid: physicalDriveTable
+                    value: pdTemperature
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.36.{{ $index }}'
+                    index: 'slot.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID-PDT }} Enclosure {{ enclDeviceId }}'
+                    descr:  '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }}'
+        count:
+            data:
+                -
+                    oid: adapterPropertiesTable
+                    value: vdPresentCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.18.{{ $index }}'
+                    index: 'vdsum.{{ $index }}'
+                    group: 'RAID Controller {{ $adapterID-APT }}'
+                    descr: 'Virtual disks'
+                -
+                    oid: adapterPropertiesTable
+                    value: pdDiskPredFailureCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.19.{{ $index }}'
+                    index: 'vdfail.{{ $index }}'
+                    group: 'RAID Controller {{ $adapterID-APT }}'
+                    warn_limit: 1
+                    descr: 'Virtual disk failure'
+                -
+                    oid: adapterPropertiesTable
+                    value: pdDiskPredFailureCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.23.{{ $index }}'
+                    index: 'criticaldisks.{{ $index }}'
+                    group: 'RAID Controller {{ $adapterID-APT }}'
+                    warn_limit: 1
+                    descr: 'Critical disks'
+                -
+                    oid: adapterPropertiesTable
+                    value: pdDiskFailedCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.24.{{ $index }}'
+                    index: 'faileddisks.{{ $index }}'
+                    group: 'RAID Controller {{ $adapterID-APT }}'
+                    warn_limit: 1
+                    descr: 'Failed disks'
+        state:
+            data:
+                -
+                    oid: adapterPropertiesTable
+                    value: alarmState
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.4.{{ $index }}'
+                    group: 'RAID Controller {{ $adapterID-APT }}'
+                    descr: 'Alarm'
+                    state_name: alarmState
+                    states:
+                        - { descr: disabled , graph: 0, value: 0, generic: 1 }
+                        - { descr: enabled  , graph: 0, value: 1, generic: 0 }
+                -
+                    oid: enclosurePowerSupplyTable
+                    value: powerSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.5.5.1.3.{{ $index }}'
+                    group: 'Enclosure {{ $enclosureId-EPST }}'
+                    descr: 'Powersupply {{ $powerSupplyID }}'
+                    state_name: powerSupplyStatus
+                    states:
+                        - { descr: invalid       , graph: 0, value: 1, generic: 2 }
+                        - { descr: ok            , graph: 0, value: 2, generic: 0 }
+                        - { descr: critical      , graph: 0, value: 3, generic: 2 }
+                        - { descr: nonCritical   , graph: 0, value: 4, generic: 1 }
+                        - { descr: unrecoverable , graph: 0, value: 5, generic: 2 }
+                        - { descr: notInstalled  , graph: 0, value: 6, generic: 3 }
+                        - { descr: unknown       , graph: 0, value: 7, generic: 1 }
+                        - { descr: notAvailible  , graph: 0, value: 8, generic: 3 }
+                -
+                    oid: enclosureFanTable
+                    value: fanStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.5.3.1.3.{{ $index }}'
+                    group: 'Enclosure {{ $enclosureId }}'
+                    descr: 'FAN {{ $fanID }}'
+                    state_name: fanStatus
+                    states:
+                        - { descr: invalid       , graph: 0, value: 1, generic: 2 }
+                        - { descr: ok            , graph: 0, value: 2, generic: 0 }
+                        - { descr: critical      , graph: 0, value: 3, generic: 2 }
+                        - { descr: nonCritical   , graph: 0, value: 4, generic: 1 }
+                        - { descr: unrecoverable , graph: 0, value: 5, generic: 2 }
+                        - { descr: notInstalled  , graph: 0, value: 6, generic: 3 }
+                        - { descr: unknown       , graph: 0, value: 7, generic: 1 }
+                        - { descr: notAvailible  , graph: 0, value: 8, generic: 3 }
+                -
+                    oid: enclosureAlarmTable
+                    value: alarmStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.5.7.{{ $index }}'
+                    group: 'Enclosure {{ $enclosureId-EAT }}'
+                    descr: 'Alarm'
+                    state_name: alarmStatus
+                    states:
+                        - { descr: invalid       , graph: 0, value: 1, generic: 2 }
+                        - { descr: ok            , graph: 0, value: 2, generic: 0 }
+                        - { descr: critical      , graph: 0, value: 3, generic: 2 }
+                        - { descr: nonCritical   , graph: 0, value: 4, generic: 1 }
+                        - { descr: unrecoverable , graph: 0, value: 5, generic: 2 }
+                        - { descr: notInstalled  , graph: 0, value: 6, generic: 3 }
+                        - { descr: unknown       , graph: 0, value: 7, generic: 1 }
+                        - { descr: notAvailible  , graph: 0, value: 8, generic: 3 }
+                -
+                    oid: bbuTable
+                    value: chargerStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.6.2.1.20.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID }}'
+                    descr: 'BBU charger'
+                    state_name: chargerStatus
+                    states:
+                        - { descr: notAvailible, graph: 0, value: -1, generic: 3 }
+                        - { descr: off          , graph: 0, value:  0, generic: 2 }
+                        - { descr: complete     , graph: 0, value:  1, generic: 0 }
+                        - { descr: progress     , graph: 0, value:  2, generic: 1 }
+                -
+                    oid: bbuTable
+                    value: batteryReplacement
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.6.2.1.27.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID }}'
+                    descr: 'BBU replacement'
+                    state_name: batteryReplacement
+                    states:
+                        - { descr: not availible    , graph: 0, value: -1, generic: 3 }
+                        - { descr: needsReplacement , graph: 0, value:  1, generic: 2 }
+                        - { descr: ok               , graph: 0, value:  0, generic: 0 }
