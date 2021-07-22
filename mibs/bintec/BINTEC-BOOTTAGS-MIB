@@ -1,0 +1,119 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2012-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-syscfg,v $
+-- $Revision: 1.6 $
+-- $Date: 2015-11-06 12:41:36 $
+---------------------------------------------------------------------------
+
+BINTEC-BOOTTAGS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, 
+    snmpModules, mib-2, IpAddress
+        FROM SNMPv2-SMI
+	
+    DisplayString
+        FROM SNMPv2-TC
+	
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+	
+    sys
+        FROM BINTEC-MIB;
+ 
+---------------------------------------------------------------------------
+
+sysConfigMIB MODULE-IDENTITY
+    LAST-UPDATED "201511060000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO "EMail:   info@bintec-elmeg.com
+                  Web:     www.bintec-elmeg.com"
+    DESCRIPTION  "Management Information for the system boot config"
+
+    ::= { sys 9 }
+
+sysConfigAdmin OBJECT IDENTIFIER
+	::= { sysConfigMIB 1 }
+
+---------------------------------------------------------------------------
+-- System Config Administrative variables
+
+    sysConfigLedMode OBJECT-TYPE
+        SYNTAX INTEGER { normal(1), minimal(2), off(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The LED mode of the system:
+            normal : LEDs work normal, 
+            minimal : only Status-LED flashes once in a second, 
+            off := LEDs are off. "
+    ::= { sysConfigAdmin 1 }
+
+    sysConfigTftpBootLocalIpAddr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Local IP address for TFTP boot."
+    ::= { sysConfigAdmin 2 }
+    
+    sysConfigTftpBootServerIpAddr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "IP address of TFTP sever."
+    ::= { sysConfigAdmin 3 }
+
+    sysConfigTftpBootFile OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "Name of the TFTP boot file."
+	::= { sysConfigAdmin 4 }
+
+    sysConfigAutoTftpBoot OBJECT-TYPE
+	SYNTAX INTEGER { no(1), yes(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Indicates whether the device tries to boot the image
+	    from TFTP server. If this fails it will stay in the bootmonitor
+	    mode."
+	::= { sysConfigAdmin 5 }
+
+    sysConfigFunctionBootState OBJECT-TYPE
+        SYNTAX INTEGER { last(1), on(2), off(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+	    "This variable configures how the initial value of
+             sysStatFunctionState is determined:
+	     last : use value out of NVRAM
+             on   : set to on
+             off  : set of off."
+	DEFVAL { last }
+	::= { sysConfigAdmin 6 }
+
+    sysConfigOperationMode OBJECT-TYPE
+        SYNTAX INTEGER { plain(0), mgw(1), pbx(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+	    "This variable indicates the operation mode of the device how it
+	     will come up on next system start.
+	     
+	     If any voice functionality is integrated it can be either mgw(1)
+	     for Media GateWay functionality of pbx(2) for a full-fledged 
+	     telephone system.
+	     
+	     For systems w/o voice functionality the variable has value
+	     plain(0)."
+	DEFVAL { plain }
+	::= { sysConfigAdmin 7 }
+
+END

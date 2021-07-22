@@ -1,0 +1,269 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2011-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-service,v $
+-- $Revision: 1.9 $
+-- $Date: 2016-06-06 10:25:23 $
+-- Author: Johannes Thumshirn
+---------------------------------------------------------------------------
+
+BINTEC-SERVICECALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    mib-2, TimeTicks, enterprises   FROM SNMPv2-SMI
+    IpAddress                       FROM RFC1155-SMI
+    DisplayString                   FROM SNMPv2-TC
+    admin-2                         FROM BINTEC-MIB;
+
+---------------------------------------------------------------------------
+-- Module-info
+
+serviceCallMIB MODULE-IDENTITY
+    LAST-UPDATED    "201606060000Z"
+    ORGANIZATION    "bintec elmeg GmbH"
+    CONTACT-INFO    "EMail:   info@bintec-elmeg.com
+                     Web:     www.bintec-elmeg.com"
+    DESCRIPTION     "Management-information for service-call-entities."
+    REVISION        "201106080000Z"
+    DESCRIPTION     "Initial version."
+    ::= { admin-2 8 }
+
+---------------------------------------------------------------------------
+-- Administrative: Global service-call-settings
+
+serviceCallAdmin OBJECT IDENTIFIER ::= { serviceCallMIB 1 }
+
+serviceCallDaemonAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate service-call-daemon."
+    DEFVAL      { disabled }
+    ::= { serviceCallAdmin 1 }
+
+serviceCallDaemonOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current operational state of service-call-daemon."
+    DEFVAL { disabled }
+    ::= { serviceCallAdmin 2 }
+
+serviceCallServiceHostAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Address or domain-name of to-be-called server for service-requests."
+    ::= { serviceCallAdmin 3 }
+
+serviceCallServiceHostPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control-channel port-number of to-be-called server."
+    ::= { serviceCallAdmin 4 }
+
+serviceCallDefaultShorthold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds to wait before closing an inactive service-call."
+    ::= { serviceCallAdmin 6 }
+
+serviceCallKnownHostsFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Optional 'known_host' file-name to be set when starting SSH-client.
+         If string not empty, SSH-client-variables 'GlobalKnownHostsFile' and
+         'UserKnownHostsFile' are set to it in order to override defaults.
+         More details are listed in table 'sshcKnownHost'.
+         WARNING: Due to parameter-parsing, string must not hold any blanks."
+    ::= { serviceCallAdmin 7 }
+
+---------------------------------------------------------------------------
+-- Administrative: Configured service-calls
+
+serviceCallTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ServiceCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Currently configured tunnels for service-call-feature.
+         Normally, all entries share the same ticket-number, and there is one
+         entry for the control-tunnel between service-call-daemon and server,
+         and one entry per each to-be-tunnelled service-type."
+    ::= { serviceCallMIB 2 }
+
+serviceCallEntry OBJECT-TYPE
+    SYNTAX      ServiceCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { serviceCallIndex, serviceCallTicket }
+    ::= { serviceCallTable 1 }
+
+ServiceCallEntry ::=
+    SEQUENCE {
+        serviceCallIndex                INTEGER,
+        serviceCallOperStatus           INTEGER,
+        serviceCallAdminStatus          INTEGER,
+        serviceCallType                 INTEGER,
+        serviceCallForwardedService     INTEGER,
+        serviceCallForwardedIP          IpAddress,
+        serviceCallTicket               DisplayString,
+        serviceCallDuration             TimeTicks,
+        serviceCallHostPort             INTEGER,
+        serviceCallUserId               DisplayString
+    }
+
+serviceCallIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Internal identifier of this tunnel."
+    ::= { serviceCallEntry 1 }
+
+serviceCallOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        new(7),
+        connect(8),
+        login(9),
+        forward(10),
+        register(11),
+        ready(12),
+        blocked(13),
+        error(14)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current operational state of this tunnel.
+         States relevant for forwarding-entries only:
+           forward  - Tunnelling/forwarding started.
+         States relevant for control-entry only:
+           register - Device-registration ongoing.
+           ready    - Ready for tunnel-requests from server.
+         States relevant for all entry-types:
+           new      - Processing not yet started.
+           connect  - Connecting to server.
+           login    - Logging into server.
+           blocked  - Waiting for network to become available again.
+           error    - Processing aborted."
+    DEFVAL      { new }
+    ::= { serviceCallEntry 2 }
+
+serviceCallAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2),
+        delete(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Activate/deactivate/delete this tunnel."
+    DEFVAL      { enabled }
+    ::= { serviceCallEntry 3 }
+
+serviceCallType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pbx(1),
+        phone(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of target-unit accessed via this tunnel.
+         (Implicitly always pbx for control-tunnel.)
+         pbx   - This PBX (or router) shall be accessed.
+         phone - A phone attached to this PBX shall be accessed."
+    DEFVAL      { pbx }
+    ::= { serviceCallEntry 4 }
+
+serviceCallForwardedService OBJECT-TYPE
+    SYNTAX      INTEGER {
+        control(1),
+        http(2),
+        https(3),
+        shell(4),
+        trace(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of to-be-tunnelled service for this entry.
+         control - Control-tunnel between service-call-daemon and server.
+         http    - HTTP (port 80).
+         https   - HTTPS (using SSL, port 443).
+         shell   - Telnet (port 23).
+         trace   - Bricktrace for packet-capturing (port 7000)."
+    DEFVAL      { control }
+    ::= { serviceCallEntry 5 }
+
+serviceCallForwardedIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For control-tunnel, two cases must be distinguished.
+         For target-unit-type pbx, field is a dummy and may be set to 0.0.0.0.
+         For target-unit-type phone, field is set to IP-address of phone.
+         For service-tunnels, field is set to IP-address of target-unit
+         (127.0.0.1 in pbx-case, and otherwise IP-address of phone)."
+    ::= { serviceCallEntry 6 }
+
+serviceCallTicket OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..14))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ticket-number for this tunnel, to be copied to serviceCallUserId if
+         not empty. Otherwise, derive serviceCallUserId from biboAdmSystemId."
+    ::= { serviceCallEntry 7 }
+
+serviceCallDuration OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Duration of this tunnel."
+    DEFVAL      { 0 }
+    ::= { serviceCallEntry 8 }
+
+serviceCallHostPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For control-tunnel, field is not relevant and is set to 0.
+         For service-tunnels, field tells port-number dynamically allocated on
+         called server for tunnelling this service via SSH-port-forwarding."
+    ::= { serviceCallEntry 9 }
+
+serviceCallUserId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temporary user-id for this tunnel (see also serviceCallTicket)."
+    ::= { serviceCallEntry 10 }
+
+END

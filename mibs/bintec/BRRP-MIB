@@ -1,0 +1,454 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1999-2014 bintec elmeg GmbH
+-- All Rights reserved
+-- $RCSfile: mibvrrp,v $ 
+-- $Revision: 1.13 $ 
+
+BRRP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+	IpAddress, Counter, TimeTicks, enterprises
+		FROM RFC1155-SMI
+
+	OBJECT-TYPE
+		FROM RFC-1212;
+
+	--  MIB-II (same prefix as MIB-I)
+	bintec 		OBJECT IDENTIFIER ::= { enterprises 272 }
+	bibo		OBJECT IDENTIFIER ::= { bintec 4 }
+	brrp		OBJECT IDENTIFIER 
+
+	::= { bibo 40 }
+
+    -- BRRP - used by watchdog daemon to implement redundancy
+
+-- *******************************************************************
+--  BRRP Operations Table
+-- *******************************************************************
+
+ biboBrrpOperTable OBJECT-TYPE
+     SYNTAX   SEQUENCE OF BiboBrrpOperEntry
+     ACCESS   not-accessible
+     STATUS   mandatory
+     DESCRIPTION
+         "Operations table for a BRRP router which consists of a
+          sequence (i.e., one or more conceptual rows) of
+          'biboBrrpOperEntry' items."
+     ::= { brrp 1 }
+
+ biboBrrpOperEntry OBJECT-TYPE
+     SYNTAX   BiboBrrpOperEntry
+     ACCESS   not-accessible
+     STATUS   mandatory
+     DESCRIPTION
+         "An entry in the biboBrrpOperTable containing the operational
+          characteristics of a virtual router. On a BRRP router,
+          a given virtual router is identified by a combination
+          of the IF index and VRID.
+
+          Rows in the table cannot be modified unless the value
+          of `biboBrrpOperAdminState' is `disabled' and the
+          `biboBrrpOperState' has transitioned to `initialize'."
+
+     INDEX    { biboBrrpVirtIfIndex, biboBrrpOperVrId }
+     ::= { biboBrrpOperTable 1 }
+
+ BiboBrrpOperEntry ::=
+     SEQUENCE {
+         biboBrrpOperVrId			INTEGER,
+         biboBrrpVirtIfIndex			INTEGER,
+         biboBrrpOperMasterIpAddr		IpAddress,
+         biboBrrpOperState			INTEGER,
+         biboBrrpOperAdminState			INTEGER,
+         biboBrrpOperPriority			INTEGER,
+         biboBrrpOperAuthType			INTEGER,
+         biboBrrpOperAuthKey			OCTET STRING,
+         biboBrrpOperAdvertisementInterval	INTEGER,
+         biboBrrpOperMasterDownRetries		INTEGER,
+         biboBrrpOperPreemptMode		INTEGER,
+         biboBrrpOperVirtualRouterUpTime	TimeTicks,
+--          biboBrrpOperProtocol			INTEGER,
+         biboBrrpMasterIfIndex			INTEGER,
+         biboBrrpOperDecrPrio			INTEGER
+ }
+
+ biboBrrpOperVrId OBJECT-TYPE
+     SYNTAX   INTEGER (1..255)
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "This object contains the Virtual Router Identifier (VRID)."
+     DEFVAL { 255 }
+     ::= { biboBrrpOperEntry 1 }
+
+ biboBrrpVirtIfIndex OBJECT-TYPE
+     SYNTAX   INTEGER
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "The index of the virtual interface used by the virtual router."
+     ::= { biboBrrpOperEntry 2 }
+
+ biboBrrpOperMasterIpAddr OBJECT-TYPE
+     SYNTAX   IpAddress
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "The master router's real (primary) IP address. This is
+         the IP address listed as the source in BRRP advertisement
+         last received by this virtual router."
+     ::= { biboBrrpOperEntry 3 }
+
+ biboBrrpOperState OBJECT-TYPE
+     SYNTAX   INTEGER {
+	initialize(1),
+	backup(2),
+	master(3)
+     }
+     ACCESS   read-only
+     STATUS   mandatory
+
+     DESCRIPTION
+         "The current state of the virtual router. This object has
+         four defined values:
+
+           - `initialize', which indicates that all the
+             virtual router is waiting for a startup event.
+
+           - `backup', which indicates the virtual router is
+             monitoring the availability of the master router.
+
+           - `master', which indicates that the virtual router
+             is forwarding packets for IP addresses that are
+             associated with this router.
+
+         Setting the `brrpOperAdminState' object (below) initiates
+         transitions in the value of this object."
+     DEFVAL { initialize }
+     ::= { biboBrrpOperEntry 4 }
+
+ biboBrrpOperAdminState OBJECT-TYPE
+     SYNTAX   INTEGER {
+         up(1),
+         down(2),
+         delete(3)
+     }
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "This object will enable/disable the virtual router
+         function. Setting the value to `up', will transition
+         the state of the virtual router from `initialize' to `backup'
+         or `master', depending on the value of `brrpOperPriority'.
+         Setting the value to `down', will transition  the
+         router from `master' or `backup' to `initialize'. State
+         transitions may not be immediate; they sometimes depend on
+         other factors, such as the interface (IF) state.
+
+         The `brrpOperAdminState' object must be set to `down' prior
+         to modifying the other read-only objects in the conceptual
+         row. The value of the `brrpOperRowStatus' object (below)
+         must be `active', signifying that the conceptual row
+         is valid (i.e., the objects are correctly set),
+         in order for this object to be set to `up'.
+
+         Use `delete' to delete this table entry permanently."
+     DEFVAL    { down }
+     ::= { biboBrrpOperEntry 5 }
+
+ biboBrrpOperPriority OBJECT-TYPE
+     SYNTAX   INTEGER (1..255)
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "This object specifies the priority to be used for the
+         virtual router master election process. Higher values imply
+         higher priority.
+
+         A priority of '0', although not settable, is sent by
+         the master router to indicate that this router has ceased
+         to participate in BRRP and a backup virtual router should
+         transition  to become a new master.
+
+         A priority of 255 is used for the router that owns the
+         associated IP address(es)."
+     DEFVAL       { 100 }
+     ::= { biboBrrpOperEntry 6 }
+
+ biboBrrpOperAuthType OBJECT-TYPE
+     SYNTAX   INTEGER {
+         noAuthentication(1),       -- BRRP protocol exchanges are not
+                                    -- authenticated.
+         simpleTextPassword(2),     -- Exchanges are authenticated by a
+                                    -- clear text password.
+         ipAuthenticationHeader(3)  -- Exchanges are authenticated using
+                                    -- the IP authentication header.
+     }
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "Authentication type used for BRRP protocol exchanges between
+         virtual routers. This value of this object is the same for a
+         given ifIndex.
+
+         New enumerations to this list can only be added via a new
+         RFC on the standards track."
+     DEFVAL       { noAuthentication }
+     ::= { biboBrrpOperEntry 7 }
+
+ biboBrrpOperAuthKey OBJECT-TYPE
+     SYNTAX   OCTET STRING (SIZE (0..16))
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "The Authentication Key. This object is set according to
+         the value of the 'brrpOperAuthType' object
+         ('simpleTextPassword' or 'ipAuthenticationHeader'). If the
+         length of the value is less than 16 octets, the agent will
+         left adjust and zero fill to 16 octets. The value of this
+         object is the same for a given ifIndex.
+
+         When read, biboBrrpOperAuthKey always returns an Octet String
+         of length zero."
+     ::= { biboBrrpOperEntry 8 }
+
+ biboBrrpOperAdvertisementInterval OBJECT-TYPE
+     SYNTAX   INTEGER (1..255)
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "The time interval, in seconds, between sending
+         advertisement messages. Only the master router sends
+         BRRP advertisements."
+     DEFVAL { 1 }
+     ::= { biboBrrpOperEntry 9 }
+
+ biboBrrpOperMasterDownRetries OBJECT-TYPE
+     SYNTAX   INTEGER (1..255)
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "Calculation of the MasterDownInterval from RFC 2338:
+
+	  Skew_Time = ((256 - Priority) / 256)
+
+	  MasterDownInterval = (MasterDownRetries
+	                      * AdvertisementInterval)
+	                     + Skew_Time"
+     DEFVAL { 3 }
+     ::= { biboBrrpOperEntry 10 }
+
+ biboBrrpOperPreemptMode OBJECT-TYPE
+     SYNTAX   INTEGER {
+         false(1),
+         true(2)
+     }
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "Controls whether a higher priority virtual router will
+         preempt a lower priority master."
+     DEFVAL       { true }
+     ::= { biboBrrpOperEntry 11 }
+
+ biboBrrpOperVirtualRouterUpTime OBJECT-TYPE
+     SYNTAX   TimeTicks
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "This is the value of the `sysUpTime' object when this
+         virtual router (i.e., the `brrpOperState') transitioned
+         out of `initialized'."
+     ::= { biboBrrpOperEntry 12 }
+
+ biboBrrpMasterIfIndex OBJECT-TYPE
+     SYNTAX   INTEGER
+     ACCESS   read-write
+     STATUS   mandatory
+     DESCRIPTION
+         "The index of the master interface controlling the virtual router."
+     ::= { biboBrrpOperEntry 14 }
+
+ biboBrrpOperDecrPrio OBJECT-TYPE
+     SYNTAX   INTEGER (0..255)
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "This is the value currently decremented from the virtual router 
+         priority to be used for the virtual router master election process
+
+         Actual priority = (biboBrrpOperPriority - biboBrrpOperDecrPrio)
+
+         This value could be either '0' or 'aliveSlaveBrrpDecrPrio':
+
+         - it is set to 'aliveSlaveBrrpDecrPrio' when the alive surveillance
+           (aliveSlaveBrrpState) triggers 'decrPrio' while this router state
+           is 'up' (biboBrrpOperState).
+         - it is cleared to '0' when the alive surveillance 
+           (aliveSlaveBrrpState) triggers 'up' while this router state
+           is already 'up' (biboBrrpOperState).
+         
+         The default value is '0'."
+     DEFVAL { 0 }
+     ::= { biboBrrpOperEntry 15 }
+
+
+-- *******************************************************************
+--  BRRP Router Statistics Table
+-- *******************************************************************
+
+ biboBrrpRouterStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF BiboBrrpRouterStatsEntry
+     ACCESS   not-accessible
+     STATUS       mandatory
+     DESCRIPTION
+         "Table of virtual router statistics."
+     ::= { brrp 2 }
+
+ biboBrrpRouterStatsEntry OBJECT-TYPE
+     SYNTAX       BiboBrrpRouterStatsEntry
+     ACCESS   not-accessible
+     STATUS       mandatory
+     DESCRIPTION
+         "An entry in the table, containing statistics information
+         about a given virtual router."
+     INDEX    { biboBrrpStatsIfIndex, biboBrrpStatsVrId }
+     ::= { biboBrrpRouterStatsTable 1 }
+
+ BiboBrrpRouterStatsEntry ::=
+     SEQUENCE {
+	biboBrrpStatsVrId			INTEGER,
+	biboBrrpStatsIfIndex			INTEGER,
+	biboBrrpStatsBecomeMaster		Counter,
+	biboBrrpStatsAdvertiseRcvd		Counter,
+	biboBrrpStatsAdvertiseIntervalErrors	Counter,
+	biboBrrpStatsAuthFailures		Counter,
+	biboBrrpStatsIpTtlErrors		Counter,
+	biboBrrpStatsInvalidTypePktsRcvd	Counter,
+	biboBrrpStatsInvalidAuthType		Counter,
+	biboBrrpStatsAuthTypeMismatch		Counter,
+	biboBrrpStatsPacketLengthErrors		Counter,
+	biboBrrpStatsChecksumErrors		Counter,
+	biboBrrpStatsVersionErrors		Counter
+     }
+
+ biboBrrpStatsVrId OBJECT-TYPE
+     SYNTAX   INTEGER (1..255)
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "This object contains the Virtual Router Identifier (VRID)."
+     ::= { biboBrrpRouterStatsEntry 1 }
+
+ biboBrrpStatsIfIndex OBJECT-TYPE
+     SYNTAX   INTEGER
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The index of the virtual interface used by the virtual router."
+     ::= { biboBrrpRouterStatsEntry 2 }
+
+ biboBrrpStatsBecomeMaster OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of times that this virtual router's state
+         has transitioned to MASTER."
+     ::= { biboBrrpRouterStatsEntry 3 }
+
+ biboBrrpStatsAdvertiseRcvd OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of BRRP advertisements received by this
+         virtual router."
+     ::= { biboBrrpRouterStatsEntry 4 }
+
+ biboBrrpStatsAdvertiseIntervalErrors OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of BRRP advertisement packets received
+         for which the advertisement interval is different than the
+         one configured for the local virtual router."
+     ::= { biboBrrpRouterStatsEntry 5 }
+
+ biboBrrpStatsAuthFailures OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of BRRP packets received that do not pass
+         the authentication check."
+     ::= { biboBrrpRouterStatsEntry 6 }
+
+ biboBrrpStatsIpTtlErrors OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of BRRP packets received by the virtual
+         router with IP TTL (Time-To-Live) not equal to 255."
+     ::= { biboBrrpRouterStatsEntry 7 }
+
+ biboBrrpStatsInvalidTypePktsRcvd OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The number of BRRP packets received by the virtual router
+         with an invalid value in the 'type' field."
+     ::= { biboBrrpRouterStatsEntry 8 }
+
+ biboBrrpStatsInvalidAuthType OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of packets received with an unknown
+         authentication type."
+     ::= { biboBrrpRouterStatsEntry 9 }
+
+ biboBrrpStatsAuthTypeMismatch OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of packets received with 'Auth Type' not
+         equal to the locally configured authentication method
+         (`brrpOperAuthType')."
+     ::= { biboBrrpRouterStatsEntry 10 }
+
+ biboBrrpStatsPacketLengthErrors OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of packets received with a packet length
+         less than the length of the BRRP header."
+     ::= { biboBrrpRouterStatsEntry 11 }
+
+ biboBrrpStatsChecksumErrors OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of BRRP packets received with an invalid
+         BRRP checksum value."
+     ::= { biboBrrpRouterStatsEntry 12 }
+
+ biboBrrpStatsVersionErrors OBJECT-TYPE
+     SYNTAX   Counter
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+         "The total number of BRRP packets received with an unknown
+         or unsupported version number."
+     ::= { biboBrrpRouterStatsEntry 13 }
+
+END

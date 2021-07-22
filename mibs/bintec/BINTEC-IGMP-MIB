@@ -1,0 +1,1470 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- $RCSfile: mib-igmp,v $
+-- $Revision: 1.25 $
+-- $Date: 2017-11-09 09:27:33 $
+-- Author: RFC 2933
+---------------------------------------------------------------------------
+
+BINTEC-IGMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2,
+    Counter32, Gauge32, Integer32, Unsigned32,
+    IpAddress, TimeTicks, mib-2, enterprises		FROM SNMPv2-SMI
+    RowStatus, TruthValue, TimeStamp, PhysAddress	FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP   		        FROM SNMPv2-CONF
+    InterfaceIndexOrZero, InterfaceIndex        	FROM IF-MIB
+    biboip                                      	FROM BINTEC-MIB;
+
+---------------------------------------------------------------------------
+-- Module-info
+
+igmpMIB MODULE-IDENTITY
+    LAST-UPDATED    "200206140000Z" -- June 14, 2002
+    ORGANIZATION    "IETF MAGMA Working Group."
+    CONTACT-INFO    "Dave Thaler
+                       Microsoft Corporation
+                       One Microsoft Way
+                       Redmond, WA  98052-6399
+                       US
+                       Phone: +1 425 703 8835
+                       EMail: dthaler@microsoft.com
+                     Julian Chesterfield
+                       AT&T Research-Labs
+                       75 Willow Road
+                       Menlo Park, CA 94025
+                       US
+                       Phone: +1 650 330 7762
+                       EMail: julian@research.att.com"
+    DESCRIPTION     "The MIB module for IGMP Management."
+    REVISION        "200206140000Z" -- June 14, 2002
+    DESCRIPTION     "RFC 2933 revised 6/02 to incorporate IGMPv3 changes."
+    REVISION        "200503240000Z" -- March 24, 2006
+    DESCRIPTION     "bintec specific changes and increments."
+    REVISION        "200904070000Z" -- April 17, 2009
+    DESCRIPTION     "igmpInterfaceTable split."
+    ::= { biboip 51 }
+
+---------------------------------------------------------------------------
+-- Administrative: Global IGMP-settings
+
+igmpAdmin OBJECT IDENTIFIER ::= { igmpMIB 1 }
+
+igmpAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up(1),
+        down(2),
+        auto(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object shows the current status of IGMP.
+         It may be used to turn on or off IGMP.
+         If set to auto IGMP will create host-only
+         interfaces automatically as soon as applications
+         request it."
+    DEFVAL      { auto }
+    ::= { igmpAdmin 1 }
+
+igmpAdminMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        compat(1),
+        v3only(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object show the current operation mode of IGMP.
+         With compat IGMP runs in compatibility mode, accepting
+         IGMP v1,v2,v3 packets. Running in v3only mode, only
+         IGMP v3 packets are accepted."
+    DEFVAL      { compat }
+    ::= { igmpAdmin 2 }
+
+igmpAdminMaxGroups OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the maximum number of groups."
+    DEFVAL      { 64 }
+    ::= { igmpAdmin 3 }
+
+igmpAdminMaxSources OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the maximum number of sources."
+    DEFVAL      { 64 }
+    ::= { igmpAdmin 4 }
+
+igmpAdminStateLimit OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum allowed number of Reports/Queries per seconds
+         globally on a router. Must be greater zero to be active."
+    DEFVAL      { 0 }
+    ::= { igmpAdmin 5 }
+
+igmpAdminLogging OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off(0),
+        normal(1),
+        verbose(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object might be used to define the behaviour of
+         generated syslog messages:
+             off     - be quiet
+             normal  - critical error messages are generated
+             verbose - creates messages about what IGMP is currently doing"
+    DEFVAL      { off }
+    ::= { igmpAdmin 6 }
+
+igmpAdminToS OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies value of 'Type of Service' octet stored in IP-header (see
+         section 3.1 of RFC-791) for outgoing IGMP-frames (queries/reports).
+         (Default-value is 0xC0 as proposed in section 4 of RFC-3376.)"
+    DEFVAL      { 192 }
+    ::= { igmpAdmin 7 }
+
+igmpAdminMcastToUcast OBJECT-TYPE
+    SYNTAX INTEGER {
+	enabled(1), 	-- Multicast to Unicast conversion enabled
+	disabled(2)	-- Multicast to Unicast conversion disabled
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables layer 2 IGMP Multicast to Unicast conversion -
+	 necessary to suppress multicast flooding on LAN switch ports not
+	 involved."
+    DEFVAL      { enabled }
+    ::= { igmpAdmin 8 }
+
+---------------------------------------------------------------------------
+-- Administrative: IGMP-interface-table
+
+igmpInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the interfaces on which IGMP
+         is enabled."
+    ::= { igmpMIB 2 }
+
+igmpInterfaceEntry OBJECT-TYPE
+    SYNTAX      IgmpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an interface on
+         which IGMP is enabled."
+    INDEX       { igmpInterfaceIfIndex }
+    ::= { igmpInterfaceTable 1 }
+
+IgmpInterfaceEntry ::=
+    SEQUENCE {
+        igmpInterfaceIfIndex                InterfaceIndex,
+        igmpInterfaceQueryInterval          Unsigned32,
+        igmpInterfaceStatus                 RowStatus,
+        igmpInterfaceVersion                Unsigned32,
+        igmpInterfaceQuerier                IpAddress,
+        igmpInterfaceQueryMaxResponseTime   Unsigned32,
+        igmpInterfaceQuerierUpTime          TimeTicks,
+        igmpInterfaceQuerierExpiryTime      TimeStamp,
+        igmpInterfaceVersion1QuerierTimer   TimeStamp,
+        igmpInterfaceWrongVersionQueries    Counter32,
+        igmpInterfaceJoins                  Counter32,
+        igmpInterfaceProxyIfIndex           InterfaceIndexOrZero,
+        igmpInterfaceGroups                 Gauge32,
+        igmpInterfaceRobustness             Unsigned32,
+        igmpInterfaceLastMembQueryIntvl     Unsigned32,
+        igmpInterfaceVersion2QuerierTimer   TimeStamp,
+        igmpInterfaceGeneralQueryTimer      TimeStamp,
+        igmpInterfaceStateLimit             Unsigned32,
+        igmpInterfaceHostOnlyMode           TruthValue,
+        igmpInterfaceFallback1ProxyIfIndex  InterfaceIndexOrZero,
+        igmpInterfaceFallback2ProxyIfIndex  InterfaceIndexOrZero,
+        igmpInterfaceFallback3ProxyIfIndex  InterfaceIndexOrZero
+    }
+
+igmpInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which IGMP is
+         enabled."
+    ::= { igmpInterfaceEntry 1 }
+
+igmpInterfaceQueryInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The frequency at which IGMP Host-Query packets are
+         transmitted on this interface."
+    DEFVAL      { 125 }
+    ::= { igmpInterfaceEntry 2 }
+
+igmpInterfaceStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The activation of a row enables IGMP on the interface.  The
+         destruction of a row disables IGMP on the interface."
+    ::= { igmpInterfaceEntry 3 }
+
+igmpInterfaceVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The version of IGMP which is running on this interface."
+    DEFVAL      { 3 }
+    ::= { igmpInterfaceEntry 4 }
+
+igmpInterfaceQuerier OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The address of the IGMP Querier on the IP subnet to which
+         this interface is attached."
+    ::= { igmpInterfaceEntry 5 }
+
+igmpInterfaceQueryMaxResponseTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    UNITS       "tenths of seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum query response time (in tenths of seconds)
+         advertised in IGMPv2 queries on this interface."
+    DEFVAL      { 100 }
+    ::= { igmpInterfaceEntry 6 }
+
+igmpInterfaceQuerierUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time since igmpInterfaceQuerier was last changed."
+    ::= { igmpInterfaceEntry 7 }
+
+igmpInterfaceQuerierExpiryTime OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time when the Other Querier
+         Present Timer expires.  If the local system is the querier,
+         the value of this object is zero."
+    ::= { igmpInterfaceEntry 8 }
+
+igmpInterfaceVersion1QuerierTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time when the host assumes that there are no
+         IGMPv1 routers present on the interface.  While this is non-
+         zero, the host will reply to all queries with version 1
+         membership reports."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 9 }
+
+igmpInterfaceWrongVersionQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of queries received whose IGMP version does not
+         match igmpInterfaceVersion, over the lifetime of the row
+         entry.  IGMP requires that all routers on a LAN be
+         configured to run the same version of IGMP.  Thus, if any
+         queries are received with the wrong version, this indicates
+         a configuration error."
+    ::= { igmpInterfaceEntry 10 }
+
+igmpInterfaceJoins OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of times a group membership has been added on
+         this interface; that is, the number of times an entry for
+         this interface has been added to the Cache Table.  This
+         object gives an indication of the amount of IGMP activity
+         over the lifetime of the row entry."
+    ::= { igmpInterfaceEntry 11 }
+
+igmpInterfaceProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, specifies related 'upstream' interface for proxy-forwarding
+         (see RFC-4605). In this case, all memberships learned on 'downstream'
+         interface (represented by this row) are reported on upstream, and all
+         related multicast-traffic is forwarded from upstream to downstream,
+         from downstream to upstream (and from downstream to downstream, if
+         further downstream interfaces refer to same upstream interface).
+         For case that upstream interface is not usable (no related entries in
+         MIB-table 'ipAddr'), 'fallback' interfaces can be specified via
+         'igmpInterfaceFallback(1/2/3)ProxyIfIndex', to be used instead for all
+         reporting and forwarding. Currently chosen 'upstream' interface is
+         told by 'igmpInterfaceOperChosenProxyIfIndex'."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 12 }
+
+igmpInterfaceGroups OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The current number of entries for this interface in the
+         Cache Table."
+    ::= { igmpInterfaceEntry 13 }
+
+igmpInterfaceRobustness OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Robustness Variable allows tuning for the expected
+         packet loss on a subnet.  If a subnet is expected to be
+         lossy, the Robustness Variable may be increased.  IGMP is
+         robust to (Robustness Variable-1) packet losses."
+    DEFVAL      { 2 }
+    ::= { igmpInterfaceEntry 14 }
+
+igmpInterfaceLastMembQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    UNITS       "tenths of seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Last Member Query Interval is the Max Response Time
+         (in tenths of seconds) inserted into Group-Specific Queries
+         sent in response to Leave Group messages, and is also the
+         amount of time between Group-Specific Query messages.
+         This value may be tuned to modify the leave latency of the
+         network. A reduced value results in reduced time to detect
+         the loss of the last member of a group."
+    DEFVAL      { 10 }
+    ::= { igmpInterfaceEntry 15 }
+
+igmpInterfaceVersion2QuerierTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time when the host assumes that there are no
+         IGMPv2 routers present on the interface.  While this is non-
+         zero, the host will reply to all queries with version 1 or 2
+         membership reports."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 16 }
+
+igmpInterfaceGeneralQueryTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time when the next general Query is issued
+         on this interface."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 17 }
+
+igmpInterfaceStateLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum allowed number of Reports/Queries per seconds
+         on this interface. Must be greater zero to be active."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 18 }
+
+igmpInterfaceHostOnlyMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether the interface is running
+         in host-only mode.
+         If set to false this interface will operate in host and
+         routing mode."
+    DEFVAL      { false }
+    ::= { igmpInterfaceEntry 19 }
+
+igmpInterfaceFallback1ProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, specifies '1st fallback' for 'igmpInterfaceProxyIfIndex'
+         (see further description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 20 }
+
+igmpInterfaceFallback2ProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, specifies '2nd fallback' for 'igmpInterfaceProxyIfIndex'
+         (see further description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 21 }
+
+igmpInterfaceFallback3ProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, specifies '3rd fallback' for 'igmpInterfaceProxyIfIndex'
+         (see further description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceEntry 22 }
+
+---------------------------------------------------------------------------
+-- Operative: IGMP-group-cache-table
+
+igmpCacheTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpCacheEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the IP multicast groups for
+         which there are members on a particular interface."
+    ::= { igmpMIB 3 }
+
+igmpCacheEntry OBJECT-TYPE
+    SYNTAX      IgmpCacheEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the igmpCacheTable."
+    INDEX       { igmpCacheAddress, igmpCacheIfIndex }
+    ::= { igmpCacheTable 1 }
+
+IgmpCacheEntry ::=
+    SEQUENCE {
+        igmpCacheAddress            IpAddress,
+        igmpCacheIfIndex            InterfaceIndex,
+        igmpCacheSelf               TruthValue,
+        igmpCacheLastReporter       IpAddress,
+        igmpCacheUpTime             TimeTicks,
+        igmpCacheExpiryTime         TimeStamp,
+        igmpCacheStatus             RowStatus,
+        igmpCacheVersion1HostTimer  TimeStamp,
+        igmpCacheVersion2HostTimer  TimeStamp,
+        igmpCacheSourceFilterMode   Integer32
+    }
+
+igmpCacheAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP multicast group address for which this entry
+         contains information."
+    ::= { igmpCacheEntry 1 }
+
+igmpCacheIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface for which this entry contains information for
+         an IP multicast group address."
+    ::= { igmpCacheEntry 2 }
+
+igmpCacheSelf OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether the local system is a member of
+         this group address on this interface."
+    DEFVAL      { false }
+    ::= { igmpCacheEntry 3 }
+
+igmpCacheLastReporter OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the source of the last membership report
+         received for this IP Multicast group address on this
+         interface.  If no membership report has been received, this
+         object has the value 0.0.0.0."
+    ::= { igmpCacheEntry 4 }
+
+igmpCacheUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time elapsed since this entry was created."
+    ::= { igmpCacheEntry 5 }
+
+igmpCacheExpiryTime OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when this entry will
+         be aged out.  A value of 0 indicates that the entry is only
+         present because igmpCacheSelf is true and that if the router
+         left the group, this entry would be aged out immediately.
+         Note that some implementations may process membership
+         reports from the local system in the same way as reports
+         from other hosts, so a value of 0 is not required."
+    ::= { igmpCacheEntry 6 }
+
+igmpCacheStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry."
+    ::= { igmpCacheEntry 7 }
+
+igmpCacheVersion1HostTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the local router will assume that
+         there are no longer any IGMP version 1 members on the IP
+         subnet attached to this interface.  Upon hearing any IGMPv1
+         Membership Report, this value is reset to the group
+         membership timer.  While this time remaining is non-zero,
+         the local router ignores any IGMPv2 Leave messages for this
+         group that it receives on this interface."
+    ::= { igmpCacheEntry 8 }
+
+igmpCacheVersion2HostTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the local router will assume that
+         there are no longer any IGMP version 2 members on the IP
+         subnet attached to this interface.  Upon hearing any IGMPv2
+         Membership Report, this value is reset to the group
+         membership timer."
+    ::= { igmpCacheEntry 9 }
+
+igmpCacheSourceFilterMode OBJECT-TYPE
+    SYNTAX      Integer32 {
+        include (1),
+        exclude (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state in which the interface is currently set. The
+         value indicates the relevance of the corresponding source
+         list entries in the SrcList Table for IGMPv3 interfaces."
+    ::= { igmpCacheEntry 10 }
+
+---------------------------------------------------------------------------
+-- Operative: IGMP-source/sender-cache-table
+
+igmpSrcListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpSrcListEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This (conceptual) table lists the sources/senders corresponding to an
+         entry of igmpCacheTable."
+    ::= { igmpMIB 4 }
+
+igmpSrcListEntry OBJECT-TYPE
+    SYNTAX      IgmpSrcListEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the igmpSrcListTable."
+    INDEX       { igmpSrcListAddress, igmpSrcListIfIndex, igmpSrcListHostAddress }
+    ::= { igmpSrcListTable 1 }
+
+IgmpSrcListEntry ::=
+    SEQUENCE {
+        igmpSrcListAddress          IpAddress,
+        igmpSrcListIfIndex          InterfaceIndex,
+        igmpSrcListHostAddress      IpAddress,
+        igmpSrcListStatus           RowStatus,
+        igmpSrcListTimer            TimeStamp,
+        igmpSrcListSelf             TruthValue
+    }
+
+igmpSrcListAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The igmpCacheAddress value (multicast-group-address) of the related
+         igmpCacheTable entry."
+    ::= { igmpSrcListEntry 1 }
+
+igmpSrcListIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The igmpCacheIfIndex value (interface-index) of the related
+         igmpCacheTable entry."
+    ::= { igmpSrcListEntry 2 }
+
+igmpSrcListHostAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source-address (multicast-sender) specified by this entry.
+         The igmpCacheSourceFilterMode value (filter-mode) of the related
+         igmpCacheTable entry tells if this source is included or excluded."
+    ::= { igmpSrcListEntry 3 }
+
+igmpSrcListStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry."
+    ::= { igmpSrcListEntry 4 }
+
+igmpSrcListTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when this entry will be aged out. "
+    ::= { igmpSrcListEntry 5 }
+
+igmpSrcListSelf OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tells if the local system is a member of this entity."
+    DEFVAL      { false }
+    ::= { igmpSrcListEntry 6 }
+
+---------------------------------------------------------------------------
+-- Operative: IGMP-host/listener-cache-table
+
+igmpDstListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpDstListEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This (conceptual) table lists the hosts/listeners for the entries of
+         either igmpCacheTable (ASM-case, igmpDstListSourceAddress == 0) or
+         igmpSrcListTable (SSM-case, igmpDstListSourceAddress != 0). This info
+         is needed only if igmpAdminMcastToUcast is enabled."
+    ::= { igmpMIB 9 }
+
+igmpDstListEntry OBJECT-TYPE
+    SYNTAX      IgmpDstListEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the igmpDstListTable."
+    INDEX       { igmpDstListGroupAddress, igmpDstListAddress, igmpDstListIfIndex }
+    ::= { igmpDstListTable 1 }
+
+IgmpDstListEntry ::=
+    SEQUENCE {
+        igmpDstListGroupAddress     IpAddress,
+        igmpDstListAddress          IpAddress,
+        igmpDstListIfIndex          InterfaceIndex,
+        igmpDstListHwaddr           PhysAddress,
+	igmpDstListSourceAddress    IpAddress,
+        igmpDstListTimer            TimeStamp
+    }
+
+igmpDstListGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The igmpCacheAddress/igmpSrcListAddress value (multicast-group-address)
+         of the related igmpCacheTable/igmpSrcListTable entry."
+    ::= { igmpDstListEntry 1 }
+
+igmpDstListAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP-address of the host/listener specified by this entry."
+    ::= { igmpDstListEntry 2 }
+
+igmpDstListIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The igmpCacheIfIndex/igmpSrcListIfIndex value (interface-index) of the
+         related igmpCacheTable/igmpSrcListTable entry."
+    ::= { igmpDstListEntry 3 }
+
+igmpDstListHwaddr OBJECT-TYPE
+    SYNTAX     PhysAddress (SIZE(0..65535))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The media-dependent physical address of the host/listener specified by
+         this entry."
+    ::= { igmpDstListEntry 4 }
+
+igmpDstListSourceAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Either 0 (ASM-case, referring to igmpCacheTable entry) or
+         igmpSrcListHostAddress (multicast-sender) of related igmpSrcListTable
+         entry (SSM-case)."
+    ::= { igmpDstListEntry 5 }
+
+igmpDstListTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when this entry will be aged out. "
+    ::= { igmpDstListEntry 6 }
+
+---------------------------------------------------------------------------
+-- Administrative: IGMP-static-group-table
+
+igmpStaticGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpStaticGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing for groups
+         being statically connected members on the specified interface."
+    ::= { igmpMIB 6 }
+
+igmpStaticGroupEntry OBJECT-TYPE
+    SYNTAX      IgmpStaticGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an statically connected member on
+         an interface."
+    INDEX       { igmpStaticGroupIfIndex, igmpStaticGroupAddress }
+    ::= { igmpStaticGroupTable 1 }
+
+IgmpStaticGroupEntry ::=
+    SEQUENCE {
+        igmpStaticGroupIfIndex      InterfaceIndex,
+        igmpStaticGroupAddress      IpAddress,
+        igmpStaticGroupStatus       RowStatus
+    }
+
+igmpStaticGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the static group."
+    ::= { igmpStaticGroupEntry 1 }
+
+igmpStaticGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The group address of this entry."
+    ::= { igmpStaticGroupEntry 2 }
+
+igmpStaticGroupStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status of this static group."
+    ::= { igmpStaticGroupEntry 3 }
+
+---------------------------------------------------------------------------
+-- Administrative: IGMP-ACL-table
+
+igmpACLTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpACLEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing for ACL rules."
+    ::= { igmpMIB 7 }
+
+igmpACLEntry OBJECT-TYPE
+    SYNTAX      IgmpACLEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an ACL rule."
+    INDEX       { igmpACLOrder }
+    ::= { igmpACLTable 1 }
+
+IgmpACLEntry ::=
+    SEQUENCE {
+        igmpACLOrder            Integer32,
+        igmpACLStatus           RowStatus,
+        igmpACLAction           INTEGER,
+        igmpACLIfIndex          InterfaceIndex,
+        igmpACLSenderAddress    IpAddress,
+        igmpACLSenderNetmask    IpAddress,
+        igmpACLGroupAddress     IpAddress,
+        igmpACLGroupNetmask     IpAddress,
+        igmpACLType             Integer32
+    }
+
+igmpACLOrder OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The order of this entry."
+    ::= { igmpACLEntry 1 }
+
+igmpACLStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry."
+    ::= { igmpACLEntry 2 }
+
+igmpACLAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+        accept(1),
+        deny(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status of this rule."
+    DEFVAL      { accept }
+    ::= { igmpACLEntry 3 }
+
+igmpACLIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The incoming interface for which this rule applies."
+    ::= { igmpACLEntry 4 }
+
+igmpACLSenderAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The originator of the packet for which this rule applies."
+    ::= { igmpACLEntry 5 }
+
+igmpACLSenderNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The netmask of the originator for which this rule applies."
+    ::= { igmpACLEntry 6 }
+
+igmpACLGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address (combined with igmpACLGroupMask) which specifies
+         a multicast group."
+    ::= { igmpACLEntry 7 }
+
+igmpACLGroupNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The netmask (combined with igmpACLGroup) which specifies
+         a multicast group."
+    ::= { igmpACLEntry 8 }
+
+igmpACLType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        report(1),
+        traffic(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type for which this rule applies, either IGMP reporting or
+         incoming mulicast traffic."
+    DEFVAL      { report }
+    ::= { igmpACLEntry 9 }
+
+---------------------------------------------------------------------------
+-- Operative: IGMP-interface-table
+
+igmpInterfaceOperTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpInterfaceOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the interfaces on which IGMP
+         is currently operating."
+    ::= { igmpMIB 8 }
+
+igmpInterfaceOperEntry OBJECT-TYPE
+    SYNTAX      IgmpInterfaceOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an interface on
+         which IGMP is currently operating."
+    INDEX       { igmpInterfaceOperIfIndex }
+    ::= { igmpInterfaceOperTable 1 }
+
+IgmpInterfaceOperEntry ::=
+    SEQUENCE {
+        igmpInterfaceOperIfIndex                InterfaceIndex,
+        igmpInterfaceOperQueryInterval          Unsigned32,
+        igmpInterfaceOperVersion                Unsigned32,
+        igmpInterfaceOperQuerier                IpAddress,
+        igmpInterfaceOperQueryMaxResponseTime   Unsigned32,
+        igmpInterfaceOperQuerierUpTime          TimeTicks,
+        igmpInterfaceOperQuerierExpiryTime      TimeStamp,
+        igmpInterfaceOperVersion1QuerierTimer   TimeStamp,
+        igmpInterfaceOperWrongVersionQueries    Counter32,
+        igmpInterfaceOperJoins                  Counter32,
+        igmpInterfaceOperProxyIfIndex           InterfaceIndexOrZero,
+        igmpInterfaceOperGroups                 Gauge32,
+        igmpInterfaceOperRobustness             Unsigned32,
+        igmpInterfaceOperLastMembQueryIntvl     Unsigned32,
+        igmpInterfaceOperVersion2QuerierTimer   TimeStamp,
+        igmpInterfaceOperGeneralQueryTimer      TimeStamp,
+        igmpInterfaceOperStateLimit             Unsigned32,
+        igmpInterfaceOperHostOnlyMode           TruthValue,
+        igmpInterfaceOperFallback1ProxyIfIndex  InterfaceIndexOrZero,
+        igmpInterfaceOperFallback2ProxyIfIndex  InterfaceIndexOrZero,
+        igmpInterfaceOperFallback3ProxyIfIndex  InterfaceIndexOrZero,
+        igmpInterfaceOperChosenProxyIfIndex     InterfaceIndexOrZero
+    }
+
+igmpInterfaceOperIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which IGMP is
+         operating."
+    ::= { igmpInterfaceOperEntry 1 }
+
+igmpInterfaceOperQueryInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The frequency at which IGMP Host-Query packets are
+         transmitted on this interface."
+    DEFVAL      { 125 }
+    ::= { igmpInterfaceOperEntry 2 }
+
+igmpInterfaceOperVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of IGMP which is running on this interface."
+    DEFVAL      { 3 }
+    ::= { igmpInterfaceOperEntry 4 }
+
+igmpInterfaceOperQuerier OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the IGMP Querier on the IP subnet to which
+         this interface is attached."
+    ::= { igmpInterfaceOperEntry 5 }
+
+igmpInterfaceOperQueryMaxResponseTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    UNITS       "tenths of seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum query response time advertised in IGMPv2
+         queries on this interface."
+    DEFVAL      { 100 }
+    ::= { igmpInterfaceOperEntry 6 }
+
+igmpInterfaceOperQuerierUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time since igmpInterfaceOperQuerier was last changed."
+    ::= { igmpInterfaceOperEntry 7 }
+
+igmpInterfaceOperQuerierExpiryTime OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the Other Querier
+         Present Timer expires.  If the local system is the querier,
+         the value of this object is zero."
+    ::= { igmpInterfaceOperEntry 8 }
+
+igmpInterfaceOperVersion1QuerierTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the host assumes that there are no
+         IGMPv1 routers present on the interface.  While this is non-
+         zero, the host will reply to all queries with version 1
+         membership reports."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 9 }
+
+igmpInterfaceOperWrongVersionQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of queries received whose IGMP version does not
+         match igmpInterfaceOperVersion, over the lifetime of the row
+         entry.  IGMP requires that all routers on a LAN be
+         configured to run the same version of IGMP.  Thus, if any
+         queries are received with the wrong version, this indicates
+         a configuration error."
+    ::= { igmpInterfaceOperEntry 10 }
+
+igmpInterfaceOperJoins OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times a group membership has been added on
+         this interface; that is, the number of times an entry for
+         this interface has been added to the Cache Table.  This
+         object gives an indication of the amount of IGMP activity
+         over the lifetime of the row entry."
+    ::= { igmpInterfaceOperEntry 11 }
+
+igmpInterfaceOperProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Copied from related 'igmpInterfaceProxyIfIndex' entry
+         (see description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 12 }
+
+igmpInterfaceOperGroups OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries for this interface in the
+         Cache Table."
+    ::= { igmpInterfaceOperEntry 13 }
+
+igmpInterfaceOperRobustness OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Robustness Variable allows tuning for the expected
+         packet loss on a subnet.  If a subnet is expected to be
+         lossy, the Robustness Variable may be increased.  IGMP is
+         robust to (Robustness Variable-1) packet losses."
+    DEFVAL      { 2 }
+    ::= { igmpInterfaceOperEntry 14 }
+
+igmpInterfaceOperLastMembQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    UNITS       "tenths of seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Last Member Query Interval is the Max Response Time
+         inserted into Group-Specific Queries sent in response to
+         Leave Group messages, and is also the amount of time between
+         Group-Specific Query messages.  This value may be tuned to
+         modify the leave latency of the network.  A reduced value
+         results in reduced time to detect the loss of the last
+         member of a group.  The value of this object is irrelevant
+         if igmpInterfaceOperVersion is 1."
+    DEFVAL      { 10 }
+    ::= { igmpInterfaceOperEntry 15 }
+
+igmpInterfaceOperVersion2QuerierTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the host assumes that there are no
+         IGMPv2 routers present on the interface.  While this is non-
+         zero, the host will reply to all queries with version 1 or 2
+         membership reports."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 16 }
+
+igmpInterfaceOperGeneralQueryTimer OBJECT-TYPE
+    SYNTAX
+                TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the next general Query is issued
+         on this interface."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 17 }
+
+igmpInterfaceOperStateLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum allowed number of Reports/Queries per seconds
+         on this interface. Must be greater zero to be active."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 18 }
+
+igmpInterfaceOperHostOnlyMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether the interface is running
+         in host-only mode.
+         If set to false this interface will operate in host and
+         routing mode."
+    DEFVAL      { false }
+    ::= { igmpInterfaceOperEntry 19 }
+
+igmpInterfaceOperFallback1ProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Copied from related 'igmpInterfaceFallback1ProxyIfIndex' entry
+         (see description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 20 }
+
+igmpInterfaceOperFallback2ProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Copied from related 'igmpInterfaceFallback2ProxyIfIndex' entry
+         (see description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 21 }
+
+igmpInterfaceOperFallback3ProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Copied from related 'igmpInterfaceFallback3ProxyIfIndex' entry
+         (see description there)."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 23 }
+
+igmpInterfaceOperChosenProxyIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tells currently chosen 'upstream' interface
+         (see further description in 'igmpInterfaceProxyIfIndex')."
+    DEFVAL      { 0 }
+    ::= { igmpInterfaceOperEntry 22 }
+
+---------------------------------------------------------------------------
+-- Conformance-information
+
+igmpMIBConformance OBJECT IDENTIFIER ::= { igmpMIB 5 }
+
+igmpMIBCompliances OBJECT IDENTIFIER ::= { igmpMIBConformance 1 }
+
+igmpMIBGroups OBJECT IDENTIFIER ::= { igmpMIBConformance 2 }
+
+-- Compliance-statements
+
+igmpV1HostMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for hosts running IGMPv1 and
+         implementing the IGMP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        igmpBaseMIBGroup
+    }
+    OBJECT      igmpInterfaceStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    OBJECT      igmpCacheStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { igmpMIBCompliances 1 }
+
+igmpV1RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for routers running IGMPv1 and
+         implementing the IGMP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        igmpBaseMIBGroup,
+        igmpRouterMIBGroup
+    }
+    OBJECT      igmpInterfaceStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    OBJECT      igmpCacheStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { igmpMIBCompliances 2 }
+
+igmpV2HostMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for hosts running IGMPv2 and
+         implementing the IGMP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        igmpBaseMIBGroup,
+        igmpV2HostMIBGroup
+    }
+    OBJECT      igmpInterfaceStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    OBJECT      igmpCacheStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { igmpMIBCompliances 3 }
+
+igmpV2RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for routers running IGMPv2 and
+         implementing the IGMP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        igmpBaseMIBGroup,
+        igmpRouterMIBGroup,
+        igmpV2RouterMIBGroup
+    }
+    OBJECT      igmpInterfaceStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    OBJECT      igmpCacheStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { igmpMIBCompliances 4 }
+
+igmpV3HostMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for hosts running IGMPv3 and
+         implementing the IGMP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        igmpBaseMIBGroup,
+        igmpV2HostMIBGroup,
+        igmpV3HostMIBGroup
+    }
+    OBJECT      igmpInterfaceStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    OBJECT      igmpCacheStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { igmpMIBCompliances 5 }
+
+igmpV3RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for routers running IGMPv3 and
+         implementing the IGMP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        igmpBaseMIBGroup,
+        igmpRouterMIBGroup,
+        igmpV2RouterMIBGroup,
+        igmpV3RouterMIBGroup
+    }
+    OBJECT      igmpInterfaceStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    OBJECT      igmpCacheStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { igmpMIBCompliances 6 }
+
+-- Conformance-units
+
+igmpBaseMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpCacheSelf,
+        igmpCacheStatus,
+        igmpInterfaceStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of
+         IGMP version 1, 2 or 3."
+    ::= { igmpMIBGroups 1 }
+
+igmpRouterMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpCacheUpTime,
+        igmpCacheExpiryTime,
+        igmpInterfaceJoins,
+        igmpInterfaceGroups,
+        igmpCacheLastReporter,
+        igmpInterfaceQuerierUpTime,
+        igmpInterfaceQuerierExpiryTime,
+        igmpInterfaceQueryInterval
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of additional objects for management of IGMP
+         version 1, 2 or 3 in routers."
+    ::= { igmpMIBGroups 2 }
+
+igmpV2HostMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpInterfaceVersion1QuerierTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of additional objects for management of IGMP
+         version 2 in hosts."
+    ::= { igmpMIBGroups 3 }
+
+igmpHostOptMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpCacheLastReporter,
+        igmpInterfaceQuerier
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of optional objects for IGMP hosts.
+         Supporting this group can be especially useful in an
+         environment with a router which does not support the IGMP
+         MIB."
+    ::= { igmpMIBGroups 4 }
+
+igmpV2RouterMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpInterfaceVersion,
+        igmpInterfaceQuerier,
+        igmpInterfaceQueryMaxResponseTime,
+        igmpInterfaceRobustness,
+        igmpInterfaceWrongVersionQueries,
+        igmpInterfaceLastMembQueryIntvl,
+        igmpCacheVersion1HostTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of additional objects for management of IGMP
+         version 2 in routers."
+    ::= { igmpMIBGroups 5 }
+
+igmpV2ProxyMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpInterfaceProxyIfIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of additional objects for management of IGMP
+         proxy devices."
+    ::= { igmpMIBGroups 6 }
+
+igmpV3HostMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpCacheSourceFilterMode,
+        igmpInterfaceVersion2QuerierTimer,
+        igmpSrcListAddress,
+        igmpSrcListIfIndex,
+        igmpSrcListHostAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of additional objects for management of IGMP
+         version 3 in hosts."
+    ::= { igmpMIBGroups 7 }
+
+igmpV3RouterMIBGroup OBJECT-GROUP
+    OBJECTS {
+        igmpCacheSourceFilterMode,
+        igmpCacheVersion2HostTimer,
+        igmpSrcListAddress,
+        igmpSrcListIfIndex,
+        igmpSrcListHostAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of additional objects for management of IGMP
+         version 3 in routers."
+    ::= { igmpMIBGroups 8 }
+
+END

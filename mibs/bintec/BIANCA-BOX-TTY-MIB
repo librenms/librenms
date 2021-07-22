@@ -1,0 +1,223 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2015 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mibtty,v $
+-- $Revision: 1.21 $
+
+BIANCA-BOX-TTY-MIB DEFINITIONS ::= BEGIN
+        IMPORTS 
+            NetworkAddress, IpAddress, Counter, Gauge, TimeTicks,
+            enterprises
+                FROM RFC1155-SMI
+        
+            DisplayString
+                FROM RFC1158-MIB
+    
+            OBJECT-TYPE
+                FROM RFC-1212
+            
+            Date, HexValue
+                FROM BINTEC-MIB;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    tty		OBJECT IDENTIFIER 
+	::= { bibo 41 }
+
+
+    -- tty  Group
+
+        ttyIfTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF TtyIfEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The ttyIfTable contains information relating to the 
+                serial interfaces found on the system."
+		::= { tty 1 }
+
+	ttyIfEntry OBJECT-TYPE
+            SYNTAX  TtyIfEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"TTY Port Description Interface entry"
+	    INDEX   { ttyIfIndex }
+              ::= { ttyIfTable 1 }
+
+	TtyIfEntry ::=
+            SEQUENCE {
+                ttyIfIndex			INTEGER,
+		ttyIfName	   		DisplayString,
+		ttyIfNetwork			DisplayString,
+		ttyIfProfile			INTEGER,
+		ttyIfSpeed                      INTEGER,
+		ttyIfCSQ			INTEGER,
+		ttyIfAdminStatus		INTEGER,
+		ttyIfOperStatus			INTEGER,
+		ttyIfCommand			DisplayString,
+		ttyIfAnswer			DisplayString,
+                ttyIfMode                       INTEGER,
+                ttyIfCurrentMode                INTEGER,
+                ttyIfCurrentSpeed               INTEGER
+            }
+
+	ttyIfIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Unique index of the tty Interface."
+	::= { ttyIfEntry 1 }
+
+	ttyIfName OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..16))
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+	       " Name for the Port"
+	::= { ttyIfEntry 2 }
+
+	ttyIfNetwork OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..60))
+	    ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+		"GSM Network is actually used"
+	::= { ttyIfEntry 3 }
+
+	ttyIfProfile OBJECT-TYPE
+            SYNTAX  INTEGER {
+		profile1 (1),
+		profile2 (2),
+		profile3 (3),
+		profile4 (4),
+		profile5 (5)
+	    }
+            ACCESS  read-write
+            STATUS  obsolete
+	    DESCRIPTION
+	       " The profile for this port "
+	    DEFVAL { profile1 }
+	::= { ttyIfEntry 4 }
+
+	ttyIfSpeed OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		e9600(1), e19200(2), e38400(3), e57600(4), e115200(5),
+		default(6)
+	    } 
+	    ACCESS  read-write
+	    STATUS  obsolete
+	    DESCRIPTION
+		"The external speed to the modem"
+	    DEFVAL { e19200 }
+	::= { ttyIfEntry 5 }
+
+
+
+	ttyIfCSQ OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  obsolete
+	    DESCRIPTION
+	       " The GSM receive signal level "
+	    DEFVAL { -113 }
+	::= { ttyIfEntry 6 }
+
+	ttyIfAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	       disable(1),
+	       enable(2)
+	    }
+	    ACCESS  read-write
+	    STATUS  obsolete
+	    DESCRIPTION
+	       "Disable or enbale tty for Modem connection"
+	    DEFVAL { disable }
+	::= { ttyIfEntry 7 }
+
+	ttyIfOperStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	       up(1),
+	       down(2),
+	       init(3),
+	       called(4),
+	       calling(5),
+	       connect(6),
+	       simwait(7),
+	       pinwait(8),
+	       pinerror(9),
+	       error(10),
+	       disconnected(11)
+	    }
+	    ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+	       "Operation state for this port"
+	::= { ttyIfEntry 8 }
+
+
+	ttyIfCommand OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..40))
+	    ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+	       "Last Command to the Modem"
+	::= { ttyIfEntry 9 }
+
+	ttyIfAnswer OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..60))
+	    ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+	       "Last Answer from the Modem"
+	::= { ttyIfEntry 10 }
+
+	ttyIfMode OBJECT-TYPE
+            SYNTAX  INTEGER {
+                disabled(1),
+                aux(2),
+                soip(3),
+                gps(4)
+
+
+
+
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The mode in which the tty interface should operate
+                 from now on."
+            DEFVAL { disabled }
+	::= { ttyIfEntry 11 }
+
+	ttyIfCurrentMode OBJECT-TYPE
+            SYNTAX  INTEGER {
+                disabled(1),
+                aux(2),
+                soip(3),
+                gps(4)
+
+
+
+
+            }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The current mode in which the tty interface operates now."
+            DEFVAL { disabled }
+	::= { ttyIfEntry 12 }
+
+	ttyIfCurrentSpeed OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The current speed of the tty interface."
+	::= { ttyIfEntry 13 }
+
+	
+END

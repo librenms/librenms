@@ -1,0 +1,2634 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1999-2018 bintec elmeg GmbH
+-- All Rights Reserved
+-- $RCSfile: mib-voip,v $
+-- $Revision: 1.28 $
+
+BIANCA-BRICK-VOIP-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+	    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	    Integer32, Unsigned32, Counter32, Counter64, IpAddress, TimeTicks,
+	    mib-2, enterprises
+		FROM SNMPv2-SMI
+
+	    DisplayString
+		FROM SNMPv2-TC
+
+	    voip, Date, BitValue
+		FROM BINTEC-MIB
+
+	    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+	       FROM SNMPv2-CONF;
+
+
+    -- Management Information for VoIP related Topics
+
+voipMIB MODULE-IDENTITY
+    LAST-UPDATED "201804121321Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+	    "EMail:   info@bintec-elmeg.com
+	     Web:     www.bintec-elmeg.com
+	    "
+    DESCRIPTION
+	    "The MIB module for VoIP administration entities.
+	    "
+    REVISION      "201704240000Z"
+    DESCRIPTION
+	    "Add VoIP SIP provider extension table voipSipProvExt."
+    REVISION      "200902130000Z"
+    DESCRIPTION
+	    "SWYX certified version."
+
+    ::= { voip 5 }
+
+
+    voipProviderTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipProviderEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The common information database for VoIP provider settings.
+		 Used by H.323, MGCP and SIP."
+	::= { voip 1 }
+
+	voipProviderEntry OBJECT-TYPE
+	     SYNTAX  VoipProviderEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Contains parameters common to all VoIP provider types."
+	    INDEX { voipProviderDomain, voipProviderAccount }
+	::= { voipProviderTable 1 }
+
+	VoipProviderEntry ::=
+	    SEQUENCE {
+		voipProviderIndex		INTEGER,
+		voipProviderAdminStatus		INTEGER,
+		voipProviderOperStatus		INTEGER,
+		voipProviderDescr		DisplayString,
+		voipProviderDomain		DisplayString,
+		voipProviderPort		INTEGER,
+		voipProviderType		INTEGER,
+		voipProviderAccount		DisplayString,
+		voipProviderPwd			OCTET STRING,
+		voipProviderProfileNo		INTEGER,
+		voipProviderSipProvProfile	INTEGER
+	    }
+
+	voipProviderIndex OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Unique index for referencing this provider entry."
+	    DEFVAL { 1 }
+	::= { voipProviderEntry 1 }
+
+	voipProviderAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		enable(1),
+		disable(2),
+		delete(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Administrative status for this provider instance."
+	    DEFVAL { enable }
+	::= { voipProviderEntry 2 }
+
+	voipProviderOperStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		down(11),
+		dormant(12),
+		trying(13),
+		register(14),
+		authenticate(15),
+		up(16),
+		failed(17),
+		blocked(18),
+		disable(19)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Current operative state of provider."
+	    DEFVAL { down }
+	::= { voipProviderEntry 3 }
+
+	voipProviderDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"User defined description of this entry."
+	    DEFVAL { "" }
+	::= { voipProviderEntry 4 }
+
+	voipProviderDomain OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"IP address or fully qualified domain name (FQDN) of this
+		 VoIP provider instance."
+	    DEFVAL { "" }
+	::= { voipProviderEntry 5 }
+
+	voipProviderPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Optional destination port of this VoIP provider (e.g 5060 for
+		 SIP or 1720 for H.323), if set to '0' this port will be
+		 selected otherwise (e.g. in case of SIP via DNS lookup for
+		 a SRV record)."
+	    DEFVAL { 5060 }
+	::= { voipProviderEntry 6 }
+
+	voipProviderType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		unknown(1),
+		h323(2),
+		mgcp(3),
+		sip(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Type of provider (H.323, MGCP, SIP). Currently only SIP is
+		 implemented. In case of type SIP a further (automatically
+		 added) voipSipProviderTable with the same table index defines
+		 further variables for SIP provider."
+	    DEFVAL { unknown  }
+	::= { voipProviderEntry 7 }
+
+	voipProviderAccount OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..64))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Optional user name for login to provider (only if given)."
+	    DEFVAL { "" }
+	::= { voipProviderEntry 8 }
+
+	voipProviderPwd OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (0..64))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Password or private key for login to provider (only if given)."
+	    DEFVAL { "" }
+	::= { voipProviderEntry 9 }
+
+	voipProviderProfileNo OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"This variable is only used internally and managed by TR069 daemon.
+		 An entry gets assigned to a VoIP Profile by it. 
+		 Profile number 1 means that entry isn't modifiable by GUI. 
+		 Profile 3 is even not not shown in GUI and gets only used
+		 if no other provider entry is available.
+		 A value of 0 means 'any other profile'"
+	    DEFVAL { 0 }
+        ::= { voipProviderEntry 20 }
+
+    voipProviderSipProvProfile OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Index to the SIP provider profile (voipProviderProfileIndex)
+             which was used to create this VoIP provider entry.
+             This variable is used internally by GUI.
+             (0 means undefined)"
+        DEFVAL { 0 }
+        ::= { voipProviderEntry 21 }
+
+-- VoIP provider specific interface extension table
+
+	voipExtensionTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipExtensionEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"Description of a physical extension (dial peer)."
+	::= { voip 2 }
+
+	voipExtensionEntry OBJECT-TYPE
+	     SYNTAX  VoipExtensionEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Settings of an extension entry common to all extension types."
+	    INDEX { voipExtensionNumber, voipExtensionType }
+	::= { voipExtensionTable 1 }
+
+
+	VoipExtensionEntry ::=
+	    SEQUENCE {
+		voipExtensionIndex	INTEGER,
+		voipExtensionNumber	DisplayString,
+		voipExtensionAlias	DisplayString,
+		voipExtensionMask	BitValue,
+		voipExtensionType	INTEGER,
+		voipExtensionOperStatus	INTEGER
+	    }
+
+	voipExtensionIndex OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Unique index of this extension entry."
+	    DEFVAL { 1 }
+	::= { voipExtensionEntry 1 }
+
+	voipExtensionNumber OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..32))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Assigned number or prefix for this extension."
+	::= { voipExtensionEntry 2 }
+
+	voipExtensionAlias OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..32))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"An internal alias assigned to this extension. This parameter is
+		 currently unused."
+	::= { voipExtensionEntry 3 }
+
+	voipExtensionMask OBJECT-TYPE
+	    SYNTAX  BitValue
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Interface stack mask position of a referenced interface
+		 (ISDN stack or MGCP UNITS). This entry can only be set for
+		 'voipExtensionType' = 'analog' and 'digital' (and theoretically
+		 'mgcp'). For all other types this variable is empty.
+
+		 For 'analog' and 'digital' interfaces the needed value can be
+		 found in the interface's isdnStkTable entry at 'isdnstkNumber'
+		 (= the bitmask position of the interface in the stack's
+		 bitmask). Note that despite the BitValue data type of this
+		 parameter no bitmask is entered here, just the 'isdnstkNumber'
+		 integer value of a single interface."
+	    DEFVAL { 0 }
+	::= { voipExtensionEntry 4 }
+
+	voipExtensionType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		analog(1),
+		digital(2),
+		sip(3),
+		h323(4),
+		mgcp(5),
+		delete(7)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Interface type of extension. 'analog' (POTS), 'digital' (ISDN),
+		 SIP, MGCP, H.323 (or 'delete').
+		 MGCP and H.323 are currently not implemented."
+	    DEFVAL { digital }
+	::= { voipExtensionEntry 5 }
+
+    voipExtensionOperStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		down(11),
+		dormant(12),
+		trying(13),
+		register(14),
+		authenticate(15),
+		up(16),
+		failed(17),
+		blocked(18),
+		disable(19)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Current operational state of connected extension."
+	    DEFVAL { down }
+	::= { voipExtensionEntry 9 }
+
+
+
+
+-- VoIP active call table
+
+	voipCallTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipCallEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"Up-to-date informations of active VoIP calls."
+	::= { voip 3 }
+
+	voipCallEntry OBJECT-TYPE
+	     SYNTAX  VoipCallEntry
+	     MAX-ACCESS not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"Table of current VoIP calls (counterpart to isdnCallTable)."
+	    INDEX { voipCallTimeStamp }
+	::= { voipCallTable 1 }
+
+	VoipCallEntry ::=
+	    SEQUENCE {
+		voipCallTimeStamp		Date,
+		voipCallProtocolType		INTEGER,
+		voipCallState			INTEGER,
+		voipCallRole			INTEGER,
+		voipCallRefValue		INTEGER,
+		voipCallId			OCTET STRING,
+		voipCallLocalNumber		DisplayString,
+		voipCallLocalAlias		DisplayString,
+		voipCallLocalIpAddr		IpAddress,
+		voipCallLocalIpPort		INTEGER,
+		voipCallRemoteNumber		DisplayString,
+		voipCallRemoteAlias		DisplayString,
+		voipCallRemoteIpAddr		IpAddress,
+		voipCallRemoteIpPort		INTEGER,
+		voipCallRemoteEndpointVendor	DisplayString,
+		voipCallNegotiatedCodec		INTEGER,
+		voipCallTxPacketLengthMs	INTEGER,
+		voipCallTxPackets		Counter32,
+		voipCallTxOctets		Counter32,
+		voipCallRxPacketLengthMs	INTEGER,
+		voipCallRxPackets		Counter32,
+		voipCallRxOctets		Counter32,
+		voipCallDisconnectCause		DisplayString,
+		voipCallConnect			INTEGER,
+		voipCallIf			INTEGER
+	    }
+
+	voipCallTimeStamp OBJECT-TYPE
+	    SYNTAX  Date
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Timestamp of call (connection) establishment."
+	::= { voipCallEntry 1 }
+
+	voipCallProtocolType  OBJECT-TYPE
+	    SYNTAX  INTEGER{
+		h323(1),
+		mgcp(2),
+		sip(3),
+		ipi(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The VoIP protocol used for the active call."
+	    DEFVAL { sip }
+	::= { voipCallEntry 2 }
+
+	voipCallState  OBJECT-TYPE
+    	    SYNTAX  INTEGER{
+		admission(1),   -- H.323 gatekeeper only
+		off-hook(2),
+		dialing(3),
+		called(4),
+		proceeding(5),
+		alerting(6),
+		connected(7),
+		disconnect(8),
+		disengage(9),   -- H.323 gatekeeper only
+		release(10),
+		hold(11),
+		conference(12),
+		idle(13),
+		transfer(14),
+		overlapped(15)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Tracks the call state of the active call."
+	    DEFVAL { admission }
+	::= { voipCallEntry 3 }
+
+	voipCallRole  OBJECT-TYPE
+	    SYNTAX  INTEGER{
+		caller(1),
+		called(2),
+		delete(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The endpoints role in the active call."
+	    DEFVAL { caller }
+	::= { voipCallEntry 4 }
+
+	voipCallRefValue  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..32767)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Unique number which identifies the call (Q.931 compatible)."
+	::= { voipCallEntry 5 }
+
+	voipCallId  OBJECT-TYPE
+	    SYNTAX  OCTET STRING
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Call-ID of the associated call."
+	::= { voipCallEntry 6 }
+
+	voipCallLocalNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Internal number of local user."
+	::= { voipCallEntry 7 }
+
+	voipCallLocalAlias OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Optional alias of local user."
+	::= { voipCallEntry 8 }
+
+	voipCallLocalIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"IP address used by local user."
+	::= { voipCallEntry 9 }
+
+	voipCallLocalIpPort  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Associated port number used by local user."
+	::= { voipCallEntry 10 }
+
+	voipCallRemoteNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of remote user if available."
+	::= { voipCallEntry 11 }
+
+	voipCallRemoteAlias OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Alias of remote user if available."
+	::= { voipCallEntry 12 }
+
+	voipCallRemoteIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"IP address used by remote user."
+	::= { voipCallEntry 13 }
+
+	voipCallRemoteIpPort  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Associated port number used by remote user."
+	::= { voipCallEntry 14 }
+
+	voipCallRemoteEndpointVendor  OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Vendor's product description used by remote user."
+	::= { voipCallEntry 15 }
+
+	voipCallNegotiatedCodec OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		g711a(1),
+		g711u(2),
+		g723-53(3),
+		g723-63(4),
+		g726-16(5),
+		g726-24(6),
+		g726-32(7),
+		g726-40(8),
+		g728(9),
+		g729(10),
+		g729a(11),
+		g729b(12),
+		t38udp(13),
+		t38tcp(14),
+		gsm(15),
+		g722(16),
+		data(17),
+		dtmf(18)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Used codec negotiated during connection establishment."
+	    DEFVAL { g711a }
+	::= { voipCallEntry 16 }
+
+	voipCallTxPacketLengthMs  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..255)
+	    UNITS   "ms"
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Audio data length in milliseconds transmitted in a single
+		 frame."
+	::= { voipCallEntry 17 }
+
+	voipCallTxPackets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of RTP packets transmitted."
+	::= { voipCallEntry 18 }
+
+	voipCallTxOctets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of octets transmitted."
+	::= { voipCallEntry 19 }
+
+	voipCallRxPacketLengthMs  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..255)
+	    UNITS   "ms"
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Audio data length in milliseconds received in a single frame."
+	::= { voipCallEntry 20 }
+
+	voipCallRxPackets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of RTP packets received."
+	::= { voipCallEntry 21 }
+
+	voipCallRxOctets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of octets received."
+	::= { voipCallEntry 22 }
+
+	voipCallDisconnectCause  OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Saves the disconnect reason of call after termination."
+	::= { voipCallEntry 23 }
+
+    voipCallConnect  OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Call connection time stamp (internal representation)."
+	::= { voipCallEntry 24 }
+
+
+	voipCallIf  OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Index of interface for this call in case of protocol type ipi."
+	::= { voipCallEntry 25 }
+
+
+-- VoIP call history table
+
+	voipCallHistoryTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipCallHistoryEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"VoIP call history. Only finished calls are stored in this
+		 table."
+	::= { voip 4 }
+
+	voipCallHistoryEntry OBJECT-TYPE
+	    SYNTAX  VoipCallHistoryEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"Defintion of a VoIP call history entry. Only finished calls are
+		 stored here. (counterpart to the the isdnCallHistoryTable)."
+	    INDEX { voipCallHistoryTimeStamp }
+	::= { voipCallHistoryTable 1 }
+
+	VoipCallHistoryEntry ::=
+	    SEQUENCE {
+		voipCallHistoryTimeStamp		Date,
+		voipCallHistoryDuration			TimeTicks,
+		voipCallHistoryProtocolType		INTEGER,
+		voipCallHistoryDisconnectCause		DisplayString,
+		voipCallHistoryRole			INTEGER,
+		voipCallHistoryRefValue			INTEGER,
+		voipCallHistoryId			OCTET STRING,
+		voipCallHistoryLocalNumber		DisplayString,
+		voipCallHistoryLocalAlias		DisplayString,
+		voipCallHistoryLocalIpAddr		IpAddress,
+		voipCallHistoryLocalIpPort		INTEGER,
+		voipCallHistoryRemoteNumber		DisplayString,
+		voipCallHistoryRemoteAlias		DisplayString,
+		voipCallHistoryRemoteIpAddr		IpAddress,
+		voipCallHistoryRemoteIpPort		INTEGER,
+		voipCallHistoryRemoteEndpointVendor	DisplayString,
+		voipCallHistoryNegotiatedCodec		INTEGER,
+		voipCallHistoryTxPacketLengthMs		INTEGER,
+		voipCallHistoryTxPackets		Counter32,
+		voipCallHistoryTxOctets			Counter32,
+		voipCallHistoryRxPacketLengthMs		INTEGER,
+		voipCallHistoryRxPackets		Counter32,
+		voipCallHistoryRxOctets			Counter32,
+		voipCallHistoryIf			INTEGER
+	    }
+
+	voipCallHistoryTimeStamp OBJECT-TYPE
+	    SYNTAX  Date
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Timestamp of call (connection) establishment."
+	::= { voipCallHistoryEntry 1 }
+
+	voipCallHistoryDuration OBJECT-TYPE
+	     SYNTAX
+		    TimeTicks
+	    UNITS   "10E-2s"
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Call duration in hundredth seconds."
+	::= { voipCallHistoryEntry 2 }
+
+	voipCallHistoryProtocolType  OBJECT-TYPE
+	    SYNTAX  INTEGER{
+		h323(1),
+		mgcp(2),
+		sip(3),
+		ipi(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"VoIP protocol used during call."
+	    DEFVAL { sip }
+	::= { voipCallHistoryEntry 3 }
+
+	voipCallHistoryDisconnectCause  OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Saves disconnect reason of the call."
+	::= { voipCallHistoryEntry 4 }
+
+
+	voipCallHistoryRole  OBJECT-TYPE
+	    SYNTAX  INTEGER{
+		caller(1),
+		called(2),
+		delete(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Endpoint's role within finished call."
+	    DEFVAL { caller }
+	::= { voipCallHistoryEntry 5 }
+
+	voipCallHistoryRefValue  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..32767)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Unique number which identifies call (conforming to Q.931)."
+	::= { voipCallHistoryEntry 6 }
+
+	voipCallHistoryId  OBJECT-TYPE
+	    SYNTAX  OCTET STRING
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Call-ID of associated call."
+	::= { voipCallHistoryEntry 7 }
+
+	voipCallHistoryLocalNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Internal number of local user."
+	::= { voipCallHistoryEntry 8 }
+
+	voipCallHistoryLocalAlias OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Optional alias of local user."
+	::= { voipCallHistoryEntry 9 }
+
+	voipCallHistoryLocalIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"IP address used by local user."
+	::= { voipCallHistoryEntry 10 }
+
+	voipCallHistoryLocalIpPort  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Associated port number used by local user."
+	::= { voipCallHistoryEntry 11 }
+
+	voipCallHistoryRemoteNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of remote user if available."
+	::= { voipCallHistoryEntry 12 }
+
+	voipCallHistoryRemoteAlias OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Alias of remote user if available."
+	::= { voipCallHistoryEntry 13 }
+
+	voipCallHistoryRemoteIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"IP address used by remote user."
+	::= { voipCallHistoryEntry 14 }
+
+	voipCallHistoryRemoteIpPort  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Associated port number used by remote user."
+	::= { voipCallHistoryEntry 15 }
+
+	voipCallHistoryRemoteEndpointVendor  OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Vendor's product description used by remote user."
+	::= { voipCallHistoryEntry 16 }
+
+	voipCallHistoryNegotiatedCodec OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		g711a(1),
+		g711u(2),
+		g723-53(3),
+		g723-63(4),
+		g726-16(5),
+		g726-24(6),
+		g726-32(7),
+		g726-40(8),
+		g728(9),
+		g729(10),
+		g729a(11),
+		g729b(12),
+		t38udp(13),
+		t38tcp(14),
+		gsm(15),
+		g722(16),
+		data(17),
+		dtmf(18)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Codec negotiated during connection establishment."
+	    DEFVAL { g711a }
+	::= { voipCallHistoryEntry 17 }
+
+	voipCallHistoryTxPacketLengthMs  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..255)
+	    UNITS   "ms"
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Audio data length in milliseconds transmitted in a single
+		 frame."
+	::= { voipCallHistoryEntry 18 }
+
+	voipCallHistoryTxPackets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of RTP packets transmitted."
+	::= { voipCallHistoryEntry 19 }
+
+	voipCallHistoryTxOctets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of octets transmitted."
+	::= { voipCallHistoryEntry 20 }
+
+	voipCallHistoryRxPacketLengthMs  OBJECT-TYPE
+	    SYNTAX  INTEGER(1..255)
+	    UNITS   "ms"
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Audio data length in milliseconds received in a single frame."
+	::= { voipCallHistoryEntry 21 }
+
+	voipCallHistoryRxPackets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of RTP packets received."
+	::= { voipCallHistoryEntry 22 }
+
+	voipCallHistoryRxOctets  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of octets received."
+	::= { voipCallHistoryEntry 23 }
+
+	voipCallHistoryIf  OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Call-ID of associated call."
+	::= { voipCallHistoryEntry 24 }
+
+    voipCallHistoryMaxEntries OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Maximum number of voipCallHistory entries in memory."
+	    DEFVAL { 100 }
+	::= { voip 10 }
+
+    voipAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(1),
+		enabled(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Globally enable or disable VoIP features. Setting this to
+		 'disable' disables all VoIP dependent subsystems including
+		  Mediagateway."
+	::= { voip 11 }
+
+-- OIDs 12 up to 20 and 22 to 24 were obsoleted, don't reuse
+-- OIDs 21 and 25 follow way below
+
+    voipTraceAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(1),
+		enabled(2),
+		delete(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Globally set VoIP trace buffer feature.
+		 'disabled' no trace active or stop active trace
+		 'enabled'  trace buffer is active using voipTraceMode
+		 'delete'   delete existing voip trace buffer, voipTraceBufferID
+		            will be set to -1 and voipTraceAdminStatus resets to 'disabled'.
+		"
+	    DEFVAL { disabled }
+	::= { voip 26 }
+
+    voipTraceBufferID OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"If a trace buffer is available the used ID is saved here.
+		 In trcBufTable an entry with that ID (trcBufID) exists. If value
+		 is -1, no trace buffer is available.
+		"
+	    DEFVAL { -1 }
+	::= { voip 27 }
+
+    voipTraceMode OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		state1(1),
+		state2(2),
+		events1(3),
+		events2(4),
+		sip(5)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Globally set VoIP trace buffer mode.
+		 'state1' dump all registrations and calls (snapshot)
+		 'state2' dump all registrations, calls, transactions
+		          and internal DNS results (snapshot)
+		 'events1' trace current state changes and errors
+		 'events2' trace current state changes, errors and all SIP messages
+		 'sip' trace all sent and reveived SIP messages only
+		"
+	    DEFVAL { events1 }
+	::= { voip 28 }
+
+    voipProvProfMgmtCmd OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		put(2),
+		get(3),
+		put-local(4),
+		get-local(5),
+		copy-prof(6)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"set VoIP provider profile management command.
+		 'put' export profile via tftp
+		 'get' import profile via tftp
+		 'put-local' export profile(s) into dedicated configuration
+		          determined via 'voipProvProfMgmtPath'
+		 'get-local' import profile(s) from dedicated configuration
+		          determined via 'voipProvProfMgmtPath'
+		 'copy-prof' create custom-defined profile copy from predefined
+		          profile determined via 'voipProvProfMgmtIndex'
+		"
+	    DEFVAL { none }
+	::= { voip 40 }
+
+    voipProvProfMgmtHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"TFTP host's IP address to send/receive configuration files
+		 containing voip provider profile entries."
+	::= { voip 41 }
+
+    voipProvProfMgmtFile OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"TFTP filename to send/receive configuration files
+		 containing voip provider profile entries."
+	::= { voip 42 }
+
+    voipProvProfMgmtPath OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Name of the dedicated configuration in flash to be used for
+		 import/export of voip provider profile(s)."
+	::= { voip 43 }
+
+    voipProvProfMgmtIndex OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..5000)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Index of voipProviderProfileTable entry to be copied into
+		 a new voipProviderProfMgmtTable entry - triggered via
+		 voipProvProfMgmtCmd copy-prof (5)."
+	    DEFVAL { 1 }
+	::= { voip 44 }
+
+    voipProvProfMgmtDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Description of the new provider profile entry."
+	::= { voip 45 }
+
+    voipOutboundInterface0 OBJECT-TYPE
+	    SYNTAX      INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"If set this interface index value determines the outbound interface
+		 associated with the local VoIP service. In conjunction with the
+		 (optional) voipOutboundInterface1 and voipOutboundInterface2 it
+		 represents a list of interfaces, the aim in this case is to
+		 support (VoIP-)interface-autodetection too. Note that within
+		 this list no prioritization, best-match selection or fallback
+		 policy takes place."
+	::= { voip 47 }
+
+    voipOutboundInterface1 OBJECT-TYPE
+	    SYNTAX      INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"If set this interface index value determines the outbound interface
+		 associated with the local VoIP service. In conjunction with the
+		 (optional) voipOutboundInterface0 and voipOutboundInterface2 it
+		 represents a list of interfaces, the aim in this case is to
+		 support (VoIP-)interface-autodetection too. Note that within
+		 this list no prioritization, best-match selection or fallback
+		 policy takes place."
+	::= { voip 48 }
+
+    voipOutboundInterface2 OBJECT-TYPE
+	    SYNTAX      INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"If set this interface index value determines the outbound interface
+		 associated with the local VoIP service. In conjunction with the
+		 (optional) voipOutboundInterface0 and voipOutboundInterface1 it
+		 represents a list of interfaces, the aim in this case is to
+		 support (VoIP-)interface-autodetection too. Note that within
+		 this list no prioritization, best-match selection or fallback
+		 policy takes place."
+	::= { voip 49 }
+
+        voipEmergencyTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipEmergencyEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"Contains emergency handling rules"
+	::= { voip 21 }
+
+	voipEmergencyEntry OBJECT-TYPE
+	     SYNTAX  VoipEmergencyEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Describes an emergency rule"
+	    INDEX { voipEmergencyIndex }
+	::= { voipEmergencyTable 1 }
+
+	VoipEmergencyEntry ::=
+	    SEQUENCE {
+		voipEmergencyIndex	    INTEGER,
+		voipEmergencyAdminStatus    INTEGER,
+		voipEmergencyDescr	    DisplayString,
+		voipEmergencyNumber	    DisplayString,
+		voipEmergencyInterface      INTEGER,
+		voipEmergencyConvert	    DisplayString
+	    }
+
+        voipEmergencyIndex OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The unique Index value for this entry."
+	::= { voipEmergencyEntry 1 }
+
+	voipEmergencyAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2),
+                delete(3)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The administrative state of this entry."
+            DEFVAL { enabled }
+	::= { voipEmergencyEntry 2 }
+        
+        voipEmergencyDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Description of this entry."
+	::= { voipEmergencyEntry 3 }
+
+        voipEmergencyNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The emergency Number for handling"
+	::= { voipEmergencyEntry 4 }
+
+    	voipEmergencyInterface OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Optional:
+                    The fixed outgoing VoIP Interface for this emergency address,
+                    independent from any other call routing.
+                Default:
+                    If this value is 0, the standard call routing is used
+                    to retrieve the outgoing interface but any conversion 
+                    rules specified in the call routing entry are skipped and
+                    only the numbers defined in this entry are dialed instead."
+            DEFVAL { 0 }
+	::= { voipEmergencyEntry 5 }
+
+        voipEmergencyConvert OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Optional:
+                    The new emergency number if the outgoing interface
+                    uses a different emergency format.
+                 Default:
+                    Empty. No conversion is done."
+	::= { voipEmergencyEntry 6 }
+
+---------------------------------------------------------------------------
+-- Common used voip tables in operation mode PBX or MGW                    
+---------------------------------------------------------------------------
+
+	voipSpecialNumberTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSpecialNumberEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"Contains special number handling rules."
+	::= { voip 25 }
+
+	voipSpecialNumberEntry OBJECT-TYPE
+	     SYNTAX  VoipSpecialNumberEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Describes a special number rule"
+	    INDEX { voipSpecialNumberIndex }
+	::= { voipSpecialNumberTable 1 }
+
+	VoipSpecialNumberEntry ::=
+	    SEQUENCE {
+		voipSpecialNumberIndex		INTEGER,
+		voipSpecialNumberAdminStatus	INTEGER,
+		voipSpecialNumberDescr		DisplayString,
+		voipSpecialNumberNumber		DisplayString,
+		voipSpecialNumberInterface	INTEGER,
+		voipSpecialNumberConvert	DisplayString
+	    }
+
+        voipSpecialNumberIndex OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The unique Index value for this entry."
+	::= { voipSpecialNumberEntry 1 }
+
+	voipSpecialNumberAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2),
+                delete(3)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The administrative state of this entry."
+            DEFVAL { enabled }
+	::= { voipSpecialNumberEntry 2 }
+        
+        voipSpecialNumberDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Description of this entry."
+	::= { voipSpecialNumberEntry 3 }
+
+        voipSpecialNumberNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The Special Number for handling."
+	::= { voipSpecialNumberEntry 4 }
+
+    	voipSpecialNumberInterface OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"(Used in MGW mode only!)
+		Optional:
+                    The fixed outgoing VoIP Interface for this special address,
+                    independent from any other call routing.
+                Default:
+                    If this value is 0, the standard call routing is used
+                    to retrieve the outgoing interface but any conversion 
+                    rules specified in the call routing entry are skipped and
+                    only the numbers defined in this entry are dialed instead."
+            DEFVAL { 0 }
+	::= { voipSpecialNumberEntry 5 }
+
+        voipSpecialNumberConvert OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Optional:
+                    The new special number if the outgoing interface
+                    uses a different number format.
+                 Default:
+                    Empty. No conversion is done."
+	::= { voipSpecialNumberEntry 6 }
+
+	voipSipProvExtTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipProvExtEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"Describes additional information for a SIP provider account"
+	::= { voip 29 }
+
+	voipSipProvExtEntry OBJECT-TYPE
+	     SYNTAX  VoipSipProvExtEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Describes additional information for a SIP provider account"
+	    INDEX { voipSipProvExtIndex }
+	::= { voipSipProvExtTable 1 }
+
+	VoipSipProvExtEntry ::=
+	    SEQUENCE {
+		voipSipProvExtIndex		INTEGER,
+		voipSipProvExtSendFromDisplay	INTEGER,
+		voipSipProvExtSendFromUser	INTEGER,
+		voipSipProvExtSendPPreferred	INTEGER,
+		voipSipProvExtSendPAsserted	INTEGER,
+		voipSipProvExtCLIPBilling	DisplayString
+	    }
+
+	voipSipProvExtIndex OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"Unique table index of this entry. This value cannot be edited
+		 or changed. This value is identical to 'Index' number of
+		 parent entry in voipProviderTable or mpsTrunkGroupTable."
+	::= { voipSipProvExtEntry 1 }
+
+	voipSipProvExtSendFromDisplay OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP From header display for outgoing call.
+		 none: no display used
+		 username: the username, same as in Contact header
+		 clip: calling party number that should be shown on destination device
+		 clip-billing: calling party number for billing (must be a valid number)"
+	    DEFVAL { none }
+	::= { voipSipProvExtEntry 2 }
+
+	voipSipProvExtSendFromUser OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		username(1),
+		clip(2),
+		clip-billing(3)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP From header as username for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	    DEFVAL { username }
+	::= { voipSipProvExtEntry 3 }
+
+	voipSipProvExtSendPPreferred OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP P-Preferred-Identity header for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	    DEFVAL { none }
+	::= { voipSipProvExtEntry 4 }
+
+	voipSipProvExtSendPAsserted OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP P-Asserted-Identity header for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	    DEFVAL { none }
+	::= { voipSipProvExtEntry 5 }
+
+	voipSipProvExtCLIPBilling OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS	current
+	    DESCRIPTION
+		"A valid phone number used if 'clip-billing' is selected. See above"
+	::= { voipSipProvExtEntry 6 }
+
+
+-- VoIP provider profile persistent working table
+
+    voipProviderProfileTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipProviderProfileEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The common information database for VoIP provider profiles.
+		 Used by H.323, MGCP and SIP."
+	::= { voip 30 }
+
+	voipProviderProfileEntry OBJECT-TYPE
+	     SYNTAX  VoipProviderProfileEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Contains parameters common to all VoIP provider profiles."
+	    INDEX { voipProviderProfileIndex }
+	::= { voipProviderProfileTable 1 }
+
+	VoipProviderProfileEntry ::=
+	    SEQUENCE {
+		voipProviderProfileIndex		INTEGER,
+		voipProviderProfileDescr		DisplayString,
+		voipProviderProfileType			INTEGER,
+		voipProviderProfileAccountType		INTEGER,
+		voipProviderProfileRegistrarHost	DisplayString,
+		voipProviderProfileRegistrarPort	INTEGER,
+		voipProviderProfileRegistrarProt	INTEGER,
+		voipProviderProfileRegistrarIPVer	INTEGER,
+		voipProviderProfileProxyHost		DisplayString,
+		voipProviderProfileProxyPort		INTEGER,
+		voipProviderProfileProxyProt		INTEGER,
+		voipProviderProfileProxyIPVer		INTEGER,
+		voipProviderProfileSTUNHost		DisplayString,
+		voipProviderProfileSTUNPort		INTEGER,
+		voipProviderProfileDomain		DisplayString,
+		voipProviderProfileFromDomain		DisplayString,
+		voipProviderProfileRegistrationType	INTEGER,
+		voipProviderProfileRegistrationInterval	INTEGER,
+		voipProviderProfileTlsCertCaCheck	INTEGER,
+		voipProviderProfileTlsCertHostCheck	INTEGER,
+
+		voipProviderProfileCodecMask		BITS,
+		voipProviderProfileCodecOrder		INTEGER,
+		voipProviderProfileG726Endian		INTEGER,
+		voipProviderProfileSRTP			INTEGER,
+		voipProviderProfileSrcIPCheck		INTEGER,
+		voipProviderProfileEarlyMedia		INTEGER,
+		voipProviderProfileCLIR			BITS,
+		voipProviderProfileSendFromDisplay	INTEGER,
+		voipProviderProfileSendFromUser		INTEGER,
+		voipProviderProfileSendPPreferred	INTEGER,
+		voipProviderProfileSendPAsserted	INTEGER,
+		voipProviderProfileCLIPBilling		DisplayString,
+		voipProviderProfileCheckExistingBinding	BITS,
+		voipProviderProfileNatPing		INTEGER,
+		voipProviderProfileOutNumberTranslation	BITS,
+		voipProviderProfileNetCentricServices	BITS,
+		voipProviderProfileGetCalledNumber	INTEGER,
+		voipProviderProfileAuthName		DisplayString,
+		voipProviderProfileVendorID		DisplayString
+	    }
+
+	voipProviderProfileIndex OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Unique and persistent index for referencing this provider
+		 profile entry."
+	::= { voipProviderProfileEntry 1 }
+
+	voipProviderProfileDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Description of this provider profile entry."
+	::= { voipProviderProfileEntry 2 }
+
+	voipProviderProfileType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		predefined(1),
+		custom(2),
+		converted(3)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Determines the origin of this entry, predefined(1) entries
+		 are factory-defined ones whereas custom(2) is used for
+		 user-defined profiles. If set to converted(3) it's the
+		 result of a translation process from (now legacy) VoIP-related
+		 table entries."
+	::= { voipProviderProfileEntry 3 }
+
+	voipProviderProfileAccountType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		singleNumber(1),
+		ddi(2)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This value determines the type of the account type. This is
+		 either a single number or a DDI account."
+	::= { voipProviderProfileEntry 4 }
+
+	voipProviderProfileRegistrarHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Host address of Registrar, either domain or IP address."
+	::= { voipProviderProfileEntry 5 }
+
+	voipProviderProfileRegistrarPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Registrar port, e.g. 5060. Default is 0 (NAPTR/SRV is used)."
+	::= { voipProviderProfileEntry 6 }
+
+	voipProviderProfileRegistrarProt OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		udp(1),
+		tcp(2),
+		tls(3),
+		auto(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Protocol for connection to registrar. If 'auto' is selected,
+		 DNS procedures for NAPTR are used."
+	::= { voipProviderProfileEntry 7 }
+
+	voipProviderProfileRegistrarIPVer OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		ipv4(1),
+		ipv6(2),
+		ipv4prefered(3),
+		ipv6prefered(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Selection of IP protocol.
+		 ipv4: only (resolved) IPv4 addresses are used
+		 ipv6: only (resolved) IPv6 addresses are used
+		 ipv4prefered: if (resolved) IPv4 address is available for the given
+		       protocol then it is used, else IPv6 address is used
+		       if available
+		 ipv6prefered: if (resolved) IPv6 address is available for the
+		       given protocol then it is used, else IPv4 address is used
+		       if available"
+	::= { voipProviderProfileEntry 8 }
+
+	voipProviderProfileProxyHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Host address of Proxy, either domain or IP address. If empty,
+		 the registrar host is used."
+	::= { voipProviderProfileEntry 9 }
+
+	voipProviderProfileProxyPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Proxy port, e.g. 5060. Default is 0 (NAPTR/SRV is used)."
+	::= { voipProviderProfileEntry 10 }
+
+	voipProviderProfileProxyProt OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		udp(1),
+		tcp(2),
+		tls(3),
+		auto(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Protocol for connection to proxy. If 'auto' is selected,
+		 DNS procedures for NAPTR are used."
+	::= { voipProviderProfileEntry 11 }
+
+	voipProviderProfileProxyIPVer OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		ipv4(1),
+		ipv6(2),
+		ipv4prefered(3),
+		ipv6prefered(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Selection of IP protocol.
+		 ipv4: only (resolved) IPv4 addresses are used
+		 ipv6: only (resolved) IPv6 addresses are used
+		 ipv4prefered: if (resolved) IPv4 address is available for the given
+		       protocol then it is used, else IPv6 address is used
+		       if available
+		 ipv6prefered: if (resolved) IPv6 address is available for the
+		       given protocol then it is used, else IPv4 address is used
+		       if available"
+	::= { voipProviderProfileEntry 12 }
+
+	voipProviderProfileSTUNHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Host address of STUN server, either domain or IP address. If empty,
+		 the registrar host is used."
+	::= { voipProviderProfileEntry 13 }
+
+	voipProviderProfileSTUNPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"STUN port, default is 3478."
+	::= { voipProviderProfileEntry 14 }
+
+	voipProviderProfileDomain OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Optional domain name used with SIP messages. No DNS operations
+		 are done for this value."
+	::= { voipProviderProfileEntry 15 }
+
+	voipProviderProfileFromDomain OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Optional domain name used in From header only. No DNS operations
+		 are done for this value."
+	::= { voipProviderProfileEntry 16 }
+
+	voipProviderProfileRegistrationType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		single(2),
+		bulk(3)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Type of registration:
+		 none: no registration, remote registrar has static information
+		 single: registration of just one account
+		 bulk: bulk number registration (bnc)."
+	::= { voipProviderProfileEntry 17 }
+
+	voipProviderProfileRegistrationInterval OBJECT-TYPE
+	    SYNTAX  INTEGER (1..86400)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Registration expire time in seconds."
+	::= { voipProviderProfileEntry 18 }
+
+
+	voipProviderProfileTlsCertCaCheck OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': no verification of peer certificate at all
+		 'enabled': peer certificate is checked against local CAs."
+	::= { voipProviderProfileEntry 19 }
+
+	voipProviderProfileTlsCertHostCheck OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': no check for peer certificate's host name
+		 'enabled': check peer certificate's host name with DNS host."
+	::= { voipProviderProfileEntry 20 }
+
+	voipProviderProfileCodecMask OBJECT-TYPE
+	    SYNTAX  BITS {
+		g711a(0),
+		g711u(1),
+		g722(2),
+		g729(3),
+		g729e(4),
+		g726v32(5),
+		g726v16(6),
+		g726v24(7),
+		g726v40(8),
+		g723v63(9),
+		g723v53(10),
+		iLBCv15(11),
+		iLBCv13(12),
+		dtmf(13),
+		t38(14),
+		data(15)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Codec mask of supported codecs."
+	    DEFVAL { {g711a, g711u, g722, g729} }
+	::= { voipProviderProfileEntry 21 }
+
+	voipProviderProfileCodecOrder OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		default(0),
+		bestquality(1),
+		lowbandwidth(2)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Preferred order of codecs:
+		  'default' -> system default order,
+		  'bestquality' -> highest quality first, depends on MOS value,
+		  'lowbandwidth' -> lowest bandwidth first"
+	    DEFVAL { default }
+	::= { voipProviderProfileEntry 22 }
+
+	voipProviderProfileG726Endian OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		little(0),
+		big(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Endianness of G.726 codecs.
+		 'little': X.420
+		 'big': I.366.2 Annex E (AAL2)."
+	::= { voipProviderProfileEntry 23 }
+
+	voipProviderProfileSRTP OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		optional(1),
+		mandatory(2)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': not supported or disabled SRTP
+		 'optional': outgoing calls use 'RTP/AVP' and
+		             'encryption: optional' in SDP
+		 'mandatory': outgoing calls use 'RTP/SAVP', if remote party
+		             answers without SRTP, the call will be terminated."
+	::= { voipProviderProfileEntry 24 }
+
+	voipProviderProfileSrcIPCheck OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': no source IP address check of received INVITE
+		 'enabled': check source IP of received INVITE with registration
+		            address. If not equal, call will be rejected."
+	::= { voipProviderProfileEntry 25 }
+
+	voipProviderProfileEarlyMedia OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Early media support for outgoing calls.
+		 'disabled': internal phones hear local generated ringback tone
+		 'enabled': internal phones get media (RTP) before call is finally
+		            answered, if provider sends early media."
+	::= { voipProviderProfileEntry 26 }
+
+	voipProviderProfileCLIR OBJECT-TYPE
+	    SYNTAX  BITS {
+		display(0),
+		user(1),
+		domain(2),
+		privacy-header(3),
+		privacy-user(4),
+		privacy-id(5)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Type of number suppression in outgoing SIP calls:
+		 display        : anonymous in display of the From header field.
+		 user           : anonymous in user (account) field in the From
+		                  header field.
+		 domain         : anonymous.invalid in domain of the From header
+		                  field.
+		 privacy-header : Privacy header field with value 'header'.
+		 privacy-user   : Privacy header field with value 'user'.
+		 privacy-id     : Privacy header field with value 'id'."
+	::= { voipProviderProfileEntry 27 }
+
+	voipProviderProfileSendFromDisplay OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP From header display for outgoing call.
+		 none: no display used
+		 username: the username, same as in Contact header
+		 clip: calling party number that should be shown on destination device
+		 clip-billing: calling party number for billing (must be a valid number)"
+	::= { voipProviderProfileEntry 28 }
+
+	voipProviderProfileSendFromUser OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		username(1),
+		clip(2),
+		clip-billing(3)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP From header as username for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	::= { voipProviderProfileEntry 29 }
+
+	voipProviderProfileSendPPreferred OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP P-Preferred-Identity header for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	::= { voipProviderProfileEntry 30 }
+
+	voipProviderProfileSendPAsserted OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP P-Asserted-Identity header for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	::= { voipProviderProfileEntry 31 }
+
+	voipProviderProfileCLIPBilling OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"A valid phone number used if 'clip-billing' is selected. See above"
+	::= { voipProviderProfileEntry 32 }
+
+	voipProviderProfileCheckExistingBinding OBJECT-TYPE
+	    SYNTAX  BITS {
+		fetch(0),
+		reject(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Check for existing binding:
+		 'fetch':  fetch existing bindings before new
+		           registration
+		 'reject': unregister oldest binding from received
+		           registration reject."
+	::= { voipProviderProfileEntry 33 }
+
+	voipProviderProfileNatPing OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"For external router usage - periodically a message should
+		 be sent to keep the NAT bindings open.
+		 'disabled': no keep alive messages used
+		 'enabled':  periodically a keep alive message is sent."
+	    DEFVAL { disabled }
+	::= { voipProviderProfileEntry 34 }
+
+	voipProviderProfileOutNumberTranslation OBJECT-TYPE
+	    SYNTAX  BITS {
+		addAreaCode(0),
+		addCountryCode(1),
+		replaceInternationalPrefix(2)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number translation for outgoing calls:
+		 addAreaCode    : add country code if number doesn't start with
+		                  national prefix.
+		 addCountryCode : add country code if number doesn't start with
+		                  international prefix.
+		 replaceInternationalPrefix: replace internation prefix with '+'."
+	    DEFVAL { {} }
+	::= { voipProviderProfileEntry 35 }
+
+	voipProviderProfileNetCentricServices OBJECT-TYPE
+	    SYNTAX  BITS {
+		holdRetrieve(0),
+		callDeflection(1),
+		numberUpdate(2)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"There supplementary services that are handled inside our PBX
+		 only. Some may be propagated to the provider:
+		 holdRetrieve   : Send hold and retrieve to the provider
+		 callDeflection : incoming calls can be redirected by
+		                  '301 moved temporarily'
+		 numberUpdate:    If the internal number changes during a call,
+		                  the new number can be propagted by sending a
+		                  SIP UPDATE message."
+	    DEFVAL { {} }
+	::= { voipProviderProfileEntry 36 }
+
+	voipProviderProfileGetCalledNumber OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		toHeader(1),
+		requestURI(2)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Get the called number for incoming calls from:
+		 'toHeader': get number from To header
+		 'requestURI': get number from request URI."
+	    DEFVAL { toHeader }
+	::= { voipProviderProfileEntry 37 }
+
+	voipProviderProfileAuthName OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Some providers allow a pre-defined authentication name."
+	::= { voipProviderProfileEntry 38 }
+
+	voipProviderProfileVendorID OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Textual ID that identifies a special vendor."
+	::= { voipProviderProfileEntry 39 }
+
+-- VoIP provider profile management table
+
+    voipProviderProfMgmtTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipProviderProfMgmtEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The common information database for VoIP provider profiles.
+		 Used by H.323, MGCP and SIP."
+	::= { voip 31 }
+
+	voipProviderProfMgmtEntry OBJECT-TYPE
+	     SYNTAX  VoipProviderProfMgmtEntry
+	     MAX-ACCESS  not-accessible
+	     STATUS  current
+	     DESCRIPTION
+		"Contains parameters common to all VoIP provider profiles."
+	    INDEX { voipProviderProfMgmtIndex }
+	::= { voipProviderProfMgmtTable 1 }
+
+	VoipProviderProfMgmtEntry ::=
+	    SEQUENCE {
+		voipProviderProfMgmtIndex		INTEGER,
+		voipProviderProfMgmtDescr		DisplayString,
+		voipProviderProfMgmtType		INTEGER,
+		voipProviderProfMgmtAccountType		INTEGER,
+		voipProviderProfMgmtRegistrarHost	DisplayString,
+		voipProviderProfMgmtRegistrarPort	INTEGER,
+		voipProviderProfMgmtRegistrarProt	INTEGER,
+		voipProviderProfMgmtRegistrarIPVer	INTEGER,
+		voipProviderProfMgmtProxyHost		DisplayString,
+		voipProviderProfMgmtProxyPort		INTEGER,
+		voipProviderProfMgmtProxyProt		INTEGER,
+		voipProviderProfMgmtProxyIPVer		INTEGER,
+		voipProviderProfMgmtSTUNHost		DisplayString,
+		voipProviderProfMgmtSTUNPort		INTEGER,
+		voipProviderProfMgmtDomain		DisplayString,
+		voipProviderProfMgmtFromDomain		DisplayString,
+		voipProviderProfMgmtRegType		INTEGER,
+		voipProviderProfMgmtRegInterval		INTEGER,
+		voipProviderProfMgmtTlsCertCaCheck	INTEGER,
+		voipProviderProfMgmtTlsCertHostCheck	INTEGER,
+
+		voipProviderProfMgmtCodecMask		BITS,
+		voipProviderProfMgmtCodecOrder		INTEGER,
+		voipProviderProfMgmtG726Endian		INTEGER,
+		voipProviderProfMgmtSRTP		INTEGER,
+		voipProviderProfMgmtSrcIPCheck		INTEGER,
+		voipProviderProfMgmtEarlyMedia		INTEGER,
+		voipProviderProfMgmtCLIR		BITS,
+		voipProviderProfMgmtSendFromDisplay	INTEGER,
+		voipProviderProfMgmtSendFromUser	INTEGER,
+		voipProviderProfMgmtSendPPreferred	INTEGER,
+		voipProviderProfMgmtSendPAsserted	INTEGER,
+		voipProviderProfMgmtCLIPBilling		DisplayString,
+		voipProviderProfMgmtCheckExistingBinding	BITS,
+		voipProviderProfMgmtNatPing		INTEGER,
+		voipProviderProfMgmtOutNumberTranslation	BITS,
+		voipProviderProfMgmtNetCentricServices	BITS,
+		voipProviderProfMgmtGetCalledNumber	INTEGER,
+		voipProviderProfMgmtAuthName		DisplayString,
+		voipProviderProfMgmtVendorID		DisplayString
+	    }
+
+	voipProviderProfMgmtIndex OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Unique and persistent index for referencing this provider
+		 profile entry."
+	    DEFVAL { 1 }
+	::= { voipProviderProfMgmtEntry 1 }
+
+	voipProviderProfMgmtDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Description of this provider profile entry."
+	    DEFVAL { "" }
+	::= { voipProviderProfMgmtEntry 2 }
+
+	voipProviderProfMgmtType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		predefined(1),
+		custom(2),
+		converted(3),
+		delete(10)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Determines the origin of this entry, predefined(1) entries
+		 are factory-defined ones whereas custom(2) is used for
+		 user-defined profiles. If set to converted(3) it's the
+		 result of a translation process from (now legacy) VoIP-related
+		 table entries."
+	    DEFVAL { predefined  }
+	::= { voipProviderProfMgmtEntry 3 }
+
+	voipProviderProfMgmtAccountType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		singleNumber(1),
+		ddi(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This value determines the type of the account type. This is
+		 either a single number or a DDI account."
+	    DEFVAL { singleNumber  }
+	::= { voipProviderProfMgmtEntry 4 }
+
+	voipProviderProfMgmtRegistrarHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Host address of Registrar, either domain or IP address."
+	    DEFVAL { "" }
+	::= { voipProviderProfMgmtEntry 5 }
+
+	voipProviderProfMgmtRegistrarPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Registrar port, e.g. 5060. Default is 0 (NAPTR/SRV is used)."
+	    DEFVAL { 0 }
+	::= { voipProviderProfMgmtEntry 6 }
+
+	voipProviderProfMgmtRegistrarProt OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		udp(1),
+		tcp(2),
+		tls(3),
+		auto(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Protocol for connection to registrar. If 'auto' is selected,
+		 DNS procedures for NAPTR are used."
+	    DEFVAL { udp  }
+	::= { voipProviderProfMgmtEntry 7 }
+
+	voipProviderProfMgmtRegistrarIPVer OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		ipv4(1),
+		ipv6(2),
+		ipv4prefered(3),
+		ipv6prefered(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Selection of IP protocol.
+		 ipv4: only (resolved) IPv4 addresses are used
+		 ipv6: only (resolved) IPv6 addresses are used
+		 ipv4prefered: if (resolved) IPv4 address is available for the given
+		       protocol then it is used, else IPv6 address is used
+		       if available
+		 ipv6prefered: if (resolved) IPv6 address is available for the
+		       given protocol then it is used, else IPv4 address is used
+		       if available"
+	    DEFVAL { ipv4  }
+	::= { voipProviderProfMgmtEntry 8 }
+
+	voipProviderProfMgmtProxyHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Host address of Proxy, either domain or IP address. If empty,
+		 the registrar host is used."
+	    DEFVAL { "" }
+	::= { voipProviderProfMgmtEntry 9 }
+
+	voipProviderProfMgmtProxyPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Proxy port, e.g. 5060. Default is 0 (NAPTR/SRV is used)."
+	    DEFVAL { 0 }
+	::= { voipProviderProfMgmtEntry 10 }
+
+	voipProviderProfMgmtProxyProt OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		udp(1),
+		tcp(2),
+		tls(3),
+		auto(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Protocol for connection to proxy. If 'auto' is selected,
+		 DNS procedures for NAPTR are used."
+	    DEFVAL { udp  }
+	::= { voipProviderProfMgmtEntry 11 }
+
+	voipProviderProfMgmtProxyIPVer OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		ipv4(1),
+		ipv6(2),
+		ipv4prefered(3),
+		ipv6prefered(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Selection of IP protocol.
+		 ipv4: only (resolved) IPv4 addresses are used
+		 ipv6: only (resolved) IPv6 addresses are used
+		 ipv4prefered: if (resolved) IPv4 address is available for the given
+		       protocol then it is used, else IPv6 address is used
+		       if available
+		 ipv6prefered: if (resolved) IPv6 address is available for the
+		       given protocol then it is used, else IPv4 address is used
+		       if available"
+	    DEFVAL { ipv4  }
+	::= { voipProviderProfMgmtEntry 12 }
+
+	voipProviderProfMgmtSTUNHost OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Host address of STUN server, either domain or IP address. If empty,
+		 the registrar host is used."
+	    DEFVAL { "" }
+	::= { voipProviderProfMgmtEntry 13 }
+
+	voipProviderProfMgmtSTUNPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"STUN port, default is 3478."
+	    DEFVAL { 3478 }
+	::= { voipProviderProfMgmtEntry 14 }
+
+	voipProviderProfMgmtDomain OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Optional domain name used with SIP messages. No DNS operations
+		 are done for this value."
+	    DEFVAL { "" }
+	::= { voipProviderProfMgmtEntry 15 }
+
+	voipProviderProfMgmtFromDomain OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Optional domain name used in From header only. No DNS operations
+		 are done for this value."
+	    DEFVAL { "" }
+	::= { voipProviderProfMgmtEntry 16 }
+
+	voipProviderProfMgmtRegType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		single(2),
+		bulk(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Type of registration:
+		 none: no registration, remote registrar has static information
+		 single: registration of just one account
+		 bulk: bulk number registration (bnc)."
+	    DEFVAL { single }
+	::= { voipProviderProfMgmtEntry 17 }
+
+	voipProviderProfMgmtRegInterval OBJECT-TYPE
+	    SYNTAX  INTEGER (1..86400)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Registration expire time in seconds."
+	    DEFVAL { 600 }
+	::= { voipProviderProfMgmtEntry 18 }
+
+
+	voipProviderProfMgmtTlsCertCaCheck OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': no verification of peer certificate at all
+		 'enabled': peer certificate is checked against local CAs."
+	    DEFVAL { disabled }
+	::= { voipProviderProfMgmtEntry 19 }
+
+	voipProviderProfMgmtTlsCertHostCheck OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': no check for peer certificate's host name
+		 'enabled': check peer certificate's host name with DNS host."
+	    DEFVAL { disabled }
+	::= { voipProviderProfMgmtEntry 20 }
+
+	voipProviderProfMgmtCodecMask OBJECT-TYPE
+	    SYNTAX  BITS {
+		g711a(0),
+		g711u(1),
+		g722(2),
+		g729(3),
+		g729e(4),
+		g726v32(5),
+		g726v16(6),
+		g726v24(7),
+		g726v40(8),
+		g723v63(9),
+		g723v53(10),
+		iLBCv15(11),
+		iLBCv13(12),
+		dtmf(13),
+		t38(14),
+		data(15)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Codec mask of supported codecs."
+	    DEFVAL { {g711a, g711u, g722, g729} }
+	::= { voipProviderProfMgmtEntry 21 }
+
+	voipProviderProfMgmtCodecOrder OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		default(0),
+		bestquality(1),
+		lowbandwidth(2)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Preferred order of codecs:
+		  'default' -> system default order,
+		  'bestquality' -> highest quality first, depends on MOS value,
+		  'lowbandwidth' -> lowest bandwidth first"
+	    DEFVAL { default }
+	::= { voipProviderProfMgmtEntry 22 }
+
+	voipProviderProfMgmtG726Endian OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		little(0),
+		big(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Endianness of G.726 codecs.
+		 'little': X.420
+		 'big': I.366.2 Annex E (AAL2)."
+	    DEFVAL { little }
+	::= { voipProviderProfMgmtEntry 23 }
+
+	voipProviderProfMgmtSRTP OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		optional(1),
+		mandatory(2)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': not supported or disabled SRTP
+		 'optional': outgoing calls use 'RTP/AVP' and
+		             'encryption: optional' in SDP
+		 'mandatory': outgoing calls use 'RTP/SAVP', if remote party
+		             answers without SRTP, the call will be terminated."
+	    DEFVAL { disabled }
+	::= { voipProviderProfMgmtEntry 24 }
+
+	voipProviderProfMgmtSrcIPCheck OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"SRTP support:
+		 'disabled': no source IP address check of received INVITE
+		 'enabled': check source IP of received INVITE with registration
+		            address. If not equal, call will be rejected."
+	    DEFVAL { disabled }
+	::= { voipProviderProfMgmtEntry 25 }
+
+	voipProviderProfMgmtEarlyMedia OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Early media support for outgoing calls.
+		 'disabled': internal phones hear local generated ringback tone
+		 'enabled': internal phones get media (RTP) before call is finally
+		            answered, if provider sends early media."
+	    DEFVAL { disabled }
+	::= { voipProviderProfMgmtEntry 26 }
+
+	voipProviderProfMgmtCLIR OBJECT-TYPE
+	    SYNTAX  BITS {
+		display(0),
+		user(1),
+		domain(2),
+		privacy-header(3),
+		privacy-user(4),
+		privacy-id(5)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Type of number suppression in outgoing SIP calls:
+		 display        : anonymous in display of the From header field.
+		 user           : anonymous in user (account) field in the From
+		                  header field.
+		 domain         : anonymous.invalid in domain of the From header
+		                  field.
+		 privacy-header : Privacy header field with value 'header'.
+		 privacy-user   : Privacy header field with value 'user'.
+		 privacy-id     : Privacy header field with value 'id'."
+	    DEFVAL { {privacy-id} }
+	::= { voipProviderProfMgmtEntry 27 }
+
+	voipProviderProfMgmtSendFromDisplay OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP From header display for outgoing call.
+		 none: no display used
+		 username: the username, same as in Contact header
+		 clip: calling party number that should be shown on destination device
+		 clip-billing: calling party number for billing (must be a valid number)"
+	    DEFVAL { none }
+	::= { voipProviderProfMgmtEntry 28 }
+
+	voipProviderProfMgmtSendFromUser OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		username(1),
+		clip(2),
+		clip-billing(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP From header as username for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	    DEFVAL { username }
+	::= { voipProviderProfMgmtEntry 29 }
+
+	voipProviderProfMgmtSendPPreferred OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP P-Preferred-Identity header for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	    DEFVAL { none }
+	::= { voipProviderProfMgmtEntry 30 }
+
+	voipProviderProfMgmtSendPAsserted OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		none(1),
+		username(2),
+		clip(3),
+		clip-billing(4)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Assignment of source information element to be used in
+		 SIP P-Asserted-Identity header for outgoing call.
+		 For definition of values see voipSipProvExtSendFromDisplay."
+	    DEFVAL { none }
+	::= { voipProviderProfMgmtEntry 31 }
+
+	voipProviderProfMgmtCLIPBilling OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"A valid phone number used if 'clip-billing' is selected. See above"
+	::= { voipProviderProfMgmtEntry 32 }
+
+	voipProviderProfMgmtCheckExistingBinding OBJECT-TYPE
+	    SYNTAX  BITS {
+		fetch(0),
+		reject(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Check for existing binding:
+		 'fetch':  fetch existing bindings before new
+		           registration
+		 'reject': unregister oldest binding from received
+		           registration reject."
+	::= { voipProviderProfMgmtEntry 33 }
+
+	voipProviderProfMgmtNatPing OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		disabled(0),
+		enabled(1)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"For external router usage - periodically a message should
+		 be sent to keep the NAT bindings open.
+		 'disabled': no keep alive messages used
+		 'enabled':  periodically a keep alive message is sent."
+	    DEFVAL { disabled }
+	::= { voipProviderProfMgmtEntry 34 }
+
+	voipProviderProfMgmtOutNumberTranslation OBJECT-TYPE
+	    SYNTAX  BITS {
+		addAreaCode(0),
+		addCountryCode(1),
+		replaceInternationalPrefix(2)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Number translation for outgoing calls:
+		 addAreaCode    : add country code if number doesn't start with
+		                  national prefix.
+		 addCountryCode : add country code if number doesn't start with
+		                  international prefix.
+		 replaceInternationalPrefix: replace internation prefix with '+'."
+	    DEFVAL { {} }
+	::= { voipProviderProfMgmtEntry 35 }
+
+	voipProviderProfMgmtNetCentricServices OBJECT-TYPE
+	    SYNTAX  BITS {
+		holdRetrieve(0),
+		callDeflection(1),
+		numberUpdate(2)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"There supplementary services that are handled inside our PBX
+		 only. Some may be propagated to the provider:
+		 holdRetrieve   : Send hold and retrieve to the provider
+		 callDeflection : incoming calls can be redirected by
+		                  '301 moved temporarily'
+		 numberUpdate:    If the internal number changes during a call,
+		                  the new number can be propagted by sending a
+		                  SIP UPDATE message."
+	    DEFVAL { {} }
+	::= { voipProviderProfMgmtEntry 36 }
+
+	voipProviderProfMgmtGetCalledNumber OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		toHeader(1),
+		requestURI(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Get the called number for incoming calls from:
+		 'toHeader': get number from To header
+		 'requestURI': get number from request URI."
+	    DEFVAL { toHeader }
+	::= { voipProviderProfMgmtEntry 37 }
+
+	voipProviderProfMgmtAuthName OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Some providers allow a pre-defined authentication name."
+	::= { voipProviderProfMgmtEntry 38 }
+
+	voipProviderProfMgmtVendorID OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Textual ID that identifies a special vendor."
+	::= { voipProviderProfMgmtEntry 39 }
+
+END

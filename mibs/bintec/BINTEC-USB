@@ -1,0 +1,717 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2007-2014 bintec elmeg GmbH
+-- $RCSfile: mib-usb,v $
+-- $Revision: 1.8 $
+-- $Date: 2014-02-07 10:37:50 $
+-- Author: Peter Kietzmann
+---------------------------------------------------------------------------
+
+BINTEC-USB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64, IpAddress, TimeTicks,
+    mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+
+    usb, Date
+	FROM BINTEC-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+-- This MIB file contains MIBs for USB host controller and device handling
+--  group usb: 
+-- 
+
+usbMIB MODULE-IDENTITY
+    LAST-UPDATED "201202280000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+             Web:     www.bintec-elmeg.com
+            "
+    DESCRIPTION
+            "The MIB module for USB administration entities.
+            "
+    ::= { usb 255 }
+
+---------------------------------------------------------------------------
+-- USB Descriptor Stuff
+---------------------------------------------------------------------------
+
+usbDeviceDescTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsbDeviceDescEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "This table contains the actually detected USB devices."
+    ::= { usb 1 }
+
+    usbDeviceDescEntry OBJECT-TYPE
+	SYNTAX      UsbDeviceDescEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"(one entry of usbDeviceDescTable)"
+	INDEX   { usbDeviceDescDevAddr }
+	::= { usbDeviceDescTable 1 }
+
+    UsbDeviceDescEntry ::=
+	SEQUENCE {
+	    usbDeviceDescDevAddr		INTEGER,
+	    usbDeviceDescUpTime			TimeStamp,
+	    usbDeviceDescStatus			INTEGER,
+	    usbDeviceDescBcdUSB			INTEGER,
+	    usbDeviceDescDeviceClass		INTEGER,
+	    usbDeviceDescDeviceSubClass		INTEGER,
+	    usbDeviceDescDeviceProtocol		INTEGER,
+	    usbDeviceDescMaxPacketSize		INTEGER,
+	    usbDeviceDescIdVendor		INTEGER,
+	    usbDeviceDescIdProduct		INTEGER,
+	    usbDeviceDescBcdDevice		INTEGER,
+	    usbDeviceDescTxtManufacturer	DisplayString,
+	    usbDeviceDescTxtProduct		DisplayString,
+	    usbDeviceDescTxtSerialNumber	DisplayString,
+	    usbDeviceDescNumConfigurations	INTEGER,
+	    usbDeviceDescRawData		OCTET STRING,
+	    usbDeviceDescHubPortNumber		INTEGER,
+	    usbDeviceDescDeviceSpeed		INTEGER,
+	    usbDeviceDescDepth			INTEGER,
+	    usbDeviceDescParent			INTEGER
+    }
+
+    usbDeviceDescDevAddr OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DevAddr = (slot << 12) | (unit << 8) | (Enum << 4).
+		 Enum is assigned by the USB device enumerator."
+	::= { usbDeviceDescEntry 1 }
+
+    usbDeviceDescUpTime OBJECT-TYPE
+	SYNTAX      TimeStamp
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"TimeStamp when the USB host controller/root hub
+		 detected the inserted USB device."
+	::= { usbDeviceDescEntry 2 }
+
+    usbDeviceDescStatus OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    attach(1),
+	    config(2),
+	    detach(3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Current status of the USB device:
+		 attach - attach the device to the specified device class
+		 config - configure the device if supported
+		 detach - detach the device from upper layers."
+	::= { usbDeviceDescEntry 3 }
+
+    usbDeviceDescBcdUSB OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    unspecified(1),
+	    usb1-0(2),
+	    usb1-1(3),
+	    usb2-0(4),
+	    usb3-0(5)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The USB standard supported by the device."
+	::= { usbDeviceDescEntry 4 }
+
+    usbDeviceDescDeviceClass OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    spec-in-ifc(0),
+	    comm(2),
+	    hub(9),
+	    diagnostic(220),
+	    wireless(224),
+	    vendor-spec(255)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The class code of the USB device.
+		 0x00 - each interface specifies it's own class code.
+		 0xFF - the class code is vendor specific.
+		 Otherwise the value is a valid class code."
+	::= { usbDeviceDescEntry 5 }
+
+    usbDeviceDescDeviceSubClass OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DeviceClass dependent SubClass code.
+		 There are no unique values over all DeviceClasses defined."
+	::= { usbDeviceDescEntry 6 }
+
+    usbDeviceDescDeviceProtocol OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DeviceClass and SubClass dependent DeviceProtocol code.
+		 There are no unique values over all DeviceClasses defined."
+	::= { usbDeviceDescEntry 7 }
+
+    usbDeviceDescMaxPacketSize OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The maximum packet size supported by the USB device.
+		 This value normally depends on the USB standard supported."
+	::= { usbDeviceDescEntry 8 }
+
+    usbDeviceDescIdVendor OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The unique USB device vendor ID."
+	::= { usbDeviceDescEntry 9 }
+
+    usbDeviceDescIdProduct OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The (hopefully) unique USB device product ID."
+	::= { usbDeviceDescEntry 10 }
+
+    usbDeviceDescBcdDevice OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The USB device release number in BCD format."
+	::= { usbDeviceDescEntry 11 }
+
+    usbDeviceDescTxtManufacturer OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Human readable manufacturers name (if present)."
+	::= { usbDeviceDescEntry 12 }
+
+    usbDeviceDescTxtProduct OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Human readable product name (if present)."
+	::= { usbDeviceDescEntry 13 }
+
+    usbDeviceDescTxtSerialNumber OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Human readable serial number (if present)."
+	::= { usbDeviceDescEntry 14 }
+
+    usbDeviceDescNumConfigurations OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of alternative device configurations
+		 supported by the USB device."
+	::= { usbDeviceDescEntry 15 }
+
+    usbDeviceDescRawData OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(0..18))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Device descriptor raw data for debugging purposes only."
+	::= { usbDeviceDescEntry 16 }
+
+    usbDeviceDescHubPortNumber OBJECT-TYPE
+	SYNTAX      INTEGER(0..15)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of the port the USB device is connected to."
+	::= { usbDeviceDescEntry 17 }
+
+    usbDeviceDescDeviceSpeed OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    low(1),	--   1.5 MBit/s
+	    full(2),	--  12.5 MBit/s
+	    high(3)	-- 480.0 MBit/s
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The speed the USB device uses for data transmission."
+	::= { usbDeviceDescEntry 18 }
+
+    usbDeviceDescDepth OBJECT-TYPE
+	SYNTAX      INTEGER(0..7)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The depth in the bus topology where the device is located.
+		 0 = Root Hub, 1 = Device at Root Hub, 2 = Device at ext. Hub,
+		 3 = Device at external Hub connected to an external Hub, etc."
+	::= { usbDeviceDescEntry 19 }
+
+    usbDeviceDescParent OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DevAddr = (slot << 12) | (unit << 8) | (Enum << 4)
+		 of the parent hub for this device.
+		 Enum is assigned by the USB device enumerator."
+	::= { usbDeviceDescEntry 20 }
+
+---------------------------------------------------------------------------
+
+usbConfigDescTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsbConfigDescEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "This table contains the configuration(s)
+	     provided by the detected USB device."
+    ::= { usb 2 }
+
+    usbConfigDescEntry OBJECT-TYPE
+	SYNTAX      UsbConfigDescEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"(one entry of usbConfigDescTable)"
+	INDEX   { usbConfigDescDevAddr, usbConfigDescConfigValue }
+	::= { usbConfigDescTable 1 }
+
+    UsbConfigDescEntry ::=
+	SEQUENCE {
+	    usbConfigDescDevAddr		INTEGER,
+	    usbConfigDescTotalLength		INTEGER,
+	    usbConfigDescNumInterfaces		INTEGER,
+	    usbConfigDescConfigValue		INTEGER,
+	    usbConfigDescTxtConfiguration	DisplayString,
+	    usbConfigDescAttributes		INTEGER,
+	    usbConfigDescMaxPower		INTEGER,
+	    usbConfigDescRawData		OCTET STRING
+    }
+
+    usbConfigDescDevAddr OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DevAddr = (slot << 12) | (unit << 8) | (Enum << 4).
+		 Enum is assigned by the USB device enumerator."
+	::= { usbConfigDescEntry 1 }
+
+    usbConfigDescTotalLength OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Length of the configuration descriptor frame in bytes."
+	::= { usbConfigDescEntry 2 }
+
+    usbConfigDescNumInterfaces OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of interfaces supported by the USB device."
+	::= { usbConfigDescEntry 3 }
+
+    usbConfigDescConfigValue OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The configuration value associated with this configuration."
+	::= { usbConfigDescEntry 4 }
+
+    usbConfigDescTxtConfiguration OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Human readable configuration description (if present)."
+	::= { usbConfigDescEntry 5 }
+
+    usbConfigDescAttributes OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The following attributes are currently defined
+		 by the USB standard:
+			Bit  7  - bus powered
+			Bit  6  - self powered
+			Bit  5  - remote wakeup
+			Bit 4-0 - reserved."
+	::= { usbConfigDescEntry 6 }
+
+    usbConfigDescMaxPower OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Maximum power consumption in steps of 2 mA."
+	::= { usbConfigDescEntry 7 }
+
+    usbConfigDescRawData OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Configuration descriptor raw data for debugging purposes only."
+	::= { usbConfigDescEntry 8 }
+
+---------------------------------------------------------------------------
+
+usbInterfaceDescTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsbInterfaceDescEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "This table contains the interfaces provided by
+	     the detected USB device configuration."
+    ::= { usb 3 }
+
+    usbInterfaceDescEntry OBJECT-TYPE
+	SYNTAX      UsbInterfaceDescEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"(one entry of usbInterfaceDescTable)"
+	INDEX   { usbInterfaceDescDevAddr, usbInterfaceDescInterfaceNumber }
+	::= { usbInterfaceDescTable 1 }
+
+    UsbInterfaceDescEntry ::=
+	SEQUENCE {
+	    usbInterfaceDescDevAddr		INTEGER,
+	    usbInterfaceDescInterfaceNumber	INTEGER,
+	    usbInterfaceDescAltSettings		INTEGER,
+	    usbInterfaceDescNumEndpoints	INTEGER,
+	    usbInterfaceDescDeviceClass		INTEGER,
+	    usbInterfaceDescDeviceSubClass	INTEGER,
+	    usbInterfaceDescDeviceProtocol	INTEGER,
+	    usbInterfaceDescIdxInterface	INTEGER,
+	    usbInterfaceDescRawData		OCTET STRING
+    }
+
+    usbInterfaceDescDevAddr OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DevAddr = (slot << 12) | (unit << 8) | (Enum << 4).
+		 Enum is assigned by the USB device enumerator."
+	::= { usbInterfaceDescEntry 1 }
+
+    usbInterfaceDescInterfaceNumber OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of this interface."
+	::= { usbInterfaceDescEntry 2 }
+
+    usbInterfaceDescAltSettings OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Value used to select alternative setting."
+	::= { usbInterfaceDescEntry 3 }
+
+    usbInterfaceDescNumEndpoints OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of endpoints provided by this interface."
+	::= { usbInterfaceDescEntry 4 }
+
+    usbInterfaceDescDeviceClass OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    unspec(0),
+	    audio(1),
+	    cdc(2),
+	    hid(3),
+	    physical(5),
+	    image(6),
+	    printer(7),
+	    msc(8),
+	    hub(9),
+	    cdc-data(10),
+	    smartcard(11),
+	    firm-upd(12),
+	    security(13),
+	    diagnostic(220),
+	    wireless(224),
+	    appl-spec(254),
+	    vendor-spec(255)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Class code (assigned by usb.org)."
+	::= { usbInterfaceDescEntry 5 }
+
+    usbInterfaceDescDeviceSubClass OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Subclass code (assigned by usb.org)."
+	::= { usbInterfaceDescEntry 6 }
+
+    usbInterfaceDescDeviceProtocol OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The class dependent protocol code."
+	::= { usbInterfaceDescEntry 7 }
+
+    usbInterfaceDescIdxInterface OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The index to the string describing the interface (if present)."
+	::= { usbInterfaceDescEntry 8 }
+
+    usbInterfaceDescRawData OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(0..9))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Interface descriptor raw data for debugging purposes only."
+	::= { usbInterfaceDescEntry 9 }
+
+---------------------------------------------------------------------------
+
+usbEndpointDescTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsbEndpointDescEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "This table contains the endpoints provided by
+	     the detected USB device configuration."
+    ::= { usb 4 }
+
+    usbEndpointDescEntry OBJECT-TYPE
+	SYNTAX      UsbEndpointDescEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"(one entry of usbEndpointDescEntry)"
+	INDEX   { usbEndpointDescDevAddr, usbEndpointDescIfcIndex }
+	::= { usbEndpointDescTable 1 }
+
+    UsbEndpointDescEntry ::=
+	SEQUENCE {
+	    usbEndpointDescDevAddr		INTEGER,
+	    usbEndpointDescIfcIndex		INTEGER,
+	    usbEndpointDescIfcNum		INTEGER,
+	    usbEndpointDescEpAddress		INTEGER,
+	    usbEndpointDescPipeDirection	INTEGER,
+	    usbEndpointDescPipeType		INTEGER,
+	    usbEndpointDescAttributes		INTEGER,
+	    usbEndpointDescMaxPacketSize	INTEGER,
+	    usbEndpointDescInterval		INTEGER,
+	    usbEndpointDescRawData		OCTET STRING,
+	    usbEndpointStatXferPackets		Counter32,
+	    usbEndpointStatXferBytes		Counter32,
+	    usbEndpointStatXferQlen		Counter32,
+	    usbEndpointStatXferStalled		Counter32,
+	    usbEndpointStatXferIoError		Counter32,
+	    usbEndpointStatXferBabble		Counter32,
+	    usbEndpointStatXferOverrun		Counter32,
+	    usbEndpointStatXferToggle		Counter32
+    }
+
+    usbEndpointDescDevAddr OBJECT-TYPE
+	SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"DevAddr = (slot << 12) | (unit << 8) | (Enum << 4) | IfcNum.
+		 Enum is assigned by the USB device enumerator."
+	::= { usbEndpointDescEntry 1 }
+
+    usbEndpointDescIfcIndex OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Index = PipeType << 5 | PipeDirection << 4 | EpAddress.
+		 Used for unique enumeration of the endpoints."
+	::= { usbEndpointDescEntry 2 }
+
+    usbEndpointDescIfcNum OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The interface number of the endpoints interface."
+	::= { usbEndpointDescEntry 3 }
+
+    usbEndpointDescEpAddress OBJECT-TYPE
+	SYNTAX      INTEGER(0..15)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The endpoints address (direction bit stripped)."
+	::= { usbEndpointDescEntry 4 }
+
+    usbEndpointDescPipeDirection OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    in(1),
+	    out(2)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Transfer direction of this endpoint."
+	::= { usbEndpointDescEntry 5 }
+
+    usbEndpointDescPipeType OBJECT-TYPE
+	SYNTAX      INTEGER {
+	    ctrl(1),
+	    iso(2),
+	    bulk(3),
+	    intr(4)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The endpoint type extracted from the
+		 endpoint descriptor attribute field."
+	::= { usbEndpointDescEntry 6 }
+
+    usbEndpointDescAttributes OBJECT-TYPE
+	SYNTAX      INTEGER(0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Complete endpoint atribute field. For debugging only."
+	::= { usbEndpointDescEntry 7 }
+
+    usbEndpointDescMaxPacketSize OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The maximum packet size the endpoint
+		 is capable of sending or receiving."
+	::= { usbEndpointDescEntry 8 }
+
+    usbEndpointDescInterval OBJECT-TYPE
+	SYNTAX      INTEGER (0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Interval for polling endpoint data transfers (in frame counts).
+		 Ignored for bulk and control endpoints.
+		 Iso endpoints must be equal 1.
+		 Field may range from 1 to 255 for interrupt endpoints."
+	::= { usbEndpointDescEntry 9 }
+
+    usbEndpointDescRawData OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(0..7))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Endpoint descriptor raw data for debugging purposes only."
+	::= { usbEndpointDescEntry 10 }
+
+    usbEndpointStatXferPackets OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of packets transferred by the endpoint."
+	::= { usbEndpointDescEntry 11 }
+
+    usbEndpointStatXferBytes OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes transferred by the endpoint."
+	::= { usbEndpointDescEntry 12 }
+
+    usbEndpointStatXferQlen OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of frames enqueued at the endpoint."
+	::= { usbEndpointDescEntry 13 }
+
+    usbEndpointStatXferStalled OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of stall conditions detected."
+	::= { usbEndpointDescEntry 14 }
+
+    usbEndpointStatXferIoError OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of I/O errors detected."
+	::= { usbEndpointDescEntry 15 }
+
+    usbEndpointStatXferBabble OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of Babble errors detected."
+	::= { usbEndpointDescEntry 16 }
+
+    usbEndpointStatXferOverrun OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of Frame Overrun errors detected."
+	::= { usbEndpointDescEntry 17 }
+
+    usbEndpointStatXferToggle OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of Toggle errors detected."
+	::= { usbEndpointDescEntry 18 }
+
+-- end: USB
+---------------------------------------------------------------------------
+
+END

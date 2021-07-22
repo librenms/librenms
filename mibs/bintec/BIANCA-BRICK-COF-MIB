@@ -1,0 +1,794 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-cof,v $ 
+-- $Revision: 1.6 $ 
+
+BIANCA-BRICK-COF-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+	      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, 
+	      Counter32, Gauge32, IpAddress
+	      FROM SNMPv2-SMI
+
+            DisplayString
+                FROM SNMPv2-TC
+
+            Date, bibo, security
+                FROM BINTEC-MIB;
+ 
+---------------------------------------------------------------------------
+
+securityMIB MODULE-IDENTITY
+    LAST-UPDATED "201110210000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO "EMail:   info@bintec-elmeg.com
+                  Web:     www.bintec-elmeg.com"
+    DESCRIPTION  "Management Information for the Cobion Orange Filter Subsystem"
+
+    REVISION      "201110210000Z"
+    DESCRIPTION
+            "Added COF statistic variables." 
+
+    ::= { bibo 65 }
+
+---------------------------------------------------------------------------
+
+-- Content Filtering  MIB
+
+	cofServerTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF CofServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Contains all Cobion Server Adresses "
+        ::= { security 1 }
+
+        cofServerEntry OBJECT-TYPE
+            SYNTAX CofServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Contains a Server for Content filter communication."
+            INDEX { cofServerAddress }
+        ::= { cofServerTable 1 }
+
+	
+	CofServerEntry ::=
+            SEQUENCE {
+		cofServerPriority		INTEGER,
+		cofServerAddress   	   	IpAddress,
+		cofServerPort			INTEGER,
+		cofServerProtocol		INTEGER,
+		cofServerStatus			INTEGER
+           }
+
+
+	cofServerPriority OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Priority of the Server.
+		The entries with the highest values are used first."
+        ::= { cofServerEntry 1 }
+
+
+        cofServerAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Ip-Address of the Server"
+        ::= { cofServerEntry 2 }
+
+        cofServerPort OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The TCP-Port of the Server"
+	    DEFVAL { 6000 }
+        ::= { cofServerEntry 3 }
+
+        cofServerProtocol OBJECT-TYPE
+            SYNTAX INTEGER {
+	       cobion(1),
+	       disabled(6),
+	       delete(7)
+	       }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Protocoltype for the Server"
+	    DEFVAL { cobion }
+        ::= { cofServerEntry 4 }
+
+        cofServerStatus OBJECT-TYPE
+            SYNTAX INTEGER { not-used(1), not-reachable(2), active(3) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Operation state of the Server"
+	    DEFVAL { not-used }
+        ::= { cofServerEntry 5 }
+
+
+
+
+	cofCategoryTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF CofCategoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Contains all Cobion Main Categories "
+        ::= { security 2 }
+
+        cofCategoryEntry OBJECT-TYPE
+            SYNTAX CofCategoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Contains a Main Category"
+            INDEX { cofCategoryIndex }
+        ::= { cofCategoryTable 1 }
+
+	
+	CofCategoryEntry ::=
+            SEQUENCE {
+		cofCategoryIndex		INTEGER,
+		cofCategoryName  	   	DisplayString,
+		cofCategoryAllowedRequests	INTEGER,
+		cofCategoryLoggedRequests	INTEGER,
+		cofCategoryBlockedURLs		INTEGER
+           }
+
+
+	cofCategoryIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Index of the Category"
+        ::= { cofCategoryEntry 1 }
+
+
+        cofCategoryName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..128))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Name of the Category"
+            DEFVAL { "" }
+        ::= { cofCategoryEntry 2 }
+
+
+        cofCategoryAllowedRequests OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of requested URLs of this category while 
+		the access to the category was allowed"
+	    DEFVAL { 0 }
+        ::= { cofCategoryEntry 3 }
+
+
+        cofCategoryLoggedRequests OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of requested URLs of this category while 
+		the access to the category was logged"
+	    DEFVAL { 0 }
+        ::= { cofCategoryEntry 4 }
+
+
+        cofCategoryBlockedURLs OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The number of requested URLs of this category while 
+		the access to the category was blocked"
+	    DEFVAL { 0 }
+        ::= { cofCategoryEntry 5 }
+
+
+
+
+	cofUrlTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF CofUrlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Contains all fix configured Urls "
+        ::= { security 3 }
+
+        cofUrlEntry OBJECT-TYPE
+            SYNTAX CofUrlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Contains a Url and it's category"
+            INDEX { cofUrlAddress }
+        ::= { cofUrlTable 1 }
+
+	
+	CofUrlEntry ::=
+            SEQUENCE {
+		cofUrlAddress   	   	DisplayString,
+		cofUrlProtocol			INTEGER,
+		cofUrlCategory			INTEGER
+           }
+
+
+	cofUrlAddress OBJECT-TYPE
+	    SYNTAX DisplayString (SIZE (0..128))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Address/Url of the Destination.
+		Example: messenger.yahoo.com/features/voice"
+        ::= { cofUrlEntry 1 }
+
+
+        cofUrlProtocol OBJECT-TYPE
+            SYNTAX INTEGER {
+	    	http(1),
+		https(2),
+		ftp(3),
+		all(4),
+		delete(7)
+	    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Protocol of the enabled Url.
+		Currently only http is supported."
+            DEFVAL { all }
+        ::= { cofUrlEntry 2 }
+
+
+        cofUrlCategory OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Category of this Url.
+		 It's the cofCategoryIndex from the cofCategoryTable."
+            DEFVAL { 31 }
+        ::= { cofUrlEntry 3 }
+
+
+
+
+	cofFilterTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF CofFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Contains all Filters with Day/Time and Action "
+        ::= { security 4 }
+
+        cofFilterEntry OBJECT-TYPE
+            SYNTAX CofFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Contains a Content Filter Entry"
+            INDEX { cofFilterIndex }
+        ::= { cofFilterTable 1 }
+
+	
+	CofFilterEntry ::=
+            SEQUENCE {
+	       cofFilterIndex		INTEGER,
+	       cofFilterDay		INTEGER,
+	       cofFilterStart		INTEGER,
+	       cofFilterEnd		INTEGER,
+	       cofFilterCategory	INTEGER,
+	       cofFilterAction		INTEGER
+	    }
+	       
+	cofFilterIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+	    MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Index of the Filter. The filter rules are processed
+		in the order of this value, starting with the table entry
+		with the lowest index value."
+        ::= { cofFilterEntry 1 }
+
+	cofFilterDay OBJECT-TYPE
+	    SYNTAX INTEGER {
+	       monday(1),
+	       tuesday(2),
+	       wednesday(4),
+	       thursday(8),
+	       friday(16),
+	       motofr(31),
+	       saturday(32),
+	       sunday(64),
+	       everyday(127)
+	    }
+	    MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The valid Day of the Filter"
+	    DEFVAL { everyday }
+        ::= { cofFilterEntry 2 }
+
+        cofFilterStart OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Start Time of the Filter in minutes from the 
+		beginning of the day 00:00. The value denotes the
+		first minute of the day, during this filter entry is 
+		active.
+		The valid range of this value is 0 to 1439."
+            DEFVAL { 0 }
+        ::= { cofFilterEntry 3 }
+
+        cofFilterEnd OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The End Time of the Filter in minutes from the
+		beginning of the day 00:00. The value denotes the
+		last minute of the day, during this filter entry is 
+		active.
+		The value must be greater than or equal to the value 
+		of cofFilterStart. The valid range of this value 
+		is 0 to 1439."
+            DEFVAL { 1439 }
+        ::= { cofFilterEntry 4 }
+
+        cofFilterCategory OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Category for the Filter"
+        ::= { cofFilterEntry 5 }
+
+
+        cofFilterAction OBJECT-TYPE
+            SYNTAX INTEGER {
+	       allow(1),
+	       block(2),
+	       logging(3),
+	       delete(7)
+	    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Action for the entry"
+	    DEFVAL { block }
+        ::= { cofFilterEntry 6 }
+
+
+
+
+
+	cofHistoryTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF CofHistoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Status Table for History  "
+        ::= { security 5 }
+
+        cofHistoryEntry OBJECT-TYPE
+            SYNTAX CofHistoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Contains a History Entry"
+            INDEX { cofHistoryTime }
+        ::= { cofHistoryTable 1 }
+
+	
+	CofHistoryEntry ::=
+            SEQUENCE {
+	       cofHistoryTime		Date,
+	       cofHistorySource		IpAddress,
+	       cofHistoryUrl		DisplayString,
+	       cofHistoryCategory	INTEGER,
+	       cofHistoryAction		INTEGER
+	    }
+	       
+	cofHistoryTime OBJECT-TYPE
+	    SYNTAX Date
+	    MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Time of the Filter action"
+        ::= { cofHistoryEntry 1 }
+
+        cofHistorySource OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Source Address of the Entry"
+        ::= { cofHistoryEntry 2 }
+
+        cofHistoryUrl OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..128))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Url of the Entry"
+        ::= { cofHistoryEntry 3 }
+
+        cofHistoryCategory OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Category for the Entry"
+        ::= { cofHistoryEntry 4 }
+
+
+        cofHistoryAction OBJECT-TYPE
+            SYNTAX INTEGER {
+	       allow(1),
+	       block(2),
+	       logging(3)
+	    }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Action for the entry"
+        ::= { cofHistoryEntry 5 }
+
+
+
+
+
+        cofAdminStatus OBJECT-TYPE
+  	    SYNTAX  INTEGER {
+	   	disable(1),
+		enable(2),
+		enable-demo(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	    	"Disable or enbale Content Filtering"
+	    DEFVAL { disable }
+	::= { security 6 }
+
+
+	cofTicket OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	    	"The License Ticket for Content Filter Server"
+	    DEFVAL  { "" }
+	::= { security 7 }
+
+	cofTicketExpire OBJECT-TYPE
+	    SYNTAX  Date
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    	"The expiration Date of License Ticket"
+	::= { security 8 }
+
+
+	cofHistoryMaxEntries OBJECT-TYPE
+	    SYNTAX  INTEGER (0..512)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	    	"Maximum count of history Entries"
+	    DEFVAL { 64 }	
+	::= { security 9 }
+
+	cofTicketStatus OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    	"The result of the last ticket usage"
+	    DEFVAL  { "" }
+	::= { security 10 }
+
+        cofUrlDepth OBJECT-TYPE
+  	    SYNTAX  INTEGER (0..32)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	    	"Maximum checked URL directory path depth.
+		 If set to 0 only the URL domainname is checked, so all
+		 pages of this WEB server have the same category.
+		 If set to 1, the first level of URL path is checked,
+		 so e.g www.server.com/info and www.server.com/games
+		 can have different categories and are verified.
+		 With higher value the loading of WEB pages can get slower
+		 because each page consists usually of multiple requests (e.g.
+		 pictures) that are all checked against the Cobion server.
+		 With smaller value sub-pages can get the category of the
+		 above path, even if they can probably be categorized different.
+		 The maximum depth of the path categorized by the Cobion server
+		 can be different for every WEB server address. 
+		 "
+	    DEFVAL { 1 }
+	::= { security 11 }
+
+
+-------------------------------------------------------------------------------
+-- COF Statistics Table
+    
+    cofStat      OBJECT IDENTIFIER 
+	::= { security 15 }
+    
+        cofStatCurCofRequests OBJECT-TYPE
+  	    SYNTAX  Gauge32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The number of COF requests currently waiting. The COF requests
+		 include the inquiry of the HTTP requests from all clients and
+		 the COF requests done for administrative purposes.
+		 This number includes the COF requests answered from the COF servers
+		 and the COF cache."
+	    DEFVAL { 0 }
+	::= { cofStat 1 }
+    
+        cofStatMaxCofRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The highest number of waiting COF requests in parallel
+		 at one time."
+	    DEFVAL { 0 }
+	::= { cofStat 2 }
+
+        cofStatTotalCofRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of processed COF requests."
+	    DEFVAL { 0 }
+	::= { cofStat 3 }
+    
+        cofStatTotalAllowedCofRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of client HTTP requestst allowed."
+	    DEFVAL { 0 }
+	::= { cofStat 4 }
+    
+        cofStatTotalDeniedCofRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of client HTTP requests denied."
+	    DEFVAL { 0 }
+	::= { cofStat 5 }
+    
+        cofStatTotalOtherCofRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of other aministrative COF requests."
+	    DEFVAL { 0 }
+	::= { cofStat 6 }
+    
+        cofStatTotalCanceledCofRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of canceled COF requests from
+		 all clients. E. g. a waiting COF request is
+		 canceled when either the HTTP client or server
+		 side close the connection prematurely.
+		 "
+	    DEFVAL { 0 }
+	::= { cofStat 7 }
+    
+        cofStatTotalCofRequestsTempFailed OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of COF requests which failed with
+		 one server and were tried again with another COF
+		 server."
+	    DEFVAL { 0 }
+	::= { cofStat 8 }
+
+        cofStatTotalCofRequestsFailed OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of COF requests which finally
+		failed and were not tried further."
+	    DEFVAL { 0 }
+	::= { cofStat 9 }
+    
+        cofStatCurCofSessions OBJECT-TYPE
+  	    SYNTAX  Gauge32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The number of sessions currently established to
+		 COF servers."
+	    DEFVAL { 0 }
+	::= { cofStat 10 }
+
+        cofStatMaxCofSessions OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The highest number of sessions established to
+		 COF servers in parallel at one time."
+	    DEFVAL { 0 }
+	::= { cofStat 11 }
+
+        cofStatTotalCofSessions OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of sessions to COF servers."
+	    DEFVAL { 0 }
+	::= { cofStat 12 }
+    
+        cofStatCurClientSessions OBJECT-TYPE
+  	    SYNTAX  Gauge32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The number of established HTTP client sessions
+		 currently."
+	    DEFVAL { 0 }
+	::= { cofStat 13 }
+
+        cofStatMaxClientSessions OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The highest number of HTTP client sessions in parallel
+		 at one time."
+	    DEFVAL { 0 }
+	::= { cofStat 14 }
+
+        cofStatTotalClientSessions OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of HTTP client sessions."
+	    DEFVAL { 0 }
+	::= { cofStat 15 }
+    
+        cofStatCurHttpServerSessions OBJECT-TYPE
+  	    SYNTAX  Gauge32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The number of currently established HTTP server sessions."
+	    DEFVAL { 0 }
+	::= { cofStat 16 }
+
+	cofStatMaxHttpServerSessions OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The highest number of HTTP server sessions established
+		 in parallel at one time."
+	    DEFVAL { 0 }
+	::= { cofStat 17 }
+
+	cofStatTotalHttpServerSessions OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of HTTP server sessions."
+	    DEFVAL { 0 }
+	::= { cofStat 18 }
+    
+	cofStatCurClientRequests OBJECT-TYPE
+  	    SYNTAX  Gauge32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The number of currently received HTTP requests from
+		 all clients."
+	    DEFVAL { 0 }
+	::= { cofStat 19 }
+    
+	cofStatMaxClientRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The highest number of received HTTP requests from
+		 all HTTP clients in parallel at one time."
+	    DEFVAL { 0 }
+	::= { cofStat 20 }
+    
+	cofStatTotalClientRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of received HTTP requests from
+		 all HTTP clients."
+	    DEFVAL { 0 }
+	::= { cofStat 21 }
+    
+	cofStatTotalAskedClientRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of client requests from
+		 all HTTP clients for which an inquiry was done."
+	    DEFVAL { 0 }
+	::= { cofStat 22 }
+
+	cofStatTotalAskedAllowedClientRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of allowed HTTP requests
+		 for all HTTP clients."
+	    DEFVAL { 0 }
+	::= { cofStat 23 }
+    
+	cofStatTotalAskedDeniedClientRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of denied HTTP requests from
+		 all HTTP clients."
+	    DEFVAL { 0 }
+	::= { cofStat 24 }
+
+	cofStatTotalAskedCanceledClientRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of cancelled HTTP requests from
+		 all HTTP clients."
+	    DEFVAL { 0 }
+	::= { cofStat 25 }
+    
+ 	cofStatTotalHttpPipelinedRequests OBJECT-TYPE
+  	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The total number of HTTP pipelined requests
+		 from all HTTP clients."
+	    DEFVAL { 0 }
+	::= { cofStat 26 }
+
+END

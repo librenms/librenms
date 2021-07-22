@@ -1,0 +1,255 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1999-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibbinary,v $ 
+-- $Revision: 1.8 $ 
+
+BIANCA-BRICK-BINARY-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	    NetworkAddress, IpAddress, Counter, Gauge, TimeTicks,
+	    enterprises
+		FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+
+	    OBJECT-TYPE
+		FROM RFC-1212;
+
+	bintec 		OBJECT IDENTIFIER ::= { enterprises 272 }
+	bibo		OBJECT IDENTIFIER ::= { bintec 4 }
+
+    -- Management Information for the IPSec Subsystem of the BIANCA/BRICK, 
+    ipsec        OBJECT IDENTIFIER
+        ::= { bibo 26 }
+
+-- Binary Table 
+
+	binTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BinEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The binTable contains chunks of binary data which 
+		 can be chained to larger amounts of data, allowing
+		 to store objects of an arbitrary size and format.
+                 This table is for internal use only."
+	::= { ipsec 65 }
+
+	binEntry OBJECT-TYPE
+	    SYNTAX  BinEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The binTableEntry objects contain a chunk of binary data
+		 each of a maximum of 255 byte in length and can be
+		 concatenated to sets of binary data of an arbitrary
+		 size and format using the binEntIndex and
+		 binEntNextIndex fields. The binEntSetId field is
+		 used to identify all blocks of the same set."
+	    INDEX { binEntIndex }
+	::= { binTable 1 }
+
+	BinEntry ::=
+	    SEQUENCE {
+		binEntIndex				INTEGER,
+		binEntNextIndex				INTEGER,
+		binEntSetId				INTEGER,
+		binEntData				OCTET STRING
+	    }
+
+	binEntIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The Index is a unique identifier for this entry"
+	::= { binEntry 1 }
+
+	binEntNextIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object specifies the index of the next chunk of
+		 data in a set"
+	::= { binEntry 2 }
+
+	binEntSetId OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object serves as a unique identifier for the
+		 binary data set this entry belongs to and is equal
+		 for all entries of a set"
+	::= { binEntry 3 }
+
+	binEntData OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (0..255))
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object contains a chunk of binary data"
+	::= { binEntry 4 }
+
+-- End of Binary Table
+
+--  Public Binary Table 
+
+	binPublicTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BinPublicEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The binPublicTable contains chunks of binary data which 
+		 can be chained to larger amounts of data, allowing
+		 to store objects of an arbitrary size and format.
+                 This table is for internal use only. Its contents are 
+		 readable and accessible to an SNNP manager. They are also
+		 written to configuration files."
+	::= { ipsec 67 }
+
+	binPublicEntry OBJECT-TYPE
+	    SYNTAX  BinPublicEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The binPublicEntry objects contain a chunk of binary data
+		 each of a maximum of 255 byte in length and can be
+		 concatenated to sets of binary data of an arbitrary
+		 size and format using the binPublicEntIndex and
+		 binPublicEntNextIndex fields. The binPublicEntSetId 
+		 field is used to identify all blocks of the same set."
+	    INDEX { binPublicEntIndex }
+	::= { binPublicTable 1 }
+
+	BinPublicEntry ::=
+	    SEQUENCE {
+		binPublicEntIndex			INTEGER,
+		binPublicEntNextIndex		INTEGER,
+		binPublicEntSetId			INTEGER,
+		binPublicEntData			OCTET STRING
+	    }
+
+	binPublicEntIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The Index is a unique identifier for this entry"
+	::= { binPublicEntry 1 }
+
+	binPublicEntNextIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object specifies the index of the next chunk of
+		 data in a set"
+	::= { binPublicEntry 2 }
+
+	binPublicEntSetId OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object serves as a unique identifier for the
+		 binary data set this entry belongs to and is equal
+		 for all entries of a set"
+	::= { binPublicEntry 3 }
+
+	binPublicEntData OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (0..255))
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object contains a chunk of binary data"
+	::= { binPublicEntry 4 }
+
+-- End of Public Binary Table
+
+
+-- File Table
+
+	binFileTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BinFileEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The binFileTable contains entries which combine a
+		 name and a set of binary data from the binTable to a
+		 file"
+	::= { ipsec 66 }
+
+	binFileEntry OBJECT-TYPE
+	    SYNTAX  BinFileEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The binFileEntry objects contain a file name and
+		 a set identifier referencing a data set from the
+		 binTable"
+	    INDEX { binFileEntSetId }
+	::= { binFileTable 1 }
+
+	BinFileEntry ::=
+	    SEQUENCE {
+		binFileEntName	DisplayString,
+		binFileEntSize	INTEGER,
+		binFileEntPublic INTEGER,
+		binFileEntSetId	INTEGER
+	    }
+
+	binFileEntName OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object contains the file name"
+	::= { binFileEntry 1 }
+
+	binFileEntSize OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object contains the current size of the file"
+	::= { binFileEntry 2 }
+
+	binFileEntPublic OBJECT-TYPE
+	    SYNTAX  INTEGER {
+                false(1), -- entry is not public, i.e. its contents are in the 
+                          -- binTable
+                true(2)   -- entry is public, i.e. its contents are in the 
+                          -- binPublicTable
+	    }
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object specifies, if the contents of the file should be 
+		 included in the configuration and readable via SNMP.
+		  Possible values:
+                   false(1), -- entry is not public, i.e. its contents are in 
+                             -- the binTable and not accessible
+                   true(2)   -- entry is public, i.e. its contents are in the 
+			     -- binPublicTable and accessible."
+	    DEFVAL { false }
+	::= { binFileEntry 3 }
+
+	binFileEntSetId OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This object contains the set identifier as a
+		 reference to the binTable"
+	::= { binFileEntry 17 }
+
+-- End of File Table
+
+
+
+END

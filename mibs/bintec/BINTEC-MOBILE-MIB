@@ -1,0 +1,1943 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (c) Copyright 2000-2014 bintec elmeg GmbH
+-- All Rights reserved
+-- $RCSfile: mib-mobile,v $
+-- $Revision: 1.17 $
+-- $Date: 2014-03-25 12:10:50 $
+-- Author: Peter.Kietzmann@teldat.de
+--------------------------------------------------------------------------
+BINTEC-MOBILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32, Unsigned32, Counter32, Counter64, IpAddress, TimeTicks,
+        mib-2, enterprises
+        FROM SNMPv2-SMI
+
+        DisplayString, TimeStamp
+        FROM SNMPv2-TC
+
+        tty, Date, BitValue, HexValue
+        FROM BINTEC-MIB
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+
+mobileMIB MODULE-IDENTITY
+        LAST-UPDATED "201403250000Z"
+        ORGANIZATION "bintec elmeg GmbH"
+        CONTACT-INFO
+                "EMail: info@bintec-elmeg.com
+                 Web: www.bintec-elmeg.com
+                 "
+        DESCRIPTION
+                "MIB for GSM/UMTS/LTE-Modem support"
+        REVISION "2011012000Z"
+        DESCRIPTION
+                "MIB group for mobile devices.
+                 Holds configuration information and statistic data."
+        ::= { tty 4 }
+
+mobile OBJECT IDENTIFIER ::= { mobileMIB 1 }
+
+--
+
+    mobileDevCfgTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobileDevCfgEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The mobileDevCfgTable configures the detected mobile device
+             identified by the IMEI (International Mobile Equipment Identity).
+            "
+    ::= { mobile 20 }
+
+    mobileDevCfgEntry OBJECT-TYPE
+        SYNTAX      MobileDevCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single mobileDevCfgTable entry.
+            "
+        INDEX { mobileDevCfgIMEI }
+    ::= { mobileDevCfgTable 1 }
+
+    MobileDevCfgEntry ::=
+        SEQUENCE {
+            mobileDevCfgIMEI            DisplayString,
+            mobileDevCfgInit            DisplayString,
+            mobileDevCfgGPSEnable       INTEGER,
+            mobileDevCfgModulation      INTEGER
+        }
+
+    mobileDevCfgIMEI OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The IMEI (International Mobile Equipment Identity)
+             of the mobile device to configure.
+            "
+    ::= { mobileDevCfgEntry 1 }
+
+    mobileDevCfgInit OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Additional Modem hardware init sequence.
+             This sequence will be send to the modem to initialize it.
+             Normally this string should be empty (un-used).
+            "
+    ::= { mobileDevCfgEntry 2 }
+
+    mobileDevCfgGPSEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+            disabled(1),
+            enabled(2),
+            delete(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables the creation and periodic update
+             of a mobileGPSInfoTable entry.
+             The UMTS Modem Hardware must support GPS functionality.
+             This is indicated by the Object `mobileStatGpsSupport'.
+            "
+        DEFVAL { disabled }
+    ::= { mobileDevCfgEntry 3 }
+ 
+    mobileDevCfgModulation OBJECT-TYPE
+        SYNTAX      INTEGER {
+            auto(1),
+            mdm-9600(2),
+            mdm-14400(3),
+            v110-9600(4),
+            v110-14400(5),
+            v120(6),
+            gprs(7)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The Modulation to be used by the modem.
+             With auto(1) the modulation will be automatically chosen.
+             mdm_9600(2) sets the modulation to 9600 bps (V.32).
+             mdm_14400(3) sets the modulation to 14400 bps (V.34).
+             The values v110_9600(4) and v110_14400(5) set the
+             modulation to V110 encapsulation with the corresponding
+             speed (9600 or 14400 bps).
+             Setting the value to v120(6) v120 will be used.
+             If the value is set to gprs(7) the modulation for GSM
+             capable modems is taken from mobileConfigAccessType.
+            "
+        DEFVAL { auto }
+    ::= { mobileDevCfgEntry 4 }
+
+--
+
+    mobileSimCfgTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MobileSimCfgEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The mobileSimCfgTable configures each corresponding
+             SIM-Card identified by the cards unique ICC-ID.
+            "
+    ::= { mobile 21 }
+
+    mobileSimCfgEntry OBJECT-TYPE
+        SYNTAX MobileSimCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single mobileSimCfgTable entry.
+            "
+        INDEX { mobileSimCfgIccId }
+    ::= { mobileSimCfgTable 1 }
+
+    MobileSimCfgEntry ::=
+        SEQUENCE {
+            mobileSimCfgIccId               DisplayString,
+            mobileSimCfgPIN                 DisplayString,
+            mobileSimCfgPUK                 DisplayString,
+            mobileSimCfgAPN                 DisplayString,
+            mobileSimCfgAccessMode          INTEGER,
+            mobileSimCfgRoamingMode         INTEGER,
+            mobileSimCfgRoamingPLMN         INTEGER,
+            mobileSimCfgDispatch            INTEGER,
+            mobileSimCfgGsmFallback         DisplayString,
+            mobileSimCfgCugAddr             IpAddress,
+            mobileSimCfgCugAuth             INTEGER,
+            mobileSimCfgCugUser             DisplayString,
+            mobileSimCfgCugPwd              DisplayString,
+            mobileSimCfgOperatorScan        INTEGER,
+            mobileSimCfgPinData             OCTET STRING,    -- FT special
+            mobileSimCfgCugAPN              DisplayString
+        }
+
+    mobileSimCfgIccId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The ICC-ID of the used SIM-Card to configure.
+
+             Unfortunately some UMTS modem vendors offer no capability
+             to read this ID before entering the valid PIN :-(
+            "
+    ::= { mobileSimCfgEntry 1 }
+
+    mobileSimCfgPIN OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..8))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The PIN code of the SIM card. This is used to
+             authorize the access to the SIM-Card.
+            "
+    ::= { mobileSimCfgEntry 2 }
+
+    mobileSimCfgPUK OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The PUK code of the SIM card.
+             Needed in case of wrong PIN input for three times in a row.
+            "
+    ::= { mobileSimCfgEntry 3 }
+
+    mobileSimCfgAPN OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "GPRS APN (Access Point Name) used by this SIM-Card.
+            "
+    ::= { mobileSimCfgEntry 4 }
+
+    mobileSimCfgAccessMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+            auto(1),           -- factory default settings
+            gprs-only(2),      -- GPRS only (no UMTS/LTE)
+            umts-only(3),      -- UMTS only (no GPRS/LTE)
+            gprs-pref(4),      -- GPRS preferred (Priority 2G/3G/xxx)
+            umts-pref(5),      -- UMTS preferred (Priority 3G/2G/xxx)
+            delete(6),
+            lte-only(7),       -- LTE only
+            lte-pref(8),       -- LTE preferred (Priority 4G/3G/2G)
+            lte-umts(9),       -- Priority 4G/3G, no GPRS
+            lte-gprs(10),      -- Priority 4G/2G, no UMTS
+            lte-gprs-umts(11), -- Priority 4G/2G/3G
+            umts-lte(12),      -- Priority 3G/4G, no GPRS
+            umts-gprs(13),     -- Priority 3G/2G, no LTE
+            umts-lte-gprs(14), -- Priority 3G/4G/2G
+            gprs-lte(15),      -- Priority 2G/4G, no UMTS
+            gprs-umts(16),     -- Priority 2G/3G, no LTE
+            gprs-lte-umts(17)  -- Priority 2G/4G/3G
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The default Access Type to be used by the GPRS/UMTS/LTE Modem.
+             This setting depends on local network availability and
+             therefore it's bound to the network operator specific
+             SIM-Card. Possible settings are:
+                auto(1)           -- factory default settings
+                gprs-only(2)      -- GPRS only (no UMTS/LTE)
+                umts-only(3)      -- UMTS only (no GPRS/LTE)
+                gprs-pref(4)      -- GPRS preferred (Priority 2G/3G/xxx)
+                umts-pref(5)      -- UMTS preferred (Priority 3G/2G/xxx)
+                lte-only(7)       -- LTE only
+                lte-pref(8)       -- LTE preferred (Priority 4G/3G/2G)
+                lte-umts(9)       -- Priority 4G/3G, no GPRS
+                lte-gprs(10)      -- Priority 4G/2G, no UMTS
+                lte-gprs-umts(11) -- Priority 4G/2G/3G
+                umts-lte(12)      -- Priority 3G/4G, no GPRS
+                umts-gprs(13)     -- Priority 3G/2G, no LTE
+                umts-lte-gprs(14) -- Priority 3G/4G/2G
+                gprs-lte(15)      -- Priority 2G/4G, no UMTS
+                gprs-umts(16)     -- Priority 2G/3G, no LTE
+                gprs-lte-umts(17) -- Priority 2G/4G/3G
+             Not all possible settings make sense and/or are supported
+             by all LTE capable Modems.
+            "
+        DEFVAL { auto }
+    ::= { mobileSimCfgEntry 5 }
+
+    mobileSimCfgRoamingMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+            disabled(1),
+            auto(2),
+            unrestricted(3),
+            international(4),
+            national(5),
+            fixed(6),
+            full-auto(7)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The Roaming configuration for this mobile interface.
+             Possible values are:
+                 disabled      - no roaming at all
+                 auto          - roaming decision by modems factory defaults
+                 unrestricted  - no restrictions for roaming decision
+                 international - international roaming only
+                 national      - national roaming only
+                 fixed         - use mobileConfigRoamingPLMN exclusively
+                 full-auto     - let the modem select the roaming partner
+            "
+        DEFVAL { auto }
+    ::= { mobileSimCfgEntry 6 }
+
+    mobileSimCfgRoamingPLMN OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "The PLMN (Public Land Mobile Netword) code used for Roaming.
+                 Used only if mobileDevCfgRoamingMode_fixed is selected.
+                "
+    ::= { mobileSimCfgEntry 7 }
+
+    mobileSimCfgDispatch OBJECT-TYPE
+        SYNTAX      INTEGER {
+            ppp(1),       -- route call to PPP daemon
+            isdnlogin(2), -- route call to ISDNlogin daemon
+            none(3),      -- ignore incoming calls
+            ppp-modem(13),
+            ppp-v110-1200(15),
+            ppp-v110-2400(16),
+            ppp-v110-4800(17),
+            ppp-v110-9600(18),
+            ppp-v110-14400(19),
+            ppp-v110-19200(20),
+            ppp-v110-38400(21),
+            ppp-v120(23),
+            ppp-modem-profile-1(26),
+            ppp-modem-profile-2(27),
+            ppp-modem-profile-3(28),
+            ppp-modem-profile-4(29),
+            ppp-modem-profile-5(30),
+            ppp-modem-profile-6(31),
+            ppp-modem-profile-7(32),
+            ppp-modem-profile-8(33),
+            ipsec(60)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The dispatch service the Modem should be used for.
+             The SIM-Card should support/enable basic functionality
+             to use the service (eg access circuit switched networks
+             to use V.110 and/or V.120).
+             Routing tasks (IP, IPX, X.25, bridging, ...) should use ppp(1).
+             For isdnlogin program use the isdnlogin(2) item.
+             For IPSec callback use item ipsec(60).
+            "
+        DEFVAL { isdnlogin }
+    ::= { mobileSimCfgEntry 8 }
+
+    mobileSimCfgGsmFallback OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "If the Router is called using the GsmFallback number
+             the actual connection is dropped and the Access Type
+             is switched back from UMTS to GSM.
+            "
+    ::= { mobileSimCfgEntry 9 }
+
+-- Closed User Group handling
+
+    mobileSimCfgCugAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The provider assigned IP-Address if any.
+            "
+    ::= { mobileSimCfgEntry 15 }
+
+    mobileSimCfgCugAuth OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none(1),
+            pap(2),
+            chap(3),
+            pap-chap(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The authentication method to be used.
+            "
+        DEFVAL { pap-chap }
+    ::= { mobileSimCfgEntry 16 }
+
+    mobileSimCfgCugUser OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The provider assigned user name.
+            "
+    ::= { mobileSimCfgEntry 17 }
+
+    mobileSimCfgCugPwd OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The provider assigned password.
+            "
+    ::= { mobileSimCfgEntry 18 }
+
+    mobileSimCfgOperatorScan OBJECT-TYPE
+        SYNTAX	INTEGER  {
+            never(1),
+            startup(2),
+            always(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS	current
+        DESCRIPTION
+            "Handling of scanning available Providers (PLMN)
+                never       - use only home or fixed PLMN 
+                startup     - scan on startup, only for information
+                always      - used for using roaming PLMN outside own country 
+            "
+        DEFVAL { never }
+    ::= { mobileSimCfgEntry 19 }
+
+-- Hidden Data
+
+    mobileSimCfgPinData OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION
+            "Not accessible entry for storing the PIN permanently.
+             This is a security feature (?) used by France Telecom.
+            "
+    ::= { mobileSimCfgEntry 20 }
+
+    mobileSimCfgCugAPN OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Closed User Group authentication APN,
+             may be different from registration APN.
+            "
+    ::= { mobileSimCfgEntry 21 }
+
+
+    mobileStatTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MobileStatEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The mobileStatTable holds statistics about the actually
+             detected and/or used mobile device.
+            "
+    ::= { mobile 22 }
+
+    mobileStatEntry OBJECT-TYPE
+        SYNTAX MobileStatEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A single mobileStatTable entry.
+            "
+        INDEX { mobileStatIfIndex }
+    ::= { mobileStatTable 1 }
+
+    MobileStatEntry ::=
+        SEQUENCE {
+            mobileStatIfIndex           INTEGER,
+            -- Hardware dependent dynamic objects
+            mobileStatOperStatus        INTEGER,
+            mobileStatErrorCode         INTEGER,
+            mobileStatCommand           DisplayString,
+            mobileStatAnswer            DisplayString,
+            mobileStatInDiscards        INTEGER,
+            -- Network dependent dynamic objects
+            mobileStatSelectedPLMN      INTEGER,
+            mobileStatNetwork           DisplayString,
+            mobileStatLocationAreaCode  DisplayString,
+            mobileStatCellId            DisplayString,
+            mobileStatAccessType        INTEGER,
+            mobileStatCSQ               INTEGER,
+            mobileStatBand              INTEGER,
+            -- Hardware dependent static objects
+            mobileStatIMEI              DisplayString,
+            mobileStatCtrlIfIndex       INTEGER,
+            mobileStatGpsSupport        INTEGER,
+            mobileStatLteSupport        INTEGER,
+            mobileStatSmsStorageBits    BITS,
+            -- SIM card dependent static objects
+            mobileStatIccId             DisplayString,
+            mobileStatHomePLMN          INTEGER,
+            mobileStatSubscriberNumber  DisplayString,
+            mobileStatServiceCenterAddr DisplayString,
+            -- Administrative special Action
+            mobileStatAction            INTEGER,
+            mobileStatATexec            DisplayString
+
+        }
+
+    mobileStatIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The interface index of the corresponding TTY interface.
+            "
+    ::= { mobileStatEntry 1 }
+
+-- Hardware dependent dynamic objects
+
+    mobileStatOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            up(1),
+            down(2),
+            init(3),
+            called(4),
+            calling(5),
+            connect(6),
+            simwait(7),
+            pinwait(8),
+            error(9),
+            disconnected(10),
+            pukwait(11),
+            regwait(12),
+            apnwait(13)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status of the GSM modem. The following
+             states can occur:
+             - up(1)            the device is up - initialization finished
+             - down(2)          the device is down
+             - init(3)          initialization state 
+             - called(4)        incoming call received
+             - calling(5)       dialout is performed
+             - connect(6)       connection established
+             - simwait(7)       modem is detected - SIM card not ready
+             - pinwait(8)       modem is waiting for non-empty PIN entry
+             - error(9)         error - for details consult ErrorCode
+             - disconnected(10) the device isn't available (unplugged)
+             - pukwait(11)      waiting for PUK entry after PIN invalidated
+             - regwait(12)      wating for network operator registration
+             - apnwait(13)      waiting for APN entry if APN is empty
+             The initial OperStatus is down(2).
+            "
+        DEFVAL { down }
+    ::= { mobileStatEntry 2 }
+
+    mobileStatErrorCode OBJECT-TYPE
+        SYNTAX      INTEGER {
+            none(1),
+            unspecified(2),
+            pinerror(3),
+            pukerror(4),
+            apnerror(5),
+            simerror(6),
+            reg-denied(7)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If an error occurs (OperStatus is set to error) this variable
+             shows the reason for the error. Currently the following error
+             codes are possible:
+             - none(1)        no error occured
+             - unspecified(2) error can't be specified any further
+             - pinerror(3)    PIN was wrong PUK needed
+             - pukerror(4)    PUK was wrong 
+             - apnerror(5)    APN was wrong
+             - simerror(6)    SIM card not present or damaged
+             - reg-denied(7)  Network registration denied
+             The initial ErrorCode is none(1).
+            "
+        DEFVAL { none }
+    ::= { mobileStatEntry 3 }
+
+    mobileStatCommand OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..60)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The last command that was sent to the mobile device.
+            "
+    ::= { mobileStatEntry 4 }
+
+    mobileStatAnswer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..60)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The last answer received from the mobile device.
+            "
+    ::= { mobileStatEntry 5 }
+
+    mobileStatInDiscards OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of frames which can't be enqueued upstream.
+            "
+    ::= { mobileStatEntry 6 }
+
+-- Network dependent dynamic objects
+
+    mobileStatSelectedPLMN OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The PLMN (Public Land Mobile Network) code of the Network
+             currently selected.
+            "
+    ::= { mobileStatEntry 7 }
+
+    mobileStatNetwork OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..60))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the PLMN (Public Land Mobile Network)
+             actually being used.
+            "
+    ::= { mobileStatEntry 8 }
+
+    mobileStatLocationAreaCode OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual Location Area Code the UMTS-Modem is registered.
+            "
+    ::= { mobileStatEntry 9 }
+
+    mobileStatCellId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual Cell-ID the UMTS-Modem is registered.
+            "
+    ::= { mobileStatEntry 10 }
+
+    mobileStatAccessType OBJECT-TYPE
+        SYNTAX     INTEGER {
+            unknown(1),
+            gsm(2),
+            compact-gsm(3),
+            umts(4),
+            gsm-edge(5),
+            umts-hsdpa(6),
+            umts-hsupa(7),
+            umts-hspa(8),
+            lte(9),
+            hspa-plus(10),
+            cdma-rev0(11),
+            cdma-revA(12),
+            cdma-revB(13)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Access Type the modem actually registers on.
+             Normally the `edge' or `hs*pa' Access Types aren't
+             provided in detail by the network operator and/or modem.
+             Possible Access Types are:
+                unknown(1)
+                gsm(2)           -- GSM
+                compact-gsm(3)   -- CGSM
+                umts(4)          -- UMTS
+                gsm-edge(5)      -- GPRS/EDGE
+                umts-hsdpa(6)    -- HSDPA
+                umts-hsupa(7)    -- HSUPA
+                umts-hspa(8)     -- HSPA
+                lte(9)           -- LTE
+                hspa-plus(10)    -- HSPA+
+                cdma-rev0(11)    -- CDMA 1xEV-DO Rev. 0
+                cdma-revA(12)    -- CDMA 1xEV-DO Rev. A
+                cdma-revB(13)    -- CDMA 1xEV-DO Rev. B
+            "
+        DEFVAL { unknown }
+    ::= { mobileStatEntry 11 }
+
+    mobileStatCSQ OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS       "dBm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The GSM receive signal level in decibel (db).
+             A value below -100 signals a very low signal quality.
+             A value between -100 and -80 means that signal quality is low.
+             If the value is between -80 and -70 the quality is ok. The
+             interval from -70 to -60 signals a good quality and if the
+             value is above -60 the quality is excellent. The default e.g.
+             initial value is -113.
+            "
+    ::= { mobileStatEntry 12 }
+
+    mobileStatBand OBJECT-TYPE
+        SYNTAX     INTEGER {
+            cdma-band-0(0),	-- CDMA Band Class 0
+            cdma-band-1(1),	-- CDMA Band Class 1
+            cdma-band-3(3),	-- CDMA Band Class 3
+            cdma-band-4(4),	-- CDMA Band Class 4
+            cdma-band-5(5),	-- CDMA Band Class 5
+            cdma-band-6(6),	-- CDMA Band Class 6
+            cdma-band-7(7),	-- CDMA Band Class 7
+            cdma-band-8(8),	-- CDMA Band Class 8
+            cdma-band-9(9),	-- CDMA Band Class 9
+            cdma-band-10(10),	-- CDMA Band Class 10
+            cdma-band-11(11),	-- CDMA Band Class 11
+            cdma-band-12(12),	-- CDMA Band Class 12
+            cdma-band-13(13),	-- CDMA Band Class 13
+            cdma-band-14(14),	-- CDMA Band Class 14
+            cdma-band-15(15),	-- CDMA Band Class 15
+            cdma-band-16(16),	-- CDMA Band Class 16
+            gsm-450(40),	-- GSM 450
+            gsm-480(41),	-- GSM 480
+            gsm-750(42),	-- GSM 750
+            gsm-850(43),	-- GSM 850
+            gsm-900-ext(44),	-- GSM 900 (Extended)
+            gsm-900-pri(45),	-- GSM 900 (Primary)
+            gsm-900-rway(46),	-- GSM 900 (Railways)
+            gsm-1800(47),	-- GSM 1800
+            gsm-1900(48),	-- GSM 1900
+            wcdma-2100(80),	-- WCDMA 2100
+            wcdma-pcs-1900(81),	-- WCDMA PCS 1900
+            wcdma-dcs-1800(82),	-- WCDMA DCS 1800
+            wcdma-1700-us(83),	-- WCDMA 1700 (US)
+            wcdma-650(84),	-- WCDMA 850
+            wcdma-800(85),	-- WCDMA 800
+            wcdma-2600(86),	-- WCDMA 2600
+            wcdma-900(87),	-- WCDMA 900
+            wcdma-1700-jp(88),	-- WCDMA 1700 (Japan)
+            e-utra-band-1(120),	-- LTE E-UTRA Band 1
+            e-utra-band-2(121),	-- LTE E-UTRA Band 2
+            e-utra-band-3(122),	-- LTE E-UTRA Band 3
+            e-utra-band-4(123),	-- LTE E-UTRA Band 4
+            e-utra-band-5(124),	-- LTE E-UTRA Band 5
+            e-utra-band-6(125),	-- LTE E-UTRA Band 6
+            e-utra-band-7(126),	-- LTE E-UTRA Band 7
+            e-utra-band-8(127),	-- LTE E-UTRA Band 8
+            e-utra-band-9(128),	-- LTE E-UTRA Band 9
+            e-utra-band-10(129),-- LTE E-UTRA Band 10
+            e-utra-band-11(130),-- LTE E-UTRA Band 11
+            e-utra-band-12(131),-- LTE E-UTRA Band 12
+            e-utra-band-13(132),-- LTE E-UTRA Band 13
+            e-utra-band-14(133),-- LTE E-UTRA Band 14
+            e-utra-band-17(134),-- LTE E-UTRA Band 17
+            e-utra-band-33(135),-- LTE E-UTRA Band 33
+            e-utra-band-34(136),-- LTE E-UTRA Band 34
+            e-utra-band-35(137),-- LTE E-UTRA Band 35
+            e-utra-band-36(138),-- LTE E-UTRA Band 36
+            e-utra-band-47(139),-- LTE E-UTRA Band 37
+            e-utra-band-38(140),-- LTE E-UTRA Band 38
+            e-utra-band-39(141),-- LTE E-UTRA Band 39
+            e-utra-band-40(142),-- LTE E-UTRA Band 40
+            e-utra-band-18(143),-- LTE E-UTRA Band 18
+            e-utra-band-19(144),-- LTE E-UTRA Band 19
+            e-utra-band-20(145),-- LTE E-UTRA Band 20
+            e-utra-band-21(146),-- LTE E-UTRA Band 21
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Band Class currently used.
+            "
+        DEFVAL { unknown }
+    ::= { mobileStatEntry 21 }
+
+-- Hardware dependent static objects
+
+    mobileStatIMEI OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IMEI (International Mobile Equipment Identity)
+             of the detected mobile device.
+            "
+    ::= { mobileStatEntry 13 }
+
+    mobileStatCtrlIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If the UMTS card provides several channels and one could
+             be used to control the card e.g. get status information
+             from the card like the signal quality a dedicated daemon
+             uses the mobileStatCtrlIfIndex for this purpose.
+             If mobileStatCtrlIfIndex is set to 0 no interface
+             is available for this task.
+            "
+        DEFVAL { 0 }
+    ::= { mobileStatEntry 14 }
+
+    mobileStatGpsSupport OBJECT-TYPE
+        SYNTAX      INTEGER {
+            none(1),
+            available(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Signals for configuration software if the hardware
+             is capable to deliver GPS information.
+             - none(1)          no GPS support
+             - available(2)     GPS support available
+            "
+        DEFVAL { none }
+    ::= { mobileStatEntry 15 }
+
+    mobileStatLteSupport OBJECT-TYPE
+        SYNTAX      INTEGER {
+            none(1),
+            available(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Signals for configuration software if the hardware
+             is capable to attach to LTE networks.
+             - none(1)          no LTE support
+             - available(2)     LTE support available
+            "
+        DEFVAL { none }
+    ::= { mobileStatEntry 20 }
+
+    mobileStatSmsStorageBits OBJECT-TYPE
+        SYNTAX BITS {
+            sm(1), -- use SIM card storage
+            me(2), -- use Mobile Equipment storage
+            mt(3), -- use one of the ME associated storages
+            bm(4), -- use Broadcast Message storage
+            ta(5), -- use Terminal Adapter storage
+            sr(6)  -- use Status Report storage
+        }
+        MAX-ACCESS read-only
+        STATUS current 
+        DESCRIPTION
+            "The SMS storage types supported by the modem hardware."
+    ::= { mobileStatEntry 22 }
+
+-- SIM card dependent static objects
+
+    mobileStatIccId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ICC-ID of the SIM-Card found in the mobile device
+             which is actually enumerated with mobileStatIfIndex.
+
+             Some UMTS modem vendors offer no capability to
+             read this ID before entering a valid PIN :-(
+             In this case the default configuration is choosen.
+            "
+    ::= { mobileStatEntry 16 }
+
+    mobileStatHomePLMN OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The PLMN (Public Land Mobile Network) code of the Home PLMN.
+            "
+    ::= { mobileStatEntry 17 }
+
+    mobileStatSubscriberNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Subscriber Number stored on the SIM card.
+            "
+    ::= { mobileStatEntry 18 }
+
+    mobileStatServiceCenterAddr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Service Center Address stored on the SIM card.
+            "
+    ::= { mobileStatEntry 19 }
+
+    mobileStatAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+            idle(1),
+            reset(2),
+            qmi(3),
+            dip(4),
+            dhcprelay(5)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Perform extern triggered Action on sierra wireless modems
+             - idle         no waiting Action
+             - reset        reset the modem
+             - qmi          switch modem into qmi mode
+             - dip          switch modem into direct IP mode
+             - dhcprelay    enable DHCP relay through the modem
+            "
+        DEFVAL { idle } 
+    ::= { mobileStatEntry 23 }
+
+    mobileStatATexec OBJECT-TYPE
+        SYNTAX      DisplayString ( SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Perform a User requested AT Command in idle state"
+        DEFVAL { "" } 
+    ::= { mobileStatEntry 24 }
+
+
+--
+    mobileOperatorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobileOperatorEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The mobileOperatorTable shows the actually available 
+             network provider and the registration status.
+            "
+    ::= { mobile 23 }
+
+    mobileOperatorEntry OBJECT-TYPE
+        SYNTAX      MobileOperatorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single mobileOperatorTable entry.
+            "
+        INDEX { mobileOperatorIfIndex, mobileOperatorCode, mobileOperatorAcT }
+    ::= { mobileOperatorTable 1 }
+
+    MobileOperatorEntry ::=
+        SEQUENCE {
+            mobileOperatorIfIndex           INTEGER,
+            mobileOperatorCode              INTEGER,
+            mobileOperatorAcT               INTEGER,
+            mobileOperatorStatus            INTEGER,
+            mobileOperatorName              DisplayString,
+            mobileOperatorPriority          INTEGER,
+            mobileOperatorPreference        INTEGER,
+            mobileOperatorCurrentOrder      INTEGER
+        }
+
+    mobileOperatorIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index of the corresponding TTY interface.
+            "
+    ::= { mobileOperatorEntry 1 }
+
+    mobileOperatorCode OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The PLMN code of the network operator.
+            "
+    ::= { mobileOperatorEntry 2 }
+
+    mobileOperatorAcT OBJECT-TYPE
+        SYNTAX     INTEGER {
+            unknown(1),
+            gsm(2),
+            compact-gsm(3),
+            umts(4),
+            gsm-edge(5),
+            umts-hsdpa(6),
+            umts-hsupa(7),
+            umts-hspa(8),
+            lte(9),
+            hspa-plus(10),
+            cdma-rev0(11),
+            cdma-revA(12),
+            cdma-revB(13)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Access Type the modem actually registers on.
+             Normally the `edge' or `hs*pa' Access Types aren't
+             provided in detail by the network operator and/or modem.
+             Possible Access Types are:
+                unknown(1)
+                gsm(2)           -- GSM
+                compact-gsm(3)   -- CGSM
+                umts(4)          -- UMTS
+                gsm-edge(5)      -- GPRS/EDGE
+                umts-hsdpa(6)    -- HSDPA
+                umts-hsupa(7)    -- HSUPA
+                umts-hspa(8)     -- HSPA
+                lte(9)           -- LTE
+                hspa-plus(10)    -- HSPA+
+                cdma-rev0(11)    -- CDMA 1xEV-DO Rev. 0
+                cdma-revA(12)    -- CDMA 1xEV-DO Rev. A
+                cdma-revB(13)    -- CDMA 1xEV-DO Rev. B
+            "
+        DEFVAL { gsm }
+    ::= { mobileOperatorEntry 3 }
+
+    mobileOperatorStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknown(1),
+            available(2),
+            current(3),
+            forbidden(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The registration status depending on the network operator.
+             The following states can occur:
+             - unknown(1)   -- no idea
+             - available(2) -- registration possible
+             - current(3)   -- successfully registered
+             - forbidden(4) -- no roaming possible
+            "
+        DEFVAL { unknown }
+    ::= { mobileOperatorEntry 4 }
+
+    mobileOperatorName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..60))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the network operator.
+            "
+    ::= { mobileOperatorEntry 5 }
+
+    mobileOperatorPriority OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Priority of the Operator to use in roaming mode. There are
+             different priority value ranges for the following types of
+             operator entries:
+
+             - Home Operator (from SIM card)
+             - Priviledged Operator (from SIM card)
+             - Administrative Operator
+             - Preferred Operator
+             - Practicable Operator 
+
+             The start and the size of each priority range is predefined but
+             variable and will be configurable in future via the global
+             mobile settings.
+            " 
+       DEFVAL { 256 }
+    ::= { mobileOperatorEntry 6 }
+
+    mobileOperatorPreference OBJECT-TYPE
+        SYNTAX      INTEGER {
+            home(1),
+            privileged(2),
+            preferred(3),
+            practicable(4),
+            banned(5),
+            administrative(6)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The registration priority for the network operator.
+             The following states can occur:
+             - home(1)          -- home operator
+             - privileged(2)    -- home operators best roaming partner
+             - preferred(3)     -- home operators roaming partner
+             - practicable(4)   -- roaming possible but not preferred 
+             - banned(5)        -- no roaming to this operator possible
+             - administrative(6)    -- configured via  mobileAdmOperatorTable
+            "
+        DEFVAL { banned }
+    ::= { mobileOperatorEntry 7 }
+
+   mobileOperatorCurrentOrder OBJECT-TYPE
+        SYNTAX  INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The order of the entry in the currently used internal roaming
+             list, the value '-1' indicates an unused (ignored) entry.
+            "
+        DEFVAL { -1 }
+    ::= { mobileOperatorEntry 8 }
+
+
+--
+
+    mobileSmsSendTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobileSmsSendEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The mobileSmsSendTable holds all information to send
+                 a SMS (Short Message Service) via a GSM/UMTS modem.
+                "
+    ::= { mobile 24 }
+
+    mobileSmsSendEntry OBJECT-TYPE
+        SYNTAX      MobileSmsSendEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A single mobileSmsSendTable entry.
+                 This entry is temporary until it's successfully sent.
+                 After being successfully sent this entry is copied to
+                 the mobileSmsTable. Since the GSM/UMTS modem stores
+                 the SMS internally or on the SIM-Card this table
+                 is a NOSAVE table.
+                "
+        INDEX { mobileSmsSendId }
+    ::= { mobileSmsSendTable 1 }
+
+    MobileSmsSendEntry ::=
+        SEQUENCE {
+            mobileSmsSendId                     INTEGER,
+            mobileSmsSendIfIndex                INTEGER,
+            mobileSmsSendMsgStorage             INTEGER,
+            mobileSmsSendMsgSlot                INTEGER,
+            mobileSmsSendMsgStatus              INTEGER,
+            mobileSmsSendDestAddr               DisplayString,
+            mobileSmsSendMsgFormat              INTEGER,
+            mobileSmsSendMsgCoding              INTEGER,
+            mobileSmsSendMsgData                OCTET STRING
+    }
+
+    mobileSmsSendId OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A unique ID generated by the application
+             which triggers the SMS send request.
+            "
+    ::= { mobileSmsSendEntry 1 }
+
+    mobileSmsSendIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The interface index of the mobile device
+             which should transmit the SMS.
+            "
+    ::= { mobileSmsSendEntry 2 }
+
+    mobileSmsSendMsgStorage OBJECT-TYPE
+        SYNTAX      INTEGER {
+            sm(1), -- use SIM card storage
+            me(2)  -- use Mobile Equipment storage
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the storage which holds the SMS.
+             Available storages are:
+                sm(1)  -- SIM card storage
+                me(2)  -- Mobile Equipment storage
+             The default of this object is 'me' because mobile
+             equipment offers more storage normally.
+            "
+        DEFVAL { me }
+    ::= { mobileSmsSendEntry 3 }
+
+    mobileSmsSendMsgSlot OBJECT-TYPE
+        SYNTAX      INTEGER (-1..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual index to address the SMS in 'mobileSmsSendMsgStorage'.
+             This index is returned by the mobile device after the store
+             operation is successfully finished.
+            "
+        DEFVAL { -1 }
+    ::= { mobileSmsSendEntry 4 }
+
+    mobileSmsSendMsgStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            transmit(1),   -- start transmission
+            success(2),    -- transmission successful
+            error(3),      -- transmission failed
+            delete(5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The Status of the SMS.
+             To start transmission of the SMS set Status to `transmit(1)'.
+
+             On successful transmission the Status is set to `success(2)'.
+             Afterwards the SMS is moved to the 'mobileSmsTable'.
+
+             When transmission fails the Status changes to     `error(3)'.
+             The SMS stays in 'mobileSmsSendTable' for retransmissions.
+
+             If the SMS should be deleted from the 'mobileSmsSendTable'
+             and the mobile device storage specified in
+             'mobileSmsSendMsgStorage' the Status should be set to `delete(5)'.
+            "
+        DEFVAL { transmit }
+    ::= { mobileSmsSendEntry 5 }
+
+    mobileSmsSendDestAddr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..64)) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The destination address of this SMS.
+            "
+    ::= { mobileSmsSendEntry 6 }
+
+    mobileSmsSendMsgFormat OBJECT-TYPE
+        SYNTAX      INTEGER {
+            pdu(1),
+            txt(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The message format of the SMS.
+             Traditional SMS use plain  `txt(2)' format.
+             Special or Unicode SMS use `pdu(1)' format.
+            "
+        DEFVAL { txt }
+    ::= { mobileSmsSendEntry 7 }
+
+    mobileSmsSendMsgCoding OBJECT-TYPE
+        SYNTAX      INTEGER {
+            ira(1),        -- International Reference Alphabet
+            gsm(2),        -- GSM 03.38 7 bit default alphabet
+            ucs2(3),       -- unicode 16 bit
+            pc437(4),
+            iso8859-1(5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the coding of the SMS user data section.
+            "
+        DEFVAL { iso8859-1 }
+    ::= { mobileSmsSendEntry 8 }
+
+    mobileSmsSendMsgData OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..160)) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The raw text data of the SMS depending on the coding.
+            "
+    ::= { mobileSmsSendEntry 9 }
+
+--
+
+    mobileSmsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobileSmsEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The mobileSmsTable holds all SMS (Short Message Service)
+                 which are stored in the GSM/UMTS modem and/or on the SIM-
+                 Card used.
+                "
+    ::= { mobile 25 }
+
+    mobileSmsEntry OBJECT-TYPE
+        SYNTAX      MobileSmsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A single mobileSmsTable entry.
+                 Each entry is a copy of a SMS stored in the GSM/UMTS modem
+                 and/or on the SIM-Card used.
+                 Status information like 'received-unread', 'received-read',
+                 'stored-unsent' and 'stored-sent' is additionally available.
+                 After being successfully sent an entry in the
+                 mobileSmsSendTable is moved to the mobileSmsTable.
+                 Since space in the GSM/UMTS modem and SIM-Card is limited
+                 applications have to delete entries from time to time.
+                "
+        INDEX { mobileSmsIfIndex, mobileSmsMsgStorage, mobileSmsMsgSlot }
+    ::= { mobileSmsTable 1 }
+
+    MobileSmsEntry ::=
+        SEQUENCE {
+            mobileSmsIfIndex                INTEGER,
+            mobileSmsMsgStorage             INTEGER,
+            mobileSmsMsgSlot                INTEGER,
+            mobileSmsMsgStatus              INTEGER,
+            mobileSmsServiceCenterTimeStamp DisplayString,
+            mobileSmsServiceCenterAddress   DisplayString,
+            mobileSmsPhoneNumber            DisplayString,
+            mobileSmsMsgFormat              INTEGER,
+            mobileSmsMsgCoding              INTEGER,
+            mobileSmsMsgData                OCTET STRING
+    }
+
+    mobileSmsIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The interface index of the mobile device
+             which received the SMS or should transmit it.
+            "
+    ::= { mobileSmsEntry 1 }
+
+    mobileSmsMsgStorage OBJECT-TYPE
+        SYNTAX      INTEGER {
+            sm(1), -- use SIM card storage
+            me(2), -- use Mobile Equipment storage
+            mt(3), -- use one of the ME associated storages
+            bm(4), -- use Broadcast Message storage
+            ta(5), -- use Terminal Adapter storage
+            sr(6)  -- use Status Report storage
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the storage which holds the SMS.
+             Available storages are:
+                sm(1)  -- SIM card storage
+                me(2)  -- Mobile Equipment storage
+                mt(3)  -- one of the ME associated storages
+                bm(4)  -- Broadcast Message storage
+                ta(5)  -- Terminal Adapter storage
+                sr(6)  -- Status Report storage
+            "
+    ::= { mobileSmsEntry 2 }
+
+    mobileSmsMsgSlot OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual index to address the SMS in 'mobileSmsMsgStorage'.
+            "
+    ::= { mobileSmsEntry 3 }
+
+    mobileSmsMsgStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rec-unread(1),	-- received unread
+            rec-read(2),	-- received read
+            sto-unsent(3),	-- stored unsent
+            sto-sent(4),	-- stored sent
+            delete(5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The status of the SMS.
+             The first four states correspond with 3GPP TS27.005.
+             For incoming SMS the Status is set to            `rec-unread(1)'.
+             After reading the SMS the Status is set to         `rec-read(2)'.
+             On storing one SMS for sending the Status is     `sto-unsent(3)'.
+             If SMS was sent successfully Status changes to     `sto-sent(4)'.
+
+             In order to delete the SMS permanently set Status to `delete(5)'.
+             This object can only be set to `delete'.
+             Other settings are ignored silently.
+            "
+    ::= { mobileSmsEntry 4 }
+
+    mobileSmsServiceCenterTimeStamp OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..64)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date/time the SMS is sent or received.
+            "
+    ::= { mobileSmsEntry 5 }
+
+    mobileSmsServiceCenterAddress OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..64)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Service Center Address used to send or receive this SMS.
+            "
+    ::= { mobileSmsEntry 6 }
+
+    mobileSmsPhoneNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..64)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The origination or destination address of this SMS
+             depending on the value of 'mobileSmsMsgStatus'.
+            "
+    ::= { mobileSmsEntry 7 }
+
+    mobileSmsMsgFormat OBJECT-TYPE
+        SYNTAX      INTEGER {
+            pdu(1),
+            txt(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The message format of the SMS.
+             Traditional SMS use plain  `txt(2)' format.
+             Special or Unicode SMS use `pdu(1)' format.
+            "
+        DEFVAL { pdu }
+    ::= { mobileSmsEntry 8 }
+
+    mobileSmsMsgCoding OBJECT-TYPE
+        SYNTAX      INTEGER {
+            ira(1),        -- International Reference Alphabet
+            gsm(2),        -- GSM 03.38 7 bit default alphabet
+            ucs2(3),       -- unicode 16 bit
+            pc437(4),
+            iso8859-1(5),
+            uh-7bit(6),    -- user header with 7 bit encoding
+            uh-8bit(7)     -- user header with 8 bit encoding
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the coding of the SMS user data section.
+            "
+        DEFVAL { ira }
+    ::= { mobileSmsEntry 9 }
+
+    mobileSmsMsgData OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..160)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The raw data of the complete SMS.
+            "
+    ::= { mobileSmsEntry 10 }
+
+--
+
+    mobileGPSInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobileGPSInfoEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The mobileGPSInfoTable shows the actually available 
+                 GPS information if supported by the Hardware.
+                "
+    ::= { mobile 26 }
+
+    mobileGPSInfoEntry OBJECT-TYPE
+        SYNTAX MobileGPSInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single mobileGPSInfoTable entry.
+            "
+        INDEX { mobileGPSInfoIfIndex }
+    ::= { mobileGPSInfoTable 1 }
+
+    MobileGPSInfoEntry ::=
+        SEQUENCE {
+            mobileGPSInfoIfIndex               INTEGER,
+            mobileGPSInfoOperStatus            INTEGER,
+            mobileGPSInfoDate                  DisplayString,
+            mobileGPSInfoTime                  DisplayString,
+            mobileGPSInfoLatitude              DisplayString,
+            mobileGPSInfoLongitude             DisplayString,
+            mobileGPSInfoSpeedOverGround       INTEGER,
+            mobileGPSInfoNumberOfSatelites     INTEGER
+        }
+
+    mobileGPSInfoIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index of the corresponding TTY interface.
+            "
+    ::= { mobileGPSInfoEntry 1 }
+
+    mobileGPSInfoOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknown(1),
+            down(2),
+            init(3),
+            up(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operation status of the UMTS modems internal GPS module.
+             The following states can occur:
+             - unknown(1) -- initialization failed
+             - down(2)    -- GPS module disabled
+             - init(3)    -- GPS module is looking for satelites
+             - up(4)      -- GPS module is providing GPS info
+            "
+        DEFVAL { unknown }
+    ::= { mobileGPSInfoEntry 2 }
+
+    mobileGPSInfoDate OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual date calculated from GPS info.
+            "
+    ::= { mobileGPSInfoEntry 3 }
+
+    mobileGPSInfoTime OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual time calculated from GPS info.
+            "
+    ::= { mobileGPSInfoEntry 4 }
+
+    mobileGPSInfoLatitude OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual Latitude calculated from GPS info.
+            "
+    ::= { mobileGPSInfoEntry 5 }
+
+    mobileGPSInfoLongitude OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actual Longitude calculated from GPS info.
+            "
+    ::= { mobileGPSInfoEntry 6 }
+
+    mobileGPSInfoSpeedOverGround OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The actually detected Speed over Ground.
+            "
+        ::= { mobileGPSInfoEntry 7 }
+
+    mobileGPSInfoNumberOfSatelites OBJECT-TYPE
+        SYNTAX      INTEGER (0..34)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of satelites actually found by the GPS module.
+            "
+    ::= { mobileGPSInfoEntry 8 }
+
+--
+
+    mobilePLMNTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobilePLMNEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The mobilePLMNTable holds the PLMN (Public Land
+             Mobile Network) codes known by the mobile device.
+             This table is used to translate PLMN code into name.
+            "
+    ::= { mobile 27 }
+
+    mobilePLMNEntry OBJECT-TYPE
+        SYNTAX      MobilePLMNEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single mobilePLMNTable entry.
+            "
+        INDEX { mobilePLMNCode }
+    ::= { mobilePLMNTable 1 }
+
+    MobilePLMNEntry ::=
+        SEQUENCE {
+            mobilePLMNCode          INTEGER,
+            mobilePLMNName          DisplayString
+        }
+
+    mobilePLMNCode OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The PLMN (Public Land Mobile Network) code of the network operator.
+             This code is merged from the MCC (Mobile Country Code)
+             and MNC (Mobile Network Code) of the network operator.
+            "
+        ::= { mobilePLMNEntry 1 }
+
+    mobilePLMNName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the network operator.
+            "
+        ::= { mobilePLMNEntry 2 }
+
+--
+
+    mobileOperatorPLMNTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MobileOperatorPLMNEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The mobileOperatorPLMNTable shows the Operator_controlled_PLMN
+             (Public Land Mobile Networks) codes accessible by the SIM-Card.
+            "
+    ::= { mobile 28 }
+
+    mobileOperatorPLMNEntry OBJECT-TYPE
+        SYNTAX MobileOperatorPLMNEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A single mobileOperatorPLMNTable entry.
+            "
+        INDEX { mobileOperatorPLMNIccId, mobileOperatorPLMNCode }
+    ::= { mobileOperatorPLMNTable 1 }
+
+    MobileOperatorPLMNEntry ::=
+        SEQUENCE {
+            mobileOperatorPLMNIccId         DisplayString,
+            mobileOperatorPLMNCode          INTEGER,
+            mobileOperatorPLMNName          DisplayString,
+            mobileOperatorPLMNAllowGSM      INTEGER,
+            mobileOperatorPLMNAllowUMTS     INTEGER
+        }
+
+    mobileOperatorPLMNIccId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ICC-ID of the SIM-Card.
+             The Operator PLMN List is copied from this SIM-Card.
+            "
+    ::= { mobileOperatorPLMNEntry 1 }
+
+    mobileOperatorPLMNCode OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The PLMN Code is built from a 3 digit MCC (Mobile Country
+             Code) and 2 or 3 digit MNC (Mobile Network Code).
+            "
+    ::= { mobileOperatorPLMNEntry 2 }
+
+    mobileOperatorPLMNName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..40))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the network operator.
+            "
+    ::= { mobileOperatorPLMNEntry 3 }
+
+    mobileOperatorPLMNAllowGSM OBJECT-TYPE
+        SYNTAX      INTEGER {
+            allowed(1),
+            denied(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Access Right to register to GSM Access Technology.
+            "
+        DEFVAL { allowed }
+    ::= { mobileOperatorPLMNEntry 4 }
+
+    mobileOperatorPLMNAllowUMTS OBJECT-TYPE
+        SYNTAX      INTEGER {
+            allowed(1),
+            denied(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Access Right to register to UMTS Access Technology.
+            "
+        DEFVAL { allowed }
+    ::= { mobileOperatorPLMNEntry 5 }
+
+--
+
+    mobilePdpContextTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MobilePdpContextEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The mobilePdpContextTable shows the PDP (Packet Data Protocol)
+             context stored in the detected mobile device. The mobile device
+             is identified by the unique IMEI (International Mobile Equipment
+             Identity).
+            "
+    ::= { mobile 29 }
+
+    mobilePdpContextEntry OBJECT-TYPE
+        SYNTAX      MobilePdpContextEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single mobilePdpContextTable entry.
+            "
+        INDEX { mobilePdpContextIndex }
+    ::= { mobilePdpContextTable 1 }
+
+    MobilePdpContextEntry ::=
+        SEQUENCE {
+            mobilePdpContextIndex               INTEGER,
+            mobilePdpContextIfIndex             INTEGER,
+            mobilePdpContextPrimaryId           INTEGER,
+            mobilePdpContextSecondaryId         INTEGER,
+            mobilePdpContextType                INTEGER,
+            mobilePdpContextAPN                 DisplayString,
+            mobilePdpContextPreferredAddress    DisplayString,
+            mobilePdpContextDataCompression     INTEGER,
+            mobilePdpContextHeaderCompression   INTEGER
+        }
+
+    mobilePdpContextIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique index for this entry.
+            "
+    ::= { mobilePdpContextEntry 1 }
+
+    mobilePdpContextIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The interface index of the corresponding TTY interface.
+            "
+    ::= { mobilePdpContextEntry 2 }
+
+    mobilePdpContextPrimaryId OBJECT-TYPE
+        SYNTAX      INTEGER (1..16)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The primary PDP context identifier.
+            "
+    ::= { mobilePdpContextEntry 3 }
+
+    mobilePdpContextSecondaryId OBJECT-TYPE
+        SYNTAX      INTEGER (0..16)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Shows the secondary PDP context identifier (non-zero).
+             In case of a primary PDP context this object is zero.
+            "
+    ::= { mobilePdpContextEntry 4 }
+
+    mobilePdpContextType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            ipv4(1),
+            ppp(2),
+            ipv6(3),
+            ipv4v6(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The protocol type of the PDP context.
+             This object is unused in case of a secondary PDP context.
+            "
+        DEFVAL { ppp }
+    ::= { mobilePdpContextEntry 5 }
+
+    mobilePdpContextAPN OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The APN (Access Point Name) used by the PDP context.
+             This object is unused in case of a secondary PDP context.
+            "
+    ::= { mobilePdpContextEntry 6 }
+
+    mobilePdpContextPreferredAddress OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The preferred (IP-)Address assigned to the PDP context.
+            "
+    ::= { mobilePdpContextEntry 7 }
+
+    mobilePdpContextDataCompression OBJECT-TYPE
+        SYNTAX      INTEGER {
+            off(1),     -- default, if value is unspecified
+            on(2),      -- manufacturer preferred compression
+            v42bis(3),
+            v44(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The data compression used for data connections.
+             This object is normally unused in 2G/3G/4G networks.
+            "
+        DEFVAL { off }
+    ::= { mobilePdpContextEntry 8 }
+
+    mobilePdpContextHeaderCompression OBJECT-TYPE
+        SYNTAX      INTEGER {
+            off(1),     -- default, if value is unspecified
+            on(2),      -- manufacturer preferred compression
+            rfc1144(3),
+            rfc2507(4),
+            rfc3095(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The header compression used for data connections.
+             This object is normally unused in 2G/3G/4G networks.
+            "
+        DEFVAL { off }
+    ::= { mobilePdpContextEntry 9 }
+--
+    mobileAdmOperatorTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MobileAdmOperatorEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The mobileAdmOperatorTable shows the configured preferred PLMNs.
+            "
+    ::= { mobile 30 }
+
+    mobileAdmOperatorEntry OBJECT-TYPE
+        SYNTAX MobileAdmOperatorEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A single mobileAdmOperatorTable entry.
+            "
+        INDEX { mobileAdmOperatorIccId, mobileAdmOperatorCode }
+    ::= { mobileAdmOperatorTable 1 }
+
+    MobileAdmOperatorEntry ::=
+        SEQUENCE {
+            mobileAdmOperatorIccId          DisplayString,
+            mobileAdmOperatorCode           INTEGER,
+            mobileAdmOperatorName           DisplayString,
+            mobileAdmOperatorAcT            BITS,
+            mobileAdmOperatorPriority       INTEGER,
+            mobileAdmOperatorStatus         INTEGER
+        }
+
+    mobileAdmOperatorIccId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The ICC-ID of the SIM-Card.
+             The operator is assigned to this SIM Id.
+            "
+    ::= { mobileAdmOperatorEntry 1 }
+
+    mobileAdmOperatorCode OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The PLMN Code is built from a 3 digit MCC (Mobile Country
+             Code) and 2 or 3 digit MNC (Mobile Network Code).
+            "
+    ::= { mobileAdmOperatorEntry 2 }
+
+    mobileAdmOperatorName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..40))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the network operator.
+            "
+    ::= { mobileAdmOperatorEntry 3 }
+
+    mobileAdmOperatorAcT OBJECT-TYPE
+        SYNTAX      BITS {
+            gsm(1), 
+            umts(2),
+            lte(3)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The AcT defines the Access technologies
+             gsm    - G2 connectivity 
+             umts   - G3 connectivity
+             lte    - G4 connectivity
+            "
+    ::= { mobileAdmOperatorEntry 4 }
+
+    mobileAdmOperatorPriority OBJECT-TYPE
+        SYNTAX      INTEGER  
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This value represents the relative priority of this entry.
+             it is added to the admistrative base priority (see
+             'mobileOperatorPriority') to be used afterwards for the operator
+             selection procedure. Under normal circumstances it's intended
+             that this resulting priority is higher than the priority values
+             associated with the priviledged and preferred operators read 
+             from SIM card.
+            "
+        DEFVAL { 0 }
+    ::= { mobileAdmOperatorEntry 5 }
+
+    mobileAdmOperatorStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            permit(1),  -- PLMN is preferred used for roaming
+            deny(2),    -- PLMN is not allowed for usage
+            delete(8)       
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The operator's status.
+            permit      - the operator is allowed for roaming.
+            deny        - the operator is forbidden to use.
+            delete      - delete this entry
+            "
+        DEFVAL { permit }
+    ::= { mobileAdmOperatorEntry 6 }
+
+END

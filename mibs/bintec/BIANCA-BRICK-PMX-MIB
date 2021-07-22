@@ -1,0 +1,448 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mibpmx,v $ 
+-- $Revision: 1.12 $ 
+
+BIANCA-BRICK-PMX-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+            Counter, enterprises
+                FROM RFC1155-SMI
+
+            Date, HexValue
+                FROM BINTEC-MIB
+ 
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    pmx		OBJECT IDENTIFIER 
+	::= { bibo 12 }
+
+    -- Interfaces Group
+
+    -- Management Information for the PMX Subsystem of the BIANCA/BRICK
+
+        pmxIfTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF PMXIfEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		"The pmxIfTable contains information relating to the 
+                interfaces found on the system. Each entry corresponds to
+                a connected primary rate interface. Entries can only be 
+		added or deleted by the system. 
+
+                Creating entries: Entries are created by the system
+                only when a new PMX module is installed.
+
+                Deleting entries: Entries are removed by the system
+                after the appropriate PMX module is removed."
+	::= { pmx 1 }
+
+	pmxIfEntry OBJECT-TYPE
+            SYNTAX  PMXIfEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+		""
+	    INDEX   { pmxIfIndex }
+              ::= { pmxIfTable 1 }
+
+	PMXIfEntry ::=
+            SEQUENCE {
+                pmxIfIndex 			INTEGER,
+		pmxIfSelftest			INTEGER,
+
+		-- Status and operation control
+		pmxIfLayer1State		INTEGER,
+		pmxIfLayer1Mode			INTEGER,
+		pmxIfLayer1Framing		INTEGER,
+		pmxIfLayer1LineCode		INTEGER,
+		pmxIfChannelMode		INTEGER,
+		pmxIfLoopbackMode   		INTEGER,
+
+		-- Statistics
+		pmxIfErrors			Counter,
+		pmxIfPortMode   		INTEGER,
+		-- Statistics
+		pmxIfLOS        	    	Counter, 
+		pmxIfNoFAS			Counter,
+		pmxIfRemoteAlarms		Counter,
+		pmxIfAlarmInds			Counter,
+		pmxIfCRC4Errors			Counter,
+		pmxIfSlipPositive		Counter,
+		pmxIfSlipNegative		Counter
+
+            }
+
+	pmxIfIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Unique Index of the primary rate interface. The index
+		 is similar to slotnumber * 1000 and is also refenced in 
+		 the ifTable, the isdnIfTable and in the isdnStkTable
+		"
+	::= { pmxIfEntry 1 }
+
+
+	pmxIfSelftest OBJECT-TYPE
+            SYNTAX  INTEGER {
+	          successful(1), 	-- operative
+                  acfa-failure(2), 	-- not operative
+                  m32-failure(3), 	-- not operative
+                  mem-failure(4) 	-- not operative
+        	}
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The result of the initial selftest of the PMX module
+		 If the result is not succesful, the module is disabled
+
+ 		  successful(1)		All selftests succeeded;
+                  acfa-failure(2)	failure with the module ACFA Chip
+                  m32-failure(3)	failure with the module M32 Chip
+                  mem-failure(4)	failure with the module memory"
+	    DEFVAL { successful }
+	::= { pmxIfEntry 2 }
+
+
+	pmxIfLayer1State OBJECT-TYPE
+            SYNTAX  INTEGER {
+	          active(1), 		-- active, everything is o.k.
+                  remote-alarm(2), 	-- receipt of a remote alarm indication
+                  no-signal(3),		-- no signal is received  
+		  no-sync(4),		-- signal received but no sync
+		  crc-error(5),		-- signal and sync but heavy crc errors
+		  power-on(6),		-- initial state after power on    
+		  resync(7)  		-- initial state after power on    
+        	}
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "The layer 1 state of the primary rate interface
+
+ 		  active(F1)		active, framing and synchronisation
+					is o.k. This is the only state where
+					data-transmission is possible
+                  remote-alarm(F2)	receipt of an RAI, remote alarm 
+					indication, from the remote side;
+					The remote-alarm is also known as
+					yellow alarm or distant alarm
+                  no-signal(F3)		no signal is received, RAI will
+					be transmitted. NOS is also known
+					as red alarm .  
+		  no-sync(F4)		signal is received but synchronistation
+					is not possible, RAI will be transmitted
+					The received signal may also consist
+					of contingous Ones
+		  crc-error(F5)		signal and synchronisation are o.k. but
+					signal has heavy crc errors, RAI will 
+					be transmitted
+		  power-on(F6)		initial state after power was   
+					switched on (transient)
+		  resync(7)  		Setting Layer 1 State to resync can
+					be used to force resynchronisation
+
+		  The Layer1states are also visible in the isdnIfTable, but
+		  the state numbers are mapped to those of an BRI-Interface "
+	    DEFVAL { power-on }
+	::= { pmxIfEntry 3 }
+
+	pmxIfLayer1Mode OBJECT-TYPE
+            SYNTAX  INTEGER {
+		e1(1),		-- PCM30 , european mode 
+		t1(2)		-- PCM24 , US mode
+	    }
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                "In T1 and E1 mode the primary rate interface is working
+		 with totaly different clock frequencies, framing and 
+		 impedance. This depends on one of the jumpers on the 
+		 PMX module. For correct operation all 5 jumpers must be 
+		 in correct position. 
+
+		 E1 is normaly used in Europe and is similar to 
+		    PCM30, 30 channels, 2 Mbit/sec, Impedance 120 Ohm 
+
+		 T1 is normaly used in USA and is similar to 
+		    PCM24, 24 channels, 1.5 Mbit/sec, Impedance 100 Ohm
+		"
+	    DEFVAL { e1 }
+	::= { pmxIfEntry 4 }
+
+        pmxIfLayer1Framing OBJECT-TYPE
+            SYNTAX  INTEGER {
+		e1(1),		-- E1 , standard mode  
+		e1-mf(2),	-- E1 , crc mode  
+		e1-crc(3),	-- E1 , multiframe and crc 
+		e1-mf-crc(4),	-- E1 , multiframe and crc 
+		t1-esf(5),	-- T1 , extended superframe mode
+		t1-d4(6)	-- T1 , D4 mode
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "In T1 and E1 mode the primary rate interface can work  
+                 with totaly different framing types on layer 1. The 
+                 framing type must match the configuration of the 
+		 first connected point e.g. the exchange or the NT 
+ 
+		 e1(1)		E1 - minimum mode, CCITT Recommendation G.704
+                                (Table 4a)  
+		 e1-crc(2)	E1 , crc mode, CCITT Recommendation G.704
+                                (Table 4b)  
+		 e1-mf(3)	E1 , CCITT Recommendation G.704 (Table 4a) 
+				with Timeslot 16 multiframing enabled
+		 e1-mf-crc(4)	E1 , CCITT Recommendation G.704 (Table 4b) 
+				with Timeslot 16 multiframing enabled
+		 t1-esf(5)	T1 , Extended SuperFrame mode DS1
+		 t1-d4(6)	T1 , AT&T D4 format DS1
+
+		 t1-framings can only be set when pmxIfLayer1Mode is t1
+		 e1-framings can only be set when pmxIfLayer1Mode is e1
+		 The default framing for t1 is t1-esf, the default framing 
+		 for e1 is e1-crc
+
+		 Modifications of the default values are usualy not required.
+		 Exceptions are only known for sweden and france (use e1)
+ 		"
+            DEFVAL { e1-crc }
+        ::= { pmxIfEntry 5 }
+
+        pmxIfLayer1LineCode OBJECT-TYPE
+            SYNTAX  INTEGER {
+                e1-hdb3(1),     -- High Density Bipolar 3 Level
+                t1-b8zs(2),     -- Bipolar 8 Zero Substitution
+                t1-ami(3)       -- Alternating Mark Inversion
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "In T1 mode the primary rate interface is able
+                 to work with different line codes. 
+
+                 e1-hdb3(1)      High Density Bipolar 3 Level Coding
+				 This is the only valid linecoding for E1
+                 t1-b8zs(2)      Bipolar 8 Zero Substitution
+				 B8ZS refers to the use of a specified  
+				 pattern  of  normal  bits  and  bipolar 
+				 violations which are used to replace a
+				 sequence of eight zero bits
+                 t1-ami(3)       Alternating Mark Inversion. 
+				 AMI refers to a mode wherein no  zero  code
+		                 suppression  is  present  and the line encoding
+		                 does not solve the problem directly.   In  this
+               			 application, the higher layer must provide data
+		                 which meets or exceeds the  pulse  density  
+       			         requirements, such as inverting HDLC data.
+
+
+		 t1-linecodes can only be set when pmxIfLayer1Mode is t1
+		 e1-linecodes can only be set when pmxIfLayer1Mode is e1
+
+		 The default linecode for t1 is t1-b8zs
+                "
+            DEFVAL { e1-hdb3 }
+        ::= { pmxIfEntry 6 }
+
+        pmxIfChannelMode OBJECT-TYPE
+            SYNTAX  INTEGER {
+		e1-standard(1),	-- 1 D-channel 64 kbit, 30 B-channels 64kbit
+		e1-1tr6(2),	-- 1 D-channel 64 kbit, 30 B-channels 64kbit
+		e1-H0(3),	-- 1 D-channel 64 kbit, 5 B-channels 384kbit
+		e1-H12(4),	-- 1 D-channel 64 kbit, 1 B-channel 1920kbit
+		e1-burst(5),	-- 1 channel 1984kbit
+		e1-raw(6),	-- 1 channel 2048kbit
+		e1-leased(7),	-- 31 B-channels 64 kbit 
+
+		t1-standard(10),-- 1 D-channel 64 kbit, 23 B-channels 64kbit
+		t1-H0(11),	-- 1 D-channel 64 kbit, 4 B-channels 384kbit
+		t1-H11(12),	-- 1 D-channel 64 kbit, 1 B-channel 1472kbit
+		t1-burst(13),	-- 1 channel 1536kbit
+		t1-raw(14),	-- 1 channel 1536kbit
+		t1-leased(15)	-- 24 B-channels 64 kbit
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "In T1 and E1 mode the primary rate interface may work  
+                 with different channel types. Usually every timeslot
+                 is similar to one channel but it is also possible to 
+                 bundle multiple timeslots to one channel with a higher 
+                 bandwith. This channel bundeling is currently not 
+		 supported by the switching equipment for dialup 
+		 connections of any network-provider. But usage is 
+		 possible with leased lines.
+		
+		 e1-standard(1)	1 D-channel 64 kbit, 30 B-channels 64kbit
+				bchannels are numbered from 1 to 15 and
+				from 16 to 31
+		 e1-1tr6(2)	1 D-channel 64 kbit, 30 B-channels 64kbit
+				identical timeslotassignment as e1-standard
+				but bchannels are numbered from 1 to 30
+		 e1-H0(3)	1 D-channel 64 kbit, 5 B-channels 384kbit
+				bchannels are numbered from 1 to 5 
+		 e1-H12(4)	1 D-channel 64 kbit, 1 B-channel 1920kbit
+		 e1-burst(5)	1 channel 1984kbit, channel number is 0 
+		 e1-raw(6) 	1 channel 2048kbit, channel number is 0
+		 e1-leased(7) 	31 B-channels 64kbit, numbered from 1 to 31
+		 t1-standard(6) 1 D-channel 64 kbit, 23 B-channels 64kbit
+				bchannels are numbered from 1 to 23
+		 t1-H0(7)	1 D-channel 64 kbit, 4 B-channels 384kbit
+				bchannels are numbered from 1 to 4
+		 t1-H11(8)	1 D-channel 64 kbit, 1 B-channel 1472kbit
+		 t1-burst(9)	1 channel 1536kbit, channel number is 0
+ 
+		 t1-channelmodes can only be set when pmxIfLayer1Mode is t1
+		 e1-channelmodes can only be set when pmxIfLayer1Mode is e1
+                "
+            DEFVAL { e1-standard }
+        ::= { pmxIfEntry 7 }
+
+        pmxIfLoopbackMode OBJECT-TYPE
+            SYNTAX  INTEGER {
+                no-loop(1),		-- do not loop, normal operation
+                full-loop(2),		-- loopback everything incl. signaling
+                all-channels(3),	-- loopback all B and D-channels 
+                only-bchannels(4)	-- loopback only the B-channels 
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Loopback-Mode is only required for equipment test
+
+                 no-loop(1)		do not loopanything, this is the 
+					correct mode for normal operation
+                 full-loop(2)		loopback everything incl. the 
+					signaling channel
+                 all-channels(3)	loopback all B and D-channels 
+                 only-bchannels(4)	loopback only the B-channels 
+
+		 The loops are usualy not reversible. Reboot is required
+		 to regain normal operation mode.
+                "
+            DEFVAL { no-loop }
+        ::= { pmxIfEntry 8 }
+ 
+
+	pmxIfErrors OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"The measured PMX interface errors since startup" 
+
+	::= { pmxIfEntry 9 }
+
+        pmxIfPortMode OBJECT-TYPE
+            SYNTAX  INTEGER {
+                normal(1),		-- disable 'Out'-port
+                go-thru(2),	        -- enable 'Out'-port
+                go-thru-tst(3)		-- enable 'Out'-port, IPAT loop
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+		"PortMode switches the CM-PRI's 'Out'-port
+
+		 normal(1)		'Out'-port is disabled, this
+					CM-PRI is connected to 'In'
+		 go-thru(2)		'Out'-port is enabled, this
+					CM-PRI is disconnected.
+		 go-thru-tst(3)		same as 'go-thru' but an internal
+					test loop is activated
+		 "
+            DEFVAL { normal }
+        ::= { pmxIfEntry 10 }
+ 
+	pmxIfLOS OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Loss Of Signal conditions since startup" 
+
+	::= { pmxIfEntry 21 }
+
+	pmxIfNoFAS OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Loss Of Frame Alignment conditions since startup" 
+
+	::= { pmxIfEntry 22 }
+
+	pmxIfRemoteAlarms OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Remote Alarms received since startup" 
+
+	::= { pmxIfEntry 23 }
+
+	pmxIfAlarmInds OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Alarms received since startup" 
+
+	::= { pmxIfEntry 24 }
+
+	pmxIfCRC4Errors OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"CRC4 errors detected since startup" 
+
+	::= { pmxIfEntry 25 }
+
+	pmxIfSlipPositive OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Positive Slip conditions detected since startup;
+		 flags that the frequency of receive clock is less
+		 than frequency of internal system clock" 
+
+	::= { pmxIfEntry 26 }
+
+	pmxIfSlipNegative OBJECT-TYPE
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+		"Negative Slip conditions detected since startup;
+		 flags that the frequency of receive clock is greater
+		 than frequency of internal system clock" 
+
+	::= { pmxIfEntry 27 }
+
+END

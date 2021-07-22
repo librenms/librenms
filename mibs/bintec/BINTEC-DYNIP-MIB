@@ -1,0 +1,2258 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2006-2016 bintec elmeg GmbH
+-- $RCSfile: mib-dynip,v $
+-- $Revision: 1.35 $
+-- $Date: 2016-09-15 14:25:51 $
+---------------------------------------------------------------------------
+
+BINTEC-DYNIP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64, IpAddress, TimeTicks,
+    mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString, TimeStamp, PhysAddress
+        FROM SNMPv2-TC
+
+    biboip, Date, BitValue, HexValue
+	FROM BINTEC-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+---------------------------------------------------------------------------
+
+dynipMIB MODULE-IDENTITY
+    LAST-UPDATED "201609140000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+	     Web:     www.bintec-elmeg.com
+	    "
+    DESCRIPTION
+            "The MIB module for dynamic IP administration entities.
+            "
+    REVISION      "200606210000Z"
+    DESCRIPTION
+            "Dynamic IP administration used for: 
+	        - DHCP IP address assignment
+		- PPP  IP address assignment" 
+
+    ::= { biboip 52 }
+
+---------------------------------------------------------------------------
+-- OID groups & all tables 
+---------------------------------------------------------------------------
+	-- ipDhcp (deleted)				dynipMIB 1
+	-- ipDhcpTable                                  biboip 8
+	-- ipDhcpInUseTable (deleted in mibdhcp)	biboip 9
+	-- ipDhcpClientTable				dynipMIB 2
+	-- ipDhcpPoolTable 				dynipMIB 3 
+	-- ipDynAddrPoolTable				dynipMIB 4
+	-- ipDynAddrTable				dynipMIB 5
+	-- ipDhcpOptionTable				dynipMIB 6
+	-- ipStatAddrTable				dynipMIB 7
+	-- ipDynaAddrTable				dynipMIB 8
+	-- ipDhcpClientRtTemplTable			dynipMIB 9
+
+---------------------------------------------------------------------------
+-- types
+---------------------------------------------------------------------------
+DynIpPoolId			::= INTEGER (0..65535)
+
+---------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------
+-- ipDhcpTable
+---------------------------------------------------------------------------
+
+ipDhcpTable OBJECT-TYPE
+    SYNTAX 	SEQUENCE OF IpDhcpEntry
+    MAX-ACCESS 	not-accessible
+    STATUS 	current	
+    DESCRIPTION
+        ""
+    ::= { biboip 8 }
+
+    ipDhcpEntry OBJECT-TYPE
+    	SYNTAX 		IpDhcpEntry
+    	MAX-ACCESS 	not-accessible
+    	STATUS 		current
+    	DESCRIPTION
+	    ""
+    	INDEX { ipDhcpIfIndex }
+	::= { ipDhcpTable 1 }
+
+    IpDhcpEntry ::=
+	SEQUENCE {
+	    ipDhcpIfIndex	    	INTEGER,
+	    ipDhcpState		    	INTEGER,
+	    ipDhcpFirst		    	IpAddress,
+	    ipDhcpRange		    	INTEGER,
+	    ipDhcpLease		    	INTEGER,
+	    ipDhcpPhys		    	PhysAddress,
+	    ipDhcpNodeType	    	INTEGER,
+	    ipDhcpGateway	    	IpAddress,
+	    ipDhcpHwType	    	INTEGER,
+	    ipDhcpId			DisplayString,
+	    ipDhcpUseDefaultHostname    INTEGER,
+	    ipDhcpRadiusAcct	    	INTEGER,
+	    ipDhcpRadiusGroupId	    	INTEGER,
+	    ipDhcpAliveInterval	    	INTEGER
+	}
+
+    ipDhcpIfIndex OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "Index of interface where this range of IP addresses
+	     will be assigned to DHCP clients"
+	::= { ipDhcpEntry 1 }
+
+    ipDhcpState OBJECT-TYPE
+	SYNTAX 		INTEGER { on(1), delete(2) }
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    ""
+	DEFVAL { on }
+	::= { ipDhcpEntry 2 }
+
+    ipDhcpFirst OBJECT-TYPE
+	SYNTAX 		IpAddress
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "First address of this range. There must exist a route
+	    to this address via this interface"
+	::= { ipDhcpEntry 3 }
+
+    ipDhcpRange OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "Number of IP addresses that will be assigned starting
+	     from DhcpFirst. A range of 0 will disable this entry"
+	::= { ipDhcpEntry 4 }
+
+    ipDhcpLease OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "amount of time (in minutes) a DHCP client can use an
+	     IP address assigned from this address range"
+	DEFVAL { 120 }
+	::= { ipDhcpEntry 5 }
+
+    ipDhcpPhys OBJECT-TYPE
+	SYNTAX 		PhysAddress
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "MAC address of host this single address should be assigned
+	     to. If ipDhcpPhys is not empty or different from 0:0:0:0:0:0,
+	     ipDhcpRange must be 1"
+	::= { ipDhcpEntry 6 }
+
+    ipDhcpNodeType OBJECT-TYPE
+	SYNTAX  	INTEGER { none(1), bnode(2), pnode(3), mnode(4),
+				  hnode(5) }
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "The NetBIOS end-node type according RFC 1001
+	     - none(1)	: don't include in DHCP response
+	     - bnode(2) : Broadcast node
+	     - pnode(3) : Point-to-Point node
+	     - mnode(4) : Mixed node
+	     - hnode(5)	: Hybrid node, not in RFC 1001"
+	DEFVAL { none }
+	::= { ipDhcpEntry 7 }
+
+    ipDhcpGateway OBJECT-TYPE
+	SYNTAX 		IpAddress	
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "The Gateway which is told the clients upon requests. 
+	     If this object equals 0.0.0.0 and DHCP client and
+	     server share the same network, the DHCP server's own
+	     address is returned upon request. If DHCP client and
+	     server do not share the same network, the address of
+	     the dhcp relay agent forwarding the request is returned."
+	::= { ipDhcpEntry 8 }
+
+    ipDhcpHwType OBJECT-TYPE
+	SYNTAX 		INTEGER { sec(253), non-ipsec(254), any(255) }
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "Restricts the hardware type of the client.
+	     - sec(253)		: matches ipsec and tbd only
+	     - non-ipsec(254)	: matches all but ipsec and tbd
+	     - any(255)		: no hardware type restriction"
+	DEFVAL { any }
+	::= { ipDhcpEntry 9 }
+
+    ipDhcpId OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS 	read-only
+	STATUS 	current
+	DESCRIPTION
+	    "The Client ID this pool is reserved for.
+ 	     If ipDhcpClientId is not empty ipDhcpRange must be 1"
+	::= { ipDhcpEntry 10 }
+
+    ipDhcpUseDefaultHostname OBJECT-TYPE
+	SYNTAX 	INTEGER { disabled(1), enabled(2)	}
+        MAX-ACCESS 	read-only
+        STATUS  	current
+        DESCRIPTION
+	    "This object enables/disables the use of the DHCP client 
+	     IP address in the hostname field of the reply. If enabled, 
+	     when a hostname is required by the client, the router 
+	     builds a hostname equal to the string representation of 
+	     the IP address of the client. If disabled, the router 
+	     does not include any hostname information in the DHCP 
+	     reply."
+        DEFVAL { enabled }
+	::= { ipDhcpEntry 11 }
+
+    ipDhcpRadiusAcct OBJECT-TYPE
+	SYNTAX 	INTEGER { disabled(1), enabled(2)	}
+        MAX-ACCESS  	read-only
+        STATUS  	current
+        DESCRIPTION
+	    "This object enables/disables the use of Radius accounting
+	     for this DHCP pool."
+        DEFVAL { disabled }
+	::= { ipDhcpEntry 13 }
+
+    ipDhcpRadiusGroupId OBJECT-TYPE
+        SYNTAX  	INTEGER (0..9)
+        MAX-ACCESS  	read-only
+        STATUS  	current
+        DESCRIPTION
+	    "This object specifies the group ID which is used by the 
+	     Radius daemon to find the associated server entry in
+	     radiusSrvTable for DHCP accounting purposes. See
+	     description of radiusSrvGroupId for details."
+        DEFVAL { 0 }
+	::= { ipDhcpEntry 14 }
+
+    ipDhcpAliveInterval OBJECT-TYPE
+	SYNTAX 		INTEGER (0..65535)
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+	    "This object specifies a period (in seconds) for checking
+	     that the client is still alive. If this object is set to
+	     0, no alive check is performed."
+	DEFVAL { 0 }
+	::= { ipDhcpEntry 15 }
+
+---------------------------------------------------------------------------
+-- ipDhcpClientTable
+---------------------------------------------------------------------------
+
+ipDhcpClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDhcpClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Interfaces that are enabled for DHCP client mode."
+    ::= { dynipMIB 2 }
+
+    ipDhcpClientEntry OBJECT-TYPE
+	SYNTAX      IpDhcpClientEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    ""
+	INDEX { ipDhcpClientIfIndex }
+	::= { ipDhcpClientTable 1 }
+
+    IpDhcpClientEntry ::= 
+	SEQUENCE {
+	    ipDhcpClientIfIndex       INTEGER,
+	    ipDhcpClientPhysAddress   PhysAddress,
+	    ipDhcpClientState         INTEGER,
+	    ipDhcpClientGatewayMetric INTEGER,
+	    ipDhcpClientHostname      DisplayString,
+	    ipDhcpClientVendorClassId DisplayString,
+	    ipDhcpClientBroadcastBit  INTEGER,
+	    ipDhcpClientMakeDefRoute  INTEGER,
+	    ipDhcpClientAddress       IpAddress,
+	    ipDhcpClientExpires       Date,
+	    ipDhcpClientSubnet	      IpAddress,
+	    ipDhcpClientMaxRetries    INTEGER,
+	    ipDhcpClientCurrRetries   Counter32
+	}
+	
+    ipDhcpClientIfIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Index of interface which will get IP address with DHCP."
+	::= { ipDhcpClientEntry 1 }
+	
+    ipDhcpClientPhysAddress OBJECT-TYPE
+	SYNTAX      PhysAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "MAC address for DHCP request"
+	::= { ipDhcpClientEntry 2 }
+
+    ipDhcpClientState OBJECT-TYPE
+	SYNTAX      INTEGER  { 
+			delete(1), renew(2), rebooting(3), init(4),selecting(5),
+			requesting(6), bound(7), renewing(8), rebinding(9)
+		    }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "States according to RFC 2131 Figure 5. By setting state
+	     to renew, the client will renew it's ip address, state
+	     delete will terminate the DHCP procedure on the interface.
+	     delete   : delete client entry
+	     renew    : request IP address renewal
+	    "
+	DEFVAL { init }
+	::= { ipDhcpClientEntry 3 }
+
+    ipDhcpClientGatewayMetric OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Metric for gateway route, if a route is provided by the DHCP server."
+	DEFVAL { 1 }		
+	::= { ipDhcpClientEntry 4 }
+
+    ipDhcpClientHostname OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..45))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The hostname to be sent in the DHCP discover and requests to the 
+	    DHCP server. Some ISPs identify their customers via the hostname 
+	    (DHCP Option 12) from the DHCP discover and requests. In this case 
+	    setting the hostname enables the router (acting as a DHCP client) 
+	    to get its network configuration."
+	::= { ipDhcpClientEntry 5 }
+
+    ipDhcpClientVendorClassId OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The vendor class id to be sent to the DHCP server in discover and 
+	    request DHCP messages."
+	::= { ipDhcpClientEntry 6 }
+
+    ipDhcpClientBroadcastBit OBJECT-TYPE
+	SYNTAX      INTEGER { off(1), on(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Toggles BROADCAST bit. See section 4.1 of RFC-2131.
+	     For avoiding broadcasts, this value should be set to off.
+	     However, for making sure that old configurations still work, this
+	     value should be set to on.
+	     Default value is specified according to the standard behavior
+	     prior to variable introduction (on)."
+	DEFVAL { on }
+	::= { ipDhcpClientEntry 7 }
+
+    ipDhcpClientMakeDefRoute OBJECT-TYPE
+	SYNTAX      INTEGER { false(1), true(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Toggles if default-route is built for a received Router Option.
+             (see section 3.5 of RFC-2132). Table <ipDhcpClientRtTempl> allows
+             some further settings related to this DHCP-Option."
+	DEFVAL { true }
+	::= { ipDhcpClientEntry 8 }
+
+    ipDhcpClientAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "assigned IP address"
+	::= { ipDhcpClientEntry 31 }
+
+    ipDhcpClientExpires OBJECT-TYPE
+	SYNTAX      Date
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "End of Lease time. From then on, the brick is not
+	     allowed to use this IP address any longer"
+	::= { ipDhcpClientEntry 32 }
+
+    ipDhcpClientSubnet OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "assigned IP subnet"
+	::= { ipDhcpClientEntry 30 }
+
+    ipDhcpClientMaxRetries OBJECT-TYPE
+	SYNTAX      INTEGER (0..1000)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Maximum number of retries in case of timeout events, if set
+	     to zero this limitaition is deactivated."
+	DEFVAL { 0 }
+	::= { ipDhcpClientEntry 33 }
+
+    ipDhcpClientCurrRetries OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Current number of retries triggered via timeout events."
+	::= { ipDhcpClientEntry 34 }
+
+---------------------------------------------------------------------------
+-- ipDhcpPoolTable
+---------------------------------------------------------------------------
+
+ipDhcpPoolTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IpDhcpPoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+	"This table defines for DHCP which dynamic IP address pool,
+	 represented by an entry in ipDynAddrPoolTable, is to be
+	 used on which interface and (optionaL) for which (vendor-specific)
+	 types of DHCP clients."
+    ::= { dynipMIB 3 }
+
+    ipDhcpPoolEntry OBJECT-TYPE
+	SYNTAX      IpDhcpPoolEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    ""
+	INDEX { ipDhcpPoolIfIndex, ipDhcpPoolDynAddrPoolId }
+	::= { ipDhcpPoolTable 1 }
+
+    IpDhcpPoolEntry ::=
+	SEQUENCE {
+	    ipDhcpPoolIfIndex	    	    INTEGER,
+	    ipDhcpPoolDynAddrPoolId	    DynIpPoolId,
+	    ipDhcpPoolAssignmentMode	    BITS,
+	    ipDhcpPoolEnabled		    INTEGER,
+	    ipDhcpPoolLeaseTime		    INTEGER,
+	    ipDhcpPoolGateway		    IpAddress,
+	    ipDhcpPoolRadiusAcct	    INTEGER,
+	    ipDhcpPoolRadiusGroupId	    INTEGER,
+	    ipDhcpPoolAliveCheck	    INTEGER,
+	    ipDhcpPoolAliveInterval	    INTEGER,
+	    ipDhcpPoolTftpServer1	    IpAddress,
+	    ipDhcpPoolTftpServer2	    IpAddress,
+	    ipDhcpPoolOfferOptionsGroupID   INTEGER,
+	    ipDhcpPoolAckOptionsGroupID	    INTEGER,
+	    ipDhcpPoolGatewayEnabled	    INTEGER,
+	    ipDhcpPoolSendRepliesToRelay    INTEGER,
+	    ipDhcpPoolDescription   	    DisplayString,
+	    ipDhcpPoolVendorClassId 	    DisplayString,
+	    ipDhcpPoolOfferVSOptionsGroupID INTEGER,
+	    ipDhcpPoolAckVSOptionsGroupID   INTEGER
+	}
+
+    ipDhcpPoolIfIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The index for the interface for which the DHCP subsystem
+	     is answering DHCP requests using the associated dynamic 
+	     address pool."
+	::= { ipDhcpPoolEntry 1 }
+
+    ipDhcpPoolDynAddrPoolId OBJECT-TYPE
+	SYNTAX      DynIpPoolId
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Uniquely identifies associated dynamic address pool from 
+	     which the DHCP requests are served from."
+	::= { ipDhcpPoolEntry 2 }
+
+    ipDhcpPoolAssignmentMode OBJECT-TYPE
+	SYNTAX      BITS { local(0), relay(1) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Indicates, to which DHCP clients addresses from the 
+	     associated dynamic address pool will be assigned:
+	     to clients in local network (local) or/and to clients
+	     that ask for ip address via a BOOTP relay agent (relay)."
+	DEFVAL { { local } }
+	::= { ipDhcpPoolEntry 3 }
+
+    ipDhcpPoolEnabled OBJECT-TYPE
+  	SYNTAX      INTEGER { false(1), true(2), delete(3) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Enable, disable or delete the table entry."
+	DEFVAL { true }
+	::= { ipDhcpPoolEntry 4 }
+
+    ipDhcpPoolLeaseTime OBJECT-TYPE
+	SYNTAX      INTEGER (1..300)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Specifies the amount of time (in minutes) IP addresses of
+	     the associated pool are leased to clients.
+             If in case of manual assigned IP address ipStatAddrLeaseTime 
+             value is specified (i.e. is not -1), ipDhcpPoolLeaseTime is 
+             ignored in favor of this parameter."
+	DEFVAL { 120 }
+	::= { ipDhcpPoolEntry 5 }
+
+    ipDhcpPoolGateway OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The default gateway given to the client via 'router option'.
+	     An IP address of 0.0.0.0 uses the local IP address of the 
+	     interface where the request came in if the server and client 
+	     are located in the same network. If the server and the client
+	     not located in the same network, the address of the BOOTP 
+	     relay agent forwarding the request is used.
+             If in case of manual assigned IP address ipStatAddrGateway 
+             value is specified (i.e. is not 255.255.255.255), 
+             ipDhcpPoolGateway is ignored in favor of this parameter."
+	DEFVAL { '00000000'H }
+	::= { ipDhcpPoolEntry 6 }
+
+    ipDhcpPoolRadiusAcct OBJECT-TYPE
+	SYNTAX      INTEGER { disabled(2), enabled(3) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Enables or disables the radius accounting for IP addresses
+	     of the associated pool:
+	     - disabled    : disables radius accounting
+	     - enabled     : enables radius accounting 
+	    If in case of manual assigned IP address ipStatAddrRadiusAcct
+	    value is specified (i.e. is not default), ipDhcpPoolRadiusAcct
+	    is ignored in favor of this parameter."
+	DEFVAL { disabled }
+	::= { ipDhcpPoolEntry 7 }
+
+    ipDhcpPoolRadiusGroupId OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the radius group Id which is used by the
+	     radius daemon to find the associated server entry in 
+	     radiusSrvTable for accounting purposes. See description of
+	     radiusSrvGroupId for details.
+	     If in case of manual assigned IP address ipStatAddrRadiusGroupId
+	     value is specified (i.e. is not -1), ipDhcpPoolRadiusGroupId 
+             is ignored in favor of this parameter."
+	DEFVAL { 0 }
+	::= { ipDhcpPoolEntry 8 }
+
+    ipDhcpPoolAliveCheck OBJECT-TYPE
+	SYNTAX      INTEGER { disabled(1), enabled(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Enables or disables the alive checking for the associated pool. 
+             The alive check allows the system to purge dynamic entries 
+             whose lease is still valid but the client no longer exists.
+	     - disabled     : disables alive check for pool users
+	     - enabled      : enables alive check for pool users"
+	DEFVAL { disabled }
+	::= { ipDhcpPoolEntry 9 }
+
+    ipDhcpPoolAliveInterval OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies a time period in seconds for checking 
+	     whether the client is still alive. If this object is set to 0, 
+	     no alive check is performed.
+	     If in case of manual assigned IP address ipStatAddrAliveInterval
+	     value is specified (i.e. is not -1), ipDhcpPoolAliveInterval
+	     is ignored in favor of this parameter."
+	DEFVAL { 0 }
+	::= { ipDhcpPoolEntry 10 }
+
+    ipDhcpPoolTftpServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The IP address of the first TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     If in case of manual assigned IP address either 
+	     ipStatAddrTftpServer1 or ipStatAddrTftpServer2 value
+	     is assigned (i.e. is not 255.255.255.255), 
+             ipDhcpPoolTftpServer1 and ipDhcpPoolTftpServer2 are ignored 
+             in favor of these parameters.
+	     If ipDhcpPoolTftpServer1 is 0.0.0.0, then only the IP address 
+	     specified in ipDhcpPoolTftpServer2 will be considered. If both 
+	     addresses are 0.0.0.0, no DHCP option 150 will be returned to 
+	     the client."
+	DEFVAL { '00000000'H }
+	::= { ipDhcpPoolEntry 11 }
+
+    ipDhcpPoolTftpServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The IP address of the second TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     If in case of manual assigned IP address either 
+	     ipStatAddrTftpServer1 or ipStatAddrTftpServer2 value
+	     is assigned (i.e. is not 255.255.255.255), 
+             ipDhcpPoolTftpServer1 and ipDhcpPoolTftpServer2 are ignored 
+             in favor of these parameters.
+	     If ipDhcpPoolTftpServer2 is 0.0.0.0, then only the IP address 
+	     specified in ipDhcpPoolTftpServer1 will be considered. If both 
+	     addresses are 0.0.0.0, no DHCP option 150 will be returned to 
+	     the client."
+	DEFVAL { '00000000'H }
+	::= { ipDhcpPoolEntry 12 }
+
+    ipDhcpPoolOfferOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the option or set of options which are added 
+	     to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. Selecting a
+	     null value result in no option being added.
+	     In case of manual assigned IP address 
+	     ipStatAddrOfferOptionsGroupId defines the used group id
+	     and ipDhcpPoolOfferOptionsGroupID is ignored."
+	::= { ipDhcpPoolEntry 13 }
+	
+    ipDhcpPoolAckOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the option or set of options which are added 
+	     to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. Selecting a
+	     null value result in no option being added.
+	     In case of manual assigned IP address
+	     ipStatAddrAckOptionsGroupId defines the used group id
+	     and ipDhcpPoolAckOptionsGroupID is ignored."
+	::= { ipDhcpPoolEntry 14 }
+	
+    ipDhcpPoolGatewayEnabled OBJECT-TYPE
+  	SYNTAX      INTEGER { yes(1), no(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Specifies if 'router option' is delivered within BOOTP
+	     REPLY message. If this object is set to 'yes' router option 
+	     is filled depending on ipDhcpPoolGateway. If this object is
+   	     set to 'no' router option is not delivered regardless of
+	     object ipDhcpPoolGateway.
+	     In case of manual assigned IP address 
+	     ipStatAddrGatewayEnabled defines wether 'router option' is
+	     delivered or not and ipDhcpPoolGatewayEnabled is ignored."
+	DEFVAL { yes }
+	::= { ipDhcpPoolEntry 15 }
+
+    ipDhcpPoolSendRepliesToRelay OBJECT-TYPE
+  	SYNTAX      INTEGER { yes(1), no(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "As soon as a DHCP request includes a client IP address 
+	     (ciaddr), RFC 1542 recommends that the server unicast the 
+	     relevant DHCP reply message to the client IP address. 
+	     Nevertheless, situations exist where it is desirable to send 
+	     the reply to a BOOTP relay IP address if one has been included 
+	     in the DHCP request. This object specifies how the DHCP server 
+	     must behave in this aspect:
+	     - If this object is set to 'no' (default) and a client IP 
+	     address was included in the DHCP request, DHCP replies are 
+	     sent to this client IP address, regardless of a BOOTP relay 
+	     address being included or not in the DHCP request.
+	     - If this object is set to 'yes' and a BOOTP relay IP address 
+	     was included in the DHCP request, DHCP replies are sent to 
+	     this BOOTP relay IP address, regardless of a client IP address 
+	     being included or not in the DHCP request."
+	DEFVAL { no }
+	::= { ipDhcpPoolEntry 16 }
+
+    ipDhcpPoolDescription OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..50))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The name of this entry, only used for descriptive purposes
+	     (max. 50 characters)."
+	::= { ipDhcpPoolEntry 17 }
+
+    ipDhcpPoolVendorClassId OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "If set this object defines the Vendor Class Identifier (Option 60)
+	     a DHCP client has to send as matching criteria."
+	::= { ipDhcpPoolEntry 18 }
+
+    ipDhcpPoolOfferVSOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the vendor-specific option or set of options which
+	     are added to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The options
+	     are defined in ipDhcpOptionTable. Selecting a null value
+	     result in no option being added."
+	::= { ipDhcpPoolEntry 19 }
+	
+    ipDhcpPoolAckVSOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the vendor-specific option or set of options which
+	     are added to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The options
+	     are defined in ipDhcpOptionTable. Selecting a null value
+	     result in no option being added."
+	::= { ipDhcpPoolEntry 20 }
+	
+---------------------------------------------------------------------------
+-- ipDynAddrPoolTable/
+---------------------------------------------------------------------------
+
+ipDynAddrPoolTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IpDynAddrPoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+	"This table defines all dynamic IP address pools of the 
+	 system. Pools don't have to overlap in their ip address
+	 range. Corrections therefor are made autonomous by the
+	 system. Pools can be shared amongst subsystems/ user types."
+    ::= { dynipMIB 4 }
+
+    ipDynAddrPoolEntry OBJECT-TYPE
+	SYNTAX      IpDynAddrPoolEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    ""
+	INDEX { ipDynAddrPoolIdentifier }
+	::= { ipDynAddrPoolTable 1 }
+
+    IpDynAddrPoolEntry ::=
+	SEQUENCE {
+	    ipDynAddrPoolIdentifier		DynIpPoolId,
+	    ipDynAddrPoolDescription		DisplayString,
+	    ipDynAddrPoolFirstAddr		IpAddress,
+	    ipDynAddrPoolRange			INTEGER,
+	    ipDynAddrPoolDnsServer1		IpAddress,
+	    ipDynAddrPoolDnsServer2		IpAddress,
+	    ipDynAddrPoolAdminStatus		INTEGER
+	}
+
+    ipDynAddrPoolIdentifier OBJECT-TYPE
+	SYNTAX      DynIpPoolId
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object uniquely identifies the dynamic IP address
+	     pool in the system."
+	::= { ipDynAddrPoolEntry 1 }
+
+    ipDynAddrPoolDescription OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..50))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The name of the pool, only used for descriptive purposes
+	     (max. 50 characters)."
+	::= { ipDynAddrPoolEntry 2 }
+
+    ipDynAddrPoolFirstAddr OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The first IP address of the pool. A value of 0.0.0.0 
+	     disables the pool."
+	::= { ipDynAddrPoolEntry 3 }
+
+    ipDynAddrPoolRange OBJECT-TYPE
+	SYNTAX      INTEGER (0..16777214)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The number of consequtive IP addresses available in this
+	     pool starting with (and including) ipDynAddrPoolFirstAddr.
+	     A value of 0 disables the pool.
+	     Note that when the range is truncated by setting a smaller 
+	     range or a 'higher' ipDynAddrPoolFirstAddr, the related 
+	     entries in the ipDynaAddrTable which are not covered any
+	     longer by this pool are autonomous removed by the system."
+	::= { ipDynAddrPoolEntry 4 }
+
+    ipDynAddrPoolDnsServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the Primary Domain Name Server to be 
+             given to the client via 'domain name server option'.
+	     If either ipStatAddrDnsServer1 or ipStatAddrDnsServer2 value
+	     is assigned (i.e. is not 255.255.255.255), 
+             ipDynAddrPoolDnsServer1 and ipDynAddrPoolDnsServer2 are 
+             ignored in favor of these parameters.
+             If both ipDynAddrPoolDnsServer1 and ipDynAddrPoolDnsServer2
+             are assigned 0.0.0.0 the Primary and Secondary DNS
+             IP addresses are chosen according to setting of variable
+             ipDnsDhcpAssign and optionally contents of ipDnsServerOper MIB table.
+             See description of these objects for details."
+	::= { ipDynAddrPoolEntry 5 }
+
+    ipDynAddrPoolDnsServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the Secondary Domain Name Server to be 
+             given to the client via 'domain name server option'.
+	     If either ipStatAddrDnsServer1 or ipStatAddrDnsServer2 value
+	     is assigned (i.e. is not 255.255.255.255), 
+             ipDynAddrPoolDnsServer1 and ipDynAddrPoolDnsServer2 are 
+             ignored in favor of these parameters.
+             If both ipDynAddrPoolDnsServer1 and ipDynAddrPoolDnsServer2
+             are assigned 0.0.0.0 the Primary and Secondary DNS
+             IP addresses are chosen according to setting of variable
+             ipDnsDhcpAssign and optionally contents of ipDnsServerOper MIB table.
+             See description of these objects for details."
+	::= { ipDynAddrPoolEntry 6 }
+
+    ipDynAddrPoolAdminStatus OBJECT-TYPE
+	SYNTAX      INTEGER { enable(1), delete(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "MIB entry deletion is performed by this object: 
+             - enable  : enables ipDynAddrPoolTable entry
+	     - delete  : deletes ipDynAddrPoolTable entry."
+	DEFVAL { enable }
+	::= { ipDynAddrPoolEntry 7 }
+
+---------------------------------------------------------------------------
+-- ipDynAddrTable
+---------------------------------------------------------------------------
+
+ipDynAddrTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IpDynAddrEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+	"This table has an entry for each assigned IP address from an 
+	 dynamic IP address pool. The assignment could be made manual
+	 by an operator. But usually the assignment is made by the
+	 system when assigning IP address to a client, when detecting 
+	 the use of a pool address by foreign device or when detecting 
+	 the use of a pool address by the router itself.
+	 Only manual entries are saved in the boot configuration."
+    ::= { dynipMIB 5 }
+
+    ipDynAddrEntry OBJECT-TYPE
+	SYNTAX      IpDynAddrEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    ""
+	INDEX { ipDynAddrAddress }
+	::= { ipDynAddrTable 1 }
+
+    IpDynAddrEntry ::=
+	SEQUENCE {
+	    ipDynAddrAddress		    IpAddress,
+	    ipDynAddrUserType		    INTEGER,
+	    ipDynAddrType		    INTEGER,
+	    ipDynAddrGateway		    IpAddress,
+	    ipDynAddrDnsServer1		    IpAddress,
+	    ipDynAddrDnsServer2		    IpAddress,
+	    ipDynAddrClientId		    OCTET STRING,
+	    ipDynAddrPhysAddress	    PhysAddress,
+	    ipDynAddrHostName		    DisplayString,
+	    ipDynAddrLeaseTime		    INTEGER,
+	    ipDynAddrAliveInterval	    INTEGER,
+	    ipDynAddrRadiusAcct		    INTEGER,
+	    ipDynAddrRadiusGroupId	    INTEGER,
+	    ipDynAddrTftpServer1	    IpAddress,
+	    ipDynAddrTftpServer2	    IpAddress,
+	    ipDynAddrOfferOptionsGroupID    INTEGER,
+	    ipDynAddrAckOptionsGroupID	    INTEGER
+	}
+
+    ipDynAddrAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "The IP address assigned to the client."
+	::= { ipDynAddrEntry 1 }
+
+    ipDynAddrUserType OBJECT-TYPE
+	SYNTAX      INTEGER { none(1), dhcp(2), ppp(3) }
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "For dynamic entries this object identifies the user (subsystem) 
+	     which has created the entry.
+	     For manual entries this object specifies the subsystem which is
+	     allowed to assign this entry (default dhcp).
+	     Entries could also have the UserType 'none'. This means that the 
+	     entry is not associated with any subsystem"
+	DEFVAL { dhcp }
+	::= { ipDynAddrEntry 2 }
+
+    ipDynAddrType OBJECT-TYPE
+	SYNTAX      INTEGER { dynamic(1), manual(2) }
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "The type of this entry.
+	     - dynamic : entry is not saved in boot configuration
+	     - manual  : entry is saved in boot configuration"
+	DEFVAL { manual }
+	::= { ipDynAddrEntry 3 }
+
+    ipDynAddrGateway OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "The default gateway given to the client via 'router option'.
+	     An IP address of 0.0.0.0 uses the local IP address of the 
+	     interface where the request came in if the server and client 
+	     are located in the same network. If the server and the client
+	     not located in the same network, the address of the BOOTP 
+	     relay agent forwarding forwarding the request is used.
+	     If no gateway is specified (value 255.255.255.255), the 
+	     value from the related entry in ipDhcpPoolTable determines
+	     the gateway IP address.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynAddrEntry 4 }
+
+    ipDynAddrDnsServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "This object specifies the Primary Domain Name Server to be 
+             given to the client via 'domain name server option'. 
+             If both ipDynAddrDnsServer1 and ipDynAddrDnsServer2 are not
+             specified (value 255.255.255.255), the 'domain name server
+             option' returned to the client will be configured according to 
+             the values specified in entries ipDynAddrPoolDnsServer1 and 
+             ipDynAddrPoolDnsServer2.
+             If both ipDynAddrDnsServer1 and ipDynAddrDnsServer2
+             are assigned with 0.0.0.0 the Primary and Secondary DNS
+             IP addresses are taken regarding values ipDnsDhcpAssign,  
+             biboAdmNameServer and biboAdmNameServ2. See description of 
+             these objects for details."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynAddrEntry 5 }
+
+    ipDynAddrDnsServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "This object specifies the Secondary Domain Name Server to be 
+             given to the client via 'domain name server option'. 
+             If both ipDynAddrDnsServer1 and ipDynAddrDnsServer2 are not
+             specified (value 255.255.255.255), the 'domain name server
+             option' returned to the client will be configured according to 
+             the values specified in entries ipDynAddrPoolDnsServer1 and 
+             ipDynAddrPoolDnsServer2.
+             If both ipDynAddrDnsServer1 and ipDynAddrDnsServer2
+             are assigned with 0.0.0.0 the Primary and Secondary DNS
+             IP addresses are taken regarding values ipDnsDhcpAssign,  
+             biboAdmNameServer and biboAdmNameServ2. See description of 
+             these objects for details."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynAddrEntry 6 }
+
+    ipDynAddrClientId OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "Specifies the client identifier of the DHCP client.
+	     For dynamic entries it comes with the request message.
+	     For manual entries it is the client identifier the DHCP 
+	     request must contain to match this entry. 
+	     Only applicable for DHCP."
+	::= { ipDynAddrEntry 7 }
+
+    ipDynAddrPhysAddress OBJECT-TYPE
+	SYNTAX      PhysAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "Specifies the hardware (MAC) address of the DHCP client.
+	     For dynamic entries it comes with the request message.
+	     For manual entries it is the hardware address the DHCP 
+	     request must contain to match this entry. 
+	     Only applicable for DHCP."
+	::= { ipDynAddrEntry 8 }
+
+    ipDynAddrHostName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "The hostname of this client.
+	     For dynamic entries it is the hostname as contained in the 
+	     request message.
+	     For manual entries it is the hostname to be used by the client
+	     and delivered via the reply. 
+	     Only applicable for DHCP."
+	::= { ipDynAddrEntry 9 }
+
+    ipDynAddrLeaseTime OBJECT-TYPE
+	SYNTAX      INTEGER (-1..65535)
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "Specifies the amount of time (in minutes) the IP address is
+	     leased to the client.
+	     If no lease time is specified (-1) the value from the related 
+	     entry in ipDhcpPoolTable determines the lease time.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { -1 }
+	::= { ipDynAddrEntry 10 }
+
+    ipDynAddrAliveInterval OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "This object specifies a time period in seconds for checking 
+	     whether the client is still alive. The alive check allows the 
+	     system to purge dynamic entries whose lease is still valid but 
+	     the client no longer exists.
+	     If this object is set to 0, no alive check is performed.
+	     If no alive interval is specified (-1) the value from the 
+	     related entry in ipDhcpPoolTable determines the alive
+	     interval.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { -1 }
+	::= { ipDynAddrEntry 11 }
+
+    ipDynAddrRadiusAcct OBJECT-TYPE
+	SYNTAX      INTEGER { default(1), disable(2), enable(3), delete(4) }
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "Enables or disables the radius accounting for this entry.
+	     - default : related entry in ipDhcpPoolTable determines 
+	                 the radius accounting
+	     - disable : disables radius accounting
+	     - enable  : enables radius accounting
+	     - delete  : delete ipDynAddrTable entry.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { default }
+	::= { ipDynAddrEntry 12 }
+
+    ipDynAddrRadiusGroupId OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "This object specifies the radius group Id which is used by the
+	     radius daemon to find the associated server entry in 
+	     radiusSrvTable for accounting purposes. See description of
+	     radiusSrvGroupId for details.
+	     If no value is specified (-1) the value from the 
+	     related entry in ipDhcpPoolTable determines the radius
+	     group Id.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { -1 }
+	::= { ipDynAddrEntry 13 }
+
+-- obsolete    ipDynAddrPoolId OBJECT-TYPE ::= { ipDynAddrEntry 14 }
+
+-- obsolete    ipDynAddrIfIndex OBJECT-TYPE ::= { ipDynAddrEntry 15 }
+
+-- obsolete    ipDynAddrExpires OBJECT-TYPE ::= { ipDynAddrEntry 16 }
+
+-- obsolete    ipDynAddrState OBJECT-TYPE ::= { ipDynAddrEntry 17 }
+
+    ipDynAddrTftpServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "The IP address of the first TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     If this address is 0.0.0.0, then only the IP address specified 
+             in ipDynAddrTftpServer2 will be considered. If both addresses 
+             are 0.0.0.0, no DHCP option 150 will be returned to 
+	     the client.
+             If both ipDynAddrTftpServer1 and ipDynAddrTftpServer2 are not
+             specified (value 255.255.255.255), the DHCP option 150 
+             returned to the client will be configured according to the 
+             values specified in entries ipDhcpPoolTftpServer1 and 
+             ipDhcpPoolTftpServer2."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynAddrEntry 18 }
+
+    ipDynAddrTftpServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "The IP address of the second TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     If this address is 0.0.0.0, then only the IP address specified 
+	     in ipDynAddrTftpServer1 will be considered. If both addresses 
+             are 0.0.0.0, no DHCP option 150 will be returned to 
+	     the client.
+             If both ipDynAddrTftpServer1 and ipDynAddrTftpServer2 are not
+             specified (value 255.255.255.255), the DHCP option 150 
+             returned to the client will be configured according to the 
+             values specified in entries ipDhcpPoolTftpServer1 and 
+             ipDhcpPoolTftpServer2."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynAddrEntry 19 }
+
+    ipDynAddrOfferOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "Identifies the option or set of options which are added 
+	     to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. Selecting a
+	     null value result in no option being added."
+	::= { ipDynAddrEntry 20 }
+	
+    ipDynAddrAckOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      obsolete
+	DESCRIPTION
+	    "Identifies the option or set of options which are added 
+	     to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. Selecting a
+	     null value result in no option being added."
+	::= { ipDynAddrEntry 21 }
+
+
+---------------------------------------------------------------------------
+-- ipDhcpOptionTable
+---------------------------------------------------------------------------
+
+ipDhcpOptionTable OBJECT-TYPE
+    SYNTAX	    SEQUENCE OF IpDhcpOptionEntry
+    MAX-ACCESS	    not-accessible
+    STATUS	    current
+    DESCRIPTION
+	"Arbitrary DHCP options used for DHCP server and BOOTP relay."
+    ::= { dynipMIB 6 }
+
+    ipDhcpOptionEntry OBJECT-TYPE
+	SYNTAX	    IpDhcpOptionEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+	    ""
+	INDEX { ipDhcpOptionIndex }
+	::= { ipDhcpOptionTable 1 }
+
+    IpDhcpOptionEntry ::=
+	SEQUENCE {
+	    ipDhcpOptionIndex		    INTEGER,
+	    ipDhcpOptionEnabled 	    INTEGER,
+	    ipDhcpOptionGroupID 	    INTEGER,
+	    ipDhcpOptionGroupDescr	    DisplayString,
+	    ipDhcpOptionCode		    INTEGER,
+	    ipDhcpOptionContentType	    INTEGER,
+	    ipDhcpOptionContentString	    DisplayString,
+	    ipDhcpOptionContentHex	    DisplayString,
+	    ipDhcpOptionContentGroupID	    INTEGER
+	}
+
+    ipDhcpOptionIndex OBJECT-TYPE
+	SYNTAX	    INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	    "Index of entry."
+	::= { ipDhcpOptionEntry 8 }
+
+    ipDhcpOptionEnabled OBJECT-TYPE
+	SYNTAX	    INTEGER { delete(1), true(2), false(3) }
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	    "Enable, disable or delete the table entry."
+	DEFVAL { true }
+	::= { ipDhcpOptionEntry 16 }
+
+    ipDhcpOptionGroupID OBJECT-TYPE
+	SYNTAX	    INTEGER (1..65535)
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	"This object specifies the ID for a group of DHCP options or 
+	 suboptions. When a DHCP operation refers to such an ID, all 
+	 options (or suboptions) sharing the same group ID will be added 
+	 consecutively."
+        DEFVAL { 1 }
+	::= { ipDhcpOptionEntry 24 }
+
+    ipDhcpOptionGroupDescr OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	    "A user-friendly name for the group of DHCP options this entry
+	     belongs to."
+	::= { ipDhcpOptionEntry 32 }
+
+    ipDhcpOptionCode OBJECT-TYPE
+	SYNTAX	    INTEGER (0..255)
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	    "DHCP option code."
+	::= { ipDhcpOptionEntry 40 }
+
+    ipDhcpOptionContentType OBJECT-TYPE
+	SYNTAX	    INTEGER { string(1), hex(2), group(3) }
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	    "Content type for this DHCP option.
+	     - if set to 'string', the variable part of the DHCP option is
+	       filled with the string specified in ipDhcpOptionContentString.
+	     - if set to 'hex', the variable part of the DHCP option is
+	       filled with the hex content specified in ipDhcpOptionContentHex.
+	     - if set to 'group', the variable part of the DHCP option is
+	       filled with the collection of DHCP suboptions which share
+	       the ipDhcpOptionGroupID value specified in
+	       ipDhcpOptionContentGroupID."
+	DEFVAL { string }
+	::= { ipDhcpOptionEntry 48 }
+
+    ipDhcpOptionContentString OBJECT-TYPE
+	SYNTAX	   DisplayString
+	MAX-ACCESS  read-write
+	STATUS	   current
+	DESCRIPTION
+	    "This object specifies the content of the string which is
+	     used to fill the variable part of the DHCP option when
+	     ipDhcpOptionContentType is set to 'string'."
+	::= { ipDhcpOptionEntry 56 }
+
+    ipDhcpOptionContentHex OBJECT-TYPE
+	SYNTAX	   OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS	   current
+	DESCRIPTION
+	    "This object specifies the content of the hex buffer which is
+	     used to fill the variable part of the DHCP option when
+	     ipDhcpOptionContentType is set to 'hex'."
+	::= { ipDhcpOptionEntry 64 }
+
+    ipDhcpOptionContentGroupID OBJECT-TYPE
+	SYNTAX	    INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+	"This object specifies the ipDhcpOptionGroupID of the group of
+	DHCP suboptions which is used to fill the variable part of the
+	DHCP option when ipDhcpOptionContentType is set to 'group'.
+        If the value is 0, this group has no subelements."
+        DEFVAL { 0 }
+	::= { ipDhcpOptionEntry 72 }
+
+
+---------------------------------------------------------------------------
+-- ipStatAddrTable
+---------------------------------------------------------------------------
+
+ipStatAddrTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IpStatAddrEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+	"This table has an entry for each static assigned IP address.
+	 The IP address has to be taken from the range of a dynamic IP
+	 address pool.
+	 Each entry in ipStatAddrTable leads to a dynamically created entry
+         in ipDynaAddrTable of Type 'manual'.
+	 Entries are made by administration and saved in boot configuration.
+	 Actual only DHCP subsystem uses static IP address assignment to 
+         reserve an IP address for a dedicated DHCP client"
+    ::= { dynipMIB 7 }
+
+    ipStatAddrEntry OBJECT-TYPE
+	SYNTAX      IpStatAddrEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    ""
+	INDEX { ipStatAddrAddress }
+	::= { ipStatAddrTable 1 }
+
+    IpStatAddrEntry ::=
+	SEQUENCE {
+	    ipStatAddrAddress		    IpAddress,
+	    ipStatAddrUserType		    INTEGER,
+	    ipStatAddrGatewayEnabled	    INTEGER,
+	    ipStatAddrGateway		    IpAddress,
+	    ipStatAddrDnsServer1	    IpAddress,
+	    ipStatAddrDnsServer2	    IpAddress,
+	    ipStatAddrClientId		    OCTET STRING,
+	    ipStatAddrPhysAddress	    PhysAddress,
+	    ipStatAddrHostName		    DisplayString,
+	    ipStatAddrLeaseTime		    INTEGER,
+	    ipStatAddrAliveInterval	    INTEGER,
+	    ipStatAddrRadiusAcct	    INTEGER,
+	    ipStatAddrRadiusGroupId	    INTEGER,
+	    ipStatAddrTftpServer1	    IpAddress,
+	    ipStatAddrTftpServer2	    IpAddress,
+	    ipStatAddrOfferOptionsGroupID   INTEGER,
+	    ipStatAddrAckOptionsGroupID	    INTEGER,
+	    ipStatAddrOfferVSOptionsGroupID INTEGER,
+	    ipStatAddrAckVSOptionsGroupID   INTEGER
+	}
+
+    ipStatAddrAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The IP address to assign to the client. The IP address has 
+             to come from a dynamic IP address pool."
+	::= { ipStatAddrEntry 1 }
+
+    ipStatAddrUserType OBJECT-TYPE
+	SYNTAX      INTEGER { dhcp(1) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the subsystem which does the static
+	     assignment (actual only DHCP)."
+	DEFVAL { dhcp }
+	::= { ipStatAddrEntry 2 }
+
+    ipStatAddrGatewayEnabled OBJECT-TYPE
+	SYNTAX      INTEGER { yes(1), no(2) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Specifies if 'router option' is delivered within BOOTP
+	     REPLY message. If this object is set to 'yes' router option 
+	     is filled depending on ipStatAddrGateway respectively 
+	     ipDhcpPoolGateway. If this object is set to 'no' router 
+	     option is not delivered regardless of object 
+	     ipStatAddrGateway or ipDhcpPoolGateway."
+	DEFVAL { yes }
+	::= { ipStatAddrEntry 3 }
+
+    ipStatAddrGateway OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The default gateway given to the client via 'router option'.
+	     An IP address of 0.0.0.0 uses the local IP address of the 
+	     interface where the request came in if the server and client 
+	     are located in the same network. If the server and the client
+	     not located in the same network, the address of the BOOTP 
+	     relay agent forwarding forwarding the request is used.
+	     If no gateway is specified (value 255.255.255.255), the 
+	     value from the related entry in ipDhcpPoolTable determines
+	     the gateway IP address.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { 'ffffffff'h }
+	::= { ipStatAddrEntry 4 }
+
+    ipStatAddrDnsServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the Primary Domain Name Server to be 
+             given to the client via 'domain name server option'. 
+             If both ipStatAddrDnsServer1 and ipStatAddrDnsServer2 are not
+             specified (value 255.255.255.255), the 'domain name server
+             option' returned to the client will be configured according to 
+             the values specified in entries ipDynAddrPoolDnsServer1 and 
+             ipDynAddrPoolDnsServer2.
+             If both ipStatAddrDnsServer1 and ipStatAddrDnsServer2
+             are assigned with 0.0.0.0 the Primary and Secondary DNS
+             IP addresses are taken regarding values ipDnsDhcpAssign,  
+             biboAdmNameServer and biboAdmNameServ2. See description of 
+             these objects for details."
+	DEFVAL { 'ffffffff'h }
+	::= { ipStatAddrEntry 5 }
+
+    ipStatAddrDnsServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the Secondary Domain Name Server to be 
+             given to the client via 'domain name server option'. 
+             If both ipStatAddrDnsServer1 and ipDynAddrDnsServer2 are not
+             specified (value 255.255.255.255), the 'domain name server
+             option' returned to the client will be configured according to 
+             the values specified in entries ipDynAddrPoolDnsServer1 and 
+             ipDynAddrPoolDnsServer2.
+             If both ipStatAddrDnsServer1 and ipStatAddrDnsServer2
+             are assigned with 0.0.0.0 the Primary and Secondary DNS
+             IP addresses are taken regarding values ipDnsDhcpAssign,  
+             biboAdmNameServer and biboAdmNameServ2. See description of 
+             these objects for details."
+	DEFVAL { 'ffffffff'h }
+	::= { ipStatAddrEntry 6 }
+
+    ipStatAddrClientId OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Specifies the client identifier of the DHCP client.
+	     If not empty it is used to compare with the client identifier 
+	     in DHCP request message."
+	::= { ipStatAddrEntry 7 }
+
+    ipStatAddrPhysAddress OBJECT-TYPE
+	SYNTAX      PhysAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Specifies the hardware (MAC) address of the DHCP client.
+	     If not empty it is used to compare with the hardware address 
+	     in DHCP request message."
+	::= { ipStatAddrEntry 8 }
+
+    ipStatAddrHostName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The hostname of this client.
+	     It is the hostname to be used by the client and delivered via 
+	     the reply."
+	::= { ipStatAddrEntry 9 }
+
+    ipStatAddrLeaseTime OBJECT-TYPE
+	SYNTAX      INTEGER (-1..300)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Specifies the amount of time (in minutes) the IP address is
+	     leased to the client.
+	     If no lease time is specified (-1) the value from the related 
+	     entry in ipDhcpPoolTable determines the lease time.
+             A value of 0 is unsupported and will lead to a lease time of 
+             1 minute."
+	DEFVAL { -1 }
+	::= { ipStatAddrEntry 10 }
+
+    ipStatAddrAliveInterval OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies a time period in seconds for checking 
+	     whether the client is still alive. The alive check allows the 
+	     system to purge dynamic entries whose lease is still valid but 
+	     the client no longer exists.
+	     If ipDhcpPoolAliveCheck from the related entry in 
+	     ipDhcpPoolTable is set to disable, no alive check is performed. 
+	     If this object is set to 0, no alive check is performed.
+	     If no alive interval is specified (-1) the value from the 
+	     related entry in ipDhcpPoolTable determines the alive
+	     interval."
+	DEFVAL { -1 }
+	::= { ipStatAddrEntry 11 }
+
+    ipStatAddrRadiusAcct OBJECT-TYPE
+	SYNTAX      INTEGER { default(1), disable(2), enable(3), delete(4) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Enables or disables the radius accounting for this entry.
+	     - default : related entry in ipDhcpPoolTable determines 
+	                 the radius accounting
+	     - disable : disables radius accounting
+	     - enable  : enables radius accounting
+	     - delete  : delete ipStatAddrTable entry."
+	DEFVAL { default }
+	::= { ipStatAddrEntry 12 }
+
+    ipStatAddrRadiusGroupId OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object specifies the radius group Id which is used by the
+	     radius daemon to find the associated server entry in 
+	     radiusSrvTable for accounting purposes. See description of
+	     radiusSrvGroupId for details.
+	     If no value is specified (-1) the value from the 
+	     related entry in ipDhcpPoolTable determines the radius
+	     group Id."
+	DEFVAL { -1 }
+	::= { ipStatAddrEntry 13 }
+
+    ipStatAddrTftpServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The IP address of the first TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     If this address is 0.0.0.0, then only the IP address specified 
+             in ipDynAddrTftpServer2 will be considered. If both addresses 
+             are 0.0.0.0, no DHCP option 150 will be returned to 
+	     the client.
+             If both ipStatAddrTftpServer1 and ipStatAddrTftpServer2 are not
+             specified (value 255.255.255.255), the DHCP option 150 
+             returned to the client will be configured according to the 
+             values specified in entries ipDhcpPoolTftpServer1 and 
+             ipDhcpPoolTftpServer2."
+	DEFVAL { 'ffffffff'h }
+	::= { ipStatAddrEntry 14 }
+
+    ipStatAddrTftpServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The IP address of the second TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     If this address is 0.0.0.0, then only the IP address specified 
+	     in ipDynAddrTftpServer1 will be considered. If both addresses 
+             are 0.0.0.0, no DHCP option 150 will be returned to 
+	     the client.
+             If both ipStatAddrTftpServer1 and ipStatAddrTftpServer2 are not
+             specified (value 255.255.255.255), the DHCP option 150 
+             returned to the client will be configured according to the 
+             values specified in entries ipDhcpPoolTftpServer1 and 
+             ipDhcpPoolTftpServer2."
+	DEFVAL { 'ffffffff'h }
+	::= { ipStatAddrEntry 15 }
+
+    ipStatAddrOfferOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the option or set of options which are added 
+	     to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. Selecting a
+	     null value result in no option being added."
+	::= { ipStatAddrEntry 16 }
+	
+    ipStatAddrAckOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the option or set of options which are added 
+	     to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. Selecting a
+	     null value result in no option being added."
+	::= { ipStatAddrEntry 17 }
+
+    ipStatAddrOfferVSOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the option or set of vendor-specific options which
+	     are added to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The options are
+	     defined in ipDhcpOptionTable. Selecting a null value result in
+	     no option being added."
+	::= { ipStatAddrEntry 18 }
+	
+    ipStatAddrAckVSOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Identifies the option or set of vendor-specific options which
+	     are added to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The options are
+	     defined in ipDhcpOptionTable. Selecting a null value result in
+	     no option being added."
+	::= { ipStatAddrEntry 19 }
+
+---------------------------------------------------------------------------
+-- ipDynaAddrTable
+---------------------------------------------------------------------------
+
+ipDynaAddrTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IpDynaAddrEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+	"This table has an entry for each dynamically assigned IP 
+	 address from an dynamic IP address pool. 
+	 The entry is created by the system 
+         - when assigning IP address to a client, 
+         - when detecting the use of a pool address by foreign device,
+         - when detecting the use of a pool address by the router itself or
+         - in consequence of an entry in ipStatAddrTable to reserve an IP 
+           address for a dedicated DHCP client.
+	 Entries are not saved in the boot configuration."
+    ::= { dynipMIB 8 }
+
+    ipDynaAddrEntry OBJECT-TYPE
+	SYNTAX      IpDynaAddrEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    ""
+	INDEX { ipDynaAddrAddress }
+	::= { ipDynaAddrTable 1 }
+
+    IpDynaAddrEntry ::=
+	SEQUENCE {
+	    ipDynaAddrAddress		    IpAddress,
+	    ipDynaAddrUserType		    INTEGER,
+	    ipDynaAddrType		    INTEGER,
+	    ipDynaAddrGatewayEnabled	    INTEGER,
+	    ipDynaAddrGateway		    IpAddress,
+	    ipDynaAddrDnsServer1	    IpAddress,
+	    ipDynaAddrDnsServer2	    IpAddress,
+	    ipDynaAddrClientId		    OCTET STRING,
+	    ipDynaAddrPhysAddress	    PhysAddress,
+	    ipDynaAddrHostName		    DisplayString,
+	    ipDynaAddrLeaseTime		    INTEGER,
+	    ipDynaAddrAliveInterval	    INTEGER,
+	    ipDynaAddrRadiusAcct	    INTEGER,
+	    ipDynaAddrRadiusGroupId	    INTEGER,
+	    ipDynaAddrPoolId		    DynIpPoolId,
+	    ipDynaAddrIfIndex		    INTEGER,
+	    ipDynaAddrExpires		    Date,
+	    ipDynaAddrState		    INTEGER,
+	    ipDynaAddrTftpServer1	    IpAddress,
+	    ipDynaAddrTftpServer2	    IpAddress,
+	    ipDynaAddrOfferOptionsGroupID   INTEGER,
+	    ipDynaAddrAckOptionsGroupID	    INTEGER,
+	    ipDynaAddrOfferVSOptionsGroupID INTEGER,
+	    ipDynaAddrAckVSOptionsGroupID   INTEGER,
+	    ipDynaAddrVendorClassId	    DisplayString
+	}
+
+    ipDynaAddrAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The IP address assigned to the client."
+	::= { ipDynaAddrEntry 1 }
+
+    ipDynaAddrUserType OBJECT-TYPE
+	SYNTAX      INTEGER { unknown(1), dhcp(2), ppp(3), ipsec(4) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Local subsystem that uses this entry respectively assigns 
+             the IP address of this entry.
+             UserType 'unknown' means that the entry is not associated 
+             with any local subsystem."
+	DEFVAL { dhcp }
+	::= { ipDynaAddrEntry 2 }
+
+    ipDynaAddrType OBJECT-TYPE
+	SYNTAX      INTEGER { dynamic(1), manual(2) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The type of this entry.
+	     - dynamic : entry was created in consequence of a dynamic
+                         IP address assignment or if IP address usage by
+                         own or foreign device was detected
+	     - manual  : entry was created as a result of an entry in 
+                         ipStatAddrTable to reserve an IP address for a 
+                         dedicated DHCP client"
+	DEFVAL { manual }
+	::= { ipDynaAddrEntry 3 }
+
+    ipDynaAddrGatewayEnabled OBJECT-TYPE
+	SYNTAX      INTEGER { yes(1), no(2) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Displays if 'router option' is delivered within BOOTP
+	     REPLY message. If this object is set to 'yes' router option 
+	     is filled depending on ipDhcpPoolGateway and possibly 
+             ipStatAddrGateway. If this object is set to 'no' router 
+             option is not delivered regardless of object ipDhcpPoolGateway.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { yes }
+	::= { ipDynaAddrEntry 4 }
+
+    ipDynaAddrGateway OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The default gateway given to the client via 'router option'
+	     if ipDynaAddrGatewayEnabled is set to 'yes'.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynaAddrEntry 5 }
+
+    ipDynaAddrDnsServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The Primary Domain Name Server given to the client via 
+             'domain name server option'."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynaAddrEntry 6 }
+
+    ipDynaAddrDnsServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The Secondary Domain Name Server given to the client via 
+             'domain name server option'."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynaAddrEntry 7 }
+
+    ipDynaAddrClientId OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Client identifier of the DHCP client. 
+	     This object is only relevant for entries with UserType dhcp."
+	::= { ipDynaAddrEntry 8 }
+
+    ipDynaAddrPhysAddress OBJECT-TYPE
+	SYNTAX      PhysAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Hardware (MAC) address of the DHCP client.
+	     This object is only relevant for entries with UserType dhcp."
+	::= { ipDynaAddrEntry 9 }
+
+    ipDynaAddrHostName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Hostname of the DHCP client.
+	     This object is only relevant for entries with UserType dhcp."
+	::= { ipDynaAddrEntry 10 }
+
+    ipDynaAddrLeaseTime OBJECT-TYPE
+	SYNTAX      INTEGER (-1..300)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Time (in minutes) the IP address is leased to the client.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { -1 }
+	::= { ipDynaAddrEntry 11 }
+
+    ipDynaAddrAliveInterval OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Time period in seconds for checking whether the client is 
+             still alive. If its value is 0, no alive check is performed.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { -1 }
+	::= { ipDynaAddrEntry 12 }
+
+    ipDynaAddrRadiusAcct OBJECT-TYPE
+	SYNTAX      INTEGER { default(1), disable(2), enable(3) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Displays if radius accounting is enabled for this entry.
+	     - disable : radius accounting is disabled
+	     - enable  : radius accounting is enabled
+	     - default : final value (disabled or enabled) will be 
+                         assigned when ipDynaAddrState changes to 'allocated'
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { default }
+	::= { ipDynaAddrEntry 13 }
+
+    ipDynaAddrRadiusGroupId OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Radius group Id which is used by the radius daemon to find 
+             the associated server entry in radiusSrvTable for accounting 
+             purposes. See description of radiusSrvGroupId for details.
+	     This object is only relevant if ipDynaAddrRadiusAcct is set
+	     to enable. If value is -1 the radius group it will get its 
+	     final value when ipDynaAddrState changes to 'allocated'.
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { -1 }
+	::= { ipDynaAddrEntry 14 }
+
+    ipDynaAddrPoolId OBJECT-TYPE
+	SYNTAX      DynIpPoolId
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The identifier of the dynamic address pool this entry 
+	     belongs to."
+	::= { ipDynaAddrEntry 15 }
+
+    ipDynaAddrIfIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The interface index of the interface where client is 
+	     connected."
+	::= { ipDynaAddrEntry 16 }
+
+    ipDynaAddrExpires OBJECT-TYPE
+	SYNTAX      Date
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Point of time until the client owns the IP address.
+	     Before the expiration of this term the client has to renew 
+	     its IP address.  
+	     This object is only relevant for entries with UserType dhcp
+             when ipDynaAddrState has value 'allocated'."
+	::= { ipDynaAddrEntry 17 }
+
+    ipDynaAddrState OBJECT-TYPE
+	SYNTAX      INTEGER { init(1), checking(2), foreign(3), own(4), 
+			      reserved(5), allocated(6), iprequest(7),
+			      ipreply(8)
+
+			    }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The state of this entry.
+	     - init     : initial state (temporary)	
+	     - checking : the related IP address is checked for 
+			    address conflicts (temporary)
+	     - foreign  : the related IP address is already in use
+			    by a foreign device
+	     - own      : the related IP address is one of the
+			    routers own local IP addresses
+	     - reserved : the related IP address is reserved for
+			    reuse of a known client currently not 
+			    using the lease or is reserved after 
+			    manual entry in ipStatAddrTable and before
+			    use of this entry,
+			    reserved entries are not available for 
+			    assigments of new clients until the pool
+			    is exhausted, only in this case the entry 
+			    is assigned to the new client
+	     - allocated: the related IP address is associated to a client
+	     - iprequest: internal state (temporary)
+	     - ipreply: internal state (temporary)"
+	DEFVAL { init }
+	::= { ipDynaAddrEntry 18 }
+
+    ipDynaAddrTftpServer1 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The IP address of the first TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynaAddrEntry 19 }
+
+    ipDynaAddrTftpServer2 OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The IP address of the second TFTP server given to the client 
+	     via 'TFTP server option' (DHCP option 150).
+	     This object is only relevant for entries with UserType dhcp."
+	DEFVAL { 'ffffffff'h }
+	::= { ipDynaAddrEntry 20 }
+
+    ipDynaAddrOfferOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Identifier of option or of set of options which are added 
+	     to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. 
+	     This object is only relevant for entries with UserType dhcp."
+	::= { ipDynaAddrEntry 21 }
+	
+    ipDynaAddrAckOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Identifier of option or of set of options which are added 
+	     to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The 
+	     options are defined in ipDhcpOptionTable. 
+	     This object is only relevant for entries with UserType dhcp."
+	::= { ipDynaAddrEntry 22 }
+
+    ipDynaAddrOfferVSOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Identifier of option or of set of vendor-specific options which
+	     are added to the original DHCP OFFER message issued by the DHCP 
+	     server before delivering it to the DHCP client. The options are
+	     defined in ipDhcpOptionTable. This object is only relevant for
+	     entries with UserType dhcp."
+	::= { ipDynaAddrEntry 23 }
+	
+    ipDynaAddrAckVSOptionsGroupID OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "Identifier of option or of set of vendor-specific options which
+	     are added to the original DHCP ACK message issued by the DHCP 
+	     server before delivering it to the DHCP client. The options are
+	     defined in ipDhcpOptionTable. This object is only relevant for
+	     entries with UserType dhcp."
+	::= { ipDynaAddrEntry 24 }
+
+    ipDynaAddrVendorClassId OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The vendor class id sent by the DHCP client in discover and 
+	    request DHCP messages."
+	::= { ipDynaAddrEntry 25 }
+
+
+---------------------------------------------------------------------------
+-- ipDhcpClientRtTemplTable
+---------------------------------------------------------------------------
+
+ipDhcpClientRtTemplTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpDhcpClientRtTemplEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines some 'gateway-route-templates' that extend the
+         actions taken by the DHCP-client when receiving a 'Router' Option
+         (see section 3.5 of RFC-2132).
+         By default, it builds a default-route for the specified gateway. (See
+         field <MakeDefRoute> of table <ipDhcpClient> for more details.)
+         Additionally (and even if this default-route is suppressed by setting
+         <MakeDefRoute> to <false>), DHCP-client adds a routing-entry for each
+         template-entry with matching DstIfIndex.
+         The <RtType> value tells whether an ipExtRt-entry or ipRoute-entry
+         shall be built. In both cases, most fields are copied from template
+         to routing-entry.
+         In addition, the <Type> is always set to <indirect>, the <Proto> is
+         set to <other>, the <Age> is initialised, and the <NextHop> is set to
+         the gateway-address received via Router Option.
+         Remark: For ipRoute-entries, some fields have slightly different names
+           than the related template-fields, and some template-fields are
+           meaningful only for ipExtRt-entries. Additionally, the <Info> field
+           is set to a reserved OID-value (default-behaviour of DHCP-client to
+           mark its entries).
+         Remark: The template-table is tightly coupled to the generated routing
+           entries. This means that any changes in the template-table cause the
+           related routing-entries to be updated, added, or removed."
+    ::= { dynipMIB 9 }
+
+    ipDhcpClientRtTemplEntry OBJECT-TYPE
+        SYNTAX  IpDhcpClientRtTemplEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Remark: Formally defined INDEX does not cover all entries that
+               are needed for selecting an entry unambiguously. However,
+               listing all of them would make the OIDs rather long."
+        INDEX { ipDhcpClientRtTemplRtType, ipDhcpClientRtTemplDstIfIndex }
+    ::= { ipDhcpClientRtTemplTable 1 }
+
+    IpDhcpClientRtTemplEntry ::=
+        SEQUENCE {
+            ipDhcpClientRtTemplRtType               INTEGER,
+            ipDhcpClientRtTemplDescription          DisplayString,
+            ipDhcpClientRtTemplMetric1              INTEGER,
+            ipDhcpClientRtTemplDstIfIndex           INTEGER,
+            ipDhcpClientRtTemplDstIfMode            INTEGER,
+            ipDhcpClientRtTemplDstAddr              IpAddress,
+            ipDhcpClientRtTemplDstMask              IpAddress,
+            ipDhcpClientRtTemplDstPort              INTEGER,
+            ipDhcpClientRtTemplDstPortRange         INTEGER,
+            ipDhcpClientRtTemplSrcIfIndex           INTEGER,
+            ipDhcpClientRtTemplSrcAddr              IpAddress,
+            ipDhcpClientRtTemplSrcMask              IpAddress,
+            ipDhcpClientRtTemplSrcPort              INTEGER,
+            ipDhcpClientRtTemplSrcPortRange         INTEGER,
+            ipDhcpClientRtTemplProtocol             INTEGER,
+            ipDhcpClientRtTemplTos                  INTEGER,
+            ipDhcpClientRtTemplTosMask              INTEGER
+        }
+
+    ipDhcpClientRtTemplRtType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            ipextrt(1),
+            iproute(2),
+            delete(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Tells what kind of routing-entry shall be built.
+             <ipextrt>: Build ipExtRtType-entry.
+             <ipextrt>: Build ipRouteType-entry.
+             <delete>:  Remove this template-entry."
+        DEFVAL { ipextrt }
+    ::= { ipDhcpClientRtTemplEntry 1 }
+
+    ipDhcpClientRtTemplDescription OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Copied to ipExtRtDescription if RtType is ipextrt.
+             Ignored                      if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 2 }
+
+    ipDhcpClientRtTemplMetric1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtMetric1 if RtType is ipextrt.
+             Copied to ipRouteMetric1 if RtType is iproute.
+             Remark: Default-value deviates from ipExtRt/ipRoute-table"
+        DEFVAL { 1 }
+    ::= { ipDhcpClientRtTemplEntry 3 }
+
+    ipDhcpClientRtTemplDstIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "DHCP-client checks this value against its own interface to decide
+             whether it shall use this pattern-entry.
+             Copied to ipExtRtDstIfIndex if RtType is ipextrt.
+             Copied to ipRouteIfIndex    if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 4 }
+
+    ipDhcpClientRtTemplDstIfMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            dialup-wait(1),
+            dialup-continue(2),
+            up-only(3),
+            always(4) ,
+            dialup-always(5)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtDstIfMode if RtType is ipextrt.
+             Ignored                    if RtType is iproute.
+             Remark: Default-value deviates from ipExtRt-table"
+        DEFVAL { always }
+    ::= { ipDhcpClientRtTemplEntry 5 }
+
+    ipDhcpClientRtTemplDstAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtDstAddr if RtType is ipextrt.
+             Copied to ipRouteDest    if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 6 }
+
+    ipDhcpClientRtTemplDstMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtDstMask if RtType is ipextrt.
+             Copied to ipRouteMask    if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 7 }
+
+    ipDhcpClientRtTemplDstPort OBJECT-TYPE
+        SYNTAX  INTEGER (-1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtDstPort if RtType is ipextrt.
+             Ignored                  if RtType is iproute."
+        DEFVAL { -1 }
+    ::= { ipDhcpClientRtTemplEntry 8 }
+
+    ipDhcpClientRtTemplDstPortRange OBJECT-TYPE
+        SYNTAX  INTEGER (-1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtDstPortRange if RtType is ipextrt.
+             Ignored                       if RtType is iproute."
+        DEFVAL { -1 }
+    ::= { ipDhcpClientRtTemplEntry 9 }
+
+    ipDhcpClientRtTemplSrcIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtSrcIfIndex if RtType is ipextrt.
+             Ignored                     if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 10 }
+
+    ipDhcpClientRtTemplSrcAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtSrcAddr if RtType is ipextrt.
+             Ignored                  if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 11 }
+
+    ipDhcpClientRtTemplSrcMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtSrcMask if RtType is ipextrt.
+             Ignored                  if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 12 }
+
+    ipDhcpClientRtTemplSrcPort OBJECT-TYPE
+        SYNTAX  INTEGER (-1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtSrcPort if RtType is ipextrt.
+             Ignored                  if RtType is iproute."
+        DEFVAL { -1 }
+    ::= { ipDhcpClientRtTemplEntry 13 }
+
+    ipDhcpClientRtTemplSrcPortRange OBJECT-TYPE
+        SYNTAX  INTEGER (-1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtSrcPortRange if RtType is ipextrt.
+             Ignored                       if RtType is iproute."
+        DEFVAL { -1 }
+    ::= { ipDhcpClientRtTemplEntry 14 }
+
+    ipDhcpClientRtTemplProtocol OBJECT-TYPE
+        SYNTAX  INTEGER {
+            icmp(1),
+            igmp(2),
+            ggp(3),
+            tcp(6),
+            egp(8),
+            pup(12),
+            udp(17),
+            hmp(20),
+            xns-idp(22),
+            rdp(27),
+            rsvp(46),
+            ipv6(41),
+            gre(47),
+            esp(50),
+            ah(51),
+            igrp(88),
+            ospf(89),
+            pim(103),
+            l2tp(115),
+            dont-verify(256)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtProtocol if RtType is ipextrt.
+             Ignored                   if RtType is iproute."
+        DEFVAL { dont-verify }
+    ::= { ipDhcpClientRtTemplEntry 15 }
+
+    ipDhcpClientRtTemplTos OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtTos if RtType is ipextrt.
+             Ignored              if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 16 }
+
+    ipDhcpClientRtTemplTosMask OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Copied to ipExtRtTosMask if RtType is ipextrt.
+             Ignored                  if RtType is iproute."
+    ::= { ipDhcpClientRtTemplEntry 17 }
+
+---------------------------------------------------------------------------
+
+END

@@ -1,0 +1,1930 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2016 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-atm,v $
+-- $Revision: 1.8 $
+
+BIANCA-BRICK-ATM2-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+	    enterprises, MODULE-IDENTITY, OBJECT-TYPE, IpAddress,
+	    Integer32, Counter32, Gauge32, TimeTicks, enterprises,
+	    Counter64
+		FROM SNMPv2-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+ 
+	    PhysAddress 
+		FROM RFC1213-MIB
+
+	    bintec, bibo, atm
+		FROM BINTEC-MIB;
+
+---------------------------------------------------------------------------
+
+atmMIB MODULE-IDENTITY
+    LAST-UPDATED "201309260000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO "EMail:   info@bintec-elmeg.com
+                  Web:     www.bintec-elmeg.com"
+    DESCRIPTION  "Vendor specific Management Information for the ATM Subsystem"
+
+    ::= { atm 250 }
+
+---------------------------------------------------------------------------
+
+---
+--- ATM Interface Table
+---
+
+	atmIfTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF AtmIfEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	    	"The atmIfTable displays all available ATM capable interfaces."
+	::= { atm 10 }
+
+	atmIfEntry OBJECT-TYPE
+	    SYNTAX	AtmIfEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+		"An interface entry containing objects at the
+		subnetwork layer and below for a particular
+		interface."
+		INDEX { atmIfIndex }
+	::= { atmIfTable 1 }
+
+	AtmIfEntry ::=
+	    SEQUENCE {
+		atmIfIndex  		Integer32,
+		atmIfType 		INTEGER,
+		atmIfDescr 		DisplayString,
+		atmIfAdminStatus	INTEGER,
+		atmIfOperStatus		INTEGER,
+		atmIfLastChange		TimeTicks,
+		atmIfInPkts		Counter32,
+		atmIfOutPkts		Counter32,
+		atmIfRxSpeed 		Gauge32,
+		atmIfTxSpeed 		Gauge32,
+		atmIfInOctets		Counter32,
+		atmIfInDiscards		Counter32,
+		atmIfInErrors		Counter32,
+		atmIfOutOctets		Counter32,
+		atmIfOutDiscards	Counter32,
+		atmIfOutErrors		Counter32,
+		atmIfMaxTxRate		Integer32,
+		atmIfOperMode 		INTEGER,
+		atmIfHCInPkts		Counter64,
+		atmIfHCOutPkts		Counter64,
+		atmIfHCInOctets		Counter64,
+		atmIfHCOutOctets	Counter64,
+		atmIfHCInDiscards	Counter64,
+		atmIfHCOutDiscards	Counter64
+	    }
+
+	atmIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The interface index of the associated ATM hardware."
+	::= { atmIfEntry 1 }
+        
+	atmIfType OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		other(1),
+		adsl(2),
+		shdsl(3),
+		vdsl(4)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"This object contains an interface type."
+	    DEFVAL { other }
+	::= { atmIfEntry 2 }
+        
+	atmIfDescr OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"Short description for this object."
+	::= { atmIfEntry 3 }
+        
+	atmIfAdminStatus OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	up(1),
+		down(2)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"This object contains the desired state of the ATM interface."
+	    DEFVAL { up }
+	::= { atmIfEntry 4 }
+        
+	atmIfOperStatus OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	up(1),
+		down(2)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "The current operational state of the ATM interface."
+            DEFVAL { down }
+	::= { atmIfEntry 5 }
+
+	atmIfLastChange OBJECT-TYPE
+	    SYNTAX
+		    TimeTicks
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The value of sysUpTime at the time the interface entered
+		 its current operational state. If the current state was
+		 entered prior to the last re-initialization of the local
+		 network management subsystem, then this object contains a
+		 zero value."
+	::= { atmIfEntry 6 }
+        
+	atmIfMaxTxRate OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+                "This object enables traffic shaping on the related ATM
+		 interface. If set to zero (0) there is no shaping active.
+		 Otherwise this variable defines the maximum amount of bits
+		 per second to be transmitted. Note that the maximum transmit
+		 rate is also determined by the capabilities of the ATM
+		 hardware."
+            DEFVAL { 0 }
+	::= { atmIfEntry 7 }
+
+	atmIfOperMode OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	atm(1),
+		efm(2)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "The current operational mode of the ATM interface.
+		The value atm(1) means ATM is used on the line.
+		The value efm(2) means ATM is used only internally
+		and Ethernet with HDLC framing is used on the line."
+            DEFVAL { atm }
+	::= { atmIfEntry 8 }
+
+	atmIfInPkts OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of reassembled received packets."
+	::= { atmIfEntry 22 }
+
+	atmIfOutPkts OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"This number of transmitted packets."
+	::= { atmIfEntry 23 }
+
+	atmIfRxSpeed OBJECT-TYPE
+	    SYNTAX	Gauge32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"This object contains the receive interface speed."
+	::= { atmIfEntry 24 }
+
+	atmIfTxSpeed OBJECT-TYPE
+	    SYNTAX	Gauge32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"This object contains the transmit interface speed."
+	::= { atmIfEntry 25 }
+        
+	atmIfInOctets OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of octets received on the interface,
+		 including framing characters."
+	::= { atmIfEntry 26 }
+
+	atmIfInDiscards OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of inbound packets which were chosen to be
+		 discarded even though no errors had been detected to prevent
+		 their being deliverable to a higher-layer protocol. One
+		 possible reason for discarding such a packet could be to
+		 free up buffer space."
+	::= { atmIfEntry 27 }
+
+	atmIfInErrors OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+       	    STATUS	current
+     	    DESCRIPTION
+		"The number of inbound packets that contained errors preventing
+		 them from being deliverable to a higher-layer protocol."
+    	::= { atmIfEntry 28 }
+
+	atmIfOutOctets OBJECT-TYPE 
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of octets transmitted out of the interface,
+		 including framing characters."
+	::= { atmIfEntry 29 }
+	
+	atmIfOutDiscards OBJECT-TYPE
+      	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+     		"The number of outbound packets which were chosen to be
+		 discarded even though no errors had been detected to prevent
+		 their being transmitted.  One possible reason for discarding
+		 such a packet could be to free up buffer space."
+	::= { atmIfEntry 30 }
+
+	atmIfOutErrors OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+            DESCRIPTION
+		"The number of outbound packets that could not be transmitted
+		 because of errors."
+	::= { atmIfEntry 31 }
+
+	atmIfHCInPkts OBJECT-TYPE
+	    SYNTAX	Counter64
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of reassembled received packets."
+	::= { atmIfEntry 32 }
+
+	atmIfHCOutPkts OBJECT-TYPE
+	    SYNTAX	Counter64
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"This number of transmitted packets."
+	::= { atmIfEntry 33 }
+
+	atmIfHCInOctets OBJECT-TYPE
+	    SYNTAX	Counter64
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of octets received on the interface,
+		 including framing characters."
+	::= { atmIfEntry 34 }
+
+	atmIfHCOutOctets OBJECT-TYPE 
+	    SYNTAX	Counter64
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of octets transmitted out of the interface,
+		 including framing characters."
+	::= { atmIfEntry 35 }
+	
+	atmIfHCInDiscards OBJECT-TYPE
+	    SYNTAX	Counter64
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of inbound packets which were chosen to be
+		 discarded even though no errors had been detected to prevent
+		 their being deliverable to a higher-layer protocol. One
+		 possible reason for discarding such a packet could be to
+		 free up buffer space."
+	::= { atmIfEntry 36 }
+
+	atmIfHCOutDiscards OBJECT-TYPE
+	    SYNTAX	Counter64
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+     		"The number of outbound packets which were chosen to be
+		 discarded even though no errors had been detected to prevent
+		 their being transmitted.  One possible reason for discarding
+		 such a packet could be to free up buffer space."
+	::= { atmIfEntry 37 }
+
+
+---
+--- The Virtual Path Group
+--- This group is mandatory for all UNI devices.
+--- Information concerning Virtual Path Connections
+--- This is the lite version of ATM-FORUM-MIB
+---
+
+    	atmVpcTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF AtmVpcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	    	"A table of status and parameter information on the virtual
+		 path connections which cross this UNI. There is one entry in
+		 this table for each permanent virtual path connection.
+	    	 This is the lite version of ATM-FORUM-MIB DEFINITIONS "
+	::= { atm 11 } 
+
+	atmVpcEntry OBJECT-TYPE
+	    SYNTAX	AtmVpcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	    	"An entry in the table, containing information about a
+		 particular virtual path connection."
+	    INDEX	 { atmVpcPortIndex, atmVpcVpi } 
+	::= { atmVpcTable 1 } 
+
+	AtmVpcEntry ::=
+	    SEQUENCE {
+		atmVpcPortIndex		Integer32,
+		atmVpcVpi		INTEGER,
+		atmVpcOperStatus	INTEGER
+	    } 
+
+	atmVpcPortIndex OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The interface index of the associated ATM hardware."
+	::= { atmVpcEntry 1 } 
+
+	atmVpcVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path Connection."
+	::= { atmVpcEntry 2 } 
+
+	atmVpcOperStatus OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		unknown(1),
+		end2endUp(2),
+		end2endDown(3),
+		localUpEnd2endUnknown(4),
+		localDown(5)
+	    } 
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The present actual operational status of the VPC. A value of
+		 end2endUp(2) or end2endDown(3) would be used if the end-to-end
+	    	 status is known. If only local status information is available,
+		 a value of localUpEnd2endUnknown(4) or localDown(5) would
+		 be used."
+            DEFVAL { unknown }
+	::= { atmVpcEntry 3 } 
+
+
+---
+--- The Virtual Channel Group
+--- This group is mandatory for all UNI devices.
+--- Information concerning Virtual Channel Connections
+--- This is the lite version of ATM-FORUM-MIB
+---
+
+	atmVccTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF AtmVccEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+		"A table of status and parameter information on the virtual
+		 channel connections which are visible at this UNI. There is
+		 one entry in this table for each permanent virtual channel
+		 connection, including reserved VCCs that are supported;
+		 e.g., signalling, OAM flows, and ILMI, but not unassigned
+		 cells. This is the lite version of ATM-FORUM-MIB DEFINITIONS "
+	::= { atm 12 } 
+
+	atmVccEntry OBJECT-TYPE
+	    SYNTAX	AtmVccEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+		"An entry in the table, containing information about a
+		 particular virtual channel connection."
+	    INDEX	 { atmVccPortIndex, atmVccVpi, atmVccVci } 
+	::= { atmVccTable 1 } 
+
+	AtmVccEntry ::=
+	    SEQUENCE {
+		atmVccPortIndex		Integer32,
+		atmVccVpi		INTEGER,
+		atmVccVci		INTEGER,
+		atmVccOperStatus	INTEGER
+	    } 
+
+	atmVccPortIndex OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The interface index of the associated ATM hardware."
+	    ::= { atmVccEntry 1 } 
+
+	atmVccVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Channel Connection."
+	::= { atmVccEntry 2 } 
+
+	atmVccVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	::= { atmVccEntry 3 } 
+
+	atmVccOperStatus OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		unknown(1), 
+		end2endUp(2), 
+		end2endDown(3), 
+		localUpEnd2endUnknown(4),
+		localDown(5)
+	    } 
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The present actual operational status of the VCC. A value
+		 of end2endUp(2) or end2endUp(3) is used if the end-to-end
+		 status is known. If only local status is known a value of
+		 localUpEnd2endUnknown(4) or localDown(5) is used."
+            DEFVAL { unknown }
+	::= { atmVccEntry 4 } 
+
+---
+--- OAM configuration table
+---
+
+	atmOamTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF AtmOamEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	    	"This tables contains all OAM configuration parameters."
+	::= { atm 13 }
+
+	atmOamEntry OBJECT-TYPE
+	    SYNTAX	AtmOamEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+		""
+		INDEX { atmOamAtmIfIndex, atmOamVpi, atmOamVci }
+	::= { atmOamTable 1 }
+
+	AtmOamEntry ::=
+	    SEQUENCE {
+		atmOamAtmIfIndex		Integer32,
+		atmOamVpi			INTEGER,
+		atmOamVci			INTEGER,
+		atmOamFlowLevel			INTEGER,
+		atmOamLoopbackEnd2End		INTEGER,
+		atmOamLoopbackSegment		INTEGER,
+		atmOamLoopbackEnd2EndInterval	INTEGER,
+		atmOamLoopbackSegmentInterval	INTEGER,
+		atmOamLoopbackEnd2EndMaxPending	INTEGER,
+		atmOamLoopbackSegmentMaxPending	INTEGER,
+		atmOamCCEnd2EndActivation	INTEGER,
+		atmOamCCSegmentActivation	INTEGER,
+		atmOamCCEnd2EndDirection	INTEGER,
+		atmOamCCSegmentDirection	INTEGER
+	    }
+
+	atmOamAtmIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"The interface index of the associated ATM hardware."
+	::= { atmOamEntry 1 }
+
+	atmOamVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path/Channel Connection."
+	    DEFVAL { 8 }
+	::= { atmOamEntry 2 }
+
+	atmOamVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	    DEFVAL { 32 }
+	::= { atmOamEntry 3 }
+
+	atmOamFlowLevel	OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	f5(1),
+	    	f4(2),
+                delete(10)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"The OAM hierarchical flow levels : VC (F5) or VP (F4)."
+	    DEFVAL { f5 }
+	::= { atmOamEntry 4 }
+
+	atmOamLoopbackEnd2End OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	disabled(1),
+		enabled(2)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Indicates wether OAM loopback is enabled onto the end-to-end
+		 connection."
+	    DEFVAL { disabled }
+	::= { atmOamEntry 5 }
+
+	atmOamLoopbackSegment OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	disabled(1),
+		enabled(2)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Indicates wether active OAM loopback is enabled onto the
+		 segment connection."
+	    DEFVAL { disabled }
+	::= { atmOamEntry 6 }
+
+	atmOamLoopbackEnd2EndInterval OBJECT-TYPE
+	    SYNTAX	INTEGER (0..999)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"OAM loopback transmit interval (in seconds) for end-to-end
+		 context."
+	    DEFVAL { 5 }
+	::= { atmOamEntry 7 }
+
+	atmOamLoopbackSegmentInterval OBJECT-TYPE
+	    SYNTAX	INTEGER (0..999)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"OAM loopback transmit interval (in seconds) for segment
+		 context."
+	    DEFVAL { 5 }
+	::= { atmOamEntry 8 }
+
+	atmOamLoopbackEnd2EndMaxPending OBJECT-TYPE
+	    SYNTAX	INTEGER (0..999)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Specifies the maximum number of outstanding OAM loopback
+		 responses after which the associated F4/F5 instance will
+		 be set into the end-to-end operational down status."
+	    DEFVAL { 5 }
+	::= { atmOamEntry 9 }
+		
+	atmOamLoopbackSegmentMaxPending OBJECT-TYPE
+	    SYNTAX	INTEGER (0..999)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Specifies the maximum number of outstanding OAM loopback
+		 responses after which the associated F4/F5 instance will
+		 be set into the segment operational down status."
+	    DEFVAL { 5 }
+	::= { atmOamEntry 10 }
+		
+	atmOamCCEnd2EndActivation OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	passive(1),
+		active(2),
+		both(3),
+		no-negotiation(4),
+		none(5)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Determines wether OAM continuity check activation request 
+		 will be activated and/or accepted for the associated
+		 end-to-end connection.
+		 If set to passive(1) or both(3) CC activation requests
+		 will be confirmed. If set to active(2) or both CC will
+		 be requested. If set to no-negotiation(4) - depending on
+		 the settings in atmOamCCEnd2EndDirection - CC cells will
+		 be send and/or expected periodically without any previous
+		 CC activation negotiation. If set to none(5) neither
+		 CC activation will be requested/confirmed nor any CC
+		 cells will be generated/expected."
+	    DEFVAL { passive }
+	::= { atmOamEntry 11 }
+
+	atmOamCCSegmentActivation OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	passive(1),
+		active(2),
+		both(3),
+		no-negotiation(4),
+		none(5)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Determines wether OAM continuity check activation request
+		 will be activated and/or accepted for the associated
+		 segment connection.
+		 If set to passive(1) or both(3) CC activation requests
+		 will be confirmed. If set to active(2) or both CC will
+		 be requested. If set to no-negotiation(4) - depending on
+		 the settings in atmOamCCSegmentDirection - CC cells will
+		 be send and/or expected periodically without any previous
+		 CC activation negotiation. If set to none(5) neither
+		 CC activation will be requested/confirmed nor any CC
+		 cells will be generated/expected."
+	    DEFVAL { passive }
+	::= { atmOamEntry 12 }
+
+	atmOamCCEnd2EndDirection OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	sink(1),
+		source(2),
+		both(3),
+		none(4)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Determines OAM continuity check direction (for end-to-end).
+		 If set to sink(1) CC cells will be received only, if set to
+		 source(2) CC cells will be generated periodically, if set to
+		 both(3) CC cells will be received from the source as well
+		 as send to the sink."
+	    DEFVAL { both }
+	::= { atmOamEntry 13 }
+
+	atmOamCCSegmentDirection OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	sink(1),
+		source(2),
+		both(3),
+		none(4)
+	    }    
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"Determines OAM continuity check direction (for segment).
+		 If set to sink(1) CC cells will be received only, if set to
+		 source(2) CC cells will be generated periodically, if set to
+		 both(3) CC cells will be received from the source as well
+		 as send to the sink."
+	    DEFVAL { both }
+	::= { atmOamEntry 14 }
+
+
+---
+--- OAM statistics table
+---
+
+	atmOamStatTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF AtmOamStatEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	        "This tables displays all used VCs."
+	::= { atm 14 }
+
+	atmOamStatEntry OBJECT-TYPE
+	    SYNTAX	AtmOamStatEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+		""
+        INDEX { atmOamStatAtmIfIndex, atmOamStatVpi, atmOamStatVci }
+	::= { atmOamStatTable 1 }
+
+	AtmOamStatEntry ::=
+	    SEQUENCE {
+		atmOamStatAtmIfIndex		Integer32,
+		atmOamStatVpi          		INTEGER,
+		atmOamStatVci          		INTEGER,
+		atmOamStatFlowType         	INTEGER,
+		atmOamStatLoopbackTxCells	Counter32,
+		atmOamStatLoopbackRxCells	Counter32,
+		atmOamStatLoopbackPending	Counter32,
+		atmOamStatLoopbackCorr		Integer32,
+		atmOamStatAisState		INTEGER,
+		atmOamStatAisTxCells		Counter32,
+		atmOamStatAisRxCells		Counter32,
+		atmOamStatTotalAisTxCells	Counter32,
+		atmOamStatTotalAisRxCells	Counter32,
+		atmOamStatRdiState		INTEGER,
+		atmOamStatRdiTxCells		Counter32,
+		atmOamStatRdiRxCells		Counter32,
+		atmOamStatTotalRdiTxCells	Counter32,
+		atmOamStatTotalRdiRxCells	Counter32,
+		atmOamStatCCActivatorState	INTEGER,
+		atmOamStatCCActivatorDirection	INTEGER,
+		atmOamStatCCActivatorCorr	Integer32,
+		atmOamStatCCResponderState	INTEGER,
+		atmOamStatCCResponderDirection	INTEGER,
+		atmOamStatCCResponderCorr	Integer32,
+		atmOamStatCCTxCells		Counter32,
+		atmOamStatCCRxCells		Counter32
+	    }
+
+	atmOamStatAtmIfIndex OBJECT-TYPE
+	    SYNTAX	INTEGER 
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The interface index of the associated ATM hardware."
+	::= { atmOamStatEntry 1 }
+
+	atmOamStatVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path Connection."
+	::= { atmOamStatEntry 2 }
+
+	atmOamStatVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	::= { atmOamStatEntry 3 }
+	
+	atmOamStatFlowType OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		f5-segment(1),
+		f5-end2end(2),
+		f4-segment(3),
+		f4-end2end(4)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The OAM hierarchical flow levels: see ITU I.610"
+	    DEFVAL { f5-end2end }
+	::= { atmOamStatEntry 4 }
+	
+	atmOamStatLoopbackTxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM loopback cells that have been sent 
+ 	         to the target in this sequence."
+	::= { atmOamStatEntry 6 }
+
+	atmOamStatLoopbackRxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM loopback cells that have been received 
+ 	         from the target in this sequence."
+	::= { atmOamStatEntry 7 }
+
+	atmOamStatLoopbackPending OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of currently outstanding OAM loopback responses."
+	::= { atmOamStatEntry 8 }
+
+	atmOamStatLoopbackCorr OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The correlation of the last sent loopback message."
+	::= { atmOamStatEntry 9 }
+
+	atmOamStatAisState OBJECT-TYPE
+	    SYNTAX	INTEGER  { off(1), on(2) }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The AIS state is set to on(2) after receiving an AIS cell
+		 or detection of LOC (Loss of Continuity). The Ais state is
+		 set to off(1) either when receiving user cells
+		 (same VCC context) or via timeout."
+	    DEFVAL { off }
+	::= { atmOamStatEntry 10 }
+
+	atmOamStatAisTxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM alarm indication signal (AIS) cells   
+ 	         that have been transmitted since last change of AisState."
+	::= { atmOamStatEntry 11 }
+
+	atmOamStatAisRxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM alarm indication signal (AIS) cells   
+ 	         that have been received since last change of AisState."
+	::= { atmOamStatEntry 12 }
+
+	atmOamStatTotalAisTxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of OAM alarm indication signal (AIS) cells   
+ 	         that have been transmitted."
+	::= { atmOamStatEntry 13 }
+
+	atmOamStatTotalAisRxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of OAM alarm indication signal (AIS) cells   
+ 	         that have been received."
+	::= { atmOamStatEntry 14 }
+
+	atmOamStatRdiState OBJECT-TYPE
+	    SYNTAX	INTEGER  { off(1), on(2) }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The RDI state is set to on(2) after receiving a RDI cell.
+		 The RDI state is to off(1) via timeout."
+	    DEFVAL { off }
+	::= { atmOamStatEntry 15 }
+
+	atmOamStatRdiTxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM remote defect indication (RDI) cells 
+ 	         that have been transmitted since last change of RdiState."
+	::= { atmOamStatEntry 16 }
+
+	atmOamStatRdiRxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM remote defect indication (RDI) cells 
+ 	         that have been received since last change of RdiState."
+	::= { atmOamStatEntry 17 }
+
+	atmOamStatTotalRdiTxCells OBJECT-TYPE
+	    SYNTAX	Counter32 
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The totoal number of OAM remote defect indication (RDI) cells 
+ 	         that have been transmitted."
+	::= { atmOamStatEntry 18 }
+
+	atmOamStatTotalRdiRxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The total number of OAM remote defect indication (RDI) cells 
+ 	         that have been received."
+	::= { atmOamStatEntry 19 }
+
+	atmOamStatCCActivatorState OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		inactive(1),
+		wait-act-con(2),
+		active(3),
+		wait-deact-con(4)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The status of the initiated CC negotiation, inactive(1)
+		 is the initial status, wait-act-con(2) is set after
+		 sending an CC activation request, active(3) is reached
+		 after receiving the CC activation confirmation whereas
+		 wait-deact-con(4) is used to indicate awaiting the
+		 CC deactivation confirmation."
+            DEFVAL { inactive }
+	::= { atmOamStatEntry 20 }
+
+	atmOamStatCCActivatorDirection OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		sink(1),
+		source(2),
+		both(3),
+		not-applicable(4)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The direction of action indicated by a received CC activation
+		 confirmation, source(1) correlates with 'A-B', sink(2) with
+		 'B-A' and both(3) with 'A-B' and 'B-A'."
+            DEFVAL { not-applicable }
+	::= { atmOamStatEntry 21 }
+
+	atmOamStatCCActivatorCorr OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The correlation of the last CC activation message sent
+		 to the responder."
+	::= { atmOamStatEntry 22 }
+
+	atmOamStatCCResponderState OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		inactive(1),
+		active(3),
+		wait-deact-con(4)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The status of the passive CC negotiation, inactive(1)
+		 is the initial status, active(3) is reached after receiving
+		 an CC activation request whereas wait-deact-con(4) is used
+		 to indicate awaiting the CC deactivation confirmation."
+            DEFVAL { inactive }
+	::= { atmOamStatEntry 23 }
+
+	atmOamStatCCResponderDirection OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		source(1),
+		sink(2),
+		both(3),
+		not-applicable(4)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The direction of action indicated by a received CC activation
+		 request, source(1) correlates with 'B-A', sink(2) with
+		 'A-B' and both(3) with 'A-B' and 'B-A'."
+            DEFVAL { not-applicable }
+	::= { atmOamStatEntry 24 }
+
+	atmOamStatCCResponderCorr OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The correlation of the received CC activation message."
+	::= { atmOamStatEntry 25 }
+
+	atmOamStatCCTxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM continuity check cells
+ 	         that have been sent to the target in this sequence."
+	::= { atmOamStatEntry 26 }
+
+	atmOamStatCCRxCells OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+		"The number of OAM continuity check cells
+ 	         that have been received from the target in this sequence."
+	::= { atmOamStatEntry 27 }
+
+
+---
+--- Ethernet over ATM (LAN emulation) PVC table
+---
+
+	ethoaPvcTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF EthoaPvcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	        "The ethoaPvcTable displays all virtual ethernets defined for
+		 a VCI/VPI on a specified hardware."
+	::= { atm 15 }
+
+
+	ethoaPvcEntry OBJECT-TYPE
+	    SYNTAX	EthoaPvcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+
+	    DESCRIPTION
+		""
+	    INDEX { ethoaPvcVpi, ethoaPvcVci, ethoaPvcAtmIfIndex }
+	::= { ethoaPvcTable 1 }
+
+	EthoaPvcEntry ::=
+	    SEQUENCE {
+		ethoaPvcIfIndex  		Integer32,
+		ethoaPvcDescr			DisplayString,
+		ethoaPvcAtmIfIndex		Integer32,
+		ethoaPvcVpi			INTEGER,
+		ethoaPvcVci			INTEGER,
+		ethoaPvcEncapsulation		INTEGER,
+		ethoaPvcPhysAddress		PhysAddress
+	    }
+
+	ethoaPvcIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "This object contains an interface index and assigns the
+                 row to an entry in ifTable. When creating new entries
+                 in the table, the value of this object shall be set to 0.
+                 The next free ifIndex value is than allocated and assigned
+		 to the object. At the same time a new interface is created
+		 in the IfTable."
+            DEFVAL { 0 }
+	::= { ethoaPvcEntry 1 }
+
+        ethoaPvcDescr OBJECT-TYPE
+            SYNTAX	DisplayString
+            MAX-ACCESS	read-write
+            STATUS	current
+            DESCRIPTION
+                "Short description of the configured PVC"
+        ::= { ethoaPvcEntry 2 }
+                
+
+	ethoaPvcAtmIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"The Index to the ATM hardware."
+	::= { ethoaPvcEntry 3 }
+
+	ethoaPvcVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path Connection."
+	    DEFVAL { 8 }
+	::= { ethoaPvcEntry 4 }
+
+	ethoaPvcVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	    DEFVAL { 32 }
+	::= { ethoaPvcEntry 5 }
+	
+	ethoaPvcEncapsulation OBJECT-TYPE
+	    SYNTAX	INTEGER {
+		bridged-no-fcs(1),	-- without frame checksum (FCS
+		bridged-fcs(2),		-- with frame checksum (FCS)
+		vc-multiplexed(3),	-- VC multiplexing
+		delete(10)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"This values decides whether frames are send without FCS(1),
+		 with FCS(2) or wether VC multiplexing is used."
+	    DEFVAL { bridged-no-fcs }
+	::= { ethoaPvcEntry 6 }
+
+	ethoaPvcPhysAddress OBJECT-TYPE
+	    SYNTAX	PhysAddress
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The MAC-Address used for the virtual interface."
+	::= { ethoaPvcEntry 7 }
+	
+
+---
+--- raw protocol Pvc table
+---
+
+	rpoaPvcTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF RpoaPvcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	        "This table configures Vpi/Vci for raw protocols
+		 (IP, IPX, etc.)"
+	::= { atm 16 }
+
+	rpoaPvcEntry OBJECT-TYPE
+	    SYNTAX	RpoaPvcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+
+	    DESCRIPTION
+		""
+	    INDEX { rpoaPvcVpi, rpoaPvcVci, rpoaPvcAtmIfIndex }
+	::= { rpoaPvcTable 1 }
+
+	RpoaPvcEntry ::=
+	    SEQUENCE {
+		rpoaPvcIfIndex  		Integer32,
+		rpoaPvcDescr			DisplayString,
+		rpoaPvcAtmIfIndex		Integer32,
+		rpoaPvcVpi			INTEGER,
+		rpoaPvcVci			INTEGER,
+		rpoaPvcEncapsulation		INTEGER
+
+	    }
+
+	rpoaPvcIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "This object contains an interface index and assigns the
+                 row to an entry in ifTable. When creating new entries
+                 in the table, the value of this object shall be set to 0.
+                 The next free ifIndex value is than allocated and assigned
+		 to the object. At the same time a new interface is created
+		 in the IfTable."
+            DEFVAL { 0 }
+	::= { rpoaPvcEntry 1 }
+
+        rpoaPvcDescr OBJECT-TYPE
+            SYNTAX	DisplayString
+            MAX-ACCESS	read-write
+            STATUS	current
+            DESCRIPTION
+                "Short description of the configured PVC"
+        ::= { rpoaPvcEntry 2 }
+
+	rpoaPvcAtmIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"The Index to the ATM hardware."
+	::= { rpoaPvcEntry 3 }
+
+	rpoaPvcVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path Connection."
+	    DEFVAL { 8 }
+	::= { rpoaPvcEntry 4 }
+
+	rpoaPvcVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	    DEFVAL { 32 }
+	::= { rpoaPvcEntry 5 }
+	
+	rpoaPvcEncapsulation OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	non-iso(1),
+		iso(2),
+		vc-multiplexed(3),
+		delete(10)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"This values decides whether frames are send codes
+		 with LLC 0xAA 0xAA (non-ISO), LLC 0xFE 0xFE (ISO)
+		 or wether VC multiplexing is used."
+	    DEFVAL { non-iso }
+	::= { rpoaPvcEntry 6 }
+
+
+---
+--- pppoa Pvc Table
+---
+
+	pppoaPvcTable OBJECT-TYPE
+	    SYNTAX	SEQUENCE OF PppoaPvcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+	        "This table configures Vpi/Vci for PPP oaver AAL5 (PPPoA)
+		 permanent and on-demand sessions."
+
+	::= { atm 17 }
+
+	pppoaPvcEntry OBJECT-TYPE
+	    SYNTAX	PppoaPvcEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+
+	    DESCRIPTION
+		""
+	    INDEX { pppoaPvcVpi, pppoaPvcVci, pppoaPvcAtmIfIndex }
+	::= { pppoaPvcTable 1 }
+
+	PppoaPvcEntry ::=
+	    SEQUENCE {
+		pppoaPvcIfIndex  		Integer32,
+		pppoaPvcDescr			DisplayString,
+		pppoaPvcAtmIfIndex		Integer32,
+		pppoaPvcVpi			INTEGER,
+		pppoaPvcVci			INTEGER,
+		pppoaPvcEncapsulation		INTEGER,
+		pppoaPvcClientType		INTEGER
+
+	    }
+
+	pppoaPvcIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "This object contains an interface index and refers to an
+		 entry in ifTable. When creating new entries in the table,
+                 the next free ifIndex value is than allocated and assigned
+		 to the object. At the same time a new interface is created
+		 in the IfTable with that very index."
+            DEFVAL { 0 }
+	::= { pppoaPvcEntry 1 }
+
+        pppoaPvcDescr OBJECT-TYPE
+            SYNTAX	DisplayString
+            MAX-ACCESS	read-write
+            STATUS	current
+            DESCRIPTION
+                "Short description of the configured PVC"
+        ::= { pppoaPvcEntry 2 }
+
+
+	pppoaPvcAtmIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"The Index to the ATM hardware."
+	::= { pppoaPvcEntry 3 }
+
+	pppoaPvcVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Path Connection."
+	    DEFVAL { 8 }
+	::= { pppoaPvcEntry 4 }
+
+	pppoaPvcVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	    DEFVAL { 32 }
+	::= { pppoaPvcEntry 5 }
+	
+	pppoaPvcEncapsulation OBJECT-TYPE
+            SYNTAX	INTEGER {
+                vc-multiplexed(1),
+                llc(2),
+                delete(10)
+            }   
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"This value decides whether VC multiplexing or 
+		 LLC encapsulation is used."
+	    DEFVAL { vc-multiplexed }
+	::= { pppoaPvcEntry 6 }
+	
+	pppoaPvcClientType OBJECT-TYPE
+            SYNTAX	INTEGER {
+                permanent(1),
+                on-demand(2)
+            }   
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"This variable defines whether the PPP over AAL5 session
+		 will be established permanent(1) or initiated on-demand(2)."
+	    DEFVAL { on-demand }
+	::= { pppoaPvcEntry 7 }
+
+
+--- VC-related ATM QoS (ATM service categories)
+
+        atmQosVccTable OBJECT-TYPE
+            SYNTAX	SEQUENCE OF AtmQosVccEntry
+            MAX-ACCESS	not-accessible
+            STATUS	current
+            DESCRIPTION
+            	"This table provides QoS information for each active ATM VC on
+	     	 the related ATM interface"
+        ::= { atm 19 }
+
+        atmQosVccEntry OBJECT-TYPE
+            SYNTAX	AtmQosVccEntry
+            MAX-ACCESS	not-accessible
+            STATUS	current
+            DESCRIPTION
+            	"An entry in the table, containing ATM QoS parameters about a
+	     	 particular virtual connection."
+            INDEX        { atmQosVccAtmIfIndex, atmQosVccVpi, atmQosVccVci }
+        ::= { atmQosVccTable 1 }
+
+        AtmQosVccEntry ::=
+            SEQUENCE {
+                atmQosVccAtmIfIndex	Integer32,
+                atmQosVccVpi		INTEGER,
+                atmQosVccVci		INTEGER,
+		atmQosVccService	INTEGER,
+		atmQosVccOutPcr		Integer32,
+		atmQosVccOutScr		Integer32,	
+		atmQosVccOutMbs		Integer32,
+		atmQosVccOutMcr		Integer32
+            }
+
+	atmQosVccAtmIfIndex OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+		"The interface index of the associated ATM hardware."
+	::= { atmQosVccEntry 1 }
+
+	atmQosVccVpi OBJECT-TYPE
+	    SYNTAX	INTEGER (0..255)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VPI value of this Virtual Channel Connection."
+	::= { atmQosVccEntry 2 }
+
+	atmQosVccVci OBJECT-TYPE
+	    SYNTAX	INTEGER (0..65535)
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The VCI value of this Virtual Channel Connection."
+	::= { atmQosVccEntry 3 }
+
+	atmQosVccService OBJECT-TYPE
+	    SYNTAX	INTEGER {	-- ATM Forum UNI 4.0
+	    	cbr(1),
+		vbr(2),
+--		vbr2(3),
+		vbr3(4),
+
+
+
+--		vbr2-rt(6),
+--		vbr3-rt(7),
+		ubr(8),
+--		ubr2(9),
+--		abr(10),
+		delete(20)
+	    }
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"The ATM service category of this virtual circuit connection:
+		    cbr
+		    vbr
+		    vbr2
+		    vbr3	VBR1 + Best Effort 
+		    vbr-rt	real-time
+		    vbr2-rt	real-time
+		    vbr3-rt	real-time
+		    ubr		Best Effort
+		    ubr2	Best Effort
+		    abr
+		    delete
+		"
+	    DEFVAL { ubr }
+	::= { atmQosVccEntry 4 }
+
+	atmQosVccOutPcr OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"Output Peak Cell Rate (PCR) in bps."
+	::= { atmQosVccEntry 5 }
+
+	atmQosVccOutScr OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"Output Sustained Cell Rate (SCR) in bps."
+	::= { atmQosVccEntry 6 }
+
+	atmQosVccOutMbs OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"Output Maximum Burst Size (MBS) in Bytes, only for
+		 atmQosVccService vbr-rt(2) and vbr-nrt(3) (ATM service
+		 service category VBR)."
+	::= { atmQosVccEntry 7 }
+
+	atmQosVccOutMcr OBJECT-TYPE
+	    SYNTAX	Integer32 
+	    MAX-ACCESS	read-write
+	    STATUS	current
+	    DESCRIPTION
+	    	"Output Minimum Cell Rate (MCR) in bps for connection with
+		 vbr-nrt(3)."
+	::= { atmQosVccEntry 8 }
+
+---
+--- ATM ATUR Performance Data Table
+---
+
+    atmAturPerfDataTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AtmAturPerfDataEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+	    ""
+	::= { atm 20 }
+
+    atmAturPerfDataEntry OBJECT-TYPE
+	SYNTAX		AtmAturPerfDataEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+	    "An entry in atmAturPerfDataTable."
+	INDEX       { atmAturPerfIfIndex }
+	::= { atmAturPerfDataTable 1 }
+
+    AtmAturPerfDataEntry ::= SEQUENCE {
+	atmAturPerfIfIndex                 Integer32,
+	atmAturPerfIdleCells               Integer32,
+	atmAturPerfDataCells               Integer32,
+	atmAturPerfLcds                    Integer32,
+	atmAturPerfHecs                    Integer32,
+	atmAturPerfCurr15MinTimeElapsed    INTEGER,
+	atmAturPerfCurr15MinIdleCells      Integer32,
+	atmAturPerfCurr15MinDataCells      Integer32,
+	atmAturPerfCurr15MinLcds           Integer32,
+	atmAturPerfCurr15MinHecs           Integer32,
+	atmAturPerfCurr1DayTimeElapsed     INTEGER,
+	atmAturPerfCurr1DayIdleCells       Integer32,
+	atmAturPerfCurr1DayDataCells       Integer32,
+	atmAturPerfCurr1DayLcds            Integer32,
+	atmAturPerfCurr1DayHecs            Integer32,
+	atmAturPerfPrev1DayIdleCells       Integer32,
+	atmAturPerfPrev1DayDataCells       Integer32,
+	atmAturPerfPrev1DayLcds            Integer32,
+	atmAturPerfPrev1DayHecs            Integer32,
+	atmAturPerfCurrShowtimeHecs        Integer32
+	}
+	
+    atmAturPerfIfIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Specifies the ATM interface index."
+	::= { atmAturPerfDataEntry 1 }
+	
+    atmAturPerfIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM idle cells."
+	::= { atmAturPerfDataEntry 2 }
+
+    atmAturPerfDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM data cells."
+	::= { atmAturPerfDataEntry 3 }
+
+   atmAturPerfLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+ 	    "Count of the number of Loss of Cell Delineation failures since
+	    agent reset."
+	::= { atmAturPerfDataEntry 4 }
+
+    atmAturPerfHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+ 	    "Count of the number of Header Error Check failures since
+	     agent reset."
+	::= { atmAturPerfDataEntry 5 }
+    
+    atmAturPerfCurr15MinTimeElapsed OBJECT-TYPE
+	SYNTAX		INTEGER (0..899)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Total elapsed seconds in this interval."
+	::= { atmAturPerfDataEntry 11 }
+    
+    atmAturPerfCurr15MinIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM idle cells in the mandatory 15 minute interval."
+	::= { atmAturPerfDataEntry 12 }
+
+    atmAturPerfCurr15MinDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM data cells in the mandatory 15 minute interval."
+	::= { atmAturPerfDataEntry 13 }
+
+    atmAturPerfCurr15MinLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of seconds in the mandatory 15 minute interval
+	     when there was Loss of Cell Delineation."
+	::= { atmAturPerfDataEntry 14 }
+
+    atmAturPerfCurr15MinHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of seconds in the mandatory 15 minute interval
+	     when there was Header Error Check failures."
+	::= { atmAturPerfDataEntry 15 }
+
+    atmAturPerfCurr1DayTimeElapsed OBJECT-TYPE
+	SYNTAX		INTEGER (0..86399)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Number of seconds that have elapsed since the
+	     beginning of the mandatory 1-day interval."
+	::= { atmAturPerfDataEntry 18 }
+
+    atmAturPerfCurr1DayIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM idle cells during the mandatory day as measured
+	     by atmAturPerfCurr1DayTimeElapsed."
+	::= { atmAturPerfDataEntry 19 }
+	    
+    atmAturPerfCurr1DayDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM data cells during the mandatory day as measured
+	     by atmAturPerfCurr1DayTimeElapsed."
+	::= { atmAturPerfDataEntry 20 }
+
+    atmAturPerfCurr1DayLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of the number of seconds when there was Loss
+	     of Cell Delineation during the mandatory day as measured
+	     by atmAturPerfCurr1DayTimeElapsed."
+	::= { atmAturPerfDataEntry 21 }
+
+    atmAturPerfCurr1DayHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of the number of seconds when there was Header
+	     Error Check failures during the mandatory day as measured
+	     by atmAturPerfCurr1DayTimeElapsed."
+	::= { atmAturPerfDataEntry 22 }
+
+    atmAturPerfPrev1DayIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "The number of ATM idle cells within the most recent previous
+	     1-day period."
+	::= { atmAturPerfDataEntry 26 }
+
+    atmAturPerfPrev1DayDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "The number of ATM data cells within the most recent previous
+	     1-day period."
+	::= { atmAturPerfDataEntry 27 }
+
+    atmAturPerfPrev1DayLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Count of seconds in the interval when there was
+	     Loss of Cell Delineation within the most recent previous
+	     1-day period."
+	::= { atmAturPerfDataEntry 28 }
+
+    atmAturPerfPrev1DayHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Count of seconds in the interval when there was
+ 	     Header Error Check within the most recent previous
+	     1-day period."
+	::= { atmAturPerfDataEntry 29 }
+
+    atmAturPerfCurrShowtimeHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Number of HEC errors detected since the most recent
+	     DSL showtime."
+	::= { atmAturPerfDataEntry 30 }
+
+---
+--- ATM ATUC Performance Data Table
+---
+
+    atmAtucPerfDataTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AtmAtucPerfDataEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+	    ""
+	::= { atm 21 }
+
+    atmAtucPerfDataEntry OBJECT-TYPE
+	SYNTAX		AtmAtucPerfDataEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+	    "An entry in atmAtucPerfDataTable."
+	INDEX       { atmAtucPerfIfIndex }
+	::= { atmAtucPerfDataTable 1 }
+
+    AtmAtucPerfDataEntry ::= SEQUENCE {
+	atmAtucPerfIfIndex                 Integer32,
+	atmAtucPerfIdleCells               Integer32,
+	atmAtucPerfDataCells               Integer32,
+	atmAtucPerfLcds                    Integer32,
+	atmAtucPerfHecs                    Integer32,
+	atmAtucPerfCurr15MinTimeElapsed    INTEGER,
+	atmAtucPerfCurr15MinIdleCells      Integer32,
+	atmAtucPerfCurr15MinDataCells      Integer32,
+	atmAtucPerfCurr15MinLcds           Integer32,
+	atmAtucPerfCurr15MinHecs           Integer32,
+	atmAtucPerfCurr1DayTimeElapsed     INTEGER,
+	atmAtucPerfCurr1DayIdleCells       Integer32,
+	atmAtucPerfCurr1DayDataCells       Integer32,
+	atmAtucPerfCurr1DayLcds            Integer32,
+	atmAtucPerfCurr1DayHecs            Integer32,
+	atmAtucPerfPrev1DayIdleCells       Integer32,
+	atmAtucPerfPrev1DayDataCells       Integer32,
+	atmAtucPerfPrev1DayLcds            Integer32,
+	atmAtucPerfPrev1DayHecs            Integer32,
+	atmAtucPerfCurrShowtimeHecs        Integer32
+	}
+	
+    atmAtucPerfIfIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Specifies the ATM interface index."
+	::= { atmAtucPerfDataEntry 1 }
+	
+    atmAtucPerfIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM idle cells."
+	::= { atmAtucPerfDataEntry 2 }
+
+    atmAtucPerfDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM data cells."
+	::= { atmAtucPerfDataEntry 3 }
+
+   atmAtucPerfLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+ 	    "Count of the number of Loss of Cell Delineation failures since
+	    agent reset."
+	::= { atmAtucPerfDataEntry 4 }
+
+    atmAtucPerfHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+ 	    "Count of the number of Header Error Check failures since
+	     agent reset."
+	::= { atmAtucPerfDataEntry 5 }
+
+    atmAtucPerfCurr15MinTimeElapsed OBJECT-TYPE
+	SYNTAX		INTEGER (0..899)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Total elapsed seconds in this interval."
+	::= { atmAtucPerfDataEntry 11 }
+    
+    atmAtucPerfCurr15MinIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM idle cells in the mandatory 15 minute interval."
+	::= { atmAtucPerfDataEntry 12 }
+
+    atmAtucPerfCurr15MinDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM data cells in the mandatory 15 minute interval."
+	::= { atmAtucPerfDataEntry 13 }
+
+    atmAtucPerfCurr15MinLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of seconds in the mandatory 15 minute interval
+	     when there was Loss of Cell Delineation."
+	::= { atmAtucPerfDataEntry 14 }
+
+    atmAtucPerfCurr15MinHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of seconds in the mandatory 15 minute interval
+	     when there was Header Error Check failures."
+	::= { atmAtucPerfDataEntry 15 }
+    
+    atmAtucPerfCurr1DayTimeElapsed OBJECT-TYPE
+	SYNTAX		INTEGER (0..86399)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Number of seconds that have elapsed since the
+	     beginning of the mandatory 1-day interval."
+	::= { atmAtucPerfDataEntry 18 }
+
+    atmAtucPerfCurr1DayIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM idle cells during the mandatory day as measured
+	     by atmAtucPerfCurr1DayTimeElapsed."
+	::= { atmAtucPerfDataEntry 19 }
+	    
+    atmAtucPerfCurr1DayDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "The number of ATM data cells during the mandatory day as measured
+	     by atmAtucPerfCurr1DayTimeElapsed."
+	::= { atmAtucPerfDataEntry 20 }
+
+    atmAtucPerfCurr1DayLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of the number of seconds when there was Loss
+	     of Cell Delineation during the mandatory day as measured
+	     by atmAtucPerfCurr1DayTimeElapsed."
+	::= { atmAtucPerfDataEntry 21 }
+
+    atmAtucPerfCurr1DayHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	    "Count of the number of seconds when there was Header
+	     Error Check failures during the mandatory day as measured
+	     by atmAtucPerfCurr1DayTimeElapsed."
+	::= { atmAtucPerfDataEntry 22 }
+
+    atmAtucPerfPrev1DayIdleCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "The number of ATM idle cells within the most recent previous
+	     1-day period."
+	::= { atmAtucPerfDataEntry 26 }
+
+    atmAtucPerfPrev1DayDataCells OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "The number of ATM data cells within the most recent previous
+	     1-day period."
+	::= { atmAtucPerfDataEntry 27 }
+
+    atmAtucPerfPrev1DayLcds OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Count of seconds in the interval when there was
+	     Loss of Cell Delineation within the most recent previous
+	     1-day period."
+	::= { atmAtucPerfDataEntry 28 }
+
+    atmAtucPerfPrev1DayHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Count of seconds in the interval when there was
+	     Header Error Check within the most recent previous
+	     1-day period."
+	::= { atmAtucPerfDataEntry 29 }
+
+    atmAtucPerfCurrShowtimeHecs OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+	    "Number of HEC errors detected since the most recent
+	     DSL showtime."
+	::= { atmAtucPerfDataEntry 30 }
+
+
+
+END

@@ -1,0 +1,196 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2009-2014 bintec elmeg GmbH
+-- $RCSfile: mib-sysped,v $
+-- $Revision: 1.7 $
+-- $Date: 2014-02-07 10:37:50 $
+---------------------------------------------------------------------------
+
+FEC-SYSPED-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32,
+    mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString, TimeStamp, TruthValue
+        FROM SNMPv2-TC
+
+    sys, Date
+	FROM BINTEC-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+---------------------------------------------------------------------------
+
+sysPEDMIB MODULE-IDENTITY
+    LAST-UPDATED "201201240000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+	     Web:     www.bintec-elmeg.com
+	    "
+    DESCRIPTION
+            "The MIB module for PED specific parts.
+            "
+
+    ::= { sys 6 }
+
+---------------------------------------------------------------------------
+-- OID groups & all tables 
+---------------------------------------------------------------------------
+sysPedRelay		OBJECT IDENTIFIER	::= { sysPEDMIB 1 }
+--        	sysPedRelay1State				1
+--        	sysPedRelay2State				2
+--        	sysPedRelayCount			       31
+
+sysPedTemperature	OBJECT IDENTIFIER	::= { sysPEDMIB 2 }
+--        	sysPedTemperatureCurrent		1
+--        	sysPedTemperatureMax			2
+--        	sysPedTemperatureMaxTime		3
+--        	sysPedTemperatureMin			4
+--        	sysPedTemperatureMinTime		5
+--        	sysPedTemperatureUpdatePeriod	6
+--        	sysPedTemperatureLowerThreshold	7
+--        	sysPedTemperatureUpperThreshold	8
+--        	sysPedTemperatureAlarm			9
+
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+--  sysPedRelais
+---------------------------------------------------------------------------
+
+sysPedRelay1State  OBJECT-TYPE
+	SYNTAX 		INTEGER  { open(1), closed(2) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Relay control.
+		open  : Relay is open.
+		closed: Relay is closed.
+
+		Default state is open."
+	DEFVAL { open }
+::= { sysPedRelay 1 }
+
+sysPedRelay2State  OBJECT-TYPE
+	SYNTAX 		INTEGER  { open(1), closed(2) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Relay control.
+		open  : Relay is open.
+		closed: Relay is closed.
+
+		Default state is open."
+	DEFVAL { open }
+::= { sysPedRelay 2 }
+
+sysPedRelayCount  OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of available relays in the system."
+::= { sysPedRelay 31 }
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+--  sysPedTemperature
+---------------------------------------------------------------------------
+
+sysPedTemperatureCurrent  OBJECT-TYPE
+	SYNTAX 		INTEGER (-55..150)
+	UNITS		"degree Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Temperature during the last measurement time."
+::= { sysPedTemperature 1 }
+
+sysPedTemperatureMax  OBJECT-TYPE
+	SYNTAX 		INTEGER (-55..150)
+	UNITS		"degree Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Maximum observed temperature."
+::= { sysPedTemperature 2 }
+
+sysPedTemperatureMaxTime  OBJECT-TYPE
+	SYNTAX 		Date
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Point in time the maximum temperature was observed."
+::= { sysPedTemperature 3 }
+
+sysPedTemperatureMin  OBJECT-TYPE
+	SYNTAX 		INTEGER (-55..150)
+	UNITS		"degree Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Minimum observed temperature."
+::= { sysPedTemperature 4 }
+
+sysPedTemperatureMinTime  OBJECT-TYPE
+	SYNTAX 		Date
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Point in time the minimum temperature was observed."
+::= { sysPedTemperature 5 }
+
+sysPedTemperatureUpdatePeriod  OBJECT-TYPE
+	SYNTAX 		Unsigned32
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Measurement interval of temperature update in seconds.
+		0: Disable measurements."
+	DEFVAL { 10 }
+::= { sysPedTemperature 6 }
+
+sysPedTemperatureLowerThreshold  OBJECT-TYPE
+	SYNTAX 		INTEGER (-55..125)
+	UNITS		"degree Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Minimal allowed temperature. If temperature falls below
+		this threshold, a syslog message is generated."
+	DEFVAL { -25 }
+::= { sysPedTemperature 7 }
+
+sysPedTemperatureUpperThreshold  OBJECT-TYPE
+	SYNTAX 		INTEGER (-55..125)
+	UNITS		"degree Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Maximal allowed temperature. If temperature raises above
+		this threshold, a syslog message is generated."
+	DEFVAL { 70 }
+::= { sysPedTemperature 8 }
+
+sysPedTemperatureAlarm  OBJECT-TYPE
+	SYNTAX 		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates if the defined temperature thresholds are
+		violated."
+	DEFVAL { false }
+::= { sysPedTemperature 9 }
+
+---------------------------------------------------------------------------
+END

@@ -1,0 +1,2197 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2006-2016 bintec elmeg GmbH
+-- $RCSfile: mib-systel,v $
+-- $Revision: 1.17 $
+-- $Date: 2016-09-14 14:22:08 $
+---------------------------------------------------------------------------
+
+FEC-SYSTEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64, IpAddress, TimeTicks,
+    mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+
+    DisplayString, TimeStamp, TruthValue, MacAddress
+        FROM SNMPv2-TC
+
+    bibo, Date, BitValue, HexValue
+        FROM BINTEC-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+---------------------------------------------------------------------------
+
+systemPhoneMIB MODULE-IDENTITY
+    LAST-UPDATED "201609140000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+             Web:     www.bintec-elmeg.com
+            "
+    DESCRIPTION
+            "This MIB file contains administration MIBs for system phones 
+            "
+    REVISION      "201212130000Z"
+    DESCRIPTION
+            "System phone." 
+
+    ::= { bibo 64 }
+
+---------------------------------------------------------------------------
+-- systel OID groups & all tables
+---------------------------------------------------------------------------
+
+systemPhoneSetup     OBJECT IDENTIFIER ::= { systemPhoneMIB 1 }
+                -- systemPhoneTable                   1
+                -- systemPhoneAudioTable              2
+                -- systemPhoneFacilityTable           3
+                -- systemPhoneMSNTable                4
+                -- systemPhoneIPTable                 5
+
+systemPhoneModule    OBJECT IDENTIFIER ::= { systemPhoneMIB 2 }
+                -- systemPhoneModuleTable             1
+                -- systemPhoneFunctionKeyTable        2
+
+systemPhoneCapabilities OBJECT IDENTIFIER ::= { systemPhoneMIB 3 }
+                -- systemPhoneCapabilityTable         1
+
+systemPhoneGlobalConfig OBJECT IDENTIFIER ::= { systemPhoneMIB 4 }
+                -- systemPhoneGlobCfg                1
+
+systemPhoneFwu  OBJECT IDENTIFIER ::= { systemPhoneMIB 5 }
+                -- systemPhoneFwuServer               1
+                -- systemPhoneFwuFileTable            2
+                -- systemPhoneFwuProcessTable         3
+                -- systemPhoneFwuServerUpdTable       4
+
+systemPhoneOem  OBJECT IDENTIFIER ::= { systemPhoneMIB 6 }
+                -- systemPhoneOemTable                1
+                -- systemPhoneOemUserTable            2
+
+---------------------------------------------------------------------------
+-- systel types
+---------------------------------------------------------------------------
+
+SystelTerminalIndex                     ::= INTEGER (1..65535)
+SystelExtTerminalIndex                  ::= INTEGER (1..65535)
+SystelFunctionKeyIndex                  ::= INTEGER (1..65535)
+SystelModuleIndex                       ::= INTEGER (1..65535)
+SystelFKButtonIndex                     ::= INTEGER (1..30)
+SystelFKLevel                           ::= INTEGER (0..1)
+SystelAudioVolume                       ::= INTEGER (0..10)
+SystelTargetIndex                       ::= INTEGER (1..65535)
+SystelDeviceClass                       ::= INTEGER { elmeg(1),
+						      unify(2),
+						      gigaset(3)
+						    }
+SystelDeviceType                        ::= INTEGER { cs290(20),
+                                                      cs410(22),
+                                                      cs290u(23),
+                                                      cs410u(24),
+                                                      cs400(25),
+                                                      ips290(32),
+                                                      ips400(33),
+                                                      ips290plus(34),
+                                                      s530(64),
+                                                      s560(65),
+                                                      ost-40(144),
+                                                      ost-80(145),
+						      ip120(160),
+						      ip130(165),
+						      ip140(161),
+						      ip620(166),
+						      ip630(168),
+						      ip680(171),
+						      dect150(162),
+						      dect200-b(163),
+						      dect200-m(164),
+						      de310-ip-pro(176),
+						      de410-ip-pro(177),
+						      de700-ip-pro(178),
+						      de900-ip-pro(179),
+						      n510-ip-pro(180),
+						      n720-ip-pro(181),
+						      n720-dm-pro(182),
+						      maxwell-basic(183),
+						      maxwell-3(185),
+						      maxwell-10(188)
+                                                    }
+SystelLanguage				::= INTEGER { german(1),
+						      dutch(2),
+						      english(3),
+						      italian(5),
+						      danish(6),
+						      spanish(7),
+						      swedish(8),
+						      french(10),
+						      portuguese(11),
+						      czech(14),
+						      norwegian(16),
+						      greek(17),
+						      icelandic(20),
+						      polish(21),
+						      hungarian(22),
+						      russian(23),
+						      romanian(24),
+						      slovak(25),
+						      turkish(26)
+						    }
+                                                    
+---------------------------------------------------------------------------
+-- group: systemPhoneSetup
+-- systemPhoneTable
+---------------------------------------------------------------------------
+
+systemPhoneTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains general information about system phones."
+    ::= { systemPhoneSetup 1 }
+
+    systemPhoneEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneTerminalIndex }
+        ::= { systemPhoneTable 1 }
+
+    SystemPhoneEntry ::=
+        SEQUENCE {
+            systemPhoneTerminalIndex             SystelTerminalIndex,
+            systemPhoneDeviceType                SystelDeviceType,
+            systemPhoneDevicePin                 DisplayString,
+            systemPhoneConfigDate                Date,
+            systemPhoneConfigSequenceNumber      INTEGER,
+            systemPhoneOperStatus                INTEGER,
+            systemPhoneAdminStatus               INTEGER
+        }
+
+    systemPhoneTerminalIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Reference to mpsTerminalTable, a unique value for each system phone."
+        DEFVAL { 1 }
+        ::= { systemPhoneEntry 1 }
+
+    systemPhoneDeviceType OBJECT-TYPE
+        SYNTAX          SystelDeviceType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specified type of system phone."
+        DEFVAL { cs410 }
+        ::= { systemPhoneEntry 2 }
+
+
+    systemPhoneDevicePin OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(4))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The device PIN of the system phone (eg. to protect the configuration,
+	    settings or number programming menu of system phone)."
+        DEFVAL { "0000" }
+        ::= { systemPhoneEntry 3 }
+
+    systemPhoneConfigDate OBJECT-TYPE
+        SYNTAX          Date
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "The date of last configuration synchronization between PBX and
+	    system phone."
+        DEFVAL { "" }
+        ::= { systemPhoneEntry 4 }
+
+    systemPhoneConfigSequenceNumber OBJECT-TYPE
+        SYNTAX          INTEGER (0..255)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "A unique sequence number of the configuration data saved in the PBX
+	    and synchronized with the system phone."
+        DEFVAL { 0 }
+        ::= { systemPhoneEntry 5 }
+
+    systemPhoneOperStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                connected(1),
+                                unconnected(2),
+                                unsupported(3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Operational state of the system phone."
+        DEFVAL { unconnected }
+        ::= { systemPhoneEntry 6 }
+
+    systemPhoneAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneEntry 7 }
+
+---------------------------------------------------------------------------
+-- systemPhoneAudioTable 
+---------------------------------------------------------------------------
+
+systemPhoneAudioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneAudioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains information about audio settings of system phones.
+	An entry in this table will also be deleted if the related
+	systemPhoneTable entry is deleted."
+    ::= { systemPhoneSetup 2 }
+
+    systemPhoneAudioEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneAudioEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneAudioIndex }
+        ::= { systemPhoneAudioTable 1 }
+
+    SystemPhoneAudioEntry ::=
+        SEQUENCE {
+            systemPhoneAudioIndex                SystelTerminalIndex,
+            systemPhoneAudioFac                  BITS,
+            systemPhoneAudioHeadsetType          INTEGER,
+            systemPhoneAudioVolSpeaker           SystelAudioVolume,
+            systemPhoneAudioVolHandset           INTEGER,
+            systemPhoneAudioVolCallWaitingBeep   INTEGER,
+            systemPhoneAudioVolDoNotDisturbBeep  SystelAudioVolume,
+            systemPhoneAudioVolAppointedTimeBeep INTEGER,
+            systemPhoneAudioVolNotifyBeep        INTEGER,
+            systemPhoneAudioVolAnswMachOKBeep    INTEGER,
+            systemPhoneAudioAdminStatus          INTEGER,
+            systemPhoneAudioNGVolHeadset         SystelAudioVolume,
+            systemPhoneAudioNGVolAcknowledgeBeep SystelAudioVolume,
+            systemPhoneAudioNGMicHeadsetResp     INTEGER
+            }
+
+    systemPhoneAudioIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Reference to the mpsTerminalTable."
+        DEFVAL { 1 }
+        ::= { systemPhoneAudioEntry 1 }
+
+    systemPhoneAudioFac OBJECT-TYPE
+        SYNTAX          BITS {
+                             out-ringing(0),
+                             out-paging(1),
+                             out-listening(2),
+                             out-handsfree(3),
+                             out-answ-mach(4),
+                             headset(5),
+                             handsfree-mute(6),
+                             beep-negative-ack(7),
+                             beep-positive-ack(8),
+                             beep-call-waiting-repeat(9)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Facility settings for audio control:   
+                out-ringing              : Normal ringing tones can be heard on
+					   the internal speaker [0] or on the
+					   internal speaker and an additional
+					   speaker connected to 'audio out'
+					   [1].
+                out-paging               : Incomming announcements can be heard
+					   on the internal speaker [0] or on the
+					   internal speaker and an additional
+					   speaker connected to 'audio out' [1].
+                out-listening            : Hands-free listening can be heard on
+					   the internal speaker [0] or on the
+					   internal speaker and an additional
+					   speaker connected to 'audio out' [1].
+                out-handsfree            : Hands-free talking and system call
+					   exchange can be heard on the internal
+					   speaker [0] or on the internal
+					   speaker and an additional speaker
+					   connected to 'audio out' [1].
+                out-answ-mach            : Call of messages of anwering machine
+					   can be heard on the internal speaker
+					   [0] or on the internal speaker and an
+					   additional speaker connected to
+					   'audio out' [1].
+                headset                  : Setting this bit to [1] enables some
+					   automatic headset functions:
+                                           --> if function keys auto call
+					   acceptance AND headset are adjusted
+					   AND the user activates the auto call
+					   acceptance function key, the headset
+					   automatically answer the call
+                                           --> furthermore, if function keys
+					   trunk-line key OR extension key
+					   adjusted, pressing such a keys leads
+					   to automatically calling via headset
+                handsfree-mute           : Enable [1] or disbable [0] mute after
+					   handsfree calling.
+                beep-negative-ack        : Enable [1] or disbable [0] negative
+					   ack beep tone.
+                beep-positive-ack        : Enable [1] or disbable [0] positive
+					   ack beep tone.
+                beep-call-waiting-repeat : Setting this bit to [0] means that
+					   the user is noticed onced. Setting
+					   this bit to [1], causes beep-tone of
+					   call waiting signal to be repeated."
+        DEFVAL { {beep-negative-ack, beep-positive-ack} }
+        ::= { systemPhoneAudioEntry 2 }
+
+    systemPhoneAudioHeadsetType OBJECT-TYPE
+        SYNTAX          INTEGER (0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The headset type. Value currently only used within the system phone,
+	    but must be saved in the PBX."
+        DEFVAL { 0 }
+        ::= { systemPhoneAudioEntry 3 }
+
+    systemPhoneAudioVolSpeaker OBJECT-TYPE
+        SYNTAX          SystelAudioVolume
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for telephone speaker. For NG phones range
+	    was changed (0 .. 10)."
+        DEFVAL { 3 }
+        ::= { systemPhoneAudioEntry 4 }
+
+    systemPhoneAudioVolHandset OBJECT-TYPE
+        SYNTAX          INTEGER (0..3)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for telephone handset."
+        DEFVAL { 1 }
+        ::= { systemPhoneAudioEntry 5 }
+
+    systemPhoneAudioVolCallWaitingBeep OBJECT-TYPE
+        SYNTAX          SystelAudioVolume
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for call waiting tone. For NG phones range
+	    was changed (0 .. 10)."
+        DEFVAL { 3 }
+        ::= { systemPhoneAudioEntry 6 }
+
+    systemPhoneAudioVolDoNotDisturbBeep OBJECT-TYPE
+        SYNTAX          SystelAudioVolume
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for do not disturb tone. For NG phones range
+	    was changed (0 .. 10)."
+        DEFVAL { 3 }
+        ::= { systemPhoneAudioEntry 7 }
+
+    systemPhoneAudioVolAppointedTimeBeep OBJECT-TYPE
+        SYNTAX          INTEGER(0..6)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for appointed time call tone."
+        DEFVAL { 3 }
+        ::= { systemPhoneAudioEntry 8 }
+
+    systemPhoneAudioVolNotifyBeep OBJECT-TYPE
+        SYNTAX          INTEGER (0..2)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for notify beep tone."
+        DEFVAL { 1 }
+        ::= { systemPhoneAudioEntry 9 }
+
+    systemPhoneAudioVolAnswMachOKBeep OBJECT-TYPE
+        SYNTAX          INTEGER (0..2)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for answering machine acknowledgement tone."
+        DEFVAL { 1 }
+        ::= { systemPhoneAudioEntry 10 }
+
+    systemPhoneAudioAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneAudioEntry 11 }
+
+    systemPhoneAudioNGVolHeadset OBJECT-TYPE
+        SYNTAX          SystelAudioVolume
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for headset. This mib item is only important
+	    for NG phones."
+        DEFVAL { 5 }
+        ::= { systemPhoneAudioEntry 12 }
+
+    systemPhoneAudioNGVolAcknowledgeBeep OBJECT-TYPE
+        SYNTAX          SystelAudioVolume
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies volume setting for acknowledgement beep tone. This mib item
+	    is only important for NG phones."
+        DEFVAL { 5 }
+        ::= { systemPhoneAudioEntry 13 }
+
+    systemPhoneAudioNGMicHeadsetResp OBJECT-TYPE
+        SYNTAX          INTEGER (1..3)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies responsivity settings for microphone of headset. This mib
+	    item is only important for NG phones."
+        DEFVAL { 2 }
+        ::= { systemPhoneAudioEntry 14 }
+
+---------------------------------------------------------------------------
+-- systemPhoneFacilityTable
+---------------------------------------------------------------------------
+
+systemPhoneFacilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneFacilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains system phone configuration concerning display and
+	operations. An entry in this table will also be deleted if the related
+	systemPhoneTable entry is deleted."
+    ::= { systemPhoneSetup 3 }
+
+    systemPhoneFacilityEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneFacilityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneFacIndex }
+        ::= { systemPhoneFacilityTable 1 }
+
+    SystemPhoneFacilityEntry ::=
+        SEQUENCE {
+            systemPhoneFacIndex               SystelTerminalIndex,
+            systemPhoneFacDisplayGeneral      BITS,
+            systemPhoneFacDisplayDuringCall   INTEGER,
+            systemPhoneFacLedConf             INTEGER,
+            systemPhoneFacDispLang            SystelLanguage,
+            systemPhoneFacCharacterSet        INTEGER,
+            systemPhoneFacAutoCallAcceptTime  INTEGER,
+            systemPhoneFacCallWaitInt         INTEGER,
+            systemPhoneFacCallWaitExt         INTEGER,
+            systemPhoneFacDoNotDisturb        INTEGER,
+            systemPhoneFacAdminStatus         INTEGER,
+            systemPhoneFacNGDisplayLight      INTEGER,
+            systemPhoneFacNGDoNotDisturbTone  INTEGER,
+            systemPhoneFacNGLedConf           BITS
+        }
+
+    systemPhoneFacIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Reference to the mpsTerminalTable."
+        DEFVAL { 1 }
+        ::= { systemPhoneFacilityEntry 1 }
+
+    systemPhoneFacDisplayGeneral OBJECT-TYPE
+        SYNTAX          BITS {
+                             softkey-style(0),
+                             clir(1),
+                             colr(2),
+                             call-end-info(3),
+                             do-not-disturb(4),
+                             softkey-local-phonebook(5),
+                             dial-option(6),
+                             uus-inhibit-ctrl-int(7),
+                             uus-inhibit-ctrl-ext(8),
+                             auto-call-accept(9)
+                             }
+
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Facility settings for display and operation control:
+	    softkey-style:		(0) use of lower case,
+					(1) use of upper case for the softkeys.
+	    clir:			(0) activate number suppression
+					    (outgoing CLIR active),
+					(1) deactivate number suppression
+					    (outgoing CLIP active).
+	    colr:			(0) activate number suppression
+					    (incoming COLR active),
+					(1) deactivate number suppression
+					    (incoming COLP active).
+	    call-end-info:		Enable (1) or disable (0) displaying call
+					information after call is disconnected.
+	    do-not-disturb:		(0) the do not disturb option is true for
+					    all MSNs,
+					(1) the do not disturb option is true for
+					    the first MSN only.
+	    softkey-local-phonebook:	(0) enable softkey for PBX phonebook
+					    access,
+					(1) enable softkey for local phonebook
+					    access.
+	    dial-option:		(0) DTMF, (1) Keypad.
+	    uus-inhibit-ctrl-int:	Enable (1) or disable (0) the UUS inhibit
+					intern.
+	    uus-inhibit-ctrl-ext:	Enable (1) or disable (0) the UUS inhibit
+					extern.
+	    auto-call-accept:		Enable (1) or disable (0) the automatic
+					call acceptance with the configured
+					settings of systemPhoneFacAutoCall-
+					AcceptTime. (This bit is only used with
+					NG system phones."
+        DEFVAL { {clir, colr, call-end-info } }
+        ::= { systemPhoneFacilityEntry 2 }
+
+    systemPhoneFacDisplayDuringCall OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                number-and-costOrDuration(1),
+                                number-and-costOrNothing(2),
+                                number-and-duration(3),
+                                number-and-time(4),
+                                numberOnly(5),
+                                date-and-time-only(6)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Information shown on display during an active call:
+	    number-and-costOrDuration(1):	Shows call number and cost, if no
+						costs are provided by the PSTN
+						instead the call number and the
+						duration will be shown.
+	    number-and-costOrNothing(2):	Shows call number and cost, if no
+						costs are provided by the PSTN
+						instead only call number will be
+						shown.
+	    number-and-duration(3):		Shows call number and duration.
+	    number-and-time(4):			Shows call number and actual
+						time.
+	    numberOnly(5):			Shows call number only.
+	    date-and-time-only(6):		Shows actual date and time only."
+        DEFVAL { number-and-costOrDuration }
+        ::= { systemPhoneFacilityEntry 3 }
+
+    systemPhoneFacLedConf OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                indication-off(1),
+                                indication-all(2),
+                                indication-message(3)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Information of status LED function for elmeg CS/IP series system
+	    phones:
+	    indication-off:	Status LED function is off.
+	    indication-all:	Status LED blinks on all new events.
+	    indication-message:	Status LED blinks only if a new message
+				received."
+        DEFVAL { indication-all }
+        ::= { systemPhoneFacilityEntry 4 }
+
+    systemPhoneFacDispLang OBJECT-TYPE
+        SYNTAX          SystelLanguage
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The current display language."
+        DEFVAL { german }
+        ::= { systemPhoneFacilityEntry 5 }
+
+        systemPhoneFacCharacterSet OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                latin-ext(1),
+                                latin-greek(2),
+                                latin-cyrillic(3)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The character set of the display language:
+	    latin-ext:		Latin character set with extensions.
+	    latin-greek:	Latin and greek character set.
+	    latin-cyrillic:	Latin and cyrillic character set."
+        DEFVAL { latin-ext }
+        ::= { systemPhoneFacilityEntry 6 }
+
+    systemPhoneFacAutoCallAcceptTime OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                immediately(1),
+                                sec-5(2),
+                                sec-10(3),
+                                sec-15(4),
+                                sec-20(5)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Setting of automatic call acceptance time, only used if 'headset' in
+	    systemPhoneAudioFac is enabled(1) and a function-key 'autoanswer' is
+	    configured and active on the system phone. For NG phones there are
+	    new values available, marked with *:
+	    immediately:	phone immediately accepts calls.
+	    sec-5:		phone accepts calls after 5 seconds ringing.
+	    sec-10:		phone accepts calls after 10 seconds ringing.
+            sec-15:		*phone accepts calls after 15 seconds ringing
+				(only for NG phones).
+	    sec-20:		*phone accepts calls after 20 seconds ringing
+				(only for NG phones)."
+        DEFVAL { sec-5 }
+        ::= { systemPhoneFacilityEntry 7 }
+
+    systemPhoneFacCallWaitInt OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                off(1),
+                                on(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Setting for intern call waiting:
+	    off:	call waiting signal is disabled.
+	    on:		call waiting signal is activated (user is noticed by a
+			single tone)."
+        DEFVAL { off }
+        ::= { systemPhoneFacilityEntry 8 }
+
+    systemPhoneFacCallWaitExt OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                off(1),
+                                on(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Setting for extern call waiting:
+	    off:	call waiting signal is disabled.
+	    on:		call waiting signal is activated (user is noticed by a
+			single tone)."
+        DEFVAL { off }
+        ::= { systemPhoneFacilityEntry 9 }
+
+    systemPhoneFacDoNotDisturb OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                disable(1),
+                                quiet(2),
+                                notice(3)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Information of do not disturb setup:
+	    disable:	Do not disturb option is disabled.
+	    quiet:	Do not disturb option is enabled, without notice tone.
+	    notice:	Do not disturb option is enabled, a single notice tone
+			indicates an incoming call."
+        DEFVAL { disable }
+        ::= { systemPhoneFacilityEntry 10 }
+
+    systemPhoneFacAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneFacilityEntry 11 }
+
+    systemPhoneFacNGDisplayLight OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                sec-15(1),
+                                sec-30(2),
+                                sec-45(3),
+                                sec-60(4),
+                                sec-75(5),
+                                sec-90(6),
+                                sec-105(7),
+                                sec-120(8),
+                                sec-135(9),
+                                always-off(64),
+                                always-on(128)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Settings for display light - this mib item is only important for NG
+	    system phones:
+	    sec-x:	After an user action (e.g. keypress) display light is on
+			for dedicated time x.
+	    always-off:	Display light is always off.
+	    always-on:	Display light is always on."
+        DEFVAL { sec-60 }
+        ::= { systemPhoneFacilityEntry 12 }
+
+    systemPhoneFacNGDoNotDisturbTone OBJECT-TYPE
+        SYNTAX          INTEGER (0..4)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Information of do not disturb setup for NG system phones:
+	    0:		NG system phone signals incoming calls/messages
+			without any tone.
+	    1..4:	NG system phone signals incoming calls/messages
+			with special tone.
+	    Note: If there is no configured do-not-disturb-key, there is no
+	    chance to activate the do not disturb option for NG system phones.
+	    Settings made in systemPhoneFacNGDoNotDisturb are only SETTINGS,
+	    activation or deactivation of do not disturb mode only is possibly
+	    via configured do not disturb key. Otherwise, if no key is
+	    configured, NG system phone always signals incoming calls with
+	    selected call melody."
+        DEFVAL { 0 }
+        ::= { systemPhoneFacilityEntry 13 }
+
+    systemPhoneFacNGLedConf OBJECT-TYPE
+        SYNTAX          BITS {
+                              message-received(0),
+                              call-received(1),
+                              call-state(2)
+                             }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Information of status LED function for NG system phones:
+	    new-message:	Status LED blinks if new message received,
+	    new-call:		Status LED blinks if call was missed,
+	    call-state:		Status LED blinks in call state."
+        DEFVAL { {message-received, call-received} }
+        ::= { systemPhoneFacilityEntry 14 }
+
+---------------------------------------------------------------------------
+-- systemPhoneMSNTable
+---------------------------------------------------------------------------
+
+systemPhoneMSNTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneMSNEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains configuration data assigned to a specific MSN
+	of the system phone."
+    ::= { systemPhoneSetup 4 }
+
+    systemPhoneMSNEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneMSNEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneMSNExtTermIndex }
+        ::= { systemPhoneMSNTable 1 }
+
+    SystemPhoneMSNEntry ::=
+        SEQUENCE {
+            systemPhoneMSNExtTermIndex           SystelExtTerminalIndex, 
+            systemPhoneMSNMelodyExt              INTEGER,
+            systemPhoneMSNVolumeExt              INTEGER,
+            systemPhoneMSNMelodyInt              INTEGER,
+            systemPhoneMSNVolumeInt              INTEGER,
+            systemPhoneMSNCfNumber               DisplayString,
+            systemPhoneMSNCdNumber               DisplayString,
+            systemPhoneMSNAdminStatus            INTEGER
+        }
+
+    systemPhoneMSNExtTermIndex OBJECT-TYPE
+        SYNTAX          SystelExtTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "A reference to the mpsExtensionTerminalTable."
+        DEFVAL { 1 }
+        ::= { systemPhoneMSNEntry 1 }
+
+    systemPhoneMSNMelodyExt OBJECT-TYPE
+        SYNTAX          INTEGER (0..19)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The variable contains the number index of a specific melody for
+	    signalling external calls.
+	    This melody is generated within the system phone."
+        DEFVAL { 0 }
+        ::= { systemPhoneMSNEntry 2 }
+
+    systemPhoneMSNVolumeExt OBJECT-TYPE
+        SYNTAX          INTEGER (0..10)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Volume of the external ringing melody:
+	    0..6:	Muted .. Loud
+	    7:		Increasing volume.
+	    NG system phones have different ranges of values:
+	    1..9:	Soft .. Loud
+	    10:		Increasing volume."
+        DEFVAL { 3 }
+        ::= { systemPhoneMSNEntry 3 }
+
+    systemPhoneMSNMelodyInt OBJECT-TYPE
+        SYNTAX          INTEGER (0..19)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The variable contains the number index of a specific melody for
+	    signalling internal calls.
+	    This melody is generated within the system phone."
+        DEFVAL { 0 }
+        ::= { systemPhoneMSNEntry 4 }
+
+    systemPhoneMSNVolumeInt OBJECT-TYPE
+        SYNTAX          INTEGER (0..10)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Volume of the internal ringing melody:
+	    0..6:	Muted .. Loud
+	    7:		Increasing volume.
+	    NG system phones have different ranges of values:
+	    1..9:	Soft .. Loud
+	    10:		Increasing volume."
+        DEFVAL { 3 }
+        ::= { systemPhoneMSNEntry 5 }
+
+    systemPhoneMSNCfNumber OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..26))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Number of a call forwarding target, specific for this MSN."
+        DEFVAL { "" }
+        ::= { systemPhoneMSNEntry 6 }
+
+    systemPhoneMSNCdNumber OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..26))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Number of a call deflection target, specific for this MSN."
+        DEFVAL { "" }
+        ::= { systemPhoneMSNEntry 7 }
+
+    systemPhoneMSNAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneMSNEntry 8 }
+
+---------------------------------------------------------------------------
+-- systemPhoneIPTable
+---------------------------------------------------------------------------
+
+systemPhoneIPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneIPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains data assigned to network/ip-configuration of the
+	system phone."
+    ::= { systemPhoneSetup 5 }
+
+    systemPhoneIPEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneIPEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneIPIndex }
+        ::= { systemPhoneIPTable 1 }
+
+    SystemPhoneIPEntry ::=
+        SEQUENCE {
+            systemPhoneIPIndex                  SystelTerminalIndex,
+            systemPhoneIPFacility               BITS,
+            systemPhoneIPMacAddress             MacAddress,
+            systemPhoneIPAddress                IpAddress,
+            systemPhoneIPGatewayAddress         IpAddress,
+            systemPhoneIPRegistrarAddress       IpAddress,
+            systemPhoneIPSubnetmask             IpAddress
+        }
+
+    systemPhoneIPIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "A reference to systemPhoneTable (or mpsTerminalTable)."
+        DEFVAL { 1 }
+        ::= { systemPhoneIPEntry 1 }
+
+    systemPhoneIPFacility OBJECT-TYPE
+        SYNTAX          BITS { 
+                              dhcp(0),
+                              gateway-equals-registrar(1)
+                             }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "IP facility bit matrix:
+	    dhcp:			0, system phone uses a dhcp-server, the
+					ip address of this dhcp-server is stored
+					in systemIPGatewayAddress.
+					1, system phone don't uses a dhcp-server,
+					the ip address stored in
+					systemPhoneIPGateway is the standard
+					gateway of systemphone.
+	    gateway-equals-registrar:	0, system phone gateway address is
+					different to registrar address for sip
+					registration.
+					1, system phone gateway address equals
+					registrar address for sip registration."
+        ::= { systemPhoneIPEntry 2 }
+
+    systemPhoneIPMacAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Variable contains the MAC-Address of the system phone."
+        ::= { systemPhoneIPEntry 3 }
+
+    systemPhoneIPAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Variable contains the IP-Address of the system phone."
+        ::= { systemPhoneIPEntry 4 }
+
+    systemPhoneIPGatewayAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Variable contains the IP address of standard gateway."
+        ::= { systemPhoneIPEntry 5 }
+
+    systemPhoneIPRegistrarAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Variable contains the IP address of registrar server (in system
+	    phone the registrar server is mentioned as SysServer)."
+        ::= { systemPhoneIPEntry 6 }
+
+    systemPhoneIPSubnetmask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Variable contains the subnetmask which the system phone will use
+	    for the IP address."
+        ::= { systemPhoneIPEntry 7 }
+
+---------------------------------------------------------------------------
+-- group: systemPhoneModule
+-- systemPhoneModuleTable
+---------------------------------------------------------------------------
+
+systemPhoneModuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains information about base and extension modules of
+	system phones."
+    ::= { systemPhoneModule 1 }
+
+    systemPhoneModuleEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneModuleEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneModuleIndex }
+        ::= { systemPhoneModuleTable 1 }
+
+    SystemPhoneModuleEntry ::=
+        SEQUENCE {
+            systemPhoneModuleIndex                   SystelModuleIndex,
+            systemPhoneModuleTermIndex               SystelTerminalIndex,
+            systemPhoneModuleType                    INTEGER,
+            systemPhoneModulePrio                    INTEGER,
+            systemPhoneModuleVersion                 DisplayString,
+            systemPhoneModuleRelDate                 DisplayString,
+            systemPhoneModuleSerNum                  DisplayString,
+            systemPhoneModuleOperStatus              INTEGER,
+            systemPhoneModuleAdminStatus             INTEGER
+        }
+
+    systemPhoneModuleIndex OBJECT-TYPE
+        SYNTAX          SystelModuleIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "A unique value for system phone itself (base) or any extension module
+	    (e.g. T400, T400/2, T500, Answering machine)."
+        DEFVAL { 1 }
+        ::= { systemPhoneModuleEntry 1 }
+
+    systemPhoneModuleTermIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "A reference to systemPhoneTable (or mpsTerminalTable)."
+        DEFVAL { 1 }
+        ::= { systemPhoneModuleEntry 2 }
+
+    systemPhoneModuleType OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                base(1),
+                                t400(2),
+                                ab-mod(3),
+                                t400-2(4),
+                                t500(5),
+                                gigaset-base(6),
+                                gigaset-expansion-module(7)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The module type:
+	    base:	module is the system phone itself.
+	    t400:	module is a keypad extension T400.
+	    ab-mod:	module is an answering machine.
+	    t400-2:	module is a keypad extension T400/2.
+	    t500:	module is a NG Phone keypad extension T500
+	    giga..:	module is a gigaset phone base or expansion module"
+        DEFVAL { base }
+        ::= { systemPhoneModuleEntry 3 }
+
+    systemPhoneModulePrio OBJECT-TYPE
+        SYNTAX          INTEGER (0..3)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The variable defines the module position docked to the base
+	    system phone."
+        DEFVAL { 0 }
+        ::= { systemPhoneModuleEntry 4 }
+
+    systemPhoneModuleVersion OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..9))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Information about the module's software version."
+        DEFVAL { "" }
+        ::= { systemPhoneModuleEntry 5 }
+
+    systemPhoneModuleRelDate OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..17))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Information about the module's release date."
+        DEFVAL { "" }
+        ::= { systemPhoneModuleEntry 6 }
+
+    systemPhoneModuleSerNum OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..15))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The serial number of the module."
+        DEFVAL { "" }
+        ::= { systemPhoneModuleEntry 7 }
+
+    systemPhoneModuleOperStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                connected(1),
+                                unconnected(2),
+                                unsupported(3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Operational status of the module."
+        DEFVAL { unconnected }
+        ::= { systemPhoneModuleEntry 8 }
+
+    systemPhoneModuleAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneModuleEntry 9 }
+
+---------------------------------------------------------------------------
+-- systemPhoneFunctionKeyTable
+---------------------------------------------------------------------------
+
+systemPhoneFunctionKeyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneFunctionKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains information concerning system phone function
+	key configuration."
+    ::= { systemPhoneModule 2 }
+
+    systemPhoneFunctionKeyEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneFunctionKeyEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneFKIndex }
+        ::= { systemPhoneFunctionKeyTable 1 }
+
+    SystemPhoneFunctionKeyEntry ::=
+        SEQUENCE {
+            systemPhoneFKIndex                       SystelFunctionKeyIndex,
+            systemPhoneFKModuleIndex                 SystelModuleIndex,
+            systemPhoneFKButton                      SystelFKButtonIndex,
+            systemPhoneFKLevel                       SystelFKLevel,
+            systemPhoneFKDescription                 DisplayString,
+            systemPhoneFKType                        INTEGER,
+            systemPhoneFKMSNPrio                     INTEGER,
+            systemPhoneFKTargetIndex                 SystelTargetIndex,
+            systemPhoneFKTargetString                DisplayString,
+            systemPhoneFKAdminStatus                 INTEGER
+        }
+
+    systemPhoneFKIndex OBJECT-TYPE
+        SYNTAX          SystelFunctionKeyIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "A unique value for each function key of a system phone."
+        DEFVAL { 1 }
+        ::= { systemPhoneFunctionKeyEntry 1 }
+
+    systemPhoneFKModuleIndex OBJECT-TYPE
+        SYNTAX          SystelModuleIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Variable contains the index of the systemPhoneModuleTable as
+	    reference."
+        DEFVAL { 1 }
+        ::= { systemPhoneFunctionKeyEntry 2 }
+
+    systemPhoneFKButton OBJECT-TYPE
+        SYNTAX          SystelFKButtonIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Identifier for each function key.
+	    Valid range for systemPhoneFKButton for T400 is 1..22.
+	    Valid range for systemPhoneFKButton for T500 is 1..30."
+        DEFVAL { 1 }
+        ::= { systemPhoneFunctionKeyEntry 3 }
+
+    systemPhoneFKLevel OBJECT-TYPE
+        SYNTAX          SystelFKLevel
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Identifier for the (shift) level of each function key.
+	    One short press activates level 0 function, double press activates
+	    level 1 function."
+        DEFVAL { 0 }
+        ::= { systemPhoneFunctionKeyEntry 4 }
+
+    systemPhoneFKDescription OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..20))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The variable contains a short description of the key type, which may
+	    be printed on the system telephone label."
+        DEFVAL { "" }
+        ::= { systemPhoneFunctionKeyEntry 5 }
+
+    systemPhoneFKType OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                dial-standard(1),
+                                dial-dtmf(2),
+                                dial-keypad(3),
+                                extension-subscriber(4),
+                                extension-team(5),
+                                trunk-line(6),
+                                team-log(7),
+                                system-call-announce(8),
+                                system-call-announce-allow(9),
+                                system-call-exchange(10),
+                                system-call-exchange-allow(11),
+                                boss-boss(12),
+                                boss-secretary(13),
+                                boss-diversion(14),
+                                call-forwarding-cfu(15),
+                                call-forwarding-cfb(16),
+                                call-forwarding-cfnr(17),
+                                macro(18),
+                                headset(19),
+                                auto-accept(20),
+                                bundle(21),
+                                connection(22),
+                                system-parking(23),
+                                internal-line-access(24),
+                                hotel-room(25),
+                                agent-time(26),
+                                night-mode(27),
+                                hotel-room-connect(28),
+                                agent-time-renew(29),
+                                do-not-disturb(30),
+                                shift(31),
+                                parallel-ringing(32),
+                                nop(33),
+                                system-call-announce-team(34),
+                                msn-selection(35),
+                                xml-content(50),
+                                next-call-anonymous(51),
+                                menu-call-divert(52),
+                                menu-resource-dir(53),
+                                menu-internet-radio(54),
+                                toggle-call-divert(55),
+                                not-configured(99)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specifies type of function key:
+	    dial-standard:			standard speed dialing key.
+	    dial-dtmf:				dials a DTMF sequence.
+	    dial-keypad:			dials a keypad sequence.
+	    extension-subscriber:		line key with LED and pickup
+						function for user extension.
+	    extension-team:			line key with LED and pickup
+						function for team extension.
+	    trunk-line:				trunk line key to establish next
+						call via a configured trunk line.
+	    team-log:				log an extension in or out of a
+						team.
+	    system-call-announce:		announcement to a choosen
+						extension.
+	    system-call-announce-allow:		allow/restrict incoming
+						announcement inquiries.
+	    system-call-exchange:		build up a call exchange
+						connection between system phone
+						and choosen extension.
+	    system-call-exchange-allow:		allow/restrict incoming call
+						exchange inquiries.
+	    boss-boss:				key has to configure on boss
+						system phone to call the
+						secretary (special line key).
+	    boss-secretary:			key has to configure on secretary
+						system phone to call the boss
+						(special line key).
+	    boss-diversion:			key has to configure on boss
+						system phone to divert incoming
+						calls to secretary's phone.
+	    call-forwarding-cfu:		activate/deactivate call
+						forwarding immediately for an
+						associated extension to a choosen
+						internal number.
+	    call-forwarding-cfb:		activate/deactivate call
+						forwarding on busy for an
+						associated extension to a choosen
+						internal number.
+	    call-forwarding-cfnr:		activate/deactivate call
+						forwarding if no reply for an
+						associated extension to a choosen
+						internal number.
+	    macro:				macro key (configuration only via
+						system phone).
+	    headset:				prepare a headset call (off-hook)
+						or accept an incoming call with
+						the headset.
+	    auto-accept:			activate/deactivate automatic
+						call accpetance.
+	    bundle:				establish next call via a
+						configured bundle (trunk group).
+	    connection:				key to change between two calls
+						(for the correct function of this
+						function key type you have to
+						configure at least 2 connection
+						keys, to switch between the
+						connections).
+	    system-parking:			depositing a subscriber to
+						configured system parking place
+						(open inquiry) or fetch a
+						subscriber from system parking
+						place.
+	    internal-line-access:		get internal call waiting tone if
+						automatic outside line access is
+						activated.
+	    hotel-room:				key has to configure on first
+						level of reception system phone
+						to checkin or checkout hotel
+						rooms.
+	    agent-time:				key has to configure on first
+						level of agent system phone to
+						activate/deactivate agent time
+						for associated agent.
+	    night-mode:				activate/deactivate the PBX
+						nightmode (eg. for switching
+						variants of teams, TFE, CoS,
+						etc.).
+	    hotel-room-connect:			key is automatically set to
+						second level on system phone if a
+						hotel-room is configured, with a
+						double press the reception can
+						establish a call to choosen hotel
+						room.
+	    agent-time-renew:			key is automatically set to
+						second level on system phone if a
+						agent-time is configured, with a
+						double press the agent can renew
+						the associated agent timer.
+	    do-not-disturb:			activate / deactivate the do not
+						disturb mode of NG system phones
+						(settings for this mode have to
+						be modified in
+						systemPhoneFacilityTable).
+	    shift:				this key has to be configured as
+						alternative to the double
+						keypress to get access to the
+						second level function keys.
+	    parallel-ringing:			this key activates or deactivates
+						the parallel ringing option.
+	    nop:				this key is only a dummy key and
+						leads to no operation in system
+						phone. It is usefull to use this
+						keytype if second level should be
+						locked.
+	    system-call-announce-team:		announcement to a team.
+	    msn-selection:			use a specific MSN for outgoing
+	    					call (CLIP signalling). 
+	    xml-content:			gigaset-> XML Mini Browser (URL).
+	    next-call-anonymous:		gigaset-> set CLIR for next call.
+	    menu-call-divert:			gigaset-> menu call diversion.
+	    menu-resource-dir:			gigaset-> menu media pool.
+	    menu-internet-radio:		gigaset-> menu internet radio.
+	    toggle-call-divert:			gigaset-> call diversion on/off.
+	    not-configured:			gigaset-> This function key is
+	    					not configured and therefore will
+	    					not be set via provisioning.
+	    					(That means: Do not touch! This
+	    					key is controlled by the device
+	    					itself.)"
+        DEFVAL { dial-standard }
+        ::= { systemPhoneFunctionKeyEntry 6 }
+
+    systemPhoneFKMSNPrio OBJECT-TYPE
+        SYNTAX          INTEGER (0..12)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This variable contains the index of the selected MSN within the
+	    phone, for which this function shall be activated.
+	    Only used when selecting the systemPhoneFKType: team-log, call-
+	    forwarding-xxx or auto-accept.
+	    1 .. 12:	The function key is attributed to a specific MSN.
+	    0:		The function key is attributed to the default MSN."
+        DEFVAL { 0 }
+        ::= { systemPhoneFunctionKeyEntry 7 }
+
+    systemPhoneFKTargetIndex OBJECT-TYPE
+        SYNTAX          SystelTargetIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The variable contains either ExtensionIndex, GroupIndex,
+	    TrunkGroupIndex, TrunkBundleIndex or SystemNumberPosition,
+	    depending upon the function key type selected."
+        DEFVAL { 1 }
+        ::= { systemPhoneFunctionKeyEntry 8 }
+
+    systemPhoneFKTargetString OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Variable contents depends upon the function key configured.
+	    It may be either a dialling number, a DTMF sequence, a keypad
+	    sequence, a call forwarding target number or a macro key sequence."
+        DEFVAL { "" }
+        ::= { systemPhoneFunctionKeyEntry 9 }
+
+    systemPhoneFKAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneFunctionKeyEntry 10 }
+
+---------------------------------------------------------------------------
+-- group: systemPhoneCapabilities
+-- systemPhoneCapabilityTable
+---------------------------------------------------------------------------
+
+systemPhoneCapabilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneCapabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains system phone capabilities which could be partially
+	specific to phone types (for example the availability of MSN)."
+    ::= { systemPhoneCapabilities 1 }
+
+    systemPhoneCapabilityEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneCapabilityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneCapDeviceType }
+        ::= { systemPhoneCapabilityTable 1 }
+
+    SystemPhoneCapabilityEntry ::=
+        SEQUENCE {
+            systemPhoneCapDeviceType               SystelDeviceType,
+            systemPhoneCapAvailableMSN             INTEGER,
+            systemPhoneCapGeneral                  BITS,
+            systemPhoneCapAvailableFunctionKeys    INTEGER,
+            systemPhoneCapAvailableExtFunctionKeys INTEGER,
+            systemPhoneCapMaxExtensionModules      INTEGER,
+            systemPhoneCapAvailableLanguages       BITS
+        }
+
+    systemPhoneCapDeviceType OBJECT-TYPE
+        SYNTAX          SystelDeviceType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Subscripted via the device type of a system phone."
+        DEFVAL { cs290 }
+        ::= { systemPhoneCapabilityEntry 1 }
+
+    systemPhoneCapAvailableMSN OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Number of MSNs available in this device."
+        DEFVAL { 3 }
+        ::= { systemPhoneCapabilityEntry 2 }
+
+    systemPhoneCapGeneral OBJECT-TYPE
+        SYNTAX          BITS {
+                             do-not-disturb(0),
+                             hands-free(1),
+                             local-phonebook(2),
+                             intercom(3),
+                             hotel(4),
+                             macrokey(5),
+                             boss-secretary(6),
+                             key-extension-module(7),
+                             ab-module(8),
+                             headset-auto-call(9),
+                             extended-status-led(10),
+                             conver-disp-settings(11),
+                             ng-do-not-disturb(12),
+                             extended-auto-pick-up(13),
+                             shift-key(14),
+                             parallel-ringing-key(15),
+                             headset-key(16),
+                             connection-key(17)
+                             }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Capabilities of different system phone types. Feature is supported
+	    by the phone device type if the BIT is set to 1:
+	    do-not-disturb:		DND - Modus available.
+	    hands-free:			Hands free calling possible, cause
+					a mic in system phone integrated.
+	    local-phonebook:		Has a local phonebook.
+	    intercom:			Intercom available.
+	    hotel:			Hotel funct./hotelroom keys available.
+	    macrokey:			Macro key supported.
+	    boss-secretary:		Boss-Secretary functions incl.
+					Diversionkey available.
+	    key-extension-module:	Has Key-extensions (T400, T400/2, T500).
+	    ab-module:			Answering machine (module) available.
+	    headset-auto-call:		(0) Auto-Call-Acceptance (key) available
+					    only if headset control (key) is set,
+					(1) Auto-Call-Acceptance available (also
+					    without headset control (key), via
+					    hands-free telephone).
+	    extended-status-led:	(0) CS/IP system phones don't support the
+					    extended status led configuration,
+					(1) NG phones have a bitfield to
+					    configure status led on different
+					    events (eg. incoming/missing call or
+					    message).
+	    conver-disp-settings:	(1) Conversation display settings are
+					    available (for CS/IP system phones),
+					(0) NG system phones don't support this
+					    settings.
+	    ng-do-not-disturb:		Special Do not disturb settings in
+					GUI for NG system phones is enabled.
+					Furthermore, if this bit is set a do
+					not disturb function key is available.
+	    extended-auto-pick-up:	(0) For CS/IP system phones only the
+					    following values are available for
+					    systemPhoneFacAutoCallAcceptTime:
+					    immediatly, sec-5, sec-10,
+					(1) For NG system phones further values
+					    are available: off, sec-15, sec-20.
+	    shift-key:			Shift key is available.
+	    parallel-ringing-key:	Parallel ringing key available.
+	    headset-key:		Headset key available.
+	 				Note: NG system phones have their own
+	 				firmly integrated headset key, so there
+	 				is no use of this function key.
+	    connection-key:		Connection keys available.
+					Note: NG system phones don't support this
+					kind of key."
+        ::= { systemPhoneCapabilityEntry 3 }
+
+    systemPhoneCapAvailableFunctionKeys OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Number of (2-level) function keys available on this device."
+        DEFVAL { 5 }
+        ::= { systemPhoneCapabilityEntry 4 }
+        
+    systemPhoneCapAvailableExtFunctionKeys OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Number of function keys available on the expansion module."
+        ::= { systemPhoneCapabilityEntry 5 }
+
+    systemPhoneCapMaxExtensionModules OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Maximum number of key expansion modules which can be connected to
+            this device."
+        ::= { systemPhoneCapabilityEntry 6 }
+
+    systemPhoneCapAvailableLanguages OBJECT-TYPE
+        SYNTAX          BITS 	{
+        			german(1),
+				dutch(2),
+				english(3),
+				italian(5),
+				danish(6),
+				spanish(7),
+				swedish(8),
+				french(10),
+				portuguese(11),
+				czech(14),
+				norwegian(16),
+				greek(17),
+				icelandic(20),
+				polish(21),
+				hungarian(22),
+				russian(23),
+				romanian(24),
+				slovak(25),
+				turkish(26)
+				}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "A matrix of supported display languages by the phone device."
+        ::= { systemPhoneCapabilityEntry 7 }
+        
+---------------------------------------------------------------------------
+-- group: systemPhoneFwu
+-- systemPhoneFwuServer
+---------------------------------------------------------------------------
+
+    systemPhoneFwuServer OBJECT IDENTIFIER ::= { systemPhoneFwu 1 }
+
+    systemPhoneFwuServerStartHour OBJECT-TYPE
+        SYNTAX          INTEGER (0..24)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Every day firmware update start time (hour)."
+        DEFVAL { 0 }
+        ::= { systemPhoneFwuServer 1 }
+      
+    systemPhoneFwuServerStartMinute OBJECT-TYPE
+        SYNTAX          INTEGER (0..60)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Every day firmware update start time (minute)."
+        DEFVAL { 0 }
+        ::= { systemPhoneFwuServer 2 }
+
+    systemPhoneFwuServerEndHour OBJECT-TYPE
+        SYNTAX          INTEGER (0..24)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Every day firmware update end time (hour)."
+        DEFVAL { 5 }
+        ::= { systemPhoneFwuServer 3 }
+
+    systemPhoneFwuServerEndMinute OBJECT-TYPE
+        SYNTAX          INTEGER (0..60)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Every day firmware update end time (minute)."
+        DEFVAL { 0 }
+        ::= { systemPhoneFwuServer 4 }
+
+    systemPhoneFwuServerFileStatus OBJECT-TYPE
+        SYNTAX          INTEGER { create(1), done(2) }
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+           "Firmware file status:
+	    create(1):	new firmware file shall be stored on the device
+	    done(2):	synchronization of storage device with MIB is done."
+        DEFVAL { done }
+        ::= { systemPhoneFwuServer 5 }
+
+    systemPhoneFwuServerUploadResult OBJECT-TYPE
+        SYNTAX          INTEGER { success(1),
+                                  no-mem-card(2),
+                                  no-mem-space(3),
+                                  incomp-fw-format(4),
+                                  transfer-error(5),
+                                  write-protection(6),
+                                  internal-error(7)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Firmware file upload result (error) code:
+	    success(1):		 the firmware file upload was successful,
+	    no-mem-card(2):	 no memory card plugged in,
+	    no-mem-space(3):	 no more space available on the memory card,
+	    incomp-fw-format(4): the firmware file format doesn't match the
+				 requirements,
+	    transfer-error(5):	 any transfer error occured during upload,
+	    write-protection(6): active write protection on storage device,
+	    internal-error(7):	 unexpected internal error occured."
+        DEFVAL { success }
+        ::= { systemPhoneFwuServer 6 }
+
+    systemPhoneFwuServerUploadStatus OBJECT-TYPE
+        SYNTAX          INTEGER { progress(1), done(2) }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Firmware file upload status:
+	    progress(1):	firmware file storage on the device is in
+	    			progress,
+	    done(2):		firmware file storage on the device and
+				synchronization with MIB is done."
+        DEFVAL { done }
+        ::= { systemPhoneFwuServer 7 }
+
+    systemPhoneFwuServerRemoteAccessAllowed OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Allow/block access to the intern FW-UPD Server from extern ISDN."
+        DEFVAL { false }
+        ::= { systemPhoneFwuServer 8 }
+
+    systemPhoneFwuServerUrlAllowed OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Allow/block access to extern FW-UPD Server (URL) from intern
+            (e. g. Gigaset Maxwell Series) phone devices."
+        DEFVAL { false }
+        ::= { systemPhoneFwuServer 9 }
+
+---------------------------------------------------------------------------
+-- systemPhoneFwuFileTable
+---------------------------------------------------------------------------
+
+systemPhoneFwuFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneFwuFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains information about firmware files stored on sd card
+	for system phone firmware update."
+    ::= { systemPhoneFwu 2 }
+
+    systemPhoneFwuFileEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneFwuFileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This entries only created by the respective device driver."
+        INDEX { systemPhoneFwuFileIndex }
+        ::= { systemPhoneFwuFileTable 1 }
+
+    SystemPhoneFwuFileEntry ::=
+        SEQUENCE {
+            systemPhoneFwuFileIndex                    INTEGER,
+            systemPhoneFwuFileType                     SystelDeviceType,
+            systemPhoneFwuFileDirectory                DisplayString,
+            systemPhoneFwuFileName                     DisplayString,
+            systemPhoneFwuFileVersion                  DisplayString,
+            systemPhoneFwuFileAdminStatus              INTEGER
+        }
+
+    systemPhoneFwuFileIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "A counting index for each firmware file stored on the mounted
+	     device."
+        DEFVAL { 1 }
+        ::= { systemPhoneFwuFileEntry 1 }
+
+    systemPhoneFwuFileType OBJECT-TYPE
+        SYNTAX          SystelDeviceType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Variable contains the phone type of firmware file (stripped out of
+	    the header of the file)."
+        DEFVAL { cs410 }
+        ::= { systemPhoneFwuFileEntry 2 }
+                
+    systemPhoneFwuFileDirectory OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specifies the complete path/tree where the firmware file can be
+	     found on the mounted device."
+        DEFVAL { "" }
+        ::= { systemPhoneFwuFileEntry 3 }
+
+    systemPhoneFwuFileName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Simply contains the firmware file name on the mounted device."
+        DEFVAL { "" }
+        ::= { systemPhoneFwuFileEntry 4 }
+
+    systemPhoneFwuFileVersion OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..20))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Version information of the firmware file stored on sd card (stripped
+	     out of the header of file). Version string of elmeg system phones
+	     have a size of max. 9 characters. Siemens OpenStage devices have a
+	     maximum size of 12."
+        DEFVAL { "" }
+        ::= { systemPhoneFwuFileEntry 5 }
+
+    systemPhoneFwuFileAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneFwuFileEntry 6 }
+
+---------------------------------------------------------------------------
+-- systemPhoneFwuProcessTable
+---------------------------------------------------------------------------
+
+systemPhoneFwuProcessTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneFwuProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains information of firmware update of system phones."
+    ::= { systemPhoneFwu 3 }
+
+    systemPhoneFwuProcessEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneFwuProcessEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneFwuProcessIndex }
+        ::= { systemPhoneFwuProcessTable 1 }
+
+    SystemPhoneFwuProcessEntry ::=
+        SEQUENCE {
+            systemPhoneFwuProcessIndex                       SystelTerminalIndex,
+            systemPhoneFwuProcessStartNow                    TruthValue,
+            systemPhoneFwuProcessStartSchedule               TruthValue,
+            systemPhoneFwuProcessStatus                      INTEGER,
+            systemPhoneFwuProcessResult                      INTEGER,
+            systemPhoneFwuProcessProgress                    INTEGER,
+            systemPhoneFwuProcessUnknownMsgCounter           Unsigned32,
+            systemPhoneFwuProcessTimeoutCounter              Unsigned32,
+            systemPhoneFwuProcessAdminStatus                 INTEGER
+        }
+
+    systemPhoneFwuProcessIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "A reference to the systemPhoneTable (or mpsTerminalTable)."
+        DEFVAL { 1 }
+        ::= { systemPhoneFwuProcessEntry 1 }
+
+    systemPhoneFwuProcessStartNow OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This variable contains the user input in a boolean value to
+	    immediately update the firmware of this device."
+        DEFVAL { false }
+        ::= { systemPhoneFwuProcessEntry 2 }
+
+    systemPhoneFwuProcessStartSchedule OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "If this variable is true, the firmwareupdate starts scheduled.
+	    The period of firmware updates is defined in
+	    systemPhoneFwuServerTable."
+        DEFVAL { false }
+        ::= { systemPhoneFwuProcessEntry 3 }
+
+    systemPhoneFwuProcessStatus OBJECT-TYPE
+        SYNTAX          INTEGER{
+                                done(1),
+                                running(2),
+                                waiting(3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Status of system phone firmware update:
+	    done:	there is no firmware update in time
+	    running:	firmwareupdate is actually running
+	    waiting:	because lack of system ressources the scheduled or
+			immediately started firmware update is in waiting mode."
+        DEFVAL { done }
+        ::= { systemPhoneFwuProcessEntry 4 }
+
+    systemPhoneFwuProcessResult OBJECT-TYPE
+        SYNTAX          INTEGER{
+                                idle(1),
+                                ok(2),
+                                failed(3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Result of system phone firmware update:
+	    idle:	initial value
+	    ok:		firmware update is successfully completed
+	    failed:	an error occurred during the firmware update process."
+        DEFVAL { idle }
+        ::= { systemPhoneFwuProcessEntry 5 }
+
+    systemPhoneFwuProcessProgress OBJECT-TYPE
+        SYNTAX          INTEGER (0..100)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Progress of system phone firmware update."
+        DEFVAL { 0 }
+        ::= { systemPhoneFwuProcessEntry 6 }
+
+    systemPhoneFwuProcessUnknownMsgCounter OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Statistic value which shows the received unknown messages of internal
+	    firmware download server during the firmware update."
+        DEFVAL { 0 }
+        ::= { systemPhoneFwuProcessEntry 7 }
+
+    systemPhoneFwuProcessTimeoutCounter OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Statistic value which shows the occured timeouts during the firmware
+	    update."
+        DEFVAL { 0 }
+        ::= { systemPhoneFwuProcessEntry 8 }
+
+    systemPhoneFwuProcessAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2),
+			    disable(3)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "In case of elmegIP (gigaset) devices this variable activates (enable)
+	    or deactivates (disable) the automatic update function of gigaset
+	    devices (introduced by a SIP NOTIFY check-sync). Other systemphones
+	    ignore the AdminStatus-value. To delete this mib, value must be set
+	    to delete. "
+        DEFVAL { enable }
+        ::= { systemPhoneFwuProcessEntry 9 }
+
+---------------------------------------------------------------------------
+-- systemPhoneFwuServerUpdTable
+---------------------------------------------------------------------------
+
+systemPhoneFwuServerUpdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPhoneFwuServerUpdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains URL informations for firmware update of system phones."
+    ::= { systemPhoneFwu 4 }
+
+    systemPhoneFwuServerUpdEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneFwuServerUpdEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneFwuServerUpdDevClass, systemPhoneFwuServerUpdDevType }
+        ::= { systemPhoneFwuServerUpdTable 1 }
+
+    SystemPhoneFwuServerUpdEntry ::=
+        SEQUENCE {
+            systemPhoneFwuServerUpdDevClass             SystelDeviceClass,
+            systemPhoneFwuServerUpdDevType              SystelDeviceType,
+            systemPhoneFwuServerUpdPathDefault          DisplayString,
+            systemPhoneFwuServerUpdPath                 DisplayString
+        }
+
+    systemPhoneFwuServerUpdDevClass OBJECT-TYPE
+        SYNTAX          SystelDeviceClass
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "The device class (company) the system phone belongs to."
+        ::= { systemPhoneFwuServerUpdEntry 1 }
+
+    systemPhoneFwuServerUpdDevType OBJECT-TYPE
+        SYNTAX          SystelDeviceType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "The specific device type of the system phone."
+        ::= { systemPhoneFwuServerUpdEntry 2 }
+
+    systemPhoneFwuServerUpdPathDefault OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "This is the default URL used for a specific system phone FW update.
+	    It is set by the FW update server process and should be used if no
+	    systemPhoneFwuServerUpdPath is defined."
+        ::= { systemPhoneFwuServerUpdEntry 3 }
+
+    systemPhoneFwuServerUpdPath OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This is the configured URL used for a specific system phone FW update.
+            It overrides the value set in systemPhoneFwuServerUpdPathDefault.
+            If the string is empty then the systemPhoneFwuServerUpdPathDefault
+            is used."
+        ::= { systemPhoneFwuServerUpdEntry 4 }
+
+---------------------------------------------------------------------------
+-- group: systemPhoneOem
+-- systemPhoneOemTable
+---------------------------------------------------------------------------
+
+systemPhoneOemTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SystemPhoneOemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table contains general information about OEM system phones."
+    ::= { systemPhoneOem 1 }
+
+    systemPhoneOemEntry OBJECT-TYPE
+        SYNTAX          SystemPhoneOemEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneOemTerminalIndex }
+        ::= { systemPhoneOemTable 1 }
+
+    SystemPhoneOemEntry ::=
+        SEQUENCE {
+            systemPhoneOemTerminalIndex      SystelTerminalIndex,
+            systemPhoneOemDeviceType         SystelDeviceType,
+            systemPhoneOemAdminStatus        INTEGER
+        }
+
+    systemPhoneOemTerminalIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Reference to the mpsTerminalTable, a unique value for each OEM
+	    system phone."
+        DEFVAL { 1 }
+        ::= { systemPhoneOemEntry 1 }
+
+    systemPhoneOemDeviceType OBJECT-TYPE
+        SYNTAX          SystelDeviceType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Specified type of OEM system phone."
+        DEFVAL { dect150 }
+        ::= { systemPhoneOemEntry 2 }
+
+    systemPhoneOemAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneOemEntry 3 }
+
+---------------------------------------------------------------------------
+-- systemPhoneOemUserTable
+---------------------------------------------------------------------------
+
+systemPhoneOemUserTable OBJECT-TYPE
+    SYNTAX              SEQUENCE OF SystemPhoneOemUserEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+       "This table contains personal information about OEM system phones.
+        (It must be autosaved because the parameter can be changed by a
+        user)."
+    ::= { systemPhoneOem 2 }
+
+    systemPhoneOemUserEntry OBJECT-TYPE
+        SYNTAX              SystemPhoneOemUserEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+           ""
+        INDEX { systemPhoneOemUserIndex }
+        ::= { systemPhoneOemUserTable 1 }
+
+    SystemPhoneOemUserEntry ::=
+        SEQUENCE {
+            systemPhoneOemUserIndex          SystelTerminalIndex,
+            systemPhoneOemUserLanguage       SystelLanguage,
+            systemPhoneOemUserAdminStatus    INTEGER
+        }
+
+    systemPhoneOemUserIndex OBJECT-TYPE
+        SYNTAX          SystelTerminalIndex
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Reference to the mpsTerminalTable, a unique value for each OEM
+	    system phone."
+        DEFVAL { 1 }
+        ::= { systemPhoneOemUserEntry 1 }
+
+    systemPhoneOemUserLanguage OBJECT-TYPE
+        SYNTAX          SystelLanguage
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "The current display language of the phone device."
+        DEFVAL { english }
+        ::= { systemPhoneOemUserEntry 2 }
+
+    systemPhoneOemUserAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            delete(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Just for MIB entry deletion."
+        DEFVAL { enable }
+        ::= { systemPhoneOemUserEntry 3 }
+
+---------------------------------------------------------------------------
+END

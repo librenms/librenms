@@ -1,0 +1,1578 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 2005-2017 bintec elmeg Gmbh, All Rights Reserved
+-- $RCSfile: mibsip,v $
+-- $Revision: 1.37 $
+
+BIANCA-BRICK-SIP-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	    IpAddress, Counter, enterprises
+		FROM RFC1155-SMI
+
+	    DisplayString
+		FROM RFC1158-MIB
+
+	    Date, BitValue
+		FROM BINTEC-MIB
+
+	    OBJECT-TYPE
+		FROM RFC-1212;
+
+	bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+	bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+
+	voip	OBJECT IDENTIFIER
+	::= { bibo 33 }
+
+	voipSip OBJECT IDENTIFIER
+	::=  { voip 6 }
+
+	voipSipDialLatency OBJECT-TYPE
+	    SYNTAX INTEGER (1..15)
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"The dial delay in seconds after the last entered digit."
+	    DEFVAL { 5 }
+	::= { voipSip 1 }
+
+	voipSipTermination OBJECT-TYPE
+	    SYNTAX INTEGER {
+		off(1),
+		on(2)
+	    }
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"This value describes the RTP stream routing between SIP phones:
+
+		  'off' -> RTP streams between phones are routed directly;
+		  'on'  -> RTP streams are always terminated in the gateway.
+
+		 This value can be set to off to reduce systemload. In this case
+		 all SIP phones in the network must be able to connect over
+		 IP routing. Otherwise the Mediagateway is always endpoint of
+		 the RTP stream and the streams are connected in the gateway."
+	    DEFVAL { on }
+	::= { voipSip 2 }
+
+	voipSipOperStatus OBJECT-TYPE
+	    SYNTAX INTEGER {
+		down(1),
+		up(2),
+		failed(3)
+	    }
+	    ACCESS read-only
+	    STATUS mandatory
+	    DESCRIPTION
+		"The operational status of the Mediagateway."
+	    DEFVAL { down }
+	::= { voipSip 3 }
+
+	voipSipLastError OBJECT-TYPE
+	    SYNTAX DisplayString
+	    ACCESS read-only
+	    STATUS mandatory
+	    DESCRIPTION
+		"The last error message on PABX startup."
+	    DEFVAL { "" }
+	::= { voipSip 4 }
+
+	voipSipSBC OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"Set the default Session Border Controller (SBC) behaviour.
+
+		 A Session Border Controller is a SIP provider account which
+		 takes over the PBX functionality of the Mediagateway. The
+		 'DDIMode' of the used SIP provider account has to be anything
+		 but 'off'. All internal and external activities are controlled
+		 by the SBC. If the SBC is disabled ('-1') or the SBC is
+		 not available the Mediagateway uses the internal PBX
+		 functionality.
+
+		 Auto mode ('0') means that a separate SIP account is used for
+		 each existing extension entry (so in this case it is not
+		 possible to set one global SBC). In auto mode each
+		 voipExtensionTable entry needs a matching
+		 voipProviderTable/voipSipProviderTable entry. So in auto mode
+		 Mediagateway pairs SIP provider accounts and their matching
+		 extensions.
+
+		 Possible values:
+
+		     -1   -> SBC is disabled;
+		      0   -> Auto mode;
+		  1...999 -> Index of a voipSipProviderTable entry (has
+			     to be a SIP trunk provider)."
+	    DEFVAL { 0 }
+	::= { voipSip 5 }
+
+	voipSipDropExtension OBJECT-TYPE
+	    SYNTAX DisplayString
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"Fallback number which is dialed if no matching call endpoint
+		 (extension) for a dialed number is found. Fallback number can
+		 be an internal extension or another external call endpoint."
+	    DEFVAL { "" }
+	::= { voipSip 6 }
+
+	voipSipServerCertIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"Index of certificate entry in certTable which is to be used as
+		 server certificate for SIPS transport. This parameter is only
+		 used if 'ServerCertSource' = 'certtable'."
+	    DEFVAL { 0 }
+	::= { voipSip 20 }
+
+	voipSipServerCertSource OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		internal(1),
+		certtable(2)
+	    }
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"Source of server certificate for SIPS transport:
+
+		  'internal'  -> 'ServerCertIndex' is not used, internal server
+				 certificate of SIP stack is used instead;
+		  'certtable' -> use certificate from certTable entry specified
+				 by 'ServerCertIndex'.
+
+		 Default value is 'internal'."
+	    DEFVAL { internal }
+	::= { voipSip 21 }
+
+	voipSipMaxConcurrentServerTransactions OBJECT-TYPE
+	    SYNTAX INTEGER (0..10000)
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"The maximum amount of concurrent server transactions created by incoming
+         INVITE, REGISTER, ...
+         If the limit is reached, new server transactions will be ignored.
+         A value of 0 means no limitation"
+	    DEFVAL { 640 }
+	::= { voipSip 22 }
+
+	voipSipMaxServerTransactionsPerSecond OBJECT-TYPE
+	    SYNTAX INTEGER (0..10000)
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"The maximum amount of server transactions per second created by incoming
+         INVITE, REGISTER, ...
+         If the limit is reached, new server transactions will be ignored.
+         A value of 0 means no limitation"
+	    DEFVAL { 96 }
+	::= { voipSip 23 }
+
+	voipSipMaxServerTransactionsPerPeer OBJECT-TYPE
+	    SYNTAX INTEGER (0..10000)
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"The maximum amount of server transactions per peer created by incoming
+         INVITE, REGISTER, ...
+         If the limit is reached, new server transactions from that peer will be ignored.
+         A value of 0 means no limitation"
+	    DEFVAL { 96 }
+	::= { voipSip 24 }
+
+        voipSipRoutingPreference OBJECT-TYPE
+            SYNTAX INTEGER {
+                local(1),
+                routing(2)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                " The routing preference for the received called address.
+                  - local     matching local extensions are preferred
+                  - routing   matching configured routes are preferred
+                "
+            DEFVAL { local }
+        ::= { voipSip 25 } 
+
+        voipSipDefaultCountryCode OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..6))
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                " The default country code. This value is 
+                  used by GUI VoIP configuration to set
+                  or modify provider specific dialing rules.
+                "
+       
+            DEFVAL { "" }
+        ::= { voipSip 26 }
+
+       voipSipDefaultAreaCode OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..12))
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                " The default area code. This value is  
+                  used by GUI VoIP configuration to set
+                  or modify provider specific dialing rules.
+                "
+            DEFVAL { "" }
+        ::= { voipSip 27 }
+
+	voipSipSipPort OBJECT-TYPE
+	    SYNTAX          INTEGER (0..65535)
+	    MAX-ACCESS      read-write
+	    STATUS          current
+	    DESCRIPTION
+		"Standard value of the SIP port."
+	    DEFVAL { 5060 }
+	::= { voipSip 28 }
+
+	voipSipSipNatPort OBJECT-TYPE
+	    SYNTAX          INTEGER (0..65535)
+	    MAX-ACCESS      read-write
+	    STATUS          current
+	    DESCRIPTION
+		"The external port mapped by NAT. For security reasons this might be
+		 different than the internal port (mpsVoIPConfigSipPort)."
+	    DEFVAL { 5060 }
+	::= { voipSip 29 }
+
+       voipSipDscpSignalling OBJECT-TYPE
+            SYNTAX INTEGER (0..63)
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "The 6 bit DSCP value used in IP header for signalling data."
+            DEFVAL { 46 }
+            -- 46 is binary 101110, see RFC 2598 (expedited forwarding)
+        ::= { voipSip 30 }
+
+       voipSipIsdnTypeOfNumber OBJECT-TYPE
+            SYNTAX INTEGER {
+                standard(1),
+                specific(2)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "Specifies the type of of number for the calling number in ISDN setup: 
+                   standard - calling number is not modified and type of number is unknown.
+                   specific - calling number is checked for international, national or subscriber.
+                              The type of number is set to the result. The calling number is 
+                              modified if the type is international or national."
+            DEFVAL { standard }
+        ::= { voipSip 31 }
+
+        voipSipProviderTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipProviderEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+	    "Contains SIP specific provider account data."
+	::= { voipSip 10 }
+
+
+	voipSipProviderEntry OBJECT-TYPE
+	    SYNTAX VoipSipProviderEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Describes a SIP specific provider account entry."
+	    INDEX { voipSipProviderIndex }
+	::= { voipSipProviderTable 1 }
+
+
+	VoipSipProviderEntry ::=
+	    SEQUENCE {
+		voipSipProviderIndex	    INTEGER,
+		voipSipProviderProxy	    DisplayString,
+		voipSipProviderAuthId	    DisplayString,
+		voipSipProviderTransport    INTEGER,
+		voipSipProviderExpire	    INTEGER,
+		voipSipProviderRegister	    INTEGER,
+		voipSipProviderCodecs	    BitValue,
+		voipSipProviderOrder	    INTEGER,
+		voipSipProviderDSPLength    INTEGER,
+		voipSipProviderDSPOptions   INTEGER,
+		voipSipProviderRealm	    DisplayString,
+		voipSipProviderTimeout	    INTEGER,
+		voipSipProviderDDIMode	    INTEGER,
+		voipSipProviderDDICli	    INTEGER,
+		voipSipProviderDDISsn	    DisplayString,
+		voipSipProviderDad	    INTEGER,
+		voipSipProviderOptions	    BitValue
+	   }
+
+	voipSipProviderIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Unique table index of this entry. This value cannot be edited
+		 or changed. This value is identical to 'Index' number of
+		 parent entry in voipProviderTable."
+	    DEFVAL { 1 }
+	::= { voipSipProviderEntry 1 }
+
+
+	voipSipProviderProxy OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"SIP outbound proxy. This value is set if provider uses an
+		 outbound proxy for communication."
+	    DEFVAL { "" }
+	::= { voipSipProviderEntry 2 }
+
+
+	voipSipProviderAuthId OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Authentication ID for provider (only sometimes used).
+		 This value is set if the authentication ID differs from the
+		 setting of 'Account' in voipProviderTable."
+	    DEFVAL { "" }
+	::= { voipSipProviderEntry 3 }
+
+
+	voipSipProviderTransport OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		udp(1),
+		tcp(2),
+		sips(3),
+		auto(4)
+--		delete(7) - obsoleted
+	    }
+
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Transport protocol used by connection. Allowed values are:
+		     udp(1) - UDP (default)
+		     tcp(2) - TCP
+		     sips(3) - TLS
+		     auto(4) - Taken from NAPTR-record if found there,
+		               else UDP (default)"
+	    DEFVAL { udp }
+	::= { voipSipProviderEntry 4 }
+
+
+	voipSipProviderExpire OBJECT-TYPE
+	    SYNTAX  INTEGER (0..38400)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Expire time for registration retransmission.
+
+		 Default value is 600."
+	    DEFVAL { 600 }
+	::= { voipSipProviderEntry 5 }
+
+
+	voipSipProviderRegister OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		off(1),
+		on(2)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Switch between dynamic or static mode. In dynamic mode a
+		 REGISTER (SIP message) is sent before expire time is reached.
+		 In static mode no REGISTER is send. In this case communication
+		 is fixied between two endpoints without registration algorithm.
+		 This can be used in carrier environments with fixed settings.
+
+		 Possible values are:
+			off(1)	static mode
+			on(2)	dynamic mode
+
+		 Default value is on."
+	    DEFVAL { on }
+	::= { voipSipProviderEntry 6 }
+
+
+	voipSipProviderCodecs OBJECT-TYPE
+	    SYNTAX  BitValue
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Supported codecs of provider. Set one or more of the following
+		 bit values:
+
+		    ulaw	(1),
+		    alaw	(2),
+		    g729	(4),
+		    g726	(8),
+		    g726_16    (16),
+		    g726_32    (32),
+		    g726_40    (64),
+		    g728      (128),
+		    g723_63   (256),
+		    g723_53   (512),
+		    g729_e   (1024),
+		    gsm      (2048),
+		    dtmf     (4096),
+		    dtmf_cc  (8192),
+		    t38_udp (16384),
+		    t38_tcp (32768).
+
+		 Default: 'ulaw', 'alaw' and 'g.729' (7).
+
+		 'g729' is g729 with 8 kBit/s, 'g729_e' is g729 with 12.4
+		 kBit/s. 'dtmf' enables/disables (out of band) DTMF relay via
+		 RTP and SIP INFO events; depending from capabilities of a
+		 dialed endpoint it automatically chooses either RTP or SIP INFO
+		 event method. 'dtmf_cc is' obsolete. As well 't38_tcp' is
+		 unused."
+	    DEFVAL { 7 }
+	::= { voipSipProviderEntry 7 }
+
+
+	voipSipProviderOrder OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		default(1),
+		quality(2),
+		lowest(3),
+		highest(4)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Codec signalling order:
+
+		  'default' -> system default order,
+		  'quality' -> highest quality first,
+		  'lowest'  -> lowest bandwith first,
+		  'highest' -> highest bandwith first.
+
+		 Default value is default."
+	    DEFVAL { default }
+	::= { voipSipProviderEntry 8 }
+
+
+	voipSipProviderDSPLength OBJECT-TYPE
+	    SYNTAX  INTEGER (5..500)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Audio data (payload) duration per packet in milliseconds (for
+		 all codecs).
+
+		 Default value is 20."
+	    DEFVAL { 20 }
+	::= { voipSipProviderEntry 9 }
+
+
+	voipSipProviderDSPOptions OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		echo(2),
+		cng(3),
+		both(4)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"DSP options:
+
+		  'none' -> neither echo cancellation nor comfort noise,
+		  'echo' -> echo cancellation,
+		  'cng'  -> comfort noise generation,
+		  'both' -> echo and comfort noise.
+
+		 Default value is both."
+	    DEFVAL { both }
+	::= { voipSipProviderEntry 10 }
+
+
+	voipSipProviderRealm OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Realm of the provider (only sometimes used). Normally the URL
+		 after the '@' of the username is used for all entries using
+		 provider's domain name. In some cases this value differs.
+		 So at authentication and other cases this domain name is used
+		 instead of the registration domain.
+
+		 e.g register: 12345@voip.sip.sipgate.de
+			realm: sipgate.de
+
+		 By default this value is the empty string."
+	    DEFVAL { "" }
+	::= { voipSipProviderEntry 11 }
+
+	voipSipProviderTimeout OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Here a specific session timeout can be set. It is similar to a
+		 keep alive polling between the Mediagateway and the registrar
+		 in order to detect a dead RTP session. The default is '0'
+		 (disabled). In RFC minimum time is 90sec. The default is 1800
+		 seconds."
+	    DEFVAL { 0 }
+	::= { voipSipProviderEntry 12 }
+
+
+	voipSipProviderDDIMode OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		off(1),
+		client(2),
+		server(3),
+		gw-trunk(4)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Set trunk DDI (direct dial in) mode for provider entry:
+
+		  'off'      -> Normal mode with single number account;
+		  'client'   -> The gateway is DDI client;
+		  'server'   -> The gateway is in server mode. So DDI clients
+				can connect to the Mediagateway;
+		  'gw-trunk' -> The Gateway is DDI client but is used as trunk.
+
+		 Default value is off."
+	    DEFVAL { off }
+	::= { voipSipProviderEntry 16 }
+
+
+	voipSipProviderDDICli OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		off(1),
+		disp(2),
+		user(3),
+		disp-user(4),
+		ppi(5),
+		pai(6)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The field in the SIP header which is used in order to indicate
+		 the caller's identity to connected clients. The needed method
+		 is provider dependent. Possible methods are:
+
+		  'off'       -> anonymous mode;
+		  'disp'      -> tranfer in DISPLAY field of the FROM header;
+		  'user'      -> tranfer in USER (account) field in the FROM
+				 header;
+		  'disp-user' -> transfer in USER and DISPLAY field;
+		  'ppi'       -> transfer in the P-Prefered-Identity header;
+		  'pai'       -> transfer in the P-Asserted-Identity header.
+
+		 Default value is user."
+	    DEFVAL { user }
+	::= { voipSipProviderEntry 17 }
+
+--
+--	Removed OIDs
+--
+--	voipSipProviderDDICty OBJECT-TYPE
+--	::= { voipSipProviderEntry 18 }
+--
+--	voipSipProviderDDIArea OBJECT-TYPE
+--	::= { voipSipProviderEntry 19 }
+--
+
+	voipSipProviderDDISsn OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"In case of 'DDIMode' = 'server' a specific subscriber (network)
+		 number can be given here. This has the same meaning as the
+		 subscriber number in ISDN PP configuration. For other 'DDIMode'
+		 configurations this parameter does not make sense."
+	    DEFVAL { "" }
+	::= { voipSipProviderEntry 20 }
+
+--
+--	Removed OID
+--
+--	voipSipProviderDDIDigits OBJECT-TYPE
+--	::= { voipSipProviderEntry 21 }
+--
+
+	voipSipProviderDad OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		auto(1),
+		user(2),
+		display(3)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The field in the SIP INVITE message where the call
+		 destination's identity is transfered. The needed method is
+		 provider dependent. All informations are located in the 'TO:'
+		 header:
+
+		  'auto'    -> check DISPLAY field first and if empty use the
+			       USER (account) field;
+		  'user'    -> use USER (account) field only;
+		  'display' -> use DISPLAY field only."
+	    DEFVAL { auto }
+
+	::= { voipSipProviderEntry 22 }
+
+        voipSipProviderOptions OBJECT-TYPE
+	    SYNTAX  BitValue
+	    ACCESS  read-write
+	    STATUS  mandatory
+	    
+	    DESCRIPTION
+		"Field used for account specific features:
+
+		 BIT0:	HAS_MCID            Malicious Call Identification
+		 BIT1:	HAS_CLID            Display always the number (if available), ignore
+                                            presentation option
+		 BIT2:	HAS_FAXREDIR        Redirect an incoming Fax to a specific Number
+		 BIT3:	HAS_SRTP            Use Secure RTP
+		 BIT4:	HAS_SRTP_HALFCALL   Half call based SRTP termination
+		 BIT5:	HAS_SRTP_SAVP       Use SAVP in SDP negotiation
+                 BIT6:  HAS_PUBLIC_REGISTER Allow client registration from a public WAN address
+                 BIT7:  HAS_STARTUP_FRAME   Send a dummy RTP package to the provider first
+                 BIT8:  HAS_SIP_REDIRECT    Send SIP 302 instead of execute Call forwarding
+                 BIT9:  HAS_SIP_PREMEDIA    Receive RTP data immediately after an outgoing INVITE
+                 BIT10: HAS_BNC_REGISTER    Register with IBM Sip Trunk Bulk option"
+	    DEFVAL { 0 }
+	::= { voipSipProviderEntry 23 } 
+
+
+	voipSipExtensionTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipExtensionEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+	    "Contains specific parameters for an internal SIP account."
+	::= { voipSip 12 }
+
+
+	voipSipExtensionEntry OBJECT-TYPE
+	    SYNTAX VoipSipExtensionEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Contains an internal SIP account assigned to a
+		 voipExtensionTable entry."
+	    INDEX { voipSipExtensionIndex }
+	::= { voipSipExtensionTable 1 }
+
+
+	VoipSipExtensionEntry ::=
+	    SEQUENCE {
+		voipSipExtensionIndex	    INTEGER,
+		voipSipExtensionIdent	    DisplayString,
+		voipSipExtensionPwd	    DisplayString,
+		voipSipExtensionOptions	    BitValue,
+		voipSipExtensionExpire	    INTEGER,
+		voipSipExtensionCodecs	    BitValue,
+		voipSipExtensionOrder	    INTEGER,
+		voipSipExtensionDSPLength   INTEGER,
+		voipSipExtensionDSPOptions  INTEGER,
+		voipSipExtensionTransport   INTEGER,
+		voipSipExtensionPort	    INTEGER,
+		voipSipExtensionStaticIp    IpAddress,
+		voipSipExtensionTimeout	    INTEGER
+	   }
+
+
+	voipSipExtensionIndex OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This is the reference to the main 'Index' of the parent entry
+		 configured in voipExtensionTable. This value cannot be
+		 modified and is only set in the trap handler of the
+		 Mediagateway."
+	    DEFVAL { 1 }
+	::= { voipSipExtensionEntry 1 }
+
+
+	voipSipExtensionIdent OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..32))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"SIP identifier (auth-ID) for REGISTER (normally the same as
+		 'Number' in voipExtensionTable). This value must be set if a
+		 different URL for account and authentication is used."
+	    DEFVAL { "" }
+	::= { voipSipExtensionEntry 2 }
+
+
+	voipSipExtensionPwd OBJECT-TYPE
+	    SYNTAX  DisplayString  (SIZE (0..32))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"SIP account password for registration."
+	    DEFVAL { "" }
+	::= { voipSipExtensionEntry 3 }
+
+
+	voipSipExtensionOptions OBJECT-TYPE
+	    SYNTAX  BitValue
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Field used for extension specific features:
+		 BIT0:	HAS_MCID     Malicious Call Identification
+		 BIT1:	HAS_CLID     always display number (if available), ignore
+                                     presentation
+		 BIT2:	HAS_FAXREDIR Redirect an incoming Fax to a specific Number
+		 BIT3:	HAS_SRTP            Use Secure RTP
+		 BIT4:	HAS_SRTP_HALFCALL   Half call based SRTP termination
+		 BIT5:	HAS_SRTP_SAVP       Use SAVP in SDP negotiation
+		 BIT6:	HAS_PUBLIC_REGISTER Allow client registrations from public networks"
+	    DEFVAL { 0 }
+	::= { voipSipExtensionEntry 4 }
+
+
+	voipSipExtensionExpire OBJECT-TYPE
+	    SYNTAX  INTEGER (0..3600)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Expire time of a connected SIP terminal. In registration mode
+		 terminal has to reregister before this timer expires.
+		 Without reregistration within this timeframe terminal will be
+		 disconected after this period."
+	    DEFVAL { 60 }
+	::= { voipSipExtensionEntry 5 }
+
+
+	voipSipExtensionCodecs OBJECT-TYPE
+	    SYNTAX  BitValue
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Supported codecs of extension. Set one or more of following
+		 bit values:
+
+		  ulaw	(1),
+		  alaw	(2),
+		  g729	(4),
+		  g726	(8),
+		  g726_16    (16),
+		  g726_32    (32),
+		  g726_40    (64),
+		  g728      (128),
+		  g723_63   (256),
+		  g723_53   (512),
+		  g729_e   (1024),
+		  gsm      (2048),
+		  dtmf     (4096),
+		  dtmf_cc  (8192),
+		  t38_udp (16384),
+		  t38_tcp (32768).
+
+		 Default: 'ulaw', 'alaw' and 'g.729' (7).
+
+		 'g729' is g729 with 8 kBit/s, 'g729_e' is g729 with 12.4
+		 kBit/s. 'dtmf' enables/disables (out of band) DTMF relay via
+		 RTP and SIP INFO events; depending from capabilities of a
+		 dialed endpoint it automatically chooses either RTP or SIP INFO
+		 event method. 'dtmf_cc' is obsolete. As well 't38_tcp' is
+		 unused."
+	    DEFVAL { 7 }
+	::= { voipSipExtensionEntry  6 }
+
+
+	voipSipExtensionOrder OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		default(1),
+		quality(2),
+		lowest(3),
+		highest(4)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Codec signalling order:
+
+		  'default' -> system default order,
+		  'quality' -> highest quality first,
+		  'lowest'  -> lowest bandwith first,
+		  'highest' -> highest bandwith first."
+	    DEFVAL { default }
+	::= { voipSipExtensionEntry 7 }
+
+
+	voipSipExtensionDSPLength OBJECT-TYPE
+	    SYNTAX  INTEGER (5..500)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Audio data (payload) duration per packet in milliseconds (for
+		 all codecs).
+
+		 Default value is 20."
+	    DEFVAL { 20 }
+	::= { voipSipExtensionEntry 8 }
+
+
+	voipSipExtensionDSPOptions OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		echo(2),
+		cng(3),
+		both(4)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"DSP options:
+
+		  'none' -> neither echo cancellation nor comfort noise,
+		  'echo' -> echo cancellation,
+		  'cng'  -> comfort noise generation,
+		  'both' -> echo and comfort noise.
+
+		 Default value is both."
+	    DEFVAL { both }
+	::= { voipSipExtensionEntry 9 }
+
+	voipSipExtensionTransport OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		udp(1),
+		tcp(2),
+		sips(3)
+--		delete(8) - obsoleted
+	    }
+
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Transport protocol used by connected terminal.
+
+		 Default value is udp."
+	    DEFVAL { udp }
+	::= { voipSipExtensionEntry 10 }
+
+
+	voipSipExtensionPort OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"IP Port used by connected terminal. Normally 5060, but in most
+		 terminals this port can be configured."
+	    DEFVAL { 5060 }
+	::= { voipSipExtensionEntry 11 }
+
+
+	voipSipExtensionStaticIp OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This options is only used for special cases. Normally this has
+		 to be empty. However if no client registration is done by the
+		 connected terminal this parameter has to be set to the IP
+		 address of the connected terminal. With this parameter such a
+		 terminal is permanently known to the Mediagateway which
+		 therefore is able to send or receive data to/from the terminal.
+
+		 Microsoft Exchange communication server is using this kind of
+		 communication. In this case the port 5065 is used and the
+		 transport protocol is TCP."
+	::= { voipSipExtensionEntry 12 }
+
+
+	voipSipExtensionTimeout OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Here a specific RTP session timeout in seconds can be set. It
+		 is similar to a keep alive polling between the Mediagateway and
+		 a SIP client in order to detect a dead RTP session. A value of
+		 0 disables the timeout. In RFC the minimum time is 90sec. The
+		 default is 1800sec."
+	    DEFVAL { 0 }
+	::= { voipSipExtensionEntry 13 }
+
+
+	voipSipRouteTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipRouteEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Contains call routing informations."
+	::= { voipSip 13 }
+
+
+	voipSipRouteEntry OBJECT-TYPE
+	    SYNTAX VoipSipRouteEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Describes a call routing entry."
+	    INDEX { voipSipRouteIndex }
+	::= { voipSipRouteTable 1 }
+
+
+	VoipSipRouteEntry ::=
+	    SEQUENCE {
+		voipSipRouteAddress	    DisplayString,
+		voipSipRouteDescr	    DisplayString,
+		voipSipRoutePrefix	    DisplayString,
+		voipSipRouteIndex	    INTEGER,
+		voipSipRouteType	    INTEGER,
+		voipSipRouteAdminStatus	    INTEGER,
+		voipSipRouteSrcIf	    INTEGER,
+		voipSipRouteDstIf	    INTEGER,
+		voipSipRouteSrcAddress	    DisplayString,
+		voipSipRouteDial	    INTEGER
+	   }
+
+
+	voipSipRouteAddress OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..64))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Call destination address (e.g. telephone number or SIP account)
+		 that is affected by this call routing entry."
+	    DEFVAL { "" }
+	::= { voipSipRouteEntry 1 }
+
+	voipSipRouteDescr OBJECT-TYPE
+	    SYNTAX DisplayString (SIZE (0..64))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"User defined description of this call routing entry."
+	    DEFVAL { "" }
+	::= { voipSipRouteEntry 2 }
+
+	voipSipRoutePrefix OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..100))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This parameter defines a translation rule for call addresses
+		 (such as telephone numbers). This translation rule is applied
+		 to the caller's number for 'RouteType' = 'clid' and to call
+		 destination number for 'RouteType' = 'trunk'. For all other
+		 values of 'RouteType' this parameter has to be empty.
+
+		 The string format of a translation rule is '<x:y>' (lenghts of
+		 the x and y strings can vary). A rule entry can contain
+		 multiple translation rules separated by ';'. The best matching
+		 translation rule is being used."
+	    DEFVAL { "" }
+	::= { voipSipRouteEntry 3 }
+
+
+	voipSipRouteIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Unique index of this entry."
+	    DEFVAL { 0 }
+	::= { voipSipRouteEntry 4 }
+
+
+	voipSipRouteType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		external(1),
+		trunk(2),
+		deny(3),
+		clid(9)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Main type of this entry:
+
+		  'external' -> describes a routing entry to an external route
+				(carrier);
+		  'trunk'    -> describes a routing entry to an internal route
+				(sub-PBX);
+		  'deny'     -> decribes an entry for a locked destination;
+		  'clid'     -> describes a calling line identification
+				manipulation rule.
+
+		 Default value is external."
+	    DEFVAL { external }
+	::= { voipSipRouteEntry 5 }
+
+
+	voipSipRouteAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		enable(1),
+		disable(2),
+		delete(8)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Administrative status:
+
+		  'enable'  -> Routing entry is used for call routing
+			       decissions;
+		  'disable' -> Ignore this call routing entry.
+
+		 Deafult value is enable."
+	    DEFVAL { enable }
+	::= { voipSipRouteEntry 6 }
+
+
+	voipSipRouteSrcIf OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Table index number of a source (interface) of a call (which
+		 triggers this call routing entry). That can be either a
+		 caller's ISDN or analog device (on this gateway), a
+		 voipSipLineTable entry or a SIP provider account. In case of
+		 SIP for all call routes except those with 'RouteType' = 'clid'
+		 you can only take voipSipProviderTable entries with 'DDIMode' =
+		 'server'.
+
+		 Index number ranges:
+
+		  voipSipProviderTable entry = 1...999;
+		  ISDN or analog device      = 1000...10000;
+		  voipSipLineTable entry     = >10000."
+	    DEFVAL { 0 }
+	::= { voipSipRouteEntry 7 }
+
+
+	voipSipRouteDstIf OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Table index number of an interface used for dialling out a
+		 call affected by this rule.
+
+		 That can be either a ISDN or analog interface (on this
+		 gateway), a voipSipLineTable entry or a SIP provider account.
+		 In case of SIP the voipSipProviderTable entry must have
+		 'DDIMode' = 'server'. For table index number range see 'SrcIf'.
+
+		 This parameter is only useful for 'Type' = 'clid' and 'Type' =
+		 'trunk'. For all other values of 'Type' this parameter has to
+		 be 0 (disabled)."
+	    DEFVAL { 0 }
+	::= { voipSipRouteEntry 8 }
+
+
+	voipSipRouteSrcAddress OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..32))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Call source address (e.g. telephone number or SIP account)
+		 that is affected by this call routing entry."
+	    DEFVAL { "" }
+	::= { voipSipRouteEntry 9 }
+
+
+	voipSipRouteDial OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Table index in voipSipDialTable of the first entry in a list
+		 which is used by this call route entry. This entry point
+		 parameter can only be set in case of 'Type' = 'external'. For
+		 all other types this parameter has to be 0 (disabled).
+
+		 The referenced voipSipDialTable list is used to store dialing
+		 priorities and rules. The entry point's index is used as
+		 highest priority. If the connection failed with a provider
+		 dependent error the next entry in voipSipDialTable defined
+		 by 'Next' in this table is used."
+	    DEFVAL { 0 }
+	::= { voipSipRouteEntry 10 }
+
+--
+-- This table was removed and the OID could not be used otherwise
+--
+--    voipSipDDIMsnTable OBJECT-TYPE
+--	    SYNTAX  SEQUENCE OF VoipSipDDIMsnEntry
+--	    ACCESS  not-accessible
+--	    STATUS  obsolete
+--	    "Contains all assigned MSNs to DDI Providers"
+--	::= { voipSip 14 }
+--
+
+	voipSipLineTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipLineEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Contains ISDN line bundle entries."
+	::= { voipSip 15 }
+
+
+	voipSipLineEntry OBJECT-TYPE
+	    SYNTAX VoipSipLineEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Describes an ISDN bundle definition entry."
+	    INDEX { voipSipLineIndex }
+	::= { voipSipLineTable 1 }
+
+
+	VoipSipLineEntry ::=
+	    SEQUENCE {
+		voipSipLineIndex	    INTEGER,
+		voipSipLineDescr	    DisplayString,
+		voipSipLineMode		    INTEGER,
+		voipSipLineMask		    BitValue
+	   }
+
+
+	voipSipLineIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Unique index (interface index) of entry."
+	    DEFVAL { 0 }
+	::= { voipSipLineEntry 1 }
+
+
+	voipSipLineDescr OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..30))
+	    ACCESS read-write
+	    STATUS mandatory
+	    DESCRIPTION
+		"User defined description of line bundle."
+	    DEFVAL { "" }
+	::= { voipSipLineEntry 2 }
+
+
+	voipSipLineMode OBJECT-TYPE
+	    SYNTAX INTEGER {
+		external(1),
+		trunk(2),
+		delete(8)
+		}
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The mode of the bundle:
+
+		  'external' -> bundle contains only TE PP ISDN ports;
+		  'trunk'    -> bundle contains only NT PP ISDN ports;
+		  'delete'   -> delete entry.
+
+		 Deafult value is external."
+	    DEFVAL { external }
+	::= { voipSipLineEntry 3 }
+
+
+	voipSipLineMask OBJECT-TYPE
+	    SYNTAX BitValue
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Bitmask with those bits set to 1 for all ISDN interfaces used
+		 by this bundle entry. The corresponding ISDN interfaces can be
+		 found in isdnStkTable entries with 'isdnStkNumber' equal to
+		 bit position of set bits here."
+	    DEFVAL { 0 }
+	::= { voipSipLineEntry 4 }
+
+
+	voipSipAliasTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipAliasEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Contains call number translation rules."
+	::= { voipSip 16 }
+
+
+	voipSipAliasEntry OBJECT-TYPE
+	    SYNTAX VoipSipAliasEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Describes a call number translation entry."
+	    INDEX { voipSipAliasIndex }
+	::= { voipSipAliasTable 1 }
+
+
+	VoipSipAliasEntry ::=
+	    SEQUENCE {
+		voipSipAliasIndex	    INTEGER,
+		voipSipAliasDescr	    DisplayString,
+		voipSipAliasAdminStatus	    INTEGER,
+		voipSipAliasLocal	    DisplayString,
+		voipSipAliasRemote	    DisplayString,
+		voipSipAliasDirection	    INTEGER,
+		voipSipAliasAccount	    INTEGER
+	   }
+
+
+	voipSipAliasIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Unique index of entry."
+	    DEFVAL { 0 }
+	::= { voipSipAliasEntry 1 }
+
+
+	voipSipAliasDescr OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..30))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"User defined description of entry."
+	    DEFVAL { "" }
+	::= { voipSipAliasEntry 2 }
+
+
+	voipSipAliasAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		enable(1),
+		disable(2),
+		delete(8)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	DESCRIPTION
+		"Administrative status of this call number translation entry:
+
+		  'enable'  -> The entry is enabled;
+		  'disable' -> The entry is disabled.
+
+		 Default value is enable."
+	    DEFVAL { enable }
+	::= { voipSipAliasEntry 3 }
+
+
+	voipSipAliasLocal OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..30))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"Local/internal number of an extension."
+	    DEFVAL { "" }
+	::= { voipSipAliasEntry 4 }
+
+
+	voipSipAliasRemote OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..30))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"External number of the same extension as referenced by
+		 'Local'."
+	    DEFVAL { "" }
+	::= { voipSipAliasEntry 5 }
+
+
+	voipSipAliasDirection OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		incoming(1),
+		outgoing(2),
+		both(3)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Defines for which call directions this call number translation
+		 entry is checked:
+
+		  'incoming' -> entry is checked only for incoming calls;
+		  'outgoing' -> entry is checked only for outgoing calls;
+		  'both'     -> entry is always checked.
+
+		 Default value is both."
+	    DEFVAL { both }
+	::= { voipSipAliasEntry 6 }
+
+
+	voipSipAliasAccount OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Table index number of an outgoing/incoming
+		 interface/account/line of a call (which triggers this call
+		 translation entry). That can be either a caller's ISDN or
+		 analog interface (on this gateway), a voipSipLineTable entry or
+		 a SIP provider account.
+
+		 For table index number ranges see 'SrcIf' of
+		 voipSipRouteTable."
+	    DEFVAL { 0 }
+	::= { voipSipAliasEntry 7 }
+
+
+	voipSipShortcutTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipShortcutEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Contains shortcut (speed dial) definitions."
+	::= { voipSip 17 }
+
+
+	voipSipShortcutEntry OBJECT-TYPE
+	    SYNTAX VoipSipShortcutEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Describes a shortcut (speed dial) entry."
+	    INDEX { voipSipShortcutCode }
+	::= { voipSipShortcutTable 1 }
+
+
+	VoipSipShortcutEntry ::=
+	    SEQUENCE {
+		voipSipShortcutAdminStatus  INTEGER,
+		voipSipShortcutDescr	    DisplayString,
+		voipSipShortcutCode	    DisplayString,
+		voipSipShortcutReplace	    DisplayString
+	   }
+
+
+	voipSipShortcutAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		enable(1),
+		disable(2),
+		delete(8)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The administration status of the shortcut entry:
+
+		  'enable'  -> the entry is active;
+		  'disable' -> the entry is ignored;
+		  'delete'  -> delete the entry.
+
+		 Default value is enable."
+	    DEFVAL { enable }
+	::= { voipSipShortcutEntry 1 }
+
+
+	voipSipShortcutDescr OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..30))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"User defined description of entry."
+	    DEFVAL { "" }
+	::= { voipSipShortcutEntry 2 }
+
+
+	voipSipShortcutCode OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..10))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"Shortcut code. Note that no additional '*' is entered in
+		 this variable. The additional '*' a user has to dial in order
+		 to indicate a shortcut is automatically prefixed by the
+		 system."
+	    DEFVAL { "" }
+	::= { voipSipShortcutEntry 3 }
+
+
+	voipSipShortcutReplace OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..30))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"Replacement string for shortcut. May be any sequence of
+		 characters and numbers.
+
+		 Example: 'Code' is 30; 'Replace' is 003059876. So if you
+			  dial *30345 the dialed number is 003059876345."
+	    DEFVAL { "" }
+	::= { voipSipShortcutEntry 4 }
+
+
+	voipSipDialTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VoipSipDialEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Contains lists of (backup) dial entries."
+	::= { voipSip 18 }
+
+
+	voipSipDialEntry OBJECT-TYPE
+	    SYNTAX VoipSipDialEntry
+	    ACCESS not-accessible
+	    STATUS mandatory
+	    DESCRIPTION
+		"Contains the elements of a (backup) dial entry."
+	    INDEX { voipSipDialIndex }
+	::= { voipSipDialTable 1 }
+
+
+	VoipSipDialEntry ::=
+	    SEQUENCE {
+		voipSipDialIndex	    INTEGER,
+		voipSipDialAdminStatus	    INTEGER,
+		voipSipDialRule		    DisplayString,
+		voipSipDialAccount	    INTEGER,
+		voipSipDialNext		    INTEGER
+	   }
+
+
+	voipSipDialIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Unique index of entry."
+	    DEFVAL { 0 }
+	::= { voipSipDialEntry 1 }
+
+
+	voipSipDialAdminStatus OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		enable(1),
+		disable(2),
+		new(3),
+		delete(8)
+	    }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	DESCRIPTION
+		"Administrative status for dial/backup entry:
+
+		  'enable'  -> the entry is active;
+		  'disable' -> the entry will be ignored.
+
+		 Deafult value is enable."
+	    DEFVAL { enable }
+	::= { voipSipDialEntry 2 }
+
+
+	voipSipDialRule OBJECT-TYPE
+	    SYNTAX DisplayString  (SIZE (0..100))
+	    ACCESS read-write
+	    STATUS mandatory
+
+	    DESCRIPTION
+		"Manipulation rule for dialed number. The string format of a
+		 manipulation rule is '<x:y>' (lenghts of strings x and y
+		 can vary). A rule entry can contain multiple manipulation rules
+		 separated by ';'. The best matching manipulation rule of a rule
+		 entry gets used."
+	    DEFVAL { "" }
+	::= { voipSipDialEntry 3 }
+
+
+	voipSipDialAccount OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Table index number of an interface/account/line used for
+		 dialing. That can be either a caller's ISDN or analog interface
+		 (on this gateway), a voipSipLineTable entry or a SIP provider
+		 account. For table index number range see 'SrcIf' of
+		 voipSipRouteTable."
+	    DEFVAL { 0 }
+	::= { voipSipDialEntry 4 }
+
+
+	voipSipDialNext OBJECT-TYPE
+	    SYNTAX INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Next dial entry in the priority list. If the connection failed
+		 with a provider error, the entry refrenced by this index is
+		 used for next dial attempt. So unlimited routes can be created
+		 and sorted to user defined fallback solutions."
+	    DEFVAL { 0 }
+	::= { voipSipDialEntry 5 }
+
+END

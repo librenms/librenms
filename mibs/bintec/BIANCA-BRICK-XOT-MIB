@@ -1,0 +1,279 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 2001-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibxot,v $ 
+-- $Revision: 1.8 $ 
+
+BIANCA-BRICK-XOT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            IpAddress, Counter, TimeTicks, enterprises
+                FROM RFC1155-SMI
+
+            Date, HexValue
+                FROM BINTEC-MIB
+ 
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+    xot		OBJECT IDENTIFIER
+	::= { bibo 32 }
+
+    -- XOT Group
+
+    -- Management Information for the XOT Subsystem of the BIANCA/BRICK
+
+	xotIfTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF XotIfEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This Table contains configuration information for XOT 
+		interfaces. Each time a new entry is made here, a corresponding
+		entries are made in the ifTable and biboAdmDeviceTable."
+	::= { xot 1 }
+
+	xotIfEntry OBJECT-TYPE
+	    SYNTAX  XotIfEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"Entries in this table are created by defining a new value for
+		the field xotIfIndex. Entries may be deleted by setting the
+		field xotIfAllowIncoming to the value delete."
+	    INDEX   { xotIfIndex }
+	::= { xotIfTable 1 }
+
+	XotIfEntry ::=
+	    SEQUENCE {
+		xotIfIndex				INTEGER,
+		xotIfInIpAddr				IpAddress,
+		xotIfInIpMask				IpAddress,
+		xotIfOutIpAddr				IpAddress,
+		xotIfOutPort				INTEGER,
+		xotIfMaxLinks				INTEGER,
+		xotIfMtu				INTEGER,
+		xotIfAllowIncoming			INTEGER,
+		xotIfSrcIpAddr				IpAddress
+	}
+
+	xotIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The index of the virtual interface. This object identifies
+		 a row in the ifTable."
+	::= { xotIfEntry 1 }
+
+	xotIfInIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The IP address of remote partner by incoming calls."
+	::= { xotIfEntry 2 }
+	
+	xotIfInIpMask OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The subnet mask associated with the IP address of 
+		 remote partner by incoming calls. This indicates the mask
+		 to be logical-ANDed with the received source IP address 
+		 before being compared to the value in the xotIfInIpAddr field."
+	::= { xotIfEntry 3 }
+	
+	xotIfOutIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The IP address of remote partner by outgoing calls."
+	::= { xotIfEntry 4 }
+
+	xotIfOutPort OBJECT-TYPE
+	    SYNTAX  INTEGER (1..65535)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The port number of remote partner by outgoing calls."
+	    DEFVAL { 1998 }
+	::= { xotIfEntry 5 }
+
+	xotIfMaxLinks OBJECT-TYPE
+	    SYNTAX  INTEGER (0..9999)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The Maximum number of Links."
+	    DEFVAL  { 5 }
+	::= { xotIfEntry 6 }
+
+	xotIfMtu OBJECT-TYPE
+	    SYNTAX  INTEGER (576..8180)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The Maximum transfer unit to be used with the interface."
+	    DEFVAL  { 1456 }
+	::= { xotIfEntry 7 }
+
+	xotIfAllowIncoming OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	    	yes(1), no(2), delete(3)
+	    }
+
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object indicates, whether incoming connection should
+		be allowed on the link."
+	    DEFVAL  { yes }
+	::= { xotIfEntry 8 }
+
+	xotIfSrcIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The source IP address for outgoing calls."
+	::= { xotIfEntry 9 }
+
+
+    -- XOT statistics
+
+	xotStatTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF XotStatEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"The xotStatTable contains statistical connection-
+                specific information. Only the system can add or delete
+                entries to this table.
+
+                Creating entries: Entries are created by the system
+                each time a new XOT interface is created in the 
+                xotIfTable.
+
+                Deleting entries: Entries are removed by the system
+                when the corresponding XOT interface is removed."
+	::= { xot 2 }
+
+	xotStatEntry OBJECT-TYPE
+	    SYNTAX  XotStatEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	    INDEX   { xotStatIfIndex }
+	::= { xotStatTable 1 }
+
+	XotStatEntry ::=
+	    SEQUENCE {
+		xotStatIfIndex				INTEGER,
+		xotStatOutgoingCalls			Counter,
+		xotStatIncomingCalls			Counter,
+		xotStatPktsSent				Counter,
+		xotStatPktsRecvd			Counter,
+		xotStatOutgoingFails			Counter,
+		xotStatIncomingFails			Counter
+	    }
+
+	xotStatIfIndex OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Correlating XOT interface index."
+	::= { xotStatEntry 1 }
+
+	xotStatOutgoingCalls OBJECT-TYPE
+	    SYNTAX  Counter 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The number of outgoing calls on this interface since
+		 its last change to the 'up' state."
+	::= { xotStatEntry 2 }
+
+	xotStatIncomingCalls OBJECT-TYPE
+	    SYNTAX  Counter 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The number of incoming calls on this interface since
+		 its last change to the 'up' state."
+	::= { xotStatEntry 3 }
+
+	xotStatPktsSent OBJECT-TYPE
+	    SYNTAX  Counter 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The number of transmitted packets on this interface since
+		 its last change to the 'up' state."
+	::= { xotStatEntry 4 }
+
+	xotStatPktsRecvd OBJECT-TYPE
+	    SYNTAX  Counter 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The number of received packets on this interface since
+		 its last change to the 'up' state."
+	::= { xotStatEntry 5 }
+
+	xotStatOutgoingFails OBJECT-TYPE
+	    SYNTAX  Counter 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The number of outgoing call failures on this interface since
+		 its last change to the 'up' state."
+	::= { xotStatEntry 6 }
+
+	xotStatIncomingFails OBJECT-TYPE
+	    SYNTAX  Counter 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The number of incoming call failures on this interface since
+		 its last change to the 'up' state."
+	::= { xotStatEntry 7 }
+
+
+    -- XOT static
+
+	xotTcpPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"TCP port for XOT listen."
+	    DEFVAL { 1998 }
+	::= { xot 3 }
+
+
+END

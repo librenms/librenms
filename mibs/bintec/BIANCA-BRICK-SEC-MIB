@@ -1,0 +1,726 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibsec,v $ 
+-- $Revision: 1.56 $ 
+
+BIANCA-BRICK-SEC-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            Counter, enterprises
+                FROM RFC1155-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+
+	    BitValue, HexValue
+		FROM BINTEC-MIB
+ 
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bintecsec 	OBJECT IDENTIFIER 
+		::= { bintec 254 }
+	biboAdmAdminCommunity OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The Community name used for admin access"
+	    DEFVAL { "bintec" }
+	::= { bintecsec 1 }
+
+	biboAdmReadCommunity OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The Community name used for read-only access."
+	    DEFVAL { "public" }
+	::= { bintecsec 2 }
+
+	biboAdmWriteCommunity OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The Community name used for read-write access."
+	    DEFVAL { "public" }
+	::= { bintecsec 3 }
+
+	biboAdmLicenseTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmLicenseEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		"This table contains the licenses, purchased for this
+		 BIANCA/BRICK. Each entry describes a license. Each
+		 license can enable one or more features of the
+		 BIANCA/BRICK, when the activation key is correct.
+		 Please Note, that a license is only valid for the
+		 BIANCA/BRICK it has been purchased for."
+	::= { bintecsec 4 }
+
+	biboAdmLicenseEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmLicenseEntry
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+	    DESCRIPTION
+		""
+	    INDEX   { biboAdmLicenseKey }
+	::= { biboAdmLicenseTable 1 }
+
+	BiboAdmLicenseEntry ::=
+	    SEQUENCE {
+		biboAdmLicenseSerialNumber		INTEGER,
+		biboAdmLicenseMask			INTEGER,
+		biboAdmLicenseKey			DisplayString,
+		biboAdmLicenseState			INTEGER,
+
+		biboAdmLicenseSerialId			DisplayString,
+		biboAdmLicenseHwSerial			DisplayString,
+		biboAdmLicenseLicType			INTEGER
+	    }
+
+	biboAdmLicenseSerialNumber OBJECT-TYPE
+	    SYNTAX  INTEGER (0..999999) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the serial number of the license in 
+		 case of a numerical license (together with 'Mask' and 'Key')."
+	::= { biboAdmLicenseEntry 1 }
+
+	biboAdmLicenseMask OBJECT-TYPE
+	    SYNTAX  INTEGER (0..8388607)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The LicenseMask is a bitfield, that specifies the different
+		 features enabled by the license. (only used on a numerical 
+		 license)."
+	::= { biboAdmLicenseEntry 2 }
+
+	biboAdmLicenseKey OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object contains the activation key. A license is only
+		 valid, if the activation key is correct."
+	::= { biboAdmLicenseEntry 3 }
+
+	biboAdmLicenseState OBJECT-TYPE
+	    SYNTAX  INTEGER { ok(1), not-ok(2), delete(3), internal-ok(4), 
+			      internal-erase(5), not-supported(6) }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"To delete a license from the system, this object has
+		 to be set to delete. In case of an 'internal-ok' license the
+		 license can be erased from the modules EEPROM, if it is set
+		 to 'internal-erase'.
+		 The state will be 'not-supported' if a license refers to 
+		 a feature which is not supported by the image loaded.
+		 With 'delete' it is only deleted from the main board 
+		 flash memory."
+	    DEFVAL { not-ok }
+	::= { biboAdmLicenseEntry 4 }
+
+	biboAdmLicenseSerialId OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the serial id string of the license in
+		 case of string license (together with 'Key')."
+	::= { biboAdmLicenseEntry 5 }
+
+	biboAdmLicenseHwSerial OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object contains the device Hardware serial number
+		 for which the license is purchased for."
+	::= { biboAdmLicenseEntry 6 }
+
+	biboAdmLicenseLicType OBJECT-TYPE
+	    SYNTAX INTEGER {
+		ip(1), capi(2), bridge(3), x25(4), ipx(5), stac(6),
+		frame-relay(7), tapi(8), ospf(9), extended-lan(10),
+		tunneling(11), taf(12), extended-wan(13), leased-line(14),
+		e25(29),
+		ipsec(33), ipseccb-ipxfer(34), bgp(35),
+		uefs(36), siplan(37), siptrunk(38), pim(39),
+		call-by-call(40), fax(41), sipout(42), brrp(43),
+		wlan-controller(44), terminal-option(45),
+		data-encr-accel(46), voice-mail-system(47), pptp(48),
+		ethernet(128), bri(129), g703(130), pri(131), 
+		modem(132), g7032pri(133), slots(134), e3(135), 
+		serial(136), shdsl(137), vdsl(138)
+	    } 
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The type of licenseable feature."
+	::= { biboAdmLicenseEntry 7 }
+
+
+
+	biboAdmRadiusSecret OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The shared secret for RADIUS access."
+	    DEFVAL { "" }
+	::= { bintecsec 5 }
+
+	biboAdmHttpPassword OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The password for HTTP access."
+	    DEFVAL { "bintec" }
+	::= { bintecsec 6 }
+
+
+        biboAdmLoginTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF BiboAdmLoginEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                 "The biboAdmLoginTable defines additional users and
+                  their passwords, and the commnd to be executed
+		  at login."
+        ::= { bintecsec 7 }
+ 
+        biboAdmLoginEntry OBJECT-TYPE
+            SYNTAX  BiboAdmLoginEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                ""
+            INDEX { biboAdmLoginUser }
+        ::= { biboAdmLoginTable 1 }
+ 
+        BiboAdmLoginEntry ::=
+            SEQUENCE {
+                biboAdmLoginUser                        DisplayString,
+                biboAdmLoginPassword                    DisplayString,
+                biboAdmLoginCommand                     DisplayString,
+                biboAdmLoginState                       INTEGER,
+                biboAdmLoginSnmpShellCommand            DisplayString,
+                biboAdmLoginSNMPAccessLevel             INTEGER,
+                biboAdmLoginShellAccessLevel            INTEGER,
+                biboAdmLoginHTTPAccessRights            BITS,
+                biboAdmLoginGUIAccessLevel              INTEGER,
+                biboAdmLoginActivityMonAccessLevel      INTEGER,
+                biboAdmLoginApDiscAccessLevel           INTEGER,
+                biboAdmLoginHTTPAccessClass             INTEGER,
+                biboAdmLoginGUIAccessMask               HexValue,
+                biboAdmLoginGUIWriteAccessMask          HexValue,
+                biboAdmLoginPasswordChangeRequired      INTEGER,
+                biboAdmLoginSNMPAccessRightsDefault       INTEGER,
+                biboAdmLoginSNMPAccessRuleFirst         INTEGER
+            }
+ 
+        biboAdmLoginUser OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "This is the login name."
+        ::= { biboAdmLoginEntry 1 }
+ 
+        biboAdmLoginPassword OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "This is the user password."
+        ::= { biboAdmLoginEntry 2 }
+
+        biboAdmLoginCommand OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  obsolete
+             DESCRIPTION
+                "This is the command, which is started at login, 
+		 e.g. sh, telnet. All external commands are possible.
+
+		 Variable got replaced by biboAdmLoginSnmpShellCommand."
+        ::= { biboAdmLoginEntry 3 }
+ 
+        biboAdmLoginState OBJECT-TYPE
+            SYNTAX  INTEGER { valid(1), delete(2), invalid(3) }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "The variable is used to disable or discard the entry."
+            DEFVAL { valid }
+        ::= { biboAdmLoginEntry 4 }
+ 
+        biboAdmLoginSnmpShellCommand OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "This is the command, which is started upon shell login;
+                 examples are 'telnet <IPaddr>', 'ifstat' or 'ps -ef'.
+                 All external commands are possible, SNMP as well as all other
+                 internal commands can be emulated via:
+
+		    sh -c '<cmd>[;<cmd> ... ]'
+
+		 Obsoletes biboAdmLoginCommand."
+        ::= { biboAdmLoginEntry 5 }
+ 
+        biboAdmLoginSNMPAccessLevel OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    no-access(1),
+                    read(2),
+                    write(3),
+                    admin(4),
+		    rule-based(5)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Define SNMP access level for account.
+                 Available access levels are:
+                     no-access(1),
+                     read(2),
+                     write(3),
+                     admin(4),
+		     rule-based(5): access level depends on the referenced rule(s)
+                 They match SNMP communities but for value no-access which
+                 disables SNMP access for that account.
+ 
+                 Default value is no-access in order to avoid unintentionally
+                 granting access rights."
+            DEFVAL { no-access }
+        ::= { biboAdmLoginEntry 6 }
+ 
+        biboAdmLoginShellAccessLevel OBJECT-TYPE
+            SYNTAX  INTEGER (0..1)
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Define Shell access level for account.
+                 Available access levels are 0 and 1, basically switching shell
+                 access off or on, respectively.
+ 
+                 Default value is 0 in order to avoid unintentionally granting
+                 access rights."
+            DEFVAL { 0 }
+        ::= { biboAdmLoginEntry 7 }
+ 
+        biboAdmLoginHTTPAccessRights OBJECT-TYPE
+            SYNTAX  BITS {
+		admin(0),
+		fci(1),
+		maint(2),
+		easp(3)
+	    }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Define HTTP access rights for account which are defined as bit field.
+                 Available access right bits are currently:
+                     bit 0: admin - access to any and all pages
+                     bit 1: fci - access to web configuration interface
+                     bit 2: maint - access to system maintenance pages
+                                    (update of images, import and export of configurations
+                                    and the like)
+                     bit 3: easp - access to pages dedicated for use by external
+                                    applications (currently only Dime Manager)
+ 
+                 If bit 0 (admin) is set, all other bit values are ignored and assumed
+                 as set (i.e. access allowed). This allows for defining unrestricted access
+                 in a forward-compatible manner even when new bits should be
+                 introduced.
+ 
+                 A value of 0 turns HTTP access off completely.
+                 Other values grant HTTP access in an application dependent
+                 manner; each value may be interpreted differently on different
+                 products.
+ 
+                 Default value is 0 in order to avoid unintentionally granting
+                 access rights."
+            DEFVAL { { } }
+        ::= { biboAdmLoginEntry 8 }
+ 
+        biboAdmLoginGUIAccessLevel OBJECT-TYPE
+            SYNTAX  INTEGER (0..255)
+            ACCESS  read-write
+            STATUS  obsolete
+ 
+            DESCRIPTION
+                "Define GUI access level for account.
+                 Available access levels reach from 0 to 255.
+ 
+                 Value 0 turns GUI access off, value 1 defines allmighty
+                 administrator role.
+                 Other values grant GUI access in an application dependend
+                 manner; each value may be interpreted differently on different
+                 products.
+ 
+                 Default value is 0 in order to avoid unintentinoally granting
+                 access rights."
+            DEFVAL { 0 }
+        ::= { biboAdmLoginEntry 9 }
+ 
+        biboAdmLoginActivityMonAccessLevel OBJECT-TYPE
+            SYNTAX  INTEGER (0..1)
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Define activitiy monitor access level for account.
+ 
+                 Value 0 inhibits any means of influencing system by activity
+                 monitor mechanisms.
+                 Value 1 grants full access.
+ 
+                 NOTE:
+                   This variable is currently only valid for special users
+                   admin and write (SNMP communities).
+                   For all other users it is ignored.
+ 
+                 Default value is 0 in order to avoid unintentinoally granting
+                 access rights."
+            DEFVAL { 0 }
+        ::= { biboAdmLoginEntry 10 }
+ 
+        biboAdmLoginApDiscAccessLevel OBJECT-TYPE
+            SYNTAX  INTEGER (0..1)
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Define access level for access point discovery instances.
+ 
+                 Value 0 inhibits any means of influencing system by access
+                 point discovery mechanisms.
+                 Value 1 grants full access.
+ 
+                 NOTE:
+                   This variable is currently only valid for special user admin
+                   (SNMP community).
+                   For all other users it is ignored.
+ 
+                 Default value is 0."
+            DEFVAL { 0 }
+        ::= { biboAdmLoginEntry 11 }
+
+       biboAdmLoginHTTPAccessClass OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    user(1),
+                    admin(2)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Define SNMP access class for account.
+                 Available access levels are:
+                     user(1),
+                     admin(2),
+
+                 HTTP access class allows HTTP sessions to be classified and
+		 realize limitation of HTTP sessions while allowing for
+		 prioritizing sessions over user sessions. This ensures
+		 manageability of the system even if normal users flood system
+		 with their requests.
+ 
+                 Default value is user."
+            DEFVAL { user }
+        ::= { biboAdmLoginEntry 12 }
+
+        biboAdmLoginGUIAccessMask OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+           DESCRIPTION
+                "Define GUI access level bits for account.
+                 Available access levels bits reach from 0 to 30
+ 
+                 Value 0 turns GUI access off, 
+                 bit 0 (value 1) is reserved
+                 bit 1 (value 2) defines almighty administrator role.
+                 Other values grant GUI access  depending on
+                 biboAdmGuiAccessTable entries. The default behavior (if
+                 there is no entry in biboAdmGuiAccessTable) is application
+                 dependent; each value may be interpreted differently on
+                 different products.
+ 
+                 Default value is 0 in order to avoid unintentionally granting
+                 access rights."
+            DEFVAL { 0 }
+        ::= { biboAdmLoginEntry 13 }
+
+
+         biboAdmLoginGUIWriteAccessMask OBJECT-TYPE
+            SYNTAX  HexValue 
+            ACCESS  read-write
+            STATUS  mandatory
+
+           DESCRIPTION
+                "Define GUI write access level bits for account.
+                 Available write access levels bits reach from 0 to 30
+
+                 Value 0 turns GUI write access off,
+                 bit 0 (value 1) is reserved
+                 bit 1 (value 2) defines almighty administrator role.
+                 Other values grant GUI access depending on
+                 biboAdmGuiAccessTable entries. The default behavior
+                 (if there is no entry in biboAdmGuiAccessTable) is
+                 application dependent; each value may be interpreted
+                 differently on different products."
+            DEFVAL { 0x7FFFFFFE }
+        ::= { biboAdmLoginEntry 14 }
+
+         biboAdmLoginPasswordChangeRequired OBJECT-TYPE
+            SYNTAX  INTEGER { 
+			  enabled(1), 
+			  disabled(2) 
+			  }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                "If biboAdmLoginPasswordChangeRequired is set to enabled
+		 the GUI demands a password change for this user at the
+                 next login.  After the password change GUI sets this value
+                 to disabled."
+              DEFVAL { disabled }
+        ::= { biboAdmLoginEntry 15 }
+
+        biboAdmLoginSNMPAccessRightsDefault OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    no-access(1),
+                    read-only(2),
+                    read-write(3)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Defines default SNMP access rule for a rule-based user.
+                 Available default rules are:
+                     no-access(1),
+                     read-only(2),
+                     read-write(3)
+                 .
+		 These access rights are used when no rule that is referred by 
+		 biboAdmLoginSNMPAccessRuleFirst matches.
+                 Default value is no-access in order to avoid unintentionally
+                 granting access rights.
+		 This variable is only valid for users with 
+		 biboAdmLoginSNMPAccessLevel = rule-based."
+             DEFVAL { no-access }
+        ::= { biboAdmLoginEntry 16 }
+ 
+        biboAdmLoginSNMPAccessRuleFirst OBJECT-TYPE
+	    SYNTAX  INTEGER (0..65535)
+            ACCESS  read-write
+            STATUS  mandatory
+ 
+            DESCRIPTION
+                "Refers to the index of the first rule in MIBsnmpAccessRuleTable
+		 that has to be checked for a rule-based user. 
+		 A value of '0' indicates the use of the default rule
+		 configured in biboAdmLoginSNMPAccessRightsDefault.
+		 This variable is only valid for users with 
+		 biboAdmLoginSNMPAccessLevel = rule-based."
+        ::= { biboAdmLoginEntry 17 }
+ 
+	biboAdmPublicKey OBJECT-TYPE
+	    SYNTAX  OCTET STRING
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"Generated public key for TAF client access"
+	::= { bintecsec 10 }
+
+	biboAdmPrivateKey OBJECT-TYPE
+	    SYNTAX  OCTET STRING
+	    ACCESS  not-accessible
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		""
+	::= { bintecsec 11 }
+
+	biboAdmActMonPassword OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"The password for Activity Monitor access."
+	    DEFVAL { "" }
+	::= { bintecsec 12 }
+
+-- bintecsec 13 is used for tacacsp
+
+-- biboAdmGuiAccessTable
+        biboAdmGuiAccessTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF BiboAdmGuiAccessEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                 "The biboAdmGuiAccessTable defines 'required access level' for
+                  GUI access IDs."
+        ::= { bintecsec 14 }
+
+        biboAdmGuiAccessEntry OBJECT-TYPE
+            SYNTAX  BiboAdmGuiAccessEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                ""
+            INDEX { biboAdmGuiAccessIndex }
+       ::= { biboAdmGuiAccessTable 1 }
+
+        BiboAdmGuiAccessEntry ::=
+            SEQUENCE {
+                biboAdmGuiAccessIndex                   INTEGER,
+--		biboAdmGuiAccessID                      DisplayString,
+                biboAdmGuiAccessState                   INTEGER,
+                biboAdmGuiAccessRequiredLvlMask         HexValue
+            }
+
+        biboAdmGuiAccessIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The GUI access index of the associated id."
+        ::= { biboAdmGuiAccessEntry 1 }
+
+--        biboAdmGuiAccessID OBJECT-TYPE
+--            SYNTAX  DisplayString (SIZE (0..50))
+--	    ACCESS  read-only
+--	    STATUS  mandatory
+--
+--            DESCRIPTION
+--                "This is the GUI access id."
+--
+--        ::= { biboAdmGuiAccessEntry 2 }
+
+       biboAdmGuiAccessState OBJECT-TYPE
+            SYNTAX  INTEGER { valid(1), delete(2), invalid(3) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Make entry valid/invalid or discard it."
+            DEFVAL { valid }
+        ::= { biboAdmGuiAccessEntry 3 }
+
+       biboAdmGuiAccessRequiredLvlMask OBJECT-TYPE
+
+            SYNTAX  HexValue 
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+               "Define required GUI access level bits.
+                Available access levels bits reach from 0 to 30
+                Normal behavior: Only users get access to the part of GUI
+                which is specified by biboAdmGuiAccessInedx, which have at
+                least  one bit set in biboAdmLoginGUIAccessMaks which is
+                also set in here.
+
+                System administrator and users which have admin rights
+                (bit 1 (2)) in biboAdmLoginGUIAccessLevel have always
+                access to any GUI part. This can be overruled by setting
+                bit 0 in biboAdmGuiAccessRequiredLevel."
+            DEFVAL { 0 }
+        ::= { biboAdmGuiAccessEntry 4 }
+
+
+        biboAdmGuiAccessLevelTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF BiboAdmGuiAccessLevelEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+
+            DESCRIPTION
+                 "This table holds a description for used
+                  level bits."
+        ::= { bintecsec 15 }
+
+        biboAdmGuiAccessLevelEntry OBJECT-TYPE
+            SYNTAX  BiboAdmGuiAccessLevelEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                 ""
+            INDEX { biboAdmGuiAccessLevelBitNr }
+       ::= { biboAdmGuiAccessLevelTable 1 }
+
+        BiboAdmGuiAccessLevelEntry ::=
+            SEQUENCE {
+                biboAdmGuiAccessLevelBitNr              INTEGER,
+                biboAdmGuiAccessLevelState              INTEGER,
+                biboAdmGuiAccessLevelDescription        DisplayString
+            }
+
+        biboAdmGuiAccessLevelBitNr OBJECT-TYPE
+            SYNTAX  INTEGER (0..30)
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Access level bit."
+
+        ::= { biboAdmGuiAccessLevelEntry 1 }
+
+        biboAdmGuiAccessLevelState OBJECT-TYPE
+            SYNTAX  INTEGER { valid(1), delete(2), invalid(3) }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Make entry valid/invalid or discard it."
+            DEFVAL { valid }
+        ::= { biboAdmGuiAccessLevelEntry 2 }
+
+        biboAdmGuiAccessLevelDescription OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                "Description for this access level bit."
+
+        ::= { biboAdmGuiAccessLevelEntry 3 }
+
+END

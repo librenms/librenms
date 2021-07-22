@@ -1,0 +1,132 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2011-2014 bintec elmeg GmbH
+-- $RCSfile: mib-sensor,v $
+-- $Revision: 1.5 $
+-- $Date: 2014-02-07 10:37:49 $
+---------------------------------------------------------------------------
+
+BINTEC-SENSOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32,
+    mib-2, enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString, TimeStamp, TruthValue
+        FROM SNMPv2-TC
+
+    sys, Date
+	FROM BINTEC-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+
+---------------------------------------------------------------------------
+
+sensorMIB MODULE-IDENTITY
+    LAST-UPDATED "201103161000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+	     Web:     www.bintec-elmeg.com
+	    "
+    DESCRIPTION
+            "The MIB module for sensor specifics.
+            "
+
+    ::= { sys 7 }
+
+---------------------------------------------------------------------------
+-- OID groups & all tables 
+---------------------------------------------------------------------------
+sensor	OBJECT IDENTIFIER	::= { sensorMIB 1 }
+
+---------------------------------------------------------------------------
+
+sensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all sensors of the system."
+    ::= { sensor 1 }
+
+    sensorEntry OBJECT-TYPE
+        SYNTAX          SensorEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            ""
+        INDEX { sensorSlot, sensorNumber }
+        ::= { sensorTable 1 }
+
+    SensorEntry ::= SEQUENCE {
+        sensorSlot            Unsigned32,
+        sensorNumber          Unsigned32,
+	sensorDescr	      DisplayString,
+	sensorType	      INTEGER,
+	sensorValue	      INTEGER,
+	sensorMeasurementUnit DisplayString
+    }
+
+    sensorSlot OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Slot where sensor is placed."
+        ::= { sensorEntry 1 }
+
+    sensorNumber OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "A unique number for a sensor in the slot."
+        ::= { sensorEntry 2 }
+
+    sensorDescr OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Decscription of sensor."
+        ::= { sensorEntry 3 }
+
+    sensorType OBJECT-TYPE
+        SYNTAX          INTEGER {
+	    temperature(1),
+	    fanspeed(2),
+	    voltage(3)
+	}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Type of sensor."
+        ::= { sensorEntry 4 }
+
+    sensorValue OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Current value of sensor."
+        ::= { sensorEntry 5 }
+
+-- ::= { sensorEntry 6 } skipped for later enhancement
+
+    sensorMeasurementUnit OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Unit of Value."
+        ::= { sensorEntry 7 }
+
+---------------------------------------------------------------------------
+END

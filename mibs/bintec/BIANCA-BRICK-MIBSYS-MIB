@@ -1,0 +1,122 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mibsys,v $ 
+-- $Revision: 1.9 $ 
+ 
+BIANCA-BRICK-MIBSYS-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            Counter, enterprises
+                FROM RFC1155-SMI
+ 
+            OBJECT-TYPE
+                FROM RFC-1212;
+
+    bintec      OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo        OBJECT IDENTIFIER ::= { bintec 4 }
+    sys         OBJECT IDENTIFIER
+        ::= { bibo 17 }
+
+-- PCM-Highway Clock
+
+sysPCMTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SysPCMEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	""
+    ::= { sys 1 }
+
+sysPCMEntry OBJECT-TYPE
+    SYNTAX SysPCMEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	""
+    INDEX { sysPCMSlot, sysPCMUnit }
+    ::= { sysPCMTable 1 }
+
+SysPCMEntry ::=
+    SEQUENCE {
+	sysPCMSlot
+	    INTEGER,
+	sysPCMUnit
+	    INTEGER,
+	sysPCMClockStatus
+	    INTEGER,
+	sysPCMClockMaster
+	    INTEGER,
+	sysPCMMasterPrio
+	    INTEGER,
+	sysPCMChanges
+	    Counter
+    }
+    
+sysPCMSlot OBJECT-TYPE
+    SYNTAX INTEGER (0..30)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	""
+    ::= { sysPCMEntry 1 }
+
+sysPCMUnit OBJECT-TYPE
+    SYNTAX INTEGER (-1..31)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Identification number of the used unit."
+    ::= { sysPCMEntry 2 }
+
+sysPCMClockStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	ready(1),
+	not-ready(2)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"shows wether this board can supply a clock signal to the
+	internal PCM-Highway.
+	ready:     this board can supply a clock signal
+	not_ready: this board can't supply a clock signal"
+    DEFVAL { not-ready }
+    ::= { sysPCMEntry 3 }
+
+sysPCMClockMaster OBJECT-TYPE
+    SYNTAX INTEGER {
+	candidate(1),
+	master(2)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"shows the status of this board.
+	 candidate:  this board can become PCM Highway master
+	 master:     this board is PCM Highway master"
+    DEFVAL { candidate }
+    ::= { sysPCMEntry 4 }
+
+sysPCMMasterPrio OBJECT-TYPE
+    SYNTAX INTEGER (0..128)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Priority during PCM-Highway master election.
+	 A small value results in high priority; the candidate with
+	 highest priority wins the election.
+	 Prio 128 (lowest priority) lets  the PCM-Highway master
+	 use its own clock (instead of using network clock)."
+    ::= { sysPCMEntry 5 }
+
+sysPCMChanges OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+    "counts how often sysPCMClockMaster has changed."
+    ::= { sysPCMEntry 10 }
+
+END

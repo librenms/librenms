@@ -1,0 +1,2840 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+--  $RCSfile: mibx25,v $ 
+-- $Revision: 1.56 $ 
+
+BIANCA-BRICK-X25-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Counter, TimeTicks, enterprises
+	FROM RFC1155-SMI
+
+    DisplayString
+	FROM RFC1158-MIB
+
+    Date, HexValue, BitValue
+        FROM BINTEC-MIB
+
+    OBJECT-TYPE
+	FROM RFC-1212;
+
+bintec 	OBJECT IDENTIFIER ::= { enterprises 272 }
+bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+x25		OBJECT IDENTIFIER
+::= { bibo 6 }
+
+
+-- X.25 Group
+
+-- Management Information for the X.25 Subsystem of the BIANCA/BRICK
+
+
+x25LinkTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25LinkEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This table contains an entry for each active link. There
+	 may be mutiple active links per interface. For point-to-
+	 multipoint interfaces, the field x25LkAddr specifies
+	 the (MAC-) address of the partner, the link leads to.
+	 There may be also multiple links for a point-to-point
+	 interface in a multilink environment without a multilink-
+	 protocol joining the multiple links to a singe logical
+	 link."
+::= { x25 1 }
+
+x25LinkEntry OBJECT-TYPE
+    SYNTAX  X25LinkEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"The x25LinkEntry is created automatically, when a link
+	 becomes active. The entry is also removed automatically,
+	 if a link becomes disconnected. It may be removed manually
+	 by setting the field x25LinkState to delete, which causes the
+	 related link to be disconnected."
+    INDEX   { x25LkIfIndex }
+::= { x25LinkTable 1 }
+
+X25LinkEntry ::=
+    SEQUENCE {
+	x25LkIfIndex				INTEGER,
+	x25LkAddr				OCTET STRING,
+	x25LkMode				INTEGER,
+	x25LkModulo				INTEGER,
+	x25LkLIC				INTEGER,
+	x25LkHIC				INTEGER,
+	x25LkLTC				INTEGER,
+	x25LkHTC				INTEGER,
+	x25LkLOC				INTEGER,
+	x25LkHOC				INTEGER,
+	x25LkDefPktSize				INTEGER,
+	x25LkDefWinSize				INTEGER,
+	x25LkMaxPktSize				INTEGER,
+	x25LkMaxWinSize				INTEGER,
+	x25LkL2WinSize				INTEGER,
+	x25LkL2RetrTimer			INTEGER,
+	x25LkL2RetrCounter			INTEGER,
+	x25LkL2SupervTimer			INTEGER,
+	x25LkL2IdleTimer			INTEGER,
+	x25LkState				INTEGER,
+	x25LkNegotiation			INTEGER,
+	x25LkDiscDelayTimer			INTEGER,
+	x25LkCallDelayTimer			INTEGER,
+	x25LkRestDelayTimer			INTEGER,
+	x25LkRewritingRule			INTEGER,
+	x25LkL1IdleTimer			INTEGER,
+	x25LkActSabmDelayTimer                  INTEGER,
+	x25LkPsvSabmDelayTimer              	INTEGER
+    }
+
+x25LkIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The index of the interface the link is running on.
+	 See ifTable."
+::= { x25LinkEntry 1 }
+
+x25LkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"On point-to-multipoint interfaces, this field contains the
+	 (MAC-)address of the partner, the link is leading to.
+	 It is empty for point-to-point interfaces, because there
+	 is only one partner at the other side."
+
+::= { x25LinkEntry 2 }
+
+x25LkMode OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	dte(1), dce(2) 
+    } 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This field indicates wheter the Layer 3 on top of the link
+	 is operated in DTE or DCE mode. The difference is in the
+	 order of VC-assignment, the handling of a call collision
+	 and the range of allowed values of the cause field."
+    DEFVAL { dte }
+::= { x25LinkEntry 3 }
+
+x25LkModulo OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	mod8(1), mod128(2) 
+    } 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This field indicates whether the layer 3 on top of the link
+	 is in modulo 8 or in modulo 128 mode."
+    DEFVAL { mod8 }
+::= { x25LinkEntry 4 }
+
+x25LkLIC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Lowest Incoming Channel as seen from the DTE. The value
+	 -1 means no incoming channels."
+::= { x25LinkEntry 5 }
+
+x25LkHIC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Highest Incoming Channel as seen from the DTE. The value
+	 -1 means no incoming channels."
+::= { x25LinkEntry 6 }
+
+x25LkLTC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Lowest Twoway Channel as seen from the DTE. The value
+	 -1 means no twoway channels."
+::= { x25LinkEntry 7 }
+
+x25LkHTC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Highest Twoway Channel as seen from the DTE. The value
+	 -1 means no twoway channels."
+::= { x25LinkEntry 8 }
+
+x25LkLOC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Lowest Outgoing Channel as seen from the DTE. The value
+	 -1 means no outgoing channels."
+::= { x25LinkEntry 9 }
+
+x25LkHOC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Highest Outgoing Channel as seen from the DTE. The value
+	 -1 means no outgoing channels."
+::= { x25LinkEntry 10 }
+
+x25LkDefPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	p128(7), p256(8), p512(9), p1024(10), p2048(11), p4096(12)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The default layer 3 packet size for this link."
+    DEFVAL { p128 }
+::= { x25LinkEntry 11 }
+
+x25LkDefWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The default window size. This is always less than 8, if the
+	 layer 3 is operated in modulo 8 mode."
+::= { x25LinkEntry 12 }
+
+x25LkMaxPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	unrestricted(1), p128(7), p256(8), p512(9), p1024(10),
+	p2048(11), p4096(12)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The maximum allowable packet size for this link during 
+	 X.25 packet size negotiation. If this field is set to
+	 unrestricted, the packet size will only be limited by
+	 the Mtu size of the interface, which is always the
+	 upper bound for the packet size."
+    DEFVAL { unrestricted }
+::= { x25LinkEntry 13 }
+
+x25LkMaxWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (0..127) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The maximum allowable window size for this link during
+	 window size negotiation."
+::= { x25LinkEntry 14 }
+
+x25LkL2WinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The layer 2 window size for this link."
+::= { x25LinkEntry 15 }
+
+x25LkL2RetrTimer OBJECT-TYPE
+    SYNTAX  INTEGER (100..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The retransmission timeout in milliseconds for the
+	 layer 2 of this link. If a frame is not acknowledged within
+	 this timeout, it will be retransmitted."
+::= { x25LinkEntry 16 }
+
+x25LkL2RetrCounter OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The retransmission counter for the layer 2 of this link.
+	 If a frame has been retransmitted more often than indicated
+	 by this object, the link will be reset or disconnected,"
+::= { x25LinkEntry 17 }
+
+x25LkL2SupervTimer OBJECT-TYPE
+    SYNTAX  INTEGER (100..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The link-supervision timeout in milliseconds for the
+	 layer 2 of this link. This timer is started, when the
+	 link gets idle. An RR poll-sequence will be initiated,
+	 when this timeout expires."
+::= { x25LinkEntry 18 }
+
+x25LkL2IdleTimer OBJECT-TYPE
+    SYNTAX  INTEGER (-1..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The idle timer in milliseconds for the layer 2 of this
+	 link. If no VCs are established and the the link has been
+	 idle for the time specified by this object, the link
+	 will be disconnected. The value 1 means, that the link is
+         disconnected immediately when the last VC has been cleared.
+	 The value 0 means, the link should not be disconnected 
+	 after the last VC has been cleared. A value of -1 means, 
+	 that the link shall be kept up even if it get disconnected 
+	 from the partner on the other end."
+::= { x25LinkEntry 19 }
+
+x25LkState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	restart-pending(1), restart-collision(2), ready(3),
+	disc-pending(4), 
+	reset-pending(5), sabm-pending(6),
+	xid-pending(7), sabm-wait(8),
+	l1connect-pending(9), l1-ready(10)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the current state of the link. The
+	 link may be manually disconnected by setting this object
+	 to the value delete."
+    DEFVAL { restart-pending }
+::= { x25LinkEntry 20 }
+
+x25LkNegotiation OBJECT-TYPE
+    SYNTAX  INTEGER { when-necessary(1), always(2), never(3) }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object determines whether packet-size and windows-size
+	 parameters are negotiated for outgoing calls.  When set to
+	 never, outgoing calls are cleared if the call parameters
+	 differ from the default-settings. When set to when-necessary,
+	 negotiation is only performed if the call parameters differ
+	 from the default settings. When set to always, negotiation
+	 is always performed."
+    DEFVAL { when-necessary }
+::= { x25LinkEntry 21 }
+
+x25LkDiscDelayTimer OBJECT-TYPE
+    SYNTAX  INTEGER (0..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The disc delay timer in milliseconds for the layer 2 of
+	 this link (only outgoing links). This timer specifies the
+	 time interval between receiving of layer 2 disconnect and
+	 actual disconnect of link. If the partner want to
+	 disconnect the layer 2 and the time specified by this object
+	 expired, the link will be disconnected. The value 0 means, 
+	 the link will be disconnected immediately after receiving of
+	 disconnect."
+::= { x25LinkEntry 22 }
+
+x25LkCallDelayTimer OBJECT-TYPE
+    SYNTAX  INTEGER (0..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The call delay timer in milliseconds for the layer 3 of
+	 this link (only outgoing link). This timer specifies the 
+	 time interval between restart procedure completion and
+	 virtual call setup. If restart procedure is completed 
+	 and the time specified by this object expired, call packet 
+	 will be sent. The value 0 means, call packet should be sent 
+	 immediately after completion of restart procedure."
+::= { x25LinkEntry 23 }
+
+x25LkRestDelayTimer OBJECT-TYPE
+    SYNTAX  INTEGER (0..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The Restart delay timer in milliseconds for this link.
+	 This timer specifies the time interval between 
+	 establishment of layer 2 and sending of restart packet. 
+	 If layer 2 is established and the time specified by this 
+	 object expired, restart packet will be sent. 
+	 The value 0 means, restart packet should be sent immediately 
+	 after establishment of layer 2."
+::= { x25LinkEntry 24 }
+
+x25LkRewritingRule OBJECT-TYPE
+    SYNTAX  INTEGER (0..999999)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This Object specifies a rewriting rule in the X25 Rewrite
+	 table. The call packet will be processed according
+	 to this rewriting rule before the call is being routed.
+	 If this value is set to zero, no rewriting will take
+	 place."
+::= { x25LinkEntry 25 }
+
+x25LkL1IdleTimer OBJECT-TYPE
+    SYNTAX  INTEGER (-1..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The idle timer in milliseconds for the layer 1 of this
+	 link. If layer 2 is disconnected and the time specified 
+	 by this object expired, the layer 1 will be disconnected. 
+	 The value 0 means, the layer 1 should not be disconnected 
+	 after the layer 2 is disconnected.
+	 A value of -1 means, that the layer 1 shall be kept up
+	 even if it get disconnected from the partner on the
+	 other end."
+::= { x25LinkEntry 26 }
+
+x25LkActSabmDelayTimer OBJECT-TYPE
+    SYNTAX  INTEGER (-1..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The sabm delay timer in milliseconds for this link (only 
+	 dialup outgoing link). This timer specifies the time interval 
+	 between establishment of layer 1 and sending of SABM packet.
+	 If layer 1 is established and the time specified by this 
+	 object expired, SABM packet will be sent. The value 0
+	 means, SABM packet should be sent immediately after 
+	 establishment of layer 1. The value -1 means, SABM packet
+	 should not be sent by dialup outgoing link."
+::= { x25LinkEntry 32 }
+
+x25LkPsvSabmDelayTimer OBJECT-TYPE
+    SYNTAX  INTEGER (-1..30000)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The passive sabm delay timer in milliseconds for this 
+	 link (only dialup incoming link). This timer specifies the time
+	 interval between establishment of layer 1 and sending of SABM 
+	 packet. If layer 1 is established and the time specified by 
+	 this object expired, SABM packet will be sent. The value 0 
+	 means, SABM packet should be sent immediately after 
+	 establishment of layer 1. The value -1 means, SABM packet 
+	 should not be sent by dialup incoming link."
+::= { x25LinkEntry 33 }
+
+
+x25LinkPresetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25LinkPresetEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This table predefines the link-parameters to be used,
+	 when a link is created. If no entry is contained
+	 in this table for a particular link, it will be setup
+	 with the default values. In any case, the parameters
+	 finally choosen for a link are displayed in the x25LinkTable.
+	 For point-to-multipoint interfaces, the parameters
+	 for the link may be set for all connected partners
+	 (x25LkPrAddr is empty) of for the specific partners
+	 individually (x25LkPrAddr is the MAC-address of the 
+	 partner)."
+::= { x25 2 }
+
+x25LinkPresetEntry OBJECT-TYPE
+    SYNTAX  X25LinkPresetEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Entries in this table are created by defining a new value
+	 for the field x25LkPrIfIndex. Entries may be deleted by
+	 setting the field x25LkPrMode to the value delete. Please
+	 note, that changing the entries dont have influence
+	 on links being already established. To take effekt the
+	 according links have to be cleared either manually
+	 (see x25LinkTable) or by other means." 
+    INDEX   { x25LkPrIfIndex }
+::= { x25LinkPresetTable 1 }
+
+X25LinkPresetEntry ::=
+    SEQUENCE {
+	x25LkPrIfIndex				INTEGER,
+	x25LkPrAddr				OCTET STRING,
+	x25LkPrMode				INTEGER,
+	x25LkPrModulo				INTEGER,
+	x25LkPrLIC				INTEGER,
+	x25LkPrHIC				INTEGER,
+	x25LkPrLTC				INTEGER,
+	x25LkPrHTC				INTEGER,
+	x25LkPrLOC				INTEGER,
+	x25LkPrHOC				INTEGER,
+	x25LkPrDefPktSize			INTEGER,
+	x25LkPrDefWinSize			INTEGER,
+	x25LkPrMaxPktSize			INTEGER,
+	x25LkPrMaxWinSize			INTEGER,
+	x25LkPrL2WinSize			INTEGER,
+	x25LkPrL2RetrTimer			INTEGER,
+	x25LkPrL2RetrCounter			INTEGER,
+	x25LkPrL2SupervTimer			INTEGER,
+	x25LkPrL2IdleTimer			INTEGER,
+	x25LkPrNegotiation			INTEGER,
+	-- x25LkPrDiscDelayTimer			INTEGER,
+	-- x25LkPrCallDelayTimer			INTEGER,
+	x25LkPrRestDelayTimer			INTEGER,
+	x25LkPrVC0				INTEGER,
+	x25LkPrRewritingRule			INTEGER
+	--, x25LkPrL1IdleTimer			INTEGER,
+	--x25LkPrActSabmDelayTimer		INTEGER,
+	--x25LkPrPsvSabmDelayTimer		INTEGER
+    }
+
+x25LkPrIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The interface index of the link to be predefined. This
+	 object identifies a row in the ifTable."
+	 
+::= { x25LinkPresetEntry 1 }
+
+x25LkPrAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"On point-to-point links, this field must be empty. On
+	 point-to-multipoint links, this field may be empty or
+	 set to a partners (MAC-) address. In the first case, the
+	 definition is valid for all links on the interface
+	 except for those having a specific predefiniton.
+	 In the second case the definition defines the link parameters
+	 for a specific partner."
+
+::= { x25LinkPresetEntry 2 }
+
+x25LkPrMode OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	dte(1), dce(2), delete(3)
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This field indicates, whether the link is initially operated
+	 in DTE or DCE mode. If a misconfiguration is detected,
+	 (DTE<->DTE od DCE<->DCE) the DTE/DCE assignement is done
+	 be means of the procedure defined in ISOxxxx."
+    DEFVAL { dte }
+::= { x25LinkPresetEntry 3 }
+
+x25LkPrModulo OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	mod8(1), mod128(2) 
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object indicates, whether the link should be operated
+	 in modulo 8 or modulo 128 mode."
+    DEFVAL { mod8 }
+::= { x25LinkPresetEntry 4 }
+
+x25LkPrLIC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Lowest Incoming Channel as seen from the DTE. Depending
+	 on the value of x25LkPrVC0, the value of -1 or Zero means
+	 no incoming channels."
+    DEFVAL { -1 }
+::= { x25LinkPresetEntry 5 }
+
+x25LkPrHIC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Highest Incoming Channel as seen from the DTE. Depending
+	 on the value of x25LkPrVC0, the value of -1 or Zero means
+	 no incoming channels."
+    DEFVAL { -1 }
+::= { x25LinkPresetEntry 6 }
+
+x25LkPrLTC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Lowest Twoway Channel as seen from the DTE. Depending
+	 on the value of x25LkPrVC0, the value of -1 or Zero means
+	 no twoway channels."
+    DEFVAL { 1 }
+::= { x25LinkPresetEntry 7 }
+
+x25LkPrHTC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Highest Twoway Channel as seen from the DTE. Depending
+	 on the value of x25LkPrVC0, the value of -1 or Zero means
+	 no twoway channels."
+    DEFVAL { 1 }
+::= { x25LinkPresetEntry 8 }
+
+x25LkPrLOC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Lowest Outgoing Channel as seen from the DTE. Depending
+	 on the value of x25LkPrVC0, the value of -1 or Zero means
+	 no outgoing channels."
+    DEFVAL { -1 }
+::= { x25LinkPresetEntry 9 }
+
+x25LkPrHOC OBJECT-TYPE
+    SYNTAX  INTEGER (-1..4095) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Highest Outgoing Channel as seen from the DTE. Depending
+	 on the value of x25LkPrVC0, the value of -1 or Zero means
+	 no outgoing channels."
+    DEFVAL { -1 }
+::= { x25LinkPresetEntry 10 }
+
+x25LkPrDefPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	p128(7), p256(8), p512(9), p1024(10), p2048(11), p4096(12)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The Layer 3 packet size for this link."
+    DEFVAL { p128 }
+::= { x25LinkPresetEntry 11 }
+
+x25LkPrDefWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The default window size. This must be less than 8, if the
+	 layer 3 is operated in modulo 8 mode."
+    DEFVAL { 2 }
+::= { x25LinkPresetEntry 12 }
+
+x25LkPrMaxPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	unrestricted(1), p128(7), p256(8), p512(9), p1024(10),
+	p2048(11), p4096(12)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The maximum allowable packet size for this link during
+	 X.25 packet size negotiation. If this field is set to
+	 unrestricted, the packet size will only be limited by
+	 the Mtu size of the interface, which is always the
+	 upper bound for the packet size."
+    DEFVAL { p128 }
+::= { x25LinkPresetEntry 13 }
+
+x25LkPrMaxWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The maximum allowable window size for this link during
+	 window size negotiation."
+    DEFVAL { 2 }
+::= { x25LinkPresetEntry 14 }
+
+x25LkPrL2WinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The layer 2 window size for this link."
+    DEFVAL { 2 }
+::= { x25LinkPresetEntry 15 }
+
+x25LkPrL2RetrTimer OBJECT-TYPE
+    SYNTAX  INTEGER (100..30000)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The retransmission timeout in milliseconds for the
+	 layer 2 of this link. If a frame is not acknowledged within
+	 this timeout, it will be retransmitted."
+    DEFVAL { 1000 }
+::= { x25LinkPresetEntry 16 }
+
+x25LkPrL2RetrCounter OBJECT-TYPE
+    SYNTAX  INTEGER (1..127) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The retransmission counter for the layer 2 of this link.
+	 If a frame has been retransmitted more often than indicated
+	 by this object, the link will be reset or disconnected."
+    DEFVAL { 10 }
+::= { x25LinkPresetEntry 17 }
+
+x25LkPrL2SupervTimer OBJECT-TYPE
+    SYNTAX  INTEGER (100..30000)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The link-supervision timeout in milliseconds for the
+	 layer 2 of this link. This timer is started, when the
+	 link gets idle. An RR poll-sequence will be initiated,
+	 when this timeout expires."
+    DEFVAL { 10000 }
+::= { x25LinkPresetEntry 18 }
+
+x25LkPrL2IdleTimer OBJECT-TYPE
+    SYNTAX  INTEGER (-1..30000)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The idle timer in milliseconds for the layer 2 of this
+	 link. If no VCs are established and the the link has been
+	 idle for the time specified by this object, the link
+	 will be disconnected. The value 0 means, the link should
+	 not be disconnected after the last VC has been cleared.
+	 A value of -1 means, that the link shall be kept up
+	 even if it get disconnected from the partner on the
+	 other end."
+    DEFVAL { 1 }
+::= { x25LinkPresetEntry 19 }
+
+x25LkPrNegotiation OBJECT-TYPE
+    SYNTAX  INTEGER { when-necessary(1), always(2), never(3) }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object determines whether packet-size and windows-size
+	 parameters are negotiated for outgoing calls.  When set to
+	 never, outgoing calls are cleared if the call parameters
+	 differ from the default-settings. When set to when-necessary,
+	 negotiation is only performed if the call parameters differ
+	 from the default settings. When set to always, negotiation
+	 is always performed."
+    DEFVAL { when-necessary }
+::= { x25LinkPresetEntry 20 }
+
+--	x25LkPrDiscDelayTimer OBJECT-TYPE
+--	    SYNTAX  INTEGER (0..30000)
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		"The disc delay timer in milliseconds for the layer 2 of
+--		 this link (only outgoing links). This timer specifies the
+--		 time interval between receiving of layer 2 disconnect and
+--		 actual disconnect of link. If the partner want to
+--		 disconnect the layer 2 and the time specified by this object
+--		 expired, the link will be disconnected. The value 0 means, 
+--		 the link will be disconnected immediately after receiving of
+--		 disconnect."
+--	    DEFVAL { 0 }
+--	::= { x25LinkPresetEntry 21 }
+--
+--	x25LkPrCallDelayTimer OBJECT-TYPE
+--	    SYNTAX  INTEGER (0..30000)
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		"The call delay timer in milliseconds for the layer 3 of
+--	 	 this link (only outgoing link). This timer specifies the 
+--		 time interval between restart procedure completion and
+--		 virtual call setup. If restart procedure is completed 
+--		 and the time specified by this object expired, call packet 
+--		 will be sent. The value 0 means, call packet should be sent 
+--		 immediately after completion of restart procedure."
+--	    DEFVAL { 0 }
+--	::= { x25LinkPresetEntry 22 }
+
+x25LkPrRestDelayTimer OBJECT-TYPE
+    SYNTAX  INTEGER (0..30000)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The Restart delay timer in milliseconds for this link.
+	 This timer specifies the time interval between 
+	 establishment of layer 2 and sending of restart packet. 
+	 If layer 2 is established and the time specified by this 
+	 object expired, restart packet will be sent. 
+	 The value 0 means, restart packet should be sent immediately 
+	 after establishment of layer 2."
+    DEFVAL { 0 }
+::= { x25LinkPresetEntry 23 }
+
+x25LkPrVC0 OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	enable(1), disable(2) 
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object indicates, whether VC#0 shall be allowed on
+	 the link. If this object is set to enable, VC#0 is allowed
+	 and the value -1 shall be used to indicate the absence of
+	 specified channels. This invalidates old configurations,
+	 for which a value of 0 specifies the absense of a specified
+	 channel. However, for compatibility reasons, if this object
+	 is not set to enabled, the values -1 or 0 may be used to
+	 specify the absence of a channel."
+    DEFVAL { disable }
+::= { x25LinkPresetEntry 24 }
+
+x25LkPrRewritingRule OBJECT-TYPE
+    SYNTAX  INTEGER (0..999999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This Object specifies a rewriting rule in the X25 Rewrite
+	 table. The call packet will be processed according
+	 to this rewriting rule before the call is being routed.
+	 If this value is set to zero, no rewriting will take
+	 place."
+::= { x25LinkPresetEntry 25 }
+
+--	x25LkPrL1IdleTimer OBJECT-TYPE
+--	    SYNTAX  INTEGER (-1..30000)
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		""
+--	    DEFVAL { 1 }
+--	::= { x25LinkPresetEntry 26 }
+--
+--	x25LkPrActSabmDelayTimer OBJECT-TYPE
+--	    SYNTAX  INTEGER (-1..30000)
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		""
+--	    DEFVAL { 0 }
+--	::= { x25LinkPresetEntry 32 }
+--
+--	x25LkPrPsvSabmDelayTimer OBJECT-TYPE
+--	    SYNTAX  INTEGER (-1..30000)
+--	    ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		""
+--	    DEFVAL { -1 }
+--	::= { x25LinkPresetEntry 33 }
+
+
+x25CallTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25CallEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This table contains an entry for each active X25-call.
+	 Calls always lead from a source-link to a destination-link.
+	 An interface index of 1 denotates a pseudo interfaces
+	 corresponding to all locally terminated calls."
+::= { x25 3 }
+
+x25CallEntry OBJECT-TYPE
+    SYNTAX  X25CallEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"The entries are created automatically, as soon as a call
+	 gets active. They are removed automatically as soon as
+	 a call gets completely cleared. A call may also be cleared
+	 manually by setting the x25CallState field of an entry to
+	 the value delete, which would also force the call to be
+	 cleared. The call data of a cleared call is copied to
+	 the x25CallHistoryTable."
+    INDEX   { 
+	x25CallSrcIfIndex, x25CallSrcVCNumber,
+	x25CallDstIfIndex, x25CallDstVCNumber
+    }
+::= { x25CallTable 1 }
+
+X25CallEntry ::=
+    SEQUENCE {
+	x25CallSrcIfIndex			INTEGER,
+	x25CallSrcLinkAddr			OCTET STRING,
+	x25CallSrcVCNumber			INTEGER,
+	x25CallDstIfIndex			INTEGER,
+	x25CallDstLinkAddr			OCTET STRING,
+	x25CallDstVCNumber			INTEGER,
+	x25CallSrcAddr				DisplayString,
+	x25CallDstAddr				DisplayString,
+	x25CallProtocolId			INTEGER,
+	x25CallFacilities			OCTET STRING,
+	x25CallUserData				DisplayString,
+	x25CallAge				TimeTicks,
+	x25CallState				INTEGER,
+	x25CallInPktSize			INTEGER,
+	x25CallOutPktSize			INTEGER,
+	x25CallInWinSize			INTEGER,
+	x25CallOutWinSize			INTEGER,
+	x25CallPktsSent				Counter,
+	x25CallBytesSent			Counter,
+	x25CallPktsRecvd			Counter,
+	x25CallBytesRecvd			Counter
+    }
+
+x25CallSrcIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The interface index of the link, the call comes from.
+	 This object contains the value 1, when the call is
+	 originated locally."
+::= { x25CallEntry 1 }
+
+x25CallSrcLinkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The (MAC-)address of the link, the call comes from (if any)"
+::= { x25CallEntry 2 }
+
+x25CallSrcVCNumber OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The virtual curcuit number of the call on the link, the
+	 call comes from."
+::= { x25CallEntry 3 }
+
+x25CallDstIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The interface index of the link, the call leads to. This
+	 object contains the value 1, when the link is terminated
+	 locally."
+::= { x25CallEntry 4 }
+
+x25CallDstLinkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The (MAC-)address of the link, the call leads to."
+::= { x25CallEntry 5 }
+
+x25CallDstVCNumber OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The virtual curcuit number of the call on the target link."
+::= { x25CallEntry 6 }
+
+x25CallSrcAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The calling address of the call as received on the source
+	 link."
+::= { x25CallEntry 7 }
+
+x25CallDstAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The called address of the call as received on the source
+	 link."
+::= { x25CallEntry 8 }
+
+x25CallProtocolId OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The protocol id (the first four byte of the call user data)
+	 of the call as received from the source link."
+::= { x25CallEntry 9 }
+
+x25CallFacilities OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The facilities of the call as received from the source
+	 link."
+::= { x25CallEntry 10 }
+
+x25CallUserData OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The user data (whithout the protocol id) of the call as
+	 received from the source link."
+::= { x25CallEntry 11 }
+
+x25CallAge OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The age of the call since received from the source link."
+::= { x25CallEntry 12 }
+
+x25CallState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	routing(1), call-pending(2), dataxfer(3),
+	out-reset-pending(4), in-reset-pending(5),
+	out-clear-pending(6), 
+	in-clear-pending(7)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The current state of the call. A call may be cleared manually
+	 by setting this object to the value delete."
+    DEFVAL { routing }
+::= { x25CallEntry 13 }
+
+x25CallInPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	p2(1), p4(2), p8(3), p16(4), p32(5), p64(6),
+	p128(7), p256(8), p512(9), p1024(10), p2048(11),
+	p4096(12), p8192(13), p16384(14), p32768(15)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The packet size of packets being received by the caller,
+	 as negotiated by the negotiation procedure."
+    DEFVAL { p128 }
+::= { x25CallEntry 14 }
+
+x25CallOutPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	p2(1), p4(2), p8(3), p16(4), p32(5), p64(6),
+	p128(7), p256(8), p512(9), p1024(10), p2048(11),
+	p4096(12), p8192(13), p16384(14), p32768(15)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The packet size of packets being sent by the caller,
+	 as negotiated by the negotiation procedure."
+    DEFVAL { p128 }
+::= { x25CallEntry 15 }
+
+x25CallInWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The window size of packets being received by the caller,
+	 as negotiated by the negotiation procedure."
+::= { x25CallEntry 16 }
+
+x25CallOutWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The window size of packets being sent by the caller,
+	 as negotiated by the negotiation procedure."
+::= { x25CallEntry 17 }
+
+x25CallPktsSent OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of all layer 3 packets (including RR/RNR/REJ)
+	 sent by the caller."
+::= { x25CallEntry 18 }
+
+x25CallBytesSent OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of data bytes sent in DATA and INTERRUPT
+	 packets by the caller."
+::= { x25CallEntry 19 }
+
+x25CallPktsRecvd OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of all layer 3 packets (including RR/RNR/REJ)
+	 received by the caller."
+::= { x25CallEntry 20 }
+
+x25CallBytesRecvd OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of data bytes received in DATA and INTERRUPT
+	 packets by the caller."
+::= { x25CallEntry 21 }
+
+
+x25CallHistoryTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25CallHistoryEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This table provides call information for the last 10 calls
+	 after they have been cleared. Active call are not contained
+	 in the x25CallHistoryTable."
+::= { x25 4 }
+
+x25CallHistoryEntry OBJECT-TYPE
+    SYNTAX  X25CallHistoryEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Entries are created automatically, when a call is cleared
+	 completely. The first entry is deleted automatcally, if a
+	 new entry would be the 11th entry in the table."
+    INDEX   { x25CallHistorySrcIfIndex, x25CallHistoryDstIfIndex }
+::= { x25CallHistoryTable 1 }
+
+X25CallHistoryEntry ::=
+    SEQUENCE {
+	x25CallHistoryTime			Date,
+	x25CallHistoryDuration			INTEGER,
+	x25CallHistorySrcIfIndex		INTEGER,
+	x25CallHistorySrcLinkAddr		OCTET STRING,
+	x25CallHistorySrcVCNumber		INTEGER,
+	x25CallHistoryDstIfIndex		INTEGER,
+	x25CallHistoryDstLinkAddr		OCTET STRING,
+	x25CallHistoryDstVCNumber		INTEGER,
+	x25CallHistorySrcAddr			DisplayString,
+	x25CallHistoryDstAddr			DisplayString,
+	x25CallHistoryProtocolId		INTEGER,
+	x25CallHistoryFacilities		OCTET STRING,
+	x25CallHistoryUserData			DisplayString,
+	x25CallHistoryInPktSize			INTEGER,
+	x25CallHistoryOutPktSize		INTEGER,
+	x25CallHistoryInWinSize			INTEGER,
+	x25CallHistoryOutWinSize		INTEGER,
+	x25CallHistoryPktsSent			Counter,
+	x25CallHistoryBytesSent			Counter,
+	x25CallHistoryPktsRecvd			Counter,
+	x25CallHistoryBytesRecvd		Counter,
+	x25CallHistoryClearCause		INTEGER,
+	x25CallHistoryClearDiag			INTEGER
+    }
+
+x25CallHistoryTime OBJECT-TYPE
+    SYNTAX  Date 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Date and time, when the call was received."
+::= { x25CallHistoryEntry 1 }
+
+x25CallHistoryDuration OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Duration of the call in seconds."
+::= { x25CallHistoryEntry 2 }
+
+x25CallHistorySrcIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Interface index of the link, the call came from."
+::= { x25CallHistoryEntry 3 }
+
+x25CallHistorySrcLinkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"(MAC-)address of the link, the call came from."
+::= { x25CallHistoryEntry 4 }
+
+x25CallHistorySrcVCNumber OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Virtual Curcuit Number on the link, the call came from."
+::= { x25CallHistoryEntry 5 }
+
+x25CallHistoryDstIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Interface index of the link, the call leads to."
+::= { x25CallHistoryEntry 6 }
+
+x25CallHistoryDstLinkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"(MAC-)address of the link, the call leads to."
+::= { x25CallHistoryEntry 7 }
+
+x25CallHistoryDstVCNumber OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Virtual Curcuit Number on the link, the call leads to."
+::= { x25CallHistoryEntry 8 }
+
+x25CallHistorySrcAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The calling party number as received from the source link."
+::= { x25CallHistoryEntry 9 }
+
+x25CallHistoryDstAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The called party number as received from the source link."
+::= { x25CallHistoryEntry 10 }
+
+x25CallHistoryProtocolId OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The Protocol ID of the call (first four bytes of the call
+	 user data field) as received from the source link."
+::= { x25CallHistoryEntry 11 }
+
+x25CallHistoryFacilities OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The facility field of the call as received from the
+	 source link."
+::= { x25CallHistoryEntry 12 }
+
+x25CallHistoryUserData OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The call user data behind the protocol ID as received
+	 from the source link"
+::= { x25CallHistoryEntry 13 }
+
+x25CallHistoryInPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	p2(1), p4(2), p8(3), p16(4), p32(5), p64(6),
+	p128(7), p256(8), p512(9), p1024(10), p2048(11),
+	p4096(12), p8192(13), p16384(14), p32768(15)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The packet size of packets being received by the caller,
+	 as negotiated by the negotiation procedure."
+    DEFVAL { p128 }
+::= { x25CallHistoryEntry 14 }
+
+x25CallHistoryOutPktSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+	p2(1), p4(2), p8(3), p16(4), p32(5), p64(6),
+	p128(7), p256(8), p512(9), p1024(10), p2048(11),
+	p4096(12), p8192(13), p16384(14), p32768(15)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The packet size of packets being sent by the caller,
+	 as negotiated by the negotiation procedure."
+    DEFVAL { p128 }
+::= { x25CallHistoryEntry 15 }
+
+x25CallHistoryInWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The window size of packets being received by the caller,
+	 as negotiated by the negotiation procedure."
+::= { x25CallHistoryEntry 16 }
+
+x25CallHistoryOutWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..127)
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The window size of packets being sent by the caller,
+	 as negotiated by the negotiation procedure."
+::= { x25CallHistoryEntry 17 }
+
+x25CallHistoryPktsSent OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of all layer 3 packets (including RR/RNR/REJ)
+	 sent by the caller."
+::= { x25CallHistoryEntry 18 }
+
+x25CallHistoryBytesSent OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of data bytes sent in DATA and INTERRUPT
+	 packets by the caller."
+::= { x25CallHistoryEntry 19 }
+
+x25CallHistoryPktsRecvd OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of all layer 3 packets (including RR/RNR/REJ)
+	 received by the caller."
+::= { x25CallHistoryEntry 20 }
+
+x25CallHistoryBytesRecvd OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The number of data bytes received in DATA and INTERRUPT
+	 packets by the caller."
+::= { x25CallHistoryEntry 21 }
+
+x25CallHistoryClearCause OBJECT-TYPE
+    SYNTAX  INTEGER (-1..255) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The clearing cause of the call as received in the first
+	 clear packet. A value of -1 means, no cause was received."
+::= { x25CallHistoryEntry 22 }
+
+x25CallHistoryClearDiag OBJECT-TYPE
+    SYNTAX  INTEGER (-1..255) 
+    ACCESS  read-only
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The clearing diagnostics of the call as received in the first
+	 clear packet. A value of -1 means, no diagnostics was
+	 received."
+::= { x25CallHistoryEntry 23 }
+
+
+
+x25RouteTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25RouteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"The X.25 Routing Table specifies the target link for
+	 different call parameters. For each incoming call the
+	 route table will be searched for a matching entry. If
+	 multiple entries match the call parameters, a metric
+	 defines which of them to use. A route is only used, if
+	 the state of the target interface is up or dormant (see
+	 mib2). Also the state of the link is used to determine
+	 wether to use the route or not. With this mechanism,
+	 a rerouting scheme can be implemented."
+::= { x25 5 }
+
+x25RouteEntry OBJECT-TYPE
+    SYNTAX  X25RouteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Entries can only be created and deleted manually."
+    INDEX   { x25RtSrcIfIndex, x25RtDstIfIndex }
+::= { x25RouteTable 1 }
+
+X25RouteEntry ::=
+    SEQUENCE {
+	x25RtSrcIfIndex				INTEGER,
+	x25RtSrcLinkAddr			OCTET STRING,
+	x25RtDstIfIndex				INTEGER,
+	x25RtDstLinkAddr			OCTET STRING,
+	x25RtDstLinkAddrMode			INTEGER,
+
+	x25RtSrcAddr				DisplayString,
+	x25RtSrcNSAP				DisplayString,
+	x25RtDstAddr				DisplayString,
+	x25RtDstNSAP				DisplayString,
+	x25RtProtocolId				INTEGER,
+	x25RtCallUserData			OCTET STRING,
+	x25RtRPOA				INTEGER,
+	x25RtNUI				DisplayString,
+
+	x25RtRewritingRule			INTEGER,
+	x25RtMetric				INTEGER,
+	x25RtCug                                INTEGER,
+	x25RtCugOutgoing                        INTEGER,
+	x25RtCugBilateral                       INTEGER,
+
+	x25RtDstLinkAddrRule			DisplayString
+    }
+
+x25RtSrcIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The originating interface index of the call. If this object
+	 is set to zero, the originating interface index will  not
+	 be checked for the matching process. If this field is set to
+	 one, the route is only valid for call originating locally."
+    DEFVAL  { 0 }
+::= { x25RouteEntry 1 }
+
+x25RtSrcLinkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The originating (MAC-)address of the call. If this object
+	 is a zero length string, the originating address will not
+	 be checked for the matching process."
+::= { x25RouteEntry 2 }
+
+x25RtDstIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The interface index the call has to be sent to. If this
+	 value is set to one, the call will be used locally.
+	 If the value is set to zero, the call will be refused. The
+	 routing entry will only be used if the destination interface
+	 status is up or dormant. Additionally the target link must
+	 be in the state ready, if it is permanently activated, i.e.
+	 the x25LkL2IdleTimer is set to -1."
+    DEFVAL  { 0 }
+::= { x25RouteEntry 3 }
+
+x25RtDstLinkAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The (MAC-)address of the station, the call has to be sent
+	 to. This object is ignored for point-to-point interfaces."
+::= { x25RouteEntry 4 }
+
+x25RtDstLinkAddrMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+	default(1), direct(2), delete(3), rule(4), auto(5)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the way, the destination link address
+	 is generated. Default will use the default method for the
+	 target interface. When direct is selected, the destination
+	 address is taken from the route entry. Set to rule(4), the
+	 the address is generated according the rule defined in the
+	 x25RtDstLinkAddrRule entry of the x25RouteTable.
+	 Other methods will be developed in the future."
+    DEFVAL  { default }
+::= { x25RouteEntry 5 }
+
+x25RtSrcAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The source X.121 address in the X25 call packet. If empty, the
+	 source address will not be matched. Extended Adresses are
+	 indicated by a leading '@'. The wildcards '*', '?', '[',
+	 ']', '{', '}' may be used."
+::= { x25RouteEntry 6 }
+
+x25RtSrcNSAP OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The source NSAP in the X25 call packet. If empty, the
+	 source NSAP will not be matched. The NSAP is preceeded
+	 by an 'X' if it is an OSI compatible NSAP or by a 'N' if
+	 the NSAP is in a not OSI compatible format. The wildcards
+	 '*', '?', '[', ']', '{', '}' may be used."
+::= { x25RouteEntry 7 }
+
+x25RtDstAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The target X.121 address in the X25 call packet. If empty, the
+	 target address will not be matched. Extended Adresses are
+	 indicated by a leading '@'. The wildcards '*', '?', '[',
+	 ']', '{', '}' may be used."
+::= { x25RouteEntry 8 }
+
+x25RtDstNSAP OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The target NSAP in the X25 call packet. If empty, the
+	 target NSAP will not be matched. The NSAP is preceeded
+	 by an 'X' if it is an OSI compatible NSAP or by a 'N' if
+	 the NSAP is in a not OSI compatible format. The wildcards
+	 '*', '?', '[', ']', '{', '}' may be used."
+::= { x25RouteEntry 9 }
+
+x25RtProtocolId OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The protocol id of the X25 call packet. The protocol id
+	 will not be used for the matching process, when this 
+	 object is set to -1"
+    DEFVAL { -1 }
+::= { x25RouteEntry 10 }
+
+x25RtCallUserData OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The call user data field of the X25 call packet behind the
+	 protocol id. If empty, the call user data field will not
+	 be used for matching."
+::= { x25RouteEntry 11 }
+
+x25RtRPOA OBJECT-TYPE
+    SYNTAX  INTEGER (-1..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object will be compared to the first value in the
+	 list of RPOAs in the X25 call packet, if not set to -1."
+    DEFVAL { -1 }
+::= { x25RouteEntry 12 }
+
+x25RtNUI OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object will be compared to the NUI facility supplied
+	 with the call. If this object is an empty string, the
+	 NUI facility will not be used for the matching process." 
+::= { x25RouteEntry 13 }
+
+x25RtRewritingRule OBJECT-TYPE
+    SYNTAX  INTEGER (0..999999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This Object specifies a rewriting rule in the X25 Rewriting
+	 Rule table. The call packed will be processed according
+	 to this rewriting rule before the call is being delivered.
+	 If this value is set to zero, no rewriting will take
+	 place."
+::= { x25RouteEntry 14 }
+
+x25RtMetric OBJECT-TYPE
+    SYNTAX  INTEGER  (0..255)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies a metric similar to the metric of an
+	 IP routing entry. If a call matches multiple entries in the
+	 X25 routing table, the routing entry with the lowest value
+	 of Metric will be used to route the call."
+::= { x25RouteEntry 15 }
+
+x25RtCug OBJECT-TYPE
+    SYNTAX  INTEGER  (-1..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object will be compared to the CUG facility supplied
+	 with the call, if not set to -1."
+    DEFVAL { -1 }
+::= { x25RouteEntry 16 }
+
+x25RtCugOutgoing OBJECT-TYPE
+    SYNTAX  INTEGER  (-1..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object will be compared to the Outgoing CUG facility
+	 supplied with the call, if not set to -1."
+    DEFVAL { -1 }
+::= { x25RouteEntry 17 }
+
+x25RtCugBilateral OBJECT-TYPE
+    SYNTAX  INTEGER  (-1..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object will be compared to the Bilateral CUG facility
+	 supplied with the call, if not set to -1."
+    DEFVAL { -1 }
+::= { x25RouteEntry 18 }
+
+x25RtDstLinkAddrRule OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"If x25RtDstLinkAddrMode is set to rule this object describes, 
+	how to develop the destination link address (may be ISDN 
+	call number, MAC address or IP address) from destination X.25 
+	address or destination X.25 NSAP."
+::= { x25RouteEntry 19 }
+
+
+
+x25RewriteTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25RewriteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This Table contains entries, that describe different
+	 rules of rewriting the call parameters before delivering
+	 a call. Which entry in this table is used, will be determined
+	 by the route table."
+::= { x25 6 }
+
+x25RewriteEntry OBJECT-TYPE
+    SYNTAX  X25RewriteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	""
+    INDEX   { x25RwRewritingRule }
+::= { x25RewriteTable 1 }
+
+X25RewriteEntry ::=
+    SEQUENCE {
+	x25RwRewritingRule			INTEGER,
+	x25RwReverseCharging			INTEGER,
+	x25RwRPOA				INTEGER,
+	x25RwNUI				DisplayString,
+	x25RwSrcAddr				DisplayString,
+	x25RwSrcNSAP				DisplayString,
+	x25RwDstAddr				DisplayString,
+	x25RwDstNSAP				DisplayString,
+	x25RwProtocolId				INTEGER,
+	x25RwCallUserData			OCTET STRING,
+	x25RwRespSrcAddr			DisplayString,
+	x25RwRespSrcNSAP			DisplayString,
+	x25RwRespDstAddr			DisplayString,
+	x25RwRespDstNSAP			DisplayString,
+	x25RwRespProtocolId			INTEGER,
+	x25RwRespCallUserData			OCTET STRING,
+	x25RwCug                                INTEGER,
+	x25RwCugOutgoing                        INTEGER,
+	x25RwCugBilateral                       INTEGER
+    }
+
+x25RwRewritingRule OBJECT-TYPE
+    SYNTAX  INTEGER (1..999999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The unique number of the rewriting rule."
+::= { x25RewriteEntry 1 }
+
+x25RwReverseCharging OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	dont-change(1), set(2), clear(3), delete(4) 
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes what to do with the reverse charging
+	 facility."
+    DEFVAL { dont-change }
+::= { x25RewriteEntry 2 }
+
+x25RwRPOA OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	dont-change(1), remove-first(2) 
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes what to do with the rpoa facility."
+    DEFVAL { dont-change }
+::= { x25RewriteEntry 3 }
+
+x25RwNUI OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the new value of the NUI facility.
+	 If this object is an empty string, the NUI facility
+	 will not be changed."
+::= { x25RewriteEntry 4 }
+
+x25RwSrcAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the source address. Digits
+	 will be set directly to the new address. A '.' will
+	 move a digit from the old address to the new address.
+	 A '*' will move all remaining digits from the old address
+	 to the new address. A '%' will delete a digit from the
+	 old address. A '#' will append all digits from the old
+	 address to the new address. Please note that the 
+	 eventually leading '@' (indicating extended adressing) 
+	 is handled execatly like digits. If this object is empty, 
+	 the source address will not be changed."
+::= { x25RewriteEntry 5 }
+
+x25RwSrcNSAP OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the source NSAP. Digits
+	 will be set directly to the new NSAP. A '.' will
+	 move a digit from the old NSAP to the new NSAP.
+	 A '*' will move all remaining digits from the old NSAP
+	 to the new NSAP. A '%' will delete a digit from the
+	 old NSAP. A '#' will append all digits from the old
+	 NSAP to the new NSAP. Please note that the eventually 
+	 leading '@' (indicating extended adressing) is handled 
+	 execatly like digits. If this object is empty, the 
+	 source NSAP will not be changed."
+::= { x25RewriteEntry 6 }
+
+x25RwDstAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the destination address. Digits
+	 will be set directly to the new address. A '.' will
+	 move a digit from the old address to the new address.
+	 A '*' will move all remaining digits from the old address
+	 to the new address. A '%' will delete a digit from the
+	 old address. A '#' will append all digits from the old
+	 address to the new address. Please note that the 
+	 eventually leading '@' (indicating extended adressing) is 
+	 handled execatly like digits. If this object is empty, 
+	 the destination address will not be changed."
+::= { x25RewriteEntry 7 }
+
+x25RwDstNSAP OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the destination NSAP. Digits
+	 will be set directly to the new NSAP. A '.' will
+	 move a digit from the old NSAP to the new NSAP.
+	 A '*' will move all remaining digits from the old NSAP
+	 to the new NSAP. A '%' will delete a digit from the
+	 old NSAP. A '#' will append all digits from the old
+	 NSAP to the new NSAP. Please note that the eventually 
+	 leading '@' (indicating extended adressing) is handled 
+	 execatly like digits. If this object is empty, the 
+	 destination NSAP will not be changed."
+::= { x25RewriteEntry 8 }
+
+x25RwProtocolId OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the new value of the protocol id field.
+	 The protocol id field will not be changed, if this object
+	 is set to -1"
+    DEFVAL { -1 }
+::= { x25RewriteEntry 9 }
+
+x25RwCallUserData OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The new value of the call user data field. The call user data
+	 field will not be changed, if this object is an empty string.
+	 A leading '%' will be ignored. This allows to delete the
+	 call user data portion of a call packet by setting this
+	 object to a single '%'."
+::= { x25RewriteEntry 10 }
+
+x25RwRespSrcAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the source address of the call
+	 accepted packet. Digits will be set directly to the new
+	 address. A '.' will move a digit from the old address to
+	 the new address.  A '*' will move all remaining digits
+	 from the old address to the new address. A '%' will
+	 delete a digit from the old address. A '#' will append 
+	 all digits from the old address to the new address. Please 
+	 note that the eventually leading '@' (indicating extended 
+	 adressing) is handled execatly like digits. If this object 
+	 is empty, the source address will not be changed."
+::= { x25RewriteEntry 11 }
+
+x25RwRespSrcNSAP OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the source NSAP in the call
+	 accepted packet. Digits will be set directly to the new
+	 NSAP. A '.' will move a digit from the old NSAP to the
+	 new NSAP.  A '*' will move all remaining digits from the
+	 old NSAP to the new NSAP. A '%' will delete a digit from the
+	 old NSAP. A '#' will append all digits from the old NSAP 
+	 to the new NSAP. Please note that the eventually leading 
+	 '@' (indicating extended adressing) is handled execatly like
+	 digits. If this object is empty, the source NSAP will
+	 not be changed."
+::= { x25RewriteEntry 12 }
+
+x25RwRespDstAddr OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the destination address of the call
+	 accepted packet. Digits will be set directly to the new
+	 address. A '.' will move a digit from the old address to
+	 the new address.  A '*' will move all remaining digits
+	 from the old address to the new address. A '%' will
+	 delete a digit from the old address. A '#' will append 
+	 all digits from the old address to the new address. Please 
+	 note that the eventually leading '@' (indicating extended 
+	 adressing) is handled execatly like digits. If this object 
+	 is empty, the destination address will not be changed."
+::= { x25RewriteEntry 13 }
+
+x25RwRespDstNSAP OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies how to rewrite the destination NSAP in the call
+	 accepted packet. Digits will be set directly to the new
+	 NSAP. A '.' will move a digit from the old NSAP to the
+	 new NSAP.  A '*' will move all remaining digits from the
+	 old NSAP to the new NSAP. A '%' will delete a digit from the
+	 old NSAP. A '#' will append all digits from the old NSAP 
+	 to the new . Please note that the eventually leading 
+	 '@' (indicating extended adressing) is handled execatly like
+	 digits. If this object is empty, the destination NSAP will
+	 not be changed."
+::= { x25RewriteEntry 14 }
+
+x25RwRespProtocolId OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the new value of the ProtocolID field
+	 of the call accepted packet. The ProtocolID will not be
+	 changed, if this object is set to -1."
+    DEFVAL { -1 }
+::= { x25RewriteEntry 15 }
+
+x25RwRespCallUserData OBJECT-TYPE
+    SYNTAX  OCTET STRING 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The new value of the call user data field of the call
+	 accepted packet. The call user data field will not be
+	 changed, if this object is an empty string. A leading
+	 '%' will be ignored. This allows to delete the
+	 call user data portion of a call accepted packet by
+	 setting this object to a single '%'."
+::= { x25RewriteEntry 16 }
+
+x25RwCug OBJECT-TYPE
+    SYNTAX  INTEGER (-2..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the new value of the CUG facility.
+	 If this object is set to -1, the CUG facility will not be
+	 changed. The CUG facility will be removed, if this object is
+	 set to -2."
+    DEFVAL { -1 }
+::= { x25RewriteEntry 17 }
+
+x25RwCugOutgoing OBJECT-TYPE
+    SYNTAX  INTEGER (-2..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the new value of the Outgoing CUG
+	 facility. If this object is set to -1, the Outgoing CUG
+	 facility will not be changed. The Outgoing CUG facility will be
+	 removed, if this object is set to -2."
+    DEFVAL { -1 }
+::= { x25RewriteEntry 18 }
+
+x25RwCugBilateral OBJECT-TYPE
+    SYNTAX  INTEGER (-2..9999)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the new value of the Bilateral CUG
+	 facility. If this object is set to -1, the Bilateral CUG
+	 facility will not be changed. The Bilateral CUG facility will
+	 be removed, if this object is set to -2."
+    DEFVAL { -1 }
+::= { x25RewriteEntry 19 }
+
+
+x25MprTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25MprEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This table contains an entry for each partner reachable
+	 via X.25 for Multiprotocol over X.25 according to RFC 1356.
+	 Entries in this table are created manually and will result
+	 to the creation of a multiprotocol routing interface in
+	 the ifTable. This interface can than be used by higher
+	 level protocols like ip, ipx and bridging.
+
+	 The object x25MprIfIndex shall be set to 0 for creation
+	 of new entries. The BRICK will allocate the next free
+	 interface index and assign it ti x25MprIfIndex.
+
+	 Rows of this table can be deleted by setting the object
+	 x25MprEncapsulation to the value delete.
+	 "
+::= { x25 7 }
+
+x25MprEntry OBJECT-TYPE
+    SYNTAX  X25MprEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	""
+    INDEX   { x25MprIfIndex }
+::= { x25MprTable 1 }
+
+X25MprEntry ::=
+    SEQUENCE {
+	x25MprIfIndex				INTEGER,
+	x25MprMtu				INTEGER,
+	x25MprEncapsulation			INTEGER,
+	x25MprNumVC				INTEGER,
+	x25MprMaxVC				INTEGER,
+	x25MprWinSize				INTEGER,
+	x25MprPktSize				INTEGER,
+	x25MprShortHold				INTEGER,
+	x25MprMaxRetries			INTEGER,
+	x25MprBlockTime				INTEGER,
+	x25MprAddr				DisplayString,
+	x25MprMode				INTEGER,
+	x25MprAutoRoute				INTEGER,
+	x25MprIpSubnet				IpAddress,
+	x25MprIpSubnetMask			IpAddress
+    }
+
+x25MprIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains an interface index and assigns the
+	 row to an entry in ifTable. When creating new entries
+	 in the table, the value of this object shall be set to 0.
+	 The next free ifIndex value is than allocated
+	 by the BRICK and assigned to the object. At the same
+	 time a new interface is created in the IfTable."
+    DEFVAL { 0 }
+::= { x25MprEntry 1 }
+
+x25MprMtu OBJECT-TYPE
+    SYNTAX  INTEGER (576..8180) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The Maximum transfer unit to be used with the interface,
+	 the row is describing."
+    DEFVAL { 1500 }
+::= { x25MprEntry 2 }
+
+x25MprEncapsulation OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	ip-rfc877(1), ip(2), ipx(3), mpr(4), delete(5)
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the encapsulation method to be used.
+
+	 If this object is set to ip_rfc877, the RFC877 compatible
+	 encapsulation is selected. The relating interface
+	 is only capabable of transferring IP datagrams. All
+	 other protocols are not supported. Virtual channels
+	 are established only with the CUD field set to CC.
+
+	 If this object is set to ip, the relating interface is
+	 also only capable of forwarding IP datagrams. However,
+	 the virtual channels are setup with the CUD field
+	 set to 80 00 00 00 08 00.
+
+	 The encapsulation ipx allows only forwarding of IPX
+	 datagrams. VCs are established using a CUD field
+	 of 80 00 00 00 81 37.
+
+	 If this object is set to mpr, the corresponding
+	 corresponding interface is capable of IP, IPX and
+	 BRIDGING. The different protocols are multiplexed over
+	 the same VC. The CUD field is set to 00."
+
+    DEFVAL { ip-rfc877 }
+::= { x25MprEntry 3 }
+
+x25MprNumVC OBJECT-TYPE
+    SYNTAX  INTEGER (0..255) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the number of VCs used with the
+	 corresponding interface. The BRICK will always try to
+	 have that many VCs available for the relating interface."
+    DEFVAL { 1 }
+::= { x25MprEntry 4 }
+
+x25MprMaxVC OBJECT-TYPE
+    SYNTAX  INTEGER (0..255) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the maximum number of VCs used
+	 with the corresponding interface. It shall be greater
+	 or equal to x25MprNumVC."
+    DEFVAL { 1 }
+::= { x25MprEntry 5 }
+
+x25MprWinSize OBJECT-TYPE
+    SYNTAX  INTEGER (1..7) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes the window size to be
+	 used for outgoing X.25 virtual calls."
+    DEFVAL { 7 }
+::= { x25MprEntry 6 }
+
+x25MprPktSize OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	p128(7), p256(8), p512(9), p1024(10), p2048(11), p4096(12) 
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes the packet size, to be used for
+	 outgoing X.25 calls. Please note that this parameter is
+	 independant of the x25MprMtu parameter."
+    DEFVAL { p4096 }
+::= { x25MprEntry 7 }
+
+x25MprShortHold OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the time of inactivity in seconds,
+	 after which the VCs are disconnected automatically."
+    DEFVAL { 60 }
+::= { x25MprEntry 8 }
+
+x25MprMaxRetries OBJECT-TYPE
+    SYNTAX  INTEGER (1..255) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies the maximum number of tries for
+	 X.25 call establishement. If the BRICK has tried to establish
+	 the call for this many times, the interface is in
+	 the blocked state for a time specified by x25MprBlockTime.
+	 During the blocked state, no more tries are made."
+	 
+    DEFVAL { 5 }
+::= { x25MprEntry 9 }
+
+x25MprBlockTime OBJECT-TYPE
+    SYNTAX  INTEGER (0..65536) 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes the amount of time, the corresponding
+	 interface remains in the blocked state after too many
+	 tries to establish the X.25 call."
+    DEFVAL { 60 }
+::= { x25MprEntry 10 }
+
+x25MprAddr OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The X.25 address to be used with this interface. A leading
+	 @ indicates extended adressing."
+::= { x25MprEntry 11 }
+
+x25MprMode OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	normal(1), multiuser(2)
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes the operating mode of the interface.
+	     normal    -- normal operating mode
+	     multiuser -- A new interface is created for each
+			  incoming X.25 call.
+	"
+    DEFVAL { normal }
+::= { x25MprEntry 12 }
+
+x25MprAutoRoute OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	off(1), check(2), translate(3)
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object describes, how automatic routes are created.
+	 It is especially usefull combined with the multiuser Mode
+	 of the interface.
+	     off       -- do not create automatic routes
+	     check     -- Check the source address of the
+			  the first packet and create a backward
+			  Route, when in the range specified by
+			  IpSubnet/IpSubnetMask
+	     translate -- Translate the ip source address to
+			  the range specified by IpSubnet/IpSubnetMask.
+			  Automatically create ipNatOutEntries
+			  and set ipExtIfNat for dynamic interfaces
+			  to reverse.
+	"
+    DEFVAL { off }
+::= { x25MprEntry 13 }
+
+x25MprIpSubnet OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies, together with x25MprSubnetMask
+	 the possible range for automatically created routes.
+	 The object is valid, when x25MprMode is set to autoroute
+	 or multiuser.
+	"
+::= { x25MprEntry 14 }
+
+x25MprIpSubnetMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies, together with x25MprSubnet
+	 the possible range for automatically created routes.
+	 The object is valid, when x25MprMode is set to autoroute
+	 or multiuser.
+	"
+::= { x25MprEntry 15 }
+
+
+--      x25PadProfileTable OBJECT-TYPE ::= { x25 8 }
+
+--      x25ToTcpTable OBJECT-TYPE ::= { x25 9 }
+
+
+x25LocalPadCall OBJECT-TYPE
+    SYNTAX  INTEGER { accept(1), dont-accept(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies wether a PAD Call (PID=1) routed
+	 to the local X.25 entity (ifIndex=1) should
+	 be accepted to allow for a remote login via X.25. This
+	 may be disabled for security reasons by setting this
+	 object do dont-accept."
+    DEFVAL { accept }
+::= { x25 10 }
+
+x25LocalAddr OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"The X.25 address to be used as originating address
+	 for outgoing X.25 call from this BRICK. A leading
+	 @ indicates extended adressing."
+    DEFVAL { "" }
+::= { x25 11 }
+
+x25Rerouting OBJECT-TYPE
+    SYNTAX  INTEGER { allow(1), disallow(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object specifies whether a rerouting request should be 
+	 accepted to establish connection to another server. 
+	 This is only relevant for x29 rerouting."
+    DEFVAL { disallow }
+::= { x25 12 }
+
+x25HistoryMaxEntries OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Maximum number of x25CallHistory entries in memory."
+    DEFVAL { 10 }
+::= { x25 13 }
+
+x25AccountingTemplate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"Specifies the format of accounting messages sent by the
+	 syslog protocol. The format can consist of any order of
+	 the following variables.
+	 Tag     Meaning
+	 %S  Date and Time the connection was established; 
+	     in DD.MM.YY/HH:MM:SS format.
+	 %d  The duration of the connection in seconds.
+	 %z  The X25 source address.
+	 %Z  The X25 destination address.
+	 %y  Total number of bytes received over the connection.
+	 %Y  Total number of bytes sent over the connection.
+	 %g  Total packets received over the connection.
+	 %G  Total packets sent over the connection.
+	 %c  The X25 clear cause.
+	 %C  The X25 clear diagnostic.
+	 %f  The source interface.
+	 %F  The destination interface.
+	 %v  The source virtual channel number.
+	 %V  The destination virtual channel number.
+
+	 The default accounting template setting contains the 
+	 following tags: %S,%d,%z,%Z,%y,%Y,%g,%G,%c,%C."
+
+    DEFVAL { "%S,%d,%z,%Z,%y,%Y,%g,%G,%c,%C" }
+::= { x25 14 }
+
+
+
+x25OverIsdnIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF X25OverIsdnIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"This table contains an entry for each Interface
+	 accessible to the X.25 Switch for X.25 over ISDN
+	 B-channel data transfer. This mechanism superseeds
+	 the old one using the PPP implementation as ISDN
+	 call generator. The relationship to ISDN is much more
+	 direct and offers more possibilities.
+
+	 For each entry in this table, there is a corresponding
+	 Table in the ifTable of mib-2.
+	"
+::= { x25 15 }
+
+x25OverIsdnIfEntry OBJECT-TYPE
+    SYNTAX  X25OverIsdnIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	""
+    INDEX   { xoiIfIndex }
+::= { x25OverIsdnIfTable 1 }
+
+X25OverIsdnIfEntry ::=
+    SEQUENCE {
+	xoiIfIndex				INTEGER,
+	xoiIfType				INTEGER,
+	xoiIfDirection				INTEGER,
+	xoiIfLocalNumber			DisplayString,
+	xoiIfRemoteNumber			DisplayString,
+	xoiIfStkMask				BitValue,
+	xoiIfSignalling				HexValue,
+	xoiIfL1Protocol				INTEGER,
+	xoiIfL2Protocol				INTEGER,
+	xoiIfPadProfile				INTEGER,
+	xoiIfModemProfile			INTEGER,
+	xoiIfMaxCalls				INTEGER,
+	xoiIfL2Mode				INTEGER,
+	xoiIfStatCommand			INTEGER,
+	xoiIfMaxRetries				INTEGER,
+	xoiIfRetryTime				INTEGER,
+	xoiIfBlockTime				INTEGER,
+
+	-- Statistics
+	xoiIfCurrentCalls			INTEGER,
+	xoiIfIncomingCalls			INTEGER,
+	xoiIfOutgoingCalls			INTEGER,
+	xoiIfMaxConcCalls			INTEGER,
+	xoiIfCumulTime				INTEGER,
+	
+	xoiIfBrkSeqVar				INTEGER
+
+
+    }
+
+xoiIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+
+    DESCRIPTION
+	"This object contains the interface index for the
+	 interface. When this object is set to an interface
+	 number, that does not yet correspond to an existing
+	 interface, a new interface is created. The interface
+	 index is forced into the range of indices for X25 over
+	 ISDN routing. Setting this object to an existing interface
+	 index sets all the values for the respective row to
+	 default values.
+	"
+::= { x25OverIsdnIfEntry 1 }
+
+xoiIfType OBJECT-TYPE
+    SYNTAX  INTEGER { delete(1), one-to-one(2), multi-vc(3) } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the type of the interface and can
+		 also be used to delete the complete row and the corresponding
+		 interface. The following types are available:
+
+		 one-to-one	Each X.25 Call sent to the interface will
+				create a new isdn call. This leads to
+				a one-to-one relation between ISDN and
+				X.25 calls.
+
+		 multi-vc	The first X.25 call sent to the interface
+				will create a new isdn call established. The
+				following calls will be sent to the same ISDN
+				call as long as VCs (two way or outgoing) 
+				are available. Only if all VCs are used up,
+				a new ISDN call will be established.
+
+		 In either case, multiple incoming X.25 calls are allowed
+		 according to the X25LinkPresetTable. The ISDN calls
+		 are cleared, as soon as the corresponding layer 2 Link
+		 has been cleared as specified in x25LkL2IdleTimer.
+		"
+	    DEFVAL { one-to-one }
+	::= { x25OverIsdnIfEntry 2 }
+
+	xoiIfDirection OBJECT-TYPE
+	    SYNTAX  INTEGER { in(1), out(2), both(3), none(4) } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the allowd direction of ISDN calls.
+		 The value none can be used to disable an interface.
+		"
+	    DEFVAL { both }
+	::= { x25OverIsdnIfEntry 3 }
+
+	xoiIfLocalNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the local ISDN number.
+
+		 For outgoing calls, it is used as calling party number,
+		 unless it is overwritten by the X.25 routing mechanisms.
+
+		 For incoming calls it is used to assign the incoming call
+		 to an interface. The called party number of the incoming
+		 ISDN call is matched against the value of this object.
+		 Wildcards are allowed in this case.
+
+		 Use care, when IfDirection is set to both. No Wildcards
+		 are allowed for outgoing calls.
+		"
+	::= { x25OverIsdnIfEntry 4 }
+
+	xoiIfRemoteNumber OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the remote ISDN number.
+
+		 For outgoing ISDN calls, it is used as called party number,
+		 unless it is overwritten by X.25 routing mechanisms.
+
+		 For incoming calls it is used to assign the incoming call
+		 to an interface. The calling party number of the incoming
+		 ISDN call is matched against the value of this object.
+		 Wildcards are allowed in this case.
+
+		 Use care, when IfDirection is set to both. No Wildcards
+		 are allowed for outgoing calls.
+		"
+	::= { x25OverIsdnIfEntry 5 }
+
+	xoiIfStkMask OBJECT-TYPE
+	    SYNTAX  BitValue
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the ISDN stacks to be used for incoming
+		 and outgoing ISDN calls. If none of the specified stacks is
+		 ready for use, the ifOperStatus in the corresponding entry
+		 of the ifTable is set to down.
+		"
+	    -- DEFVAL { 'FFFFFFFF'H }
+	    DEFVAL { 4294967295 }
+	::= { x25OverIsdnIfEntry 6 }
+
+	xoiIfSignalling OBJECT-TYPE
+	    SYNTAX  HexValue 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object sets the signalling for outgoing calls and is used
+		 assign incoming calls to interfaces. If set to 0, an ISDN
+		 signalling is generated automatically for outgoing calls
+		 depending on the values of L1Protocol and L2Protocol. All
+		 incoming calls are routed to the interface, when this object
+		 is set to 0.
+
+		 Other values are directly used for outgoing calls,
+		 independantly of the setting of L1Protocol and L2Protocol.
+		 Incoming calls are only assigned to the interface, when
+		 the signalling is equal to the value specified here.
+
+		 The possible values are specified elsewhere.
+		"
+	::= { x25OverIsdnIfEntry 7 }
+
+	xoiIfL1Protocol OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		auto(1),
+		hdlc-64k(2),
+		hdlc-56k(3),
+		v110-1200(13),
+		v110-2400(14),
+		v110-4800(15),
+		v110-7200(16),
+		v110-9600(17),
+		v110-14400(18),
+		v110-19200(19),
+		v110-28800(20),
+		v110-38400(21),
+		v120-64k(31),
+		v120-56k(32),
+		modem(41)
+	    } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the layer 1 protocol for the interface.
+		 The specified mode is used for incoming and outgoing calls.
+
+		 If auto is selected, the layer 1 protocol will be derived from
+		 ISDN signalling for incoming calls.  For outgoing calls,
+		 layer1 mode will be derived from layer 2 protocol. 
+		"
+	    DEFVAL { auto }
+	::= { x25OverIsdnIfEntry 8 }
+
+	xoiIfL2Protocol OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		auto(1),
+		lapb(2),
+		pad(3),
+		padoverlapb(4)
+	    } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the layer 2 protocol of the interface.
+		 The setting applies to incoming and outgoing calls.
+
+		 When auto is selected, the layer 2 protocol is derived from
+		 the signalling of the call for incoming calls. For outgoing
+		 calls, usually lapb is used.
+		"
+	    DEFVAL { auto }
+	::= { x25OverIsdnIfEntry 9 }
+
+	xoiIfPadProfile OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"In case of a PAD instance being used (see Layer2Mode), this
+		 object specifies the PAD profile to be used.
+		"
+	::= { x25OverIsdnIfEntry 10 }
+
+	xoiIfModemProfile OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"In case of a modem being used for layer 1, this object specifies
+		 the modem profile.
+		"
+	::= { x25OverIsdnIfEntry 11 }
+
+	xoiIfMaxCalls OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the maximum number of calls for the
+		 interface.
+		"
+	    DEFVAL { 10 }
+	::= { x25OverIsdnIfEntry 12 }
+
+	xoiIfL2Mode OBJECT-TYPE
+	    SYNTAX  INTEGER { auto(1), dte(2), dce(3) }
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies whether the layer2 should act in
+		 DTE or DCE configuration. If set to auto. The ISDN caller
+		 is always DTE, and the callee is DCE.
+		"
+	    DEFVAL { auto }
+	::= { x25OverIsdnIfEntry 13 }
+
+	xoiIfStatCommand OBJECT-TYPE
+	    SYNTAX  INTEGER { nop(1), clear(2) } 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object may be used, to clear the statistics counters
+		 for the interface. When set to clear, all statistics counters
+		 in this table and the ifTable are set to 0.
+		"
+	    DEFVAL { nop }
+	::= { x25OverIsdnIfEntry 14 }
+
+	xoiIfMaxRetries OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the number of times, an unsuccessful
+		 call has to be retried. When even after this many times,
+		 it was not possible, to establish an ISDN connection, the
+		 original X.25 call is cleared. In addition to that, when
+		 there are currently no other ISDN calls established for
+		 the interface, the interface moves to the BLOCKED state for
+		 BlockTime seconds.
+		"
+	    DEFVAL { 0 }
+	::= { x25OverIsdnIfEntry 15 }
+
+	xoiIfRetryTime OBJECT-TYPE
+	    SYNTAX  INTEGER (-3600..3600) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the amount of time in seconds, to
+		 wait between the retries of an ISDN call. If the value is
+		 negative, a random time will be chosen between 0 and the
+		 the absolute value.
+		"
+	    DEFVAL { 0 }
+	::= { x25OverIsdnIfEntry 16 }
+
+	xoiIfBlockTime OBJECT-TYPE
+	    SYNTAX  INTEGER (0..3600) 
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object specifies the amount of time in seconds, the
+		 interface will stay in the BLOCKED state after unsuccessful
+		 ISDN call establishment.
+		"
+	    DEFVAL { 0 }
+	::= { x25OverIsdnIfEntry 17 }
+
+	xoiIfCurrentCalls OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object indicates the number of currently established
+		 calls for the interface.
+		"
+	::= { x25OverIsdnIfEntry 20 }
+
+	xoiIfIncomingCalls OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object is a statistics counter. It counts the number of
+		 incoming calls for the interface.
+		"
+	::= { x25OverIsdnIfEntry 21 }
+
+	xoiIfOutgoingCalls OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object is a statistics counter. It counts the number of
+		 outgoing calls for the interface.
+		"
+	::= { x25OverIsdnIfEntry 22 }
+
+	xoiIfMaxConcCalls OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object is a statistics counter. It indicates the maximum
+		 number of calls being active concurrently.
+		"
+	::= { x25OverIsdnIfEntry 23 }
+
+	xoiIfCumulTime OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    ACCESS  read-only
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object is a statistics counter. It cumulates the connection
+		 time of all calls assigned to the interface.
+		"
+	::= { x25OverIsdnIfEntry 24 }
+
+	xoiIfBrkSeqVar OBJECT-TYPE
+	    SYNTAX  INTEGER (-10..10)
+	    ACCESS  read-write
+	    STATUS  mandatory
+
+	    DESCRIPTION
+		"This object indicates the additional number of startbits to detect
+		 a break sequence send from V.110 terminal over an S2M interface.
+		 The default number of startbits is 22, you can vary this value 
+                 in range from 12 to 32, configuring here -10 to 10.
+		"
+	::= { x25OverIsdnIfEntry 25 }
+
+END
