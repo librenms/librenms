@@ -320,14 +320,14 @@ function delete_device($id)
     \App\Models\DeviceOutage::where('device_id', $id)->delete();
 
     \App\Models\Port::where('device_id', $id)
-        ->with('device')
-        ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
-        ->chunk(100, function ($ports) use (&$ret) {
-            foreach ($ports as $port) {
-                $port->delete();
-                $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
-            }
-        });
+                    ->with('device')
+                    ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
+                    ->chunk(100, function ($ports) use (&$ret) {
+                        foreach ($ports as $port) {
+                            $port->delete();
+                            $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
+                        }
+                    });
 
     // Remove sensors manually due to constraints
     foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `device_id` = ?', [$id]) as $sensor) {
@@ -998,51 +998,6 @@ function port_fill_missing(&$port, $device)
     }
 }
 
-function scan_new_plugins()
-{
-    $installed = 0; // Track how many plugins we install.
-
-    if (file_exists(Config::get('plugin_dir'))) {
-        $plugin_files = scandir(Config::get('plugin_dir'));
-        foreach ($plugin_files as $name) {
-            if (is_dir(Config::get('plugin_dir') . '/' . $name)) {
-                if ($name != '.' && $name != '..') {
-                    if (is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php') && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.inc.php')) {
-                        $plugin_id = dbFetchRow('SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = ?', [$name]);
-                        if (empty($plugin_id)) {
-                            if (dbInsert(['plugin_name' => $name, 'plugin_active' => '0'], 'plugins')) {
-                                $installed++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return $installed;
-}
-
-function scan_removed_plugins()
-{
-    $removed = 0; // Track how many plugins will be removed from database
-
-    if (file_exists(Config::get('plugin_dir'))) {
-        $plugin_files = scandir(Config::get('plugin_dir'));
-        $installed_plugins = dbFetchColumn('SELECT `plugin_name` FROM `plugins`');
-        foreach ($installed_plugins as $name) {
-            if (in_array($name, $plugin_files)) {
-                continue;
-            }
-            if (dbDelete('plugins', '`plugin_name` = ?', $name)) {
-                $removed++;
-            }
-        }
-    }
-
-    return  $removed;
-}
-
 function validate_device_id($id)
 {
     if (empty($id) || ! is_numeric($id)) {
@@ -1177,14 +1132,14 @@ function device_has_ip($ip)
 {
     if (IPv6::isValid($ip)) {
         $ip_address = \App\Models\Ipv6Address::query()
-            ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-            ->with('port.device')
-            ->first();
+                                             ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
+                                             ->with('port.device')
+                                             ->first();
     } elseif (IPv4::isValid($ip)) {
         $ip_address = \App\Models\Ipv4Address::query()
-            ->where('ipv4_address', $ip)
-            ->with('port.device')
-            ->first();
+                                             ->where('ipv4_address', $ip)
+                                             ->with('port.device')
+                                             ->first();
     }
 
     if (isset($ip_address) && $ip_address->port) {
@@ -1585,7 +1540,7 @@ function q_bridge_bits2indices($hex_data)
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
-    */
+     */
     $hex_data = str_replace(' ', '', $hex_data);
 
     // we need an even number of digits for hex2bin
@@ -1838,8 +1793,10 @@ function device_is_up($device, $record_perf = false)
             if ($device['status'] != $response['status']) {
                 if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
                     // use current time as a starting point when an outage starts
-                    $data = ['device_id' => $device['device_id'],
-                        'going_down' => time(), ];
+                    $data = [
+                        'device_id' => $device['device_id'],
+                        'going_down' => time(),
+                    ];
                     dbInsert($data, 'device_outages');
                 }
             }
