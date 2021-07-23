@@ -21,12 +21,12 @@ abstract class Plugin
         return self::className() . '/resources/views/';
     }
 
-    final public static function menu()
+    public static function menu()
     {
         echo view(self::prefix() . self::$menu_view, self::menuData());
     }
 
-    final public static function settings()
+    public static function settings()
     {
         echo view(self::prefix() . self::$settings_view, self::settingsData());
     }
