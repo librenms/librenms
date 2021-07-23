@@ -2,8 +2,6 @@
 
 namespace LibreNMS\Plugins;
 
-use App\Models\Port;
-
 trait SettingsTrait
 {
     public static function menu()

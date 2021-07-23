@@ -8,10 +8,9 @@ namespace LibreNMS\Plugins;
  * have special requirements you can take the static methods of the respective traits from
  * the sources of \LibreNMS\Plugins\ as a template and customize them.
  */
-
 class Example extends Plugin
 {
     //use DeviceTrait;
     //use PortTrait;
-    //use SettingsTrait;
+    use SettingsTrait;
 }
