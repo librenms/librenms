@@ -1199,6 +1199,11 @@ function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
             return true;
         }
     }
+    foreach (Config::getCombined($device['os'], "disabled_sensors_regex.$sensor_class", []) as $skipRegex) {
+        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
+            return true;
+        }
+    }
 
     return false;
 }

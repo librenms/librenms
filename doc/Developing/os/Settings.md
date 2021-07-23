@@ -33,6 +33,12 @@ $config['os']['vrp']['disabled_sensors']['current'] = true;
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
+- Filter all 'power' sensors with description matching regexp ```'/ Power [TR]x /'``` for Operating System iosxr.
+
+```php
+$config['os']['iosxr']['disabled_sensors_regex']['power'][] = '/ Power [TR]x /';
+```
+
 - Ignore all temperature sensors
 
 ```php
