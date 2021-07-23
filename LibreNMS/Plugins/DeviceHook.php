@@ -4,7 +4,7 @@ namespace LibreNMS\Plugins;
 
 use App\Models\Device;
 
-trait DeviceTrait
+trait DeviceHook
 {
     public static function device_overview_container($device)
     {

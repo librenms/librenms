@@ -4,7 +4,7 @@ namespace LibreNMS\Plugins;
 
 use App\Models\Port;
 
-trait PortTrait
+trait PortHook
 {
     public static function port_container($device, $port)
     {

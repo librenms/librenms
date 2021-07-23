@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Plugins;
 
-trait SettingsTrait
+trait SettingsHook
 {
     public static function menu()
     {
