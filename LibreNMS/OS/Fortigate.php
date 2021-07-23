@@ -30,8 +30,13 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Fortinet;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 
-class Fortigate extends Fortinet implements OSPolling
+class Fortigate extends Fortinet implements
+        OSPolling,
+        WirelessClientsDiscovery,
+        WirelessApCountDiscovery
 {
     public function discoverOS(Device $device): void
     {
