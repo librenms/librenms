@@ -10,7 +10,7 @@ namespace LibreNMS\Plugins;
  */
 class Example extends Plugin
 {
-    //use DeviceHook;
+    use DeviceHook;
     //use PortHook;
     use SettingsHook;
 }
