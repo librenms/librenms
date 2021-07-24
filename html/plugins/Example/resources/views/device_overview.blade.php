@@ -1,16 +1,18 @@
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
-            <div class="panel-heading">
-                <i class="fa fa-question fa-lg icon-theme" aria-hidden="true">&nbsp;</i>
-                <strong>{{ $title }}</strong>
-            </div>
-            <table class="table table-hover table-condensed table-striped">
-                <tbody><tr><td>
-Example plugin in "Device - Overview" tab <br>
-{{ $device->hostname }}
-                </td></tr></tbody>
-            </table>
-        </div>
+@if($device->notes)
+    <div class="row">
+	<div class="col-md-12">
+	    <div class="panel panel-default panel-condensed">
+		<div class="panel-heading">
+		    <strong>{{ $title }}</strong> <a href="{{ url('device/' . $device->device_id . '/notes') }}">[EDIT]</a>
+		</div>
+		<div class="panel-body">
+		    <div class="row">
+			<div class="col-sm-12">
+			    {!! Str::markdown($device->notes) !!}
+			</div>
+		    </div>
+		</div>
+	    </div>
+	</div>
     </div>
-</div>
+@endif
