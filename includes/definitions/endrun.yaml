@@ -19,3 +19,8 @@ discovery:
           oid: .1.3.6.1.4.1.13827.12.1.16.0
           op: 'contains'
           value: 'Sonoma_D12'
+    -
+      snmpget:
+          oid: .1.3.6.1.4.1.13827.14.1.16.0
+          op: 'contains'
+          value: 'MeridianII'
