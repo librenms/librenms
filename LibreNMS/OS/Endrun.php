@@ -41,7 +41,7 @@ class Endrun extends OS implements OSDiscovery
             $device->hardware = $matches[1] ?? null;
             $device->version = $matches[2] ?? null;
             $device->serial = $info[0]['snmpSetSerialNo'] ?? null;
-	} else {
+       } else {
             $info = snmp_get_multi($this->getDeviceArray(), ['cntpVersion.0', 'cdmaVersion.0', 'snmpSetSerialNo.0'], '-OQUs', 'TEMPUSLXUNISON-MIB:SNMPv2-MIB');
             $device->features = $info[0]['cdmaVersion'] ?? null;
             $device->serial = $info[0]['snmpSetSerialNo'] ?? null;
