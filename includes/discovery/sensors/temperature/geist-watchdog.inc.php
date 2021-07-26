@@ -46,4 +46,23 @@ foreach ($temp_table as $index => $temp_data) {
     }
 }
 
+$sensor_count = 0;
+$temp_table = snmpwalk_cache_oid($device, 'internalTable', [], 'GEIST-V4-MIB');
+foreach ($temp_table as $index => $temp_data) {
+    $current_oid = '.1.3.6.1.4.1.21239.5.1.2.1.5.' . $index;
+    $descr = $temp_data['internalName'];
+    $value = $temp_data['internalTemp'];
+    discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, $sensor_count++, 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
+}
+
+$temp_table = snmpwalk_cache_oid($device, 'tempSensorTable', [], 'GEIST-V4-MIB');
+foreach ($temp_table as $index => $temp_data) {
+    if ($temp_data['tempSensorAvail'] == 1) {
+        $current_oid = '.1.3.6.1.4.1.21239.5.1.4.1.5.' . $index;
+        $descr = $temp_data['tempSensorName'];
+        $value = $temp_data['tempSensorTemp'];
+        discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, $sensor_count++, 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
+    }
+}
+
 unset($temp_table);
