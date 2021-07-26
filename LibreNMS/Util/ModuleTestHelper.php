@@ -651,7 +651,7 @@ class ModuleTestHelper
         $module_output = [];
         $module_start = "#### Load $type module ";
         $module_end = "#### Unload $type module %s ####";
-        $parts = explode($module_start, $output); /* @phpstan-ignore-line */
+        $parts = explode($module_start, $output);
         array_shift($parts); // throw away first part of output
         foreach ($parts as $part) {
             // find the module name

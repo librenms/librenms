@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\AlertSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<AlertSchedule> */
 class AlertScheduleFactory extends Factory
 {
     /**
