@@ -24,7 +24,6 @@ jobs:
           VALIDATE_PHP_BUILTIN: true
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
-          VALIDATE_PYTHON_MYPY: false
 
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: master
