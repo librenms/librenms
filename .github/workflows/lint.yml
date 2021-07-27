@@ -18,7 +18,7 @@ jobs:
 
       -
         name: Lint Code Base
-        uses: github/super-linter@slim-v4
+        uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
           VALIDATE_PHP_BUILTIN: true
