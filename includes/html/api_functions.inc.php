@@ -2602,7 +2602,7 @@ function del_service_from_host(Illuminate\Http\Request $request)
 
 function search_by_mac(Illuminate\Http\Request $request)
 {
-    $macAddress = Rewrite::normalizeMac((string) $request->route('search'));
+    $macAddress = Rewrite::macToHex((string) $request->route('search'));
 
     $rules = [
         'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',

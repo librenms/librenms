@@ -136,17 +136,6 @@ class Rewrite
     }
 
     /**
-     * Remove all allowed delmiters and convert to lower
-     *
-     * @param string $mac
-     * @return string
-     */
-    public static function normalizeMac($mac)
-    {
-        return trim(strtolower(str_replace(['.', ':', '-'], '', $mac)));
-    }
-
-    /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
      * @param string $mac
