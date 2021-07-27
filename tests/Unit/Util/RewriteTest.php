@@ -7,7 +7,6 @@ use LibreNMS\Util\Rewrite;
 
 class RewriteTest extends TestCase
 {
-
     /**
      * @test
      * @dataProvider validMacProvider
