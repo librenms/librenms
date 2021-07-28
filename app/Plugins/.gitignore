@@ -1,0 +1,7 @@
+# Ignore everything in this directory
+*
+# Except these
+!.gitignore
+!*.php
+!/Hooks/
+!/ExamplePlugin/
