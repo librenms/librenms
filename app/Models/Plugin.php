@@ -31,6 +31,8 @@ class Plugin extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'plugin_id';
+    protected $fillable = ['plugin_name', 'plugin_active', 'version', 'settings'];
+    protected $casts = ['plugin_active' => 'bool', 'settings' => 'array'];
 
     // ---- Query scopes ----
 
@@ -43,38 +45,13 @@ class Plugin extends BaseModel
         return $query->where('plugin_active', 1);
     }
 
-    public static function scan_new_plugins()
+    public function scopeVersionOne($query)
     {
-        $countInstalled = 0;
-
-        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
-            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['..', '.']);
-            $plugin_files = array_diff($plugin_files, self::pluck('plugin_name')->toarray());
-            foreach ($plugin_files as $name) {
-                if (is_dir(\LibreNMS\Config::get('plugin_dir') . '/' . $name)
-                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')
-                    && dbInsert(['plugin_name' => $name, 'plugin_active' => '0'], 'plugins')) {
-                    $countInstalled++;
-                }
-            }
-        }
-
-        return $countInstalled;
+        return $query->where('version', 1);
     }
 
-    public static function scan_removed_plugins()
+    public function scopeVersionTwo($query)
     {
-        $countRemoved = 0;
-
-        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
-            $plugin_files = scandir(\LibreNMS\Config::get('plugin_dir'));
-            foreach (self::whereNotIn('plugin_name', $plugin_files)->select('plugin_name')->get() as $plugin) {
-                if (dbDelete('plugins', '`plugin_name` = ?', $plugin->plugin_name)) {
-                    $countRemoved++;
-                }
-            }
-        }
-
-        return  $countRemoved;
+        return $query->where('version', 2);
     }
 }

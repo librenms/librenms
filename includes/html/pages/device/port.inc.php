@@ -1,5 +1,7 @@
 <?php
 
+use App\Plugins\Hooks\PortPluginTab;
+
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
 $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$vars['port']]);
@@ -100,7 +102,9 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
-if (LibreNMS\Plugins::countHooks('port_container')) {
+$portModel = \App\Models\Port::find($port['port_id']);
+
+if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortPluginTab::class, ['port' => $portModel])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
     $menu_options['plugins'] = 'Plugins';
 }

@@ -81,13 +81,16 @@
                                     </a></li>
                             </ul>
                         </li>
-                        @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count())
+                        @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count() || PluginManager::hasPlugins())
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> @lang('Plugins')</a>
                             <ul class="dropdown-menu">
                                 {!! \LibreNMS\Plugins::call('menu') !!}
+                                @foreach(PluginManager::call(\App\Plugins\Hooks\PluginMenuEntry::class) as [$view, $data])
+                                    <li>@include($view, $data)</li>
+                                @endforeach
                                 @admin
-                                    @if(\LibreNMS\Plugins::count())
+                                    @if(\LibreNMS\Plugins::count() || PluginManager::hasPlugins())
                                         <li role="presentation" class="divider"></li>
                                     @endif
                                 <li><a href="{{ url('plugin/view=admin') }}"> <i class="fa fa-lock fa-fw fa-lg"

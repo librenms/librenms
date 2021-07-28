@@ -4,8 +4,8 @@ use App\Models\Plugin;
 
 if (Auth::user()->hasGlobalAdmin()) {
     // Scan for new plugins and add to the database
-    $new_plugins = Plugin::scan_new_plugins();
-    $removed_plugins = Plugin::scan_removed_plugins();
+    $new_plugins = \LibreNMS\Plugins::scanNew();
+    $removed_plugins = \LibreNMS\Plugins::scanRemoved();
 
     // Check if we have to toggle enabled / disable a particular module
     $plugin_id = $_POST['plugin_id'];
@@ -80,6 +80,7 @@ $.ajax({
                 <input type="hidden" name="plugin_id" value="' . $plugins['plugin_id'] . '">
                 <input type="hidden" name="plugin_active" value="' . $plugins['plugin_active'] . '">
                 <button type="submit" class="btn btn-sm btn-' . $plugin_button . '">' . $plugin_label . '</button>
+                <a href="plugin?p=' . $plugins['plugin_name'] . '" class="btn btn-sm btn-primary">Settings</a>
               </form>
             </td>
           </tr>';
