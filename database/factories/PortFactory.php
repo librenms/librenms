@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Port> */
 class PortFactory extends Factory
 {
     /**
@@ -22,7 +23,7 @@ class PortFactory extends Factory
     public function definition()
     {
         return [
-            'ifIndex' => $this->faker->unique()->numberBetween(),
+            'ifIndex' => $this->faker->unique()->numberBetween(), /* @phpstan-ignore-line */
             'ifName' => $this->faker->text(20),
             'ifDescr' => $this->faker->text(255),
             'ifLastChange' => $this->faker->unixTime(),

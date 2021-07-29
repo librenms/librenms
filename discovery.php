@@ -8,6 +8,9 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
+
+use LibreNMS\Util\Debug;
+
 $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
@@ -59,7 +62,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $doing = $options['n'] . '/' . $options['i'];
 }
 
-if (set_debug(isset($options['d'])) || isset($options['v'])) {
+if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -75,9 +78,7 @@ SNMP: {$versions['netsnmp_ver']}
 EOH;
 
     echo "DEBUG!\n";
-    if (isset($options['v'])) {
-        $vdebug = true;
-    }
+    Debug::setVerbose(isset($options['v']));
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 

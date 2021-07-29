@@ -1,0 +1,853 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux vsx123 2.6.18-92cpx86_64 #1 SMP Tue Sep 8 20:04:48 IDT 2020 x86_64",
+                    "sysContact": "<private>",
+                    "version": "R80.30",
+                    "hardware": "Check Point 23900",
+                    "features": null,
+                    "os": "gaia",
+                    "type": "firewall",
+                    "serial": "LR123456789",
+                    "icon": "checkpoint.png",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.1.30.7.0",
+                    "sensor_index": "fwLoggingHandlingRate.0",
+                    "sensor_type": "gaia",
+                    "sensor_descr": "Log Rate",
+                    "group": "Logging",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 435,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.1.25.3.0",
+                    "sensor_index": "fwNumConn.0",
+                    "sensor_type": "gaia",
+                    "sensor_descr": "Number of concurrent connections",
+                    "group": "Connections",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 61476,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.43.1.1.0",
+                    "sensor_index": "advancedUrlFilteringSubscriptionStatus.0",
+                    "sensor_type": "advancedUrlFilteringSubscriptionStatus",
+                    "sensor_descr": "URL Filtering Subscription",
+                    "group": "Licenses",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "advancedUrlFilteringSubscriptionStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.43.2.1.0",
+                    "sensor_index": "advancedUrlFilteringUpdateStatus.0",
+                    "sensor_type": "advancedUrlFilteringUpdateStatus",
+                    "sensor_descr": "URL Filtering Update",
+                    "group": "Update",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "advancedUrlFilteringUpdateStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.46.1.1.0",
+                    "sensor_index": "amwABUpdateStatus.0",
+                    "sensor_type": "amwABUpdateStatus",
+                    "sensor_descr": "Anti Malware Update",
+                    "group": "Update",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "amwABUpdateStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.46.5.1.0",
+                    "sensor_index": "amwAVUpdateStatus.0",
+                    "sensor_type": "amwAVUpdateStatus",
+                    "sensor_descr": "Anti Virus Update",
+                    "group": "Update",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "amwAVUpdateStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.46.2.1.0",
+                    "sensor_index": "antiBotSubscriptionStatus.0",
+                    "sensor_type": "antiBotSubscriptionStatus",
+                    "sensor_descr": "Anti Bot Subscription",
+                    "group": "Licenses",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "antiBotSubscriptionStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.46.3.1.0",
+                    "sensor_index": "antiVirusSubscriptionStatus.0",
+                    "sensor_type": "antiVirusSubscriptionStatus",
+                    "sensor_descr": "Anti Virus Subscription",
+                    "group": "Licenses",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "antiVirusSubscriptionStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.39.1.1.0",
+                    "sensor_index": "applicationControlSubscriptionStatus.0",
+                    "sensor_type": "applicationControlSubscriptionStatus",
+                    "sensor_descr": "Application Control Subscription",
+                    "group": "Licenses",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "applicationControlSubscriptionStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.39.2.1.0",
+                    "sensor_index": "applicationControlUpdateStatus.0",
+                    "sensor_type": "applicationControlUpdateStatus",
+                    "sensor_descr": "Application Control Update",
+                    "group": "Update",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "applicationControlUpdateStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.1.30.5.0",
+                    "sensor_index": "fwLocalLoggingStat.0",
+                    "sensor_type": "fwLocalLoggingStat",
+                    "sensor_descr": "Local Log Server Status",
+                    "group": "Logging",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "fwLocalLoggingStat"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.1.30.1.0",
+                    "sensor_index": "fwLSConnOverall.0",
+                    "sensor_type": "fwLSConnOverall",
+                    "sensor_descr": "Log Server Connectivity",
+                    "group": "Logging",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "fwLSConnOverall"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.1.30.3.1.3.1.0",
+                    "sensor_index": "fwLSConnState.1.0",
+                    "sensor_type": "fwLSConnState",
+                    "sensor_descr": "10.10.10.10, Log Server Connectivity",
+                    "group": "Logging",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "fwLSConnState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.1.30.3.1.3.2.0",
+                    "sensor_index": "fwLSConnState.2.0",
+                    "sensor_type": "fwLSConnState",
+                    "sensor_descr": "11.11.11.11, Log Server Connectivity",
+                    "group": "Logging",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "fwLSConnState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.5.5.0",
+                    "sensor_index": "haStarted.0",
+                    "sensor_type": "haStarted",
+                    "sensor_descr": "Cluster mechanism started",
+                    "group": "HA",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "haStarted"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.5.101.0",
+                    "sensor_index": "haStatCode.0",
+                    "sensor_type": "haStatCode",
+                    "sensor_descr": "Cluster member status code",
+                    "group": "HA",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "haStatCode"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2620.1.5.6.0",
+                    "sensor_index": "haState.0",
+                    "sensor_type": "haState",
+                    "sensor_descr": "Cluster member state",
+                    "group": "HA",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "haState"
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "advancedUrlFilteringSubscriptionStatus",
+                    "state_descr": "valid",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "advancedUrlFilteringSubscriptionStatus",
+                    "state_descr": "expired",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "advancedUrlFilteringSubscriptionStatus",
+                    "state_descr": "about-to-expire",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "advancedUrlFilteringSubscriptionStatus",
+                    "state_descr": "not-associated",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "advancedUrlFilteringSubscriptionStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "advancedUrlFilteringUpdateStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "advancedUrlFilteringUpdateStatus",
+                    "state_descr": "up-to-date",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "advancedUrlFilteringUpdateStatus",
+                    "state_descr": "new",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "advancedUrlFilteringUpdateStatus",
+                    "state_descr": "degrade",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "advancedUrlFilteringUpdateStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "amwABUpdateStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "amwABUpdateStatus",
+                    "state_descr": "up-to-date",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "amwABUpdateStatus",
+                    "state_descr": "new",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "amwABUpdateStatus",
+                    "state_descr": "degrade",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "amwABUpdateStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "amwAVUpdateStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "amwAVUpdateStatus",
+                    "state_descr": "up-to-date",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "amwAVUpdateStatus",
+                    "state_descr": "new",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "amwAVUpdateStatus",
+                    "state_descr": "degrade",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "amwAVUpdateStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "antiBotSubscriptionStatus",
+                    "state_descr": "valid",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "antiBotSubscriptionStatus",
+                    "state_descr": "expired",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "antiBotSubscriptionStatus",
+                    "state_descr": "about-to-expire",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "antiBotSubscriptionStatus",
+                    "state_descr": "not-associated",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "antiBotSubscriptionStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "antiVirusSubscriptionStatus",
+                    "state_descr": "valid",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "antiVirusSubscriptionStatus",
+                    "state_descr": "expired",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "antiVirusSubscriptionStatus",
+                    "state_descr": "about-to-expire",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "antiVirusSubscriptionStatus",
+                    "state_descr": "not-associated",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "antiVirusSubscriptionStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "applicationControlSubscriptionStatus",
+                    "state_descr": "valid",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "applicationControlSubscriptionStatus",
+                    "state_descr": "expired",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "applicationControlSubscriptionStatus",
+                    "state_descr": "about-to-expire",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "applicationControlSubscriptionStatus",
+                    "state_descr": "not-associated",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "applicationControlSubscriptionStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "applicationControlUpdateStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "applicationControlUpdateStatus",
+                    "state_descr": "up-to-date",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "applicationControlUpdateStatus",
+                    "state_descr": "new",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "applicationControlUpdateStatus",
+                    "state_descr": "degrade",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "applicationControlUpdateStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "fwLocalLoggingStat",
+                    "state_descr": "To log servers",
+                    "state_draw_graph": 3,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fwLocalLoggingStat",
+                    "state_descr": "Local configured",
+                    "state_draw_graph": 2,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fwLocalLoggingStat",
+                    "state_descr": "Local due to connectivity",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "fwLocalLoggingStat",
+                    "state_descr": "Local due to high rate",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "fwLSConnOverall",
+                    "state_descr": "Ok",
+                    "state_draw_graph": 2,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fwLSConnOverall",
+                    "state_descr": "Warning",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "fwLSConnOverall",
+                    "state_descr": "Error",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "fwLSConnState",
+                    "state_descr": "Ok",
+                    "state_draw_graph": 2,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fwLSConnState",
+                    "state_descr": "Error",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "fwLSConnState",
+                    "state_descr": "Not Active",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "haStarted",
+                    "state_descr": "no",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "haStarted",
+                    "state_descr": "yes",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "haStatCode",
+                    "state_descr": "Up",
+                    "state_draw_graph": 2,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "haStatCode",
+                    "state_descr": "Attention",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "haStatCode",
+                    "state_descr": "Down",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "haState",
+                    "state_descr": "down",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "haState",
+                    "state_descr": "active",
+                    "state_draw_graph": 3,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "haState",
+                    "state_descr": "standby",
+                    "state_draw_graph": 2,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "haState",
+                    "state_descr": "Active Attention",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

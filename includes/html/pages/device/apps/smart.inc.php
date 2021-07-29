@@ -1,6 +1,6 @@
 <?php
 
-$disks = get_arrays_with_application($device, $app['app_id'], 'smart');
+$disks = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'smart');
 
 print_optionbar_start();
 

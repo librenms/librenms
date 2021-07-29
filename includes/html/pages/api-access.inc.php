@@ -195,7 +195,7 @@ if (Auth::user()->hasGlobalAdmin()) {
      new QRCode(document.getElementById("qrcode"), token_hash);
    });
 
-  $('#token-removal').click('', function(event) {
+  $('#token-removal').on("click", function(event) {
     event.preventDefault();
     token_id = $("#token_id").val();
     $.ajax({
@@ -213,7 +213,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       }
     });
   });
-  $('#token-create').click('', function(event) {
+  $('#token-create').on("click", function(event) {
     event.preventDefault();
     $.ajax({
       type: "POST",
@@ -232,7 +232,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       }
     });
   });
-  $('#pass-gen').click('', function(event) {
+  $('#pass-gen').on("click", function(event) {
     event.preventDefault();
     token = $.password(32,false);
     $('#token').val(token);

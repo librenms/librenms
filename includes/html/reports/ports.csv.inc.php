@@ -3,20 +3,21 @@
 $param = [];
 
 if (! isset($vars['ignore'])) {
-    $vars['ignore'] = '0';
+    $vars['ignore'] = 0;
 }
 
 if (! isset($vars['disabled'])) {
-    $vars['disabled'] = '0';
+    $vars['disabled'] = 0;
 }
 
 if (! isset($vars['deleted'])) {
-    $vars['deleted'] = '0';
+    $vars['deleted'] = 0;
 }
 
 $where = '';
 
 foreach ($vars as $var => $value) {
+    $value = trim($value);
     if ($value != '') {
         switch ($var) {
             case 'hostname':
@@ -35,9 +36,20 @@ foreach ($vars as $var => $value) {
                 break;
 
             case 'deleted':
+                if ($value == 1 || $value == 'yes') {
+                    $where .= ' AND I.deleted = 1';
+                }
+                break;
+
+            case 'disabled':
+                if ($value == 1 || $value == 'yes') {
+                    $where .= ' AND I.disabled = 1';
+                }
+                break;
+
             case 'ignore':
-                if ($value == 1) {
-                    $where .= ' AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0';
+                if ($value == 1 || $value == 'yes') {
+                    $where .= ' AND (I.ignore = 1 OR D.ignore = 1)';
                 }
                 break;
 
@@ -61,22 +73,22 @@ foreach ($vars as $var => $value) {
                 break;
 
             case 'errors':
-                if ($value == 1) {
+                if ($value == 1 || $value = 'yes') {
                     $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
                 }
                 break;
 
             case 'state':
                 if ($value == 'down') {
-                    $where .= 'AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
+                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
                     $param[] = 'up';
                     $param[] = 'down';
                 } elseif ($value == 'up') {
-                    $where .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
+                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = 0 AND D.ignore = 0 AND I.deleted = 0';
                     $param[] = 'up';
                     $param[] = 'up';
                 } elseif ($value == 'admindown') {
-                    $where .= 'AND I.ifAdminStatus = ? AND D.ignore = 0';
+                    $where .= ' AND I.ifAdminStatus = ? AND D.ignore = 0';
                     $param[] = 'down';
                 }
                 break;
@@ -151,6 +163,7 @@ $csv[] = [
     'Media',
     'Description',
 ];
+
 foreach ($ports as $port) {
     if (port_permitted($port['port_id'], $port['device_id'])) {
         $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');

@@ -87,6 +87,7 @@ nav:
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md
       - RRDCached: Extensions/RRDCached.md
+      - Galera Database Cluster: Extensions/Galera-Cluster.md
       - Sub-directory Support: Extensions/Sub-Directory.md
       - Varnish: Extensions/Varnish.md
       - Dispatcher Service (RC): Extensions/Dispatcher-Service.md

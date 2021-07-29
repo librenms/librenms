@@ -162,6 +162,16 @@ class MenuComposer
                 ];
             }
 
+            if ($routing_count['isis']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'isis',
+                        'icon' => 'arrows-alt',
+                        'text' => 'ISIS Adjacencies',
+                    ],
+                ];
+            }
+
             if ($routing_count['cisco-otv']) {
                 $routing_menu[] = [
                     [

@@ -146,7 +146,7 @@ $('.sensor').on('focusin', function(){
     $(this).data('val', $(this).val());
 });
 
-$( ".sensor" ).bind('blur keyup',function(e) {
+$( ".sensor" ).on('blur keyup',function(e) {
     if (e.type === 'keyup' && e.keyCode !== 13) return;
     var prev = $(this).data('val');
     var data = $(this).val();

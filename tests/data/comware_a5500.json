@@ -8,7 +8,7 @@
                     "sysDescr": "HP Comware Platform Software, Software Version 5.20.99 Release 2222P08\nHP A5500-24G EI Switch with 2 Interface Slots\r\nCopyright (c) 2010-2017 Hewlett Packard Enterprise Development LP",
                     "sysContact": "<private>",
                     "version": "5.20.99",
-                    "hardware": "A5500-24G EI Switch with 2 Interface Slots\r",
+                    "hardware": "A5500-24G EI Switch with 2 Interface Slots",
                     "features": "2222P08",
                     "os": "comware",
                     "type": "network",

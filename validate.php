@@ -68,7 +68,6 @@ if (! file_exists('vendor/autoload.php')) {
 require_once 'vendor/autoload.php';
 require_once 'includes/common.php';
 require_once 'includes/functions.php';
-require_once 'includes/dbFacile.php';
 
 // Buffer output
 ob_start();

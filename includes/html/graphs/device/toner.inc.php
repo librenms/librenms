@@ -47,7 +47,7 @@ foreach (dbFetchRows('SELECT * FROM printer_supplies where device_id = ?', [$dev
     $hostname = gethostbyid($toner['device_id']);
 
     $descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad($toner['supply_descr'], 16), 0, 16));
-    $rrd_filename = Rrd::name($device['hostname'], ['toner', $toner['supply_index']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['toner', $toner['supply_type'], $toner['supply_index']]);
     $id = $toner['supply_id'];
 
     $rrd_options .= " DEF:toner$id=$rrd_filename:toner:AVERAGE";

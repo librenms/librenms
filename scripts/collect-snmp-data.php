@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -96,7 +97,7 @@ Examples:
     exit;
 }
 
-$debug = (isset($options['d']) || isset($options['debug']));
+Debug::set(isset($options['d']) || isset($options['debug']));
 
 if (isset($options['m'])) {
     $modules_input = $options['m'];

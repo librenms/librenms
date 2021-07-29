@@ -51,7 +51,7 @@ return [
 
         'console' => [
             'driver' => 'stack',
-            'channels' => ['single', 'stderr'],
+            'channels' => ['single', 'stdout'],
             'ignore_exceptions' => false,
         ],
 
@@ -92,6 +92,16 @@ return [
             'formatter' => \LibreNMS\Util\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://stderr',
+            ],
+            'level' => 'debug',
+        ],
+
+        'stdout' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'with' => [
+                'stream' => 'php://output',
             ],
             'level' => 'debug',
         ],

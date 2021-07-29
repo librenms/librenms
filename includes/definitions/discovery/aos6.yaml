@@ -1,4 +1,4 @@
-mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
+mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB:ALCATEL-IND1-LAG-MIB
 modules:
     mempools:
         data:
@@ -20,9 +20,10 @@ modules:
             data:
                 -
                     oid:
-                        - ifDescr
                         - ifName
                         - entPhysicalName
+                        - alclnkaggAggNumber
+                        - alaStackMgrSlotNINumber
         temperature:
             data:
                 -
@@ -100,3 +101,75 @@ modules:
                     low_warn_limit: ddmTxOutputPowerLowWarning
                     high_limit: ddmTxOutputPowerHiAlarm
                     warn_limit: ddmTxOutputPowerHiWarning
+        state:
+            data:
+                -
+                    oid: chasControlModuleTable
+                    value: chasControlCertifyStatus
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.5.{{ $index }}'
+                    descr: 'Certify/Restore Status'
+                    group: Chassis
+                    index: 'chasControlCertifyStatus.1'
+                    state_name: chasControlCertifyStatus
+                    states:
+                        - { value: 1, generic: 2, graph: 1, descr: Unknown }
+                        - { value: 2, generic: 1, graph: 1, descr: Need Certify }
+                        - { value: 3, generic: 0, graph: 1, descr: Certified }
+                -
+                    oid: chasControlModuleTable
+                    value: chasControlSynchronizationStatus
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.6.{{ $index }}'
+                    descr: 'Flash Between CMMs'
+                    group: Chassis
+                    index: 'chasControlSynchronizationStatus.1'
+                    state_name: chasControlSynchronizationStatus
+                    states:
+                        - { value: 1, generic: 2, graph: 1, descr: Unknown }
+                        - { value: 2, generic: 1, graph: 1, descr: Mono Control Module }
+                        - { value: 3, generic: 1, graph: 1, descr: Not Synchronized }
+                        - { value: 4, generic: 0, graph: 1, descr: Synchronized }
+                -
+                    oid: alclnkaggAggEntry
+                    value: alclnkaggAggNbrAttachedPorts
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.13.1.1.1.1.1.19.{{ $index }}'
+                    descr: 'LACP Number {{ $alclnkaggAggNumber }}'
+                    index: 'alclnkaggAggNbrAttachedPorts.{{ $index }}'
+                    group: LACP
+                    state_name: alclnkaggAggNbrAttachedPorts
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: Not Redundant }
+                        - { value: 2, generic: 0, graph: 1, descr: Redundant (2) }
+                        - { value: 3, generic: 0, graph: 1, descr: Redundant (3) }
+                        - { value: 4, generic: 0, graph: 1, descr: Redundant (4) }
+                        - { value: 5, generic: 0, graph: 1, descr: Redundant (5) }
+                        - { value: 6, generic: 0, graph: 1, descr: Redundant (6) }
+                        - { value: 7, generic: 0, graph: 1, descr: Redundant (7) }
+                        - { value: 8, generic: 0, graph: 1, descr: Redundant (8) }
+                    skip_values:
+                        -
+                            oid: alclnkaggAggNbrAttachedPorts
+                            op: '='
+                            value: 0
+                -
+                    oid: chasEntPhysOperStatus
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    group: Components
+                    index: 'chasEntPhysOperStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: Up }
+                        - { value: 2, generic: 2, graph: 1, descr: Down }
+                        - { value: 3, generic: 3, graph: 1, descr: Testing }
+                        - { value: 4, generic: 3, graph: 1, descr: Unknown }
+                        - { value: 5, generic: 0, graph: 1, descr: Secondary }
+                        - { value: 6, generic: 2, graph: 1, descr: NotPresent }
+                        - { value: 7, generic: 2, graph: 1, descr: UnPowered }
+                        - { value: 8, generic: 0, graph: 1, descr: Master }
+                        - { value: 9, generic: 0, graph: 1, descr: Idle }
+                        - { value: 10, generic: 0, graph: 1, descr: PwrSave }
+                    skip_values:
+                        -
+                            oid: entPhysicalName
+                            op: 'regex'
+                            value: '/port|Chassis|PS-1|PS-2/'
+

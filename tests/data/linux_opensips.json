@@ -1186,6 +1186,12 @@
                     "app_type": "mysql"
                 },
                 {
+                    "metric": "SlLa",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
                     "metric": "SMPs",
                     "value": 98,
                     "value_prev": null,

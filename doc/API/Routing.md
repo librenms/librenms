@@ -349,6 +349,61 @@ Output:
 }
 ```
 
+### `list_ospf_ports`
+
+List the current OSPF ports.
+
+Route: `/api/v0/ospf_ports`
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf_ports
+```
+
+Output:
+
+```json
+{
+ "status": "ok",
+ "ospf_ports": [
+        {
+          "id": 189086,
+          "device_id": 43,
+          "port_id": 2838,
+          "ospf_port_id": "10.10.2.86.0",
+          "ospfIfIpAddress": "10.10.2.86",
+          "ospfAddressLessIf": 0,
+          "ospfIfAreaId": "0.0.0.0",
+          "ospfIfType": "pointToPoint",
+          "ospfIfAdminStat": "enabled",
+          "ospfIfRtrPriority": 128,
+          "ospfIfTransitDelay": 1,
+          "ospfIfRetransInterval": 5,
+          "ospfIfHelloInterval": 10,
+          "ospfIfRtrDeadInterval": 40,
+          "ospfIfPollInterval": 90,
+          "ospfIfState": "pointToPoint",
+          "ospfIfDesignatedRouter": "0.0.0.0",
+          "ospfIfBackupDesignatedRouter": "0.0.0.0",
+          "ospfIfEvents": 33,
+          "ospfIfAuthKey": "",
+          "ospfIfStatus": "active",
+          "ospfIfMulticastForwarding": "unicast",
+          "ospfIfDemand": "false",
+          "ospfIfAuthType": "0",
+          "ospfIfMetricIpAddress": "10.10.2.86",
+          "ospfIfMetricAddressLessIf": 0,
+          "ospfIfMetricTOS": 0,
+          "ospfIfMetricValue": 10,
+          "ospfIfMetricStatus": "active",
+          "context_name": null
+        }
+    ],
+    "count": 1
+}
+```
+
 ### `list_vrf`
 
 List the current VRFs.

@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "vrp",
                     "type": "network",
-                    "serial": null,
+                    "serial": "12345678",
                     "icon": "huawei.svg",
                     "location": "<private>"
                 }

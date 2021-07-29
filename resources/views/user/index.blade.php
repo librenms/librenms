@@ -22,6 +22,9 @@
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
                     @endif
+                    @config('twofactor')
+                    <th data-column-id="twofactor" data-formatter="twofactor">@lang('2FA')</th>
+                    @endconfig
                     <th data-column-id="descr">@lang('Description')</th>
                     <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
                 </tr>
@@ -38,6 +41,11 @@
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
                             @endif
+                            @config('twofactor')
+                                @if(\App\Models\UserPref::getPref($user, 'twofactor'))
+                                <td>1</td>
+                                @endif
+                            @endconfig
                             <td>{{ $user->descr }}</td>
                             <td></td>
                         </tr>
@@ -60,6 +68,11 @@
                             return '<span class="fa fa-fw fa-check text-success"></span>';
                         } else {
                             return '<span class="fa fa-fw fa-close text-danger"></span>';
+                        }
+                    },
+                    twofactor: function (column, row) {
+                        if(row['twofactor'] == 1) {
+                            return '<span class="fa fa-fw fa-check text-success"></span>';
                         }
                     },
                     actions: function (column, row) {

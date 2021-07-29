@@ -1,4 +1,4 @@
-source: Developing/Creating-Documentation.md  
+source: Developing/Creating-Documentation.md
 path: blob/master/doc/
 
 # Creating Documentation
@@ -63,13 +63,13 @@ This means you can use:
 
 ## Building docs
 
-This is achieved with `mkdocs`, a python package. 
+This is achieved with `mkdocs`, a python package.
 
-1. Install the required packages. 
+1. Install the required packages.
 
 ```
 pip install mkdocs mkdocs-exclude mkdocs-material mkdocs-macros-plugin
-``` 
+```
 If you encounter permissions issues, these might be reoslved by using the
 user option, with whatever user you are building as, e.g. `-u librenms`
 
@@ -92,9 +92,9 @@ This will output all the documentation in html format to `/opt/librenms/out`
 
 ## Viewing docs
 
-mkdocs includes it's own light-weight webserver for this purpose. 
+mkdocs includes it's own light-weight webserver for this purpose.
 
-Viewing is as simple as running the following command: 
+Viewing is as simple as running the following command:
 
 ```
 $ mkdocs serve
@@ -105,7 +105,7 @@ INFO    -  Documentation built in 12.54 seconds
 INFO    -  Serving on http://127.0.0.1:8000
 <..>
 INFO    -  Start watching changes
-``` 
+```
 
 Now you will find the complete set of LibreNMS documentation by opening your
 browser to `localhost:8000`.

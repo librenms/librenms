@@ -85,7 +85,7 @@ foreach ($hour_steps as $hour) {
     </div>
 </div>
 <script>
-    $("#maintenance-submit").click(function() {
+    $("#maintenance-submit").on("click", function() {
         var device_id = $(this).data("device_id");
         var title = '<?=\LibreNMS\Util\Clean::html($device['hostname'], []); ?>';
         var notes = $('#notes').val();

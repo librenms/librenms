@@ -33,9 +33,8 @@ class FgTrapVpnTunTest extends SnmpTrapTestCase
 {
     public function testVpnTunDown()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
@@ -55,9 +54,8 @@ FORTINET-FORTIGATE-MIB::fgVpnTrapPhase1Name.0 test_tunnel_down";
 
     public function testVpnTunUp()
     {
-        $device = Device::factory()->create();
-        $ipv4 = Ipv4Address::factory()->make();
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81

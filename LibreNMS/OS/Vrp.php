@@ -27,6 +27,8 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\PortsNac;
+use App\Models\Sla;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
@@ -36,8 +38,10 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -48,6 +52,8 @@ class Vrp extends OS implements
     NacPolling,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
+    SlaDiscovery,
+    SlaPolling,
     OSDiscovery
 {
     public function discoverMempools()
@@ -472,5 +478,100 @@ class Vrp extends OS implements
         }
 
         return $sensors;
+    }
+
+    public function discoverSlas()
+    {
+        $slas = collect();
+        // Get the index of the last finished test
+        // NQA-MIB::nqaScheduleLastFinishIndex
+
+        $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'pingCtlTable', [], 'DISMAN-PING-MIB');
+
+        if (! empty($sla_table)) {
+            $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'nqaAdminCtrlType', $sla_table, 'NQA-MIB');
+            $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'nqaAdminParaTimeUnit', $sla_table, 'NQA-MIB');
+            $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'nqaScheduleLastFinishIndex', $sla_table, 'NQA-MIB');
+        }
+
+        foreach ($sla_table as $sla_key => $sla_config) {
+            [$owner, $test] = explode('.', $sla_key, 2);
+
+            $slas->push(new Sla([
+                'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
+                'owner' => $owner,
+                'tag' => $test,
+                'rtt_type' => $sla_config['nqaAdminCtrlType'] ?? '',
+                'rtt' => isset($sla_config['pingResultsAverageRtt']) ? $sla_config['pingResultsAverageRtt'] / 1000 : null,
+                'status' => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
+                'opstatus' => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
+            ]));
+        }
+
+        return $slas;
+    }
+
+    public function pollSlas($slas)
+    {
+        $device = $this->getDeviceArray();
+
+        // Go get some data from the device.
+        $data = snmpwalk_group($device, 'pingCtlRowStatus', 'DISMAN-PING-MIB', 2);
+        $data = snmpwalk_group($device, 'pingResultsProbeResponses', 'DISMAN-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'pingResultsSentProbes', 'DISMAN-PING-MIB', 2, $data);
+        //$data = snmpwalk_group($device, 'nqaScheduleLastFinishIndex', 'NQA-MIB', 2, $data);
+        //$data = snmpwalk_group($device, 'pingResultsMinRtt', 'DISMAN-PING-MIB', 2, $data);
+        //$data = snmpwalk_group($device, 'pingResultsMaxRtt', 'DISMAN-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'pingResultsAverageRtt', 'DISMAN-PING-MIB', 2, $data);
+
+        // Get the needed information
+        foreach ($slas as $sla) {
+            $sla_nr = $sla->sla_nr;
+            $rtt_type = $sla->rtt_type;
+            $owner = $sla->owner;
+            $test = $sla->tag;
+            $divisor = 1; //values are already returned in ms, and RRD expects them in ms
+
+            // Use DISMAN-PING Status codes. 0=Good 2=Critical
+            $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
+
+            $sla->rtt = $data[$owner][$test]['pingResultsAverageRtt'] / $divisor;
+            $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'])->toDateTimeString();
+            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+
+            $fields = [
+                'rtt' => $sla->rtt,
+            ];
+
+            // The base RRD
+            $rrd_name = ['sla', $sla['sla_nr']];
+            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
+            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
+            data_update($device, 'sla', $tags, $fields);
+
+            // Let's gather some per-type fields.
+            switch ($rtt_type) {
+                case 'icmpAppl':
+                    $icmp = [
+                        //'MinRtt' => $data[$owner][$test]['pingResultsMinRtt'] / $divisor,
+                        //'MaxRtt' => $data[$owner][$test]['pingResultsMaxRtt'] / $divisor,
+                        'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'],
+                        'ProbeLoss' => (int) $data[$owner][$test]['pingResultsSentProbes'] - (int) $data[$owner][$test]['pingResultsProbeResponses'],
+                    ];
+                    $rrd_name = ['sla', $sla_nr, $rtt_type];
+                    $rrd_def = RrdDefinition::make()
+                        //->addDataset('MinRtt', 'GAUGE', 0, 300000)
+                        //->addDataset('MaxRtt', 'GAUGE', 0, 300000)
+                        ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
+                        ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
+                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    data_update($device, 'sla', $tags, $icmp);
+                    $fields = array_merge($fields, $icmp);
+                    break;
+            }
+
+            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
+            d_echo($fields);
+        }
     }
 }

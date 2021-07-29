@@ -1,0 +1,28 @@
+includes:
+    - phpstan-baseline.neon
+    - vendor/nunomaduro/larastan/extension.neon
+    - vendor/phpstan/phpstan-mockery/extension.neon
+
+parameters:
+
+    paths:
+        - app
+        - config
+        - database
+        - LibreNMS
+        - resources
+        - tests
+
+    scanDirectories:
+        - includes
+
+    level: 5
+
+    checkMissingIterableValueType: false
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        - '#Unsafe usage of new static#'
+
+    parallel:
+        processTimeout: 300.0

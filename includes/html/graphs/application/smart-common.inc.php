@@ -12,12 +12,13 @@ $scale_min = 0;
 if (isset($vars['disk'])) {
     $disks = [$vars['disk']];
 } else {
-    $disks = get_arrays_with_application($device, $app_id, $name);
+    $disks = Rrd::getRrdApplicationArrays($device, $app_id, $name);
 }
 
 $smart_enhancements = ['id9'];
 
 $int = 0;
+$rrd_list = [];
 while (isset($disks[$int])) {
     $disk = $disks[$int];
 

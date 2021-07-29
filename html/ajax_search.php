@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Debug;
+
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
@@ -7,7 +9,7 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-set_debug($_REQUEST['debug']);
+Debug::set($_REQUEST['debug']);
 
 $device = [];
 $ports = [];

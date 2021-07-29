@@ -2,7 +2,6 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -33,6 +32,7 @@ class Handler extends ExceptionHandler
         \LibreNMS\Exceptions\DuskUnsafeException::class,
         \LibreNMS\Exceptions\UnserializableRouteCache::class,
         \LibreNMS\Exceptions\MaximumExecutionTimeExceeded::class,
+        \LibreNMS\Exceptions\DatabaseInconsistentException::class,
     ];
 
     public function render($request, Throwable $exception)

@@ -152,7 +152,7 @@ function discover_device(&$device, $force_module = false)
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
         d_echo('Device' . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
-            $attribs['discover_' . $module] ||
+            ! empty($attribs['discover_' . $module]) ||
             ($os_module_status && ! isset($attribs['discover_' . $module])) ||
             ($module_status && ! isset($os_module_status) && ! isset($attribs['discover_' . $module]))
         ) {
@@ -886,9 +886,9 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     $user_function = $data['user_func'];
                 }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
-                $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
+                $data['value'] = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
-                $snmp_value = $snmp_data[$data_name];
+                $snmp_value = $snmp_data[$data['value']];
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
@@ -917,20 +917,11 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
                     try {
-                        d_echo('Info: Trying to find a numerical OID for ' . $data_name . '.');
-                        $search_mib = $device['dynamic_discovery']['mib'];
-                        if (Str::contains($data['oid'], '::') && ! (Str::contains($data_name, '::'))) {
-                            // We should search this mib first
-                            $exp_oid = explode('::', $data['oid']);
-                            $search_mib = $exp_oid[0] . ':' . $search_mib;
-                        }
-                        $num_oid = YamlDiscovery::oidToNumeric($data_name, $device, $search_mib, $device['mib_dir']);
-                        $data['num_oid'] = $num_oid . '.{{ $index }}';
-                        d_echo('Info: We found numerical oid for ' . $data_name . ': ' . $data['num_oid']);
+                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($device, $data);
                     } catch (\Exception $e) {
-                        d_echo('Error: We cannot find a numerical OID for ' . $data_name . '. Skipping this one...');
+                        d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
-                        // Cause we still don't have a num_oid
+                        // Because we don't have a num_oid, we have no way to add this sensor.
                     }
                 }
 
@@ -1208,6 +1199,11 @@ function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
             return true;
         }
     }
+    foreach (Config::getCombined($device['os'], "disabled_sensors_regex.$sensor_class", []) as $skipRegex) {
+        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
+            return true;
+        }
+    }
 
     return false;
 }
@@ -1361,11 +1357,6 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
             $params[] = $device_id;
             $params[] = $description;
             $params[] = $description;
-
-            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
-            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?';
-            $params[] = $device_id;
-            $params[] = $description;
         }
 
         if ($identifier) {
@@ -1377,6 +1368,13 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
             $params[] = $device_id;
             $params[] = $identifier;
             $params[] = $identifier;
+        }
+
+        if ($description) {
+            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
+            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?';
+            $params[] = $device_id;
+            $params[] = $description;
         }
     }
 

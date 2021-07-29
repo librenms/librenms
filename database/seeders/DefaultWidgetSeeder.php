@@ -105,6 +105,11 @@ class DefaultWidgetSeeder extends Seeder
                 'widget' => 'alertlog',
                 'base_dimensions' => '6,3',
             ],
+            [
+                'widget_title' => 'Top Errors',
+                'widget' => 'top-errors',
+                'base_dimensions' => '6,3',
+            ],
         ];
 
         $existing = DB::table('widgets')->pluck('widget');

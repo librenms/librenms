@@ -62,9 +62,12 @@ return [
     'in_array' => 'The :attribute field does not exist in :other.',
     'integer' => 'The :attribute must be an integer.',
     'ip' => 'The :attribute must be a valid IP address.',
+    'ip_or_hostname' => 'The :attribute must a valid IP address/network or hostname.',
     'ipv4' => 'The :attribute must be a valid IPv4 address.',
     'ipv6' => 'The :attribute must be a valid IPv6 address.',
+    'is_regex' => 'The :attribute is not a valid regular expression',
     'json' => 'The :attribute must be a valid JSON string.',
+    'keys_in' => 'The :attribute contains invalid keys: :extra. Valid keys: :values',
     'lt' => [
         'numeric' => 'The :attribute must be less than :value.',
         'file' => 'The :attribute must be less than :value kilobytes.',

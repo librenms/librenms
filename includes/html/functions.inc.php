@@ -11,6 +11,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -45,14 +46,6 @@ function var_get($v)
 
     return false;
 }
-
-function data_uri($file, $mime)
-{
-    $contents = file_get_contents($file);
-    $base64 = base64_encode($contents);
-
-    return 'data:' . $mime . ';base64,' . $base64;
-}//end data_uri()
 
 function toner2colour($descr, $percent)
 {
@@ -336,7 +329,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array = [];
 
     if (! $text) {
-        $text = Rewrite::normalizeIfName($port['label']);
+        $text = Rewrite::normalizeIfName($port['label'] ?? $port['ifName']);
     }
 
     if ($type) {
@@ -462,21 +455,32 @@ function generate_port_image($args)
  */
 function graph_error($text, $color = [128, 0, 0])
 {
-    global $vars, $debug;
+    global $vars;
 
-    if (! $debug) {
-        set_image_type();
+    $type = Config::get('webui.graph_type');
+    if (! Debug::isEnabled()) {
+        header('Content-type: ' . get_image_type($type));
     }
 
-    $width = $vars['width'] ?? 150;
-    $height = $vars['height'] ?? 60;
+    $width = (int) ($vars['width'] ?? 150);
+    $height = (int) ($vars['height'] ?? 60);
 
-    if (Config::get('webui.graph_type') === 'svg') {
+    if ($type === 'svg') {
         $rgb = implode(', ', $color);
-        $font_size = 20;
-        $svg_x = 100;
-        $svg_y = min($font_size, $width ? (($height / $width) * $svg_x) : 1);
-        echo "<svg viewBox=\"0 0 $svg_x $svg_y\" xmlns=\"http://www.w3.org/2000/svg\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" style=\"font-family: sans-serif; fill: rgb($rgb);\">$text</text></svg>";
+        echo <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xhtml="http://www.w3.org/1999/xhtml"
+viewBox="0 0 $width $height"
+preserveAspectRatio="xMinYMin">
+<foreignObject x="0" y="0" width="$width" height="$height" transform="translate(0,0)">
+      <xhtml:div style="display:table; width:{$width}px; height:{$height}px; overflow:hidden;">
+         <xhtml:div style="display:table-cell; vertical-align:middle;">
+            <xhtml:div style="color:rgb($rgb); text-align:center; font-family:sans-serif; font-size:0.6em;">$text</xhtml:div>
+         </xhtml:div>
+      </xhtml:div>
+   </foreignObject>
+</svg>
+SVG;
     } else {
         $img = imagecreate($width, $height);
         imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
@@ -824,10 +828,15 @@ function alert_details($details)
                     'tab' => 'apps',
                     'app' => $tmp_alerts['app_type'],
                 ]) . "'>";
-            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= $tmp_alerts['app_type'];
             $fault_detail .= '</a>';
 
-            $fault_detail .= ' => ' . $tmp_alerts['value'];
+            if ($tmp_alerts['app_status']) {
+                $fault_detail .= ' => ' . $tmp_alerts['app_status'];
+            }
+            if ($tmp_alerts['metric']) {
+                $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
+            }
             $fallback = false;
         }
 
@@ -1019,18 +1028,14 @@ function eventlog_severity($eventlog_severity)
     }
 } // end eventlog_severity
 
-function set_image_type()
+/**
+ * Get the http content type of the image
+ * @param  string  $type svg or png
+ * @return string
+ */
+function get_image_type(string $type)
 {
-    header('Content-type: ' . get_image_type());
-}
-
-function get_image_type()
-{
-    if (Config::get('webui.graph_type') === 'svg') {
-        return 'image/svg+xml';
-    } else {
-        return 'image/png';
-    }
+    return $type === 'svg' ? 'image/svg+xml' : 'image/png';
 }
 
 function get_oxidized_nodes_list()
@@ -1113,42 +1118,6 @@ function get_postgres_databases($device_id)
     }
 
     return [];
-}
-
-/**
- * Get all application data from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @param string  $category which category of graphs are searched
- * @return array list of entry data
- */
-function get_arrays_with_application($device, $app_id, $app_name, $category = null)
-{
-    $entries = [];
-    $separator = '-';
-
-    if ($category) {
-        $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', Rrd::dirFromHost($device['hostname']), 'app', $app_name, $app_id, $category);
-    } else {
-        $pattern = sprintf('%s/%s-%s-%s-*.rrd', Rrd::dirFromHost($device['hostname']), 'app', $app_name, $app_id);
-    }
-
-    // app_name contains a separator character? consider it
-    $offset = substr_count($app_name, $separator);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
-
-        if ($entry) {
-            array_push($entries, $entry);
-        }
-    }
-
-    return $entries;
 }
 
 /**

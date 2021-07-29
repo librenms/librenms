@@ -185,7 +185,7 @@ class CiHelper
             $filter = implode('.*|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/");
+            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::testOSDetection|::test[A-Za-z]+ with data set \"$filter.*\"$/");
         } elseif ($this->flags['unit_docs']) {
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
@@ -206,7 +206,7 @@ class CiHelper
     {
         $cs_cmd = [
             $this->checkPhpExec('php-cs-fixer'),
-            '--config=.php_cs',
+            '--config=.php-cs-fixer.php',
             'fix',
             '-v',
         ];

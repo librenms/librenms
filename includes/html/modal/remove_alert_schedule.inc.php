@@ -39,7 +39,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     </div>
 </div>
 <script>
-$('#sched-maintenance-removal').click('', function(e) {
+$('#sched-maintenance-removal').on("click", function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",

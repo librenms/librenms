@@ -24,14 +24,18 @@
 
 namespace LibreNMS\Device;
 
+use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 
 class YamlDiscovery
 {
+    private static $cache_time = 1800; // 30 min, Used for oid translation cache
+
     /**
      * @param OS $os
      * @param DiscoveryItem|string $class
@@ -85,16 +89,7 @@ class YamlDiscovery
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
                         try {
-                            d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
-                            $search_mib = $device['dynamic_discovery']['mib'];
-                            if (Str::contains($data['oid'], '::') && ! (Str::contains($data['value'], '::'))) {
-                                // We should search this mib first
-                                $exp_oid = explode('::', $data['oid']);
-                                $search_mib = $exp_oid[0] . ':' . $search_mib;
-                            }
-                            $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
-                            $data['num_oid'] = $num_oid . '.{{ $index }}';
-                            d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $data['num_oid']);
+                            $data['num_oid'] = static::computeNumericalOID($device, $data);
                         } catch (\Exception $e) {
                             d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                             continue;
@@ -127,6 +122,32 @@ class YamlDiscovery
         }
 
         return $items;
+    }
+
+    /**
+     * @param array $device Device we are working on
+     * @param array $data Array derived from YAML
+     * @return string
+     */
+    public static function computeNumericalOID($device, $data)
+    {
+        d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
+        $search_mib = $device['dynamic_discovery']['mib'];
+        $mib_prefix_data_oid = Str::before($data['oid'], '::');
+        if (! empty($mib_prefix_data_oid) && empty(Str::before($data['value'], '::'))) {
+            // We should search value in this mib first, as it is explicitely specified
+            $search_mib = $mib_prefix_data_oid . ':' . $search_mib;
+        }
+
+        try {
+            $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
+
+        return $num_oid . '.{{ $index }}';
     }
 
     /**
@@ -192,7 +213,7 @@ class YamlDiscovery
             $name = $discovery_data[$name];
         }
 
-        if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
+        if (! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
@@ -268,6 +289,8 @@ class YamlDiscovery
                         continue;
                     }
 
+                    $saved_nobulk = Config::getOsSetting($os->getName(), 'nobulk', false);
+
                     foreach ($data_array as $data) {
                         foreach ((array) $data['oid'] as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
@@ -280,8 +303,15 @@ class YamlDiscovery
                                 }
                                 $snmp_flag[] = '-Ih';
 
+                                // disable bulk request for specific data
+                                if (! empty($data['nobulk'])) {
+                                    Config::set('os.' . $os->getName() . '.nobulk', true);
+                                }
+
                                 $mib = $device['dynamic_discovery']['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
+
+                                Config::set('os.' . $os->getName() . '.nobulk', $saved_nobulk);
                             }
                         }
                     }
@@ -356,12 +386,20 @@ class YamlDiscovery
         if (self::oidIsNumeric($oid)) {
             return $oid;
         }
-
-        foreach (explode(':', $mib) as $mib_name) {
-            if ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
-                break;
+        $key = 'YamlDiscovery:oidToNumeric:' . $mibdir . '/' . $mib . '/' . $oid;
+        if (Cache::has($key)) {
+            $numeric_oid = Cache::get($key);
+        } else {
+            foreach (explode(':', $mib) as $mib_name) {
+                $numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device);
+                if ($numeric_oid) {
+                    break;
+                }
             }
         }
+
+        //Store the value
+        Cache::put($key, $numeric_oid, self::$cache_time);
 
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");

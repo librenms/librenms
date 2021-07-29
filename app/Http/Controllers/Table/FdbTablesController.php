@@ -157,6 +157,7 @@ class FdbTablesController extends TableController
         $item = [
             'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
             'mac_address' => Rewrite::readableMac($fdb_entry->mac_address),
+            'mac_oui' => Rewrite::readableOUI($fdb_entry->mac_address),
             'ipv4_address' => $ip_info['ips']->implode(', '),
             'interface' => '',
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',

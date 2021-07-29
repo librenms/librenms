@@ -1310,7 +1310,7 @@ search all oxidized device configs for a string.
 Route: `api/v0/oxidized/config/search/:searchstring`
 
   - searchstring is the specific string you would like to search for.
-  
+
 Input:
 
 -
@@ -1345,7 +1345,7 @@ Returns a specific device's config from oxidized.
 Route: `api/v0/oxidized/config/:device_name`
 
   - device_name is the full dns name of the device used when adding the device to librenms.
-  
+
 Input:
 
 -

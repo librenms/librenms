@@ -215,7 +215,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
             }
         });
     });
-    $('#clear-stats').click(function(event) {
+    $('#clear-stats').on("click", function(event) {
         event.preventDefault();
         $.ajax({
             type: 'POST',

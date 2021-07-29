@@ -78,7 +78,7 @@
                 "cisco-remote-access-monitor": {
                     "type": "boolean"
                 },
-                "cisco-sla": {
+                "slas": {
                     "type": "boolean"
                 },
                 "cisco-ipsec-flow-monitor": {
@@ -219,7 +219,7 @@
                 "cisco-cef": {
                     "type": "boolean"
                 },
-                "cisco-sla": {
+                "slas": {
                     "type": "boolean"
                 },
                 "cisco-mac-accounting": {

@@ -53,7 +53,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
             <td>' . $nbr_count . '</td>
           </tr>
           <script type="text/javascript">
-          $("#ospf-panel_button' . $i . '").click(function(){
+          $("#ospf-panel_button' . $i . '").on("click", function(){
               $("#ospf-panel_span' . $i . '").toggleClass("fa-minus");
           });
           </script>

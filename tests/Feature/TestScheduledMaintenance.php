@@ -16,7 +16,7 @@ class TestScheduledMaintenance extends DBTestCase
     {
         $now = CarbonImmutable::now();
 
-        $schedule = AlertSchedule::factory()->make();
+        $schedule = AlertSchedule::factory()->make(); /** @var AlertSchedule $schedule */
         $schedule->start = $now->subHour();
         $schedule->end = $now->addHour();
         $schedule->save();

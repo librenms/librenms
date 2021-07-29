@@ -2,10 +2,12 @@ source: General/Acknowledgement.md
 path: blob/master/doc/
 path: blob/master/doc/
 
+# Acknowledgements
+
 LibreNMS wouldn't be what it is today without the use of some other amazing projects.
 We list below what we make use of including the license compliance.
 
-# 3rd Party GPLv3 Compliant
+## 3rd Party GPLv3 Compliant
 
 - [Bootstrap](http://getbootstrap.com/): MIT
 - [Font Awesome](http://fontawesome.io/icons/): MIT License

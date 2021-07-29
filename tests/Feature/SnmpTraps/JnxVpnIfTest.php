@@ -36,8 +36,8 @@ class JnxVpnIfTest extends SnmpTrapTestCase
 {
     public function testVpnIfDown()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "$device->hostname
@@ -58,8 +58,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
 
     public function testVpnIfUp()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "$device->hostname

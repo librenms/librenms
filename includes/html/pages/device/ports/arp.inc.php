@@ -5,8 +5,13 @@ $no_refresh = true;
     <thead>
         <tr>
             <th data-column-id="interface">Port</th>
-            <th data-column-id="mac_address">MAC address</th>
-            <th data-column-id="ipv4_address">IPv4 address</th>
+            <th data-column-id="mac_address" data-formatter="tooltip">MAC address</th>
+<?php
+if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+    echo '            <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
+}
+?>
+            <th data-column-id="ipv4_address" data-formatter="tooltip">IPv4 address</th>
             <th data-column-id="remote_device" data-sortable="false">Remote device</th>
             <th data-column-id="remote_interface" data-sortable="false">Remote interface</th>
         </tr>
@@ -24,6 +29,16 @@ var grid = $("#ports-arp").bootgrid({
             id: "arp-search",
             device_id: "<?php echo $device['device_id']; ?>"
         };
+    },
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'mac_address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
     },
     url: "ajax_table.php"
 });

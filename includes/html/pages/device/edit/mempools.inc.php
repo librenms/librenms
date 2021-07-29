@@ -50,7 +50,7 @@
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
 
-        grid.find(".mempool").blur(function(event) {
+        grid.find(".mempool").on("blur", function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var mempool_id = $(this).data("mempool_id");

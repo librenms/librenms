@@ -1,15 +1,17 @@
 source: Extensions/Agent-Setup.md
 path: blob/master/doc/
 
+# Check_MK Setup
+
 The agent can be used to gather data from remote systems you can use
 LibreNMS in combination with check_mk (found
 [here](https://github.com/librenms/librenms-agent)). The agent can be
 extended to include data about [applications](Applications.md) on the
 remote system.
 
-# Installation
+## Installation
 
-## Linux / BSD
+### Linux / BSD
 
 Make sure that systemd or xinetd is installed on the host you want to
 run the agent on.
@@ -71,7 +73,7 @@ monitor. Under the modules section, ensure that unix-agent is enabled.
 10: Wait for around 10 minutes and you should start seeing data in
 your graphs under Apps for the device.
 
-### Restrict the devices on which the agent listens: Linux systemd
+#### Restrict the devices on which the agent listens: Linux systemd
 If you want to restrict which network adapter the agent listens on, do the following:
 
 1: Edit `/etc/systemd/system/check_mk.socket`
@@ -81,7 +83,7 @@ If you want to restrict which network adapter the agent listens on, do the follo
 3: If the script has already been enabled in systemd, you may need to issue a `systemctl daemon-reload` and then `systemctl restart check_mk.socket`
 
 
-## Windows
-1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows
+### Windows
+1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): <https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows>
 2. Run the msi / exe
 3. Make sure your LibreNMS instance can reach TCP port 6556 on your target.

@@ -24,6 +24,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
@@ -45,9 +46,36 @@ class Unifi extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-    use OS\Traits\FrogfootResources;
+    use OS\Traits\FrogfootResources {
+        OS\Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
+    }
 
     private $ccqDivisor = 10;
+
+    public function discoverOS(Device $device): void
+    {
+        // try the Unifi MIB first, then fall back to dot11manufacturer
+        if ($data = snmp_getnext_multi($this->getDeviceArray(), ['unifiApSystemModel', 'unifiApSystemVersion'], '-OQUs', 'UBNT-UniFi-MIB')) {
+            $device->hardware = $data['unifiApSystemModel'] ?? $device->hardware;
+            $device->version = $data['unifiApSystemVersion'] ?? $device->version;
+        } elseif ($data = snmp_getnext_multi($this->getDeviceArray(), ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'], '-OQUs', 'IEEE802dot11-MIB')) {
+            $device->hardware = $data['dot11manufacturerProductName'] ?? $device->hardware;
+            if (preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $data['dot11manufacturerProductVersion'], $matches)) {
+                $device->version = $matches[1];
+            }
+        }
+    }
+
+    /**
+     * Discover processors.
+     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     *
+     * @return array Processors
+     */
+    public function discoverProcessors()
+    {
+        return $this->discoverHrProcessors() ?: $this->discoverFrogfootProcessors();
+    }
 
     /**
      * Returns an array of LibreNMS\Device\Sensor objects

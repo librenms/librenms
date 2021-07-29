@@ -46,6 +46,7 @@ return [
             'location' => 'Location Settings',
             'graylog' => 'Graylog Integration',
             'oxidized' => 'Oxidized Integration',
+            'mac_oui' => 'Mac OUI Lookup Integration',
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
@@ -63,6 +64,7 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
+            'interface_types' => 'Interface Type by RFC 7224',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -412,7 +414,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => 'Auth log entries older than (days)',
+            'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'peering_descr' => [
@@ -436,7 +438,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => 'Device performance entries older than (days)',
+            'description' => 'Device performance entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'discovery_modules' => [
@@ -496,6 +498,9 @@ return [
             ],
             'ipv6-addresses' => [
                 'description' => 'IPv6 Addresses',
+            ],
+            'isis' => [
+                'description' => 'ISIS',
             ],
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
@@ -641,7 +646,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => 'Event log entries older than (days)',
+            'description' => 'Event log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'favicon' => [
@@ -845,6 +850,12 @@ return [
             'description' => 'Logon Message',
             'help' => 'Displayed on the login page',
         ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => 'Enable MAC OUI lookup',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
+        ],
         'mono_font' => [
             'description' => 'Monospaced Font',
         ],
@@ -929,6 +940,10 @@ return [
             'default_group' => [
                 'description' => 'Set the default group returned',
             ],
+            'ignore_groups' => [
+                'description' => 'Do not backup these Oxidized groups',
+                'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
+            ],
             'enabled' => [
                 'description' => 'Enable Oxidized support',
             ],
@@ -941,8 +956,20 @@ return [
             'group_support' => [
                 'description' => 'Enable the return of groups to Oxidized',
             ],
+            'ignore_os' => [
+                'description' => 'Do not backup these OS',
+                'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces).  Only allows existing OS.',
+            ],
+            'ignore_types' => [
+                'description' => 'Do not backup these device types',
+                'help' => 'Do not backup the listed device types with Oxidized. Only allows existing types.',
+            ],
             'reload_nodes' => [
                 'description' => 'Reload Oxidized nodes list, each time a device is added',
+            ],
+            'maps' => [
+                'description' => 'Variable Mapping',
+                'help' => 'Used to set group or other variables or map OS names that differ.',
             ],
             'url' => [
                 'description' => 'URL to your Oxidized API',
@@ -967,6 +994,10 @@ return [
                     'description' => 'Enable user access via dynamic Device Groups',
                 ],
             ],
+        ],
+        'bad_iftype' => [
+            'description' => 'Bad Interfaces',
+            'help' => 'Network Interface Types which should be ignored',
         ],
         'ping' => [
             'description' => 'Path to ping',
@@ -1028,6 +1059,9 @@ return [
             ],
             'ospf' => [
                 'description' => 'OSPF',
+            ],
+            'isis' => [
+                'description' => 'ISIS',
             ],
             'cisco-ipsec-flow-monitor' => [
                 'description' => 'Cisco IPSec flow Monitor',
@@ -1116,7 +1150,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than (days)',
+            'description' => 'Ports older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1156,7 +1190,7 @@ return [
             ],
         ],
         'route_purge' => [
-            'description' => 'Route entries older than (days)',
+            'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -1172,7 +1206,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Files entries older than (days)',
+            'description' => 'RRD Files entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -1284,7 +1318,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog entries older than (days)',
+            'description' => 'Syslog entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [
@@ -1296,6 +1330,14 @@ return [
         ],
         'traceroute6' => [
             'description' => 'Path to traceroute6',
+        ],
+        'twofactor' => [
+            'description' => 'Two-Factor',
+            'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => 'Two-Factor Throttle Time (seconds)',
+            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
         'unix-agent' => [
             'connection-timeout' => [

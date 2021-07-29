@@ -420,7 +420,7 @@
                                         <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
                                             @foreach($app_instances as $app_instance)
-                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
+                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance->app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -717,7 +717,7 @@
         }).on('keyup', function (e) {
             // on enter go to the first selection
             if (e.which === 13) {
-                $('.tt-selectable').first().click();
+                $('.tt-selectable').first().trigger( "click" );
             }
         });
 

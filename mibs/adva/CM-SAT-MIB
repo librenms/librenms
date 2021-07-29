@@ -29,22 +29,31 @@ IMPORTS
 
 
 cmServiceActivationMIB MODULE-IDENTITY
-    LAST-UPDATED    "201309120000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "201704050000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Jack Chen
-                     ADVA Optical Networking, Inc.
-                Tel: +86755 86217400-8205
-             E-mail: jchen@advaoptical.com
-             Postal: 
-             "
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Service Activation MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201309120000Z"
+             Copyright (C) ADVA."
+    REVISION        "201704050000Z"
     DESCRIPTION
-        "Notes from release 201309120000Z" 
+        "Notes from release 201704050000Z
+           a) add aborted enumeration to SatStatus
+         Notes from release 201612020000Z
+          a) added satStreamDestMepEnabled to satStreamTable
+
+         Notes from release 201309120000Z
+        " 
     ::= {fsp150cm 28}    
 
 -- 
@@ -98,7 +107,8 @@ SatStatus ::= TEXTUAL-CONVENTION
                 completed(1),
                 notStarted(2),
                 inProgress(3),
-                failed(4)
+                failed(4),
+                aborted(5)
                }
 
 SatDirection ::= TEXTUAL-CONVENTION
@@ -378,7 +388,9 @@ SatStreamEntry ::= SEQUENCE {
     satStreamStorageType               StorageType,
     satStreamRowStatus                 RowStatus,
     satStreamDmmPktPriority            VlanPriority,
-    satStreamMFactor                   Unsigned32
+    satStreamMFactor                   Unsigned32,
+    satStreamDestMepEnabled            TruthValue,
+    satStreamLlActivateEnabled         TruthValue
 }
 
 satStreamIndex OBJECT-TYPE
@@ -466,7 +478,9 @@ satStreamDestMepType OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-           "This object describes the type of Destination MEP, which can be based on MEP id or MAC Address."
+           "This object describes the type of Destination MEP, which can be based on MEP id or MAC Address.
+            This is applicable only if satStreamDestMepEnabled is true."
+           
     ::= { satStreamEntry 11 }
 
 satStreamDestMepId OBJECT-TYPE
@@ -474,7 +488,9 @@ satStreamDestMepId OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-           "This object describes the destination MEP id."
+           "This object describes the destination MEP id.
+            This is applicable only if satStreamDestMepEnabled is true."
+           
     ::= { satStreamEntry 12 }
 
 satStreamDestMepMacAddr OBJECT-TYPE
@@ -482,7 +498,8 @@ satStreamDestMepMacAddr OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-           "This object describes the Destination MEP's MAC Address."
+           "This object describes the Destination MEP's MAC Address.
+            This is applicable only if satStreamDestMepEnabled is true."
     ::= { satStreamEntry 13 }
 
 satStreamDmmPacketSize OBJECT-TYPE
@@ -764,6 +781,25 @@ satStreamMFactor OBJECT-TYPE
 	    Roughly, it equals to EBS/Test Duration, user should configure its value based on experience test."
     ::= { satStreamEntry 46 }
 
+satStreamDestMepEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "For a SAT two-way test, the remote end is expected to have a loopback for FLPDUs, but it may or may not have
+           a Responder MEP to process DMMs. This object indicates whether the remote end has a Responder MEP or not. 
+           If the Responder MEP is present, two-way delay is computed by the Controller MEP once DMR is received, 
+           if the Responder MEP is not present, the two-way delay is computed when the Controller MEP receives the looped back DMM."        
+    ::= { satStreamEntry 47 }
+
+satStreamLlActivateEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This attribute specifies whether Latching Loopback needs to be activated for the SAT stream during a SAT test. 
+            It is only applicable for two way test."
+    ::= { satStreamEntry 48 }
 
 
 --
@@ -1363,7 +1399,8 @@ cmSatGroup OBJECT-GROUP
         satStreamInner2VlanEtherType, satStreamOuterVlanId, satStreamOuterVlanPri, satStreamOuterVlanEnabled,
         satStreamOuterVlanEtherType, satStreamDeiEnabled, satStreamGreenPcp, satStreamYellowPcp,
         satStreamColorMode, satStreamCirLo, satStreamCirHi, satStreamEirLo, satStreamEirHi, satStreamCbs, satStreamEbs,
-        satStreamStorageType, satStreamRowStatus, satControlStorageType, satControlRowStatus, satStreamDmmPktPriority, satStreamMFactor,
+        satStreamStorageType, satStreamRowStatus, satControlStorageType, satControlRowStatus, satStreamDmmPktPriority, 
+        satStreamMFactor, satStreamDestMepEnabled, satStreamLlActivateEnabled,
         satResultStatsSessionId, satResultStatsTestType, satResultStatsStepNumber, satResultStatsStartTime,
         satResultStatsEndTime, satResultStatsStatus, satResultStatsResult, satResultStatsMinIRGMeasured,
         satResultStatsAvgIRGMeasured, satResultStatsMaxIRGMeasured, satResultStatsMinIRYMeasured,
@@ -1374,7 +1411,8 @@ cmSatGroup OBJECT-GROUP
         satResultStatsISyncErrorsNum, satResultStatsIfNegFLG, satResultStatsIfNegFLY,
         satResultStatsAvgIRT,satResultStatsFlrTMeasured,satResultStatsFlTCounts,satResultStatsIfNegFLT,
         satSacProfileIndex, satSacProfileAlias, satSacProfileFLR, satSacProfileFTD, satSacProfileFDV,
-        satSacProfileStorageType, satSacProfileRowStatus, satResponderSessionIndex, satResponderSessionId, satResponderSessionControlMepMacAddr, satResponderSessionMepId,
+        satSacProfileStorageType, satSacProfileRowStatus, satResponderSessionIndex, satResponderSessionId, 
+        satResponderSessionControlMepMacAddr, satResponderSessionMepId,
         satResponderSessionStorageType, satResponderSessionRowStatus, satCfmMepSatResponderEnabled
     }
     STATUS  current

@@ -313,10 +313,10 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <script>
     $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
 
-    $("#maintenance").click(function() {
+    $("#maintenance").on("click", function() {
         $("#device_maintenance_modal").modal('show');
     });
-    $("#rediscover").click(function() {
+    $("#rediscover").on("click", function() {
         var device_id = $(this).data("device_id");
         $.ajax({
             type: 'POST',
@@ -335,7 +335,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             }
         });
     });
-    $("#reset_port_state").click(function() {
+    $("#reset_port_state").on("click", function() {
         var device_id = $(this).data("device_id");
         $.ajax({
             type: 'POST',
@@ -354,7 +354,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             }
         });
     });
-    $('#hostname-edit-button').click(function(e) {
+    $('#hostname-edit-button').on("click", function(e) {
         e.preventDefault();
         disabled_state = document.getElementById('edit-hostname-input').disabled;
         if (disabled_state == true) {
@@ -363,10 +363,10 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             document.getElementById('edit-hostname-input').disabled = true;
         }
     });
-    $('#sysLocation').keypress(function (e) {
+    $('#sysLocation').on('keypress', function (e) {
         if(e.keyCode === 13) {
             e.preventDefault();
-            $('#edit').submit();
+            $('#edit').trigger( "submit" );
         }
     });
     $('#parent_id').select2({

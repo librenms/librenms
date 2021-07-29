@@ -9,8 +9,8 @@ if (Config::get('graylog.server')) {
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
                         <a href="device/device=' . $device['device_id'] . '/tab=logs/section=graylog/">
-                            <i class="fa fa-clone fa-lg icon-theme" 
-                            aria-hidden="true"></i> 
+                            <i class="fa fa-clone fa-lg icon-theme"
+                            aria-hidden="true"></i>
                             <strong>Recent Graylog</strong>
                         </a>
                     </div>

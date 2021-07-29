@@ -169,36 +169,30 @@ class RoutesTablesController extends TableController
      */
     public function formatItem($route_entry)
     {
-        $item = $route_entry->toArray();
+        $item['updated_at'] = $route_entry->updated_at ? $route_entry->updated_at->diffForHumans() : $route_entry->updated_at;
+        $item['created_at'] = $route_entry->created_at ? $route_entry->created_at->toDateTimeString() : $route_entry->created_at;
+        $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : $route_entry->inetCidrRouteIfIndex;
+        $item['inetCidrRouteMetric1'] = $route_entry->inetCidrRouteMetric1;
+        $item['inetCidrRoutePfxLen'] = $route_entry->inetCidrRoutePfxLen;
+        $item['inetCidrRouteDestType'] = $route_entry->inetCidrRouteDestType;
 
-        if ($route_entry->updated_at) {
-            $item['updated_at'] = $route_entry->updated_at->diffForHumans();
+        try {
+            $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
+            $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
+        } catch (\Exception $e) {
+            $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
         }
-        if ($route_entry->created_at) {
-            $item['created_at'] = $route_entry->created_at->toDateTimeString();
-        }
-        if ($item['inetCidrRouteIfIndex'] == 0) {
-            $item['inetCidrRouteIfIndex'] = 'Undefined';
-        }
-        if ($route_entry->inetCidrRouteNextHop) {
-            try {
-                $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
-                $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
-            } catch (\Exception $e) {
-                $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
-            }
-        }
-        if ($route_entry->inetCidrRouteDest) {
-            try {
-                $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
-                $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
-            } catch (\Exception $e) {
-                $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
-            }
-        }
-        $item['inetCidrRouteIfIndex'] = 'ifIndex ' . $item['inetCidrRouteIfIndex'];
+
+        $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : 'IfIndex ' . $route_entry->inetCidrRouteIfIndex;
         if ($port = $route_entry->port()->first()) {
             $item['inetCidrRouteIfIndex'] = Url::portLink($port, htmlspecialchars($port->getShortLabel()));
+        }
+
+        try {
+            $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
+            $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
+        } catch (\Exception $e) {
+            $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
         }
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
         if ($device) {
@@ -208,12 +202,17 @@ class RoutesTablesController extends TableController
                 $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Url::deviceLink($device) . ')';
             }
         }
+
+        $item['inetCidrRouteProto'] = $route_entry->inetCidrRouteProto;
         if ($route_entry->inetCidrRouteProto && $route_entry::$translateProto[$route_entry->inetCidrRouteProto]) {
             $item['inetCidrRouteProto'] = $route_entry::$translateProto[$route_entry->inetCidrRouteProto];
         }
+
+        $item['inetCidrRouteType'] = $route_entry->inetCidrRouteType;
         if ($route_entry->inetCidrRouteType && $route_entry::$translateType[$route_entry->inetCidrRouteType]) {
             $item['inetCidrRouteType'] = $route_entry::$translateType[$route_entry->inetCidrRouteType];
         }
+
         $item['context_name'] = '[global]';
         if ($route_entry->context_name != '') {
             $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars($route_entry->context_name) . '</a>';

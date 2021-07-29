@@ -262,6 +262,24 @@ class Url
         return self::portImage($graph_array);
     }
 
+    /**
+     * @param Port $port
+     * @return string
+     */
+    public static function portErrorsThumbnail($port)
+    {
+        $graph_array = [
+            'port_id' => $port->port_id,
+            'graph_type' => 'port_errors',
+            'from' => Carbon::now()->subDay()->timestamp,
+            'to' => Carbon::now()->timestamp,
+            'width' => 150,
+            'height' => 21,
+        ];
+
+        return self::portImage($graph_array);
+    }
+
     public static function portImage($args)
     {
         if (empty($args['bg'])) {

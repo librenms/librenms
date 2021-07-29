@@ -32,8 +32,7 @@ class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
 {
     public function testElementAlarmCleared()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -64,8 +63,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0";
 
     public function testElementAlarmMinor()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -96,8 +94,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0";
 
     public function testElementAlarmMajor()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -128,8 +125,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0";
 
     public function testElementAlarmCritical()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24

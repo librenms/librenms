@@ -119,7 +119,7 @@
         $("#pollertype").val(pollertype);
     });
 
-    $('#poller-removal').click('', function (e) {
+    $('#poller-removal').on("click", function (e) {
         e.preventDefault();
         var id = $("#id").val();
         var pollertype = $("#pollertype").val();

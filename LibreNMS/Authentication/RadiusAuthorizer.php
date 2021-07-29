@@ -5,6 +5,7 @@ namespace LibreNMS\Authentication;
 use Dapphp\Radius\Radius;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Util\Debug;
 
 class RadiusAuthorizer extends MysqlAuthorizer
 {
@@ -22,13 +23,11 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
     public function authenticate($credentials)
     {
-        global $debug;
-
         if (empty($credentials['username'])) {
             throw new AuthenticationException('Username is required');
         }
 
-        if ($debug) {
+        if (Debug::isEnabled()) {
             $this->radius->setDebug(true);
         }
 

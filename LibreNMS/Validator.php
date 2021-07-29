@@ -26,6 +26,7 @@ namespace LibreNMS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
+use LibreNMS\Util\Laravel;
 use ReflectionClass;
 
 class Validator
@@ -73,14 +74,14 @@ class Validator
             }
 
             if ((empty($validation_groups) && $group->isDefault()) || in_array($group_name, $validation_groups)) {
-                if ($print_group_status && isCli()) {
+                if ($print_group_status && Laravel::isCli()) {
                     echo "Checking $group_name:";
                 }
 
                 /** @var ValidationGroup $group */
                 $group->validate($this);
 
-                if (isCli()) {
+                if (Laravel::isCli()) {
                     if ($print_group_status) {
                         $status = ValidationResult::getStatusText($this->getGroupStatus($group_name));
                         c_echo(" $status\n");
@@ -117,7 +118,7 @@ class Validator
      * Get the ValidationResults for a specific validation group.
      *
      * @param string $validation_group
-     * @return array
+     * @return ValidationResult[]
      */
     public function getResults($validation_group = null)
     {

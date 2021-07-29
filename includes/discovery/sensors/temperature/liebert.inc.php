@@ -42,6 +42,7 @@ foreach ($lib_data as $index => $data) {
     if (is_numeric($current)) {
         $descr = $data['lgpEnvTemperatureDescrDegC'];
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
+        unset($current);
     }
 }
 

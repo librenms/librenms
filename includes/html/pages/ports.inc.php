@@ -62,7 +62,7 @@ foreach ($menu_options as $option => $text) {
 }
 
 $displayLists .= '<div style="float: right;">';
-$displayLists .= '<a href="csv.php/report=' . \LibreNMS\Util\Url::generate($vars, ['format' => '']) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . \LibreNMS\Util\Url::generate($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
+$displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['format' => '', 'page' => 'csv.php', 'report' => 'ports']) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . \LibreNMS\Util\Url::generate($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == 'hide') {
     $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => '']) . '">Search</a>';

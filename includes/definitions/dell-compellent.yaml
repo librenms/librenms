@@ -23,5 +23,13 @@ discovery_modules:
     wireless: false
 discovery:
     -
+        sysDescr:
+            'FreeBSD'
+        snmpget:
+            oid: 1.3.6.1.4.1.674.11000.2000.500.1.2.1.0
+            mib: DELL-STORAGE-SC-MIB
+            op: starts
+            value: 'Dell-Compellent'
+    -
         sysDescr: COMPELLEN
         sysObjectID: .1.3.6.1.4.1.8072.3.2.8

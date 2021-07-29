@@ -1,0 +1,9 @@
+os: bktel-oa
+text: 'BKtel'
+type: network
+icon: bktel
+mib_dir: bktel
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.7501.1.2.100
+        - .1.3.6.1.4.1.7501.1.2.99

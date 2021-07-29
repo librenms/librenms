@@ -41,7 +41,7 @@ if (config('cache.default') == 'database' && ! \Schema::hasTable('cache_locks'))
 
 $schemaLock = Cache::lock('schema', 86000);
 if (! empty($skip_schema_lock) || $schemaLock->get()) {
-    $db_rev = get_db_schema();
+    $db_rev = \LibreNMS\DB\Schema::getLegacySchema();
 
     $migrate_opts = ['--force' => true, '--ansi' => true];
 
@@ -93,7 +93,7 @@ if (! empty($skip_schema_lock) || $schemaLock->get()) {
 
         echo "-- Done\n";
         // end legacy update
-        $db_rev = get_db_schema();
+        $db_rev = \LibreNMS\DB\Schema::getLegacySchema();
     }
 
     if ($db_rev == 1000) {

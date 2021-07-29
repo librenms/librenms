@@ -68,6 +68,10 @@ class DevSimulate extends LnmsCommand
             }
         });
 
+        if (! $snmpsim->isSuccessful()) {
+            $this->line($snmpsim->getErrorOutput());
+        }
+
         return 0;
     }
 

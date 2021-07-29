@@ -2,6 +2,8 @@
 
 use LibreNMS\Config;
 
+global $debug;
+
 // Push $_GET into $vars to be compatible with web interface naming
 foreach ($_GET as $name => $value) {
     $vars[$name] = $value;
@@ -24,13 +26,11 @@ $legend = $vars['legend'];
 $output = (! empty($vars['output']) ? $vars['output'] : 'default');
 $from = parse_at_time($_GET['from']) ?: Config::get('time.day');
 $to = parse_at_time($_GET['to']) ?: Config::get('time.now');
-$graph_type = (isset($vars['graph_type']) ? $vars['graph_type'] : Config::get('webui.graph_type'));
-
 $period = ($to - $from);
-$base64_output = '';
 $prev_from = ($from - $period);
 
-$graphfile = Config::get('temp_dir') . '/' . strgen();
+$graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
+$rrd_options = '';
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
@@ -47,61 +47,75 @@ if ($auth && is_customoid_graph($type, $subtype)) {
     // Graph Template Missing");
 }
 
-if ($error_msg) {
+if (! empty($error_msg)) {
     // We have an error :(
-    graph_error($graph_error);
-} elseif ($auth === null) {
+    graph_error($error_msg);
+
+    return;
+}
+
+if ($auth === null) {
     // We are unauthenticated :(
     graph_error($width < 200 ? 'No Auth' : 'No Authorization');
-} else {
-    // $rrd_options .= " HRULE:0#999999";
-    if ($graph_type === 'svg') {
-        $rrd_options .= ' --imgformat=SVG';
-        if ($width < 350) {
-            $rrd_options .= ' -m 0.75 -R light';
-        }
-    }
 
-    if ($command_only) {
-        echo "<div class='infobox'>";
-        echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
-        echo "<pre class='rrd-pre'>";
-        echo 'rrdtool ' . Rrd::buildCommand('graph', $graphfile, $rrd_options);
-        echo '</pre>';
-        $return = Rrd::graph($graphfile, $rrd_options);
+    return;
+}
+
+if ($graph_image_type === 'svg') {
+    $rrd_options .= ' --imgformat=SVG';
+    if ($width < 350) {
+        $rrd_options .= ' -m 0.75 -R light';
+    }
+}
+
+// command output requested
+if (! empty($command_only)) {
+    echo "<div class='infobox'>";
+    echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
+    echo "<pre class='rrd-pre'>";
+    echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
+    echo '</pre>';
+    try {
+        Rrd::graph($rrd_options);
+    } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
         echo "<pre class='rrd-pre'>";
-        echo "$return";
+        echo $e->getMessage();
         echo '</pre>';
-        unlink($graphfile);
-        echo '</div>';
-    } elseif ($no_file) {
-        graph_error($width < 200 ? 'No Data' : 'No Data file');
-    } elseif ($rrd_options) {
-        Rrd::graph($graphfile, $rrd_options);
-        d_echo($rrd_cmd);
-        if (is_file($graphfile)) {
-            if (! $debug) {
-                set_image_type();
-                if ($output === 'base64') {
-                    $imagedata = file_get_contents($graphfile);
-                    $base64_output = base64_encode($imagedata);
-                } else {
-                    $fd = fopen($graphfile, 'r');
-                    fpassthru($fd);
-                    fclose($fd);
-                }
-            } else {
-                echo `ls -l $graphfile`;
-                echo '<img src="' . data_uri($graphfile, 'image/svg+xml') . '" alt="graph" />';
-            }
-            unlink($graphfile);
-        } elseif (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-            graph_error($width < 200 ? 'No Data' : 'No Data file');
-        } else {
-            graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph');
-        }
+    }
+    echo '</div>';
+
+    return;
+}
+
+// graph sent file not found flag
+if (! empty($no_file)) {
+    graph_error($width < 200 ? 'No Data' : 'No Data file ' . $no_file);
+
+    return;
+}
+
+if (empty($rrd_options)) {
+    graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
+
+    return;
+}
+
+// Generating the graph!
+try {
+    $image_data = Rrd::graph($rrd_options);
+
+    // output the graph
+    if (\LibreNMS\Util\Debug::isEnabled()) {
+        echo '<img src="data:' . get_image_type($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
-        graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
+        header('Content-type: ' . get_image_type(Config::get('webui.graph_type')));
+        echo $output === 'base64' ? base64_encode($image_data) : $image_data;
+    }
+} catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+    if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
+        graph_error($width < 200 ? 'No Data' : 'No Data file ' . basename($rrd_filename));
+    } else {
+        graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph: ' . $e->getMessage());
     }
 }

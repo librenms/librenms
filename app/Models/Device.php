@@ -155,7 +155,7 @@ class Device extends BaseModel
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
-                if ($this->groups) {
+                if ($this->groups->isNotEmpty()) {
                     $query->orWhereHas('deviceGroups', function (Builder $query) {
                         $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
@@ -322,7 +322,7 @@ class Device extends BaseModel
             $deleted = (bool) $this->attribs->get($attrib_index)->delete();
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
-            $this->attribs->forget($attrib_index);
+            $this->attribs->forget((string) $attrib_index);
 
             return $deleted;
         }
@@ -464,6 +464,17 @@ class Device extends BaseModel
         ]);
     }
 
+    public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
+    {
+        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
+            $query->on('devices.device_id', 'devices_attribs.device_id')
+                ->where('devices_attribs.attrib_type', $attribute);
+        })->where(function (Builder $query) {
+            $query->whereNull('devices_attribs.attrib_value')
+                ->orWhere('devices_attribs.attrib_value', '!=', 'true');
+        });
+    }
+
     public function scopeWhereUptime($query, $uptime, $modifier = '<')
     {
         return $query->where([
@@ -472,17 +483,9 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeCanPing(Builder $query)
+    public function scopeCanPing(Builder $query): Builder
     {
-        return $query->where('disabled', 0)
-            ->leftJoin('devices_attribs', function (JoinClause $query) {
-                $query->on('devices.device_id', 'devices_attribs.device_id')
-                    ->where('devices_attribs.attrib_type', 'override_icmp_disable');
-            })
-            ->where(function (Builder $query) {
-                $query->whereNull('devices_attribs.attrib_value')
-                    ->orWhere('devices_attribs.attrib_value', '!=', 'true');
-            });
+        return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
     }
 
     public function scopeHasAccess($query, User $user)
@@ -649,6 +652,11 @@ class Device extends BaseModel
     public function ospfPorts(): HasMany
     {
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
+    }
+
+    public function isisAdjacencies(): HasMany
+    {
+        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
     }
 
     public function netscalerVservers(): HasMany

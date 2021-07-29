@@ -332,7 +332,7 @@ class SmokepingCliTest extends DBTestCase
 
         // Generate a ridiculous number of random devices for testing
         foreach (range(1, 1000) as $i) {
-            $device = Device::factory()->create();
+            $device = Device::factory()->create(); /** @var Device $device */
             $data[$device->type][] = $device->hostname;
         }
 

@@ -11,6 +11,7 @@ use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Validations\Php;
 
 $init_modules = ['alerts'];
@@ -21,7 +22,7 @@ $options = getopt('df:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
-    $debug = true;
+    Debug::set();
 }
 
 if ($options['f'] === 'update') {
@@ -342,6 +343,15 @@ if ($options['f'] === 'peeringdb') {
     if ($lock->get()) {
         cache_peeringdb();
         $lock->release();
+    }
+}
+
+if ($options['f'] === 'mac_oui') {
+    $lock = Cache::lock('macouidb', 86000);
+    if ($lock->get()) {
+        $res = cache_mac_oui();
+        $lock->release();
+        exit($res);
     }
 }
 

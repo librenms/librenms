@@ -170,7 +170,8 @@
                                 },
                                 "additionalProperties": false,
                                 "required": [
-                                    "oid"
+                                    "oid",
+                                    "num_oid"
                                 ]
                             }
                         }
@@ -268,6 +269,9 @@
                                                     "array"
                                                 ]
                                             },
+                                            "nobulk": {
+                                                "type": "boolean"
+                                            },
                                             "entPhysicalIndex": {
                                                 "type": ["integer", "string"]
                                             },
@@ -278,6 +282,7 @@
                                         "additionalProperties": false,
                                         "required": [
                                             "descr",
+                                            "num_oid",
                                             "oid",
                                             "states"
                                         ]
@@ -431,6 +436,9 @@
                                     "array"
                                 ]
                             },
+                            "nobulk": {
+                                "type": "boolean"
+                            },
                             "entPhysicalIndex": {
                                 "type": ["integer", "string"]
                             },
@@ -444,6 +452,7 @@
                         "additionalProperties": false,
                         "required": [
                             "descr",
+                            "num_oid",
                             "oid"
                         ]
                     }

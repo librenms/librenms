@@ -45,7 +45,7 @@
 
                 Countdown.Start();
 
-                $("#countdown_timer_status").click("", function (event) {
+                $("#countdown_timer_status").on("click", function (event) {
                     event.preventDefault();
                     if (Countdown.interval) {
                         Countdown.Pause();
@@ -54,7 +54,7 @@
                     }
                 });
 
-                $("#countdown_timer").click("", function (event) {
+                $("#countdown_timer").on("click", function (event) {
                     event.preventDefault();
                 });
 
@@ -66,7 +66,7 @@
             $(document).ready(function () {
                 $("#countdown_timer").html("Refresh disabled");
                 $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i>");
-                $("#countdown_timer_status").click("", function (event) {
+                $("#countdown_timer_status").on("click", function (event) {
                     event.preventDefault();
                 });
             });

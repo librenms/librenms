@@ -14,12 +14,13 @@
  */
 
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('drfpgh:');
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 

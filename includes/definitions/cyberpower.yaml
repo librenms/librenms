@@ -3,12 +3,14 @@ text: Cyberpower
 type: power
 icon: cyberpower
 over:
-    - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
 discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.3808
+        sysDescr_except:
+            - 'Power Management Card'
 poller_modules:
     ports: false
 discovery_modules:

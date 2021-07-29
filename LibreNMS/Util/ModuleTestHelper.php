@@ -181,21 +181,21 @@ class ModuleTestHelper
 
     private function collectOids($device_id)
     {
-        global $debug, $vdebug, $device;
+        global $device;
 
         $device = device_by_id_cache($device_id);
         DeviceCache::setPrimary($device_id);
 
         // Run discovery
         ob_start();
-        $save_debug = $debug;
-        $save_vedbug = $vdebug;
-        $debug = true;
-        $vdebug = false;
+        $save_debug = Debug::isEnabled();
+        $save_vdebug = Debug::isVerbose();
+        Debug::set();
+        Debug::setVerbose(false);
         discover_device($device, $this->parseArgs('discovery'));
         poll_device($device, $this->parseArgs('poller'));
-        $debug = $save_debug;
-        $vdebug = $save_vedbug;
+        Debug::set($save_debug);
+        Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
         ob_end_clean();
 
@@ -518,7 +518,7 @@ class ModuleTestHelper
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
-        global $device, $debug, $vdebug;
+        global $device;
         Config::set('rrd.enable', false); // disable rrd
 
         if (! is_file($this->snmprec_file)) {
@@ -552,11 +552,11 @@ class ModuleTestHelper
         $data = [];  // array to hold dumped data
 
         // Run discovery
-        $save_debug = $debug;
-        $save_vedbug = $vdebug;
+        $save_debug = Debug::isEnabled();
+        $save_vedbug = Debug::isVerbose();
         if ($this->quiet) {
-            $debug = true;
-            $vdebug = true;
+            Debug::setOnly();
+            Debug::setVerbose();
         }
         ob_start();
 
@@ -564,8 +564,8 @@ class ModuleTestHelper
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
-            $vdebug = $save_vedbug;
+            Debug::setOnly($save_debug);
+            Debug::setVerbose($save_vedbug);
         } else {
             ob_flush();
         }
@@ -583,8 +583,8 @@ class ModuleTestHelper
 
         // Run the poller
         if ($this->quiet) {
-            $debug = true;
-            $vdebug = true;
+            Debug::setOnly();
+            Debug::setVerbose();
         }
         ob_start();
 
@@ -592,8 +592,8 @@ class ModuleTestHelper
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
-            $vdebug = $save_vedbug;
+            Debug::setOnly($save_debug);
+            Debug::setVerbose($save_vedbug);
         } else {
             ob_flush();
         }
@@ -608,8 +608,7 @@ class ModuleTestHelper
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
-            global $debug;
-            $debug = false;
+            Debug::set(false);
             delete_device($device['device_id']);
         }
 

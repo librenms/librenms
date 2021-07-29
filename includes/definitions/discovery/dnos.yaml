@@ -27,6 +27,7 @@ modules:
             - Dell-Vendor-MIB::productIdentificationVersion.0
             - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitCodeVersion.1
         serial:
+            - Dell-Vendor-MIB::productIdentificationServiceTag.1
             - Dell-Vendor-MIB::productIdentificationSerialNumber.0
             - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitSerialNumber.1
     processors:

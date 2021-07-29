@@ -38,6 +38,9 @@ class PortGroupController extends SelectController
         return PortGroup::hasAccess($request->user())->select(['id', 'name']);
     }
 
+    /**
+     * @param PortGroup $port_group
+     */
     public function formatItem($port_group)
     {
         return [

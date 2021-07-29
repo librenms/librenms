@@ -8,7 +8,7 @@ $valid['sensor'] = [];
 /** @var OS $os */
 $pre_cache = $os->preCache();
 
-if ($device['os'] == 'rittal-cmc-iii-pu') {
+if ($device['os'] == 'rittal-cmc-iii-pu' || $device['os'] == 'rittal-lcp') {
     include 'includes/discovery/sensors/rittal-cmc-iii-sensors.inc.php';
 } else {
     // Run custom sensors

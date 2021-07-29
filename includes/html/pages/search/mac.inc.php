@@ -7,8 +7,12 @@
             <tr>
                 <th data-column-id="hostname" data-order="asc">Device</th>
                 <th data-column-id="interface">Interface</th>
-                <th data-column-id="address" data-sortable="false">MAC Address</th>
-                <th data-column-id="description" data-sortable="false">Description</th></tr>
+                <th data-column-id="address" data-sortable="false" data-formatter="tooltip">MAC Address</th>
+<?php
+if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+    echo '                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
+}
+?>                <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th></tr>
             </tr>
         </thead>
     </table>
@@ -92,7 +96,17 @@ echo '"' . $_POST['address'] . '"+';
             address: '<?php echo $_POST['address']; ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax_table.php",
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
 });
 
 </script>

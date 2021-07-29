@@ -54,7 +54,7 @@
         $(document).ready(function() {
             $("#leaflet-map-{{ $id }}").on("click", function (event) {
                 map.scrollWheelZoom.enable();
-            }).mouseleave(function (event) {
+            }).on("mouseleave", function (event) {
                 map.scrollWheelZoom.disable();
             });
         });

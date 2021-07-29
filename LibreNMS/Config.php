@@ -30,6 +30,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Debug;
 use Log;
 
 class Config
@@ -259,8 +260,7 @@ class Config
             if (class_exists(Log::class)) {
                 Log::error($e);
             }
-            global $debug;
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 echo $e;
             }
 
@@ -404,7 +404,10 @@ class Config
     private static function processConfig()
     {
         // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
+        if (
+            isset($_SERVER['HTTPS']) ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
@@ -434,6 +437,8 @@ class Config
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
         self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
         self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
+        self::deprecatedVariable('discovery_modules.cisco-sla', 'discovery_modules.slas');
+        self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();
@@ -482,8 +487,7 @@ class Config
     private static function deprecatedVariable($old, $new)
     {
         if (self::has($old)) {
-            global $debug;
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 echo "Copied deprecated config $old to $new\n";
             }
             self::set($new, self::get($old));

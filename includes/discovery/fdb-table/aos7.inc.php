@@ -32,7 +32,12 @@ if (! empty($dot1d)) {
         foreach ($data as $slLocaleType => $data2) {
             foreach ($data2 as $portLocal => $data3) {
                 foreach ($data3 as $vlanLocal => $data4) {
-                    $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => array_combine(array_keys($data4[0]), array_fill(0, count($data4[0]), $portLocal))];
+                    if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
+                        $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
+                    }
+                    foreach ($data4[0] as $macLocal => $one) {
+                        $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
+                    }
                 }
             }
         }

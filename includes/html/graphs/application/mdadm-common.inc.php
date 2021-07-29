@@ -12,10 +12,11 @@ $scale_min = 0;
 if (isset($vars['array'])) {
     $arrays = [$vars['array']];
 } else {
-    $arrays = get_arrays_with_application($device, $app_id, $name);
+    $arrays = Rrd::getRrdApplicationArrays($device, $app_id, $name);
 }
 
 $int = 0;
+$rrd_list = [];
 while (isset($arrays[$int])) {
     $array = $arrays[$int];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id, $array]);

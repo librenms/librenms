@@ -187,7 +187,7 @@ $('#save-oid-button').on('click', function (e) {
             if (data.status == 'ok') {
                 toastr.success(data.message);
                 $('#create-oid-form').modal('hide');
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 toastr.error(data.message);
             }
@@ -219,7 +219,7 @@ $('#test-oid-button').on('click', function (e) {
         }
     });
 });
-$('#oid').change(function () {
+$('#oid').on("change", function () {
     $("#passed").val('');
     $("#cpassed").prop("checked", false);
 });

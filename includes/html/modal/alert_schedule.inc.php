@@ -254,7 +254,7 @@ function recurring_switch() {
     }
 }
 
-$('#sched-submit').click('', function(e) {
+$('#sched-submit').on("click", function(e) {
     e.preventDefault();
     // parse start/end to ISO8601
     var formData = $('form.schedule-maintenance-form').serializeArray();

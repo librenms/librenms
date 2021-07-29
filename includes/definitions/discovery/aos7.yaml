@@ -62,7 +62,7 @@ modules:
                         -
                             oid: ddmPortRxOpticalPower
                             op: '='
-                            value: 0
+                            value: -2147483648
                         -
                             oid: ddmPortTxOutputPower
                             op: '='
@@ -98,7 +98,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.11.1.4.{{ $index }}'
                     descr: 'CHASSIS-{{ $entPhysicalName }} Fan {{ $subindex1 }}'
                     low_limit: 1000
-                    high_limit: 15000
+                    high_limit: 18000
                     skip_values:
                         -
                             oid: alaChasEntPhysFanAirflow
@@ -118,10 +118,11 @@ modules:
                         - { value: 1, generic: 2, graph: 1, descr: Unknown }
                         - { value: 2, generic: 1, graph: 1, descr: Need Certify }
                         - { value: 3, generic: 0, graph: 1, descr: Certified }
+                    nobulk: true
                 -
                     oid: chasControlModuleTable
                     value: chasControlSynchronizationStatus
-                    num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.1.1.4.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.1.1.6.{{ $index }}'
                     descr: 'Flash Between CMMs'
                     group: Chassis
                     index: 'chasControlSynchronizationStatus.1'
@@ -131,6 +132,7 @@ modules:
                         - { value: 2, generic: 1, graph: 1, descr: Mono Control Module }
                         - { value: 3, generic: 1, graph: 1, descr: Not Synchronized }
                         - { value: 4, generic: 0, graph: 1, descr: Synchronized }
+                    nobulk: true
                 -
                     oid: alclnkaggAggNbrAttachedPorts
                     value: alclnkaggAggNbrAttachedPorts
@@ -148,6 +150,12 @@ modules:
                         - { value: 6, generic: 0, graph: 1, descr: Redundant (6) }
                         - { value: 7, generic: 0, graph: 1, descr: Redundant (7) }
                         - { value: 8, generic: 0, graph: 1, descr: Redundant (8) }
+                    skip_values:
+                        -
+                            oid: alclnkaggAggNbrAttachedPorts
+                            op: '='
+                            value: 0
+
                 -
                     oid: alaChasEntPhysFanTable
                     value: alaChasEntPhysFanStatus
@@ -177,6 +185,11 @@ modules:
                         - { value: 8, generic: 0, graph: 1, descr: Master }
                         - { value: 9, generic: 0, graph: 1, descr: Idle }
                         - { value: 10, generic: 0, graph: 1, descr: PwrSave }
+                    skip_values:
+                        -
+                            oid: entPhysicalName
+                            op: 'regex'
+                            value: '/TRANSCEIVER/'
                 -
                     oid: virtualChassisStatus
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.69.1.1.2.1.5.{{ $index }}'
@@ -220,6 +233,8 @@ modules:
                     descr: '{{ $entPhysicalName }} Temperature'
                     group: Chassis
                     index: 'chasCPMAHardwareBoardTemp.{{ $index }}'
+                    high_limit: chasDangerTempThreshold
+                    warn_limit: chasTempThreshold
                 -
                     oid: ddmPortInfoTable
                     value: ddmPortTemperature

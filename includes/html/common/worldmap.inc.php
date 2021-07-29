@@ -84,6 +84,7 @@ var greenMarker = L.AwesomeMarkers.icon({
         $sql = "SELECT DISTINCT(`device_id`),`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                 LEFT JOIN `locations` ON `devices`.`location_id`=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
+                AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `status` IN " . dbGenPlaceholders(count($show_status)) .
                 ' ORDER BY `status` ASC, `hostname`';
         $param = $show_status;
@@ -95,6 +96,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                 FROM `devices`
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
+                AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids)) .
                 ' AND `status` IN ' . dbGenPlaceholders(count($show_status)) .
                 ' ORDER BY `status` ASC, `hostname`';
@@ -263,7 +265,7 @@ $(document).ready(function(){
     $("#leaflet-map").on("click", function(event) {
         map.scrollWheelZoom.enable();
     });
-    $("#leaflet-map").mouseleave(function(event) {
+    $("#leaflet-map").on("mouseleave", function(event) {
         map.scrollWheelZoom.disable();
     });
 });

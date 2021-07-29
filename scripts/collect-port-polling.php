@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -23,7 +24,7 @@ function print_help()
 }
 
 if (isset($options['d'])) {
-    $debug = true;
+    Debug::set();
 }
 
 if (isset($options['help'])) {
@@ -61,7 +62,7 @@ echo 'Full Polling: ';
 Config::set('polling.selected_ports', false);
 foreach ($devices as $index => $device) {
     echo $device['device_id'] . ' ';
-    if (! $debug) {
+    if (! Debug::isEnabled()) {
         ob_start();
     }
 
@@ -76,7 +77,7 @@ Config::set('polling.selected_ports', true);
 echo 'Selective Polling: ';
 foreach ($devices as $index => $device) {
     echo $device['device_id'] . ' ';
-    if (! $debug) {
+    if (! Debug::isEnabled()) {
         ob_start();
     }
 

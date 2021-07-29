@@ -1,0 +1,23 @@
+os: stellar
+group: nokia
+text: 'Alcatel-Lucent Enterprise Stellar Wireless OS (AWOS)'
+type: network
+ifXmcbc: true
+ifname: true
+nobulk: true
+ignore_mount_string:
+    - firmware
+    - overlay
+    - .productinfo
+    - rom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_wireless_clients, text: 'Client Count' }
+icon: alcatellucent
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6486.802. #stellar
+mib_dir: nokia/stellar

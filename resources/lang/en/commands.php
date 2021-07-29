@@ -13,14 +13,16 @@ return [
     'config:set' => [
         'description' => 'Set configuration value (or unset)',
         'arguments' => [
-            'setting' => 'setting to set in dot notation (example: snmp.community.0)',
+            'setting' => 'setting to set in dot notation (example: snmp.community.0) To append to an array suffix with .+',
             'value' => 'value to set, unset setting if this is omitted',
         ],
         'options' => [
             'ignore-checks' => 'Ignore all safety checks',
         ],
         'confirm' => 'Reset :setting to the default?',
+        'forget_from' => 'Forget :path from :parent?',
         'errors' => [
+            'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
             'invalid' => 'This is not a valid setting. Please check your spelling',
             'nodb' => 'Database is not connected',

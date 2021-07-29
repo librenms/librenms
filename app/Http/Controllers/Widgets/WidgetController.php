@@ -55,7 +55,7 @@ abstract class WidgetController extends Controller
      */
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.base');
+        return view('widgets.settings.base', $this->getSettings(true));
     }
 
     public function __invoke(Request $request)
@@ -68,9 +68,7 @@ abstract class WidgetController extends Controller
             // This might be invoked in getSettingsView() in an extended class
             // So don't run it before since it's cached.
             $this->getSettings();
-        }
 
-        if (! $this->show_settings) {
             if (! empty($this->settings['device_group']) || ! empty($this->settings['port_group'])) {
                 $this->title .= ' (';
 

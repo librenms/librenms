@@ -1,18 +1,20 @@
 source: Extensions/Services.md
 path: blob/master/doc/
-[TOC]
 
-# Setting up services
+# Nagios Plugins - Services
 
 Services within LibreNMS provides the ability to leverage Nagios plugins to
 perform additional monitoring outside of SNMP. Services can also be used
 in conjunction with your SNMP monitoring for larger monitoring functionality.
 
+
+## Setting up Services
+
 **Services must be tied to a device to function properly. A good generic
-option is to use `localhost`, but it is suggested to attach the check to 
+option is to use `localhost`, but it is suggested to attach the check to
 the device you are monitoring.**
 
-## Nagios plugins source
+### Nagios plugins source
 
 Plugins come from two main sources:
 
@@ -23,7 +25,7 @@ Note: Plugins will only load if they are prefixed with `check_`.
 The `check_` prefix is stripped out when displaying in the "Add Service"
 GUI "Type" dropdown list.
 
-## Service Templates
+### Service Templates
 
 Service Templates within LibreNMS provides the same ability as Nagios
 does with Host Groups. Known as Device Groups in LibreNMS.
@@ -50,7 +52,7 @@ appropriate.
 one Device Group to be able to add Service Templates - You can define a
 dummy one. The Device Group does not need members to add Service Templates.**
 
-## Service Auto Discovery
+### Service Auto Discovery
 
 To automatically create services for devices with available checks.
 
@@ -60,7 +62,7 @@ You need to enable the discover services within config.php with the following:
 $config['discover_services']           = true;
 ```
 
-## Service Templates Auto Discovery
+### Service Templates Auto Discovery
 
 To automatically create services for devices with configured
 Service Templates.
@@ -71,12 +73,12 @@ You need to enable the discover services within config.php with the following:
 $config['discover_services_templates']           = true;
 ```
 
-## Setup
+### Setup
 
 Service checks are now distributable if you run a distributed
 setup. To leverage this, use the `dispatch` service. Alternatively,
-you could also replace `check-services.php` with `services-wrapper.py` in 
-cron instead to run across all polling nodes. 
+you could also replace `check-services.php` with `services-wrapper.py` in
+cron instead to run across all polling nodes.
 
 If you need to debug the output of services-wrapper.py then you can
 add `-d` to the end of the command - it is NOT recommended to do this
@@ -134,7 +136,7 @@ Note that some services (procs, inodes, load and similar) will always
 poll the local LibreNMS server it's running on, regardless of which
 device you add it to.
 
-## Performance data
+### Performance data
 
 By default, the check-services script will collect all performance
 data that the Nagios script returns and display each datasource on a
@@ -174,7 +176,7 @@ go together. Example below:
     -- snip --
 ```
 
-## Alerting
+### Alerting
 
 Services uses the Nagios Alerting scheme where exit code:
 
@@ -191,7 +193,7 @@ rule would look like:
     %services.service_status = "2"
 ```
 
-## Debug
+### Debug
 
 Change user to librenms for example
 
@@ -205,7 +207,7 @@ then you can run the following command to help troubleshoot services.
 ./check-services.php -d
 ```
 
-## Related Polling / Discovery Options
+### Related Polling / Discovery Options
 
 These settings are related and should be investigated and set accordingly.
 The below values are not defaults or recommended.
@@ -217,31 +219,31 @@ $config['service_poller_enabled']           = true;
 $config['service_poller_workers']           = 16;
 ```
 ```php
-$config['service_poller_frequency']           = 300;
+$config['service_poller_frequency']         = 300;
 ```
 ```php
-$config['service_poller_down_retry']           = 5;
+$config['service_poller_down_retry']        = 5;
 ```
 ```php
-$config['service_discovery_enabled']           = true;
+$config['service_discovery_enabled']        = true;
 ```
 ```php
-$config['service_discovery_workers']           = 16;
+$config['service_discovery_workers']        = 16;
 ```
 ```php
-$config['service_discovery_frequency']           = 3600;
+$config['service_discovery_frequency']      = 3600;
 ```
 ```php
-$config['service_services_enabled']           = true;
+$config['service_services_enabled']         = true;
 ```
 ```php
-$config['service_services_workers']           = 16;
+$config['service_services_workers']         = 16;
 ```
 ```php
-$config['service_services_frequency']           = 60;
+$config['service_services_frequency']       = 60;
 ```
 
-## Service checks polling logic
+### Service checks polling logic
 
 Service check is skipped when the associated device is not pingable,
 and an appropriate entry is populated in the event log. Service check
@@ -254,7 +256,7 @@ setting (Edit -> Misc) to ON.
 
 Service checks will never be polled on disabled devices.
 
-## CHECK_MRPE
+### CHECK_MRPE
 
 In most cases, only Nagios plugins that run against a remote host with the -H option are available as services.  However, if you're remote host is running the [Check_MK agent](Agent-Setup.md) you may be able to use MRPE to monitor Nagios plugins that only execute locally as services.
 

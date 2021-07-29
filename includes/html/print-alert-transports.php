@@ -134,7 +134,7 @@ foreach (dbFetchRows($query) as $group) {
 </div>
 
 <script>
-    $("button#test-transport").click(function() {
+    $("button#test-transport").on("click", function() {
         var $this = $(this);
         var transport_id = $this.data("transport_id");
         var transport = $this.data("transport");

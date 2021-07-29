@@ -110,7 +110,7 @@ class SyslogController extends TableController
 
     /**
      * @param int $syslog_priority
-     * @return string|void
+     * @return string
      */
     private function priorityLabel($syslog_priority)
     {
@@ -131,6 +131,8 @@ class SyslogController extends TableController
                 return 'label-danger'; //Alert
             case 'emerg':
                 return 'label-danger'; //Emergency
+            default:
+                return '';
         }
     }
 

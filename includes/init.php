@@ -28,6 +28,7 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 global $vars, $console_color;
 
@@ -90,7 +91,7 @@ if (module_selected('web', $init_modules)) {
     \LibreNMS\Util\Laravel::bootCli();
 }
 
-set_debug(false); // disable debug initially (hides legacy errors too)
+Debug::set(false); // disable debug initially (hides legacy errors too)
 
 if (! module_selected('nodb', $init_modules)) {
     \LibreNMS\DB\Eloquent::boot();

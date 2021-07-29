@@ -1,13 +1,13 @@
 source: Extensions/Interface-Description-Parsing.md
 path: blob/master/doc/
 
-# About
+# Interface Description Parsing
 
 Librenms can interpret, display and group certain additional information on ports.
 This is done based on the format that the port description is written
 although it's possible  to customise the parser to be specific for your setup.
 
-# Keywords
+## Keywords
 
 See [examples](#examples) for formats.
 
@@ -21,7 +21,7 @@ See [examples](#examples) for formats.
   - `{}` contains *your* circuit id
   - `[]` contains the service type or speed
 
-# Examples
+## Examples
 
 Cisco IOS / NXOS / IOSXR:
 
@@ -47,7 +47,7 @@ This requires an additional script to be [setup](#setup)
 # eth2: Peering: Peering Exchange
 ```
 
-# Customisation
+## Customisation
 
 The following config options can be set to enable more custom types:
 
@@ -59,7 +59,7 @@ $config['core_descr'][]              = "core";
 $config['custom_descr'][]            = "something_made_up";
 ```
 
-# Custom interface parser
+## Custom interface parser
 
 It's also possible to write your own parser, the existing one is: includes/port-descr-parser.inc.php
 
@@ -69,7 +69,7 @@ Once you've created your own then you can enable it with:
 $config['port_descr_parser'] = "includes/custom/my-port-descr-parser.inc.php";
 ```
 
-## Setup
+### Setup
 
 For Unix / Linux based systems, you need to run an additional script
 to support the parsing of interface infor.
@@ -84,4 +84,5 @@ to support the parsing of interface infor.
 There are no changes to be made or additions to install for the polling librenms.
 
 Now you can set up your [keywords](#keywords) in your `/etc/network/interfaces`
+
 ``//Add more distributions than just Debian based``

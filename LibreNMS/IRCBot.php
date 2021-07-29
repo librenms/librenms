@@ -717,8 +717,6 @@ class IRCBot
                 return $this->respond('Who are you again?');
             }
         }//end if
-
-        return false;
     }
 
     //end _auth()
