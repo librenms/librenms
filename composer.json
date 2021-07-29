@@ -70,7 +70,7 @@
         "laravel/dusk": "^6.15",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
-        "nunomaduro/larastan": "^0.7.4",
+        "nunomaduro/larastan": "^0.7.12",
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-mockery": "^0.12.13",
         "phpunit/phpunit": "^9.3.3",

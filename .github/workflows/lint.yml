@@ -18,7 +18,7 @@ jobs:
 
       -
         name: Lint Code Base
-        uses: github/super-linter@v3
+        uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
           VALIDATE_PHP_BUILTIN: true
@@ -39,7 +39,7 @@ jobs:
         name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 7.4
           tools: composer
 
       -

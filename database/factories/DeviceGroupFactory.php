@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<DeviceGroup> */
 class DeviceGroupFactory extends Factory
 {
     /**

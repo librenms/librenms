@@ -103,20 +103,6 @@ class Notification extends Model
 
     /**
      * @param Builder<Notification> $query
-     * @param User $user
-     * @return mixed
-     */
-    public function scopeIsArchived(Builder $query, User $user)
-    {
-        return $query->leftJoin('notifications_attribs', 'notifications.notifications_id', '=', 'notifications_attribs.notifications_id')
-            ->source()
-            ->where('notifications_attribs.user_id', $user->user_id)
-            ->where(['key' => 'read', 'value' => 1])
-            ->limit(1);
-    }
-
-    /**
-     * @param Builder<Notification> $query
      * @return Builder<Notification>
      */
     public function scopeLimit(Builder $query)
