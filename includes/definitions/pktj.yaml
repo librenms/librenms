@@ -2,6 +2,7 @@ os: pktj
 type: network
 group: unix
 text: 'Gandi Packet Journey'
+mib_dir: gandi
 icon: gandi
 over:
     - { graph: device_bits, text: 'Device Traffic' }
