@@ -4,6 +4,7 @@ text: 'Dell Storage'
 group: unix
 icon: dell
 processor_stacked: true
+mib_dir: dell
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
