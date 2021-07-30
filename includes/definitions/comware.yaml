@@ -2,6 +2,7 @@ os: comware
 text: 'HPE Comware'
 type: network
 icon: hpe
+mib_dir: h3c
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
