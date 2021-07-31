@@ -2,6 +2,7 @@ os: netware
 type: server
 text: 'Novell Netware'
 icon: novell
+mib_dir: novell
 discovery:
     -
         sysDescr:
