@@ -33,7 +33,7 @@ class System extends BaseValidation
     protected static $RUN_BY_DEFAULT = true;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function validate(Validator $validator)
     {

@@ -39,8 +39,8 @@ class Location extends Model
     use HasFactory;
 
     public $fillable = ['location', 'lat', 'lng'];
-    const CREATED_AT = null;
-    const UPDATED_AT = 'timestamp';
+    public const CREATED_AT = null;
+    public const UPDATED_AT = 'timestamp';
     protected $casts = ['lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'];
 
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';

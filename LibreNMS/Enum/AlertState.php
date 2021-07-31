@@ -26,10 +26,10 @@ namespace LibreNMS\Enum;
 
 abstract class AlertState
 {
-    const CLEAR = 0;
-    const ACTIVE = 1;
-    const ACKNOWLEDGED = 2;
-    const WORSE = 3;
-    const BETTER = 4;
-    const RECOVERED = 0;
+    public const CLEAR = 0;
+    public const ACTIVE = 1;
+    public const ACKNOWLEDGED = 2;
+    public const WORSE = 3;
+    public const BETTER = 4;
+    public const RECOVERED = 0;
 }

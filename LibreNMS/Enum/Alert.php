@@ -26,14 +26,14 @@ namespace LibreNMS\Enum;
 
 abstract class Alert
 {
-    const UNKNOWN = 0;
-    const OK = 1;
-    const INFO = 2;
-    const NOTICE = 3;
-    const WARNING = 4;
-    const ERROR = 5;
+    public const UNKNOWN = 0;
+    public const OK = 1;
+    public const INFO = 2;
+    public const NOTICE = 3;
+    public const WARNING = 4;
+    public const ERROR = 5;
 
-    const SEVERITIES = ['unknown' => self::UNKNOWN,
+    public const SEVERITIES = ['unknown' => self::UNKNOWN,
         'ok'      => self::OK,
         'info'    => self::INFO,
         'notice'  => self::NOTICE,

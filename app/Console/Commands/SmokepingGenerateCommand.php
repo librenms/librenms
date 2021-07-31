@@ -38,13 +38,13 @@ class SmokepingGenerateCommand extends LnmsCommand
     private $ip6count = 0;
     private $warnings = [];
 
-    const IP4PROBE = 'lnmsFPing-';
-    const IP6PROBE = 'lnmsFPing6-';
+    public const IP4PROBE = 'lnmsFPing-';
+    public const IP6PROBE = 'lnmsFPing6-';
 
     // These entries are solely used to appease the smokeping config parser and serve no function
-    const DEFAULTIP4PROBE = 'FPing';
-    const DEFAULTIP6PROBE = 'FPing6';
-    const DEFAULTPROBE = self::DEFAULTIP4PROBE;
+    public const DEFAULTIP4PROBE = 'FPing';
+    public const DEFAULTIP6PROBE = 'FPing6';
+    public const DEFAULTPROBE = self::DEFAULTIP4PROBE;
 
     /**
      * Create a new command instance.
