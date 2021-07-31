@@ -1,5 +1,6 @@
 os: junos
 text: 'Juniper JunOS'
+mib_dir: juniper
 type: network
 over:
     - { graph: device_bits, text: 'Device Traffic' }
