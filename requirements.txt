@@ -3,3 +3,4 @@ python-dotenv
 redis>=3.0
 setuptools
 psutil
+command_runner>=0.7.0
