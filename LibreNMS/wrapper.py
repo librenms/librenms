@@ -571,7 +571,7 @@ if __name__ == '__main__':
         parser.error("Invalid wrapper type '{}'".format(wrapper_type))
         sys.exit(4)
 
-    config = get_config()
+    config = get_config(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     log_dir = config["log_dir"]
     log_file = os.path.join(log_dir, wrapper_type + ".log")
     logger = lnms.logger_get_logger(log_file, debug=debug)
