@@ -5,10 +5,11 @@ This is a Bootstrap script for wrapper.py, in order to retain compatibility with
 
 import os
 from optparse import OptionParser
+
 import LibreNMS.library as lnms
 import LibreNMS.wrapper as wrapper
 
-WRAPPER_TYPE = 'service'
+WRAPPER_TYPE = "service"
 DEFAULT_WORKERS = 1
 
 """
@@ -38,6 +39,14 @@ try:
     amount_of_workers = int(args[0])
 except (IndexError, ValueError):
     amount_of_workers = DEFAULT_WORKERS
-    logger.warning("Bogus number of workers given. Using default number ({}) of workers.".format(amount_of_workers))
+    logger.warning(
+        "Bogus number of workers given. Using default number ({}) of workers.".format(
+            amount_of_workers)
+    )
 
-wrapper.wrapper(WRAPPER_TYPE, amount_of_workers=amount_of_workers, config=config, log_dir=log_dir, _debug=debug)
+wrapper.wrapper(WRAPPER_TYPE,
+                amount_of_workers=amount_of_workers,
+                config=config,
+                log_dir=log_dir,
+                _debug=debug
+                )
