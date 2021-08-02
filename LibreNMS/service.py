@@ -1,6 +1,6 @@
 import LibreNMS
+from LibreNMS.library import get_config_data
 
-import json
 import logging
 import os
 import pymysql
@@ -99,7 +99,7 @@ class ServiceConfig:
     watchdog_logfile = "logs/librenms.log"
 
     def populate(self):
-        config = self._get_config_data()
+        config = get_config_data(self.BASE_DIR)
 
         # populate config variables
         self.node_id = os.getenv("NODE_ID")
@@ -302,38 +302,6 @@ class ServiceConfig:
                 self.watchdog_logfile = settings["watchdog_log"]
         except pymysql.err.Error:
             warning("Unable to load poller (%s) config", self.node_id)
-
-    def _get_config_data(self):
-        try:
-            import dotenv
-
-            env_path = "{}/.env".format(self.BASE_DIR)
-            info("Attempting to load .env from '%s'", env_path)
-            dotenv.load_dotenv(dotenv_path=env_path, verbose=True)
-
-            if not os.getenv("NODE_ID"):
-                raise ImportError(".env does not contain a valid NODE_ID setting.")
-
-        except ImportError as e:
-            exception(
-                "Could not import .env - check that the poller user can read the file, and that composer install has been run recently"
-            )
-            sys.exit(3)
-
-        config_cmd = [
-            "/usr/bin/env",
-            "php",
-            "{}/config_to_json.php".format(self.BASE_DIR),
-            "2>&1",
-        ]
-        try:
-            return json.loads(subprocess.check_output(config_cmd).decode())
-        except subprocess.CalledProcessError as e:
-            error(
-                "ERROR: Could not load or parse configuration! {}: {}".format(
-                    subprocess.list2cmdline(e.cmd), e.output.decode()
-                )
-            )
 
     @staticmethod
     def parse_group(g):

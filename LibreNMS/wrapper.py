@@ -14,7 +14,7 @@
 
  Usage:         This program accepts three command line arguments
                 - the number of threads (defaults to 1 for discovery / service, and 16 for poller)
-                - the wrapper type (services-wrapper, discovery-wrapper or poller-wrapper)
+                - the wrapper type (service, discovery or poller)
                 - optional debug boolean
 
 
@@ -42,7 +42,6 @@
 """
 
 import logging
-import json
 import os
 import queue
 import sys
@@ -53,6 +52,7 @@ from argparse import ArgumentParser
 
 import LibreNMS.library as lnms
 from LibreNMS.command_runner import command_runner
+from LibreNMS import DB
 
 logger = logging.getLogger(__name__)
 
@@ -278,6 +278,19 @@ def poll_worker(
         poll_queue.task_done()
 
 
+class DBConfig:
+    """
+    Bare minimal config class for service.DB usage
+    """
+    def __init__(self, _config):
+        self.db_socket = _config["db_socket"]
+        self.db_host = _config["db_host"],
+        self.db_port = int(_config["db_port"]),
+        self.db_user = _config["db_user"],
+        self.db_pass = _config["db_pass"],
+        self.db_name = _config["db_name"],
+
+
 def wrapper(
     wrapper_type,  # Type: str
     amount_of_workers,  # Type: int
@@ -404,16 +417,9 @@ def wrapper(
     else:
         sys.exit(3)
 
-    db_connection = lnms.db_open(
-        config["db_socket"],
-        config["db_host"],
-        int(config["db_port"]),
-        config["db_user"],
-        config["db_pass"],
-        config["db_name"],
-    )
-    cursor = db_connection.cursor()
-    cursor.execute(query)
+    sconfig = DBConfig(config)
+    db_connection = DB(sconfig)
+    cursor = db_connection.query(query)
     devices = cursor.fetchall()
     for row in devices:
         devices_list.append(int(row[0]))
@@ -422,7 +428,7 @@ def wrapper(
         query = "SELECT max(device_id),min(device_id) FROM `{}`".format(
             wrappers[wrapper_type]["table_name"]
         )
-        cursor.execute(query)
+        cursor = db_connection.query(query)
         devices = cursor.fetchall()
         maxlocks = devices[0][0] or 0
         minlocks = devices[0][1] or 0
@@ -508,19 +514,15 @@ def wrapper(
 
     # Update poller statistics
     if wrapper_type == "poller":
-        cursor = db_connection.cursor()
         query = "UPDATE pollers SET last_polled=NOW(), devices='{}', time_taken='{}' WHERE poller_name='{}'".format(
             DISCOVERED_DEVICES_COUNT, total_time, config["distributed_poller_name"]
         )
-        response = cursor.execute(query)
-        if response == 1:
-            db_connection.commit()
-        else:
+        cursor = db_connection.query(query)
+        if cursor != 1:
             query = "INSERT INTO pollers SET poller_name='{}', last_polled=NOW(), devices='{}', time_taken='{}'".format(
                 config["distributed_poller_name"], DISCOVERED_DEVICES_COUNT, total_time
             )
-            cursor.execute(query)
-            db_connection.commit()
+            cursor = db_connection.query(query)
 
     db_connection.close()
 
@@ -560,15 +562,6 @@ def wrapper(
         sys.exit(2)
 
 
-def get_config(install_dir):  #  Type: str  # -> dict
-    """
-    Gets current LibreNMS configfuration
-    """
-
-    lnms.check_for_file(os.path.join(install_dir, ".env"))
-    return json.loads(lnms.get_config_data(install_dir))
-
-
 if __name__ == "__main__":
     parser = ArgumentParser(
         prog="wrapper.py",
@@ -605,7 +598,7 @@ if __name__ == "__main__":
         parser.error("Invalid wrapper type '{}'".format(wrapper_type))
         sys.exit(4)
 
-    config = get_config(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    config = lnms.get_config_data(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     log_dir = config["log_dir"]
     log_file = os.path.join(log_dir, wrapper_type + ".log")
     logger = lnms.logger_get_logger(log_file, debug=debug)
