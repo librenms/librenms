@@ -56,7 +56,9 @@ from LibreNMS.command_runner import command_runner
 
 logger = logging.getLogger(__name__)
 
-PER_DEVICE_TIMEOUT = 900  # Timeout in seconds for any poller / service / discovery action per device
+PER_DEVICE_TIMEOUT = (
+    900  # Timeout in seconds for any poller / service / discovery action per device
+)
 
 DISTRIBUTED_POLLING = False  # Is overriden by config.php
 REAL_DURATION = 0
@@ -68,37 +70,37 @@ IS_NODE = None
 STEPPING = None
 MASTER_TAG = None
 NODES_TAG = None
-TIME_TAG = ''
+TIME_TAG = ""
 
 wrappers = {
     """
     Per wrapper type configuration
     All time related variables are in seconds
     """
-    'service': {
-        'executable': 'check-services.php',
-        'table_name': 'services',
-        'memc_touch_time': 10,
-        'stepping': 300,
-        'nodes_stepping': 300,
-        'total_exec_time': 300,
+    "service": {
+        "executable": "check-services.php",
+        "table_name": "services",
+        "memc_touch_time": 10,
+        "stepping": 300,
+        "nodes_stepping": 300,
+        "total_exec_time": 300,
     },
-    'discovery': {
-        'executable': 'discovery.php',
-        'table_name': 'devices',
-        'memc_touch_time': 30,
-        'stepping': 300,
-        'nodes_stepping': 3600,
-        'total_exec_time': 21600
+    "discovery": {
+        "executable": "discovery.php",
+        "table_name": "devices",
+        "memc_touch_time": 30,
+        "stepping": 300,
+        "nodes_stepping": 3600,
+        "total_exec_time": 21600,
     },
-    'poller': {
-        'executable': 'poller.php',
-        'table_name': 'devices',
-        'memc_touch_time': 10,
-        'stepping': 300,
-        'nodes_stepping': 300,
-        'total_exec_time': 300,
-    }
+    "poller": {
+        "executable": "poller.php",
+        "table_name": "devices",
+        "memc_touch_time": 10,
+        "stepping": 300,
+        "nodes_stepping": 300,
+        "total_exec_time": 300,
+    },
 }
 
 """
@@ -107,8 +109,7 @@ wrappers = {
 
 
 #  <<<EOC
-def memc_alive(name  # Type: str
-               ):
+def memc_alive(name):  # Type: str
     """
     Checks if memcache is working by injecting a random string and trying to read it again
     """
@@ -123,9 +124,7 @@ def memc_alive(name  # Type: str
         return False
 
 
-def memc_touch(key,  # Type: str
-               _time  # Type: int
-               ):
+def memc_touch(key, _time):  # Type: str  # Type: int
     """
     Updates a memcache key wait time
     """
@@ -136,8 +135,7 @@ def memc_touch(key,  # Type: str
         pass
 
 
-def get_time_tag(step  # Type: int
-                 ):
+def get_time_tag(step):  # Type: int
     """
     Get current time tag as timestamp module stepping
     """
@@ -148,15 +146,13 @@ def get_time_tag(step  # Type: int
 # EOC
 
 
-def print_worker(print_queue,  # Type: Queue
-                 wrapper_type  # Type: str
-                 ):
+def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
     """
-        A seperate queue and a single worker for printing information to the screen prevents
-        the good old joke:
+    A seperate queue and a single worker for printing information to the screen prevents
+    the good old joke:
 
-            Some people, when confronted with a problem, think,
-            "I know, I'll use threads," and then they have two problems.
+        Some people, when confronted with a problem, think,
+        "I know, I'll use threads," and then they have two problems.
     """
     nodeso = 0
     while True:
@@ -165,7 +161,7 @@ def print_worker(print_queue,  # Type: Queue
         global DISTRIBUTED_POLLING
         if DISTRIBUTED_POLLING:
             if not IS_NODE:
-                memc_touch(MASTER_TAG, wrappers[wrapper_type]['memc_touch_time'])
+                memc_touch(MASTER_TAG, wrappers[wrapper_type]["memc_touch_time"])
                 nodes = MEMC.get(NODES_TAG)
                 if nodes is None and not memc_alive(wrapper_type):
                     logger.warning(
@@ -177,7 +173,7 @@ def print_worker(print_queue,  # Type: Queue
                     logger.info("{} Node(s) Total".format(nodes))
                     nodeso = nodes
             else:
-                memc_touch(NODES_TAG, wrappers[wrapper_type]['memc_touch_time'])
+                memc_touch(NODES_TAG, wrappers[wrapper_type]["memc_touch_time"])
             try:
                 worker_id, device_id, elapsed_time = print_queue.get(False)
             except:
@@ -200,48 +196,59 @@ def print_worker(print_queue,  # Type: Queue
         DISCOVERED_DEVICES_COUNT += 1
         if elapsed_time < STEPPING:
             logger.info(
-                "worker {} finished device {} in {} seconds".format(worker_id, device_id, elapsed_time)
+                "worker {} finished device {} in {} seconds".format(
+                    worker_id, device_id, elapsed_time
+                )
             )
         else:
             logger.warning(
-                "worker {} finished device {} in {} seconds".format(worker_id, device_id, elapsed_time)
+                "worker {} finished device {} in {} seconds".format(
+                    worker_id, device_id, elapsed_time
+                )
                 % (worker_id, device_id, elapsed_time)
             )
         print_queue.task_done()
 
 
-def poll_worker(poll_queue,  # Type: Queue
-                print_queue,  # Type: Queue
-                config,  # Type: dict
-                log_dir,  # Type: str
-                wrapper_type  # Type: str
-                ):
+def poll_worker(
+    poll_queue,  # Type: Queue
+    print_queue,  # Type: Queue
+    config,  # Type: dict
+    log_dir,  # Type: str
+    wrapper_type,  # Type: str
+):
     """
-        This function will fork off single instances of the php process, record
-        how long it takes, and push the resulting reports to the printer queue
+    This function will fork off single instances of the php process, record
+    how long it takes, and push the resulting reports to the printer queue
     """
 
     while True:
         device_id = poll_queue.get()
         #  <<<EOC
-        if not DISTRIBUTED_POLLING or \
-            MEMC.get('{}.device.{}{}'.format(wrapper_type, device_id, TIME_TAG)) is None:
+        if (
+            not DISTRIBUTED_POLLING
+            or MEMC.get("{}.device.{}{}".format(wrapper_type, device_id, TIME_TAG))
+            is None
+        ):
             if DISTRIBUTED_POLLING:
                 result = MEMC.add(
-                    '{}.device.{}{}'.format(wrapper_type, device_id, TIME_TAG),
+                    "{}.device.{}{}".format(wrapper_type, device_id, TIME_TAG),
                     config["distributed_poller_name"],
                     STEPPING,
                 )
                 if not result:
                     logger.info(
-                        "The device {} appears to be being checked by another node".format(device_id)
+                        "The device {} appears to be being checked by another node".format(
+                            device_id
+                        )
                     )
                     poll_queue.task_done()
                     continue
                 if not memc_alive(wrapper_type) and IS_NODE:
                     logger.warning(
                         "Lost Memcached, Not checking Device {} as Node. Master will check it.".format(
-                            device_id)
+                            device_id
+                        )
                     )
                     poll_queue.task_done()
                     continue
@@ -249,11 +256,15 @@ def poll_worker(poll_queue,  # Type: Queue
             try:
                 start_time = time.time()
 
-                device_log = os.path.join(log_dir, 'services_device_{}.log'.format(device_id))
-                command = '/usr/bin/env php {} -h {} {}'.format(wrappers[wrapper_type]['executable'],
-                                                                device_id,
-                                                                device_log)
-                exit_code, output = command_runner(command, shell=True, timeout=PER_DEVICE_TIMEOUT)
+                device_log = os.path.join(
+                    log_dir, "services_device_{}.log".format(device_id)
+                )
+                command = "/usr/bin/env php {} -h {} {}".format(
+                    wrappers[wrapper_type]["executable"], device_id, device_log
+                )
+                exit_code, output = command_runner(
+                    command, shell=True, timeout=PER_DEVICE_TIMEOUT
+                )
                 # logger.debug(output, exit_code)  # TODO Check why this may fail with
                 # TypeError: not all arguments converted during string formatting
                 elapsed_time = int(time.time() - start_time)
@@ -267,12 +278,13 @@ def poll_worker(poll_queue,  # Type: Queue
         poll_queue.task_done()
 
 
-def wrapper(wrapper_type,  # Type: str
-            amount_of_workers,  # Type: int
-            config,  # Type: dict
-            log_dir,  # Type: str
-            _debug=False,  # Type: bool
-            ):  # -> None
+def wrapper(
+    wrapper_type,  # Type: str
+    amount_of_workers,  # Type: int
+    config,  # Type: dict
+    log_dir,  # Type: str
+    _debug=False,  # Type: bool
+):  # -> None
     """
     Actual code that runs various php scripts, in single node mode or distributed poller mode
     """
@@ -286,11 +298,11 @@ def wrapper(wrapper_type,  # Type: str
     global STEPPING
 
     # Setup wrapper dependent variables
-    STEPPING = wrappers[wrapper_type]['stepping']
-    if wrapper_type == 'poller':
+    STEPPING = wrappers[wrapper_type]["stepping"]
+    if wrapper_type == "poller":
         if "rrd" in config and "step" in config["rrd"]:
             STEPPING = config["rrd"]["step"]
-        TIME_TAG = '.' + str(get_time_tag(STEPPING))
+        TIME_TAG = "." + str(get_time_tag(STEPPING))
 
     MASTER_TAG = "{}.master{}".format(wrapper_type, TIME_TAG)
     NODES_TAG = "{}.nodes{}".format(wrapper_type, TIME_TAG)
@@ -324,10 +336,14 @@ def wrapper(wrapper_type,  # Type: str
                 if MEMC.get(MASTER_TAG) is None:
                     logger.info("Registered as Master")
                     MEMC.set(MASTER_TAG, config["distributed_poller_name"], 10)
-                    MEMC.set(NODES_TAG, 0, wrappers[wrapper_type]['nodes_stepping'])
+                    MEMC.set(NODES_TAG, 0, wrappers[wrapper_type]["nodes_stepping"])
                     IS_NODE = False
                 else:
-                    logger.info("Registered as Node joining Master {}".format(MEMC.get(MASTER_TAG)))
+                    logger.info(
+                        "Registered as Node joining Master {}".format(
+                            MEMC.get(MASTER_TAG)
+                        )
+                    )
                     IS_NODE = True
                     MEMC.incr(NODES_TAG)
                 DISTRIBUTED_POLLING = True
@@ -353,7 +369,7 @@ def wrapper(wrapper_type,  # Type: str
 
     devices_list = []
 
-    if wrapper_type == 'services':
+    if wrapper_type == "services":
         #  <<<EOC
         if poller_group is not False:
             query = (
@@ -362,21 +378,25 @@ def wrapper(wrapper_type,  # Type: str
                 "`devices`.`disabled` = 0".format(poller_group)
             )
         else:
-            query = "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON " \
-                    "`services`.`device_id` = `devices`.`device_id` WHERE `devices`.`disabled` = 0"
+            query = (
+                "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON "
+                "`services`.`device_id` = `devices`.`device_id` WHERE `devices`.`disabled` = 0"
+            )
         # EOC
-    elif wrapper_type in ['discovery', 'poller']:
+    elif wrapper_type in ["discovery", "poller"]:
         """
-            This query specificly orders the results depending on the last_discovered_timetaken variable
-            Because this way, we put the devices likely to be slow, in the top of the queue
-            thus greatening our chances of completing _all_ the work in exactly the time it takes to
-            discover the slowest device! cool stuff he
+        This query specificly orders the results depending on the last_discovered_timetaken variable
+        Because this way, we put the devices likely to be slow, in the top of the queue
+        thus greatening our chances of completing _all_ the work in exactly the time it takes to
+        discover the slowest device! cool stuff he
         """
         #  <<<EOC
         if poller_group is not False:
             query = (
                 "SELECT `device_id` FROM `devices` WHERE `poller_group` IN ({}) AND "
-                "`disabled` = 0 ORDER BY `last_polled_timetaken` DESC".format(poller_group)
+                "`disabled` = 0 ORDER BY `last_polled_timetaken` DESC".format(
+                    poller_group
+                )
             )
         else:
             query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
@@ -399,7 +419,9 @@ def wrapper(wrapper_type,  # Type: str
         devices_list.append(int(row[0]))
     #  <<<EOC
     if DISTRIBUTED_POLLING and not IS_NODE:
-        query = "SELECT max(device_id),min(device_id) FROM `{}`".format(wrappers[wrapper_type]['table_name'])
+        query = "SELECT max(device_id),min(device_id) FROM `{}`".format(
+            wrappers[wrapper_type]["table_name"]
+        )
         cursor.execute(query)
         devices = cursor.fetchall()
         maxlocks = devices[0][0] or 0
@@ -410,23 +432,35 @@ def wrapper(wrapper_type,  # Type: str
     print_queue = queue.Queue()
 
     logger.info(
-        "starting the {} check at {} with {} threads for {} devices".format(wrapper_type,
-                                                                            time.strftime("%Y-%m-%d %H:%M:%S"),
-                                                                            amount_of_workers,
-                                                                            len(devices_list))
+        "starting the {} check at {} with {} threads for {} devices".format(
+            wrapper_type,
+            time.strftime("%Y-%m-%d %H:%M:%S"),
+            amount_of_workers,
+            len(devices_list),
+        )
     )
 
     for device_id in devices_list:
         poll_queue.put(device_id)
 
     for _ in range(amount_of_workers):
-        worker = threading.Thread(target=poll_worker,
-                                  kwargs={'poll_queue': poll_queue, 'print_queue': print_queue, 'config': config,
-                                          'log_dir': log_dir, 'wrapper_type': wrapper_type})
+        worker = threading.Thread(
+            target=poll_worker,
+            kwargs={
+                "poll_queue": poll_queue,
+                "print_queue": print_queue,
+                "config": config,
+                "log_dir": log_dir,
+                "wrapper_type": wrapper_type,
+            },
+        )
         worker.setDaemon(True)
         worker.start()
 
-    pworker = threading.Thread(target=print_worker, kwargs={'print_queue': print_queue, 'wrapper_type': wrapper_type})
+    pworker = threading.Thread(
+        target=print_worker,
+        kwargs={"print_queue": print_queue, "wrapper_type": wrapper_type},
+    )
     pworker.setDaemon(True)
     pworker.start()
 
@@ -439,10 +473,9 @@ def wrapper(wrapper_type,  # Type: str
     total_time = int(time.time() - s_time)
 
     logger.info(
-        "{}-wrapper checked {} devices in {} seconds with {} workers".format(wrapper_type,
-                                                                             DISCOVERED_DEVICES_COUNT,
-                                                                             total_time,
-                                                                             amount_of_workers)
+        "{}-wrapper checked {} devices in {} seconds with {} workers".format(
+            wrapper_type, DISCOVERED_DEVICES_COUNT, total_time, amount_of_workers
+        )
     )
 
     #  <<<EOC
@@ -474,56 +507,60 @@ def wrapper(wrapper_type,  # Type: str
     show_stopper = False
 
     # Update poller statistics
-    if wrapper_type == 'poller':
+    if wrapper_type == "poller":
         cursor = db_connection.cursor()
-        query = (
-            "UPDATE pollers SET last_polled=NOW(), devices='{}', time_taken='{}' WHERE poller_name='{}'".format(
-                DISCOVERED_DEVICES_COUNT, total_time, config["distributed_poller_name"])
+        query = "UPDATE pollers SET last_polled=NOW(), devices='{}', time_taken='{}' WHERE poller_name='{}'".format(
+            DISCOVERED_DEVICES_COUNT, total_time, config["distributed_poller_name"]
         )
         response = cursor.execute(query)
         if response == 1:
             db_connection.commit()
         else:
-            query = (
-                "INSERT INTO pollers SET poller_name='{}', last_polled=NOW(), devices='{}', time_taken='{}'".format(
-                    config["distributed_poller_name"], DISCOVERED_DEVICES_COUNT, total_time)
+            query = "INSERT INTO pollers SET poller_name='{}', last_polled=NOW(), devices='{}', time_taken='{}'".format(
+                config["distributed_poller_name"], DISCOVERED_DEVICES_COUNT, total_time
             )
             cursor.execute(query)
             db_connection.commit()
 
     db_connection.close()
 
-    if total_time > wrappers[wrapper_type]['total_exec_time']:
+    if total_time > wrappers[wrapper_type]["total_exec_time"]:
         logger.warning(
             "the process took more than {} seconds to finish, you need faster hardware or more threads".format(
-                wrappers[wrapper_type]['total_exec_time'])
+                wrappers[wrapper_type]["total_exec_time"]
+            )
         )
         logger.warning(
-            "in sequential style service checks the elapsed time would have been: {} seconds".format(REAL_DURATION)
+            "in sequential style service checks the elapsed time would have been: {} seconds".format(
+                REAL_DURATION
+            )
         )
         for device in PER_DEVICE_DURATION:
-            if PER_DEVICE_DURATION[device] > wrappers[wrapper_type]['nodes_stepping']:
+            if PER_DEVICE_DURATION[device] > wrappers[wrapper_type]["nodes_stepping"]:
                 logger.warning(
-                    "device {} is taking too long: {} seconds".format(device, PER_DEVICE_DURATION[device])
+                    "device {} is taking too long: {} seconds".format(
+                        device, PER_DEVICE_DURATION[device]
+                    )
                 )
                 show_stopper = True
         if show_stopper:
             logger.error(
                 "Some devices are taking more than {} seconds, the script cannot recommend you what to do.".format(
-                    wrappers[wrapper_type]['nodes_stepping'])
+                    wrappers[wrapper_type]["nodes_stepping"]
+                )
             )
         else:
             recommend = int(total_time / STEPPING * amount_of_workers + 1)
             logger.warning(
                 "Consider setting a minimum of {} threads. (This does not constitute professional advice!)".format(
-                    recommend)
+                    recommend
+                )
             )
 
         sys.exit(2)
 
 
-def get_config(install_dir  #  Type: str
-               ):  # -> dict
+def get_config(install_dir):  #  Type: str  # -> dict
     """
     Gets current LibreNMS configfuration
     """
@@ -532,13 +569,15 @@ def get_config(install_dir  #  Type: str
     return json.loads(lnms.get_config_data(install_dir))
 
 
-if __name__ == '__main__':
-    parser = ArgumentParser(prog='wrapper.py',
-                            usage="usage: %(prog)s [options] <wrapper_type> <workers>\n"
-                                  "wrapper_type = 'service', 'poller' or 'disccovery'"
-                                  "workers defaults to 1 for service and discovery, and 16 for poller "
-                                  "(Do not set too high, or you will get an OOM)",
-                            description="Spawn multiple librenms php processes in parallel.")
+if __name__ == "__main__":
+    parser = ArgumentParser(
+        prog="wrapper.py",
+        usage="usage: %(prog)s [options] <wrapper_type> <workers>\n"
+        "wrapper_type = 'service', 'poller' or 'disccovery'"
+        "workers defaults to 1 for service and discovery, and 16 for poller "
+        "(Do not set too high, or you will get an OOM)",
+        description="Spawn multiple librenms php processes in parallel.",
+    )
     parser.add_argument(
         "-d",
         "--debug",
@@ -550,16 +589,11 @@ if __name__ == '__main__':
     parser.add_argument(
         dest="wrapper",
         default=None,
-        help="Execute wrapper for 'service', 'poller' or 'discovery'"
+        help="Execute wrapper for 'service', 'poller' or 'discovery'",
     )
     parser.add_argument(
-        dest="threads",
-        action="store_true",
-        default=None,
-        help="Number of workers"
+        dest="threads", action="store_true", default=None, help="Number of workers"
     )
-
-
 
     args = parser.parse_args()
 
@@ -567,7 +601,7 @@ if __name__ == '__main__':
     wrapper_type = args.wrapper
     amount_of_workers = args.threads
 
-    if wrapper_type not in ['service', 'discovery', 'poller']:
+    if wrapper_type not in ["service", "discovery", "poller"]:
         parser.error("Invalid wrapper type '{}'".format(wrapper_type))
         sys.exit(4)
 
@@ -579,7 +613,13 @@ if __name__ == '__main__':
     try:
         amount_of_workers = int(amount_of_workers)
     except (IndexError, ValueError, TypeError):
-        amount_of_workers = 16 if wrapper_type == 'poller' else 1  # Defaults to 1 for service/discovery, 16 for poller
-        logger.warning("Bogus number of workers given. Using default number ({}) of workers.".format(amount_of_workers))
+        amount_of_workers = (
+            16 if wrapper_type == "poller" else 1
+        )  # Defaults to 1 for service/discovery, 16 for poller
+        logger.warning(
+            "Bogus number of workers given. Using default number ({}) of workers.".format(
+                amount_of_workers
+            )
+        )
 
     wrapper(wrapper_type, amount_of_workers, config, log_dir, _debug=debug)
