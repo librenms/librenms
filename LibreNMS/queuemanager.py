@@ -1,5 +1,4 @@
 import pymysql
-import subprocess
 import threading
 import traceback
 from logging import debug, info, error, critical, warning
@@ -342,10 +341,14 @@ class BillingQueueManager(TimedQueueManager):
     def do_work(self, run_type, group):
         if run_type == "poll":
             info("Polling billing")
-            LibreNMS.call_script("poll-billing.php")
+            exit_code, output = LibreNMS.call_script("poll-billing.php")
+            if exit_code != 0:
+                warning("Error {} in Polling billing:\n{}".format(exit_code, output))
         else:  # run_type == 'calculate'
             info("Calculating billing")
-            LibreNMS.call_script("billing-calculate.php")
+            exit_code, output = LibreNMS.call_script("billing-calculate.php")
+            if exit_code != 0:
+                warning("Error {} in Calculating billing:\n{}".format(exit_code, output))
 
 
 class PingQueueManager(TimedQueueManager):
@@ -371,7 +374,9 @@ class PingQueueManager(TimedQueueManager):
         if self.lock(group, "group", timeout=self.config.ping.frequency):
             try:
                 info("Running fast ping")
-                LibreNMS.call_script("ping.php", ("-g", group))
+                exit_code, output = LibreNMS.call_script("ping.php", ("-g", group))
+                if exit_code != 0:
+                    warning("Running fast ping for {} failed with error code {}: {}".format(group, exit_code, output))
             finally:
                 self.unlock(group, "group")
 
@@ -400,11 +405,12 @@ class ServicesQueueManager(TimedQueueManager):
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.services.frequency):
-            try:
-                info("Checking services on device {}".format(device_id))
-                LibreNMS.call_script("check-services.php", ("-h", device_id))
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 5:
+            info("Checking services on device {}".format(device_id))
+            exit_code, output = LibreNMS.call_script("check-services.php", ("-h", device_id))
+            if exit_code == 0:
+                self.unlock(device_id)
+            else:
+                if exit_code == 5:
                     info(
                         "Device {} is down, cannot poll service, waiting {}s for retry".format(
                             device_id, self.config.down_retry
@@ -413,8 +419,13 @@ class ServicesQueueManager(TimedQueueManager):
                     self.lock(
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
-            else:
-                self.unlock(device_id)
+                else:
+                    warning(
+                        "Unknown error while checking services on device {} with exit code {}: {}".format(
+                            device_id, exit_code, output
+                        )
+                    )
+
 
 
 class AlertQueueManager(TimedQueueManager):
@@ -432,14 +443,13 @@ class AlertQueueManager(TimedQueueManager):
         self.post_work("alerts", 0)
 
     def do_work(self, device_id, group):
-        try:
-            info("Checking alerts")
-            LibreNMS.call_script("alerts.php")
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                warning("There was an error issuing alerts: {}".format(e.output))
+        info("Checking alerts")
+        exit_code, output = LibreNMS.call_script("alerts.php")
+        if exit_code != 0:
+            if exit_code == 1:
+                warning("There was an error issuing alerts: {}".format(output))
             else:
-                raise
+                raise CalledProcessError
 
 
 class PollerQueueManager(QueueManager):
@@ -457,9 +467,11 @@ class PollerQueueManager(QueueManager):
             info("Polling device {}".format(device_id))
 
             try:
-                LibreNMS.call_script("poller.php", ("-h", device_id))
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 6:
+                exit_code, output = LibreNMS.call_script("poller.php", ("-h", device_id))
+            if exit_code == 0:
+                self.unlock(device_id)
+            else:
+                if exit_code == 6:
                     warning(
                         "Polling device {} unreachable, waiting {}s for retry".format(
                             device_id, self.config.down_retry
@@ -470,10 +482,8 @@ class PollerQueueManager(QueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
-                    error("Polling device {} failed! {}".format(device_id, e))
+                    error("Polling device {} failed with exit code {}: {}".format(device_id, exit_code, output))
                     self.unlock(device_id)
-            else:
-                self.unlock(device_id)
         else:
             debug("Tried to poll {}, but it is locked".format(device_id))
 
@@ -503,11 +513,12 @@ class DiscoveryQueueManager(TimedQueueManager):
         if self.lock(
             device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)
         ):
-            try:
-                info("Discovering device {}".format(device_id))
-                LibreNMS.call_script("discovery.php", ("-h", device_id))
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 5:
+            info("Discovering device {}".format(device_id))
+            exit_code, output = LibreNMS.call_script("discovery.php", ("-h", device_id))
+            if exit_code == 0:
+                self.unlock(device_id)
+            else:
+                if exit_code == 5:
                     info(
                         "Device {} is down, cannot discover, waiting {}s for retry".format(
                             device_id, self.config.down_retry
@@ -517,6 +528,6 @@ class DiscoveryQueueManager(TimedQueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
+                    error("Discovering device {} failed with exit code {}: {}".format(device_id, exit_code, output))
                     self.unlock(device_id)
-            else:
-                self.unlock(device_id)
+
