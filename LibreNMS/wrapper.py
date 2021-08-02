@@ -508,7 +508,7 @@ def wrapper(
             MEMC.delete(NODES_TAG)
         else:
             MEMC.decr(NODES_TAG)
-        logger.info("Finished {}.".format(time.time()))
+        logger.info("Finished {}.".format(time.strftime("%Y-%m-%d %H:%M:%S")))
     # EOC
 
     show_stopper = False
