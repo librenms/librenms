@@ -26,6 +26,7 @@ from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
+MAX_LOGFILE_SIZE = (1024 ** 2) * 10  # 10 Megabytes max log files
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ def logger_get_file_handler(log_file):
     err_output = None
     try:
         file_handler = RotatingFileHandler(
-            log_file, mode="a", encoding="utf-8", maxBytes=1024000, backupCount=3
+            log_file, mode="a", encoding="utf-8", maxBytes=MAX_LOGFILE_SIZE, backupCount=3
         )
     except OSError as exc:
         try:
@@ -71,7 +72,7 @@ def logger_get_file_handler(log_file):
                 temp_log_file,
                 mode="a",
                 encoding="utf-8",
-                maxBytes=1000000,
+                maxBytes=MAX_LOGFILE_SIZE,
                 backupCount=1,
             )
             file_handler.setFormatter(FORMATTER)
