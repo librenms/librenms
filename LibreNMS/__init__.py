@@ -176,8 +176,9 @@ def normalize_wait(seconds):
 
 def call_script(script, args=()):
     """
-    Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
-    status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
+    Run a LibreNMS script.  Captures all output returns exit code.
+    Blocks parent signals (like SIGINT and SIGTERM).
+    Kills script if it takes too long
     :param script: the name of the executable relative to the base directory
     :param args: a tuple of arguments to send to the command
     :returns the output of the command
