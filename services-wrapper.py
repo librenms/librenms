@@ -41,12 +41,14 @@ except (IndexError, ValueError):
     amount_of_workers = DEFAULT_WORKERS
     logger.warning(
         "Bogus number of workers given. Using default number ({}) of workers.".format(
-            amount_of_workers)
+            amount_of_workers
+        )
     )
 
-wrapper.wrapper(WRAPPER_TYPE,
-                amount_of_workers=amount_of_workers,
-                config=config,
-                log_dir=log_dir,
-                _debug=debug
-                )
+wrapper.wrapper(
+    WRAPPER_TYPE,
+    amount_of_workers=amount_of_workers,
+    config=config,
+    log_dir=log_dir,
+    _debug=debug,
+)
