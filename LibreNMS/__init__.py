@@ -1,19 +1,17 @@
+import json
+import logging
 import os
+import sys
+import tempfile
 import threading
 import timeit
 from collections import deque
-
-import logging
 from logging.handlers import RotatingFileHandler
-import tempfile
-import json
 from math import ceil
 from queue import Queue
 from time import time
 
-
 from .command_runner import command_runner
-from .service import Service, ServiceConfig
 from .queuemanager import (
     QueueManager,
     TimedQueueManager,
@@ -24,10 +22,10 @@ from .queuemanager import (
     PollerQueueManager,
     DiscoveryQueueManager,
 )
+from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
-
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +190,7 @@ def call_script(script, args=()):
 
     base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
-    debug("Running {}".format(cmd))
+    logger.debug("Running {}".format(cmd))
     # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
     return command_runner(
         cmd, preexec_fn=os.setsid, close_fds=True, timeout=DEFAULT_SCRIPT_TIMEOUT
@@ -216,15 +214,15 @@ class DB:
             import pymysql
 
             pymysql.install_as_MySQLdb()
-            info("Using pure python SQL client")
+            logger.info("Using pure python SQL client")
         except ImportError:
-            info("Using other SQL client")
+            logger.info("Using other SQL client")
 
         try:
             import MySQLdb
         except ImportError:
-            critical("ERROR: missing a mysql python module")
-            critical(
+            logger.critical("ERROR: missing a mysql python module")
+            logger.critical(
                 "Install either 'PyMySQL' or 'mysqlclient' from your OS software repository or from PyPI"
             )
             raise
@@ -245,7 +243,7 @@ class DB:
             conn.ping(True)
             self._db[threading.get_ident()] = conn
         except Exception as e:
-            critical("ERROR: Could not connect to MySQL database! {}".format(e))
+            logger.critical("ERROR: Could not connect to MySQL database! {}".format(e))
             raise
 
     def db_conn(self):
@@ -274,7 +272,7 @@ class DB:
             cursor.close()
             return cursor
         except Exception as e:
-            critical("DB Connection exception {}".format(e))
+            logger.critical("DB Connection exception {}".format(e))
             self.close()
             raise
 
@@ -329,8 +327,8 @@ class Lock:
         if (
             (name not in self._locks)
             or (  # lock doesn't exist
-                allow_owner_relock and self._locks.get(name, [None])[0] == owner
-            )
+            allow_owner_relock and self._locks.get(name, [None])[0] == owner
+        )
             or time() > self._locks[name][1]  # owner has permission  # lock has expired
         ):
             self._locks[name] = (owner, expiration + time())
@@ -356,7 +354,7 @@ class Lock:
         return False
 
     def print_locks(self):
-        debug(self._locks)
+        logger.debug(self._locks)
 
 
 class ThreadingLock(Lock):
@@ -415,7 +413,7 @@ class RedisLock(Lock):
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
-        info(
+        logger.info(
             "Created redis lock manager with socket_timeout of {}s".format(
                 redis_kwargs["socket_timeout"]
             )
@@ -442,7 +440,7 @@ class RedisLock(Lock):
             non_existing = not (allow_owner_relock and self._redis.get(key) == owner)
             return self._redis.set(key, owner, ex=int(expiration), nx=non_existing)
         except redis.exceptions.ResponseError as e:
-            exception(
+            logger.critical(
                 "Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
                 name,
                 owner,
@@ -497,7 +495,7 @@ class RedisUniqueQueue(object):
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)
-        info(
+        logger.info(
             "Created redis queue with socket_timeout of {}s".format(
                 redis_kwargs["socket_timeout"]
             )
