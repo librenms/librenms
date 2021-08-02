@@ -387,14 +387,14 @@ def wrapper(
         #  <<<EOC
         if poller_group is not False:
             query = (
-                "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON "
-                "`services`.`device_id` = `devices`.`device_id` WHERE `devices`.`poller_group` IN({}) AND "
-                "`devices`.`disabled` = 0".format(poller_group)
+                "SELECT DISTINCT(services.device_id) FROM services LEFT JOIN devices ON "
+                "services.device_id = devices.device_id WHERE devices.poller_group IN({}) AND "
+                "devices.disabled = 0".format(poller_group)
             )
         else:
             query = (
-                "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON "
-                "`services`.`device_id` = `devices`.`device_id` WHERE `devices`.`disabled` = 0"
+                "SELECT DISTINCT(services.device_id) FROM services LEFT JOIN devices ON "
+                "services.device_id = devices.device_id WHERE devices.disabled = 0"
             )
         # EOC
     elif wrapper_type in ["discovery", "poller"]:
@@ -407,13 +407,13 @@ def wrapper(
         #  <<<EOC
         if poller_group is not False:
             query = (
-                "SELECT `device_id` FROM `devices` WHERE `poller_group` IN ({}) AND "
-                "`disabled` = 0 ORDER BY `last_polled_timetaken` DESC".format(
+                "SELECT device_id FROM devices WHERE poller_group IN ({}) AND "
+                "disabled = 0 ORDER BY last_polled_timetaken DESC".format(
                     poller_group
                 )
             )
         else:
-            query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
+            query = "SELECT device_id FROM devices WHERE disabled = 0 ORDER BY last_polled_timetaken DESC"
         # EOC
     else:
         logger.critical("Bogus wrapper type called")
@@ -428,7 +428,7 @@ def wrapper(
 
     #  <<<EOC
     if DISTRIBUTED_POLLING and not IS_NODE:
-        query = "SELECT max(device_id),min(device_id) FROM `{}`".format(
+        query = "SELECT max(device_id),min(device_id) FROM {}".format(
             wrappers[wrapper_type]["table_name"]
         )
         cursor = db_connection.query(query)
@@ -513,8 +513,6 @@ def wrapper(
         logger.info("Finished {}.".format(time.strftime("%Y-%m-%d %H:%M:%S")))
     # EOC
 
-    show_stopper = False
-
     # Update poller statistics
     if wrapper_type == "poller":
         query = "UPDATE pollers SET last_polled=NOW(), devices='{}', time_taken='{}' WHERE poller_name='{}'".format(
@@ -525,7 +523,7 @@ def wrapper(
             query = "INSERT INTO pollers SET poller_name='{}', last_polled=NOW(), devices='{}', time_taken='{}'".format(
                 config["distributed_poller_name"], DISCOVERED_DEVICES_COUNT, total_time
             )
-            cursor = db_connection.query(query)
+            db_connection.query(query)
 
     db_connection.close()
 
@@ -540,6 +538,7 @@ def wrapper(
                 REAL_DURATION
             )
         )
+        show_stopper = False
         for device in PER_DEVICE_DURATION:
             if PER_DEVICE_DURATION[device] > wrappers[wrapper_type]["nodes_stepping"]:
                 logger.warning(
@@ -561,7 +560,6 @@ def wrapper(
                     recommend
                 )
             )
-
         sys.exit(2)
 
 
