@@ -215,14 +215,18 @@ class QueueManager:
 
         except ImportError:
             if self.config.distributed:
-                logger.critical("ERROR: Redis connection required for distributed polling")
+                logger.critical(
+                    "ERROR: Redis connection required for distributed polling"
+                )
                 logger.critical(
                     "Please install redis-py, either through your os software repository or from PyPI"
                 )
                 exit(2)
         except Exception as e:
             if self.config.distributed:
-                logger.critical("ERROR: Redis connection required for distributed polling")
+                logger.critical(
+                    "ERROR: Redis connection required for distributed polling"
+                )
                 logger.critical("Could not connect to Redis. {}".format(e))
                 exit(2)
 
@@ -346,12 +350,16 @@ class BillingQueueManager(TimedQueueManager):
             logger.info("Polling billing")
             exit_code, output = LibreNMS.call_script("poll-billing.php")
             if exit_code != 0:
-                logger.warning("Error {} in Polling billing:\n{}".format(exit_code, output))
+                logger.warning(
+                    "Error {} in Polling billing:\n{}".format(exit_code, output)
+                )
         else:  # run_type == 'calculate'
             logger.info("Calculating billing")
             exit_code, output = LibreNMS.call_script("billing-calculate.php")
             if exit_code != 0:
-                logger.warning("Error {} in Calculating billing:\n{}".format(exit_code, output))
+                logger.warning(
+                    "Error {} in Calculating billing:\n{}".format(exit_code, output)
+                )
 
 
 class PingQueueManager(TimedQueueManager):
@@ -379,7 +387,11 @@ class PingQueueManager(TimedQueueManager):
                 logger.info("Running fast ping")
                 exit_code, output = LibreNMS.call_script("ping.php", ("-g", group))
                 if exit_code != 0:
-                    logger.warning("Running fast ping for {} failed with error code {}: {}".format(group, exit_code, output))
+                    logger.warning(
+                        "Running fast ping for {} failed with error code {}: {}".format(
+                            group, exit_code, output
+                        )
+                    )
             finally:
                 self.unlock(group, "group")
 
@@ -409,7 +421,9 @@ class ServicesQueueManager(TimedQueueManager):
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.services.frequency):
             logger.info("Checking services on device {}".format(device_id))
-            exit_code, output = LibreNMS.call_script("check-services.php", ("-h", device_id))
+            exit_code, output = LibreNMS.call_script(
+                "check-services.php", ("-h", device_id)
+            )
             if exit_code == 0:
                 self.unlock(device_id)
             else:
@@ -428,7 +442,6 @@ class ServicesQueueManager(TimedQueueManager):
                             device_id, exit_code, output
                         )
                     )
-
 
 
 class AlertQueueManager(TimedQueueManager):
@@ -484,7 +497,11 @@ class PollerQueueManager(QueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
-                    logger.error("Polling device {} failed with exit code {}: {}".format(device_id, exit_code, output))
+                    logger.error(
+                        "Polling device {} failed with exit code {}: {}".format(
+                            device_id, exit_code, output
+                        )
+                    )
                     self.unlock(device_id)
         else:
             logger.debug("Tried to poll {}, but it is locked".format(device_id))
@@ -530,6 +547,9 @@ class DiscoveryQueueManager(TimedQueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
-                    logger.error("Discovering device {} failed with exit code {}: {}".format(device_id, exit_code, output))
+                    logger.error(
+                        "Discovering device {} failed with exit code {}: {}".format(
+                            device_id, exit_code, output
+                        )
+                    )
                     self.unlock(device_id)
-
