@@ -424,6 +424,7 @@ def wrapper(
     devices = cursor.fetchall()
     for row in devices:
         devices_list.append(int(row[0]))
+
     #  <<<EOC
     if DISTRIBUTED_POLLING and not IS_NODE:
         query = "SELECT max(device_id),min(device_id) FROM `{}`".format(
@@ -519,7 +520,7 @@ def wrapper(
             DISCOVERED_DEVICES_COUNT, total_time, config["distributed_poller_name"]
         )
         cursor = db_connection.query(query)
-        if cursor != 1:
+        if cursor.rowcount < 1:
             query = "INSERT INTO pollers SET poller_name='{}', last_polled=NOW(), devices='{}', time_taken='{}'".format(
                 config["distributed_poller_name"], DISCOVERED_DEVICES_COUNT, total_time
             )
