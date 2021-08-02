@@ -22,7 +22,7 @@ IMPORTS
 
 
 netSnmpAgentMIB MODULE-IDENTITY
-    LAST-UPDATED "200502070000Z"
+    LAST-UPDATED "201003170000Z"
     ORGANIZATION "www.net-snmp.org"
     CONTACT-INFO    
 	 "postal:   Wes Hardaker
@@ -32,6 +32,10 @@ netSnmpAgentMIB MODULE-IDENTITY
           email:    net-snmp-coders@lists.sourceforge.net"
     DESCRIPTION
 	 "Defines control and monitoring structures for the Net-SNMP agent."
+    REVISION     "201003170000Z"
+    DESCRIPTION
+	 "Made sure that this MIB can be compiled by MIB compilers that do not
+	 recognize a double dash as end-of-comments."
     REVISION     "200502070000Z"
     DESCRIPTION
     	"Fixing syntax errors"
@@ -72,7 +76,7 @@ nsCacheDefaultTimeout         OBJECT-TYPE
     DESCRIPTION
       "Default cache timeout value (unless overridden
        for a particular cache entry)."
-    DEFVAL { 5 --seconds-- }
+    DEFVAL { 5 } --seconds-- 
     ::= { nsCache 1 }
 
 nsCacheEnabled                OBJECT-TYPE
