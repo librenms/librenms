@@ -258,7 +258,7 @@ def poll_worker(
                 start_time = time.time()
 
                 device_log = os.path.join(
-                    log_dir, "services_device_{}.log".format(device_id)
+                    log_dir, "{}_device_{}.log".format(wrapper_type, device_id)
                 )
                 command = "/usr/bin/env php {} -h {}".format(
                     wrappers[wrapper_type]["executable"], device_id
