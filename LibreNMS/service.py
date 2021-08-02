@@ -1,10 +1,8 @@
 import LibreNMS
-from LibreNMS.library import get_config_data
 
 import logging
 import os
 import pymysql
-import subprocess
 import threading
 import sys
 import time
@@ -99,7 +97,7 @@ class ServiceConfig:
     watchdog_logfile = "logs/librenms.log"
 
     def populate(self):
-        config = get_config_data(self.BASE_DIR)
+        config = LibreNMS.get_config_data(self.BASE_DIR)
 
         # populate config variables
         self.node_id = os.getenv("NODE_ID")
