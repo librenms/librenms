@@ -367,7 +367,9 @@ class Service:
         return time.time() - self.start_time
 
     def attach_signals(self):
-        logger.info("Attaching signal handlers on thread %s", threading.current_thread().name)
+        logger.info(
+            "Attaching signal handlers on thread %s", threading.current_thread().name
+        )
         signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
@@ -475,7 +477,9 @@ class Service:
                 master_lock = self._acquire_master()
                 if master_lock:
                     if not self.is_master:
-                        logger.info("{} is now the master dispatcher".format(self.config.name))
+                        logger.info(
+                            "{} is now the master dispatcher".format(self.config.name)
+                        )
                         self.is_master = True
                         self.start_dispatch_timers()
 
@@ -592,7 +596,9 @@ class Service:
         while not self._lm.lock("schema-update", self.config.unique_name, max_runtime):
             attempt += 1
             if attempt >= max_tries:  # don't get stuck indefinitely
-                logger.warning("Reached max wait for other pollers to update, updating now")
+                logger.warning(
+                    "Reached max wait for other pollers to update, updating now"
+                )
                 break
             sleep(wait)
 
@@ -628,14 +634,18 @@ class Service:
             )
         except ImportError:
             if self.config.distributed:
-                logger.critical("ERROR: Redis connection required for distributed polling")
+                logger.critical(
+                    "ERROR: Redis connection required for distributed polling"
+                )
                 logger.critical(
                     "Please install redis-py, either through your os software repository or from PyPI"
                 )
                 self.exit(2)
         except Exception as e:
             if self.config.distributed:
-                logger.critical("ERROR: Redis connection required for distributed polling")
+                logger.critical(
+                    "ERROR: Redis connection required for distributed polling"
+                )
                 logger.critical("Could not connect to Redis. {}".format(e))
                 self.exit(2)
 
@@ -647,7 +657,9 @@ class Service:
         Has the effect of reloading the python files from disk.
         """
         if sys.version_info < (3, 4, 0):
-            logger.warning("Skipping restart as running under an incompatible interpreter")
+            logger.warning(
+                "Skipping restart as running under an incompatible interpreter"
+            )
             logger.warning("Please restart manually")
             return
 
@@ -678,7 +690,9 @@ class Service:
         :param signalnum: UNIX signal number
         :param flag: Flags accompanying signal
         """
-        logger.info("Received signal on thread %s, handling", threading.current_thread().name)
+        logger.info(
+            "Received signal on thread %s, handling", threading.current_thread().name
+        )
         self.reload_flag = True
 
     def terminate(self, signalnum=None, flag=None):
@@ -687,7 +701,9 @@ class Service:
         :param signalnum: UNIX signal number
         :param flag: Flags accompanying signal
         """
-        logger.info("Received signal on thread %s, handling", threading.current_thread().name)
+        logger.info(
+            "Received signal on thread %s, handling", threading.current_thread().name
+        )
         self.terminate_flag = True
 
     def shutdown(self, signalnum=None, flag=None):
@@ -710,7 +726,9 @@ class Service:
         self._stop_managers_and_wait()
 
         # try to release master lock
-        logger.info("Shutdown of %s/%s complete", os.getpid(), threading.current_thread().name)
+        logger.info(
+            "Shutdown of %s/%s complete", os.getpid(), threading.current_thread().name
+        )
         self.exit(0)
 
     def start_dispatch_timers(self):
@@ -816,7 +834,7 @@ class Service:
         except pymysql.err.Error:
             logger.critical(
                 "Unable to log performance statistics - is the database still online?",
-                exc_info=True
+                exc_info=True,
             )
 
     def systemd_watchdog(self):
@@ -839,7 +857,7 @@ class Service:
                 "BARK! Log file older than {}s, restarting service!".format(
                     self.config.poller.frequency
                 ),
-                exc_info=True
+                exc_info=True,
             )
             self.restart()
         else:

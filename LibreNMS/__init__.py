@@ -327,8 +327,8 @@ class Lock:
         if (
             (name not in self._locks)
             or (  # lock doesn't exist
-            allow_owner_relock and self._locks.get(name, [None])[0] == owner
-        )
+                allow_owner_relock and self._locks.get(name, [None])[0] == owner
+            )
             or time() > self._locks[name][1]  # owner has permission  # lock has expired
         ):
             self._locks[name] = (owner, expiration + time())
