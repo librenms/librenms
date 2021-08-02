@@ -72,11 +72,11 @@ MASTER_TAG = None
 NODES_TAG = None
 TIME_TAG = ""
 
+"""
+Per wrapper type configuration
+All time related variables are in seconds
+"""
 wrappers = {
-    """
-    Per wrapper type configuration
-    All time related variables are in seconds
-    """
     "service": {
         "executable": "check-services.php",
         "table_name": "services",
