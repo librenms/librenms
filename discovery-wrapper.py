@@ -10,7 +10,7 @@ import LibreNMS
 import LibreNMS.wrapper as wrapper
 
 WRAPPER_TYPE = "discovery"
-DEFAULT_WORKERS = 16
+DEFAULT_WORKERS = 1
 
 """
     Take the amount of threads we want to run in parallel from the commandline
