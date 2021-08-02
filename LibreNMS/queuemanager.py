@@ -1,11 +1,14 @@
+import logging
 import pymysql
 import threading
 import traceback
-from logging import debug, info, error, critical, warning
 from queue import Empty
 from subprocess import CalledProcessError
 
 import LibreNMS
+
+
+logger = logging.getLogger(__name__)
 
 
 class QueueManager:
@@ -38,8 +41,8 @@ class QueueManager:
 
         self._stop_event = threading.Event()
 
-        info("Groups: {}".format(self.config.group))
-        info(
+        logger.info("Groups: {}".format(self.config.group))
+        logger.info(
             "{} QueueManager created: {} workers, {}s frequency".format(
                 self.type.title(),
                 self.get_poller_config().workers,
@@ -51,9 +54,9 @@ class QueueManager:
             self.start()
 
     def _service_worker(self, queue_id):
-        debug("Worker started {}".format(threading.current_thread().getName()))
+        logger.debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
-            debug(
+            logger.debug(
                 "Worker {} checking queue {} ({}) for work".format(
                     threading.current_thread().getName(),
                     queue_id,
@@ -67,13 +70,13 @@ class QueueManager:
                 if (
                     device_id is not None
                 ):  # None returned by redis after timeout when empty
-                    debug(
+                    logger.debug(
                         "Worker {} ({}) got work {} ".format(
                             threading.current_thread().getName(), queue_id, device_id
                         )
                     )
                     with LibreNMS.TimeitContext.start() as t:
-                        debug("Queues: {}".format(self._queues))
+                        logger.debug("Queues: {}".format(self._queues))
                         target_desc = (
                             "{} ({})".format(device_id if device_id else "", queue_id)
                             if queue_id
@@ -82,7 +85,7 @@ class QueueManager:
                         self.do_work(device_id, queue_id)
 
                         runtime = t.delta()
-                        info(
+                        logger.info(
                             "Completed {} run for {} in {:.2f}s".format(
                                 self.type, target_desc, runtime
                             )
@@ -91,13 +94,13 @@ class QueueManager:
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
-                error(
+                logger.error(
                     "{} poller script error! {} returned {}: {}".format(
                         self.type.title(), e.cmd, e.returncode, e.output
                     )
                 )
             except Exception as e:
-                error("{} poller exception! {}".format(self.type.title(), e))
+                logger.error("{} poller exception! {}".format(self.type.title(), e))
                 traceback.print_exc()
 
     def post_work(self, payload, queue_id):
@@ -107,7 +110,7 @@ class QueueManager:
         :param queue_id: which queue to post to, 0 is the default
         """
         self.get_queue(queue_id).put(payload)
-        debug(
+        logger.debug(
             "Posted work for {} to {}:{} queue size: {}".format(
                 payload, self.type, queue_id, self.get_queue(queue_id).qsize()
             )
@@ -130,7 +133,7 @@ class QueueManager:
                     thread_name = "{}_{}-{}".format(self.type.title(), group, i + 1)
                     self.spawn_worker(thread_name, group)
 
-                debug(
+                logger.debug(
                     "Started {} {} threads for group {}".format(
                         group_workers, self.type, group
                     )
@@ -195,7 +198,7 @@ class QueueManager:
         :param group:
         :return:
         """
-        info("Creating queue {}".format(self.queue_name(queue_type, group)))
+        logger.info("Creating queue {}".format(self.queue_name(queue_type, group)))
         try:
             return LibreNMS.RedisUniqueQueue(
                 self.queue_name(queue_type, group),
@@ -212,15 +215,15 @@ class QueueManager:
 
         except ImportError:
             if self.config.distributed:
-                critical("ERROR: Redis connection required for distributed polling")
-                critical(
+                logger.critical("ERROR: Redis connection required for distributed polling")
+                logger.critical(
                     "Please install redis-py, either through your os software repository or from PyPI"
                 )
                 exit(2)
         except Exception as e:
             if self.config.distributed:
-                critical("ERROR: Redis connection required for distributed polling")
-                critical("Could not connect to Redis. {}".format(e))
+                logger.critical("ERROR: Redis connection required for distributed polling")
+                logger.critical("Could not connect to Redis. {}".format(e))
                 exit(2)
 
         return LibreNMS.UniqueQueue()
@@ -340,15 +343,15 @@ class BillingQueueManager(TimedQueueManager):
 
     def do_work(self, run_type, group):
         if run_type == "poll":
-            info("Polling billing")
+            logger.info("Polling billing")
             exit_code, output = LibreNMS.call_script("poll-billing.php")
             if exit_code != 0:
-                warning("Error {} in Polling billing:\n{}".format(exit_code, output))
+                logger.warning("Error {} in Polling billing:\n{}".format(exit_code, output))
         else:  # run_type == 'calculate'
-            info("Calculating billing")
+            logger.info("Calculating billing")
             exit_code, output = LibreNMS.call_script("billing-calculate.php")
             if exit_code != 0:
-                warning("Error {} in Calculating billing:\n{}".format(exit_code, output))
+                logger.warning("Error {} in Calculating billing:\n{}".format(exit_code, output))
 
 
 class PingQueueManager(TimedQueueManager):
@@ -368,15 +371,15 @@ class PingQueueManager(TimedQueueManager):
             for group in groups:
                 self.post_work("", group[0])
         except pymysql.err.Error as e:
-            critical("DB Exception ({})".format(e))
+            logger.critical("DB Exception ({})".format(e))
 
     def do_work(self, context, group):
         if self.lock(group, "group", timeout=self.config.ping.frequency):
             try:
-                info("Running fast ping")
+                logger.info("Running fast ping")
                 exit_code, output = LibreNMS.call_script("ping.php", ("-g", group))
                 if exit_code != 0:
-                    warning("Running fast ping for {} failed with error code {}: {}".format(group, exit_code, output))
+                    logger.warning("Running fast ping for {} failed with error code {}: {}".format(group, exit_code, output))
             finally:
                 self.unlock(group, "group")
 
@@ -401,17 +404,17 @@ class ServicesQueueManager(TimedQueueManager):
             for device in devices:
                 self.post_work(device[0], device[1])
         except pymysql.err.Error as e:
-            critical("DB Exception ({})".format(e))
+            logger.critical("DB Exception ({})".format(e))
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.services.frequency):
-            info("Checking services on device {}".format(device_id))
+            logger.info("Checking services on device {}".format(device_id))
             exit_code, output = LibreNMS.call_script("check-services.php", ("-h", device_id))
             if exit_code == 0:
                 self.unlock(device_id)
             else:
                 if exit_code == 5:
-                    info(
+                    logger.info(
                         "Device {} is down, cannot poll service, waiting {}s for retry".format(
                             device_id, self.config.down_retry
                         )
@@ -420,7 +423,7 @@ class ServicesQueueManager(TimedQueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
-                    warning(
+                    logger.warning(
                         "Unknown error while checking services on device {} with exit code {}: {}".format(
                             device_id, exit_code, output
                         )
@@ -443,11 +446,11 @@ class AlertQueueManager(TimedQueueManager):
         self.post_work("alerts", 0)
 
     def do_work(self, device_id, group):
-        info("Checking alerts")
+        logger.info("Checking alerts")
         exit_code, output = LibreNMS.call_script("alerts.php")
         if exit_code != 0:
             if exit_code == 1:
-                warning("There was an error issuing alerts: {}".format(output))
+                logger.warning("There was an error issuing alerts: {}".format(output))
             else:
                 raise CalledProcessError
 
@@ -464,15 +467,14 @@ class PollerQueueManager(QueueManager):
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.poller.frequency):
-            info("Polling device {}".format(device_id))
+            logger.info("Polling device {}".format(device_id))
 
-            try:
-                exit_code, output = LibreNMS.call_script("poller.php", ("-h", device_id))
+            exit_code, output = LibreNMS.call_script("poller.php", ("-h", device_id))
             if exit_code == 0:
                 self.unlock(device_id)
             else:
                 if exit_code == 6:
-                    warning(
+                    logger.warning(
                         "Polling device {} unreachable, waiting {}s for retry".format(
                             device_id, self.config.down_retry
                         )
@@ -482,10 +484,10 @@ class PollerQueueManager(QueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
-                    error("Polling device {} failed with exit code {}: {}".format(device_id, exit_code, output))
+                    logger.error("Polling device {} failed with exit code {}: {}".format(device_id, exit_code, output))
                     self.unlock(device_id)
         else:
-            debug("Tried to poll {}, but it is locked".format(device_id))
+            logger.debug("Tried to poll {}, but it is locked".format(device_id))
 
 
 class DiscoveryQueueManager(TimedQueueManager):
@@ -507,19 +509,19 @@ class DiscoveryQueueManager(TimedQueueManager):
             for device in devices:
                 self.post_work(device[0], device[1])
         except pymysql.err.Error as e:
-            critical("DB Exception ({})".format(e))
+            logger.critical("DB Exception ({})".format(e))
 
     def do_work(self, device_id, group):
         if self.lock(
             device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)
         ):
-            info("Discovering device {}".format(device_id))
+            logger.info("Discovering device {}".format(device_id))
             exit_code, output = LibreNMS.call_script("discovery.php", ("-h", device_id))
             if exit_code == 0:
                 self.unlock(device_id)
             else:
                 if exit_code == 5:
-                    info(
+                    logger.info(
                         "Device {} is down, cannot discover, waiting {}s for retry".format(
                             device_id, self.config.down_retry
                         )
@@ -528,6 +530,6 @@ class DiscoveryQueueManager(TimedQueueManager):
                         device_id, allow_relock=True, timeout=self.config.down_retry
                     )
                 else:
-                    error("Discovering device {} failed with exit code {}: {}".format(device_id, exit_code, output))
+                    logger.error("Discovering device {} failed with exit code {}: {}".format(device_id, exit_code, output))
                     self.unlock(device_id)
 
