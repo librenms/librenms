@@ -57,7 +57,11 @@ def logger_get_file_handler(log_file):
     err_output = None
     try:
         file_handler = RotatingFileHandler(
-            log_file, mode="a", encoding="utf-8", maxBytes=MAX_LOGFILE_SIZE, backupCount=3
+            log_file,
+            mode="a",
+            encoding="utf-8",
+            maxBytes=MAX_LOGFILE_SIZE,
+            backupCount=3,
         )
     except OSError as exc:
         try:
