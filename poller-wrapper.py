@@ -4,7 +4,7 @@ This is a Bootstrap script for wrapper.py, in order to retain compatibility with
 """
 
 import os
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import LibreNMS
 import LibreNMS.wrapper as wrapper
@@ -14,29 +14,33 @@ DEFAULT_WORKERS = 16
 
 """
     Take the amount of threads we want to run in parallel from the commandline
-    if None are given or the argument was garbage, fall back to default of 1
+    if None are given or the argument was garbage, fall back to default
 """
-usage = "usage: %prog [options] <workers> (Default: 1 Do not set too high)"
+usage = "usage: %(prog)s [options] <amount_of_workers> (Default: {}"  \
+        "(Do not set too high, or you will get an OOM)".format(DEFAULT_WORKERS)
 description = "Spawn multiple discovery.php processes in parallel."
-parser = OptionParser(usage=usage, description=description)
-parser.add_option(
+parser = ArgumentParser(usage=usage, description=description)
+parser.add_argument(
+    dest="amount_of_workers",
+    default=DEFAULT_WORKERS
+)
+parser.add_argument(
     "-d",
     "--debug",
+    dest="debug",
     action="store_true",
     default=False,
     help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
 )
-(options, args) = parser.parse_args()
-
-debug = options.debug
+args = parser.parse_args()
 
 config = LibreNMS.get_config_data(os.path.dirname(os.path.realpath(__file__)))
 log_dir = config["log_dir"]
 log_file = os.path.join(log_dir, WRAPPER_TYPE + ".log")
-logger = LibreNMS.logger_get_logger(log_file, debug=debug)
+logger = LibreNMS.logger_get_logger(log_file, debug=args.debug)
 
 try:
-    amount_of_workers = int(args[0])
+    amount_of_workers = int(args.amount_of_workers)
 except (IndexError, ValueError):
     amount_of_workers = DEFAULT_WORKERS
     logger.warning(
@@ -50,5 +54,5 @@ wrapper.wrapper(
     amount_of_workers=amount_of_workers,
     config=config,
     log_dir=log_dir,
-    _debug=debug,
+    _debug=args.debug,
 )
