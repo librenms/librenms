@@ -194,7 +194,9 @@ def call_script(script, args=()):
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     debug("Running {}".format(cmd))
     # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
-    return command_runner(cmd, preexec_fn=os.setsid, close_fds=True, timeout=DEFAULT_SCRIPT_TIMEOUT)
+    return command_runner(
+        cmd, preexec_fn=os.setsid, close_fds=True, timeout=DEFAULT_SCRIPT_TIMEOUT
+    )
 
 
 class DB:
@@ -311,7 +313,7 @@ class RecurringTimer:
 
 
 class Lock:
-    """ Base lock class this is not thread safe"""
+    """Base lock class this is not thread safe"""
 
     def __init__(self):
         self._locks = {}  # store a tuple (owner, expiration)

@@ -282,13 +282,14 @@ class DBConfig:
     """
     Bare minimal config class for service.DB usage
     """
+
     def __init__(self, _config):
         self.db_socket = _config["db_socket"]
-        self.db_host = _config["db_host"],
-        self.db_port = int(_config["db_port"]),
-        self.db_user = _config["db_user"],
-        self.db_pass = _config["db_pass"],
-        self.db_name = _config["db_name"],
+        self.db_host = (_config["db_host"],)
+        self.db_port = (int(_config["db_port"]),)
+        self.db_user = (_config["db_user"],)
+        self.db_pass = (_config["db_pass"],)
+        self.db_name = (_config["db_name"],)
 
 
 def wrapper(
@@ -598,7 +599,9 @@ if __name__ == "__main__":
         parser.error("Invalid wrapper type '{}'".format(wrapper_type))
         sys.exit(4)
 
-    config = LibreNMS.get_config_data(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    config = LibreNMS.get_config_data(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    )
     log_dir = config["log_dir"]
     log_file = os.path.join(log_dir, wrapper_type + ".log")
     logger = LibreNMS.logger_get_logger(log_file, debug=debug)
