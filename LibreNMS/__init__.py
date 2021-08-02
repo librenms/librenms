@@ -30,6 +30,7 @@ DEFAULT_SCRIPT_TIMEOUT = 3600
 logger = logging.getLogger(__name__)
 
 # Logging functions ########################################################
+# Original logger functions from ofunctions.logger_utils package
 
 FORMATTER = logging.Formatter("%(asctime)s :: %(levelname)s :: %(message)s")
 
