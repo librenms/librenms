@@ -1,5 +1,4 @@
 import os
-import subprocess
 import threading
 import timeit
 from collections import deque
@@ -9,6 +8,7 @@ from math import ceil
 from queue import Queue
 from time import time
 
+from .command_runner import command_runner
 from .service import Service, ServiceConfig
 from .queuemanager import (
     QueueManager,
@@ -20,6 +20,9 @@ from .queuemanager import (
     PollerQueueManager,
     DiscoveryQueueManager,
 )
+
+# Hard limit script execution time so we don't get to "hang"
+DEFAULT_SCRIPT_TIMEOUT = 3600
 
 
 def normalize_wait(seconds):
@@ -44,13 +47,7 @@ def call_script(script, args=()):
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     debug("Running {}".format(cmd))
     # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
-    return subprocess.check_call(
-        cmd,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-        preexec_fn=os.setsid,
-        close_fds=True,
-    )
+    return command_runner(cmd, preexec_fn=os.setsid, close_fds=True, timeout=DEFAULT_SCRIPT_TIMEOUT)
 
 
 class DB:

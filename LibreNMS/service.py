@@ -599,14 +599,11 @@ class Service:
             sleep(wait)
 
         info("Running maintenance tasks")
-        try:
-            output = LibreNMS.call_script("daily.sh")
+        exit_code, output = LibreNMS.call_script("daily.sh")
+        if exit_code == 0:
             info("Maintenance tasks complete\n{}".format(output))
-        except subprocess.CalledProcessError as e:
-            error(
-                "Error in daily.sh:\n"
-                + (e.output.decode() if e.output is not None else "No output")
-            )
+        else:
+            error("Error {} in daily.sh:\n{}".format(exit_code, output))
 
         self._lm.unlock("schema-update", self.config.unique_name)
 
