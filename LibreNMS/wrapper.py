@@ -264,13 +264,13 @@ def poll_worker(
                     wrappers[wrapper_type]["executable"], device_id
                 )
                 if debug:
-                    command = command + ' -d'
+                    command = command + " -d"
                 exit_code, output = command_runner(
                     command, shell=True, timeout=PER_DEVICE_TIMEOUT
                 )
                 logger.debug(output)
                 if debug:
-                    with open(device_log, 'w', encoding='utf-8') as dev_log_file:
+                    with open(device_log, "w", encoding="utf-8") as dev_log_file:
                         dev_log_file.write(output)
 
                 elapsed_time = int(time.time() - start_time)
@@ -280,8 +280,8 @@ def poll_worker(
             except (KeyboardInterrupt, SystemExit):
                 raise
             except Exception:
-                logger.error('Unknown problem happened: ')
-                logger.error('Traceback:', exc_info=True)
+                logger.error("Unknown problem happened: ")
+                logger.error("Traceback:", exc_info=True)
         poll_queue.task_done()
 
 
@@ -415,9 +415,7 @@ def wrapper(
         if poller_group is not False:
             query = (
                 "SELECT device_id FROM devices WHERE poller_group IN ({}) AND "
-                "disabled = 0 ORDER BY last_polled_timetaken DESC".format(
-                    poller_group
-                )
+                "disabled = 0 ORDER BY last_polled_timetaken DESC".format(poller_group)
             )
         else:
             query = "SELECT device_id FROM devices WHERE disabled = 0 ORDER BY last_polled_timetaken DESC"

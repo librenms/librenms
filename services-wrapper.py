@@ -16,14 +16,13 @@ DEFAULT_WORKERS = 1
     Take the amount of threads we want to run in parallel from the commandline
     if None are given or the argument was garbage, fall back to default
 """
-usage = "usage: %(prog)s [options] <amount_of_workers> (Default: {}"  \
-        "(Do not set too high, or you will get an OOM)".format(DEFAULT_WORKERS)
+usage = (
+    "usage: %(prog)s [options] <amount_of_workers> (Default: {}"
+    "(Do not set too high, or you will get an OOM)".format(DEFAULT_WORKERS)
+)
 description = "Spawn multiple discovery.php processes in parallel."
 parser = ArgumentParser(usage=usage, description=description)
-parser.add_argument(
-    dest="amount_of_workers",
-    default=DEFAULT_WORKERS
-)
+parser.add_argument(dest="amount_of_workers", default=DEFAULT_WORKERS)
 parser.add_argument(
     "-d",
     "--debug",
