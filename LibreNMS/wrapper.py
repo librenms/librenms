@@ -280,7 +280,7 @@ def poll_worker(
 
 class DBConfig:
     """
-    Bare minimal config class for service.DB usage
+    Bare minimal config class for LibreNMS.service.DB class usage
     """
 
     def __init__(self, _config):
@@ -383,7 +383,7 @@ def wrapper(
 
     devices_list = []
 
-    if wrapper_type == "services":
+    if wrapper_type == "service":
         #  <<<EOC
         if poller_group is not False:
             query = (
@@ -416,6 +416,7 @@ def wrapper(
             query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
         # EOC
     else:
+        logger.critical("Bogus wrapper type called")
         sys.exit(3)
 
     sconfig = DBConfig(config)
