@@ -285,11 +285,11 @@ class DBConfig:
 
     def __init__(self, _config):
         self.db_socket = _config["db_socket"]
-        self.db_host = (_config["db_host"],)
-        self.db_port = (int(_config["db_port"]),)
-        self.db_user = (_config["db_user"],)
-        self.db_pass = (_config["db_pass"],)
-        self.db_name = (_config["db_name"],)
+        self.db_host = _config["db_host"]
+        self.db_port = int(_config["db_port"])
+        self.db_user = _config["db_user"]
+        self.db_pass = _config["db_pass"]
+        self.db_name = _config["db_name"]
 
 
 def wrapper(
