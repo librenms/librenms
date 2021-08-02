@@ -216,6 +216,7 @@ def poll_worker(
     config,  # Type: dict
     log_dir,  # Type: str
     wrapper_type,  # Type: str
+    debug,  # Type: bool
 ):
     """
     This function will fork off single instances of the php process, record
@@ -259,22 +260,28 @@ def poll_worker(
                 device_log = os.path.join(
                     log_dir, "services_device_{}.log".format(device_id)
                 )
-                command = "/usr/bin/env php {} -h {} {}".format(
-                    wrappers[wrapper_type]["executable"], device_id, device_log
+                command = "/usr/bin/env php {} -h {}".format(
+                    wrappers[wrapper_type]["executable"], device_id
                 )
+                if debug:
+                    command = command + ' -d'
                 exit_code, output = command_runner(
                     command, shell=True, timeout=PER_DEVICE_TIMEOUT
                 )
-                # logger.debug(output, exit_code)  # TODO Check why this may fail with
-                # TypeError: not all arguments converted during string formatting
+                logger.debug(output)
+                if debug:
+                    with open(device_log, 'r', encoding='utf-8') as dev_log_file:
+                        dev_log_file.write(output)
+
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put(
                     [threading.current_thread().name, device_id, elapsed_time]
                 )
             except (KeyboardInterrupt, SystemExit):
                 raise
-            except:
-                pass
+            except Exception:
+                logger.error('Unknown problem happened: ')
+                logger.error('Traceback:', exc_info=True)
         poll_queue.task_done()
 
 
@@ -461,6 +468,7 @@ def wrapper(
                 "config": config,
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
+                "debug": _debug,
             },
         )
         worker.setDaemon(True)
