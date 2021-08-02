@@ -133,7 +133,7 @@ def check_for_file(file):
         with open(file) as file:
             pass
     except IOError as exc:
-        logger.error("Oh dear... %s does not seem readable: " % (file, exc))
+        logger.error("File '%s' is not readable" % file)
         logger.debug("Traceback:", exc_info=True)
         sys.exit(2)
 
