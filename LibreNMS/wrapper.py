@@ -50,9 +50,9 @@ import time
 import uuid
 from argparse import ArgumentParser
 
-import LibreNMS.library as lnms
+import LibreNMS
 from LibreNMS.command_runner import command_runner
-from LibreNMS import DB
+
 
 logger = logging.getLogger(__name__)
 
@@ -418,7 +418,7 @@ def wrapper(
         sys.exit(3)
 
     sconfig = DBConfig(config)
-    db_connection = DB(sconfig)
+    db_connection = LibreNMS.DB(sconfig)
     cursor = db_connection.query(query)
     devices = cursor.fetchall()
     for row in devices:
@@ -598,10 +598,10 @@ if __name__ == "__main__":
         parser.error("Invalid wrapper type '{}'".format(wrapper_type))
         sys.exit(4)
 
-    config = lnms.get_config_data(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    config = LibreNMS.get_config_data(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     log_dir = config["log_dir"]
     log_file = os.path.join(log_dir, wrapper_type + ".log")
-    logger = lnms.logger_get_logger(log_file, debug=debug)
+    logger = LibreNMS.logger_get_logger(log_file, debug=debug)
 
     try:
         amount_of_workers = int(amount_of_workers)

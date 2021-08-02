@@ -6,7 +6,7 @@ This is a Bootstrap script for wrapper.py, in order to retain compatibility with
 import os
 from optparse import OptionParser
 
-import LibreNMS.library as lnms
+import LibreNMS
 import LibreNMS.wrapper as wrapper
 
 WRAPPER_TYPE = "service"
@@ -30,10 +30,10 @@ parser.add_option(
 
 debug = options.debug
 
-config = wrapper.get_config(os.path.dirname(os.path.realpath(__file__)))
+config = LibreNMS.get_config_data(os.path.dirname(os.path.realpath(__file__)))
 log_dir = config["log_dir"]
 log_file = os.path.join(log_dir, WRAPPER_TYPE + ".log")
-logger = lnms.logger_get_logger(log_file, debug=debug)
+logger = LibreNMS.logger_get_logger(log_file, debug=debug)
 
 try:
     amount_of_workers = int(args[0])
