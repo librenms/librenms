@@ -1,7 +1,7 @@
 os: ifotec
 text: 'Ifotec'
 type: network
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

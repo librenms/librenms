@@ -5,7 +5,7 @@ icon: hwg
 mib_dir: hwg
 over:
     - { graph: device_state, text: States }
-nobulk: true
+snmp_bulk: false
 poller_modules:
     stp: false
     ucd-mib: false

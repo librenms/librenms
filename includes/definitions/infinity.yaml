@@ -2,7 +2,7 @@ os: infinity
 text: 'LigoWave Infinity'
 type: wireless
 icon: ligowave
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
