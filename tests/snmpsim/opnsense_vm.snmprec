@@ -1,4 +1,4 @@
-1.3.6.1.2.1.1.1.0|4|FreeBSD mwfw1.mpi-hd.mpg.de 12.1-RELEASE-p19-HBSD FreeBSD 12.1-RELEASE-p19-HBSD #0  0c59842367b(stable/21.1)-dirty: Mon Jul  5 15:08:43 CEST 2021     root@sensey:/usr/obj/usr/src/amd64.amd64/sys/SMP amd64
+1.3.6.1.2.1.1.1.0|4|FreeBSD <hostname> 12.1-RELEASE-p19-HBSD FreeBSD 12.1-RELEASE-p19-HBSD #0  0c59842367b(stable/21.1)-dirty: Mon Jul  5 15:08:43 CEST 2021     root@sensey:/usr/obj/usr/src/amd64.amd64/sys/SMP amd64
 1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.8
 1.3.6.1.2.1.1.3.0|67|13572694
 1.3.6.1.2.1.1.4.0|4|<private>

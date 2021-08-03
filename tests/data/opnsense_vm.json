@@ -5,7 +5,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.8",
-                    "sysDescr": "FreeBSD mwfw1.mpi-hd.mpg.de 12.1-RELEASE-p19-HBSD FreeBSD 12.1-RELEASE-p19-HBSD #0  0c59842367b(stable/21.1)-dirty: Mon Jul  5 15:08:43 CEST 2021     root@sensey:/usr/obj/usr/src/amd64.amd64/sys/SMP amd64",
+                    "sysDescr": "FreeBSD <hostname> 12.1-RELEASE-p19-HBSD FreeBSD 12.1-RELEASE-p19-HBSD #0  0c59842367b(stable/21.1)-dirty: Mon Jul  5 15:08:43 CEST 2021     root@sensey:/usr/obj/usr/src/amd64.amd64/sys/SMP amd64",
                     "sysContact": "<private>",
                     "version": "12.1-RELEASE-p19-HBSD",
                     "hardware": "amd64",
