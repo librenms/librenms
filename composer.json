@@ -15,11 +15,17 @@
     "license": "GPL-3.0-or-later",
     "support": {
         "source": "https://github.com/librenms/librenms/",
-        "docs": "http://docs.librenms.org/",
+        "docs": "https://docs.librenms.org/",
         "forum": "https://community.librenms.org/",
         "issues": "https://github.com/librenms/librenms/issues/",
         "chat": "https://discord.gg/librenms"
     },
+    "funding": [
+        {
+            "type": "opencollective",
+            "url": "https://opencollective.com/librenms"
+        }
+    ],
     "require": {
         "php": "^7.3|^8.0",
         "ext-curl": "*",
