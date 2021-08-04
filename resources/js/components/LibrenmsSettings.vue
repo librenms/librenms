@@ -38,7 +38,13 @@
         </tab>
         <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab" :text="$t('settings.groups.' + group)">
             <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
-                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item)" :active="item === section">
+                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item + '.name')" :active="item === section">
+
+                    <template v-if="$te('settings.sections.' + group + '.' + item + '.description')">
+                      <h5>{{ $t('settings.sections.' + group + '.' + item + '.description') }}</h5>
+                      <hr/>
+                    </template>
+
                     <form class="form-horizontal" @submit.prevent>
                         <librenms-setting
                             v-for="setting in items"
@@ -118,8 +124,8 @@
 
                 return this.checkLogic(setting.when);
             },
-            translatedCompare(prefix, a, b) {
-                return this.$t(prefix + a).localeCompare(this.$t(prefix + b))
+            translatedCompare(prefix, a, b, suffix) {
+                return this.$t(prefix + a + suffix).localeCompare(this.$t(prefix + b + suffix))
             },
             checkLogic(logic) {
                 switch (logic.operator) {
@@ -173,7 +179,7 @@
                 let sorted = {};
                 Object.keys(groups).sort((a, b) => this.translatedCompare('settings.groups.', a, b)).forEach(group_key => {
                     sorted[group_key] = {};
-                    Object.keys(groups[group_key]).sort((a, b) => this.translatedCompare('settings.sections.' + group_key + '.', a , b)).forEach(section_key => {
+                    Object.keys(groups[group_key]).sort((a, b) => this.translatedCompare('settings.sections.' + group_key + '.', a , b, '.name')).forEach(section_key => {
                         sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
                     });
                 });
