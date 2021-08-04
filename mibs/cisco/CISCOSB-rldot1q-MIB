@@ -1,0 +1,197 @@
+CISCOSB-rldot1q-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Switch Interfaces Private
+-- Version:    7.47
+-- Date:       25 Nov 2008
+
+IMPORTS
+      ifIndex                                            FROM IF-MIB
+      Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, Integer32           FROM SNMPv2-SMI
+      RowStatus, TruthValue, TEXTUAL-CONVENTION          FROM SNMPv2-TC
+      PortList, dot1qStaticUnicastEntry, dot1qTpFdbEntry FROM Q-BRIDGE-MIB
+    switch001                                            FROM CISCOSB-MIB
+	rlpBridgeMIBObjects                                  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
+
+
+rlq-bridge-mib MODULE-IDENTITY
+      LAST-UPDATED "200811250000Z"
+	  ORGANIZATION "Cisco Systems, Inc."
+
+	  CONTACT-INFO
+	  "Postal: 170 West Tasman Drive
+	  San Jose , CA 95134-1706
+	  USA
+
+	  
+	  Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+      DESCRIPTION
+          "The private MIB module definition for dot1q MIBs."
+      ::= { rlpBridgeMIBObjects 8 }
+
+rldot1q OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 8 }
+
+-- -------------------------------------------------------------
+-- dot1qStaticUnicastTable Augmentation
+-- -------------------------------------------------------------
+
+
+rldot1qStaticUnicastTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Rldot1qStaticUnicastEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An augmentation to dot1qStaticUnicastTable"
+        ::= { rldot1q 1 }
+
+
+rldot1qStaticUnicastEntry OBJECT-TYPE
+    SYNTAX      Rldot1qStaticUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An augmentation to dot1qStaticUnicastEntry"
+    AUGMENTS     {dot1qStaticUnicastEntry}
+    ::= { rldot1qStaticUnicastTable 1 }
+
+
+Rldot1qStaticUnicastEntry ::=
+        SEQUENCE {
+                rldot1qStaticUnicastAddressOwner INTEGER
+        }
+
+rldot1qStaticUnicastAddressOwner OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    static(1),
+                    learned(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The learned status of this entry:
+            static(1) - address has added by user.
+            learned(2)- address has added by device."
+    DEFVAL  { static }
+    ::= { rldot1qStaticUnicastEntry 1 }
+
+-- -------------------------------------------------------------
+-- dot1qTpFdbTable Augmentation
+-- -------------------------------------------------------------
+
+
+rldot1qTpFdbTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Rldot1qTpFdbEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An augmentation to dot1qTpFdbTable"
+        ::= { rldot1q 2 }
+
+rldot1qTpFdbEntry OBJECT-TYPE
+    SYNTAX      Rldot1qTpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An augmentation to dot1qTpFdbEntry"
+    AUGMENTS     {dot1qTpFdbEntry}
+    ::= { rldot1qTpFdbTable 1 }
+
+
+Rldot1qTpFdbEntry ::=
+        SEQUENCE {
+            rldot1qTpFdbSubStatus INTEGER
+        }
+
+rldot1qTpFdbSubStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    dynamic-static(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sub status of this entry.  The meanings of the values
+        are:
+            none(1) -
+                non of the following.
+            dynamic-static(2) -
+                the value of the corresponding instance of dot1qTpFdbPort was
+                learned dynamically in SW but kept as static address in HW."
+    ::= { rldot1qTpFdbEntry 1 }
+
+-- -------------------------------------------------------------
+-- rldot1qTpFdbCountTable
+-- -------------------------------------------------------------
+
+rldot1qTpFdbCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1qTpFdbCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Counters for FDB table. Per VLAN, port and type."   
+    ::= { rldot1q 3 }
+    
+rldot1qTpFdbCountEntry OBJECT-TYPE
+    SYNTAX      Rldot1qTpFdbCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Count the number of MAC address for a specific VLAN, port and type."
+    INDEX   { rldot1qTpFdbCountVlanTag, rldot1qTpFdbCountPort, rldot1qTpFdbCountType }
+    ::= { rldot1qTpFdbCountTable 1 }
+    
+Rldot1qTpFdbCountEntry ::=
+    SEQUENCE {
+        rldot1qTpFdbCountVlanTag
+            INTEGER,
+        rldot1qTpFdbCountPort
+            Integer32,
+        rldot1qTpFdbCountType
+            INTEGER,
+        rldot1qTpFdbCountCount
+            INTEGER
+    }
+    
+rldot1qTpFdbCountVlanTag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Vlan Tag. Zero means all vlans"
+    ::= { rldot1qTpFdbCountEntry  1 }
+    
+rldot1qTpFdbCountPort OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Port. Zero means all ports"
+    ::= { rldot1qTpFdbCountEntry 2 }
+    
+rldot1qTpFdbCountType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1), -- secured
+                    invalid(2),
+                    learned(3),  --dynamic
+                    self(4), --self
+                    mgmt(5), --static
+					multicast(6),
+					ipv4Host(7),
+					ipv6Host(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of the address:
+            TODO
+        "            
+    ::= { rldot1qTpFdbCountEntry 3 }
+    
+rldot1qTpFdbCountCount OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of address per selected vlan, port and type."
+    ::= { rldot1qTpFdbCountEntry 4 }
+    
+END
