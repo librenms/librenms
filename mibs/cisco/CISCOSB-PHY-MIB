@@ -63,7 +63,8 @@ RlPhyTestType ::= TEXTUAL-CONVENTION
         rlPhyTestTableCablePairSkew1(21),
         rlPhyTestTableCablePairSkew2(22),
         rlPhyTestTableCablePairSkew3(23),
-        rlPhyTestTableCablePairSkew4(24)
+        rlPhyTestTableCablePairSkew4(24),
+        rlPhyTestTableSFPEepromQualified(25)
     }
 
 rlPhyTest OBJECT IDENTIFIER ::= { rlPhy 1 }
