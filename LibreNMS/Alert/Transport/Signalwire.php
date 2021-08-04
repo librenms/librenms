@@ -6,6 +6,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
 */
+
 /**
  * SignalWire API Transport
  * @author Igor Kuznetsov <igor@oczmail.com>
@@ -41,7 +42,7 @@ class Signalwire extends Transport
             'sender' => $opts['sender'],
         ];
 
-        $url = 'https://'.$params['spaceUrl'].'.signalwire.com/api/laml/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
+        $url = 'https://' . $params['spaceUrl'] . '.signalwire.com/api/laml/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
 
         $data = [
             'From' => $params['sender'],
@@ -104,9 +105,9 @@ class Signalwire extends Transport
                 ],
             ],
             'validation' => [
-                'signalwire-spaceUrl'    => 'required|string',
-                'signalwire-project-id'    => 'required|string',
-                'signalwire-token'    => 'required|string',
+                'signalwire-spaceUrl' => 'required|string',
+                'signalwire-project-id' => 'required|string',
+                'signalwire-token' => 'required|string',
                 'signalwire-to' => 'required',
                 'signalwire-sender' => 'required',
             ],
