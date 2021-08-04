@@ -1,0 +1,106 @@
+-- =====================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is intended for the management of Fibre Channel (FC)
+--      Name Server.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Initial version
+--        created by qiaoxinghua 2014-03-03
+-- =====================================================================
+HH3C-FC-NAME-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cSan, hh3cVsanIndex
+        FROM HH3C-VSAN-MIB
+    Hh3cFcNameId
+        FROM HH3C-FC-TC-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+hh3cFcNameServer MODULE-IDENTITY
+    LAST-UPDATED "201403031018Z"    -- March 03, 2014 at 10:18 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB module is intended for the management of Fibre Channel (FC)
+         Name Server."
+    REVISION "201403031018Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cSan 10 }
+
+-- Node definitions
+hh3cFcNameServerMibObjects OBJECT IDENTIFIER ::= { hh3cFcNameServer 1 }
+
+-- FC Name Server Notifications
+hh3cFcNsNotification OBJECT IDENTIFIER ::= { hh3cFcNameServerMibObjects 1 }
+
+hh3cFcNsNotificationPrefix   OBJECT IDENTIFIER ::= { hh3cFcNsNotification 0 }
+hh3cFcNsNotificationSwitch   OBJECT IDENTIFIER ::= { hh3cFcNsNotification 1 }
+hh3cFcNsObjsForNotification  OBJECT IDENTIFIER ::= { hh3cFcNsNotification 2 }
+
+hh3cFcNsPortLoginNotify NOTIFICATION-TYPE
+    OBJECTS    { hh3cVsanIndex,
+                 hh3cFcNsLocalSwitchWWN,
+                 hh3cFcNsFloginPortWWN }
+    STATUS     current
+    DESCRIPTION
+    "This notification will be generated when an entry is added to the
+     Name Server database by Nx_Port locally logging in."
+    ::= { hh3cFcNsNotificationPrefix 1 }
+
+hh3cFcNsPortLogoutNotify NOTIFICATION-TYPE
+    OBJECTS    { hh3cVsanIndex,
+                 hh3cFcNsLocalSwitchWWN,
+                 hh3cFcNsFloginPortWWN }
+    STATUS     current
+    DESCRIPTION
+    "This notification will be generated when an entry is deleted from
+     the Name Server database by Nx_Port locally logging out."
+    ::= { hh3cFcNsNotificationPrefix 2 }
+
+hh3cFcNsPortLoginNotifyEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+    "This object is used to determine whether hh3cFcNsPortLoginNotify
+     will be generated for Nx_Port locally logging in."
+    ::= { hh3cFcNsNotificationSwitch 1 }
+
+hh3cFcNsPortLogoutNotifyEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+    "This object is used to determine whether hh3cFcNsPortLogoutNotify
+     will be generated for Nx_Port locally logging out."
+    ::= { hh3cFcNsNotificationSwitch 2 }
+
+hh3cFcNsLocalSwitchWWN OBJECT-TYPE
+    SYNTAX     Hh3cFcNameId
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The world wide name of the local switch."
+    ::= { hh3cFcNsObjsForNotification 1 }
+
+hh3cFcNsFloginPortWWN OBJECT-TYPE
+    SYNTAX     Hh3cFcNameId
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The world wide name of the local logged-in Nx_Port."
+    ::= { hh3cFcNsObjsForNotification 2 }
+
+END

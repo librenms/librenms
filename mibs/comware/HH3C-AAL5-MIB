@@ -1,0 +1,195 @@
+-- =============================================================
+-- Copyright (C) 2008 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes the MIB implementation of ATM
+-- Reference:  extension of RFC 1695
+-- Version: V1.1
+-- History:
+--   V1.0 Initial Version  by lizhiyong
+--   V1.1 Add node hh3cAal5VccState and Trap hh3cAal5VccStateChange
+-- =============================================================
+HH3C-AAL5-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        NOTIFICATION-TYPE,
+        Counter32
+    FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+        ifIndex
+    FROM RFC1213-MIB
+        hh3cAAL5
+    FROM HH3C-OID-MIB;
+
+hh3cAAL5MIB  MODULE-IDENTITY
+    LAST-UPDATED    "200411041350Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "PLAT Team New H3C Technologies Co.,Ltd.
+        Shang-Di Information Industry Base,
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB file provides AAL5 specific information
+        that are excluded by RFC 1695 "
+    REVISION        "200411041350Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cAAL5 1 }
+
+
+hh3cAal5MIBObjects OBJECT IDENTIFIER ::= { hh3cAAL5MIB 1 }
+hh3cAal5MIBTraps OBJECT IDENTIFIER ::= { hh3cAAL5MIB 0 }
+
+hh3cAal5VccTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HH3CAal5VccEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table extends AAL5 VCC performance
+         parameters which definded in aal5VccEntry of RFC1695."
+    ::= { hh3cAal5MIBObjects 1 }
+
+hh3cAal5VccEntry OBJECT-TYPE
+    SYNTAX         HH3CAal5VccEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This list contains the additional AAL5 VCC performance
+         parameters which are not definded in aal5VccEntry
+         of RFC1695."
+    INDEX { ifIndex, hh3cAal5VccVpi, hh3cAal5VccVci }
+    ::= { hh3cAal5VccTable 1 }
+
+HH3CAal5VccEntry ::= SEQUENCE  {
+    hh3cAal5VccVpi        Integer32,
+    hh3cAal5VccVci        Integer32,
+    hh3cAal5VccInPkts     Counter32,
+    hh3cAal5VccOutPkts    Counter32,
+    hh3cAal5VccInOctets   Counter32,
+    hh3cAal5VccOutOctets  Counter32,
+    hh3cAal5VccState      INTEGER
+    }
+
+hh3cAal5VccVpi              OBJECT-TYPE
+    SYNTAX         Integer32  (0..4095)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "The VPI value of the AAL5 VCC."
+    ::= { hh3cAal5VccEntry 1 }
+
+hh3cAal5VccVci             OBJECT-TYPE
+    SYNTAX         Integer32  (0..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "The VCI value of the AAL5 VCC."
+    ::= { hh3cAal5VccEntry 2 }
+
+hh3cAal5VccInPkts          OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of AAL5 CPCS PDUs received."
+    ::= { hh3cAal5VccEntry 3 }
+
+hh3cAal5VccOutPkts        OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of AAL5 CPCS PDUs transmitted."
+    ::= { hh3cAal5VccEntry 4 }
+
+hh3cAal5VccInOctets       OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of AAL5 CPCS PDU octets received."
+    ::= { hh3cAal5VccEntry 5 }
+
+hh3cAal5VccOutOctets     OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of AAL5 CPCS PDU octets transmitted."
+    ::= { hh3cAal5VccEntry 6 }
+
+hh3cAal5VccState OBJECT-TYPE
+    SYNTAX   INTEGER    {
+                invalid (1),
+                active (2),
+                inactive (3)
+            }
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Indicates whether the particular virtual circuit is
+        operational. 'Active' indicates the particular virtual
+        circuit is operational.  'Inactive' indicates the circuit
+        is temporarily disabled.  'Invalid' indicates the circuit
+        is deleted"
+    DEFVAL { active }
+        ::= { hh3cAal5VccEntry 7 }
+
+hh3cAal5VccStateChange   NOTIFICATION-TYPE
+    OBJECTS  { hh3cAal5VccState }
+    STATUS          current
+    DESCRIPTION
+        "The status of AAL5 VCC."
+    ::= { hh3cAal5MIBTraps 1 }
+
+
+-- Conformance Information
+
+hh3cAal5MIBConformance OBJECT IDENTIFIER ::= { hh3cAAL5MIB 3 }
+hh3cAal5MIBCompliances OBJECT IDENTIFIER ::= { hh3cAal5MIBConformance 1 }
+hh3cAal5MIBGroups      OBJECT IDENTIFIER ::= { hh3cAal5MIBConformance 2 }
+
+-- Compliance Statement
+hh3cAal5MIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hh3cAal5MIBGroup }
+    GROUP       hh3cAal5NotificationGroup
+    DESCRIPTION
+        "This optional group defines the asynchronous
+        notifications generated by ATM Systems."
+    ::= { hh3cAal5MIBCompliances 1 }
+
+-- units of conformance:
+
+hh3cAal5MIBGroup OBJECT-GROUP
+    OBJECTS {
+        hh3cAal5VccInPkts,
+        hh3cAal5VccOutPkts,
+        hh3cAal5VccInOctets,
+        hh3cAal5VccOutOctets
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { hh3cAal5MIBGroups 1 }
+
+hh3cAal5NotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hh3cAal5VccStateChange }
+    STATUS  current
+    DESCRIPTION
+        "Traps which may be used to enhance event driven
+        management of the interface."
+    ::= { hh3cAal5MIBGroups 2 }
+
+END

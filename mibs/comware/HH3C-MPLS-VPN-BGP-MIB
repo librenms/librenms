@@ -1,0 +1,593 @@
+-- =============================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB module contains managed object definitions for
+--              Multi-Protocol Label Switching (MPLS)/
+--              Border Gateway Protocol (BGP) Virtual Private Networks (VPNs).
+-- Reference: This MIB was extracted from draft-ietf-mpls-arch-06.txt
+-- Version: V1.2
+-- History:
+--   V1.0 2014-12-03 Initial version Created by YifanZhou
+--   V1.1 2015-11-14 Modified description of hh3cMplsVpnVrfBgpPAtrIpAddrPrefix,
+--        hh3cMplsVpnVrfConfMaxRts, hh3cMplsVpnVrfBgpPAtrPeerType,
+--        hh3cMplsVpnVrfBgpPAtrAtomicAggregate by dairuiqiang.
+--   V1.2 2016-10-26 add hh3cMplsVpnVrfBgpNbrState in Hh3cMplsVpnVrfBgpNbrAddrEntry by xukele 11706
+-- =============================================================================
+HH3C-MPLS-VPN-BGP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32,IpAddress
+        FROM SNMPv2-SMI
+    InetAddressType
+        FROM INET-ADDRESS-MIB
+    TEXTUAL-CONVENTION, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cMplsVpnBgp MODULE-IDENTITY
+    LAST-UPDATED "201610262000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB contains managed object definitions for the
+         Multiprotocol Label Switching (MPLS)/Border Gateway
+         Protocol (BGP) Virtual Private Networks (VPNs) as
+         defined in : Rosen, E., Viswanathan, A., and R.
+         Callon, Multiprotocol Label Switching Architecture,
+         Internet Draft <draft-ietf-mpls-arch-06.txt>,
+         August 1999."
+    REVISION
+        "201610262000Z"
+    DESCRIPTION
+        "Add hh3cMplsVpnVrfBgpNbrState in Hh3cMplsVpnVrfBgpNbrAddrEntry."
+    REVISION
+        "201511142000Z"
+    DESCRIPTION
+        "Modified description of hh3cMplsVpnVrfBgpPAtrIpAddrPrefix,
+        hh3cMplsVpnVrfConfMaxRts, hh3cMplsVpnVrfBgpPAtrPeerType,
+        hh3cMplsVpnVrfBgpPAtrAtomicAggregate."
+    REVISION
+        "201412032000Z"  -- 03 Dec 2014 20:00:00 GMT
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { hh3cCommon 160 }
+
+-- Textual Conventions.
+
+Hh3cMplsVpnId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "31a"
+    STATUS       current
+    DESCRIPTION
+        "An identifier that is assigned to each MPLS/BGP VPN and
+         is used to uniquely identify it.  This is assigned by the
+         system operator or NMS and SHOULD be unique throughout
+         the MPLS domain.  If this is the case, then this identifier
+         can then be used at any LSR within a specific MPLS domain
+         to identify this MPLS/BGP VPN.  It may also be possible to
+         preserve the uniqueness of this identifier across MPLS
+         domain boundaries, in which case this identifier can then
+         be used to uniquely identify MPLS/BGP VPNs on a more global
+         basis."
+    REFERENCE
+        "RFC 2685 [VPN-RFC2685] Fox B., et al, 'Virtual Private
+         Networks Identifier', September 1999."
+    SYNTAX OCTET STRING(SIZE (0..31))
+
+Hh3cMplsVpnRtDistinguisher ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "256a"
+    STATUS       current
+    DESCRIPTION
+        "Syntax for a route distinguisher and route target."
+    SYNTAX  OCTET STRING(SIZE (0..256))
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+hh3cMplsVpnObjects OBJECT IDENTIFIER ::= { hh3cMplsVpnBgp 1 }
+hh3cMplsVpnConf    OBJECT IDENTIFIER ::= { hh3cMplsVpnObjects 1 }
+
+-- =============================================================================
+-- hh3cMplsVpnVrfConfTable Definition
+-- =============================================================================
+hh3cMplsVpnVrfConfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsVpnVrfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-interface MPLS/BGP VPN
+         VRF Table capability and associated information.
+         Entries in this table define VRF routing instances
+         associated with MPLS/VPN interfaces.  Note that
+         multiple interfaces can belong to the same VRF
+         instance.  The collection of all VRF instances
+         comprises an actual VPN."
+   ::= { hh3cMplsVpnConf 1 }
+
+hh3cMplsVpnVrfConfEntry OBJECT-TYPE
+    SYNTAX      Hh3cMplsVpnVrfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for
+         every VRF capable of supporting MPLS/BGP VPN.  The
+         indexing provides an ordering of VRFs per-VPN
+         interface."
+    INDEX {
+            hh3cMplsVpnVrfName
+          }
+    ::= { hh3cMplsVpnVrfConfTable 1 }
+
+Hh3cMplsVpnVrfConfEntry ::= SEQUENCE {
+    hh3cMplsVpnVrfName                   Hh3cMplsVpnId,
+    hh3cMplsVpnVrfRtDistinguisher        Hh3cMplsVpnRtDistinguisher,
+    hh3cMplsVpnVrfNetPrefixType          INTEGER,
+    hh3cMplsVpnVrfNetPrefix              IpAddress,
+    hh3cMplsVpnVrfIpRtRedistributeConn   TruthValue,
+    hh3cMplsVpnVrfIpRtRedistributeStatic TruthValue,
+    hh3cMplsVpnVrfIpRtRedistributeRip    TruthValue,
+    hh3cMplsVpnVrfConfHighRtThreshold    Unsigned32,
+    hh3cMplsVpnVrfConfIsWarnOnly         TruthValue,
+    hh3cMplsVpnVrfConfMaxRts             Unsigned32,
+    hh3cMplsVpnVrfConfRowStatus          RowStatus
+}
+
+hh3cMplsVpnVrfName OBJECT-TYPE
+    SYNTAX      Hh3cMplsVpnId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The human-readable name of this VPN.  This MAY
+         be equivalent to the RFC2685 VPN-ID."
+    REFERENCE
+        "RFC 2685 [VPN-RFC2685] Fox B., et al, `Virtual
+         Private Networks Identifier`, September 1999."
+    ::= { hh3cMplsVpnVrfConfEntry 1 }
+
+hh3cMplsVpnVrfRtDistinguisher OBJECT-TYPE
+    SYNTAX      Hh3cMplsVpnRtDistinguisher
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The route distinguisher for this VRF."
+    ::= { hh3cMplsVpnVrfConfEntry 2 }
+
+hh3cMplsVpnVrfNetPrefixType OBJECT-TYPE
+    SYNTAX      INTEGER { other(1),
+                          rip(2),
+                          ospf(3),
+                          isis(4),
+                          bgp(5),
+                          static(6)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes the type of the network prefix in use for the
+         PE-CE connections. "
+    ::= { hh3cMplsVpnVrfConfEntry 3 }
+
+hh3cMplsVpnVrfNetPrefix OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes the network prefix for the
+         PE-CE connections."
+   ::= { hh3cMplsVpnVrfConfEntry 4 }
+
+hh3cMplsVpnVrfIpRtRedistributeConn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Denotes the redistribution of directly connected
+         networks into the VRF BGP table."
+    ::= { hh3cMplsVpnVrfConfEntry 5 }
+
+hh3cMplsVpnVrfIpRtRedistributeStatic OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Denotes the redistribution of static routes
+         into the VRF BGP table."
+   ::= { hh3cMplsVpnVrfConfEntry 6 }
+
+hh3cMplsVpnVrfIpRtRedistributeRip OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+     "Denotes the redistribution of RIP routes
+      into the VRF BGP table."
+   ::= { hh3cMplsVpnVrfConfEntry 7 }
+
+hh3cMplsVpnVrfConfHighRtThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Denotes high-level water marker for the number of
+         routes which this VRF may hold."
+    ::= { hh3cMplsVpnVrfConfEntry 8 }
+
+hh3cMplsVpnVrfConfIsWarnOnly OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Denotes the action when the amount of VPN's routes
+         exceed the hh3cMplsVpnVrfConfHighRtThreshold."
+    ::= { hh3cMplsVpnVrfConfEntry 9 }
+
+hh3cMplsVpnVrfConfMaxRts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Denotes maximum number of routes which this VRF is
+         configured to hold.  This value MUST be less than or
+         equal to hh3cMplsVrfMaxPossibleRts unless it is set
+         to 0."
+    ::= { hh3cMplsVpnVrfConfEntry 10 }
+
+hh3cMplsVpnVrfConfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or
+         delete a row in this table."
+    ::= { hh3cMplsVpnVrfConfEntry 11 }
+
+-- =============================================================================
+-- End of hh3cMplsVpnVrfConfTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsVpnVrfBgpNbrAddrTable Definition
+-- Ed Note: how does this table relate to the BGP peering table;
+--          this is only EBGP; what about IBGP info?
+--          route/tag distributions
+-- =============================================================================
+hh3cMplsVpnVrfBgpNbrAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsVpnVrfBgpNbrAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-interface MPLS/BGP neighbor
+         addresses for both PEs and CEs."
+    ::= { hh3cMplsVpnConf 2 }
+
+hh3cMplsVpnVrfBgpNbrAddrEntry OBJECT-TYPE
+    SYNTAX      Hh3cMplsVpnVrfBgpNbrAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for
+         every VRF capable of supporting MPLS/BGP VPN.  The
+         indexing provides an ordering of VRFs per-VPN
+         interface."
+    INDEX {
+            hh3cMplsVpnVrfName,
+            hh3cMplsVpnVrfBgpNbrAddr
+          }
+    ::= { hh3cMplsVpnVrfBgpNbrAddrTable 1 }
+
+Hh3cMplsVpnVrfBgpNbrAddrEntry ::= SEQUENCE {
+    hh3cMplsVpnVrfBgpNbrAddr        IpAddress,
+    hh3cMplsVpnVrfBgpNbrRole        INTEGER,
+    hh3cMplsVpnVrfBgpNbrAsNumber    Unsigned32,
+    hh3cMplsVpnVrfBgpNbrAdminStatus INTEGER,
+    hh3cMplsVpnVrfBgpNbrRowStatus   RowStatus,
+    hh3cMplsVpnVrfBgpNbrState       INTEGER
+}
+
+hh3cMplsVpnVrfBgpNbrAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the BGP neighbor address."
+    ::= { hh3cMplsVpnVrfBgpNbrAddrEntry 1 }
+
+hh3cMplsVpnVrfBgpNbrRole OBJECT-TYPE
+    SYNTAX      INTEGER { ce(1),
+                          pe(2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Denotes the role played by this BGP neighbor
+         with respect to this VRF."
+    ::= { hh3cMplsVpnVrfBgpNbrAddrEntry 2 }
+
+hh3cMplsVpnVrfBgpNbrAsNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Autonomous System that the BGP's neighbour in."
+    ::= { hh3cMplsVpnVrfBgpNbrAddrEntry 3 }
+
+hh3cMplsVpnVrfBgpNbrAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { mplsVpnVrfBgpNbrSetUp   (1),
+                          mplsVpnVrfBgpNbrSetDown (2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The action set by SNMP client."
+    ::= { hh3cMplsVpnVrfBgpNbrAddrEntry 4 }
+
+hh3cMplsVpnVrfBgpNbrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or
+         delete a row in this table."
+    ::= { hh3cMplsVpnVrfBgpNbrAddrEntry 5 }
+
+hh3cMplsVpnVrfBgpNbrState OBJECT-TYPE
+    SYNTAX     INTEGER { idle(1),
+                         connect(2),
+                         active(3),
+                         opensent(4),
+                         openconfirm(5),
+                         established(6)
+                       }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The BGP neighbor connection state."
+    ::= { hh3cMplsVpnVrfBgpNbrAddrEntry 6 }
+-- =============================================================================
+-- End of hh3cMplsVpnVrfBgpNbrAddrTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsVpnVrfBgpNbrPrefixTable Definition
+-- =============================================================================
+hh3cMplsVpnVrfBgpNbrPrefixTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsVpnVrfBgpNbrPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-VRF vpnv4 multi-protocol
+         prefixes supported by BGP."
+    ::= { hh3cMplsVpnConf 3 }
+
+hh3cMplsVpnVrfBgpNbrPrefixEntry OBJECT-TYPE
+    SYNTAX      Hh3cMplsVpnVrfBgpNbrPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for
+         every BGP prefix associated with a VRF supporting a
+         MPLS/BGP VPN.  The indexing provides an ordering of
+         BGP prefixes per VRF."
+    INDEX {
+            hh3cMplsVpnVrfName,
+            hh3cMplsVpnVrfBgpPAtrPeer,
+            hh3cMplsVpnVrfBgpPAtrIpAddrPrefixLen,
+            hh3cMplsVpnVrfBgpPAtrIpAddrPrefix
+          }
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixTable 1 }
+
+Hh3cMplsVpnVrfBgpNbrPrefixEntry ::= SEQUENCE {
+    hh3cMplsVpnVrfBgpPAtrPeer            IpAddress,
+    hh3cMplsVpnVrfBgpPAtrIpAddrPrefixLen Integer32,
+    hh3cMplsVpnVrfBgpPAtrIpAddrPrefix    IpAddress,
+    hh3cMplsVpnVrfBgpPAtrPeerType        InetAddressType,
+    hh3cMplsVpnVrfBgpPAtrOrigin          INTEGER,
+    hh3cMplsVpnVrfBgpPAtrASPathSegment   OCTET STRING,
+    hh3cMplsVpnVrfBgpPAtrNextHop         IpAddress,
+    hh3cMplsVpnVrfBgpPAtrMultiExitDisc   Integer32,
+    hh3cMplsVpnVrfBgpPAtrLocalPref       Integer32,
+    hh3cMplsVpnVrfBgpPAtrAtomicAggregate INTEGER,
+    hh3cMplsVpnVrfBgpPAtrAggregatorAS    Integer32,
+    hh3cMplsVpnVrfBgpPAtrAggregatorAddr  IpAddress,
+    hh3cMplsVpnVrfBgpPAtrCalcLocalPref   Integer32,
+    hh3cMplsVpnVrfBgpPAtrBest            TruthValue,
+    hh3cMplsVpnVrfBgpPAtrUnknown         OCTET STRING
+}
+
+hh3cMplsVpnVrfBgpPAtrPeer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the peer where the path
+         information was learned."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 1 }
+
+hh3cMplsVpnVrfBgpPAtrIpAddrPrefixLen OBJECT-TYPE
+    SYNTAX      Integer32  (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Length in bits of the IP address prefix
+        in the Network Layer Reachability
+        Information field."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 2 }
+
+hh3cMplsVpnVrfBgpPAtrIpAddrPrefix OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An IP address prefix in the Network Layer
+         Reachability Information field.  This object
+         is an IP address containing the prefix with
+         length specified by mplsVpnVrfBgpPAtrIpAddrPrefixLen.
+         Any bits beyond the length specified by
+         MplsVpnVrfBgpPAtrIpAddrPrefixLen are zeroed."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 3 }
+
+hh3cMplsVpnVrfBgpPAtrPeerType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Address type of the mplsVpnVrfBgpPAtrPeer object."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 4 }
+
+hh3cMplsVpnVrfBgpPAtrOrigin OBJECT-TYPE
+    SYNTAX      INTEGER { igp(1),-- networks are interior
+                          egp(2),-- networks learned via EGP
+                          incomplete(3) -- undetermined
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ultimate origin of the path
+         information."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 5 }
+
+hh3cMplsVpnVrfBgpPAtrASPathSegment OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (2..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence of AS path segments.  Each AS
+         path segment is represented by a triple
+         <type, length, value>.
+
+          The type is a 1-octet field which has two
+          possible values:
+              1      AS_SET: unordered set of ASs a
+                     route in the UPDATE
+                     message has traversed
+              2      AS_SEQUENCE: ordered set of ASs
+                     a route in the UPDATE
+                     message has traversed.
+                     The length is a 1-octet field containing the
+                     number of ASs in the value field.
+
+                     The value field contains one or more AS
+                     numbers, each AS is represented in the octet
+                     string as a pair of octets according to the
+                     following algorithm:
+                     first-byte-of-pair = ASNumber / 256;
+                     second-byte-of-pair = ASNumber & 255;"
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 6 }
+
+hh3cMplsVpnVrfBgpPAtrNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the border router that
+         should be used for the destination
+         network."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 7 }
+
+hh3cMplsVpnVrfBgpPAtrMultiExitDisc OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This metric is used to discriminate
+         between multiple exit points to an
+         adjacent autonomous system.  A value of -1
+         indicates the absence of this attribute."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 8 }
+
+hh3cMplsVpnVrfBgpPAtrLocalPref OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The originating BGP4 speaker's degree of
+         preference for an advertised route.  A
+         value of -1 indicates the absence of this
+         attribute."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 9 }
+
+hh3cMplsVpnVrfBgpPAtrAtomicAggregate OBJECT-TYPE
+    SYNTAX      INTEGER { lessSpecificRtNotSelected(1),
+                          lessSpecificRtSelected(2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the ATOMIC_AGGREGATE attribute is present
+        in the Path Attributes then this object MUST
+        have a value of 'lessSpecificRouteNotSelected'.
+        If the ATOMIC_AGGREGATE attribute is missing
+        in the Path Attributes then this object MUST
+        have a value of 'lessSpecificRouteSelected'.
+        Note that ATOMIC_AGGREGATE is now a primarily
+        informational attribute."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 10 }
+
+hh3cMplsVpnVrfBgpPAtrAggregatorAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The AS number of the last BGP4 speaker that
+         performed route aggregation.  A value of
+         zero (0) indicates the absence of this
+         attribute."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 11 }
+
+hh3cMplsVpnVrfBgpPAtrAggregatorAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the last BGP4 speaker
+         that performed route aggregation.  A value
+         of 0.0.0.0 indicates the absence of this
+         attribute."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 12 }
+
+hh3cMplsVpnVrfBgpPAtrCalcLocalPref OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The degree of preference calculated by the
+          receiving BGP4 speaker for an advertised
+          route.  A value of -1 indicates the
+          absence of this attribute."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 13 }
+
+hh3cMplsVpnVrfBgpPAtrBest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether or not this route
+         was chosen as the best BGP4 route."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 14 }
+
+hh3cMplsVpnVrfBgpPAtrUnknown OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "One or more path attributes not understood
+         by this BGP4 speaker.  A zero-length string
+         indicates the absence of such
+         attribute(s).  Octets beyond the maximum
+         size, if any, are not recorded by this
+         object."
+    ::= { hh3cMplsVpnVrfBgpNbrPrefixEntry 15 }
+
+-- =============================================================================
+-- End of hh3cMplsVpnVrfBgpNbrPrefixTable Definition
+-- =============================================================================
+-- End of MPLS-VPN-MIB
+END
