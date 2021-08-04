@@ -18,7 +18,7 @@
         "docs": "http://docs.librenms.org/",
         "forum": "https://community.librenms.org/",
         "issues": "https://github.com/librenms/librenms/issues/",
-        "irc": "irc://irc.freenode.org/#librenms"
+        "chat": "https://discord.gg/librenms"
     },
     "require": {
         "php": "^7.3|^8.0",
