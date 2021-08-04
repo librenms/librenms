@@ -522,10 +522,20 @@ class RedisUniqueQueue(object):
         self._redis.zadd(self.key, {item: time()}, nx=True)
 
     def get(self, block=True, timeout=None):
-        if block:
-            item = self._redis.bzpopmin(self.key, timeout=timeout)
-        else:
-            item = self._redis.zpopmin(self.key)
+        try:
+            if block:
+                item = self._redis.bzpopmin(self.key, timeout=timeout)
+            else:
+                item = self._redis.zpopmin(self.key)
+        # Unfortunately we cannot use _redis.exceptions.ResponseError Exception here
+        # Since it would trigger another exception in queuemanager
+        except Exception as e:
+            logger.critical(
+                "It seems like BZPOPMIN command is not supported by redis. Redis >= 5.0 required: {}".format(
+                    e
+                )
+            )
+            sys.exit(1)
 
         if item:
             item = item[1]
