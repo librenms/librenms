@@ -147,7 +147,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             } else {
                 if (preg_match('/-/', $stp_raw[$port]['dot1dStpPortDesignatedPort'])) {
                     // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal
-                    $dp = explode('-',$stp_raw[$port]['dot1dStpPortDesignatedPort'])[1];
+                    $dp = explode('-', $stp_raw[$port]['dot1dStpPortDesignatedPort'])[1];
                     $stp_port['designatedPort'] = $dp;
                 } else {
                     // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
