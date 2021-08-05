@@ -1,6 +1,6 @@
 <?php
 /*
- * DeviceHook.php
+ * PluginMenuEntry.php
  *
  * -Description-
  *
@@ -25,29 +25,26 @@
 
 namespace App\Plugins\Hooks;
 
-use App\Models\Device;
 use App\Models\User;
 
-abstract class DeviceOverview
+abstract class MenuEntryHook
 {
-    public $view = 'resources.views.device-overview';
+    public $view = 'resources.views.menu';
 
-    public function authorize(User $user, Device $device): bool
+    public function authorize(User $user): bool
     {
         return true;
     }
 
-    public function data(Device $device): array
+    public function data(): array
     {
-        return [
-            'title' => __CLASS__,
-            'device'  => $device,
-        ];
+        return [];
     }
 
-    final public function handle(Device $device)
+    final public function handle()
     {
         \View::addLocation(\PluginManager::pluginPath($this));
-        return view($this->view, $this->data($device));
+
+        return [$this->view, $this->data()];
     }
 }

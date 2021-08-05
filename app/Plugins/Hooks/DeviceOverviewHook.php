@@ -1,6 +1,6 @@
 <?php
 /*
- * ExampleSettingsPlugin.php
+ * DeviceHook.php
  *
  * -Description-
  *
@@ -23,12 +23,32 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Plugins\ExamplePlugin;
+namespace App\Plugins\Hooks;
 
+use App\Models\Device;
+use App\Models\User;
 
-use App\Plugins\Hooks\SettingsHook;
-
-class ExampleSettingsPlugin extends SettingsHook
+abstract class DeviceOverviewHook
 {
+    public $view = 'resources.views.device-overview';
 
+    public function authorize(User $user, Device $device): bool
+    {
+        return true;
+    }
+
+    public function data(Device $device): array
+    {
+        return [
+            'title' => __CLASS__,
+            'device'  => $device,
+        ];
+    }
+
+    final public function handle(Device $device)
+    {
+        \View::addLocation(\PluginManager::pluginPath($this));
+
+        return view($this->view, $this->data($device));
+    }
 }

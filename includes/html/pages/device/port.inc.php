@@ -1,6 +1,8 @@
 <?php
 
-use App\Plugins\Hooks\PortPluginTab;
+use App\Plugins\Hooks\PortTabHook;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
@@ -34,7 +36,7 @@ if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'up') {
 }
 
 $i = 1;
-$inf = \LibreNMS\Util\Rewrite::normalizeIfName($ifname);
+$inf = Rewrite::normalizeIfName($ifname);
 
 $bg = '#ffffff';
 
@@ -104,7 +106,7 @@ if (count($components) > 0) {
 
 $portModel = \App\Models\Port::find($port['port_id']);
 
-if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortPluginTab::class, ['port' => $portModel])) {
+if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
     $menu_options['plugins'] = 'Plugins';
 }
@@ -202,7 +204,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/bits/'>Bits</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/bits/'>Bits</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -212,7 +214,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/packets/'>Packets</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/packets/'>Packets</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -222,7 +224,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/cells/'>Cells</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/cells/'>Cells</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -232,7 +234,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/errors/'>Errors</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/errors/'>Errors</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -241,11 +243,11 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
 if (Auth::user()->hasGlobalAdmin() && \LibreNMS\Config::get('enable_billing') == 1) {
     $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port['port_id']]);
     if (count($bills) === 1) {
-        echo "<span style='float: right;'><a href='" . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
+        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
     } elseif (count($bills) > 1) {
-        echo "<span style='float: right;'><a href='" . \LibreNMS\Util\Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
+        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
     } else {
-        echo "<span style='float: right;'><a href='" . \LibreNMS\Util\Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port['port_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
+        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port['port_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
     }
 }
 

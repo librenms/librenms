@@ -65,10 +65,12 @@ class PluginManager
         return $this->hooksFor($hook)
             ->filter(function ($hookInstance) use ($args) {
                 $settings = ['settings' => $this->getSettings($hookInstance)];
+
                 return app()->call([$hookInstance, 'authorize'], $args + $settings);
             })
             ->map(function ($hookInstance) use ($args) {
                 $settings = ['settings' => $this->getSettings($hookInstance)];
+
                 return app()->call([$hookInstance, 'handle'], $args + $settings);
             });
     }
@@ -76,6 +78,7 @@ class PluginManager
     public function getSettings($name_or_hook): array
     {
         $name = $this->getPluginName($name_or_hook);
+
         return (array) $this->getPlugin($name)->settings;
     }
 
@@ -83,6 +86,7 @@ class PluginManager
     {
         $plugin = $this->getPlugin($this->getPluginName($name_or_hook));
         $plugin->settings = $settings;
+
         return $plugin->save();
     }
 
@@ -92,12 +96,14 @@ class PluginManager
     public function pluginPath($plugin, $file = null): string
     {
         $reflection = new \ReflectionClass($plugin);
+
         return dirname($reflection->getFileName()) . '/' . $file;
     }
 
     public function pluginEnabled(string $name_or_hook): bool
     {
         $name = $this->getPluginName($name_or_hook);
+
         return $this->getPlugin($name)->plugin_active;
     }
 
@@ -132,6 +138,7 @@ class PluginManager
         // if it is a plugin hook, get the namespace
         if (is_object($class) || class_exists($class)) {
             $reflection = new \ReflectionClass($class);
+
             return $reflection->getNamespaceName();
         }
 

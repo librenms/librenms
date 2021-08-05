@@ -13,7 +13,7 @@
  * @author     PipoCanaja <pipocanaja@gmail.com>
  */
 
-use App\Plugins\Hooks\PortPluginTab;
+use App\Plugins\Hooks\PortTabHook;
 
 $pagetitle[] = 'Plugins';
 $no_refresh = true;
@@ -23,6 +23,6 @@ $no_refresh = true;
 <hr>
 <?php
 echo \LibreNMS\Plugins::call('port_container', [$device, $port]);
-PluginManager::call(PortPluginTab::class, ['port' => $portModel])->each(function ($view) {
+PluginManager::call(PortTabHook::class, ['port' => $portModel])->each(function ($view) {
     echo $view;
 });

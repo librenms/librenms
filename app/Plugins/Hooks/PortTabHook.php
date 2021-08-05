@@ -1,6 +1,6 @@
 <?php
 /*
- * SettingsHook.php
+ * PortPluginTab.php
  *
  * -Description-
  *
@@ -25,35 +25,31 @@
 
 namespace App\Plugins\Hooks;
 
+use App\Models\Port;
 use App\Models\User;
-use App\Plugins\PluginManager;
+use App\Plugins\Hook;
 
-abstract class SettingsHook
+abstract class PortTabHook implements Hook
 {
-    public $view = 'resources.views.settings';
+    public $view = 'resources.views.port-tab';
 
-    public function authorize(User $user, array $settings): bool
+    public function authorize(User $user, Port $port): bool
     {
         return true;
     }
 
-    public function data(array $settings): array
+    public function data(Port $port): array
     {
         return [
             'title' => __CLASS__,
-            'settings' => $settings,
+            'port'  => $port,
         ];
     }
 
-    final public function handle(string $plugin, array $settings)
+    final public function handle(Port $port)
     {
-        // only if this is the selected plugin
-        if ($plugin !== \PluginManager::getPluginName($this)) {
-            return;
-        }
-
         \View::addLocation(\PluginManager::pluginPath($this));
 
-        return view($this->view, $this->data($settings));
+        return view($this->view, $this->data($port));
     }
 }

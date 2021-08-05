@@ -86,7 +86,7 @@
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> @lang('Plugins')</a>
                             <ul class="dropdown-menu">
                                 {!! \LibreNMS\Plugins::call('menu') !!}
-                                @foreach(PluginManager::call(\App\Plugins\Hooks\PluginMenuEntry::class) as [$view, $data])
+                                @foreach(PluginManager::call(\App\Plugins\Hooks\MenuEntryHook::class) as [$view, $data])
                                     <li>@include($view, $data)</li>
                                 @endforeach
                                 @admin

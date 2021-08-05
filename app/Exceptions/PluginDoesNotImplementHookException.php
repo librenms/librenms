@@ -25,7 +25,6 @@
 
 namespace App\Exceptions;
 
-
 use Throwable;
 
 class PluginDoesNotImplementHookException extends \Exception

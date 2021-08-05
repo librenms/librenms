@@ -20,10 +20,11 @@ if ($vars['view'] == 'admin') {
             chdir(Config::get('install_dir'));
 
             return;
-        } elseif(\PluginManager::pluginEnabled($plugin)) {
+        } elseif (\PluginManager::pluginEnabled($plugin)) {
             \PluginManager::call(SettingsHook::class, ['plugin' => $plugin])->each(function ($view) {
                 echo $view;
             });
+
             return;
         }
     }

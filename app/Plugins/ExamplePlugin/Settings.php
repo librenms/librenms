@@ -1,6 +1,6 @@
 <?php
 /*
- * PortPluginTab.php
+ * ExampleSettingsPlugin.php
  *
  * -Description-
  *
@@ -23,32 +23,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Plugins\Hooks;
+namespace App\Plugins\ExamplePlugin;
 
-use App\Models\Port;
-use App\Models\User;
-use App\Plugins\Hook;
+use App\Plugins\Hooks\SettingsHook;
 
-abstract class PortPluginTab implements Hook
+class Settings extends SettingsHook
 {
-    public $view = 'resources.views.port';
-
-    public function authorize(User $user, Port $port): bool
-    {
-        return true;
-    }
-
-    public function data(Port $port): array
-    {
-        return [
-            'title' => __CLASS__,
-            'port'  => $port,
-        ];
-    }
-
-    final public function handle(Port $port)
-    {
-        \View::addLocation(\PluginManager::pluginPath($this));
-        return view($this->view, $this->data($port));
-    }
 }

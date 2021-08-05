@@ -1,6 +1,6 @@
 <?php
 /*
- * PluginMenuEntry.php
+ * ExampleSettingsPlugin.php
  *
  * -Description-
  *
@@ -23,27 +23,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Plugins\Hooks;
+namespace App\Plugins\ExamplePlugin;
 
-use App\Models\User;
+use App\Plugins\Hooks\DeviceOverviewHook;
 
-abstract class PluginMenuEntry
+class DeviceOverview extends DeviceOverviewHook
 {
-    public $view = 'resources.views.menu';
-
-    public function authorize(User $user): bool
-    {
-        return true;
-    }
-
-    public function data(): array
-    {
-        return [];
-    }
-
-    final public function handle()
-    {
-        \View::addLocation(\PluginManager::pluginPath($this));
-        return [$this->view, $this->data()];
-    }
 }
