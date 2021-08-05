@@ -1968,6 +1968,8 @@ syslog:
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
+    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
+    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
