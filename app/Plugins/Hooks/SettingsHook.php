@@ -26,7 +26,6 @@
 namespace App\Plugins\Hooks;
 
 use App\Models\User;
-use App\Plugins\PluginManager;
 
 abstract class SettingsHook
 {

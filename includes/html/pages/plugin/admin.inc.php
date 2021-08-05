@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Plugin;
+use LibreNMS\Plugins;
 
 if (Auth::user()->hasGlobalAdmin()) {
     // Scan for new plugins and add to the database
-    $new_plugins = \LibreNMS\Plugins::scanNew();
-    $removed_plugins = \LibreNMS\Plugins::scanRemoved();
+    $new_plugins = Plugins::scanNew();
+    $removed_plugins = Plugins::scanRemoved();
 
     // Check if we have to toggle enabled / disable a particular module
     $plugin_id = $_POST['plugin_id'];

@@ -26,23 +26,23 @@
 namespace App\Providers;
 
 use App\Exceptions\PluginDoesNotImplementHookException;
-use App\Models\Plugin;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use App\Plugins\PluginManager;
 use View;
 
 class PluginProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->singleton(\App\Plugins\PluginManager::class, function ($app) {
-            return new \App\Plugins\PluginManager;
+        $this->app->singleton(PluginManager::class, function ($app) {
+            return new PluginManager;
         });
     }
 
     public function boot()
     {
-        $manager = app(\App\Plugins\PluginManager::class);
+        $manager = app(PluginManager::class);
 
         $this->loadLocalPlugins($manager);
 
@@ -54,7 +54,7 @@ class PluginProvider extends ServiceProvider
     /**
      * Load any local plugins these plugins must implement only one hook.
      */
-    protected function loadLocalPlugins(\App\Plugins\PluginManager $manager)
+    protected function loadLocalPlugins(PluginManager $manager)
     {
         foreach (glob(base_path('app/Plugins/*/*.php')) as $file) {
             if (preg_match('#([^/]+)/([^/.]+)\.php#', $file, $matches)) {
