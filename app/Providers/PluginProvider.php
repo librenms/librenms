@@ -26,9 +26,9 @@
 namespace App\Providers;
 
 use App\Exceptions\PluginDoesNotImplementHookException;
+use App\Plugins\PluginManager;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use App\Plugins\PluginManager;
 use View;
 
 class PluginProvider extends ServiceProvider
