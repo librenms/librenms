@@ -1,0 +1,714 @@
+CISCOSB-PORT-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- PORT-STATISTICS MIB
+-- Title:      CISCOSB Port-Statistics Private MIB
+--             This Private MIB manages Port-Statistics display messages
+-- Version:    8.00
+-- Date:       06 April 2015
+--
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+    Counter64, Integer32                            FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, TruthValue, 
+    RowStatus                                       FROM SNMPv2-TC
+    PortList                                        FROM Q-BRIDGE-MIB
+    InterfaceIndex, ifIndex                         FROM IF-MIB
+    switch001                                       FROM CISCOSB-MIB;
+    
+----------------------------------------------------
+--              MIBS definitions                  --
+----------------------------------------------------
+
+rlPortStat MODULE-IDENTITY
+    LAST-UPDATED "201504060000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+
+    CONTACT-INFO
+           "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+    DESCRIPTION
+           "This private MIB module for Port-Statistics"
+    REVISION "201504060000Z"
+    DESCRIPTION
+           "Initial revision."
+     ::= { switch001 223 }
+     
+     
+PortStatisticsSubType ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+         "Specifies port-statistic sub-type"
+     SYNTAX INTEGER {
+        second(1),
+        minute(2),
+        hour(3),
+        day(4),
+        week(5)
+    }
+
+PortStatisticsSampleClockSource ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+         "Specifies port-statistic sample clock-source"
+     SYNTAX INTEGER {
+        internal(1),
+        sntp(2),
+        userDefined(3)
+    }
+    
+PortStatisticsCounterName ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+         "Specifies port-statistic counter-name"
+     SYNTAX INTEGER {
+        anyCounter(0),
+
+        unicastFrameSent(1),
+        broadcastFrameSent(2),
+        multicastFrameSent(3),
+        goodOctetsSent(4),
+        txUtilization(5),
+        goodUnicastFrameReceived(6),
+        broadcastFrameReceived(7),
+        multicastFrameReceived(8),
+        rxErrorFrameReceived(9),
+        totalOctetsReceived(10),
+        rxUtilization(11),
+        txRxUtilization(12),
+        frames64B(13),
+        frames65To127B(14),
+        frames128To255B(15),
+        frames256To511B(16),
+        frames512To1023B(17),
+        frames1024To1518B(18),
+
+        dot3StatsFCSErrors(19),
+        dot3StatsSingleCollisionFrames(20),
+        dot3StatsLateCollisions(21),
+        dot3StatsExcessiveCollisions(22),
+        dot3StatsFrameTooLongs(23),
+        dot3StatsInternalMacReceiveErrors(24),
+        dot3InPauseFrames(25),
+        dot3OutPauseFrames(26),
+        etherStatsDropEvents(27),
+        etherStatsCRCAlignErrors(28),
+        etherStatsUndersizePkts(29),
+        etherStatsOversizePkts(30),
+        etherStatsFragments(31),
+        etherStatsJabbers(32),
+        etherStatsCollisions(33),
+
+        goodOctetsReceived(34),
+        badOctetsReceived(35),
+        goodFrameSent(36),
+        goodFrameReceived(37),
+
+        snaPortUtilizationRxColor(38),
+        snaPortUtilizationTxColor(39),
+
+        poePowerConsumption(40),
+        poePowerSavings(41),
+        
+        poeOverload(42),
+        poeShort(43),
+        poeDenied(44),     
+        poeAbsent(45),     
+        poeInvalidSignature(46),
+
+        -- must be last
+        lastCounterSpecifier(47)
+    }
+    
+-----------------------------------
+-- rlPortStatEnabledPorts (scalar)
+-----------------------------------
+rlPortStatEnabledPorts OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Port-set to determine from which port to collect port-statistics"
+    ::= { rlPortStat 1 }
+    
+-----------------------------------
+-- rlPortStatClearPorts (scalar)
+-----------------------------------
+-- this is an action MIB for clearing 
+-- port-statistics history per-port
+-----------------------------------
+rlPortStatClearPorts OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Action MIB for clearing port-statistics history on a
+         list of selected ports"
+    ::= { rlPortStat 2 }
+
+-----------------------------------
+-- rlPortStatSampleTable
+-----------------------------------
+rlPortStatSampleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPortStatSampleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds port-statistics for Ethernet ports
+         This is a read-only MIB for presentation purposes."
+    ::= {rlPortStat 3 }
+
+rlPortStatSampleEntry  OBJECT-TYPE
+    SYNTAX      RlPortStatSampleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlPortStatSampleTable."
+    INDEX    { rlPortStatSampleIfIndex,
+               rlPortStatSampleStatSubType,
+               rlPortStatSampleCounterName,
+               rlPortStatSampleStatID }
+    ::= { rlPortStatSampleTable 1 }
+    
+RlPortStatSampleEntry ::= SEQUENCE {
+    -- keys
+    rlPortStatSampleIfIndex                     InterfaceIndex,
+    rlPortStatSampleStatSubType                 PortStatisticsSubType,
+    rlPortStatSampleCounterName                 PortStatisticsCounterName,
+    rlPortStatSampleStatID                      Unsigned32,
+    -- fields
+    rlPortStatSampleCollectionInterval          Unsigned32,
+    rlPortStatSampleSystemCollectionTime        Unsigned32,
+    rlPortStatSampleCollectionTime              Unsigned32,
+    rlPortStatSampleCollectionTimeStr           DisplayString (SIZE(0..15)),
+    rlPortStatSampleCounterValue                Counter64,
+    rlPortStatSamplePartialFlag                 TruthValue,
+    rlPortStatSampleClockSource                 PortStatisticsSampleClockSource
+}
+
+-----------------------------------
+-- rlPortStatSampleTable Keys
+------------------------------------
+
+rlPortStatSampleIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface Index.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatSampleEntry 1 }
+    
+rlPortStatSampleStatSubType OBJECT-TYPE
+    SYNTAX      PortStatisticsSubType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic sub-type.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatSampleEntry 2 }
+    
+rlPortStatSampleCounterName OBJECT-TYPE
+    SYNTAX      PortStatisticsCounterName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic counter-name.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatSampleEntry 3 }
+    
+rlPortStatSampleStatID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statistics ID.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatSampleEntry 4 }
+
+-----------------------------------
+-- rlPortStatSampleTable Fields
+------------------------------------
+
+rlPortStatSampleCollectionInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic collection time interval (in seconds)."
+    ::= { rlPortStatSampleEntry 5 }
+
+rlPortStatSampleSystemCollectionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system up-time when the samples were taken, 
+         formatted in posix-time format"
+    ::= { rlPortStatSampleEntry 6 }
+    
+rlPortStatSampleCollectionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The absolute time when the samples were taken, 
+         formatted in posix-time format"
+    ::= { rlPortStatSampleEntry 7 }
+    
+rlPortStatSampleCollectionTimeStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The absolute time when the samples were taken, 
+         in string format - 'hhmmssddMMYYYYw'
+         where 'w' stands for weekDay (1-7)"
+    ::= { rlPortStatSampleEntry 8 }
+
+rlPortStatSampleCounterValue OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port-Statistics counter value"
+    ::= { rlPortStatSampleEntry 9 }
+    
+rlPortStatSamplePartialFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the collected statistics for
+         the current entry are partial."
+    ::= { rlPortStatSampleEntry 10 }
+
+rlPortStatSampleClockSource OBJECT-TYPE
+    SYNTAX      PortStatisticsSampleClockSource
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the clock-source used for marking the 
+         collection-time of the collected sample"
+    ::= { rlPortStatSampleEntry 11 }
+
+
+
+-----------------------------------
+-- rlPortStatLastSampleTable
+-----------------------------------
+rlPortStatLastSampleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPortStatLastSampleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds the last sample from port-statistics. 
+         This is a read-only MIB for presentation purposes."
+    ::= { rlPortStat 4 }
+
+rlPortStatLastSampleEntry  OBJECT-TYPE
+    SYNTAX      RlPortStatLastSampleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlPortStatLastSampleTable."
+    INDEX    { rlPortStatLastSampleIfIndex,
+               rlPortStatLastSampleStatSubType,
+               rlPortStatLastSampleCounterName }
+    ::= { rlPortStatLastSampleTable 1 }
+    
+RlPortStatLastSampleEntry ::= SEQUENCE {
+    -- keys
+    rlPortStatLastSampleIfIndex                     InterfaceIndex,
+    rlPortStatLastSampleStatSubType                 PortStatisticsSubType,
+    rlPortStatLastSampleCounterName                 PortStatisticsCounterName,
+    -- fields
+    rlPortStatLastSampleStatID                      Unsigned32,
+    rlPortStatLastSampleCollectionInterval          Unsigned32,
+    rlPortStatLastSampleSystemCollectionTime        Unsigned32,
+    rlPortStatLastSampleCollectionTime              Unsigned32,
+    rlPortStatLastSampleCollectionTimeStr           DisplayString (SIZE(0..15)),
+    rlPortStatLastSampleCounterValue                Counter64,
+    rlPortStatLastSamplePartialFlag                 TruthValue,
+    rlPortStatLastSampleClockSource                 PortStatisticsSampleClockSource
+}
+
+-----------------------------------
+-- rlPortStatLastSampleTable Keys
+------------------------------------
+
+rlPortStatLastSampleIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface Index.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatLastSampleEntry 1 }
+    
+rlPortStatLastSampleStatSubType OBJECT-TYPE
+    SYNTAX      PortStatisticsSubType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic sub-type.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatLastSampleEntry 2 }
+    
+rlPortStatLastSampleCounterName OBJECT-TYPE
+    SYNTAX      PortStatisticsCounterName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic counter-name.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatLastSampleEntry 3 }
+    
+-----------------------------------
+-- rlPortStatLastSampleTable Fields
+------------------------------------
+
+rlPortStatLastSampleStatID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics ID.
+         This variable is a key in port-statistics table."
+    ::= { rlPortStatLastSampleEntry 4 }
+
+rlPortStatLastSampleCollectionInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic collection time interval (in seconds)."
+    ::= { rlPortStatLastSampleEntry 5 }
+
+rlPortStatLastSampleSystemCollectionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system up-time when the samples were taken, 
+         formatted in posix-time format"
+    ::= { rlPortStatLastSampleEntry 6 }
+    
+rlPortStatLastSampleCollectionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The absolute time when the samples were taken, 
+         formatted in posix-time format"
+    ::= { rlPortStatLastSampleEntry 7 }
+    
+rlPortStatLastSampleCollectionTimeStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The absolute time when the samples were taken, 
+         in string format - 'hhmmssddMMYYYYw'
+         where 'w' stands for weekDay (1-7)"
+    ::= { rlPortStatLastSampleEntry 8 }
+
+rlPortStatLastSampleCounterValue OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port-Statistics counter value"
+    ::= { rlPortStatLastSampleEntry 9 }
+    
+rlPortStatLastSamplePartialFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the collected statistics for
+         the current entry are partial."
+    ::= { rlPortStatLastSampleEntry 10 }
+
+rlPortStatLastSampleClockSource OBJECT-TYPE
+    SYNTAX      PortStatisticsSampleClockSource
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the clock-source used for marking the 
+         collection-time of the collected sample"
+    ::= { rlPortStatLastSampleEntry 11 }
+
+
+-----------------------------------
+-- rlPortStatLastEventTable
+-----------------------------------
+rlPortStatLastEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPortStatLastEventEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table holds records of the last time an ether-like counter
+         changed its value and time when the change had occoured.
+         This is a read-only MIB for presentation purposes."
+    ::= {rlPortStat 5 }
+
+rlPortStatLastEventEntry OBJECT-TYPE
+    SYNTAX      RlPortStatLastEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlPortStatLastEventTable."
+    INDEX    { rlPortStatLastEventIfIndex,
+               rlPortStatLastEventCounterName }
+    ::= { rlPortStatLastEventTable 1 }
+
+RlPortStatLastEventEntry ::= SEQUENCE {
+    -- keys
+    rlPortStatLastEventIfIndex          InterfaceIndex,
+    rlPortStatLastEventCounterName      PortStatisticsCounterName,
+    -- fields
+    rlPortStatLastEventSystemTime       Unsigned32,
+    rlPortStatLastEventPosixTime        Unsigned32,
+    rlPortStatLastEventTimeStr          DisplayString (SIZE(0..15)),
+    rlPortStatLastEventCounter          PortStatisticsCounterName,
+    rlPortStatLastEventCounterValue     Counter64
+}
+
+
+-----------------------------------
+-- rlPortStatLastEventTable Keys
+------------------------------------
+rlPortStatLastEventIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface Index.
+         This variable is a key in last-event table."
+    ::= { rlPortStatLastEventEntry 1 }
+
+rlPortStatLastEventCounterName OBJECT-TYPE
+    SYNTAX      PortStatisticsCounterName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic counter-name.
+         use 'anyCounter' (0) enum value to extract the 
+         last event that occoured in a given port / ifIndex.
+         This variable is a key in last-event table."
+    ::= { rlPortStatLastEventEntry 2 }
+
+-----------------------------------
+-- rlPortStatLastEventTable Fields
+------------------------------------
+
+rlPortStatLastEventSystemTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system up-time of the event, 
+         formatted in posix-time format"
+    ::= { rlPortStatLastEventEntry 3 } 
+
+
+rlPortStatLastEventPosixTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The absolute time of the event, 
+         formatted in posix-time format"
+    ::= { rlPortStatLastEventEntry 4 }
+      
+rlPortStatLastEventTimeStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The absolute time of the event, 
+         in string format - 'hhmmssddMMYYYYw'
+         where 'w' stands for weekDay (1-7)"
+    ::= { rlPortStatLastEventEntry 5 }
+        
+rlPortStatLastEventCounter OBJECT-TYPE
+    SYNTAX      PortStatisticsCounterName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port-statistic counter-name"
+    ::= { rlPortStatLastEventEntry 6 }
+            
+rlPortStatLastEventCounterValue OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port-Statistics counter value"
+    ::= { rlPortStatLastEventEntry 7 }
+
+-----------------------------------
+-- rlPortStatClearPOEConsumptionPorts (scalar)
+-----------------------------------
+-- this is an action MIB for clearing 
+-- POE port-statistics history per-port
+-----------------------------------
+rlPortStatClearPOEConsumptionPorts OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Action MIB for clearing port-statistics POE consumption history on a
+         list of selected ports"
+    ::= { rlPortStat 6 }
+
+-----------------------------------
+-- rlPortStatPOECumulativeEnergySaved (scalar)
+-----------------------------------
+rlPortStatPOECumulativeEnergySaved OBJECT-TYPE
+    SYNTAX           Counter64
+    UNITS            "Watt*Hour"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "POE cumulative energy savings per system due to time-range feature in Watt*Hour units"
+    ::= { rlPortStat 7 }
+
+-----------------------------------
+-- rlPortStatGreenEthCumulativeEnergySaved (scalar)
+-----------------------------------
+rlPortStatGreenEthCumulativeEnergySaved OBJECT-TYPE
+    SYNTAX           Counter64
+    UNITS            "Watt*Hour"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Green Ethernet cumulative energy savings per system in Watt*Hour units"
+    ::= { rlPortStat 8 }
+
+-----------------------------------
+-- rlPortStatGreenEthEstimatedAnnualEnergySaved (scalar)
+-----------------------------------
+rlPortStatGreenEthEstimatedAnnualEnergySaved OBJECT-TYPE
+    SYNTAX           Counter64
+    UNITS            "Watt*Hour"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Green Ethernet estimated anual energy savings per system in Watt*Hour units
+		 Annual estimate is based on the saving during the previous week multiplied by 52"
+    ::= { rlPortStat 9 }
+
+-----------------------------------
+-- rlPortStatClearPortEventsCategory (scalar)
+-----------------------------------
+rlPortStatClearPortEventsCategory  OBJECT-TYPE
+	SYNTAX INTEGER {
+		macCounters(1),
+		poeCounters(2)
+	}
+	MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Scalar for determining the type of counters to be cleared 
+		 when invoking rlPortStatClearPortEvents action MIB"
+    ::= { rlPortStat 10 }
+
+-----------------------------------
+-- rlPortStatClearPortEvents (scalar)
+-----------------------------------
+rlPortStatClearPortEvents OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Action MIB for clearing port-statistics event history on a
+         list of selected ports"
+    ::= { rlPortStat 11 }
+
+-----------------------------------
+-- rlPortStatPOEEstimatedAnnualEnergySaved (scalar)
+-----------------------------------
+rlPortStatPOEEstimatedAnnualEnergySaved OBJECT-TYPE
+    SYNTAX           Counter64
+    UNITS            "Watt*Hour"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "PoE estimated anual energy savings per system in Watt*Hour units
+		 Annual estimate is based on the saving during the previous week multiplied by 52"
+    ::= { rlPortStat 12 }
+
+-----------------------------------
+-- rlPortStatPOEEstimatedAnnualEnergySavedAvailable (scalar)
+-----------------------------------
+rlPortStatPOEEstimatedAnnualEnergySavedAvailable OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Determines wether PoE estimated anual energy savings is available.
+		 Annual estimate is available when device contains energy-savings statistics from
+		 previous week."
+    ::= { rlPortStat 13 }
+
+-----------------------------------
+-- rlPortStatGreenEthEstimatedAnnualEnergySavedAvailable (scalar)
+-----------------------------------
+rlPortStatGreenEthEstimatedAnnualEnergySavedAvailable OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Determines wether Green Ethernet estimated anual energy savings is available.
+		 Annual estimate is available when device contains energy-savings statistics from
+		 previous week."
+    ::= { rlPortStat 14 }
+
+-----------------------------------
+-- rlPortStatPOECurrentEnergySaved (scalar)
+-----------------------------------
+rlPortStatPOECurrentEnergySaved OBJECT-TYPE
+    SYNTAX           Counter64
+    UNITS            "Watt*Hour"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "POE current energy savings per system due to time-range feature in Watt*Hour units"
+    ::= { rlPortStat 15 }
+
+-----------------------------------
+-- rlPortStatClearGreenEthCumulativeEnergySaved (scalar)
+-----------------------------------
+-- this is an action MIB for clearing 
+-- Green-Ethernet cumulative energy saved
+-----------------------------------
+rlPortStatClearGreenEthCumulativeEnergySaved OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Action MIB for setting Green-Ethernet-Cumulative-Energy-Saved value to zero."
+    ::= { rlPortStat 16 }
+
+-----------------------------------
+-- rlPortStatEnabled (scalar)
+-----------------------------------
+rlPortStatEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Determine whether port-statistics is globally enabled or disabled"
+    ::= { rlPortStat 17 }
+
+END
+    

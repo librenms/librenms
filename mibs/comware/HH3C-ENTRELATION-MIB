@@ -1,0 +1,169 @@
+-- =================================================================
+-- Copyright (C) 2001-2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: ENTITY RELATION MIB
+-- Version: V1.2
+-- History:
+--   V1.0(Initial version) 19th Aug 2004
+--   V1.1 2004-09-10 Exchange MIB objects' sequence, including hh3cEntRelationType
+--                   and hh3cEntityIndex.
+--                   Change subidentifier of hh3cEntRelationConformance from 3 to 2.
+--   V1.2 2004-10-12 updated by gaolong
+--        Remove hh3cEntityIndex, hh3cEntRelationType from hh3cEntRelationGroup
+--        because they are not-accessible objects.
+-- =================================================================
+--
+
+    HH3C-ENTRELATION-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            PhysicalIndex
+                FROM ENTITY-MIB
+            hh3cCommon
+                FROM HH3C-OID-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+            OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+
+        hh3cEntityRelation MODULE-IDENTITY
+            LAST-UPDATED "200408190000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "The private MIB file includes the general relation information
+                information of entities.
+                Entity MIB is used to express the physical location of the physical
+                entities. Other relations, such as stack port pair and combo port
+                pair, are not suitable to be implemented in Entity MIB. So this MIB is
+                used to  express these relations. "
+            ::= { hh3cCommon 15 }
+
+
+
+--  Textual conventions
+--
+        Hh3cEntRelationType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "entRelationType describe the relation type of the two entities
+                (indicated by entityIndex and relatedEntityIndex) .
+                stackport: this port is a stack port.
+                entityIndex is the default uplinkport index,
+                and relatedEntityIndex is the default downlinkport index.
+                comboport: this port is a combo port.
+                entityIndex is the default active port index,
+                and relatedEntityIndex is the default inactive port index."
+            SYNTAX INTEGER
+                {
+                stackport(1),
+                comboport(2)
+                }
+
+
+
+
+--  Node definitions
+--
+        hh3cEntRelationObjects OBJECT IDENTIFIER ::= { hh3cEntityRelation 1 }
+
+--    MIB contains four groups
+        hh3cEntRelation OBJECT IDENTIFIER ::= { hh3cEntRelationObjects 1 }
+
+        hh3cEntRelationTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cEntRelationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entity MIB is used to express the physical location of
+                the physical entities. Other relations, such as stack
+                port pair and combo port pair, are not suitable to be
+                implemented in Entity MIB. This MIB is used to express
+                these relations. "
+            ::= { hh3cEntRelation 1 }
+
+        hh3cEntRelationEntry OBJECT-TYPE
+            SYNTAX Hh3cEntRelationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information about a particular physical entity."
+            INDEX { hh3cEntRelationType, hh3cEntityIndex, hh3cRelatedEntityIndex }
+            ::= { hh3cEntRelationTable 1 }
+
+        Hh3cEntRelationEntry ::=
+            SEQUENCE {
+                hh3cEntRelationType
+                    Hh3cEntRelationType,
+                hh3cEntityIndex
+                    PhysicalIndex,
+                hh3cRelatedEntityIndex
+                    PhysicalIndex
+             }
+
+        hh3cEntRelationType OBJECT-TYPE
+            SYNTAX Hh3cEntRelationType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of hh3cEntRelationTable.
+                entRelationType describe the relation type of the two
+                entities(indicated by entityIndex and relatedEntityIndex) "
+            ::= { hh3cEntRelationEntry 1 }
+
+        hh3cEntityIndex OBJECT-TYPE
+            SYNTAX PhysicalIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of hh3cEntRelationTable.
+                entityIndex is the index of the entity.
+                This index is identical to entPhysicalIndex in ENTITY-MIB"
+            ::= { hh3cEntRelationEntry 2 }
+
+        hh3cRelatedEntityIndex OBJECT-TYPE
+            SYNTAX PhysicalIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of hh3cEntRelationTable.
+                relatedEntityIndex is the entity index that entityIndex related to,
+                This index is identical to entPhysicalIndex in ENTITY-MIB"
+            ::= { hh3cEntRelationEntry 3 }
+
+--    Conformance and Compliance
+        hh3cEntRelationConformance OBJECT IDENTIFIER ::= { hh3cEntityRelation 2 }
+
+        hh3cEntRelationCompliances OBJECT IDENTIFIER ::= { hh3cEntRelationConformance 1 }
+
+
+-- this module
+        hh3cEntRelationCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The compliance statement for systems supporting this MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hh3cEntRelationGroup }
+            ::= { hh3cEntRelationCompliances 1 }
+
+        hh3cEntRelationGroups OBJECT IDENTIFIER ::= { hh3cEntRelationConformance 2 }
+
+        hh3cEntRelationGroup OBJECT-GROUP
+            OBJECTS { hh3cRelatedEntityIndex }
+            STATUS current
+            DESCRIPTION
+                "Standard Entity Relation group."
+            ::= { hh3cEntRelationGroups 1 }
+
+
+    END

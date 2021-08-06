@@ -1,0 +1,1115 @@
+-- ==================================================================
+-- Copyright (c) 2004-2010 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: ACFP MIB
+-- Reference:
+-- Version: V1.5
+-- History:
+--   V1.0 2006-07-04 Created by Wang Haidong
+--   V1.1 2007-03-23 Modified by Hao Chunbo
+--        Delete the default value of hh3cAcfpPolicyAdminStatus.
+--   V1.2 2007-07-03 Modified by Hao Chunbo
+--        Add a new trap node for hh3cAcfpPolicyLifetime.
+--   V1.3 2007-11-07 Modified by Li Yugang
+--        Modify the value of hh3cAcfpServerCurContextType.
+--        Destroy the node of hh3cAcfpRuleEstablish.
+--        Add a new node for Hh3cAcfpPolicyDestIfFailAction.
+--        Add a new node for Hh3cAcfpPolicyPriority.
+--        Add a new node for hh3cAcfpRuleTCPFlag.
+--   V1.4 2007-12-19 Modified by Li Yugang
+--        Modify the description of hh3cAcfpPolicyRowStatus.
+--        Modify the description of hh3cAcfpRuleRowStatus.
+--        Modify the status of hh3cAcfpRuleEstablish.
+--        Modify the value of hh3cAcfpRuleTCPFlag.
+--   V1.5 2009-11-30 Modified by Zhu Dengfeng
+--        Add a new node for hh3cAcfpRuleSrcIPV6Address
+--        Add a new node for hh3cAcfpRuleSrcPrefixLen
+--        Add a new node for hh3cAcfpRuleDstIPV6Address
+--        Add a new node for hh3cAcfpRuleDstPrefixLen
+--        Add a new node for hh3cAcfpRuleTrafficType
+--        Add a new node for hh3cAcfpRuleTypeOrLen
+-- ==================================================================
+HH3C-ACFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, MacAddress, DisplayString
+        FROM SNMPv2-TC
+    Ipv6Address
+        FROM IPV6-TC
+    InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+--
+-- Node definitions
+--
+
+hh3cAcfp MODULE-IDENTITY
+    LAST-UPDATED "200607041936Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        Http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB module defines a set of basic objects for
+        configuring switches and routers to enable ACFP."
+    REVISION    "200607041936Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { hh3cCommon 74 }
+
+hh3cAcfpObjects OBJECT IDENTIFIER  ::= { hh3cAcfp 1 }
+
+hh3cAcfpOAP  OBJECT IDENTIFIER ::= { hh3cAcfpObjects 1 }
+
+--  ACFP server information
+--      ACFP server should create this object and
+--      advertise its capability
+
+hh3cAcfpServer OBJECT IDENTIFIER ::= { hh3cAcfpOAP 1 }
+
+hh3cAcfpServerInfo OBJECT-TYPE
+    SYNTAX      BITS
+        {
+            ipserver(0),
+            redirect(1),
+            mirror(2),
+            passThrough(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns a set of bits
+        indicating the capabilities (or configuration) of the
+        switch or router.  The set bit is indication that a
+        router or switch can support the action for
+        security rule."
+    ::= { hh3cAcfpServer 1 }
+
+hh3cAcfpServerMaxLifetime OBJECT-TYPE
+    SYNTAX      Integer32(0..2147483647)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns the maximum
+        lifetime in seconds, that this router or switch allows
+        policy rules to have."
+    ::= { hh3cAcfpServer 2 }
+
+hh3cAcfpServerPersistentRules OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns true(1) if the
+        ACFP MIB implementation can store policy rules
+        persistently.  Otherwise, it returns false(2)."
+    ::= { hh3cAcfpServer 3 }
+
+hh3cAcfpServerCurContextType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            no-context(1),
+            context-VLANID(2),
+            context-HG(3),
+            context-FlowID(4),
+            context-HGPlus(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In some circumstances, it's necessary that packets go to
+        ACFP client with context from ACFP server.  However, the context
+        perhaps is different.  hh3cAcfpServerCurContextType is
+        used to distinguish this difference, ACFP client may
+        process distinctively."
+    ::= { hh3cAcfpServer 4 }
+
+-- ACFP client Information.
+--     This object is used for network management purpose.
+
+hh3cAcfpClientInfo OBJECT IDENTIFIER ::= { hh3cAcfpOAP 2 }
+
+hh3cAcfpClientInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cAcfpClientInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the basic information about ACFP client."
+    ::= { hh3cAcfpClientInfo 1 }
+
+hh3cAcfpClientInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cAcfpClientInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This list contains the basic information about ACFP client."
+    INDEX
+        {
+            hh3cAcfpClientID
+        }
+    ::= { hh3cAcfpClientInfoTable 1 }
+
+Hh3cAcfpClientInfoEntry ::= SEQUENCE
+    {
+        hh3cAcfpClientID             Integer32,
+        hh3cAcfpClientDescription    DisplayString,
+        hh3cAcfpClientHwVersion      DisplayString,
+        hh3cAcfpClientOSVersion      DisplayString,
+        hh3cAcfpClientAppVersion     DisplayString,
+        hh3cAcfpClientIP             IpAddress,
+        hh3cAcfpClientMode           BITS,
+        hh3cAcfpClientRowStatus      RowStatus
+    }
+
+hh3cAcfpClientID OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identifier of ACFP client."
+    ::= { hh3cAcfpClientInfoEntry 1 }
+
+hh3cAcfpClientDescription OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Description of the application that is running on ACFP
+        client, eg. IPS, VCX."
+    ::= { hh3cAcfpClientInfoEntry 2 }
+
+hh3cAcfpClientHwVersion OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The hardware revision of ACFP client."
+    ::= { hh3cAcfpClientInfoEntry 3 }
+
+hh3cAcfpClientOSVersion OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The operating system version running ACFP client."
+    ::= { hh3cAcfpClientInfoEntry 4 }
+
+hh3cAcfpClientAppVersion OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The application version running on ACFP client"
+    ::= { hh3cAcfpClientInfoEntry 5 }
+
+hh3cAcfpClientIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "IP address of ACFP client."
+    ::= { hh3cAcfpClientInfoEntry 6 }
+
+hh3cAcfpClientMode OBJECT-TYPE
+    SYNTAX      BITS
+        {
+            ipserver(0),
+            redirect(1),
+            mirror(2),
+            passThrough(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "ACFP client informs Router or switch which mode it is operating.
+        Router or switch checks hh3cAcfpServerInfo to see whether it is
+        capable of fulfilling this function.  If not, router or switch
+        generates a trap informing ACFP client such OAP mode is not
+        supported."
+    DEFVAL { 0 }
+    ::= { hh3cAcfpClientInfoEntry 7 }
+
+hh3cAcfpClientRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus, supports three states: createAndGo, active, destroy.
+        Creation Operation Restriction:
+        Node hh3cAcfpClientMode must be bound while creating a row. It is
+        optional for other nodes.
+        ACFP module must be enabled for the server while creating a row.
+        The number of rows created must not exceed upper limit.
+
+        Modification Operation Restriction:
+        Nodes that do not support modification: hh3cAcfpClientMode.
+        Nodes that support modification: hh3cAcfpClientDescription,
+        hh3cAcfpClientHwVersion, hh3cAcfpClientOSVersion,
+        hh3cAcfpClientAppVersion and hh3cAcfpClientIP.
+        If the row to be modified does not exist, error returns directly.
+
+        Deletion Operation Restriction:
+        If the row to be deleted does not exist, success returns directly.
+        "
+    ::= { hh3cAcfpClientInfoEntry 8 }
+
+-- Policy Information applied to Router or switch
+
+hh3cAcfpPolicy OBJECT IDENTIFIER ::= { hh3cAcfpOAP 3 }
+
+hh3cAcfpPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cAcfpPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists all current policies for ACFP
+        client(s).  Entries in this table are created or removed
+        implicitly when entries in the hh3cAcfpRuleTable are
+        created or removed, respectively.  A policy entry in this
+        table only exists as long as there is rule of this policy
+        in the hh3cAcfpRuleTable.  The table serves for listing the
+        existing policies and their remaining lifetimes and for
+        changing lifetimes of policies and implicitly of all policy
+        members and all their member policy rules can be
+        deleted by setting hh3cAcfpPolicyLifetime to 0."
+    ::= { hh3cAcfpPolicy 1 }
+
+hh3cAcfpPolicyEntry OBJECT-TYPE
+    SYNTAX      Hh3cAcfpPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The list contains basic information of ACFP Policy."
+    INDEX
+        {
+            hh3cAcfpClientID,
+            hh3cAcfpPolicyIndex
+        }
+    ::= { hh3cAcfpPolicyTable 1 }
+
+Hh3cAcfpPolicyEntry ::= SEQUENCE
+    {
+        hh3cAcfpPolicyIndex              Integer32,
+        hh3cAcfpPolicyInIfIndex          Integer32,
+        hh3cAcfpPolicyOutIfIndex         Integer32,
+        hh3cAcfpPolicyDestIfIndex        Integer32,
+        hh3cAcfpPolicyContextID          Integer32,
+        hh3cAcfpPolicyAdminStatus        INTEGER,
+        hh3cAcfpPolicyLifetime           Integer32,
+        hh3cAcfpPolicyTimeStart          OCTET STRING,
+        hh3cAcfpPolicyTimeEnd            OCTET STRING,
+        hh3cAcfpPolicyRowStatus          RowStatus,
+        hh3cAcfpPolicyDestIfFailAction   INTEGER,
+        hh3cAcfpPolicyPriority           INTEGER
+    }
+
+hh3cAcfpPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identifier of the Policy of ACFP client"
+    ::= { hh3cAcfpPolicyEntry 1 }
+
+hh3cAcfpPolicyInIfIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Packet is received from this interface.  The value of this object
+        contains the same value of ifIndex of ifTable."
+    DEFVAL {0}
+    ::= { hh3cAcfpPolicyEntry 2}
+
+
+hh3cAcfpPolicyOutIfIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Packet is sent to this interface.  The value of this object
+        contains the same value of ifIndex of ifTable."
+    DEFVAL {0}
+    ::= { hh3cAcfpPolicyEntry 3 }
+
+hh3cAcfpPolicyDestIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Through this interface, packet go to ACFP client from
+        ACFP server.  The value of this object contains the same
+        value of ifIndex of ifTable."
+    DEFVAL {0}
+    ::= { hh3cAcfpPolicyEntry 4 }
+
+hh3cAcfpPolicyContextID OBJECT-TYPE
+    SYNTAX      Integer32(0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internal id ACFP server allocated used to map to the interface.
+        ACFP server may send packet with this hh3cAcfpPolicyContextID to
+        ACFP client, ACFP client can make use of this hh3cAcfpPolicyContextID
+        and find the policy. "
+    ::= { hh3cAcfpPolicyEntry 5 }
+
+hh3cAcfpPolicyAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1), -- policy is applied
+            disable(2)   -- policy is not applied
+
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the desired status of the
+        policy."
+    ::= { hh3cAcfpPolicyEntry 6 }
+
+hh3cAcfpPolicyLifetime OBJECT-TYPE
+    SYNTAX      Integer32(0..2147483647)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object delivers the maximum lifetime (seconds)
+        of all the rules of this, i.e., of all the rows in hh3cAcfpRuleTable
+        that have the same values of hh3cAcfpRulePolicyIndex and
+        hh3cAcfpClientID.  Successfully writing to this object modifies the
+        lifetime of all the rules of this.  Successfully writing a value
+        of 0 terminates all the rules and implicitly deletes this as soon as
+        all member entries are removed from the hh3cAcfpRuleTable. Note that
+        after a lifetime expired, all the corresponding entry in the
+        hh3cAcfpRuleTable will be removed and this will be deleted
+        implicitly.  Writing to this object is processed by the ACFP MIB
+        implementation by choosing a lifetime value that is greater than
+        or equal to zero and less than or equal to the minimum of the requested
+        value and the value specified by object hh3cAcfpServerMaxLifetime:
+
+            0 <= lt_granted <= MINIMUM(lt_requested, lt_maximum)
+
+        whereas:
+        lt_granted is the actually granted lifetime by the ACFP MIB
+        implementation.
+        lt_requested is the requested lifetime of the ACFP client.
+        lt_maximum is the value of object hh3cAcfpServerMaxLifetime.
+        SNMP set requests to this object may be rejected or the value of
+        the object after an accepted set operation may be less than the
+        value that was contained in the SNMP set request."
+    DEFVAL{ hh3cAcfpServerMaxLifetime }
+    ::= { hh3cAcfpPolicyEntry 7 }
+
+hh3cAcfpPolicyTimeStart OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Beginning time of this policy every day.  Eg. HH:MM:SS"
+    ::= { hh3cAcfpPolicyEntry 8 }
+
+hh3cAcfpPolicyTimeEnd OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ending time of this policy every day.  Eg. HH:MM:SS"
+    ::= { hh3cAcfpPolicyEntry 9 }
+
+hh3cAcfpPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus, supports three states: createAndGo, active, destroy.
+        Creation Operation Restriction:
+        The client corresponding to the index hh3cAcfpClientID must exist
+        while creating a row.
+        Nodes hh3cAcfpPolicyTimeStart and hh3cAcfpPolicyTimeEnd are
+        bound together, and hh3cAcfpPolicyTimeEnd must be greater than
+        hh3cAcfpPolicyTimeStart.
+        The number of rows created on an incoming/outgoing interface
+        cannot exceed the upper limit.
+        The number of rows created cannot exceed the upper limit for each client.
+        A packet matches a policy in the following order:
+        - It first matches the policy with the highest priority.
+        - For two policies with the same priority,
+          it matches the one with the smallest client index.
+        - For two policies with the same client index,
+          it matches the one with the smallest policy index.
+
+        Modification Operation Restriction:
+        Nodes that do not support modification: hh3cAcfpPolicyInIfIndex,
+        hh3cAcfpPolicyOutIfIndex, hh3cAcfpPolicyDestIfIndex,
+        hh3cAcfpPolicyDestIfFailAction, hh3cAcfpPolicyPriority.
+        Nodes that support modification: hh3cAcfpPolicyAdminStatus,
+        hh3cAcfpPolicyLifetime, hh3cAcfpPolicyTimeStart and hh3cAcfpPolicyTimeEnd.
+        While modifying a row, if the row corresponding to the index configured
+        does not exist, error returns directly.
+        While modifying a node, the restriction over hh3cAcfpPolicyTimeStart
+        and hh3cAcfpPolicyTimeEnd is the same as creating a node.
+
+        Deletion Operation Restriction:
+        If the row to be deleted does not exist, success returns directly.
+        "
+    ::= { hh3cAcfpPolicyEntry 10 }
+
+hh3cAcfpPolicyDestIfFailAction OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            delete(1),   -- delete all rules of the policy from driver
+            reserve(2)   -- reserve all rules of the policy in driver
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the action of the
+        policy when the destination interface failed."
+    DEFVAL { 1 }
+    ::= { hh3cAcfpPolicyEntry 11 }
+
+hh3cAcfpPolicyPriority OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            priority1(1), -- Priority 1 (MIN)
+            priority2(2), -- Priority 2
+            priority3(3), -- Priority 3
+            priority4(4), -- Priority 4
+            priority5(5), -- Priority 5
+            priority6(6), -- Priority 6
+            priority7(7), -- Priority 7
+            priority8(8)  -- Priority 8 (MAX)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the priority of the
+        policy.
+        Priority8 is maximal priority.
+        Priority1 is minimal priority."
+    DEFVAL { 4 }
+    ::= { hh3cAcfpPolicyEntry 12 }
+
+-- Individual Rule policy Information applied to Router or switch
+
+hh3cAcfpRule OBJECT IDENTIFIER ::= { hh3cAcfpOAP 4 }
+
+hh3cAcfpRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cAcfpRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists all the rules.  It is indexed by
+        hh3cAcfpClientID, hh3cAcfpRulePolicyIndex and hh3cAcfpRuleIndex.
+        Entries can be deleted by writing hh3cAcfpPolicyLifetime to 0."
+    ::= { hh3cAcfpRule 1 }
+
+hh3cAcfpRuleEntry OBJECT-TYPE
+    SYNTAX      Hh3cAcfpRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The list contains basic information of the rule."
+    INDEX
+        {
+            hh3cAcfpClientID,
+            hh3cAcfpPolicyIndex,
+            hh3cAcfpRuleIndex
+        }
+    ::= { hh3cAcfpRuleTable 1 }
+
+Hh3cAcfpRuleEntry ::= SEQUENCE
+    {
+        hh3cAcfpRuleIndex           Integer32,
+        hh3cAcfpRuleOperStatus      INTEGER,
+        hh3cAcfpRuleAction          INTEGER,
+        hh3cAcfpRuleAll             TruthValue,
+        hh3cAcfpRuleSrcMAC          MacAddress,
+        hh3cAcfpRuleDstMAC          MacAddress,
+        hh3cAcfpRuleVlanStart       Integer32,
+        hh3cAcfpRuleVlanEnd         Integer32,
+        hh3cAcfpRuleProtocol        Integer32,
+        hh3cAcfpRuleSrcIP           IpAddress,
+        hh3cAcfpRuleSrcIPMask       IpAddress,
+        hh3cAcfpRuleSrcOp           INTEGER,
+        hh3cAcfpRuleSrcStartPort    Integer32,
+        hh3cAcfpRuleSrcEndPort      Integer32,
+        hh3cAcfpRuleDstIP           IpAddress,
+        hh3cAcfpRuleDstIPMask       IpAddress,
+        hh3cAcfpRuleDstOp           INTEGER,
+        hh3cAcfpRuleDstStartPort    Integer32,
+        hh3cAcfpRuleDstEndPort      Integer32,
+        hh3cAcfpRulePrecedence      Integer32,
+        hh3cAcfpRuleTos             Integer32,
+        hh3cAcfpRuleDscp            Integer32,
+        hh3cAcfpRuleEstablish       TruthValue,
+        hh3cAcfpRuleFragment        TruthValue,
+        hh3cAcfpRulePacketRate      Integer32,
+        hh3cAcfpRuleRowStatus       RowStatus,
+        hh3cAcfpRuleTCPFlag         Integer32,
+        hh3cAcfpRuleSrcIPV6Address  Ipv6Address,
+        hh3cAcfpRuleSrcPrefixLen    InetAddressPrefixLength,
+        hh3cAcfpRuleDstIPV6Address  Ipv6Address,
+        hh3cAcfpRuleDstPrefixLen    InetAddressPrefixLength,
+        hh3cAcfpRuleTrafficType     BITS,
+        hh3cAcfpRuleTypeOrLen       Integer32
+    }
+
+hh3cAcfpRuleIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identifier of the rules which have the same hh3cAcfpPolicyIndex
+        and hh3cAcfpClientID.hh3cAcfpRuleIndex indicates rule sequence in the
+        same policy."
+    ::= { hh3cAcfpRuleEntry 1 }
+
+hh3cAcfpRuleOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            success(1), -- rule applied successfully to interface
+            fail(2)     -- rule failed to apply to interface
+
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the status of a rule.
+        success : Applied rule to interface successfully.
+        fail : Failed to apply rule to interface.
+        "
+    DEFVAL { fail }
+    ::= { hh3cAcfpRuleEntry 2 }
+
+hh3cAcfpRuleAction OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            permit(1),
+            deny(2),
+            redirect(3),
+            mirror(4),
+            rate(5)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The action of this rule."
+    ::= { hh3cAcfpRuleEntry 3 }
+
+hh3cAcfpRuleAll OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The rule match all packet or does not.
+        true : all
+        false : not all
+        "
+    DEFVAL { false }
+    ::= { hh3cAcfpRuleEntry 4 }
+
+hh3cAcfpRuleSrcMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source MAC of this rule."
+    ::= { hh3cAcfpRuleEntry 5 }
+
+hh3cAcfpRuleDstMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination MAC of this rule."
+    ::= { hh3cAcfpRuleEntry 6 }
+
+hh3cAcfpRuleVlanStart OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Starting VLAN id of this rule.
+        0 : Invalid value"
+    DEFVAL { 0 }
+    ::= { hh3cAcfpRuleEntry 7 }
+
+hh3cAcfpRuleVlanEnd OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ending VLAN id of this rule.
+        0 : Invalid value"
+    DEFVAL { 0 }
+    ::= { hh3cAcfpRuleEntry 8 }
+
+hh3cAcfpRuleProtocol OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The protocol-type of this rule.
+        <0-255>  Protocol number
+        gre      GRE tunneling(47)
+        icmp     Internet Control Message Protocol(1)
+        igmp     Internet Management Protocol(2)
+        ip       Any IP protocol(0)
+        ipinip   IP in IP tunneling(4)
+        ospf     OSPF routing protocol(89)
+        tcp      Transmission Control Protocol (6)
+        udp      User Datagram Protocol (17)
+        "
+    DEFVAL { 0 }
+    ::= { hh3cAcfpRuleEntry 9 }
+
+hh3cAcfpRuleSrcIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IP address of this rule."
+    ::= { hh3cAcfpRuleEntry 10 }
+
+hh3cAcfpRuleSrcIPMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IP-address wild of this rule.  Eg. 0.0.0.255."
+    ::= { hh3cAcfpRuleEntry 11 }
+
+hh3cAcfpRuleSrcOp OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            equal(1),
+            notEqual(2),
+            lessThan(3),
+            greaterThan(4),
+            range(5),
+            invalid(6)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source Port operation for this rule"
+    DEFVAL { invalid }
+    ::= { hh3cAcfpRuleEntry 12 }
+
+hh3cAcfpRuleSrcStartPort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Starting UDP/TCP Source Port number of this rule."
+    ::= { hh3cAcfpRuleEntry 13 }
+
+hh3cAcfpRuleSrcEndPort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ending UDP/TCP Source Port of this rule."
+    ::= { hh3cAcfpRuleEntry 14 }
+
+hh3cAcfpRuleDstIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IP address of this rule."
+    ::= { hh3cAcfpRuleEntry 15 }
+
+hh3cAcfpRuleDstIPMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IP-address wild of this rule.  Eg. 0.0.0.255"
+    ::= { hh3cAcfpRuleEntry 16 }
+
+hh3cAcfpRuleDstOp OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            equal(1),
+            nonEqual(2),
+            lessThan(3),
+            greaterThan(4),
+            range(5),
+            invalid(6)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination Port operation for this rule"
+    DEFVAL { invalid }
+    ::= { hh3cAcfpRuleEntry 17 }
+
+hh3cAcfpRuleDstStartPort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Starting UDP/TCP Destination Port number of this rule."
+    ::= { hh3cAcfpRuleEntry 18 }
+
+hh3cAcfpRuleDstEndPort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ending UDP/TCP Destination Port of this rule."
+    ::= { hh3cAcfpRuleEntry 19 }
+
+hh3cAcfpRulePrecedence OBJECT-TYPE
+    SYNTAX      Integer32(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of precedence field in IP header.
+        <255>                  Invalid value
+        <0-7>                  value of precedence
+        routine(0)             Routine precedence
+        priority(1)            Priority precedence
+        immediate(2)           Immediate precedence
+        flash(3)               Flash precedence
+        flash-override(4)      Flash Override precedence
+        critical(5)            Critical precedence
+        internet(6)            Network Control precedence
+        network(7)             Internetwork Control precedence
+        "
+    DEFVAL { 255 }
+    ::= { hh3cAcfpRuleEntry 20 }
+
+hh3cAcfpRuleTos OBJECT-TYPE
+    SYNTAX      Integer32(0..15|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of TOS field in IP header.
+        <255>                  Invalid value
+        <0-15>                 value of ToS (Type of Service)
+        Normal(0)              normal service
+        min-monetary-cost(1)   minimum monetary cost
+        max-reliability(2)     maximum reliability
+        max-throughput(4)      maximum throughput
+        min-delay(8)           minimum delay
+        "
+    DEFVAL { 255 }
+    ::= { hh3cAcfpRuleEntry 21 }
+
+hh3cAcfpRuleDscp OBJECT-TYPE
+    SYNTAX      Integer32(0..63|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of DSCP.
+        <255>                  Invalid value
+        <0-63>                 value of DSCP
+        Be(0)                  best effort
+        af11(10)               assured forwarding 11 service
+        af12(12)               assured forwarding 12 service
+        af13(14)               assured forwarding 13 service
+        af21(18)               assured forwarding 18 service
+        af22(20)               assured forwarding 20 service
+        af23(22)               assured forwarding 22 service
+        af31(26)               assured forwarding 31 service
+        af32(28)               assured forwarding 32 service
+        af33(30)               assured forwarding 33 service
+        af41(34)               assured forwarding 41 service
+        af42(36)               assured forwarding 42 service
+        af43(38)               assured forwarding 43 service
+        cs1(8)                 class selector 1 service
+        cs2(16)                class selector 2 service
+        cs3(24)                class selector 3 service
+        cs4(32)                class selector 4 service
+        cs5(40)                class selector 5 service
+        cs6(48)                class selector 6 service
+        cs7(56)                class selector 7 service
+        ef(46)                 expedited forwarding service
+        "
+    DEFVAL { 255 }
+    ::= { hh3cAcfpRuleEntry 22 }
+
+hh3cAcfpRuleEstablish OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Establish Flag.  Matches the TCP packets with the ACK
+        and/or RST flag, including the TCP packets of these
+        types: SYN+ACK, ACK, FIN+ACK, RST, RST+ACK."
+    DEFVAL { false }
+    ::= { hh3cAcfpRuleEntry 23 }
+
+hh3cAcfpRuleFragment OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag of matching fragmented packet."
+    DEFVAL { false }
+    ::= { hh3cAcfpRuleEntry 24 }
+
+hh3cAcfpRulePacketRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Packet rate (Kbps) of this rule."
+    ::= { hh3cAcfpRuleEntry 25 }
+
+hh3cAcfpRuleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus, supports three states: createAndGo, active, destroy.
+        Creation Operation Restriction:
+        Node hh3cAcfpRuleAction must be bound while creating a line.
+        Nodes hh3cAcfpRuleAll and hh3cAcfpRuleProtocol, hh3cAcfpRuleSrcIP,
+        hh3cAcfpRuleSrcIPMask, hh3cAcfpRuleDstIP, hh3cAcfpRuleSrcOp,
+        hh3cAcfpRuleSrcStartPort, hh3cAcfpRuleSrcEndPort, hh3cAcfpRuleDstIP,
+        hh3cAcfpRuleDstIPMask, hh3cAcfpRuleDstOp, hh3cAcfpRuleDstStartPort,
+        hh3cAcfpRuleDstEndPort, hh3cAcfpRulePrecedence, hh3cAcfpRuleTos,
+        hh3cAcfpRuleDscp, hh3cAcfpRuleTCPFlag, hh3cAcfpRuleFragment are
+        mutually exclusive.
+        Nodes hh3cAcfpRuleSrcIP and hh3cAcfpRuleSrcIPMask are bound together,
+        otherwise, the source IP address is neglected.
+        The restriction over hh3cAcfpRuleDstIP and hh3cAcfpRuleDstIPMask is the
+        same as hh3cAcfpRuleSrcIP and hh3cAcfpRuleSrcIPMask.
+        Nodes hh3cAcfpRuleDscp and hh3cAcfpRulePrecedence, hh3cAcfpRuleTos are
+        mutually exclusive.
+        If the node hh3cAcfpRuleSrcOp is bound to range(5),
+        hh3cAcfpRuleSrcStartPort and hh3cAcfpRuleSrcEndPort must be bound together,
+        and hh3cAcfpRuleSrcEndPort must be greater than hh3cAcfpRuleSrcStartPort.
+        If the node hh3cAcfpRuleSrcOp is bound to equal(1), notEqual(2),
+        lessThan(3) or greaterThan(4), hh3cAcfpRuleSrcStartPort must be bound
+        together, and hh3cAcfpRuleSrcEndPort is neglected.
+        The restriction over hh3cAcfpRuleDstOp, hh3cAcfpRuleDstStartPort and
+        hh3cAcfpRuleDstEndPort is the same as hh3cAcfpRuleSrcOp,
+        hh3cAcfpRuleSrcStartPort and hh3cAcfpRuleSrcEndPort.
+        If the node hh3cAcfpRuleAction is bound to redirect(3) or mirror(4),
+        the destination interfaces of the policy the rule belonging to must exist;
+        The number of rows created cannot exceed the upper limit for each policy,
+        each inbound interface and each outbound interface.
+
+        Modification Operation Restriction:
+        The row does not support modification.
+
+        Deletion Operation Restriction
+        If the row to be deleted does not exist, success returns directly.
+        "
+    ::= { hh3cAcfpRuleEntry 26 }
+
+hh3cAcfpRuleTCPFlag OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "TCP Flag.
+        <0>       don't care for TCP flag to match packets
+        <1-65535> care for TCP flag to match packets,
+                  the value is combination of next list.
+                  URG_VALID (1 << 13)
+                  URG_SET   (1 << 5)
+                  ACK_VALID (1 << 12)
+                  ACK_SET   (1 << 4)
+                  PSH_VALID (1 << 11)
+                  PSH_SET   (1 << 3)
+                  RST_VALID (1 << 10)
+                  RST_SET   (1 << 2)
+                  SYN_VALID (1 << 9)
+                  SYN_SET   (1 << 1)
+                  FIN_VALID (1 << 8)
+                  FIN_SET   1
+
+        Matches the TCP packets with the URG and/or
+        ACK and/or PSH and/or RST and/or SYN and/or FIN flag,
+        including the TCP packets of these
+        types: SYN+ACK, ACK, FIN+ACK, RST, RST+ACK."
+    DEFVAL { 0 }
+    ::= { hh3cAcfpRuleEntry 27 }
+
+hh3cAcfpRuleSrcIPV6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IPv6 address of this rule."
+    ::= { hh3cAcfpRuleEntry 28 }
+
+hh3cAcfpRuleSrcPrefixLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IPv6 address prefix length of this rule. Eg. 64."
+    ::= { hh3cAcfpRuleEntry 29 }
+
+hh3cAcfpRuleDstIPV6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IPv6 address of this rule."
+    ::= { hh3cAcfpRuleEntry 30 }
+
+hh3cAcfpRuleDstPrefixLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IPv6 address prefix length of this rule. Eg. 64."
+    ::= { hh3cAcfpRuleEntry 31 }
+
+hh3cAcfpRuleTrafficType OBJECT-TYPE
+    SYNTAX      BITS
+        {
+            unicast(0),
+            multicast(1),
+            broadcast(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Traffic type of this rule. When retrieved, this object
+        returns a set of bits indicating the traffic type."
+    ::= { hh3cAcfpRuleEntry 32 }
+
+hh3cAcfpRuleTypeOrLen OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type or length of ethernet packet.
+        For Ethernet II encapsulation, it stands for packet type.
+        For 802.3 encapsulation, it stands for packet length."
+    ::= { hh3cAcfpRuleEntry 33 }
+
+-- Notifications.  The definition of hh3cAcfpNotifications makes notification
+-- registrations reversible (see STD 58, RFC 2578, section 8.5).
+
+hh3cAcfpNotifications OBJECT IDENTIFIER  ::= { hh3cAcfpOAP 5 }
+
+hh3cAcfpCurContextChanged NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpServerCurContextType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when router or switch changed
+        hh3cAcfpServerCurContextType."
+    ::= { hh3cAcfpNotifications 1 }
+
+hh3cAcfpClientRegister NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpClientID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the ACFP client is registered."
+    ::= { hh3cAcfpNotifications 2 }
+
+hh3cAcfpClientUnRegister NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpClientID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the ACFP client is unregistered."
+    ::= { hh3cAcfpNotifications 3 }
+
+hh3cAcfpClientDead NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpClientID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the ACFP client is not responding."
+    ::= { hh3cAcfpNotifications 4 }
+
+hh3cAcfpNotSupportedOAPMode NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpClientID,
+            hh3cAcfpClientMode,
+            hh3cAcfpServerInfo
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when router or switch cannot support OAP
+        mode that ACFP client wants to operate on."
+    ::= { hh3cAcfpNotifications 5 }
+
+hh3cAcfpLifetimeChangeEvent NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpPolicyLifetime
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated for indicating that
+        The lifetime of all member rules of the was
+        changed by successfully writing to object
+        hh3cAcfpPolicyLifetime.  Note that this notification
+        is only sent if the lifetime of a policy was changed by
+        successfully writing to object hh3cAcfpPolicyLifetime."
+    ::= { hh3cAcfpNotifications 6 }
+
+hh3cAcfpRuleCreatedEvent NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpRuleIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when a new rule is created."
+    ::= { hh3cAcfpNotifications 7 }
+
+hh3cAcfpRuleDeletedEvent NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpRuleIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when a rule is deleted."
+    ::= { hh3cAcfpNotifications 8 }
+
+hh3cAcfpRuleErrorEvent NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpRuleIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when rule cannot be applied."
+    ::= { hh3cAcfpNotifications 9 }
+
+hh3cAcfpLifetimeExpireEvent NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cAcfpPolicyLifetime
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent
+         when the time of the policy existed exceeds its lifetime."
+    ::= { hh3cAcfpNotifications 10 }
+
+END

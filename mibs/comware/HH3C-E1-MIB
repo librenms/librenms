@@ -1,0 +1,449 @@
+-- =============================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference: Extension of RFC 1213 and RFC 2233
+-- Version: V1.3
+-- History:
+--   V1.0 2004-12-01
+--        Initial Version  by lizhiyong and fangmin
+--   V1.1 2009-06-08 modified by TONGWEI
+--        Added hh3ce1Table and hh3ce1InterfaceTable
+--   V1.2 2010-04-08 modified by Tong Wei
+--        Modified hh3ce1Table
+--        Added hh3ce1TimeSlotSetTable
+--   V1.3 2012-07-16 modified SYNTAX of hh3ce1Clock by shuaixiaojuan
+-- =============================================================
+HH3C-E1-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Counter32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        ifIndex
+                FROM RFC1213-MIB
+        hh3cCommon
+                FROM HH3C-OID-MIB;
+
+
+hh3cE1  MODULE-IDENTITY
+        LAST-UPDATED    "201207161741Z"
+        ORGANIZATION
+            "New H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Technologies Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+             "This MIB provides E1 interface information that are
+             excluded by RFC 1213 and RFC 2233"
+        REVISION        "201207161741Z"
+        DESCRIPTION
+                "To fix bugs in the MIB file."
+        REVISION        "201004081855Z"
+        DESCRIPTION
+                "To fix bugs in the MIB file."
+        REVISION        "200906081741Z"
+        DESCRIPTION
+                "To fix bugs in the MIB file."
+        REVISION        "200412011436Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { hh3cCommon 28 }
+
+
+hh3ce1InterfaceStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cE1InterfaceStatusEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "This  table contains E1 interface packet statistics  "
+        ::= { hh3cE1 1 }
+
+hh3ce1InterfaceStatusEntry OBJECT-TYPE
+        SYNTAX         Hh3cE1InterfaceStatusEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains E1 interface packet statistics.
+         The index of this Entry is ifIndex defined in ifTable
+         of RFC1213-MIB"
+        INDEX { ifIndex }
+        ::= { hh3ce1InterfaceStatusTable 1 }
+
+Hh3cE1InterfaceStatusEntry ::= SEQUENCE  {
+        hh3ce1InterfaceInErrs            Counter32,
+        hh3ce1InterfaceInRuntsErrs       Counter32,
+        hh3ce1InterfaceInGiantsErrs      Counter32,
+        hh3ce1InterfaceInCrcErrs         Counter32,
+        hh3ce1InterfaceInAlignErrs       Counter32,
+        hh3ce1InterfaceInOverRunsErrs    Counter32,
+        hh3ce1InterfaceInDribblesErrs    Counter32,
+        hh3ce1InterfaceInAbortedSeqErrs  Counter32,
+        hh3ce1InterfaceInNoBufferErrs    Counter32,
+        hh3ce1InterfaceInFramingErrs     Counter32,
+        hh3ce1InterfaceOutputErrs        Counter32,
+        hh3ce1InterfaceOutUnderRunErrs   Counter32,
+        hh3ce1InterfaceOutCollisonsErrs  Counter32,
+        hh3ce1InterfaceOutDeferedErrs    Counter32
+        }
+
+hh3ce1InterfaceInErrs        OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "The total number of error received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 1 }
+
+hh3ce1InterfaceInRuntsErrs   OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "The number of Runts Error(too short packet) received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 2 }
+
+hh3ce1InterfaceInGiantsErrs OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "The number of Giants Error(too long packet) received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 3 }
+
+hh3ce1InterfaceInCrcErrs     OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "The number of CRC Error received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 4 }
+
+hh3ce1InterfaceInAlignErrs   OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "The number of Align Error received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 5 }
+
+hh3ce1InterfaceInOverRunsErrs OBJECT-TYPE
+        SYNTAX           Counter32
+        MAX-ACCESS       read-only
+        STATUS          current
+        DESCRIPTION
+         "The number of Over Runs Error received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 6 }
+
+hh3ce1InterfaceInDribblesErrs  OBJECT-TYPE
+        SYNTAX            Counter32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+         "The number of dribble packets received"
+        ::= { hh3ce1InterfaceStatusEntry 7 }
+
+hh3ce1InterfaceInAbortedSeqErrs    OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of AbortedSeq Error received on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 8 }
+
+hh3ce1InterfaceInNoBufferErrs      OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of Error (no buffer available)"
+        ::= { hh3ce1InterfaceStatusEntry 9 }
+
+hh3ce1InterfaceInFramingErrs      OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of framing Errors"
+        ::= { hh3ce1InterfaceStatusEntry 10 }
+
+hh3ce1InterfaceOutputErrs          OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of total Error transmited on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 11 }
+
+hh3ce1InterfaceOutUnderRunErrs     OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of UnderRun Error transmited on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 12 }
+
+hh3ce1InterfaceOutCollisonsErrs    OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of Collisions Error transmited on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 13 }
+
+hh3ce1InterfaceOutDeferedErrs      OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "The number of Deferred Error transmited on this interface"
+        ::= { hh3ce1InterfaceStatusEntry 14 }
+
+hh3ce1Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cE1Entry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of E1 interface entries."
+        ::= { hh3cE1 2 }
+
+hh3ce1Entry OBJECT-TYPE
+        SYNTAX         Hh3cE1Entry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains E1 interface management information."
+        INDEX { ifIndex }
+        ::= { hh3ce1Table 1 }
+
+Hh3cE1TimeSlot ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Each octet within this value specifies a set of time
+            slots, with the first octet specifying time slot 1 through
+            8, the second octet specifying time slots 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the highest numbered time slot, and the least significant bit
+            represents the lowest numbered time slot.  Thus, each time slot
+            of the E1 is represented by a single bit within the
+            value of this object.  If that bit has a value of '1'
+            then that time slot is included in the set of time slots;
+            the time slot is not included if its bit has a value of '0'."
+        SYNTAX      OCTET STRING(SIZE (4))
+
+Hh3cE1Entry ::= SEQUENCE  {
+        hh3ce1Type              BITS,
+        hh3ce1Clock             INTEGER,
+        hh3ce1FrameFormat       INTEGER,
+        hh3ce1LineCode          INTEGER,
+        hh3ce1PriSetTimeSlot    Hh3cE1TimeSlot,
+        hh3ce1DChannelIndex     Integer32,
+        hh3ce1SubScribLineChannelIndex Integer32,
+        hh3ce1FcmChannelIndex Integer32
+        }
+
+hh3ce1Type              OBJECT-TYPE
+        SYNTAX  BITS {
+                    voice(0),
+                    pos(1)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "Specifies the type of the E1 interface.
+          Now it supports types as follow:
+          voice  voice type
+          pos    POS type"
+        ::= { hh3ce1Entry 1 }
+
+hh3ce1Clock             OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    slave(1),
+                    master(2),
+                    internal(3),
+                    line(4),
+                    linePri(5)
+                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specifies the clock type used on the E1 interface."
+        ::= { hh3ce1Entry 2 }
+
+hh3ce1FrameFormat       OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    crc4(1),
+                    nocrc4(2)
+                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specifies the frame format used on the E1 interface."
+        DEFVAL { crc4 }
+        ::= { hh3ce1Entry 3 }
+
+hh3ce1LineCode          OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    ami(1),
+                    hdb3(3)
+                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specifies the line code type used on the E1 interface."
+        DEFVAL { hdb3 }
+        ::= { hh3ce1Entry 4 }
+
+hh3ce1PriSetTimeSlot    OBJECT-TYPE
+        SYNTAX          Hh3cE1TimeSlot
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "This is a bit-map of PRI time slots used on the E1 interface.
+         It needs to administratively shut down the D channel of
+         the E1 interface before cancelling PRI time slots."
+        ::= { hh3ce1Entry 5 }
+
+hh3ce1DChannelIndex      OBJECT-TYPE
+        SYNTAX                Integer32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "This is the ifIndex of the D channel of the E1 interface."
+        ::= { hh3ce1Entry 6 }
+
+hh3ce1SubScribLineChannelIndex      OBJECT-TYPE
+        SYNTAX                Integer32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "This is the ifIndex of the subscriber-line channel of the E1
+         interface."
+        ::= { hh3ce1Entry 7 }
+
+hh3ce1FcmChannelIndex      OBJECT-TYPE
+        SYNTAX                Integer32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "This is the ifIndex of the FCM (Fast Connection Modem) channel
+          of the E1 interface."
+        ::= { hh3ce1Entry 8 }
+
+hh3ce1InterfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cE1InterfaceEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of channels of E1 interface entries.
+         Including D channels and subscriber-line channels."
+        ::= { hh3cE1 3 }
+
+hh3ce1InterfaceEntry OBJECT-TYPE
+        SYNTAX         Hh3cE1InterfaceEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains channels of E1 interface management information.
+         Including D channels and subscriber-line channels."
+        INDEX { ifIndex }
+        ::= { hh3ce1InterfaceTable 1 }
+
+Hh3cE1InterfaceEntry ::= SEQUENCE  {
+        hh3ce1ControllerIndex        Integer32
+        }
+
+hh3ce1ControllerIndex      OBJECT-TYPE
+        SYNTAX                Integer32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+         "Which E1 interface is this channel belonged to."
+        ::= { hh3ce1InterfaceEntry 1 }
+
+hh3ce1TimeSlotSetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cE1TimeSlotSetEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of time slot set information of E1 interface entries."
+        ::= { hh3cE1 4 }
+
+hh3ce1TimeSlotSetEntry OBJECT-TYPE
+        SYNTAX         Hh3cE1TimeSlotSetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains time slot set information of E1 interface."
+        INDEX { ifIndex }
+        ::= { hh3ce1TimeSlotSetTable 1 }
+
+Hh3cE1TimeSlotSetEntry ::= SEQUENCE  {
+        hh3ce1TimeSlotSetGroupId     Integer32,
+        hh3ce1TimeSlotSetSignalType  INTEGER,
+        hh3ce1TimeSlotSetList        Hh3cE1TimeSlot,
+        hh3ce1TimeSlotSetRowStatus   RowStatus
+        }
+
+hh3ce1TimeSlotSetGroupId             OBJECT-TYPE
+        SYNTAX  Integer32(0..30)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+         "Group ID."
+        ::= { hh3ce1TimeSlotSetEntry 1 }
+
+hh3ce1TimeSlotSetSignalType       OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    unkown(1),
+                    em-delay(2),
+                    em-immediate(3),
+                    em-wink(4),
+                    fxo-ground(5),
+                    fxo-loop(6),
+                    fxs-ground(7),
+                    fxs-loop(8),
+                    r2(9)
+                }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "Signal type. Now it supports types as follow:
+            unkown,      unkown
+            em-delay     E&M Delay Dial
+            em-immediate E&M Immediate Start
+            em-wink      E&M Wink Start
+            fxo-ground   FXO Ground Start
+            fxo-loop     FXO Loop Start
+            fxs-ground   FXS Ground Start
+            fxs-loop     FXS Loop Start
+            r2           R2 ITU Q421"
+        ::= { hh3ce1TimeSlotSetEntry 2 }
+
+hh3ce1TimeSlotSetList    OBJECT-TYPE
+        SYNTAX          Hh3cE1TimeSlot
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+         "Time slot bit map."
+        ::= { hh3ce1TimeSlotSetEntry 3 }
+
+hh3ce1TimeSlotSetRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Operation status."
+        ::= { hh3ce1TimeSlotSetEntry 4 }
+
+END

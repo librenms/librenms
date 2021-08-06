@@ -1,0 +1,88 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: MAC management MIB
+-- Reference:
+-- Version: V1.3
+-- History:
+--  V1.0 Created by Zhangshilin, 2001.06.29
+--  V1.1 2002-01-08 modified by qizhenglin
+--  V1.2 2004-09-08 modify STATUS of hh3cLswProxyArpObject from mandatory to current by gaolong.
+--  V1.3 2004-10-12 updated by gaolong
+--       Import OBJECT-IDENTITY.
+-- ------------------------------------------------------------------
+
+HH3C-LswARP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    MODULE-IDENTITY,OBJECT-TYPE, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+
+     hh3cLswArpMib MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            ""
+            REVISION "200106290000Z"
+            DESCRIPTION
+            ""
+            ::= { hh3clswCommon  4 }
+
+    hh3cLswProxyArpObject OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Description."
+            ::= { hh3cLswArpMib 1 }
+    hh3cLswProxyArpEnableTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cLswProxyArpEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "Contains information that if proxy ARP enabled for every VLAN interface. "
+        ::= { hh3cLswProxyArpObject 1 }
+
+     hh3cLswProxyArpEnableEntry OBJECT-TYPE
+        SYNTAX  Hh3cLswProxyArpEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+          "Contains information that if proxy ARP enabled for VLAN interface."
+        INDEX   { hh3cLswIfIndex }
+        ::= { hh3cLswProxyArpEnableTable 1 }
+
+    Hh3cLswProxyArpEnableEntry ::=
+    SEQUENCE {
+        hh3cLswIfIndex INTEGER ,
+        hh3cLswProxyArpStatus  INTEGER
+        }
+
+    hh3cLswIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Vlan interface index "
+        ::= { hh3cLswProxyArpEnableEntry 1 }
+
+    hh3cLswProxyArpStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            disabled(0),
+            enabled(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION " Proxy ARP status for this VLAN interface."
+        ::= { hh3cLswProxyArpEnableEntry 2    }
+
+
+END

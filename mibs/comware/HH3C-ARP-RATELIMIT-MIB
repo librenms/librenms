@@ -1,0 +1,160 @@
+-- ============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the definition of
+--              the ARP Rate Limit general configuration.
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2009-12-08
+--   Initial version, created by gejianzhuang
+-- V1.1 2013-10-14
+--   Add hh3cARPRatelimitConfigTable, modified by yanjun
+-- ============================================================================
+HH3C-ARP-RATELIMIT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        ifIndex
+    FROM IF-MIB;
+
+-- Node definitions
+hh3cARPRatelimit MODULE-IDENTITY
+    LAST-UPDATED "201310141800Z"        -- OCT 14, 2013 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB file defines the ARP packet rate limit configuration.
+        The ARP packet rate limit feature monitors and controls the
+        rate of ARP packets delivered to the CPU on a device.  The
+        current version supports the monitoring feature only."
+    REVISION "201310141800Z"
+    DESCRIPTION
+        "Add hh3cARPRatelimitConfigTable."
+    REVISION "200912081912Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 110 }
+
+
+hh3cARPRatelimitObjects OBJECT IDENTIFIER ::= { hh3cARPRatelimit 1 }
+
+hh3cARPRatelimitTrap OBJECT IDENTIFIER  ::= { hh3cARPRatelimitObjects 1 }
+
+hh3cARPRatelimitConfig OBJECT IDENTIFIER  ::= { hh3cARPRatelimitObjects 2 }
+
+-- hh3cARPRatelimitTraps
+
+hh3cARPRatelimitTraps OBJECT IDENTIFIER ::= { hh3cARPRatelimitTrap 0 }
+
+hh3cARPRatelimitOverspeedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cARPRatelimitTrapVer,
+            hh3cARPRatelimitTrapCount,
+            hh3cARPRatelimitTrapMsg
+        }
+    STATUS      current
+    DESCRIPTION
+        "If the rate of ARP packets delivered to the CPU on a device
+        exceeds the threshold, a trap message is generated and sent
+        to the remote monitoring device."
+    ::= { hh3cARPRatelimitTraps 1 }
+
+hh3cARPRatelimitTrapObjects OBJECT IDENTIFIER  ::= { hh3cARPRatelimitTrap 1 }
+
+hh3cARPRatelimitTrapVer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The version of trap information."
+    ::= { hh3cARPRatelimitTrapObjects 1 }
+
+hh3cARPRatelimitTrapCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Number of cells in the trap message.  A trap message may contain
+        multiple cells, each of which indicates that the rate information of
+        ARP packets exceeds the threshold."
+    ::= { hh3cARPRatelimitTrapObjects 2 }
+
+hh3cARPRatelimitTrapMsg OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..254))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is the cell section in a trap message sent from a
+        monitored device.  This object can contain multiple cells.
+        This object is in the format of '<cell1><cell2>...'.  Each cell
+        consists of 17 octets in the format of
+        '<TrapOrigin><IfIndex><OverSpeedValue><Threshold><Interval>'.
+
+        <TrapOrigin> indicates the source of the trap message and has
+        size of 1 octet.  It only supports the following values.
+        1 - Global.
+        2 - Interface.
+
+        <IfIndex> is the index of the interface where the rate of ARP packet
+        exceeds the threshold and has size of 4 octets.  It is 0xFFFFFFFF
+        when <TrapOrigin> is 1(Global).
+
+        <OverSpeedValue> indicates the rate that ARP packets are actually
+        delivered and has size of 4 octets.
+
+        <Threshold> indicates the threshold that ARP packets can be delivered
+        to CPU and has size of 4 octets.
+
+        <Interval> indicates the interval that a trap message is sent out
+        and has size of 4 octets."
+
+    ::= { hh3cARPRatelimitTrapObjects 3 }
+
+-- hh3cARPRatelimitConfigTable
+
+hh3cARPRatelimitConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cARPRatelimitConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is used to configure ARP packet
+        rate limit on interfaces."
+    ::= { hh3cARPRatelimitConfig 1 }
+
+hh3cARPRatelimitConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cARPRatelimitConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cARPRatelimitConfigTable."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cARPRatelimitConfigTable 1 }
+
+Hh3cARPRatelimitConfigEntry ::= SEQUENCE
+    {
+        hh3cARPRatelimitValue     Unsigned32
+    }
+
+hh3cARPRatelimitValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure ARP packet rate limit.  Support for the value range
+        depends on the device model.  If the object is set to 0, the ARP
+        packet rate limit will be disabled."
+    ::= { hh3cARPRatelimitConfigEntry 1 }
+END

@@ -1,0 +1,127 @@
+-- =================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: protocol priority mib
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 created by zhuangyu
+--     The initial version, 2005-01-17
+-- =================================================================
+HH3C-PROT-PRIORITY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC;
+
+    hh3cProtocolPriority MODULE-IDENTITY
+        LAST-UPDATED "200501171633Z"        -- January 17, 2005 at 16:33 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB is used to manage and configure the priority of specified protocol.
+            This MIB is applicable to routers, switches and other products.
+            "
+        REVISION "200501171633Z"        -- January 17, 2005 at 16:33 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hh3cCommon 37 }
+
+
+--
+-- Node definitions
+--
+    hh3cProtocolPriorityObjects OBJECT IDENTIFIER ::= { hh3cProtocolPriority 1 }
+
+    hh3cPPri OBJECT IDENTIFIER ::= { hh3cProtocolPriorityObjects 1 }
+
+    hh3cProtocolPriorityTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cProtocolPriorityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table is used to configure the priority of the protocol."
+        ::= { hh3cPPri 1 }
+
+    hh3cProtocolPriorityEntry OBJECT-TYPE
+        SYNTAX Hh3cProtocolPriorityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry containing information about the priority of the protocol."
+        INDEX { hh3cPPriProtocolType }
+        ::= { hh3cProtocolPriorityTable 1 }
+
+    Hh3cProtocolPriorityEntry ::=
+        SEQUENCE {
+            hh3cPPriProtocolType
+                INTEGER,
+            hh3cPPriPriorityType
+                INTEGER,
+            hh3cPPriPriorityVlaue
+                Integer32,
+            hh3cPPriRowStatus
+                RowStatus
+        }
+
+    hh3cPPriProtocolType OBJECT-TYPE
+        SYNTAX INTEGER
+               {
+               ospf(1),
+               telnet(2),
+               snmp(3),
+               icmp(4),
+               bgp(5),
+               ldp(6)
+               }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Protocol type."
+        ::= { hh3cProtocolPriorityEntry 1 }
+
+    hh3cPPriPriorityType OBJECT-TYPE
+        SYNTAX INTEGER
+               {
+               ipPrecedence(1),
+               dscp(2)
+               }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Priority type."
+        ::= { hh3cProtocolPriorityEntry 2 }
+
+    hh3cPPriPriorityVlaue OBJECT-TYPE
+        SYNTAX Integer32 (0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Priority value.
+            If setting hh3cPPriPriorityType to ip-precedence(1),
+            the range of hh3cPPriPriorityVlaue is from 0 to 7.
+            If setting hh3cPPriPriorityType to dscp(2),
+            the range of hh3cPPriPriorityVlaue is from 0 to 63."
+        ::= { hh3cProtocolPriorityEntry 3 }
+
+    hh3cPPriRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support createAndGo,active and destroy.
+            To create a new row, hh3cPPriPriorityType and hh3cPPriPriorityValue must be specified.
+            To modify a row,hh3cPPriPriorityType and hh3cPPriPriorityValue
+            must change at the same time and the hh3cPPriRowStatus is active ."
+        ::= { hh3cProtocolPriorityEntry 4 }
+END

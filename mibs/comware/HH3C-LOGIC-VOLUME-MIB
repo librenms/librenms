@@ -1,0 +1,947 @@
+-- ===========================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: The MIB is designed to manage the disk.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2007-09-04 created by lizhicheng
+-- =================================================================
+HH3C-LOGIC-VOLUME-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        Counter32, Integer32,
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        RowStatus, DateAndTime, TEXTUAL-CONVENTION, TruthValue
+    FROM SNMPv2-TC
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        entPhysicalIndex
+    FROM ENTITY-MIB
+        Hh3cLvIDType, Hh3cStorageEnableState, Hh3cStorageActionType,
+        Hh3cStorageLedStateType, Hh3cSessionIDType,
+        Hh3cRaidIDType, Hh3cWwpnListType, hh3cStorageRef
+    FROM HH3C-STORAGE-REF-MIB;
+
+
+hh3cLogicVolume MODULE-IDENTITY
+    LAST-UPDATED "200709041452Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB describes the general information of disk device."
+    ::= { hh3cStorageRef 5 }
+
+hh3cLvMibObjects OBJECT IDENTIFIER ::= { hh3cLogicVolume 1 }
+
+
+
+
+hh3cLogicResourceCapacityObject  OBJECT IDENTIFIER ::= { hh3cLvMibObjects 1 }
+hh3cLvCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal number of logic volumes supported."
+    ::= { hh3cLogicResourceCapacityObject 1 }
+
+hh3cLvMaxSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "TB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal size of logic volumes supported."
+    ::= { hh3cLogicResourceCapacityObject 2 }
+
+hh3cTargetCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal number of targets supported."
+    ::= { hh3cLogicResourceCapacityObject 3 }
+
+hh3cInitiatorCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal number of initiators supported."
+    ::= { hh3cLogicResourceCapacityObject 4 }
+
+hh3cSanClientCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal number of SAN client supported."
+    ::= { hh3cLogicResourceCapacityObject 5 }
+
+-- Logic Resource Table
+-- This table described the logic resource information.
+
+hh3cLogicVolumeResource  OBJECT IDENTIFIER ::= { hh3cLvMibObjects 2 }
+
+hh3cLvCreateIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object supplys an valid index which uses to create a new
+        entry for the hh3cLvTable object. Reference to hh3cLvRowStatus object
+        for more information.
+        Note that if an entry of the associated table has been created or
+        deleted, the historical value of this object may be an invalid index
+        to create a new entry for the associated table."
+    ::= { hh3cLogicVolumeResource 1 }
+
+hh3cLvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes the logic resource information of a
+        logic volume."
+    ::= { hh3cLogicVolumeResource 2 }
+
+hh3cLvEntry OBJECT-TYPE
+    SYNTAX      Hh3cLvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to a particular logic resource."
+    INDEX
+        {
+            hh3cLvIndex
+        }
+
+    ::= { hh3cLvTable 1 }
+
+Hh3cLvEntry ::= SEQUENCE
+    {
+        hh3cLvIndex                Hh3cLvIDType,
+        hh3cLvName                 OCTET STRING,
+        hh3cLvTotalSize            Integer32,
+        hh3cLvCreateRaidUuid       Hh3cRaidIDType,
+        hh3cLvCreateRaidSize       Integer32,
+        hh3cLvSedInquiryStringKeep TruthValue,
+        hh3cLvSedRaidUuid          Hh3cRaidIDType,
+        hh3cLvState                INTEGER,
+        hh3cLvAssigned             INTEGER,
+        hh3cLvType                 INTEGER,
+        hh3cLvExtendTimes          Integer32,
+        hh3cLvRowStatus            RowStatus
+    }
+
+hh3cLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object describes the symbol of a logic volume."
+    ::= { hh3cLvEntry 1 }
+
+hh3cLvName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name of a logic volume."
+    ::= { hh3cLvEntry 2 }
+
+hh3cLvTotalSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the total size of a logic volume. The
+        units is million bytes."
+    ::= { hh3cLvEntry 3 }
+
+hh3cLvCreateRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the ID of array where a logic volume
+        build on."
+    ::= { hh3cLvEntry 4 }
+
+hh3cLvCreateRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the size of a logic volume when create it.
+        The units is million bytes."
+    ::= { hh3cLvEntry 5 }
+
+hh3cLvSedInquiryStringKeep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if the inquiry string of the logic volume should
+        be reserved. This value of this object is valid only when the associated
+        hh3cLvType is equal to 'serviceEnabled'."
+    ::= { hh3cLvEntry 6 }
+
+hh3cLvSedRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the location where the SED infomation is
+        build on."
+    ::= { hh3cLvEntry 7 }
+
+hh3cLvState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            usable(1),
+            unusable(2),
+            conflict(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of a logic volume. The value
+        'conflict' means the names of two or more logic volume are reduplicate."
+    ::= { hh3cLvEntry 8 }
+
+hh3cLvAssigned OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            use(1),
+            unused(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if the logic volume has be designated for
+        target or SAN client."
+    ::= { hh3cLvEntry 9 }
+
+hh3cLvType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            virtual(1),
+            direct(2),
+            serviceEnabled(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the type of a logic volume.
+         The value 'virtual' means virtual devices are defined as sets of storage blocks
+         from one or more physical array. This allows the creation of virtual devices that
+         can be a portion of a larger physical array, or an aggregation of multiple physical array.
+         The value 'direct' means direct devices are directly mapped SCSI devices.
+         Because they are not virtualized, direct devices cannot take advantage of advanced storage options,
+         such as mirroring, failover, replication, or snapshot copy.
+         The value 'serviceEnabled' means service enabled devices are all maintained in a one-to-one
+         mapping relationship(one physical array equals one logical device)."
+    ::= { hh3cLvEntry 10 }
+
+hh3cLvExtendTimes OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the times the logic volume has been extended."
+    ::= { hh3cLvEntry 11 }
+
+hh3cLvRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to create or delete a logic
+        volume."
+    ::= { hh3cLvEntry 12 }
+
+
+
+-- Extend Logic Resource Table
+-- This table described the extend resource information of the logic volume.
+hh3cLvExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLvExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the extend resource information of the logic
+        volume."
+    ::= { hh3cLvMibObjects 3}
+
+hh3cLvExtEntry OBJECT-TYPE
+    SYNTAX      Hh3cLvExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to extend resource of logic volume."
+    INDEX
+        {
+            hh3cLvIndex,
+            hh3cLvRaidUuid
+        }
+
+    ::= { hh3cLvExtTable 1 }
+
+Hh3cLvExtEntry ::= SEQUENCE
+    {
+        hh3cLvRaidUuid        Hh3cRaidIDType,
+        hh3cLvExtSize         Integer32,
+        hh3cLvRaidSize        Integer32,
+        hh3cLvExtRowStatus    RowStatus
+    }
+
+hh3cLvRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cRaidUuid in HH3C-RAID-MIB."
+    ::= { hh3cLvExtEntry 1 }
+
+hh3cLvExtSize OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the extend size of the logic volume in a
+        specific raid. The units is million bytes.
+        This object will always return zero when read."
+    ::= { hh3cLvExtEntry 2 }
+
+hh3cLvRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the size of logic volume on the specific raid.
+        The units is million bytes."
+    ::= { hh3cLvExtEntry 3 }
+
+hh3cLvExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the action to extend the logic volume."
+    ::= { hh3cLvExtEntry 4 }
+
+
+
+
+
+-- Target's Creation Information Table
+-- This table describes some information when creating the target.
+hh3cTargetResource OBJECT IDENTIFIER ::= { hh3cLvMibObjects 4 }
+
+hh3cTargetCreateIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object supplys an valid index which uses to create a new
+        entry for the hh3cTargetTable object.
+        Note that if an entry of the associated table has been created or
+        deleted, the historical value of this object may be an invalid index
+        to create a new entry for the associated table."
+    ::= { hh3cTargetResource 1 }
+
+hh3cTargetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTargetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes some information when creating a target."
+    ::= { hh3cTargetResource 2 }
+
+hh3cTargetEntry OBJECT-TYPE
+    SYNTAX      Hh3cTargetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to a target when create it."
+    INDEX
+        {
+            hh3cTargetId
+        }
+
+    ::= { hh3cTargetTable 1 }
+
+Hh3cTargetEntry ::= SEQUENCE
+    {
+        hh3cTargetId           Integer32,
+        hh3cTargetName         OCTET STRING,
+        hh3cTargetMinLun       Integer32,
+        hh3cTargetRowStatus    RowStatus
+    }
+
+hh3cTargetId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ID of a target."
+    ::= { hh3cTargetEntry 1 }
+
+hh3cTargetName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..223))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the name of a target."
+    ::= { hh3cTargetEntry 2 }
+
+hh3cTargetMinLun OBJECT-TYPE
+    SYNTAX      Integer32(0..127)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the mini LUN(logical unit number) number
+        of a target."
+    DEFVAL { 0 }
+    ::= { hh3cTargetEntry 3 }
+
+hh3cTargetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to add or delete the target."
+    ::= { hh3cTargetEntry 4 }
+
+
+
+
+-- Target's Address Information Table
+-- This table described address information of the target.
+hh3cTargetAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTargetAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table described some address information of a target."
+    ::= { hh3cLvMibObjects 5 }
+
+hh3cTargetAddressEntry OBJECT-TYPE
+    SYNTAX      Hh3cTargetAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to the address of a target."
+    INDEX
+        {
+            hh3cTargetId,
+            hh3cTargetIpAddrType,
+            hh3cTargetIpAddress
+        }
+
+    ::= { hh3cTargetAddressTable 1 }
+
+Hh3cTargetAddressEntry ::= SEQUENCE
+    {
+        hh3cTargetIpAddress      InetAddress,
+        hh3cTargetIpAddrType     InetAddressType,
+        hh3cTargetIpRowStatus    RowStatus
+    }
+
+hh3cTargetIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object describes the IP address of a target."
+    ::= { hh3cTargetAddressEntry 1 }
+
+hh3cTargetIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object describes the type of IP address."
+    ::= { hh3cTargetAddressEntry 2 }
+
+hh3cTargetIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to add or delete a IP address
+        of a target."
+    ::= { hh3cTargetAddressEntry 3 }
+
+
+
+
+
+-- Target's Logic Resource Information Table
+-- This table describes logic resource information of the target.
+hh3cTargetLvAssignTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTargetLvAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes logic resource information of a target."
+    ::= { hh3cLvMibObjects 6 }
+
+hh3cTargetLvAssignEntry OBJECT-TYPE
+    SYNTAX      Hh3cTargetLvAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to the logic resource of a target."
+    INDEX
+        {
+            hh3cTargetId,
+            hh3cLvIndex
+        }
+
+    ::= { hh3cTargetLvAssignTable 1 }
+
+Hh3cTargetLvAssignEntry ::= SEQUENCE
+    {
+        hh3cTargetLvLun          Integer32,
+        hh3cTargetLvRowStatus    RowStatus
+    }
+
+hh3cTargetLvLun OBJECT-TYPE
+    SYNTAX      Integer32(0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the init LUN number of a target."
+    ::= { hh3cTargetLvAssignEntry 1 }
+
+hh3cTargetLvRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to add or delete
+        the logic resource of a target."
+    ::= { hh3cTargetLvAssignEntry 2 }
+
+
+
+-- Initiator's Creation Information Table
+-- This table describes the creation information of initiators.
+hh3cInitiatorResource  OBJECT IDENTIFIER ::= { hh3cLvMibObjects 7 }
+
+hh3cInitiatorCreateIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object supplys an valid index which uses to create a new
+        entry for the hh3cInitiatorTable object.
+        Note that if an entry of the associated table has been created or
+        deleted, the historical value of this object may be an invalid index
+        to create a new entry for the associated table."
+    ::= { hh3cInitiatorResource 1 }
+
+hh3cInitiatorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cInitiatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes the creation information of initiators."
+    ::= { hh3cInitiatorResource 2 }
+
+hh3cInitiatorEntry OBJECT-TYPE
+    SYNTAX      Hh3cInitiatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to the creation
+        of initiator."
+    INDEX
+        {
+            hh3cSanClientId,
+            hh3cInitiatorId
+        }
+
+    ::= { hh3cInitiatorTable 1 }
+
+Hh3cInitiatorEntry ::= SEQUENCE
+    {
+        hh3cInitiatorId          Integer32,
+        hh3cInitiatorName        OCTET STRING,
+        hh3cInitiatorRowStatus   RowStatus
+    }
+
+hh3cInitiatorId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ID of the initiator."
+    ::= { hh3cInitiatorEntry 1 }
+
+hh3cInitiatorName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..223))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the name of the initiator."
+    ::= { hh3cInitiatorEntry 2 }
+
+hh3cInitiatorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to add or delete initiators."
+    ::= { hh3cInitiatorEntry 3 }
+
+
+
+
+-- Target And Initiator Associate Information Table
+-- This table describes the associates information between targets and initiators.
+hh3cTargetInitiatorAssociateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTargetInitiatorAssociateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes the associate information between the target and
+        initiator."
+    ::= { hh3cLvMibObjects 8 }
+
+hh3cTargetInitiatorAssociateEntry OBJECT-TYPE
+    SYNTAX      Hh3cTargetInitiatorAssociateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to association between the target and initiator."
+    INDEX
+        {
+            hh3cTargetId,
+            hh3cInitiatorId
+        }
+
+    ::= { hh3cTargetInitiatorAssociateTable 1 }
+
+Hh3cTargetInitiatorAssociateEntry ::= SEQUENCE
+    {
+        hh3cTIAccessMode    INTEGER,
+        hh3cTIChap          Hh3cStorageEnableState,
+        hh3cTIUserName      OCTET STRING,
+        hh3cTIPassword      OCTET STRING,
+        hh3cTIRowStatus     RowStatus
+    }
+
+hh3cTIAccessMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            read(1),
+            write(2),
+            nonexclusive(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the mode of accessing between the target
+        and initiator.
+        The value 'read' means read available.
+        The value 'write' means read/write available, and write available only for one association.
+        The value 'nonexclusive' means read/write available for multi-association."
+    ::= { hh3cTargetInitiatorAssociateEntry 1 }
+
+hh3cTIChap OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of the chap attestation."
+    DEFVAL { disable }
+    ::= { hh3cTargetInitiatorAssociateEntry 2 }
+
+hh3cTIUserName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the user name for the chap attestation."
+    ::= { hh3cTargetInitiatorAssociateEntry 3 }
+
+hh3cTIPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(12..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the password for the chap attestation.
+        It is proclaimed and can be modified."
+    ::= { hh3cTargetInitiatorAssociateEntry 4 }
+
+hh3cTIRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to add or delete the association."
+    ::= { hh3cTargetInitiatorAssociateEntry 5 }
+
+
+
+
+-- Session Status Table
+-- This table described the information of the sessions between targets and
+-- initiators.
+hh3cTISessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTISessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table described the information of the sessions."
+    ::= { hh3cLvMibObjects 9 }
+
+hh3cTISessionEntry OBJECT-TYPE
+    SYNTAX      Hh3cTISessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to the sessions."
+    INDEX
+        {
+            hh3cTargetId,
+            hh3cTISessionId
+        }
+
+    ::= { hh3cTISessionTable 1 }
+
+Hh3cTISessionEntry ::= SEQUENCE
+    {
+        hh3cTISessionId                 Hh3cSessionIDType,
+        hh3cTISessionConnectionCount    Counter32,
+        hh3cTISessionInitiatorName      OCTET STRING
+    }
+
+
+hh3cTISessionId OBJECT-TYPE
+    SYNTAX      Hh3cSessionIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ID of a session."
+    ::= { hh3cTISessionEntry 1 }
+
+hh3cTISessionConnectionCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the number of connections between the targets
+        and initiators."
+    ::= { hh3cTISessionEntry 2 }
+
+hh3cTISessionInitiatorName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..223))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the initiator's name of a session."
+    ::= { hh3cTISessionEntry 3 }
+
+
+-- SAN Client Information Table
+-- This table described the information of the logs.
+hh3cSanClientResource  OBJECT IDENTIFIER ::= { hh3cLvMibObjects 10 }
+
+hh3cSanClientCreateIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object supplys an valid index which uses to create a new
+        entry for the hh3cSanClientTable object.
+        Note that if an entry of the associated table has been created or
+        deleted, the historical value of this object may be an invalid index
+        to create a new entry for the associated table."
+    ::= { hh3cSanClientResource 1 }
+
+hh3cSanClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSanClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table described the information of SAN(Storage Area Network)
+        clients."
+    ::= { hh3cSanClientResource 2 }
+
+hh3cSanClientEntry OBJECT-TYPE
+    SYNTAX      Hh3cSanClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to the SAN
+        clients."
+    INDEX
+        {
+            hh3cSanClientId
+        }
+    ::= { hh3cSanClientTable 1 }
+
+Hh3cSanClientEntry ::= SEQUENCE
+    {
+        hh3cSanClientId            Integer32,
+        hh3cSanClientName          OCTET STRING,
+        hh3cSanClientType          INTEGER,
+        hh3cFcInitiatorWwpnList    Hh3cWwpnListType,
+        hh3cFcAccessMode           INTEGER,
+        hh3cSanClientRowStatus     RowStatus
+    }
+
+hh3cSanClientId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the index of a SAN client."
+    ::= { hh3cSanClientEntry 1 }
+
+hh3cSanClientName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name of a SAN client."
+    ::= { hh3cSanClientEntry 2 }
+
+hh3cSanClientType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            iscsi(1),
+            fc(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the type of a SAN client."
+    ::= { hh3cSanClientEntry 3 }
+
+hh3cFcInitiatorWwpnList OBJECT-TYPE
+    SYNTAX      Hh3cWwpnListType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name list of FC Initiator WWPN(World Wide
+        Port Name). The value of this object is invalid and should be ignored
+        when the value of associated hh3cSanClientType object is not equal
+        to 'fc'."
+    ::= { hh3cSanClientEntry 4 }
+
+hh3cFcAccessMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            read(1),
+            write(2),
+            nonexclusive(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the mode of access. The value of this object
+        is invalid and should be ignored when the value of associated
+        hh3cSanClientType object is not equal to 'fc'.
+        The value 'read' means read available.
+        The value 'write' means read/write available, and write available only for one association.
+        The value 'nonexclusive' means read/write available for multi-association."
+    ::= { hh3cSanClientEntry 6 }
+
+hh3cSanClientRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the action to create or delete a SAN client."
+    ::= { hh3cSanClientEntry 7 }
+
+-- FC's Logic Resource Information Table
+-- This table describes logic resource information of the FC.
+hh3cFcLogicResourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cFcLogicResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes logic resource information of a FC."
+    ::= { hh3cLvMibObjects 11 }
+
+hh3cFcLogicResourceEntry OBJECT-TYPE
+    SYNTAX      Hh3cFcLogicResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to the logic resource of a FC."
+    INDEX
+        {
+            hh3cSanClientId,
+            hh3cLvIndex
+        }
+
+    ::= { hh3cFcLogicResourceTable 1 }
+
+Hh3cFcLogicResourceEntry ::= SEQUENCE
+    {
+        hh3cFcLvLun             Integer32,
+        hh3cFcTargetWwpnName    Hh3cWwpnListType,
+        hh3cFcInitiatorWwpnName Hh3cWwpnListType,
+        hh3cFcLvRowStatus       RowStatus
+    }
+
+hh3cFcLvLun OBJECT-TYPE
+    SYNTAX      Integer32(0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the init LUN number of a FC."
+    ::= { hh3cFcLogicResourceEntry 1 }
+
+
+hh3cFcTargetWwpnName OBJECT-TYPE
+    SYNTAX      Hh3cWwpnListType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name list of FC Target WWPN(World Wide
+        Port Name). "
+    ::= { hh3cFcLogicResourceEntry 2 }
+
+hh3cFcInitiatorWwpnName OBJECT-TYPE
+    SYNTAX      Hh3cWwpnListType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name list of FC Initiator WWPN(World Wide
+        Port Name). "
+    ::= { hh3cFcLogicResourceEntry 3 }
+
+hh3cFcLvRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to add or delete
+        the logic resource of a FC."
+    ::= { hh3cFcLogicResourceEntry 4 }
+END

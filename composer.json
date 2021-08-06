@@ -1,7 +1,7 @@
 {
     "name": "librenms/librenms",
-    "description": "A fully featured network monitoring system that provides a wealth of features and device support.",
     "type": "project",
+    "description": "A fully featured network monitoring system that provides a wealth of features and device support.",
     "keywords": [
         "network",
         "monitoring",
@@ -13,15 +13,8 @@
     ],
     "homepage": "https://www.librenms.org/",
     "license": "GPL-3.0-or-later",
-    "support": {
-        "source": "https://github.com/librenms/librenms/",
-        "docs": "http://docs.librenms.org/",
-        "forum": "https://community.librenms.org/",
-        "issues": "https://github.com/librenms/librenms/issues/",
-        "irc": "irc://irc.freenode.org/#librenms"
-    },
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^7.3 || ^8.0",
         "ext-curl": "*",
         "ext-gd": "*",
         "ext-json": "*",
@@ -77,17 +70,26 @@
         "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {
+        "ext-ldap": "*",
         "ext-memcached": "Required if you utilize distributed polling",
-        "ext-posix": "Allows for additional validation tests",
         "ext-mysqlnd": "*",
-        "ext-ldap": "*"
+        "ext-posix": "Allows for additional validation tests"
+    },
+    "config": {
+        "discard-changes": true,
+        "optimize-autoloader": true,
+        "platform-check": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": [
+                "nunomaduro/laravel-console-summary"
+            ]
+        }
     },
     "autoload": {
-        "exclude-from-classmap": [
-            "/vendor/laravel/laravel/database/",
-            "/vendor/laravel/laravel/app/",
-            "/html/plugins"
-        ],
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
@@ -101,26 +103,15 @@
         ],
         "files": [
             "includes/helpers.php"
+        ],
+        "exclude-from-classmap": [
+            "/vendor/laravel/laravel/database/",
+            "/vendor/laravel/laravel/app/",
+            "/html/plugins"
         ]
     },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "platform-check": true,
-        "discard-changes": true
-    },
     "scripts": {
-        "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
         "pre-install-cmd": "LibreNMS\\ComposerHelper::preInstall",
-        "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
-        "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
-        ],
-        "post-create-project-cmd": [
-            "@php artisan key:generate --ansi"
-        ],
         "post-install-cmd": [
             "LibreNMS\\ComposerHelper::postInstall",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
@@ -130,18 +121,33 @@
             "@php artisan config:clear",
             "@python-requirements"
         ],
+        "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
         ],
         "python-requirements": [
             "scripts/check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     },
-    "extra": {
-        "laravel": {
-            "dont-discover": [
-                "nunomaduro/laravel-console-summary"
-            ]
+    "support": {
+        "issues": "https://github.com/librenms/librenms/issues/",
+        "forum": "https://community.librenms.org/",
+        "chat": "https://discord.gg/librenms",
+        "source": "https://github.com/librenms/librenms/",
+        "docs": "https://docs.librenms.org/"
+    },
+    "funding": [
+        {
+            "type": "opencollective",
+            "url": "https://opencollective.com/librenms"
         }
-    }
+    ]
 }

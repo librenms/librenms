@@ -1,0 +1,623 @@
+-- =========================================================================
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Secure Shell(SSH) MIB
+-- Reference: draft-ylonen-ssh-protocol-00.txt
+-- Version: V1.5
+-- History:
+--  V1.0 2007-11-19 created by ZhangJun 03132
+--       Initial version.
+--  V1.1 2013-12-21 Added enum value scp(5) to hh3cSSHUserServiceType by DaiRuiqiang 04358.
+--  V1.2 2014-01-17 Added enum value scp(4) to hh3cSSHSessionServiceType by DaiRuiqiang 04358.
+--       2014-02-20 Added hh3cSCPServerEnable and hh3cSTelnetServerEnable by DaiRuiqiang 04358.
+--  V1.3 2014-10-25 Added enum value netconf(6) to hh3cSSHUserServiceType,
+--                  added enum value netconf(5) to hh3cSSHSessionServiceType by DaiRuiqiang 04358.
+--  V1.4 2016-04-26 Added hh3cSSHUserPublicKeyName2 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName3 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName4 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName5 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName6 to Hh3cSSHUserConfigEntry by DaiRuiqiang 04358.
+--                  Added enum values aes128CTR(5), aes192CTR(6), aes256CTR(7), aes128GCM(8),
+--                  aes256GCM(9), and aes256CBC(10) to hh3cSSHSessionEncry by DaiRuiqiang 04358.
+--       2018-02-06 Added enum value keyboard-interactive(6) in hh3cSSHUserAuthType by DaiRuiqiang 04358
+--  V1.5 2018-06-28 Added enum value other(11) to hh3cSSHSessionEncry by DaiRuiqiang 04358.
+-- =========================================================================
+HH3C-SSH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        DisplayString, RowStatus
+    FROM SNMPv2-TC;
+
+hh3cSSH MODULE-IDENTITY
+    LAST-UPDATED "201806280000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB is used to configure SSH server."
+    REVISION "201806280000Z"
+    DESCRIPTION
+        "Added enum value other(11) to hh3cSSHSessionEncry."
+    REVISION "201802060000Z"
+    DESCRIPTION
+        "Added enum value keyboardInteractive(6) to hh3cSSHUserAuthType."
+    REVISION "201604260000Z"
+    DESCRIPTION
+        "Added enum values aes128CTR(5), aes192CTR(6), aes256CTR(7), aes128GCM(8),
+         aes256GCM(9), and aes256CBC(10) to hh3cSSHSessionEncry.
+         Added hh3cSSHUserPublicKeyName2, and hh3cSSHUserPublicKeyName3, hh3cSSHUserPublicKeyName4,
+         hh3cSSHUserPublicKeyName5, and hh3cSSHUserPublicKeyName6 to Hh3cSSHUserConfigEntry."
+    REVISION "201410250000Z"
+    DESCRIPTION
+        "Added enum value netconf(6) to hh3cSSHUserServiceType, add enum value netconf(5) to hh3cSSHSessionServiceType."
+    REVISION "201402200000Z"
+    DESCRIPTION
+        "Added hh3cSCPServerEnable and hh3cSTelnetServerEnable."
+    REVISION "201401170000Z"
+    DESCRIPTION
+        "Added enum value scp(4) to hh3cSSHSessionServiceType."
+    REVISION "201312210000Z"
+    DESCRIPTION
+        "Added enum value scp(5) to hh3cSSHUserServiceType."
+    REVISION "200711190000Z"
+    DESCRIPTION
+        "The initial version."
+    ::= { hh3cCommon 22 }
+
+--
+-- Node definitions
+--
+-- Scalar MIB objects are defined in this section.
+hh3cSSHServerMIB OBJECT IDENTIFIER ::= { hh3cSSH 1 }
+
+hh3cSSHServerMIBObjects OBJECT IDENTIFIER ::= { hh3cSSHServerMIB 1 }
+
+-- Scalar MIB objects, which are considered as global variables
+-- to SSH server, are defined in this section.
+hh3cSSHServerGlobalConfig OBJECT IDENTIFIER ::= { hh3cSSHServerMIBObjects 1 }
+
+hh3cSSHServerVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version of the SSH server."
+    ::= { hh3cSSHServerGlobalConfig 1 }
+
+hh3cSSHServerCompatibleSSH1x OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enableCompatibleSSH1x(1),
+            disableCompatibleSSH1x(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Supporting compatibility with SSH versions 1.x.  It is
+        known that there are still devices using the previous
+        versions.  During the transition period, it is important to
+        be able to work in a way that is compatible with the
+        installed SSH clients and servers that use the older version
+        of the protocol."
+    ::= { hh3cSSHServerGlobalConfig 2 }
+
+hh3cSSHServerRekeyInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time interval of regenerating SSH server key.  The unit
+        is hour."
+    ::= { hh3cSSHServerGlobalConfig 3 }
+
+hh3cSSHServerAuthRetries OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The limit times of a specified user can retry."
+    ::= { hh3cSSHServerGlobalConfig 4 }
+
+hh3cSSHServerAuthTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The SSH server has a timeout for authentication and
+        disconnect if the authentication has not been accepted
+        within the timeout period.  The unit is second."
+    ::= { hh3cSSHServerGlobalConfig 5 }
+
+hh3cSFTPServerIdleTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The SFTP server has a timeout for idle connection if a user
+        has no activities within the timeout period.  The unit is
+        minute."
+    ::= { hh3cSSHServerGlobalConfig 6 }
+
+hh3cSSHServerEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enableSSHServer(1),
+            disableSSHServer(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable SSH server function."
+    ::= { hh3cSSHServerGlobalConfig 7 }
+
+hh3cSFTPServerEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enableSFTPService(1),
+            disableSFTPService(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable SFTP server function."
+    ::= { hh3cSSHServerGlobalConfig 8 }
+
+hh3cSTelnetServerEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enableSTelnetServer(1),
+            disableSTelnetServer(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable STelnet server function."
+    ::= { hh3cSSHServerGlobalConfig 9 }
+
+hh3cSCPServerEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enableSCPService(1),
+            disableSCPService(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable SCP server function."
+    ::= { hh3cSSHServerGlobalConfig 10 }
+
+-- SSH users are defined in this section.
+hh3cSSHUserConfig OBJECT IDENTIFIER ::= { hh3cSSHServerMIBObjects 2 }
+
+-- Define a group which consists of all objects used for users.
+hh3cSSHUserConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSSHUserConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for managing SSH users."
+    ::= { hh3cSSHUserConfig 1 }
+
+hh3cSSHUserConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cSSHUserConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SSH users configuration entry."
+    INDEX
+        {
+            hh3cSSHUserName
+        }
+    ::= { hh3cSSHUserConfigTable 1 }
+
+Hh3cSSHUserConfigEntry ::= SEQUENCE
+    {
+        hh3cSSHUserName             DisplayString,
+        hh3cSSHUserServiceType      INTEGER,
+        hh3cSSHUserAuthType         INTEGER,
+        hh3cSSHUserPublicKeyName    DisplayString,
+        hh3cSSHUserWorkDirectory    DisplayString,
+        hh3cSSHUserRowStatus        RowStatus,
+        hh3cSSHUserPublicKeyName2    DisplayString,
+        hh3cSSHUserPublicKeyName3    DisplayString,
+        hh3cSSHUserPublicKeyName4    DisplayString,
+        hh3cSSHUserPublicKeyName5    DisplayString,
+        hh3cSSHUserPublicKeyName6    DisplayString
+    }
+
+hh3cSSHUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of SSH user."
+    ::= { hh3cSSHUserConfigEntry 1 }
+
+hh3cSSHUserServiceType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            invalid(1),
+            all(2),
+            stelnet(3),
+            sftp(4),
+            scp(5),
+            netconf(6)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The service type of SSH user uses."
+    DEFVAL      { invalid }
+    ::= { hh3cSSHUserConfigEntry 2 }
+
+hh3cSSHUserAuthType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            invalid(1),
+            password(2),
+            publicKey(3),
+            any(4),
+            publicKeyPassword(5),
+            keyboardInteractive(6)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The authentication type of SSH user chooses."
+    DEFVAL      { invalid }
+    ::= { hh3cSSHUserConfigEntry 3 }
+
+hh3cSSHUserPublicKeyName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 4 }
+
+hh3cSSHUserWorkDirectory OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SFTP user's work directory associates with an existing user."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 5 }
+
+hh3cSSHUserRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status variable, used in accordance to installation
+        and removal conventions for conceptual rows.
+
+        When the `hh3cSSHUserRowStatus' is set to active(1), no objects
+        in this table can be modified.
+
+        When 'hh3cSSHUserRowStatus' is set to notInService(2), every object
+        except the 'hh3cSSHUserName' object in this table can be modified.
+
+        To create a row in this table, a manager must set this object
+        to createAndGo(4).  Until instances of all corresponding columns
+        are appropriately configured, the value of the corresponding
+        instance of the hh3cSSHUserRowStatus column is 'notReady'."
+    ::= { hh3cSSHUserConfigEntry 6 }
+
+hh3cSSHUserPublicKeyName2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 7 }
+
+hh3cSSHUserPublicKeyName3 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 8 }
+
+hh3cSSHUserPublicKeyName4 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 9 }
+
+hh3cSSHUserPublicKeyName5 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 10 }
+
+hh3cSSHUserPublicKeyName6 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 11 }
+
+-- Define a group which consists of all objects used for sessions.
+hh3cSSHSessionInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSSHSessionInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for SSH sessions."
+    ::= { hh3cSSHServerMIBObjects 3 }
+
+hh3cSSHSessionInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cSSHSessionInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SSH session information entry."
+    INDEX
+        {
+            hh3cSSHSessionID
+        }
+    ::= { hh3cSSHSessionInfoTable 1 }
+
+Hh3cSSHSessionInfoEntry ::= SEQUENCE
+    {
+        hh3cSSHSessionID               Integer32,
+        hh3cSSHSessionUserName         DisplayString,
+        hh3cSSHSessionUserIpAddrType   InetAddressType,
+        hh3cSSHSessionUserIpAddr       InetAddress,
+        hh3cSSHSessionClientVersion    DisplayString,
+        hh3cSSHSessionServiceType      INTEGER,
+        hh3cSSHSessionEncry            INTEGER,
+        hh3cSSHSessionState            INTEGER
+    }
+
+hh3cSSHSessionID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identifier of SSH session."
+    ::= { hh3cSSHSessionInfoEntry 1 }
+
+hh3cSSHSessionUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user name of SSH session."
+    ::= { hh3cSSHSessionInfoEntry 2 }
+
+hh3cSSHSessionUserIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user IP address type of SSH session."
+    ::= { hh3cSSHSessionInfoEntry 3 }
+
+hh3cSSHSessionUserIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user IP address of SSH session."
+    ::= { hh3cSSHSessionInfoEntry 4 }
+
+hh3cSSHSessionClientVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The client version of SSH session.  It is known that there are still
+        devices using the previous versions."
+    ::= { hh3cSSHSessionInfoEntry 5 }
+
+hh3cSSHSessionServiceType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            invalid(1),
+            stelnet(2),
+            sftp(3),
+            scp(4),
+            netconf(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The service type of SSH session."
+    ::= { hh3cSSHSessionInfoEntry 6 }
+
+hh3cSSHSessionEncry OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            invalid(1),
+            aes128CBC(2),
+            desCBC(3),
+            des3CBC(4),
+            aes128CTR(5),
+            aes192CTR(6),
+            aes256CTR(7),
+            aes128GCM(8),
+            aes256GCM(9),
+            aes256CBC(10),
+            other(11)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The encryption algorithm of SSH session.  There are several encryption
+        algorithms used in SSH protocol, please refer to RFC4253 Section 6.3."
+    ::= { hh3cSSHSessionInfoEntry 7 }
+
+hh3cSSHSessionState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            init(1),
+            verExchange(2),
+            keysExchange(3),
+            authRequest(4),
+            serviceRequest(5),
+            established(6),
+            disconnect(7)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of SSH session.
+        init           : This session is in initial status.
+        verExchange    : This session is in version exchanging.
+        keysExchange   : This session is in keys exchanging.
+        authRequest    : This session is in authentication requesting.
+        serviceRequest : This session is in service requesting.
+        established    : This session has been established.
+        disconnected   : This session has been disconnected."
+    ::= { hh3cSSHSessionInfoEntry 8 }
+
+
+-- Define a group which consists of all objects used for trap.
+hh3cSSHServerObjForTrap OBJECT IDENTIFIER ::= { hh3cSSHServerMIB 2 }
+
+hh3cSSHAttemptUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user name of the attacker who attempted to log in."
+    ::= { hh3cSSHServerObjForTrap 1 }
+
+hh3cSSHAttemptIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of the attacker who attempted to log in."
+    ::= { hh3cSSHServerObjForTrap 2 }
+
+hh3cSSHAttemptIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the attacker who attempted to log in."
+    ::= { hh3cSSHServerObjForTrap 3 }
+
+hh3cSSHUserAuthFailureReason OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            exceedRetries(1),
+            authTimeout(2),
+            otherReason(3)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The reason for that a user failed to log in."
+    ::= { hh3cSSHServerObjForTrap 4 }
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+hh3cSSHServerNotifications OBJECT IDENTIFIER ::= { hh3cSSHServerMIB 3 }
+
+-- All trap definitions should be placed under this object.
+hh3cSSHServerNotificationsPrefix OBJECT IDENTIFIER ::= { hh3cSSHServerNotifications 0 }
+
+-- All objects used for TRAP only are defined here.
+hh3cSSHUserAuthFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSSHAttemptUserName,
+            hh3cSSHAttemptIpAddrType,
+            hh3cSSHAttemptIpAddr,
+            hh3cSSHUserAuthFailureReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when a user fails to authentication."
+    ::= { hh3cSSHServerNotificationsPrefix 1 }
+
+hh3cSSHVersionNegotiationFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSSHAttemptIpAddrType,
+            hh3cSSHAttemptIpAddr
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when a user fails to negotiate SSH
+        protocol version."
+    ::= { hh3cSSHServerNotificationsPrefix 2 }
+
+hh3cSSHUserLogin NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSSHSessionUserName,
+            hh3cSSHSessionUserIpAddrType,
+            hh3cSSHSessionUserIpAddr
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when a user logs in successfully."
+    ::= { hh3cSSHServerNotificationsPrefix 3 }
+
+hh3cSSHUserLogoff NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSSHSessionUserName,
+            hh3cSSHSessionUserIpAddrType,
+            hh3cSSHSessionUserIpAddr
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when a user logs off."
+    ::= { hh3cSSHServerNotificationsPrefix 4 }
+
+END
