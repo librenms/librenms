@@ -224,8 +224,8 @@ class Plugins
             $plugin_files = array_diff($plugin_files, Plugin::versionOne()->pluck('plugin_name')->toArray());
             foreach ($plugin_files as $name) {
                 if (is_dir(\LibreNMS\Config::get('plugin_dir') . '/' . $name)
-                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')
-                    && Plugin::create(['plugin_name' => $name, 'plugin_active' => false, 'version' => 1])) {
+                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
+                    Plugin::create(['plugin_name' => $name, 'plugin_active' => false, 'version' => 1]);
                     $countInstalled++;
                 }
             }
