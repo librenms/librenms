@@ -46,7 +46,6 @@ class Mail extends Transport
         }
 
         return send_mail($email, $obj['title'], $msg, $html);
-
     }
 
     public static function configTemplate()
