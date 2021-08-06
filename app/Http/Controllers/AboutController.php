@@ -49,7 +49,6 @@ use App\Models\Syslog;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
-use DB;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
