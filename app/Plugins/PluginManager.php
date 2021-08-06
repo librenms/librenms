@@ -133,7 +133,7 @@ class PluginManager
                     'version' => 2,
                 ]);
                 $this->getPlugins()->put($name, $plugin);
-            } catch(QueryException $e) {
+            } catch (QueryException $e) {
                 // DB not migrated/connected
             }
         }
@@ -146,7 +146,7 @@ class PluginManager
         if ($this->plugins === null) {
             try {
                 $this->plugins = Plugin::versionTwo()->get()->keyBy('plugin_name');
-            } catch(QueryException $e) {
+            } catch (QueryException $e) {
                 // DB not migrated/connected
                 $this->plugins = new Collection;
             }
