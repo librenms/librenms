@@ -33,7 +33,21 @@ jobs:
     name: PHP Static Analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      -
+        name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      -
+        name: Determine added files
+        run: |
+          ADDED_FILES=$(git diff --name-only --diff-filter="A" origin/master -- app/ config/ database/ LibreNMS/ resources/ tests/ | tr '\n' ' '|sed 's/,*$//g')
+          echo $ADDED_FILES
+
+          echo 'ADDED_FILES<<EOF' >> $GITHUB_ENV
+          echo $ADDED_FILES >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       -
         name: Set up PHP
@@ -68,5 +82,10 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress
 
       -
-        name: Run phpstan
+        name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G
+
+      -
+        name: Run PHPStan (New files)
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G --level=6 -- $ADDED_FILES
+        if: ${{ env.ADDED_FILES }}
