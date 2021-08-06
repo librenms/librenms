@@ -42,7 +42,7 @@ class PluginProvider extends ServiceProvider
 
     public function boot()
     {
-        $manager = app(PluginManager::class);
+        $manager = $this->app->make(PluginManager::class);
 
         $this->loadLocalPlugins($manager);
 

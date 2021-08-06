@@ -26,7 +26,10 @@
 namespace App\Plugins;
 
 use App\Models\Plugin;
+use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Log;
 
 class PluginManager
 {
@@ -35,8 +38,12 @@ class PluginManager
 
     public function publishHook(string $hook_type, string $implementation_class)
     {
-        if ($this->pluginEnabled($implementation_class)) {
-            $this->hooks[$hook_type][] = new $implementation_class;
+        try {
+            if ($this->pluginEnabled($implementation_class)) {
+                $this->hooks[$hook_type][] = new $implementation_class;
+            }
+        } catch (Exception $e) {
+            Log::error("Error when loading hook $hook_type for $implementation_class: " . $e->getMessage());
         }
 
         // plugin disabled, log?
@@ -62,17 +69,23 @@ class PluginManager
 
     public function call(string $hook, array $args = []): Collection
     {
-        return $this->hooksFor($hook)
-            ->filter(function ($hookInstance) use ($args) {
-                $settings = ['settings' => $this->getSettings($hookInstance)];
+        try {
+            return $this->hooksFor($hook)
+                ->filter(function ($hookInstance) use ($args) {
+                    $settings = ['settings' => $this->getSettings($hookInstance)];
 
-                return app()->call([$hookInstance, 'authorize'], $args + $settings);
-            })
-            ->map(function ($hookInstance) use ($args) {
-                $settings = ['settings' => $this->getSettings($hookInstance)];
+                    return app()->call([$hookInstance, 'authorize'], $args + $settings);
+                })
+                ->map(function ($hookInstance) use ($args) {
+                    $settings = ['settings' => $this->getSettings($hookInstance)];
 
-                return app()->call([$hookInstance, 'handle'], $args + $settings);
-            });
+                    return app()->call([$hookInstance, 'handle'], $args + $settings);
+                });
+        } catch (Exception $e) {
+            Log::error("Error calling hook $hook: " . $e->getMessage());
+
+            return new Collection;
+        }
     }
 
     public function getSettings($name_or_hook): array
@@ -113,12 +126,16 @@ class PluginManager
 
         if (! $plugin) {
             // FIXME do not add plugins that don't exist
-            $plugin = Plugin::create([
-                'plugin_name' => $name,
-                'plugin_active' => 1,
-                'version' => 2,
-            ]);
-            $this->getPlugins()->put($name, $plugin);
+            try {
+                $plugin = Plugin::create([
+                    'plugin_name' => $name,
+                    'plugin_active' => 1,
+                    'version' => 2,
+                ]);
+                $this->getPlugins()->put($name, $plugin);
+            } catch(QueryException $e) {
+                // DB not migrated/connected
+            }
         }
 
         return $plugin;
@@ -127,7 +144,12 @@ class PluginManager
     private function getPlugins(): Collection
     {
         if ($this->plugins === null) {
-            $this->plugins = Plugin::versionTwo()->get()->keyBy('plugin_name');
+            try {
+                $this->plugins = Plugin::versionTwo()->get()->keyBy('plugin_name');
+            } catch(QueryException $e) {
+                // DB not migrated/connected
+                $this->plugins = new Collection;
+            }
         }
 
         return $this->plugins;
