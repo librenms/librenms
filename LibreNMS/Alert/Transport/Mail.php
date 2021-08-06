@@ -35,9 +35,18 @@ class Mail extends Transport
     public function contactMail($obj)
     {
         $email = $this->config['email'] ?? $obj['contacts'];
-        $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']); // fix line returns for windows mail clients
+        $html = Config::get('email_html');
 
-        return send_mail($email, $obj['title'], $msg, (Config::get('email_html') == 'true') ? true : false);
+        if ($html && ! $this->isHtmlContent($obj['msg'])) {
+            // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
+            $msg = preg_replace("/\r?\n/", "<br />\n", $obj['msg']);
+        } else {
+            // fix line returns for windows mail clients
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']);
+        }
+
+        return send_mail($email, $obj['title'], $msg, $html);
+
     }
 
     public static function configTemplate()
@@ -55,5 +64,10 @@ class Mail extends Transport
                 'email' => 'required|email',
             ],
         ];
+    }
+
+    private function isHtmlContent($content): bool
+    {
+        return $content !== strip_tags($content);
     }
 }
