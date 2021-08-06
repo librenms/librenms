@@ -549,7 +549,7 @@ menu similarly to device types.
 
 If the device group contains large amount of devices, editing it from the UI might cause errors on the form even when all the data seems correct. This is caused by PHP's `max_input_vars`-variable. You should be able to confirm that this is the case by inspecting the PHP's error logs.
 
-With the basic installation on Ubuntu 20.04 LTS with Nginx and PHP 7.4 FPM this value can be tuned by editing the file `/etc/php/7.4/fpm/php.ini` and adjusting the value of `max_input_vars`.
+With the basic installation on Ubuntu 20.04 LTS with Nginx and PHP 7.4 FPM this value can be tuned by editing the file `/etc/php/7.4/fpm/php.ini` and adjusting the value of `max_input_vars` to be at least the size of the large group. In larger installations a value such as `10000` should suffice.
 
 ## <a name="faq-where-do-i-update-my-database-credentials">Where do I update my database credentials?</a>
 
