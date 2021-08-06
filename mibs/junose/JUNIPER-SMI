@@ -67,8 +67,6 @@ jnxProducts OBJECT-IDENTITY
     jnxReservedProducts4            OBJECT IDENTIFIER ::= { jnxProducts 5 }
     jnxReservedProducts5            OBJECT IDENTIFIER ::= { jnxProducts 6 }
 
-
-
 jnxServices OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
@@ -128,8 +126,6 @@ jnxMibs OBJECT-IDENTITY
 
     -- juniper OTN MIB
     jnxOtnMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 56 }
-
-
 
 
 jnxTraps OBJECT-IDENTITY 
