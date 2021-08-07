@@ -18,6 +18,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
 
 $array = [
     'packages' => ['descr' => 'packages', 'colour' => '2B9220'],
+    'security_updates' => ['descr' => 'security updates', 'colour' => 'D46A6A'],
 ];
 
 $i = 0;

@@ -250,6 +250,10 @@
     "name": "Applications OS-Updates, New Updates Available"
   },
   {
+    "rule": "applications.app_type = \"ossec-updates\" && applications.app_status >= \"1\"",
+    "name": "Applications OS-Security-Updates, New Updates Available"
+  },
+  {
     "rule": "devices.os = \"hpblmos\" && sensors.sensor_type = \"hpblmos_psustate\" && sensors.sensor_current = \"[3-4]\"",
     "name": "HPE BladeSystem has a bad power supply"
   },

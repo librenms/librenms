@@ -125,6 +125,7 @@ $graphs['nfs-server'] = [
 ];
 $graphs['os-updates'] = [
     'packages',
+    'security_updates'
 ];
 $graphs['dhcp-stats'] = [
     'stats',
