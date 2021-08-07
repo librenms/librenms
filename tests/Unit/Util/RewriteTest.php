@@ -11,7 +11,7 @@ class RewriteTest extends TestCase
      * @test
      * @dataProvider validMacProvider
      */
-    public function testMacToHex($from, $to): void
+    public function testMacToHex(string $from, string $to): void
     {
         $this->assertEquals(Rewrite::macToHex($from), $to);
     }
