@@ -40,6 +40,7 @@ return [
             'location' => '位置資訊設定',
             'graylog' => 'Graylog 整合',
             'oxidized' => 'Oxidized 整合',
+            'mac_oui' => 'Mac OUI 查詢整合',
             'peeringdb' => 'PeeringDB 整合',
             'nfsen' => 'NfSen 整合',
             'unix-agent' => 'Unix-Agent 整合',
@@ -57,6 +58,7 @@ return [
             'rrdtool' => 'RRDTool 設定',
             'snmp' => 'SNMP',
             'poller_modules' => '輪詢器模組',
+            'interface_types' => 'RFC 7224 介面類型',
         ],
         'system' => [
             'cleanup' => '清理',
@@ -595,6 +597,12 @@ return [
             'description' => '登入訊息',
             'help' => '顯示於登入頁面',
         ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => '啟用 MAC OUI 查詢',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
+        ],
         'mono_font' => [
             'description' => 'Monospaced 字型',
         ],
@@ -699,6 +707,10 @@ return [
                     'description' => '啟用使用者存限可取用動態裝置群組',
                 ],
             ],
+        ],
+        'bad_iftype' => [
+            'description' => '捨棄介面',
+            'help' => '應該被忽略的網路介面類型',
         ],
         'ping' => [
             'description' => 'ping 路徑',
@@ -880,6 +892,14 @@ return [
         ],
         'traceroute6' => [
             'description' => 'traceroute6 路徑',
+        ],
+        'twofactor' => [
+            'description' => '雙因素驗證',
+            'help' => '允許使用者啟用基於時間 (TOTP) 或基於雜湊訊息驗證 (HOTP) 的一次性密碼 (OTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => '雙因素驗證碼有效時間 (秒)',
+            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
         'unix-agent' => [
             'connection-timeout' => [
