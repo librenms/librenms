@@ -11,12 +11,12 @@ class RewriteTest extends TestCase
      * @test
      * @dataProvider validMacProvider
      */
-    public function testMacToHex($from, $to)
+    public function testMacToHex($from, $to): void
     {
         $this->assertEquals(Rewrite::macToHex($from), $to);
     }
 
-    public function validMacProvider()
+    public function validMacProvider(): array
     {
         return [
             ['00:00:00:00:00:01', '000000000001'],
