@@ -94,7 +94,7 @@ return [
         'long' => '負載百分比',
         'unit' => '%',
         'unit_long' => '百分比',
-    ], 
+    ],
     'loss' => [
         'short' => '百分比',
         'long' => '遺失百分比',
