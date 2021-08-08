@@ -35,6 +35,7 @@ class SyslogController extends WidgetController
         'device' => null,
         'device_group' => null,
         'hidenavigation' => 0,
+        'level' => null
     ];
 
     public function getSettingsView(Request $request)
@@ -42,6 +43,8 @@ class SyslogController extends WidgetController
         $data = $this->getSettings(true);
 
         $data['device'] = Device::hasAccess($request->user())->find($data['device']);
+
+        $data['priority'] = app('translator')->get('syslog.severity.' . $data['level']);
 
         return view('widgets.settings.syslog', $data);
     }

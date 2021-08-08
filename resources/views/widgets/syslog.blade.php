@@ -22,7 +22,8 @@
         {
             return {
                 device: '{{ $device ?: '' }}',
-                device_group: '{{ $device_group }}'
+                device_group: '{{ $device_group }}',
+                level: '{{ $level }}'
             };
         },
         url: "{{ url('/ajax/table/syslog') }}"
