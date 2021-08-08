@@ -1,6 +1,6 @@
 <?php
 /**
- * DashboardController.php
+ * PriorityController.php
  *
  * -Description-
  *
@@ -18,8 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- * @copyright  2019 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
@@ -49,7 +47,7 @@ class PriorityController extends SelectController
 
     public function formatItem($syslog)
     {
-        /** @var Dashboard $dashboard */
+        /** @var Syslog $syslog */
         return [
             'id' => $syslog->level,
             'text' => app('translator')->get('syslog.severity.' . $syslog->level),
