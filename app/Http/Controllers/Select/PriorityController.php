@@ -53,5 +53,4 @@ class PriorityController extends SelectController
             'text' => app('translator')->get('syslog.severity.' . $syslog->level),
         ];
     }
-
 }

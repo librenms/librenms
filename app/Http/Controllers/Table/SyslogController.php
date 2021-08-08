@@ -37,7 +37,7 @@ class SyslogController extends TableController
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
-            'level' => 'nullable|string'
+            'level' => 'nullable|string',
         ];
     }
 
