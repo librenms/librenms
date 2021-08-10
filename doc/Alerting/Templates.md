@@ -317,6 +317,26 @@ $config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
+## Using models for optional data
+
+If some value does not exist withing the `$faults[]`-array, you may query fields from the database using Laravel models. You may use models to query additional values and use them on the template by placing the model and the value to search for within the braces. For example, ISIS-alerts do have a `port_id` value associated with the alert but `ifName` is not directly accessible from the `$faults[]`-array. If the name of the port was needed, it's value could be queried using a template such as:
+
+```
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  Local interface: {{ \App\Models\Port::find($value['port_id'])->ifName }}
+  Adjacent IP: {{ $value['isisISAdjIPAddrAddress'] }}
+  Adjacent state: {{ $value['isisISAdjState'] }}
+
+@endforeach
+@endif
+```
+
 #### Service Alert
 
 ```
