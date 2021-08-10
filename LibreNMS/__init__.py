@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import threading
+import subprocess
 import timeit
 from collections import deque
 from logging.handlers import RotatingFileHandler
@@ -169,10 +170,15 @@ def get_config_data(base_dir):
 
     config_cmd = ["/usr/bin/env", "php", "%s/config_to_json.php" % base_dir]
     try:
-        exit_code, output = command_runner(config_cmd, timeout=300)
-        if exit_code == 0:
-            return json.loads(output)
-        raise EnvironmentError
+        #exit_code, output = command_runner(config_cmd, timeout=300)
+        #if exit_code == 0:
+        #    return json.loads(output)
+        #raise EnvironmentError
+        proc = subprocess.Popen(
+            config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE
+        )
+        return json.loads(proc.communicate()[0].decode())
+
     except Exception as exc:
         logger.critical("ERROR: Could not execute command [%s]: %s" % (config_cmd, exc))
         logger.debug("Traceback:", exc_info=True)
