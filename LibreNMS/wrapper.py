@@ -264,8 +264,12 @@ def poll_worker(
                 device_log = os.path.join(
                     log_dir, "{}_device_{}.log".format(wrapper_type, device_id)
                 )
+                executable = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                    wrappers[wrapper_type]["executable"]
+                )
                 command = "/usr/bin/env php {} -h {}".format(
-                    wrappers[wrapper_type]["executable"], device_id
+                   executable, device_id
                 )
                 if debug:
                     command = command + " -d"
