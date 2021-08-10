@@ -38,7 +38,7 @@ args = parser.parse_args()
 config = LibreNMS.get_config_data(os.path.dirname(os.path.realpath(__file__)))
 if not config:
     logger = logging.getLogger(__name__)
-    logger.critical('Could not run {} wrapper. Missing config'.format(WRAPPER_TYPE))
+    logger.critical("Could not run {} wrapper. Missing config".format(WRAPPER_TYPE))
     sys.exit(1)
 log_dir = config["log_dir"]
 log_file = os.path.join(log_dir, WRAPPER_TYPE + "_wrapper.log")

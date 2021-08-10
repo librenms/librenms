@@ -170,10 +170,10 @@ def get_config_data(base_dir):
 
     config_cmd = ["/usr/bin/env", "php", "%s/config_to_json.php" % base_dir]
     try:
-        #exit_code, output = command_runner(config_cmd, timeout=300)
-        #if exit_code == 0:
+        # exit_code, output = command_runner(config_cmd, timeout=300)
+        # if exit_code == 0:
         #    return json.loads(output)
-        #raise EnvironmentError
+        # raise EnvironmentError
         proc = subprocess.Popen(
             config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE
         )

@@ -266,21 +266,22 @@ def poll_worker(
                 )
                 executable = os.path.join(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                    wrappers[wrapper_type]["executable"]
+                    wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} -h {}".format(
-                   executable, device_id
-                )
+                command = "/usr/bin/env php {} -h {}".format(executable, device_id)
                 if debug:
                     command = command + " -d"
                 exit_code, output = command_runner(
-                    command, shell=True, timeout=PER_DEVICE_TIMEOUT, valid_exit_codes=VALID_EXIT_CODES
+                    command,
+                    shell=True,
+                    timeout=PER_DEVICE_TIMEOUT,
+                    valid_exit_codes=VALID_EXIT_CODES,
                 )
                 if exit_code not in [0, 6]:
-                    logger.error('Process exited with code {}'.format(exit_code))
+                    logger.error("Process exited with code {}".format(exit_code))
                     logger.error(output)
                 elif exit_code == 5:
-                    logger.info('Unreachable device {}'.format(device_id))
+                    logger.info("Unreachable device {}".format(device_id))
                 else:
                     logger.debug(output)
                 if debug:
