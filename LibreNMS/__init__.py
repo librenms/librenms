@@ -160,10 +160,12 @@ def get_config_data(base_dir):
         if not os.getenv("NODE_ID"):
             logger.critical(".env does not contain a valid NODE_ID setting.")
 
-    except ImportError as e:
+    except ImportError as exc:
         logger.critical(
-            "Could not import .env - check that the poller user can read the file, and that composer install has been run recently"
+            'Could not import "%s" - Please check that the poller user can read the file, and that composer install has been run recently\nAdditional info: %s'
+            % (env_path, exc)
         )
+        logger.debug("Traceback:", exc_info=True)
 
     config_cmd = ["/usr/bin/env", "php", "%s/config_to_json.php" % base_dir]
     try:
@@ -174,6 +176,7 @@ def get_config_data(base_dir):
     except Exception as exc:
         logger.critical("ERROR: Could not execute command [%s]: %s" % (config_cmd, exc))
         logger.debug("Traceback:", exc_info=True)
+        return None
 
 
 def normalize_wait(seconds):
