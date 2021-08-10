@@ -25,12 +25,21 @@
         <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation')</label>
         <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
     </div>
+    <div class="form-group">
+        <label for="level-{{ $id }}" class="control-label">@lang('Priority')</label>
+        <select class="form-control" name="level" id="level-{{ $id }}" data-placeholder="@lang('All Priorities')">
+            @if($level)
+                <option value="{{ $level }}" selected>{{ $priority }}</option>
+            @endif
+        </select>
+    </div>
 @endsection
 
 @section('javascript')
     <script type="text/javascript">
         init_select2('#device-{{ $id }}', 'device', {}, '{{ $device ? $device->device_id : '' }}');
         init_select2('#device_group-{{ $id }}', 'device-group', {});
+        init_select2('#level-{{ $id }}', 'priority', {});
 
         $('#hidenavigation-{{ $id }}')
             .bootstrapSwitch('offColor','danger')
