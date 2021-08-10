@@ -41,7 +41,7 @@ if not config:
     logger.critical('Could not run {} wrapper. Missing config'.format(WRAPPER_TYPE))
     sys.exit(1)
 log_dir = config["log_dir"]
-log_file = os.path.join(log_dir, WRAPPER_TYPE + "-wrapper.log")
+log_file = os.path.join(log_dir, WRAPPER_TYPE + "_wrapper.log")
 logger = LibreNMS.logger_get_logger(log_file, debug=args.debug)
 
 try:
