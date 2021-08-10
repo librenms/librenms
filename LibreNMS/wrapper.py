@@ -60,6 +60,10 @@ PER_DEVICE_TIMEOUT = (
     900  # Timeout in seconds for any poller / service / discovery action per device
 )
 
+# 5 = no new discovered devices, 6 = unreachable device
+VALID_EXIT_CODES = [0, 5, 6]
+
+
 DISTRIBUTED_POLLING = False  # Is overriden by config.php
 REAL_DURATION = 0
 DISCOVERED_DEVICES_COUNT = 0
@@ -266,9 +270,15 @@ def poll_worker(
                 if debug:
                     command = command + " -d"
                 exit_code, output = command_runner(
-                    command, shell=True, timeout=PER_DEVICE_TIMEOUT
+                    command, shell=True, timeout=PER_DEVICE_TIMEOUT, valid_exit_codes=VALID_EXIT_CODES
                 )
-                logger.debug(output)
+                if exit_code not in [0, 6]:
+                    logger.error('Process exited with code {}'.format(exit_code))
+                    logger.error(output)
+                elif exit_code == 5:
+                    logger.info('Unreachable device {}'.format(device_id))
+                else:
+                    logger.debug(output)
                 if debug:
                     with open(device_log, "w", encoding="utf-8") as dev_log_file:
                         dev_log_file.write(output)
