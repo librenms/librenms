@@ -1,4 +1,4 @@
-mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB
+mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB:DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB
 modules:
     mempools:
         pre-cache:
@@ -27,6 +27,7 @@ modules:
             - Dell-Vendor-MIB::productIdentificationVersion.0
             - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitCodeVersion.1
         serial:
+            - Dell-Vendor-MIB::productIdentificationServiceTag.1
             - Dell-Vendor-MIB::productIdentificationSerialNumber.0
             - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitSerialNumber.1
     processors:
@@ -203,3 +204,50 @@ modules:
                         - { value: 1, descr: up, graph: 1, generic: 0 }
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: absent, graph: 1, generic: 2 }
+                -
+                    oid: dellNetVirtualLinkDetailsTable
+                    value: dellNetVLTDetailLocalStatus
+                    descr: 'Port-channel {{ $dellNetVLTDetailLocalLagID }}'
+                    group: 'VIRTUAL-LINK-TRUNK'
+                    skip_values:
+                    -
+                      oid: dellNetVLTDetailPeerStatus
+                      op: '='
+                      value: 0
+                    state_name: dellNetVLTDetailLocalStatus   
+                    states:
+                        - { value: 0, descr: down, graph: 1, generic: 2 }
+                        - { value: 1, descr: up,   graph: 1, generic: 0 }
+                -
+                    oid: dellNetVirtualLinkTrunkTable
+                    value: dellNetVLTIclBwStatus
+                    descr: 'ICL Bandwidth'
+                    group: 'VIRTUAL-LINK-TRUNK'
+                    skip_values:
+                    state_name: dellNetVLTIclBwStatus   
+                    states:
+                        - { value: 0, descr: '<80%', graph: 1, generic: 0 }
+                        - { value: 1, descr: '>80%', graph: 1, generic: 1 }
+                -
+                    oid: dellNetVirtualLinkTrunkTable
+                    value: dellNetVLTIclStatus
+                    descr: 'Link Status'
+                    group: 'VIRTUAL-LINK-TRUNK'
+                    skip_values:
+                    state_name: dellNetVLTIclStatus   
+                    states:
+                        - { value: 0, descr: 'not established', graph: 1, generic: 3 }
+                        - { value: 1, descr: 'up', graph: 1, generic: 0 }
+                        - { value: 2, descr: 'down', graph: 1, generic: 2 }
+                        - { value: 3, descr: 'error', graph: 1, generic: 1 }
+                -
+                    oid: dellNetVirtualLinkTrunkTable
+                    value: dellNetVLTRole
+                    descr: 'Role'
+                    group: 'VIRTUAL-LINK-TRUNK'
+                    skip_values:
+                    state_name: dellNetVLTRole   
+                    states:
+                        - { value: 0, descr: 'Standalone', graph: 1, generic: 3 }
+                        - { value: 1, descr: 'Primary', graph: 1, generic: 0 }
+                        - { value: 2, descr: 'Secondary', graph: 1, generic: 0 }
