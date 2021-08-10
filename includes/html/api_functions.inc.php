@@ -604,8 +604,8 @@ function get_bgp(Illuminate\Http\Request $request)
 
 function edit_bgp_descr(Illuminate\Http\Request $request)
 {
-    $data = json_decode($request->getContent(), true);
-    if (! $data) {
+    $bgp_descr = $request->json('bgp_descr');
+    if (! $bgp_descr) {
         return api_error(500, 'Invalid JSON data');
     }
 
@@ -616,9 +616,6 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
     }
 
     $peer = \App\Models\BgpPeer::firstWhere('bgpPeer_id', $bgpPeerId);
-
-    // get description
-    $bgp_descr = $data['bgp_descr'];
 
     // update existing bgp
     if ($peer === null) {
