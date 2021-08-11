@@ -297,7 +297,7 @@ Artisan::command('scan
     /** @var \Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && ! Config::has('nets')) {
+    if (empty($this->argument('network')) && ! \LibreNMS\Config::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
