@@ -604,6 +604,35 @@ function get_bgp(Illuminate\Http\Request $request)
     return api_success($bgp_session, 'bgp_session');
 }
 
+function edit_bgp_descr(Illuminate\Http\Request $request)
+{
+    $bgp_descr = $request->json('bgp_descr');
+    if (! $bgp_descr) {
+        return api_error(500, 'Invalid JSON data');
+    }
+
+    //find existing bgp for update
+    $bgpPeerId = $request->route('id');
+    if (! is_numeric($bgpPeerId)) {
+        return api_error(400, 'Invalid id has been provided');
+    }
+
+    $peer = \App\Models\BgpPeer::firstWhere('bgpPeer_id', $bgpPeerId);
+
+    // update existing bgp
+    if ($peer === null) {
+        return api_error(404, 'BGP peer ' . $bgpPeerId . ' does not exist');
+    }
+
+    $peer->bgpPeerDescr = $bgp_descr;
+
+    if ($peer->save()) {
+        return api_success_noresult(200, 'BGP description for peer ' . $peer->bgpPeerIdentifier . ' on device ' . $peer->device_id . ' updated to ' . $peer->bgpPeerDescr . '.');
+    }
+
+    return api_error(500, 'Failed to update existing bgp');
+}
+
 function list_cbgp(Illuminate\Http\Request $request)
 {
     $sql = '';
