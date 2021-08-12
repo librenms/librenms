@@ -447,4 +447,14 @@ class Rewrite
     {
         return str_pad($num, $length, '0', STR_PAD_LEFT);
     }
+
+    /**
+     * If given input is an IPv6 address, wrap it in [] for use in applications that require it
+     * @param string $ip
+     * @return string
+     */
+    public static function addIpv6Brackets($ip): string
+    {
+        return IPv6::isValid($ip) ? "[$ip]" : $ip;
+    }
 }
