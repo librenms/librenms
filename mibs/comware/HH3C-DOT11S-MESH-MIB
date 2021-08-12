@@ -1,0 +1,1478 @@
+-- =============================================================================
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide MESH configuration information.
+-- Reference:
+-- Version: V1.6
+-- History:
+--   V1.0 2008-07-08 Initial version, created by ChangHuifeng
+--   V1.1 2008-11-07 modified by liyugang
+--        Add hh3cDot11sMeshLinkStatisTable, hh3cDot11sMeshNbrStatusTable
+--        to hh3cDot11sMeshStatusGroup
+--   V1.2 2009-08-01 modified by Wang Shaojie
+--        Add hh3cDot11sMeshLinkIFName to hh3cDot11sMeshLinkStatisTable.
+--   V1.3 2013-09-14 modified by Zhang Siyu
+--        Add hh3cDot11sMeshLinkType to hh3cDot11sMeshLinkStatusTable
+--   V1.4 2015-02-02 modified by Xiao min
+--        Add hh3cDot11sMeshLinkSNR to hh3cDot11sMeshLinkStatusTable
+--        Add hh3cDot11sMeshLinkNoise to hh3cDot11sMeshLinkStatusTable
+--        Add hh3cDot11sMeshLinkPeerSNR to hh3cDot11sMeshLinkStatusTable
+--        Add hh3cDot11sMeshLinkPeerNoise to hh3cDot11sMeshLinkStatusTable
+--   V1.5 2015-05-6 modified by guoxuzhen
+--        Add hh3cDot11sMeshAKMMode, hh3cDot11sSimplerKey to Hh3cDot11sMeshPflTable
+--        Add hh3cDot11sBindInterface to hh3cDot11sRadioCfgTable
+--        2015-08-14 modified by Xiao min
+--        Add hh3cDot11sMeshLinkPeerIPAddress to hh3cDot11sMeshLinkStatusTable
+--        Add hh3cDot11sMeshLinkPeerSystemName to hh3cDot11sMeshLinkStatusTable
+--   V1.6 2018-05-15 modified by liuxiaolong
+--        Add hh3cDot11sMlspExtCfgTable to hh3cDot11sConfigGroup
+--        Add hh3cDot11sMeshLinkNotifyGroup to hh3cDot11sMesh
+--        Add hh3cDot11sMlspMode to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sWaveGuideHoldRSSI to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sWaveGuideSwitch to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sOptimizeEnable to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sOptimizeThreshold to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sMlspLogEnable to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sMlspLogInterval to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sActiveKeepaliveCount to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sLinkEstaThreshold to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sTransmissionMethod to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sTransmitLevel to hh3cDot11sMpPlcyTable
+--        Add hh3cDot11sTempLinkEnable to hh3cDot11sMpPlcyTable
+-- =============================================================================
+HH3C-DOT11S-MESH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        MacAddress,
+        RowStatus
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32,
+        Counter32,
+        IpAddress,
+        NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        hh3cDot11, Hh3cDot11RadioElementIndex, hh3cDot11APElementIndex, Hh3cDot11AKMType
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11sMesh MODULE-IDENTITY
+    LAST-UPDATED "201805151000Z"        -- May 15, 2018 at 10:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The file defines a MIB to provide MESH configuration information.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        Access point (AP)
+        Transmitter/receiver (transceiver) device
+        that commonly connects and transports data
+        between a wireless network and a wired network.
+
+        Access control (AC)
+        To control and manage multi-APs, it will bridge
+        wireless and wired network.
+
+        Fat AP
+        Applied in the home, SOHO and so on, and it could
+        work independently without help from AC.
+
+        Fit AP
+        Applied in the enterprise environment, it will work
+        under the control and management from AC.
+
+        BSS
+        IEEE 802.11 Basic Service Set (Radio Cell).  The
+        BSS of an AP comprises of the stations directly
+        associating with the AP.
+
+        Radio
+        The chip set to receive and send wireless signal.
+
+        Mesh
+        A network consisting of two or more mesh points
+        which communicate with each other via mesh services.
+
+        Mesh Point (MP)
+        An IEEE 802.11 entity that contains an IEEE 802.11-conformant
+        medium access control (MAC) and physical layer (PHY) interface
+        to the wireless medium (WM) that supports mesh services.
+
+        Mesh Access Point (MAP)
+        A mesh point that is collocated with one or more access points.
+
+        Mesh Portal Point (MPP)
+        A mesh point that is collocated with one or more portals.
+
+        Mesh Link
+        A link between two MPs.
+
+        Simultaneous Authentication of Equals (SAE)
+        A password-authenticated key exchange based on
+        a zero-knowledge proof."
+    REVISION "201805151000Z"        -- May 15, 2018 at 10:00 GMT
+    DESCRIPTION
+        "Add new nodes and new table"
+    REVISION "201508141000Z"        -- Aug 01, 2009 at 10:00 GMT
+    DESCRIPTION
+        "Add hh3cDot11sMeshLinkPeerIPAddress to hh3cDot11sMeshLinkStatusTable,
+         Add hh3cDot11sMeshLinkPeerSystemName to hh3cDot11sMeshLinkStatusTable"
+    REVISION "201505061500Z"        -- May 6, 2015 at 15:00 GMT
+    DESCRIPTION
+        "Add new nodes."
+    REVISION "200908011000Z"        -- Aug 01, 2009 at 10:00 GMT
+    DESCRIPTION
+        "Add new nodes."
+    REVISION "200811071000Z"        -- Nov 07, 2008 at 10:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes and a new table."
+    REVISION "200807081800Z"        -- July 8, 2008 at 18:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 11 }
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+
+hh3cDot11sConfigGroup OBJECT IDENTIFIER  ::= { hh3cDot11sMesh 1 }
+--  Dot11s Configuration Group has the following children:
+--  hh3cDot11sMeshGlobalPara             ::= { hh3cDot11sConfigGroup 1 }
+--  hh3cDot11sMeshPflTable               ::= { hh3cDot11sConfigGroup 2 }
+--  hh3cDot11sMpPlcyTable                ::= { hh3cDot11sConfigGroup 3 }
+--  hh3cDot11sMlspCfgTable               ::= { hh3cDot11sConfigGroup 4 }
+--  hh3cDot11sRadioCfgTable              ::= { hh3cDot11sConfigGroup 5 }
+--  hh3cDot11sAPCfgTable                 ::= { hh3cDot11sConfigGroup 6 }
+--  hh3cDot11sMlspExtCfgTable            ::= { hh3cDot11sConfigGroup 7 }
+
+hh3cDot11sWDSConfigGroup OBJECT IDENTIFIER ::= { hh3cDot11sMesh 2 }
+--  Dot11s WDS Configuration Group has the following children:
+--  hh3cDot11sWDSPeerMacTable         ::= { hh3cDot11sWDSConfigGroup 1 }
+
+hh3cDot11sMeshStatusGroup OBJECT IDENTIFIER ::= { hh3cDot11sMesh 3 }
+--  Dot11s Mesh Status Group has the following children:
+--  hh3cDot11sMeshLinkStatusTable    ::= { hh3cDot11sMeshStatusGroup 1 }
+--  hh3cDot11sMeshLinkStatisTable    ::= { hh3cDot11sMeshStatusGroup 2 }
+--  hh3cDot11sMeshNbrStatusTable     ::= { hh3cDot11sMeshStatusGroup 3 }
+
+hh3cDot11sMeshLinkNotifyGroup OBJECT IDENTIFIER ::= { hh3cDot11sMesh 4 }
+-- *****************************************************************************
+-- *  hh3cDot11sMeshGlobalPara Definition
+-- *****************************************************************************
+hh3cDot11sMeshGlobalPara OBJECT IDENTIFIER  ::= { hh3cDot11sConfigGroup 1 }
+
+hh3cDot11sMeshMkdID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh key distributor identifier (MKD-ID).
+        If the MKD-ID is not configured, the value is '00:00:00:00:00:00'."
+    ::= { hh3cDot11sMeshGlobalPara 1 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMeshGlobalPara Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sMeshPflTable Definition
+-- *****************************************************************************
+hh3cDot11sMeshPflTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMeshPflEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure mesh profile.
+        A mesh profile is created and mapped to a MP so that
+        it can provide mesh services to other MPs which have the same
+        mesh ID.
+        When the mesh profile is enabled, all of the object in this table
+        cannot be modified except hh3cDot11sMeshPflEnable.
+        The mesh profile cannot be deleted when it is bound with the radio."
+    ::= { hh3cDot11sConfigGroup 2 }
+
+hh3cDot11sMeshPflEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMeshPflEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of a mesh profile."
+    INDEX
+        {
+            hh3cDot11sMeshPflIndex
+        }
+    ::= { hh3cDot11sMeshPflTable 1 }
+
+Hh3cDot11sMeshPflEntry ::= SEQUENCE
+    {
+        hh3cDot11sMeshPflIndex         Integer32,
+        hh3cDot11sMeshPflMeshID        OCTET STRING,
+        hh3cDot11sMeshPflBindIntNum    Integer32,
+        hh3cDot11sMeshPflKeepAlive     Integer32,
+        hh3cDot11sMeshPflBackhaulRate  Integer32,
+        hh3cDot11sMeshMkdServEnable    TruthValue,
+        hh3cDot11sMeshPflEnable        TruthValue,
+        hh3cDot11sMeshPflRowStatus     RowStatus,
+        hh3cDot11sMeshAKMMode          Hh3cDot11AKMType,
+        hh3cDot11sMeshSimpleKey        OCTET STRING
+    }
+
+hh3cDot11sMeshPflIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the index of the mesh profile."
+    ::= { hh3cDot11sMeshPflEntry 1 }
+
+hh3cDot11sMeshPflMeshID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh ID of the mesh profile.
+        The string length of this object is zero when the mesh ID is not
+        configured.  If the mesh ID is not configured, hh3cDot11sMeshPflEnable
+        cannot be set to 'true'."
+    ::= { hh3cDot11sMeshPflEntry 2 }
+
+hh3cDot11sMeshPflBindIntNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the specified mesh interface number
+        bound to the mesh profile.
+        If the value is set to -1, the binding will be removed."
+    DEFVAL      { -1 }
+    ::= { hh3cDot11sMeshPflEntry 3 }
+
+hh3cDot11sMeshPflKeepAlive OBJECT-TYPE
+    SYNTAX      Integer32(1..1800)
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh link keep-alive interval."
+    ::= { hh3cDot11sMeshPflEntry 4 }
+
+hh3cDot11sMeshPflBackhaulRate OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the link backhaul rate."
+    ::= { hh3cDot11sMeshPflEntry 5 }
+
+hh3cDot11sMeshMkdServEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the mesh key distributor (MKD)
+        service for the mesh profile is enabled.
+        'true': The MKD service for the mesh profile is enabled.
+        'false': The MKD service for the mesh profile is disabled."
+    DEFVAL      { false }
+    ::= { hh3cDot11sMeshPflEntry 6 }
+
+hh3cDot11sMeshPflEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the mesh profile is enabled.
+        'true': The mesh profile is enabled.
+        'false': The mesh profile is disabled."
+    DEFVAL      { false }
+    ::= { hh3cDot11sMeshPflEntry 7 }
+
+hh3cDot11sMeshPflRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11sMeshPflEntry 8 }
+
+hh3cDot11sMeshAKMMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11AKMType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication and key management mode defined by 802.11s.
+        The following values are supported:
+        'none': No key management mode configured.
+        'psk': pre-shared key authentication."
+    DEFVAL      { none }
+    ::= { hh3cDot11sMeshPflEntry 9 }
+
+hh3cDot11sMeshSimpleKey OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the simple key for SAE."
+    ::= { hh3cDot11sMeshPflEntry 10 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMeshPflTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sMpPlcyTable Definition
+-- *****************************************************************************
+hh3cDot11sMpPlcyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMpPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure MP policy.
+        There is a default policy on system and its index is 1.
+        The default policy cannot be deleted or modified.
+        The MP policy cannot be deleted when it is applied to a radio."
+    ::= { hh3cDot11sConfigGroup 3 }
+
+hh3cDot11sMpPlcyEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMpPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of a MP policy."
+    INDEX
+        {
+            hh3cDot11sMpPlcyIndex
+        }
+    ::= { hh3cDot11sMpPlcyTable 1 }
+
+Hh3cDot11sMpPlcyEntry ::= SEQUENCE
+    {
+        hh3cDot11sMpPlcyIndex          Integer32,
+        hh3cDot11sMpPlcyName           OCTET STRING,
+        hh3cDot11sMpPlcyInitEnable     TruthValue,
+        hh3cDot11sMlspEnable           TruthValue,
+        hh3cDot11sProbReqInterval      Integer32,
+        hh3cDot11sRoleAuthEnable       TruthValue,
+        hh3cDot11sLinkHoldRSSI         Integer32,
+        hh3cDot11sLinkHoldTime         Integer32,
+        hh3cDot11sSwitchMargin         Integer32,
+        hh3cDot11sLinkSaturationRSSI   Integer32,
+        hh3cDot11sLinkRateMode         INTEGER,
+        hh3cDot11sMaxLinkNum           Integer32,
+        hh3cDot11sMpPlcyRowStatus      RowStatus,
+        hh3cDot11sMlspMode             INTEGER,
+        hh3cDot11sWaveGuideHoldRSSI    Integer32,
+        hh3cDot11sWaveGuideSwitch      TruthValue,
+        hh3cDot11sOptimizeEnable       TruthValue,
+        hh3cDot11sOptimizeThreshold    Integer32,
+        hh3cDot11sMlspLogEnable        TruthValue,
+        hh3cDot11sMlspLogInterval      Integer32,
+        hh3cDot11sActiveKeepaliveCount Integer32,
+        hh3cDot11sLinkEstaThreshold    Integer32,
+        hh3cDot11sTransmissionMethod   INTEGER,
+        hh3cDot11sTransmitLevel        Integer32,
+        hh3cDot11sTempLinkEnable       TruthValue
+    }
+
+hh3cDot11sMpPlcyIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MP policy index."
+    ::= { hh3cDot11sMpPlcyEntry 1 }
+
+hh3cDot11sMpPlcyName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MP policy name.
+        MP policy cannot be created with the name of the
+        default policy.
+        Modification is not supported."
+    ::= { hh3cDot11sMpPlcyEntry 2 }
+
+hh3cDot11sMpPlcyInitEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the link initiation for
+        the MP policy is enabled.
+        'true': The link initiation for the MP policy is enabled.
+        'false': The link initiation for the MP policy is disabled."
+    DEFVAL      { true }
+    ::= { hh3cDot11sMpPlcyEntry 3 }
+
+hh3cDot11sMlspEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the mesh link switch protocol (MLSP)
+        is enabled.
+        'true': MLSP is enabled.
+        'false': MLSP is disabled."
+    DEFVAL      { false }
+    ::= { hh3cDot11sMpPlcyEntry 4 }
+
+hh3cDot11sProbReqInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millisecond"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the probe request interval."
+    ::= { hh3cDot11sMpPlcyEntry 5 }
+
+hh3cDot11sRoleAuthEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the device can play as the role
+        of an authenticator."
+    DEFVAL      { true }
+    ::= { hh3cDot11sMpPlcyEntry 6 }
+
+hh3cDot11sLinkHoldRSSI OBJECT-TYPE
+    SYNTAX      Integer32(5..100)
+    UNITS       "dBm"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the link-hold
+        receive signal strength indicator (RSSI)."
+    ::= { hh3cDot11sMpPlcyEntry 7 }
+
+hh3cDot11sLinkHoldTime OBJECT-TYPE
+    SYNTAX      Integer32(1000..20000)
+    UNITS       "millisecond"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the link-hold time."
+    ::= { hh3cDot11sMpPlcyEntry 8 }
+
+hh3cDot11sSwitchMargin OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    UNITS       "dBm"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the link-switch margin."
+    ::= { hh3cDot11sMpPlcyEntry 9 }
+
+hh3cDot11sLinkSaturationRSSI OBJECT-TYPE
+    SYNTAX      Integer32(30..150)
+    UNITS       "dBm"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the link saturation
+        receive signal strength indicator (RSSI)."
+    ::= { hh3cDot11sMpPlcyEntry 10 }
+
+hh3cDot11sLinkRateMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            fixed(1),
+            realtime(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the rate mode of the mesh link."
+    DEFVAL      { fixed }
+    ::= { hh3cDot11sMpPlcyEntry 11 }
+
+hh3cDot11sMaxLinkNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the maximum number of the mesh link."
+    ::= { hh3cDot11sMpPlcyEntry 12 }
+
+hh3cDot11sMpPlcyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11sMpPlcyEntry 13 }
+
+hh3cDot11sMlspMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(0),
+            satble(1)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MLSP mode."
+    DEFVAL      { normal }
+    ::= { hh3cDot11sMpPlcyEntry 14 }
+
+hh3cDot11sWaveGuideHoldRSSI OBJECT-TYPE
+    SYNTAX      Integer32(5..100)
+    UNITS       "dBm"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the link-hold
+        receive signal strength indicator (RSSI) of wave guides."
+    DEFVAL      { 15 }
+    ::= { hh3cDot11sMpPlcyEntry 15 }
+
+hh3cDot11sWaveGuideSwitch OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the wave-guide switch state."
+    DEFVAL      { false }
+    ::= { hh3cDot11sMpPlcyEntry 16 }
+
+hh3cDot11sOptimizeEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the mesh link switch protocol (MLSP)
+        optimization function is enabled."
+    DEFVAL      { false }
+    ::= { hh3cDot11sMpPlcyEntry 17 }
+
+hh3cDot11sOptimizeThreshold OBJECT-TYPE
+    SYNTAX      Integer32(15..80)
+    UNITS       "dBm"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh link switch protocol (MLSP)
+        optimization threshold."
+    DEFVAL      { 30 }
+    ::= { hh3cDot11sMpPlcyEntry 18 }
+
+hh3cDot11sMlspLogEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the mesh link switch protocol (MLSP)
+        link switch logging function is enabled."
+    DEFVAL      { false }
+    ::= { hh3cDot11sMpPlcyEntry 19 }
+
+hh3cDot11sMlspLogInterval OBJECT-TYPE
+    SYNTAX      Integer32(500..4000)
+    UNITS       "millisecond"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh link switch protocol (MLSP)
+        link switch logging interval."
+    DEFVAL      { 1000 }
+    ::= { hh3cDot11sMpPlcyEntry 20 }
+
+hh3cDot11sActiveKeepaliveCount OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh link switch protocol (MLSP)
+        active link keepalive packet limit."
+    DEFVAL      { 6 }
+    ::= { hh3cDot11sMpPlcyEntry 21 }
+
+hh3cDot11sLinkEstaThreshold OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    UNITS       "dBm"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the mesh link establishment threshold."
+    DEFVAL      { 5 }
+    ::= { hh3cDot11sMpPlcyEntry 22 }
+
+hh3cDot11sTransmissionMethod OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            air(0),
+            waveGuide(1)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the method for mesh link signal transmission."
+    DEFVAL      { air }
+    ::= { hh3cDot11sMpPlcyEntry 23 }
+
+hh3cDot11sTransmitLevel OBJECT-TYPE
+    SYNTAX      Integer32(0..4)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the active mesh link keepalive packet transmission level."
+    DEFVAL      { 0 }
+    ::= { hh3cDot11sMpPlcyEntry 24 }
+
+hh3cDot11sTempLinkEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether to allow temporary mesh link establishment."
+    DEFVAL      { true }
+    ::= { hh3cDot11sMpPlcyEntry 25 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMpPlcyTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sMlspCfgTable Definition
+-- *****************************************************************************
+hh3cDot11sMlspCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMlspCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure MLSP proxy MAC address.
+        Only if the specified MP policy is modifiable and the MLSP
+        is enabled, the row of this table can be created and deleted.
+        The row of this table cannot be modified."
+    ::= { hh3cDot11sConfigGroup 4 }
+
+hh3cDot11sMlspCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMlspCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of MLSP proxy MAC address."
+    INDEX
+        {
+            hh3cDot11sMpPlcyIndex,
+            hh3cDot11sMlspProxyIndex
+        }
+    ::= { hh3cDot11sMlspCfgTable 1 }
+
+Hh3cDot11sMlspCfgEntry ::= SEQUENCE
+    {
+        hh3cDot11sMlspProxyIndex       Integer32,
+        hh3cDot11sMlspProxyMac         MacAddress,
+        hh3cDot11sMlspRowStatus        RowStatus
+    }
+
+hh3cDot11sMlspProxyIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MLSP proxy MAC address index."
+    ::= { hh3cDot11sMlspCfgEntry 1 }
+
+hh3cDot11sMlspProxyMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MLSP proxy MAC address."
+    ::= { hh3cDot11sMlspCfgEntry 2 }
+
+hh3cDot11sMlspRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11sMlspCfgEntry 3 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMlspCfgTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sRadioCfgTable Definition
+-- *****************************************************************************
+hh3cDot11sRadioCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sRadioCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure mesh to the specified radio."
+    ::= { hh3cDot11sConfigGroup 5 }
+
+hh3cDot11sRadioCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sRadioCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains mesh configure information
+        of the specified radio."
+    INDEX
+        {
+            hh3cDot11sCfgRadioIndex
+        }
+    ::= { hh3cDot11sRadioCfgTable 1 }
+
+Hh3cDot11sRadioCfgEntry ::= SEQUENCE
+    {
+        hh3cDot11sCfgRadioIndex        Hh3cDot11RadioElementIndex,
+        hh3cDot11sMeshPflMap           Integer32,
+        hh3cDot11sMpPlcyMap            Integer32,
+        hh3cDot11sBindInterface        Integer32
+    }
+
+hh3cDot11sCfgRadioIndex OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioElementIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents index of the radio."
+    ::= { hh3cDot11sRadioCfgEntry 1 }
+
+hh3cDot11sMeshPflMap OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the number of the mesh profile mapped to
+        the specified radio.  The value is zero when the radio is not
+        bound to a mesh profile."
+    DEFVAL      { 0 }
+    ::= { hh3cDot11sRadioCfgEntry 2 }
+
+hh3cDot11sMpPlcyMap OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the index of the MP policy mapped to the
+        specified radio.  The MP policy is the default policy when the radio
+        is not bound to the user-defined MP policy.
+        The index of the default policy is 1.
+        This object cannot be modified when the radio is enabled."
+    DEFVAL      { 1 }
+    ::= { hh3cDot11sRadioCfgEntry 3 }
+
+hh3cDot11sBindInterface OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the number of the WLAN-Mesh interface
+        mapped to the specified radio.  The value is -1 when the
+        radio is not bound to a WLAN-Mesh interface."
+    DEFVAL      { -1 }
+    ::= { hh3cDot11sRadioCfgEntry 4 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sRadioCfgTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sAPCfgTable Definition
+-- *****************************************************************************
+hh3cDot11sAPCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sAPCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure mesh to the specified AP."
+    ::= { hh3cDot11sConfigGroup 6 }
+
+hh3cDot11sAPCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sAPCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains mesh configure information
+        of the specified AP."
+    INDEX
+        {
+            hh3cDot11APElementIndex
+        }
+    ::= { hh3cDot11sAPCfgTable 1 }
+
+Hh3cDot11sAPCfgEntry ::= SEQUENCE
+    {
+        hh3cDot11sPortalEnable         TruthValue
+    }
+
+hh3cDot11sPortalEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the portal service is enabled.
+        'true': The portal service is enabled.
+        'false': The portal service is disabled."
+    DEFVAL      { false }
+    ::= { hh3cDot11sAPCfgEntry 1 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sAPCfgTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sWDSPeerMacTable Definition
+-- *****************************************************************************
+hh3cDot11sWDSPeerMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sWDSPeerMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure wireless distribution system (WDS).
+        The row of this table cannot be modified."
+    ::= { hh3cDot11sWDSConfigGroup 1 }
+
+hh3cDot11sWDSPeerMacEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sWDSPeerMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of WDS."
+    INDEX
+        {
+            hh3cDot11sCfgRadioIndex,
+            hh3cDot11sWDSPeerMacIndex
+        }
+    ::= { hh3cDot11sWDSPeerMacTable 1 }
+
+Hh3cDot11sWDSPeerMacEntry ::= SEQUENCE
+    {
+        hh3cDot11sWDSPeerMacIndex      Integer32,
+        hh3cDot11sWDSPeerMacAddrss     MacAddress,
+        hh3cDot11sWDSPeerMacRowStatus  RowStatus
+    }
+
+hh3cDot11sWDSPeerMacIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the peer MAC address index."
+    ::= { hh3cDot11sWDSPeerMacEntry 1 }
+
+hh3cDot11sWDSPeerMacAddrss OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the peer MAC address."
+    ::= { hh3cDot11sWDSPeerMacEntry 2 }
+
+hh3cDot11sWDSPeerMacRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11sWDSPeerMacEntry 3 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sWDSPeerMacTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sMlspExtCfgTable Definition
+-- *****************************************************************************
+hh3cDot11sMlspExtCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMlspExtCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure MLSP proxy MAC address.
+        Only if the specified MP policy is modifiable and MLSP
+        is enabled, the row of this table can be created and deleted.
+        The row of this table cannot be modified."
+    ::= { hh3cDot11sConfigGroup 7 }
+
+hh3cDot11sMlspExtCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMlspExtCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains MLSP proxy MAC address infomation."
+    INDEX
+        {
+            hh3cDot11sMlspExtPolicyName,
+            hh3cDot11sMlspExtProxyMac,
+            hh3cDot11sMlspExtProxyVlanID
+        }
+    ::= { hh3cDot11sMlspExtCfgTable 1 }
+
+Hh3cDot11sMlspExtCfgEntry ::= SEQUENCE
+    {
+            hh3cDot11sMlspExtPolicyName       OCTET STRING,
+            hh3cDot11sMlspExtProxyMac         MacAddress,
+            hh3cDot11sMlspExtProxyVlanID      Integer32,
+            hh3cDot11sMlspExtProxyIP          IpAddress,
+            hh3cDot11sMlspExtRowStatus        RowStatus
+    }
+hh3cDot11sMlspExtPolicyName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MP policy name.
+        An MP policy cannot be created with the name of the
+        default policy.
+        Modification is not supported."
+    ::= { hh3cDot11sMlspExtCfgEntry 1 }
+
+hh3cDot11sMlspExtProxyMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MLSP proxy MAC address."
+    ::= { hh3cDot11sMlspExtCfgEntry 2 }
+
+
+hh3cDot11sMlspExtProxyVlanID OBJECT-TYPE
+    SYNTAX      Integer32(1..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MLSP proxy VLAN ID."
+    ::= { hh3cDot11sMlspExtCfgEntry 3 }
+
+hh3cDot11sMlspExtProxyIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MLSP proxy IP address."
+    ::= { hh3cDot11sMlspExtCfgEntry 4 }
+
+hh3cDot11sMlspExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11sMlspExtCfgEntry 5 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMlspExtCfgTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sMeshLinkStatusTable Definition
+-- *****************************************************************************
+hh3cDot11sMeshLinkStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMeshLinkStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to represent the status of mesh link."
+    ::= { hh3cDot11sMeshStatusGroup 1 }
+
+hh3cDot11sMeshLinkStatusEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMeshLinkStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains status information of mesh link."
+    INDEX
+        {
+            hh3cDot11sMeshLinkIfIndex
+        }
+    ::= { hh3cDot11sMeshLinkStatusTable 1 }
+
+Hh3cDot11sMeshLinkStatusEntry ::= SEQUENCE
+    {
+        hh3cDot11sMeshLinkIfIndex        Unsigned32,
+        hh3cDot11sMeshLinkName           OCTET STRING,
+        hh3cDot11sMeshLinkBSSID          MacAddress,
+        hh3cDot11sMeshLinkPeerMac        MacAddress,
+        hh3cDot11sMeshLinkExistDuration  Integer32,
+        hh3cDot11sMeshLinkType           INTEGER,
+        hh3cDot11sMeshLinkSNR            Integer32,
+        hh3cDot11sMeshLinkNoise          Integer32,
+        hh3cDot11sMeshLinkPeerSNR        Integer32,
+        hh3cDot11sMeshLinkPeerNoise      Integer32,
+        hh3cDot11sMeshLinkPeerIPAddress  IpAddress,
+        hh3cDot11sMeshLinkPeerSystemName OCTET STRING
+    }
+
+hh3cDot11sMeshLinkIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the interface index of the mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 1 }
+
+hh3cDot11sMeshLinkName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the name of the mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 2 }
+
+hh3cDot11sMeshLinkBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the BSS ID of the mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 3 }
+
+hh3cDot11sMeshLinkPeerMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the peer MAC address of the mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 4 }
+
+hh3cDot11sMeshLinkExistDuration OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the time for which the link has been up."
+    ::= { hh3cDot11sMeshLinkStatusEntry 5 }
+
+hh3cDot11sMeshLinkType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            active(1),
+            dormant(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the type for the link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 6 }
+
+hh3cDot11sMeshLinkSNR OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the SNR for the link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 7 }
+
+hh3cDot11sMeshLinkNoise OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the noise for the link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 8 }
+
+hh3cDot11sMeshLinkPeerSNR OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the SNR transferred from the neighbor of this mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 9 }
+
+hh3cDot11sMeshLinkPeerNoise OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the noise transferred from the neighbor of this mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 10 }
+
+hh3cDot11sMeshLinkPeerIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of the neighbor of this mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 11 }
+
+hh3cDot11sMeshLinkPeerSystemName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the system name of the neighbor of this mesh link."
+    ::= { hh3cDot11sMeshLinkStatusEntry 12 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMeshLinkStatusTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11sMeshLinkStatisTable Definition
+-- *****************************************************************************
+hh3cDot11sMeshLinkStatisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMeshLinkStatisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to represent the statistical information of
+         mesh link."
+    ::= { hh3cDot11sMeshStatusGroup 2 }
+
+hh3cDot11sMeshLinkStatisEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMeshLinkStatisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains statistical information of mesh link."
+    INDEX
+        {
+            hh3cDot11APElementIndex,
+            hh3cDot11sMeshLinkStatIfIndex
+        }
+    ::= { hh3cDot11sMeshLinkStatisTable 1 }
+
+Hh3cDot11sMeshLinkStatisEntry ::= SEQUENCE
+    {
+        hh3cDot11sMeshLinkStatIfIndex    Unsigned32,
+        hh3cDot11sMeshLinkNbrIndex       Unsigned32,
+        hh3cDot11sMeshLinkRxTotByte      Counter32,
+        hh3cDot11sMeshLinkRxTotPkt       Counter32,
+        hh3cDot11sMeshLinkRxUniPkt       Counter32,
+        hh3cDot11sMeshLinkRxBrocPkt      Counter32,
+        hh3cDot11sMeshLinkRxMuticPkt     Counter32,
+        hh3cDot11sMeshLinkRxDiscPkt      Counter32,
+        hh3cDot11sMeshLinkTxTotByte      Counter32,
+        hh3cDot11sMeshLinkTxTotPkt       Counter32,
+        hh3cDot11sMeshLinkTxUniPkt       Counter32,
+        hh3cDot11sMeshLinkTxBrocPkt      Counter32,
+        hh3cDot11sMeshLinkTxMuticPkt     Counter32,
+        hh3cDot11sMeshLinkTxDiscPkt      Counter32,
+        hh3cDot11sMeshLinkIFName         OCTET STRING
+    }
+
+hh3cDot11sMeshLinkStatIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the interface index of the mesh link."
+    ::= { hh3cDot11sMeshLinkStatisEntry 1 }
+
+hh3cDot11sMeshLinkNbrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the neighbor index of the mesh link."
+    ::= { hh3cDot11sMeshLinkStatisEntry 2 }
+
+hh3cDot11sMeshLinkRxTotByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of bytes that the mesh link received."
+    ::= { hh3cDot11sMeshLinkStatisEntry 3 }
+
+hh3cDot11sMeshLinkRxTotPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of packets that the mesh link received."
+    ::= { hh3cDot11sMeshLinkStatisEntry 4 }
+
+hh3cDot11sMeshLinkRxUniPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of unicast packets that the mesh link received."
+    ::= { hh3cDot11sMeshLinkStatisEntry 5 }
+
+hh3cDot11sMeshLinkRxBrocPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of broadcast packets that the mesh link
+         received."
+    ::= { hh3cDot11sMeshLinkStatisEntry 6 }
+
+hh3cDot11sMeshLinkRxMuticPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of multicast packets that the mesh link
+         received."
+    ::= { hh3cDot11sMeshLinkStatisEntry 7 }
+
+hh3cDot11sMeshLinkRxDiscPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of packets that the mesh link discarded."
+    ::= { hh3cDot11sMeshLinkStatisEntry 8 }
+
+hh3cDot11sMeshLinkTxTotByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total amount of bytes that the mesh link transmitted."
+    ::= { hh3cDot11sMeshLinkStatisEntry 9 }
+
+hh3cDot11sMeshLinkTxTotPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total amount of packets that the mesh link transmitted."
+    ::= { hh3cDot11sMeshLinkStatisEntry 10 }
+
+hh3cDot11sMeshLinkTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of unicast packets that the mesh link
+         transmitted."
+    ::= { hh3cDot11sMeshLinkStatisEntry 11 }
+
+hh3cDot11sMeshLinkTxBrocPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of broadcast packets that the mesh link
+         transmitted."
+    ::= { hh3cDot11sMeshLinkStatisEntry 12 }
+
+hh3cDot11sMeshLinkTxMuticPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of multicast packets that the mesh link
+         transmitted."
+    ::= { hh3cDot11sMeshLinkStatisEntry 13 }
+
+hh3cDot11sMeshLinkTxDiscPkt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the amount of discarded packets that the mesh link
+         transmitted."
+    ::= { hh3cDot11sMeshLinkStatisEntry 14 }
+
+hh3cDot11sMeshLinkIFName    OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of mesh link interface."
+    ::= { hh3cDot11sMeshLinkStatisEntry 15 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11sMeshLinkStatisTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11sMeshNbrStatusTable Definition
+-- *****************************************************************************
+hh3cDot11sMeshNbrStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11sMeshNbrStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the status information for the neighbors of MP."
+    ::= { hh3cDot11sMeshStatusGroup 3 }
+
+hh3cDot11sMeshNbrStatusEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11sMeshNbrStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry of the table will provide status information for the
+         neighbors of MP."
+    INDEX
+        {
+            hh3cDot11APElementIndex,
+            hh3cDot11sMeshNbrIndex
+        }
+    ::= { hh3cDot11sMeshNbrStatusTable 1 }
+
+Hh3cDot11sMeshNbrStatusEntry ::= SEQUENCE
+    {
+        hh3cDot11sMeshNbrIndex          Unsigned32,
+        hh3cDot11sMeshNbrRadioID        Unsigned32,
+        hh3cDot11sMeshLocalMeshID       OCTET STRING,
+        hh3cDot11sMeshNbrMeshID         OCTET STRING,
+        hh3cDot11sMeshNbrBSSID          MacAddress,
+        hh3cDot11sMeshNbrPeerMac        MacAddress,
+        hh3cDot11sMeshLinkInMp          Unsigned32,
+        hh3cDot11sMeshMPLinkStatus      INTEGER,
+        hh3cDot11sMeshNbrChannel        Unsigned32,
+        hh3cDot11sMeshNbrLinkDuration   Integer32,
+        hh3cDot11sMeshNbrRSSI           Integer32,
+        hh3cDot11sMeshNbrSNR            Integer32
+    }
+
+hh3cDot11sMeshNbrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the index for the neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 1 }
+
+hh3cDot11sMeshNbrRadioID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio ID of the neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 2 }
+
+hh3cDot11sMeshLocalMeshID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the local mesh ID."
+    ::= { hh3cDot11sMeshNbrStatusEntry 3 }
+
+hh3cDot11sMeshNbrMeshID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the mesh ID of the neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 4 }
+
+hh3cDot11sMeshNbrBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the BSS ID of the neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 5 }
+
+hh3cDot11sMeshNbrPeerMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of the peer neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 6 }
+
+hh3cDot11sMeshLinkInMp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the interface index of mesh link that used to connect with
+         this neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 7 }
+
+hh3cDot11sMeshMPLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            processing(1),
+            up(2),
+            down(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the status of mesh link that used to connect with this
+         neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 8 }
+
+hh3cDot11sMeshNbrChannel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel number used by this neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 9 }
+
+hh3cDot11sMeshNbrLinkDuration OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the duration of mesh link that used to connect with this
+         neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 10 }
+
+hh3cDot11sMeshNbrRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the RSSI of mesh link that used to connect with this
+         neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 11 }
+
+hh3cDot11sMeshNbrSNR OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the SNR of mesh link that used to connect with this
+         neighbor."
+    ::= { hh3cDot11sMeshNbrStatusEntry 12 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11sMeshNbrStatusTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11sMeshLinkTraps Definition
+-- *****************************************************************************
+
+hh3cDot11sMeshLinkTraps OBJECT IDENTIFIER ::= { hh3cDot11sMeshLinkNotifyGroup 0 }
+
+hh3cDot11sMeshLinkSwitchTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11sMeshLinkBSSIDMAC,
+            hh3cDot11sMeshLinkPeerMAC
+        }
+    STATUS        current
+    DESCRIPTION
+        "This notification is to indicate the occurrence of a mesh link switchover."
+    ::= { hh3cDot11sMeshLinkTraps 1 }
+
+hh3cDot11sMeshLinkTrapObjects OBJECT IDENTIFIER ::= { hh3cDot11sMeshLinkNotifyGroup 1 }
+
+hh3cDot11sMeshLinkBSSIDMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the BSSID of the MP."
+    ::= { hh3cDot11sMeshLinkTrapObjects 1 }
+
+hh3cDot11sMeshLinkPeerMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of the peer MP after mesh link switchover."
+    ::= { hh3cDot11sMeshLinkTrapObjects 2 }
+END
+

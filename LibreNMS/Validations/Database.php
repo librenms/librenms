@@ -99,7 +99,7 @@ class Database extends BaseValidation
 
     private function checkVersion(Validator $validator)
     {
-        $version = Eloquent::DB()->selectOne('SELECT VERSION() as version')->version;
+        $version = Eloquent::version();
         $version = explode('-', $version);
 
         if (isset($version[1]) && $version[1] == 'MariaDB') {

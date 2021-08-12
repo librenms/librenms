@@ -1,0 +1,277 @@
+CISCOSB-Redistribute DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Redistribute table
+-- Version:    7.60.00.00
+-- Date:       14 Jun 2011
+
+IMPORTS
+    ipSpec                                                  FROM CISCOSB-IP
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue,
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC;
+
+
+ -- Textual conventions
+
+
+RlRedistSrcProtocol ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Source Protocol
+                 this defines the list of sources that redistribute their routes "
+    SYNTAX      INTEGER {
+        rlRedistProtocolConnected(1), -- directly connected routes
+        rlRedistProtocolStatic(2),    -- statically defined routes
+        rlRedistProtocolRip(3),       -- RIP
+        rlRedistProtocolOspfv2(4),    -- OSPFv2
+        rlRedistProtocolOspfv3(5),    -- OSPFv3
+        rlRedistProtocolBgp(6),       -- BGP
+        rlRedistProtocolEigrp(7),     -- EIGRP
+        rlRedistProtocolIsIs(8),      -- Is-Is
+        rlRedistProtocolMobile(9),    -- Mobile
+        rlRedistProtocolAll(10)       -- all routes
+   }
+
+RlRedistDstProtocol ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Destination Protocol"
+    SYNTAX      INTEGER {
+                rlRedistProtocolRip(3),       -- RIP
+                rlRedistProtocolOspfv2(4),    -- OSPFv2
+                rlRedistProtocolOspfv3(5),    -- OSPFv3
+                rlRedistProtocolBgp(6),       -- BGP
+                rlRedistProtocolEigrp(7),     -- EIGRP
+                rlRedistProtocolIsIs(8),      -- Is-Is
+                rlRedistProtocolMobile(9)     -- Mobile
+              }
+
+RlRedistMatchType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Match Type
+                 Bit Map that defines the criteria by which OSPF routes are redistributed into other routing domains."
+    SYNTAX      INTEGER {
+                rlRedistMatchTypeNone(0),       -- don't filter according to path type
+                rlRedistMatchTypeInternal(1),   -- Routes that are internal to a specific autonomous system.
+                rlRedistMatchTypeExternalOne(2),-- Routes that are external to the autonomous system, but are imported into OSPF as Type 1 external route.
+                rlRedistMatchTypeExternalTwo(3) -- Routes that are external to the autonomous system, but are imported into OSPF as Type 2 external route.
+    }
+
+RlRedistMetricType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Metric Type"
+    SYNTAX INTEGER {
+        rlRedistMetricTypeNone(0),         -- no metric defined
+        rlRedistMetricTypeExternalOne(1),  -- type 1 external
+        rlRedistMetricTypeExternalTwo(2)   -- type 2 external
+    }
+
+-- RlRedistLevel ::= TEXTUAL-CONVENTION
+--     STATUS  current
+--     DESCRIPTION "IS-IS Level"
+--     SYNTAX      INTEGER {
+--                 rlRedistLevelNone(0)    no level defined
+--                 rlRedistLevelOne(1),    level-1
+--                 rlRedistLevelOneTwo(2), level-1-2
+--                 rlRedistLevelTwo(3),    Level-2
+--     }
+--
+
+-------------------------------------------------------------------------------
+
+rlRedistribute OBJECT IDENTIFIER   ::= { ipSpec 27 }
+
+
+rlRedistTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlRedistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Using a routing protocol to advertise routes that are learned by some other means,
+                 such as by another routing protocol, static routes, or directly connected routes, is called redistribution.
+                 This table is used to configure under which conditions will redistribution occur
+                 and which actions (if any) should be done on redistributed route."
+          ::= { rlRedistribute 1 }
+
+RlRedistEntry  ::= SEQUENCE {
+        rlRedistDstProtocol             RlRedistDstProtocol,    -- destination protocol
+        rlRedistSrcProtocol             RlRedistSrcProtocol,    -- source protocol
+        rlRedistDstProcessId            INTEGER,                -- Destination process ID
+        rlRedistSrcProcessId            INTEGER,                -- Source process ID
+        rlRedistMatchType               RlRedistMatchType,      -- match type
+        rlRedistRoutMapName             DisplayString,          -- rout map tag (name)
+
+        rlRedistAsNumber                INTEGER,                -- Autonomous System Number
+        rlRedistMetricTransparent       TruthValue,             -- redistribute with same metric
+        rlRedistMetricValue             INTEGER,                -- if not transparent, which metric to use
+        rlRedistMetricType              RlRedistMetricType,     -- metric type
+        rlRedistSubnets                 TruthValue,             -- if FALSE: When routes are redistributed into OSPF, only routes that are not subnetted are redistributed
+        rlRedistOnlyNSSA                TruthValue,             -- Sets the nssa-only attribute for all routes redistributed into OSPF
+        rlRedistRowStatus               RowStatus               -- Row Status
+--      rlRedistISISProcessId         DisplayString            IS-IS process ID
+--      rlRedistLevel                 RlRedistLevel,           Level (Is-Is only)
+--      rlRedistTagValue              INTEGER,                 Tag Value, 0 means no tag
+}
+
+rlRedistEntry OBJECT-TYPE
+    SYNTAX  RlRedistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION  "."
+    INDEX {
+            rlRedistDstProtocol,
+            rlRedistSrcProtocol,
+            rlRedistDstProcessId,
+            rlRedistSrcProcessId,
+            rlRedistMatchType,
+            rlRedistRoutMapName
+    }
+       ::= { rlRedistTable 1}
+
+
+
+rlRedistDstProtocol  OBJECT-TYPE
+    SYNTAX RlRedistDstProtocol
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "The protocol to which the routes are exported to"
+       ::= { rlRedistEntry 1 }
+
+rlRedistSrcProtocol OBJECT-TYPE
+    SYNTAX RlRedistSrcProtocol
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "The protocol from which the routes are imported from"
+       ::= { rlRedistEntry 2 }
+
+rlRedistDstProcessId OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Parameter semantic differs according to rlRedistDstProtocol.
+                in OSPF this is an appropriate OSPF process ID to which routes are to be redistributed"
+       ::= { rlRedistEntry 3 }
+
+
+rlRedistSrcProcessId OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Parameter semantic differs according to rlRedistSrcProtocol.
+                 in BGP and EIGRP keyword, this is an autonomous system number, in range 1 to 65535..
+                 in OSPF, this is an appropriate OSPF process ID from which routes are to be redistributed.
+                 0 means no process ID"
+       ::= { rlRedistEntry 4 }
+
+rlRedistMatchType OBJECT-TYPE
+    SYNTAX RlRedistMatchType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Applicable only when rlRedistSrcProtocol is OSPF
+                defines the criteria by which OSPF routes are redistributed into other routing domains.
+                It can be one of the following:
+                rlRedistMatchTypeInternal    - Routes that are internal to a specific autonomous system.
+                rlRedistMatchTypeExternalTwo - Routes that are external to the autonomous system, but are imported into OSPF as Type 2 external route.
+                rlRedistMatchTypeExternalOne - Routes that are external to the autonomous system, but are imported into OSPF as Type 1 external route."
+        ::= { rlRedistEntry 5 }
+
+rlRedistRoutMapName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Specifies the route map that should be interrogated to filter the importation of routes
+                 from this source routing protocol to the current routing protocol.
+                 If not specified, all routes are redistributed. If this keyword is specified, but no route map tags are listed, no routes will be imported."
+        ::= { rlRedistEntry 6 }
+
+rlRedistAsNumber OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Autonomous system number for the redistributed route. Number in range from 1 to 65535.
+                 0 means no AS number defined"
+    DEFVAL {0}
+       ::= { rlRedistEntry 7}
+
+rlRedistMetricTransparent OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Redistribute routes without changing the metric"
+    DEFVAL {true}
+        ::= { rlRedistEntry 8 }
+
+rlRedistMetricValue OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "When redistributing from one OSPF process to another OSPF process on the same router,
+                 the metric will be carried through from one process to the other if no metric value is specified.
+                 When redistributing other processes to an OSPF process, the default metric is 20 when no metric value is specified."
+    DEFVAL {0}
+        ::= { rlRedistEntry 9 }
+
+rlRedistMetricType OBJECT-TYPE
+    SYNTAX RlRedistMetricType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Parameter semantic differs according to rlRedistSrcProtocol.
+                 In OSPF specifies the external link type associated with the default route advertised into the OSPF routing domain.
+                 It can be one of two values:
+                 1 - Type 1 external route
+                 2 - Type 2 external route"
+        ::= { rlRedistEntry 10}
+
+
+rlRedistSubnets OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "For redistributing routes into OSPF, the scope of redistribution for the specified protocol"
+    DEFVAL {false}
+        ::= { rlRedistEntry 11 }
+
+rlRedistOnlyNSSA OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Sets the nssa-only attribute for all routes redistributed into OSPF."
+    DEFVAL {false}
+        ::= { rlRedistEntry 12 }
+
+rlRedistRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Row Status"
+    ::= { rlRedistEntry 13 }
+
+END
+-- rlRedistISISProcessId  OBJECT-TYPE
+--     SYNTAX DisplayString
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION "In IS-IS, this is an optional tag value that defines a meaningful name for a routing process."
+--        ::= { rlRedistEntry 15 }
+
+-- rlRedistLevel OBJECT-TYPE
+--     SYNTAX RlRedistLevel
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION "In IS-IS
+--                  level-1: Level 1 routes are redistributed into other IP routing protocols independently.
+--                  level-1-2: both Level 1 and Level 2 routes are redistributed into other IP routing protocols.
+--                  level-2: Level 2 routes are redistributed into other IP routing protocols independently."
+--     DEFVAL {rlRedistLevelNone}
+--        ::= { rlRedistEntry 16 }
+-- rlRedistTagValue  OBJECT-TYPE
+--    SYNTAX INTEGER
+--     MAX-ACCESS read-write
+--     STATUS current
+--     DESCRIPTION "Specifies the 32-bit decimal value attached to each external route.
+--                  This is not used by OSPF itself.
+--                  It may be used to communicate information between Autonomous System Boundary Routers (ASBRs).
+--                  If none is specified, then the remote autonomous system number is used for routes from
+--                     Border Gateway Protocol (BGP) and Exterior Gateway Protocol (EGP);
+--                  for other protocols, zero (0) is used"
+--     DEFVAL {0}
+--         ::= { rlRedistEntry 17 }
+
+

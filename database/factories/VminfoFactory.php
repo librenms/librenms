@@ -6,6 +6,7 @@ use App\Models\Vminfo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Enum\PowerState;
 
+/** @extends Factory<Vminfo> */
 class VminfoFactory extends Factory
 {
     /**

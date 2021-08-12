@@ -1,3 +1,120 @@
+## 21.7.0
+*(2021-07-16)*
+
+A big thank you to the following 27 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (9)
+  - [rhinoau](https://github.com/rhinoau) (8)
+  - [PipoCanaja](https://github.com/PipoCanaja) (5)
+  - [mpikzink](https://github.com/mpikzink) (4)
+  - [mathieu-artic](https://github.com/mathieu-artic) (4)
+  - [martinberg](https://github.com/martinberg) (3)
+  - [Npeca75](https://github.com/Npeca75) (2)
+  - [epiecs](https://github.com/epiecs) (2)
+  - [Sea-n](https://github.com/Sea-n) (2)
+  - [paulierco](https://github.com/paulierco) (2)
+  - [djamp42](https://github.com/djamp42) (2)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+  - [geg347](https://github.com/geg347) (1)
+  - [ziodona85](https://github.com/ziodona85) (1)
+  - [keryazmi](https://github.com/keryazmi) (1)
+  - [hanserasmus](https://github.com/hanserasmus) (1)
+  - [edgetho007](https://github.com/edgetho007) (1)
+  - [dagbdagb](https://github.com/dagbdagb) (1)
+  - [jbronn](https://github.com/jbronn) (1)
+  - [adamboutcher](https://github.com/adamboutcher) (1)
+  - [VirTechSystems](https://github.com/VirTechSystems) (1)
+  - [skoobasteeve](https://github.com/skoobasteeve) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [si458](https://github.com/si458) (1)
+  - [kdanev14](https://github.com/kdanev14) (1)
+  - [cjsoftuk](https://github.com/cjsoftuk) (1)
+  - [jezekus](https://github.com/jezekus) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (32)
+  - [murrant](https://github.com/murrant) (14)
+  - [PipoCanaja](https://github.com/PipoCanaja) (13)
+
+#### Feature
+* Support multiple db servers ([#12963](https://github.com/librenms/librenms/pull/12963)) - [djamp42](https://github.com/djamp42)
+
+#### Device
+* Inital support for Eltex-MES switches ([#13036](https://github.com/librenms/librenms/pull/13036)) - [Npeca75](https://github.com/Npeca75)
+* Add support for Ucopia Appliances ([#13031](https://github.com/librenms/librenms/pull/13031)) - [mathieu-artic](https://github.com/mathieu-artic)
+* Fixing irrelevant values rpm packetloss ([#13010](https://github.com/librenms/librenms/pull/13010)) - [geg347](https://github.com/geg347)
+* Added Vlan discovery on LAG ports, Jetstream OS ([#13007](https://github.com/librenms/librenms/pull/13007)) - [Npeca75](https://github.com/Npeca75)
+* Add showtime start for OneAccess SDSL routers ([#13005](https://github.com/librenms/librenms/pull/13005)) - [mathieu-artic](https://github.com/mathieu-artic)
+* Arista_mos-support ([#13003](https://github.com/librenms/librenms/pull/13003)) - [hanserasmus](https://github.com/hanserasmus)
+* Add LTE/UMTS support for Oneaccess routers ([#13002](https://github.com/librenms/librenms/pull/13002)) - [mathieu-artic](https://github.com/mathieu-artic)
+* Add Sonicwall OS 7 ([#12997](https://github.com/librenms/librenms/pull/12997)) - [edgetho007](https://github.com/edgetho007)
+* Added support for the Rittal LCP DX Chiller ([#12995](https://github.com/librenms/librenms/pull/12995)) - [epiecs](https://github.com/epiecs)
+* Eaton M2 EMP g2 ([#12994](https://github.com/librenms/librenms/pull/12994)) - [dagbdagb](https://github.com/dagbdagb)
+* TP-Link Jetstream DDM and PoE Support ([#12990](https://github.com/librenms/librenms/pull/12990)) - [jbronn](https://github.com/jbronn)
+* Alcatel-Lucent AOS6 to yaml ([#12982](https://github.com/librenms/librenms/pull/12982)) - [paulierco](https://github.com/paulierco)
+* Added logo svg for Rocky Linux ([#12977](https://github.com/librenms/librenms/pull/12977)) - [skoobasteeve](https://github.com/skoobasteeve)
+* Added VRP ICMP SLA (NQA in huawei naming) support ([#12973](https://github.com/librenms/librenms/pull/12973)) - [PipoCanaja](https://github.com/PipoCanaja)
+* EUROstor RAID ([#12969](https://github.com/librenms/librenms/pull/12969)) - [mpikzink](https://github.com/mpikzink)
+* Add support for Liebert humidity setpoint and UPS powerfactor ([#12965](https://github.com/librenms/librenms/pull/12965)) - [martinberg](https://github.com/martinberg)
+* Added support to new device Controlbox TH-332B ([#12940](https://github.com/librenms/librenms/pull/12940)) - [kdanev14](https://github.com/kdanev14)
+* Add OS Support for Siemens Scalance X Switching ([#12938](https://github.com/librenms/librenms/pull/12938)) - [rhinoau](https://github.com/rhinoau)
+* Alcatel-Lucent aos7 LLDP Neighbors ([#12886](https://github.com/librenms/librenms/pull/12886)) - [paulierco](https://github.com/paulierco)
+* Add HPE-maPDU support ([#12550](https://github.com/librenms/librenms/pull/12550)) - [jezekus](https://github.com/jezekus)
+
+#### Webui
+* Fix availability widget service backend error ([#13044](https://github.com/librenms/librenms/pull/13044)) - [rhinoau](https://github.com/rhinoau)
+* Fix availability widget device totals ([#13043](https://github.com/librenms/librenms/pull/13043)) - [rhinoau](https://github.com/rhinoau)
+* Don't add %3F=yes to the url ([#13041](https://github.com/librenms/librenms/pull/13041)) - [murrant](https://github.com/murrant)
+* Webui - Display app metric if available ([#13023](https://github.com/librenms/librenms/pull/13023)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Webui - Fix application fault detail display ([#13016](https://github.com/librenms/librenms/pull/13016)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Two-factor UI config and status display ([#13012](https://github.com/librenms/librenms/pull/13012)) - [rhinoau](https://github.com/rhinoau)
+* Leave it to generate_device_link for sysName/hostName/IP ([#13000](https://github.com/librenms/librenms/pull/13000)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Filter out NULL lat/lng values from Geographical Map display queries ([#12985](https://github.com/librenms/librenms/pull/12985)) - [rhinoau](https://github.com/rhinoau)
+* Fix ldap/ad group webui settings ([#12967](https://github.com/librenms/librenms/pull/12967)) - [murrant](https://github.com/murrant)
+* Create Laravel Sessions Table ([#12962](https://github.com/librenms/librenms/pull/12962)) - [djamp42](https://github.com/djamp42)
+* Fix "Sub-directory Support" in small steps ([#12951](https://github.com/librenms/librenms/pull/12951)) - [mpikzink](https://github.com/mpikzink)
+
+#### Api
+* Return api error when device doesn't exist ([#12978](https://github.com/librenms/librenms/pull/12978)) - [VirTechSystems](https://github.com/VirTechSystems)
+
+#### Discovery
+* Fix an issue which led to duplication of BGP peers. ([#12932](https://github.com/librenms/librenms/pull/12932)) - [cjsoftuk](https://github.com/cjsoftuk)
+
+#### Oxidized
+* Option to filter Oxidized groups ([#12966](https://github.com/librenms/librenms/pull/12966)) - [martinberg](https://github.com/martinberg)
+
+#### Bug
+* Fix scripts to allow pathname with space ([#13027](https://github.com/librenms/librenms/pull/13027)) - [Sea-n](https://github.com/Sea-n)
+* Wrong statement used for Oxidized ignore_groups ([#13001](https://github.com/librenms/librenms/pull/13001)) - [martinberg](https://github.com/martinberg)
+* Fix typo in filename ([#12996](https://github.com/librenms/librenms/pull/12996)) - [Sea-n](https://github.com/Sea-n)
+* Make migrating after upgrading MySQL easier. ([#12971](https://github.com/librenms/librenms/pull/12971)) - [murrant](https://github.com/murrant)
+* Fix proxmox menu url ([#12970](https://github.com/librenms/librenms/pull/12970)) - [si458](https://github.com/si458)
+
+#### Refactor
+* Refractor health ([#13022](https://github.com/librenms/librenms/pull/13022)) - [mpikzink](https://github.com/mpikzink)
+
+#### Cleanup
+* PHPStan fixes ([#13038](https://github.com/librenms/librenms/pull/13038)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Documentation cleanup of sections 4-6 ([#13018](https://github.com/librenms/librenms/pull/13018)) - [rhinoau](https://github.com/rhinoau)
+* Documentation cleanup of General, Install, Getting Started sections ([#13013](https://github.com/librenms/librenms/pull/13013)) - [rhinoau](https://github.com/rhinoau)
+* Update Applications.md for SQUID ([#12987](https://github.com/librenms/librenms/pull/12987)) - [adamboutcher](https://github.com/adamboutcher)
+
+#### Misc
+* Aruba 8.8.0 MIBS ([#13042](https://github.com/librenms/librenms/pull/13042)) - [mpikzink](https://github.com/mpikzink)
+* Create HP-SN-AGENT-MIB ([#13009](https://github.com/librenms/librenms/pull/13009)) - [ziodona85](https://github.com/ziodona85)
+* Update ADVA's MIB file ([#13004](https://github.com/librenms/librenms/pull/13004)) - [keryazmi](https://github.com/keryazmi)
+* Help users that did not upgrade MySQL try two ([#12989](https://github.com/librenms/librenms/pull/12989)) - [murrant](https://github.com/murrant)
+* Add renamehost function result handling and exit codes to renamehost.php ([#12980](https://github.com/librenms/librenms/pull/12980)) - [rhinoau](https://github.com/rhinoau)
+
+#### Dependencies
+* Php-cs-fixer 3 prep ([#13039](https://github.com/librenms/librenms/pull/13039)) - [murrant](https://github.com/murrant)
+* PHP dependencies update ([#13034](https://github.com/librenms/librenms/pull/13034)) - [murrant](https://github.com/murrant)
+* Bump phpmailer/phpmailer from 6.4.1 to 6.5.0 ([#12975](https://github.com/librenms/librenms/pull/12975)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 21.6.0
 *(2021-06-17)*
 

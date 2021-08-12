@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Bill;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Bill> */
 class BillFactory extends Factory
 {
     /**

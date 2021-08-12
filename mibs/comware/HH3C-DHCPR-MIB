@@ -1,0 +1,319 @@
+-- =================================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: DHCP Relay MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--
+-- =================================================================
+
+    HH3C-DHCPR-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cRhw
+                FROM HH3C-OID-MIB
+            ifIndex
+                FROM RFC1213-MIB
+            OBJECT-GROUP
+                FROM SNMPv2-CONF
+            IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            RowStatus
+                FROM SNMPv2-TC;
+
+        hh3cDHCPRelayMib MODULE-IDENTITY
+            LAST-UPDATED "200303010000Z"        -- March 01, 2003 at 00:00 GMT
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "This MIB describes objects used for managing DHCP relay."
+            REVISION "200302120000Z"        -- February 12, 2003 at 00:00 GMT
+            DESCRIPTION
+                "The initial revision of this MIB module."
+            ::= { hh3cRhw 1 }
+
+
+
+--
+-- Node definitions
+--
+
+        hh3cDHCPRelayMibObject OBJECT IDENTIFIER ::= { hh3cDHCPRelayMib 1 }
+
+-- =================================================================
+-- 1st Table of hh3cDHCPRelayMibObjects: hh3cDHCPRIPTable
+-- =================================================================
+        hh3cDHCPRIPTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cDHCPRIPEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table for configuring ip addresses for DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 1 }
+
+        hh3cDHCPRIPEntry OBJECT-TYPE
+            SYNTAX Hh3cDHCPRIPEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for configuring ip addresses for DHCP
+                relay"
+            INDEX { ifIndex, hh3cDHCPRIPAddr }
+            ::= { hh3cDHCPRIPTable 1 }
+
+        Hh3cDHCPRIPEntry ::=
+            SEQUENCE {
+                hh3cDHCPRIPAddr
+                    IpAddress,
+                hh3cDHCPRIPRowStatus
+                    RowStatus
+             }
+
+        hh3cDHCPRIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Ip address for DHCP relay"
+            ::= { hh3cDHCPRIPEntry 1 }
+
+        hh3cDHCPRIPRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus. Three actions are used: active,
+                createAndGo, destroy"
+            ::= { hh3cDHCPRIPEntry 2 }
+
+-- =================================================================
+-- 2nd Table of hh3cDHCPRelayMibObjects: hh3cDHCPRSeletAllocateModeTable
+-- =================================================================
+        hh3cDHCPRSeletAllocateModeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cDHCPRSeletAllocateModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table for selecting allocation mode of dhcp
+                service"
+            ::= { hh3cDHCPRelayMibObject 2 }
+
+        hh3cDHCPRSeletAllocateModeEntry OBJECT-TYPE
+            SYNTAX Hh3cDHCPRSeletAllocateModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for configuring the allocation mode of
+                DHCP service"
+            INDEX { ifIndex }
+            ::= { hh3cDHCPRSeletAllocateModeTable 1 }
+
+        Hh3cDHCPRSeletAllocateModeEntry ::=
+            SEQUENCE {
+                hh3cDHCPRSelectAllocateMode
+                    INTEGER
+             }
+
+        hh3cDHCPRSelectAllocateMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                global(0),
+                interface(1),
+                relay(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Allocation mode of DHCP service"
+            ::= { hh3cDHCPRSeletAllocateModeEntry 1 }
+
+--
+-- Non-table objects
+--
+        hh3cDHCPRelayCycleStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                on(0),
+                off(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Status of DHCP relay cycle mode"
+            ::= { hh3cDHCPRelayMibObject 3 }
+
+        hh3cDHCPRRxBadPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the bad packets received by
+                DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 4 }
+
+        hh3cDHCPRRxServerPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the packets received from
+                DHCP servers by DHCP relay module"
+            ::= { hh3cDHCPRelayMibObject 5 }
+
+        hh3cDHCPRTxServerPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the packets transmited to
+                DHCP servers by DHCP relay module"
+            ::= { hh3cDHCPRelayMibObject 6 }
+
+        hh3cDHCPRRxClientPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the packets received form DHCP
+                clients by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 7 }
+
+        hh3cDHCPRTxClientPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the brodcast packets transmited
+                to DHCP clients by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 8 }
+
+        hh3cDHCPRTxClientUniPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the unicast packets received
+                form DHCP clients by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 9 }
+
+        hh3cDHCPRTxClientBroPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the brodcast packets received
+                form DHCP clients by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 10 }
+
+        hh3cDHCPRelayDiscoverPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Discover packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 11 }
+
+        hh3cDHCPRelayRequestPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Request packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 12 }
+
+        hh3cDHCPRelayDeclinePktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Decline packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 13 }
+
+        hh3cDHCPRelayReleasePktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Release packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 14 }
+
+        hh3cDHCPRelayInformPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Inform packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 15 }
+
+        hh3cDHCPRelayOfferPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Offer packets handled
+                by DHCP server"
+            ::= { hh3cDHCPRelayMibObject 16 }
+
+        hh3cDHCPRelayAckPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Ack packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 17 }
+
+        hh3cDHCPRelayNakPktNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the DHCP Nak packets handled
+                by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 18 }
+
+        hh3cDHCPRelayStatisticsReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                reset(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset the above statictics information of handled
+                packets by DHCP relay"
+            ::= { hh3cDHCPRelayMibObject 19 }
+
+        hh3cDHCPRelayMIBConformance OBJECT IDENTIFIER ::= { hh3cDHCPRelayMib 2 }
+
+        hh3cDHCPRelayMIBCompliances OBJECT IDENTIFIER ::= { hh3cDHCPRelayMIBConformance 1 }
+
+        hh3cDHCPRelayMIBGroups OBJECT IDENTIFIER ::= { hh3cDHCPRelayMIBConformance 2 }
+
+        hh3cDHCPRelayMIBGroup OBJECT-GROUP
+            OBJECTS { hh3cDHCPRIPAddr, hh3cDHCPRIPRowStatus, hh3cDHCPRSelectAllocateMode, hh3cDHCPRelayCycleStatus, hh3cDHCPRRxBadPktNum,
+                hh3cDHCPRRxServerPktNum, hh3cDHCPRTxServerPktNum, hh3cDHCPRRxClientPktNum, hh3cDHCPRTxClientPktNum, hh3cDHCPRTxClientUniPktNum,
+                hh3cDHCPRTxClientBroPktNum, hh3cDHCPRelayDiscoverPktNum, hh3cDHCPRelayRequestPktNum, hh3cDHCPRelayDeclinePktNum, hh3cDHCPRelayReleasePktNum,
+                hh3cDHCPRelayInformPktNum, hh3cDHCPRelayOfferPktNum, hh3cDHCPRelayAckPktNum, hh3cDHCPRelayNakPktNum, hh3cDHCPRelayStatisticsReset
+                 }
+            STATUS current
+            DESCRIPTION
+                "The basic collection of objects providing management of
+                DHCP realy."
+            ::= { hh3cDHCPRelayMIBGroups 1 }
+
+
+    END

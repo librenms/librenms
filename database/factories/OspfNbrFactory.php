@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\OspfNbr;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<OspfNbr> */
 class OspfNbrFactory extends Factory
 {
     /**

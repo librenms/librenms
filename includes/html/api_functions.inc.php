@@ -17,6 +17,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\OspfPort;
+use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
@@ -32,6 +33,7 @@ use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\Rewrite;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
@@ -465,8 +467,8 @@ function device_availability(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function ($device_id) {
         $availabilities = Availability::select('duration', 'availability_perc')
-            ->where('device_id', '=', $device_id)
-            ->orderBy('duration', 'ASC');
+                      ->where('device_id', '=', $device_id)
+                      ->orderBy('duration', 'ASC');
 
         return api_success($availabilities->get(), 'availability');
     });
@@ -486,8 +488,8 @@ function device_outages(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function ($device_id) {
         $outages = DeviceOutage::select('going_down', 'up_again')
-            ->where('device_id', '=', $device_id)
-            ->orderBy('going_down', 'DESC');
+                   ->where('device_id', '=', $device_id)
+                   ->orderBy('going_down', 'DESC');
 
         return api_success($outages->get(), 'outages');
     });
@@ -653,7 +655,7 @@ function list_ospf(Illuminate\Http\Request $request)
 function list_ospf_ports(Illuminate\Http\Request $request)
 {
     $ospf_ports = OspfPort::hasAccess(Auth::user())
-        ->get();
+              ->get();
     if ($ospf_ports->isEmpty()) {
         return api_error(404, 'Ospf ports do not exist');
     }
@@ -990,13 +992,13 @@ function search_ports(Illuminate\Http\Request $request)
 {
     $search = $request->route('search');
     $value = "%$search%";
-    $ports = \App\Models\Port::hasAccess(Auth::user())
-        ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
-        ->where('ifAlias', 'like', $value)
-        ->orWhere('ifDescr', 'like', $value)
-        ->orWhere('ifName', 'like', $value)
-        ->orderBy('ifName')
-        ->get();
+    $ports = Port::hasAccess(Auth::user())
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
+         ->where('ifAlias', 'like', $value)
+         ->orWhere('ifDescr', 'like', $value)
+         ->orWhere('ifName', 'like', $value)
+         ->orderBy('ifName')
+         ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
@@ -1357,15 +1359,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-        ->where('disabled', 0)
-        ->when($request->route('hostname'), function ($query, $hostname) {
-            return $query->where('hostname', $hostname);
-        })
-        ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
-        ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
-        ->whereAttributeDisabled('override_Oxidized_disable')
-        ->select(['hostname', 'sysName', 'sysDescr', 'hardware', 'os', 'ip', 'location_id'])
-        ->get();
+             ->where('disabled', 0)
+             ->when($request->route('hostname'), function ($query, $hostname) {
+                 return $query->where('hostname', $hostname);
+             })
+             ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
+             ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
+             ->whereAttributeDisabled('override_Oxidized_disable')
+             ->select(['hostname', 'sysName', 'sysDescr', 'hardware', 'os', 'ip', 'location_id'])
+             ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
@@ -1614,8 +1616,8 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
         }
 
         return ! isset($graph_data) ?
-            api_error(400, "Unsupported graph type $graph_type") :
-            api_success($graph_data, 'graph_data');
+               api_error(400, "Unsupported graph type $graph_type") :
+               api_success($graph_data, 'graph_data');
     });
 }
 
@@ -2145,10 +2147,10 @@ function list_fdb(Illuminate\Http\Request $request)
     $mac = $request->route('mac');
 
     $fdb = PortsFdb::hasAccess(Auth::user())
-        ->when(! empty($mac), function (Builder $query) use ($mac) {
-            return $query->where('mac_address', $mac);
-        })
-        ->get();
+           ->when(! empty($mac), function (Builder $query) use ($mac) {
+               return $query->where('mac_address', $mac);
+           })
+           ->get();
 
     if ($fdb->isEmpty()) {
         return api_error(404, 'Fdb do not exist');
@@ -2602,6 +2604,36 @@ function del_service_from_host(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to delete the service');
 }
 
+function search_by_mac(Illuminate\Http\Request $request)
+{
+    $macAddress = Rewrite::macToHex((string) $request->route('search'));
+
+    $rules = [
+        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
+    ];
+
+    $validate = Validator::make(['macAddress' => $macAddress], $rules);
+    if ($validate->fails()) {
+        return api_error(422, $validate->messages());
+    }
+
+    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress) {
+        $fdbDownlink->where('mac_address', $macAddress);
+    })
+         ->withCount('fdbEntries')
+         ->orderBy('fdb_entries_count')
+         ->get();
+
+    if ($ports->count() == 0) {
+        return api_error(404, 'mac not found');
+    }
+
+    if ($request->has('filter') && $request->get('filter') === 'first') {
+        return  api_success($ports->first(), 'ports');
+    }
+
+    return api_success($ports, 'ports');
+}
 function edit_service_for_host(Illuminate\Http\Request $request)
 {
     $service_id = $request->route('id');

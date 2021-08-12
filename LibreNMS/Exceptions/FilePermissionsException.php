@@ -113,7 +113,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         }
 
         // always print chwon/setfacl/chmod commands
-        $commands[] = "sudo chown -R $user:$group $install_dir";
+        $commands[] = "sudo chown -R $user:$group '$install_dir'";
         $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
         $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
 

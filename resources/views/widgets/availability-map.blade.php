@@ -5,9 +5,9 @@
         <a href="{{ url('devices/disable_notify=1') }}"><span class="label label-default label-font-border label-border">@lang('alert-disabled'): {{ $device_totals['ignored'] }}</span></a>
         <a href="{{ url('devices/disabled=1') }}"><span class="label blackbg label-font-border label-border">@lang('disabled'): {{ $device_totals['disabled'] }}</span></a>
     @endif
-    <a href="{{ url('devices/state=up') }}"><span class="label label-success label-font-border label-border">@lang('up'): {{ $device_totals['up'] }}</span></a>
+    <a href="{{ url('devices/state=up') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-success label-font-border label-border">@lang('up'): {{ $device_totals['up'] }}</span></a>
     <span class="label label-warning label-font-border label-border">@lang('warn'): {{ $device_totals['warn'] }}</span>
-    <a href="{{ url('devices/state=down') }}"><span class="label label-danger label-font-border label-border">@lang('down'): {{ $device_totals['down'] }}</span></a>
+    <a href="{{ url('devices/state=down') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-danger label-font-border label-border">@lang('down'): {{ $device_totals['down'] }}</span></a>
     @if($device_totals['maintenance'])
     <span class="label label-default label-font-border label-border">@lang('maintenance'): {{ $device_totals['maintenance'] }}</span>
     @endif

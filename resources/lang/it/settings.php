@@ -361,7 +361,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => 'Auth log entries older than (days)',
+            'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -369,7 +369,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => 'Device performance entries older than (days)',
+            'description' => 'Device performance entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'discovery_modules' => [
@@ -574,7 +574,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => 'Event log entries older than (days)',
+            'description' => 'Event log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'favicon' => [
@@ -1020,7 +1020,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than (days)',
+            'description' => 'Ports older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1046,7 +1046,7 @@ return [
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
         ],
         'route_purge' => [
-            'description' => 'Route entries older than (days)',
+            'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -1062,7 +1062,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Files entries older than (days)',
+            'description' => 'RRD Files entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -1156,7 +1156,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog entries older than (days)',
+            'description' => 'Syslog entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [

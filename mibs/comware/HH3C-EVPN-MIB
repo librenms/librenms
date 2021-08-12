@@ -1,0 +1,270 @@
+-- =============================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The EVPN(Ethernet VPN) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2017-10-21 Initial version Created by Jian Chen
+-- =============================================================================
+HH3C-EVPN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        TruthValue, DisplayString
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32
+    FROM SNMPv2-SMI
+        InetAddressType,
+        InetAddress
+    FROM INET-ADDRESS-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        InterfaceIndex
+    FROM IF-MIB;
+
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cEvpn MODULE-IDENTITY
+    LAST-UPDATED
+        "201710210900Z"        -- Oct 21, 2017 at 09:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The EVPN MIB."
+    REVISION
+        "201710210900Z"   -- Oct 21, 2017 at 09:00 GMT
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 173 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+
+hh3cEvpnObjects      OBJECT IDENTIFIER ::= { hh3cEvpn 1 }
+
+-- =============================================================================
+-- hh3cEvpnESTable Definition
+-- =============================================================================
+hh3cEvpnESTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvpnESEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for EVPN ES parameters."
+    ::= { hh3cEvpnObjects 1 }
+
+hh3cEvpnESEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvpnESEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the parameters of a EVPN ES."
+    INDEX
+    {
+        hh3cEvpnESESI
+    }
+    ::= { hh3cEvpnESTable 1 }
+
+Hh3cEvpnESEntry ::=
+    SEQUENCE
+    {
+        hh3cEvpnESESI               OCTET STRING,
+        hh3cEvpnESIfIndex           InterfaceIndex,
+        hh3cEvpnESIfName            DisplayString,
+        hh3cEvpnESMode              Unsigned32
+    }
+
+hh3cEvpnESESI   OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..10))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Ethernet Segment Identifier."
+    ::= { hh3cEvpnESEntry 1 }
+
+hh3cEvpnESIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ES interface index."
+    ::= { hh3cEvpnESEntry 2 }
+
+hh3cEvpnESIfName    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of ES interface."
+    ::= { hh3cEvpnESEntry 3 }
+
+hh3cEvpnESMode    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Redundancy mode of ES."
+    ::= { hh3cEvpnESEntry 4 }
+
+-- =============================================================================
+-- End of hh3cEvpnESTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cEvpnESMemberTable Definition
+-- =============================================================================
+hh3cEvpnESMemberTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvpnESMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for EVPN ES member information."
+    ::= { hh3cEvpnObjects 2 }
+
+hh3cEvpnESMemberEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvpnESMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contain the parameters of an ES member."
+    INDEX
+    {
+        hh3cEvpnESESI,
+        hh3cEvpnESMemberIPType,
+        hh3cEvpnESMemberIP
+    }
+    ::= { hh3cEvpnESMemberTable 1 }
+
+Hh3cEvpnESMemberEntry ::=
+    SEQUENCE
+    {
+        hh3cEvpnESMemberIPType        InetAddressType,
+        hh3cEvpnESMemberIP            InetAddress,
+        hh3cEvpnESMemberIsSelf        TruthValue
+    }
+
+hh3cEvpnESMemberIPType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ES member IP address type."
+    ::= { hh3cEvpnESMemberEntry 1 }
+
+hh3cEvpnESMemberIP   OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "ES member IP address."
+    ::= { hh3cEvpnESMemberEntry 2 }
+
+hh3cEvpnESMemberIsSelf  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Whether the member is local."
+    ::= { hh3cEvpnESMemberEntry 3 }
+
+-- =============================================================================
+-- End of hh3cEvpnESMemberTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cEvpnESDFTable Definition
+-- =============================================================================
+hh3cEvpnESDFTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvpnESDFEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for the ES DF information."
+    ::= { hh3cEvpnObjects 3 }
+
+hh3cEvpnESDFEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvpnESDFEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry represents an (ES, VLAN) group."
+    INDEX
+    {
+        hh3cEvpnESESI,
+        hh3cEvpnESDFVLANID
+    }
+    ::= { hh3cEvpnESDFTable 1 }
+
+Hh3cEvpnESDFEntry ::=
+    SEQUENCE
+    {
+        hh3cEvpnESDFVLANID            Unsigned32,
+        hh3cEvpnESDFAcIfIndex         InterfaceIndex,
+        hh3cEvpnESDFACEvcSrvInstId    Unsigned32,
+        hh3cEvpnESDFMode              Unsigned32,
+        hh3cEvpnESDFRouterIPType      InetAddressType,
+        hh3cEvpnESDFRouterIP          InetAddress
+    }
+
+hh3cEvpnESDFVLANID     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN assigned to an ES."
+    ::= { hh3cEvpnESDFEntry 1 }
+
+hh3cEvpnESDFAcIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index of an interface that hosts an Ethernet service instance for an ES."
+    ::= { hh3cEvpnESDFEntry 2 }
+
+hh3cEvpnESDFACEvcSrvInstId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet service instance ID."
+    ::= { hh3cEvpnESDFEntry 3 }
+
+hh3cEvpnESDFMode    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ES redundancy mode."
+    ::= { hh3cEvpnESDFEntry 4 }
+
+hh3cEvpnESDFRouterIPType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The designated forwarder IP address type."
+    ::= { hh3cEvpnESDFEntry 5 }
+
+hh3cEvpnESDFRouterIP    OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The designated forwarder IP address."
+    ::= { hh3cEvpnESDFEntry 6 }
+
+-- =============================================================================
+-- End of hh3cEvpnESDFTable Definition
+-- =============================================================================
+
+END

@@ -1,0 +1,408 @@
+CISCOSB-PNP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                       FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32,IpAddress                            FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    DisplayString, TruthValue                       FROM SNMPv2-TC
+    SnmpAdminString                                 FROM SNMP-FRAMEWORK-MIB
+    InetAddressType,InetAddress                     FROM INET-ADDRESS-MIB; -- RFC2851;
+
+rlPNP    MODULE-IDENTITY
+         LAST-UPDATED "201702090000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for PNP Agent."
+		REVISION "201102090000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 234 }
+
+RlOwnerType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "The entity that configured parameter."
+   SYNTAX INTEGER {
+	  rlOwnerNone(0),
+      rlOwnerDefault(1),
+      rlOwnerStatic(2),
+      rlOwnerDHCP(3),
+      rlOwnerProtocol(4),
+	  rlOwnerDelete(5)
+}
+
+-- =======================================================
+-- PnP Table
+-- =======================================================
+
+rlPNPParamsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RLPNPParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The PnP table has unique structure. It contains PnP agent parameters. 
+          It MUST have exactly 2 entries - 
+          One, represents the current parameters
+          Second, represents the next session parameters.
+          Since session cannot be interrupted in the middle, the next parameters will replace the current      
+          parameters after session ends.
+          Each parameter can be configured manually or by DHCP or by Backoff message."
+    ::= { rlPNP 1}
+
+rlPNPParamsEntry   OBJECT-TYPE
+    SYNTAX		RLPNPParamsEntry
+    MAX-ACCESS 	not-accessible
+    STATUS 		current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlPNPParamsAvailability }
+    ::= { rlPNPParamsTable 1 }
+
+RLPNPParamsEntry::= SEQUENCE {
+	rlPNPParamsAvailability					INTEGER,
+	rlPNPServerAddrType						InetAddressType,	
+	rlPNPServerAddr							InetAddress,
+	rlPNPServerAddrOwner					RlOwnerType,
+	rlPNPProtocol							INTEGER,
+	rlPNPProtocolOwner						RlOwnerType,
+	rlPNPHTTPPort							Unsigned32,
+	rlPNPHTTPPortOwner						RlOwnerType,
+	rlPNPHTTPSPort							Unsigned32,
+	rlPNPHTTPSPortOwner						RlOwnerType,
+	rlPNPUserName							DisplayString,
+	rlPNPUserNameOwner						RlOwnerType,
+	rlPNPPassword							SnmpAdminString,
+	rlPNPPasswordOwner						RlOwnerType,
+	rlPNPDiscoveryTimeout					Unsigned32,
+	rlPNPDiscoveryTimeoutOwner				RlOwnerType,
+	rlPNPDiscoveryExpoFactor 				Unsigned32,
+	rlPNPDiscoveryExpoFactorOwner			RlOwnerType,
+	rlPNPDiscoveryTimeoutMax			 	Unsigned32,
+	rlPNPDiscoveryTimeoutMaxOwner		 	RlOwnerType,
+	rlPNPReconnectTimeout					Unsigned32,
+	rlPNPReconnectTimeoutOwner				RlOwnerType,
+	rlPNPSrcAddrTyp 						InetAddressType,
+	rlPNPSrcAddr							InetAddress,
+	rlPNPSrcAddrOwner						RlOwnerType,
+	rlPNPWatchdogTimeout					Unsigned32,
+	rlPNPWatchdogTimeoutOwner				RlOwnerType,
+	rlPNPAdminState							INTEGER,
+	rlPNPAdminStateOwner					RlOwnerType,
+	rlPNPRowStatus							RowStatus
+    }
+
+rlPNPParamsAvailability 	OBJECT-TYPE
+   SYNTAX		INTEGER {none(0), next(1), current(2)}
+    MAX-ACCESS 	not-accessible
+    STATUS 		current
+    DESCRIPTION
+        "The availability of parameters:
+	Current – the parameters that are currently used by session.
+ 	Next – the parameters that will be used after end of session"
+    ::= { rlPNPParamsEntry   1 }
+
+rlPNPServerAddrType	OBJECT-TYPE
+    SYNTAX 		InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The type of PnP server address."
+    ::= { rlPNPParamsEntry   2}
+
+rlPNPServerAddr	 	OBJECT-TYPE
+    SYNTAX	InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The PnP server address. Default value is: PnPserver"
+	DEFVAL { '706e70736572766572'H }		   
+    ::= { rlPNPParamsEntry   3}
+
+rlPNPServerAddrOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the PnP server address."
+	DEFVAL { rlOwnerDefault }		   
+    ::= { rlPNPParamsEntry   4}
+
+rlPNPProtocol	OBJECT-TYPE
+    SYNTAX INTEGER{http(0), https(1)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The PnP transport protocol."
+    DEFVAL{ 0 }	   
+    ::= { rlPNPParamsEntry   5}
+
+rlPNPProtocolOwner	OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the transport protocol."
+	DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   6}
+
+rlPNPHTTPPort		OBJECT-TYPE
+    SYNTAX Unsigned32(1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The PnP HTTP port."
+    DEFVAL{ 80 }	   
+    ::= { rlPNPParamsEntry   7}
+
+rlPNPHTTPPortOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the HTTP port."
+	DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   8}
+
+rlPNPHTTPSPort	OBJECT-TYPE
+    SYNTAX Unsigned32(1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The PnP HTTPS port."
+    DEFVAL{ 443 }	   
+    ::= { rlPNPParamsEntry   9}
+
+rlPNPHTTPSPortOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the HTTPS port."
+	DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   10}
+
+rlPNPUserName       OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "This variable is used in each message from PnP agent to PnP server."
+    DEFVAL {""}	   
+    ::= { rlPNPParamsEntry   11}
+
+rlPNPUserNameOwner       OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the PnP user name."
+    DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   12}
+
+rlPNPPassword		OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "This variable optional and is used in each message from PnP agent to PnP server."
+    DEFVAL {""}	   
+    ::= { rlPNPParamsEntry   13}
+
+rlPNPPasswordOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       " The entity that configured the PnP password"
+    DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   14}
+
+rlPNPDiscoveryTimeout		OBJECT-TYPE
+    SYNTAX Unsigned32 (1..2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The time to wait in seconds before new discovery after discovery failure."
+    DEFVAL{ 60 }	   
+    ::= { rlPNPParamsEntry   15}
+
+rlPNPDiscoveryTimeoutOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       " The entity that configured the discovery timeout"
+	DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   16}
+
+rlPNPDiscoveryExpoFactor	OBJECT-TYPE
+    SYNTAX Unsigned32 (1..9)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The value that triggers the discovery attempt exponentially."
+    DEFVAL{ 3 }	   
+    ::= { rlPNPParamsEntry   17}
+
+rlPNPDiscoveryExpoFactorOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       " The entity that configured the discovery exponent factor"
+	DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   18}
+
+
+rlPNPDiscoveryTimeoutMax	OBJECT-TYPE
+    SYNTAX Unsigned32 (1..2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The maximum value of the timeout."
+    DEFVAL{ 540 }	   
+    ::= { rlPNPParamsEntry   19}
+
+rlPNPDiscoveryTimeoutMaxOwner		OBJECT-TYPE
+    SYNTAX RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       " The entity that configured the discovery timeout max"
+	DEFVAL{ 1 }	   
+    ::= { rlPNPParamsEntry   20}
+
+rlPNPReconnectTimeout		OBJECT-TYPE
+    SYNTAX Unsigned32 (1..2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "Timeout in seconds between PnP sessions."
+    DEFVAL{30}	   
+    ::= { rlPNPParamsEntry   21}
+
+rlPNPReconnectTimeoutOwner		OBJECT-TYPE
+    SYNTAX	RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the PnP reconnect timeout."
+	DEFVAL{1}	   
+    ::= { rlPNPParamsEntry   22}
+
+rlPNPSrcAddrTyp		OBJECT-TYPE
+    SYNTAX 		InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The PnP source address type."
+    ::= { rlPNPParamsEntry   23}
+
+rlPNPSrcAddr	 	OBJECT-TYPE
+    SYNTAX	InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The PnP source address."
+	DEFVAL { '00000000'H }	   
+    ::= { rlPNPParamsEntry   24}
+
+rlPNPSrcAddrOwner	OBJECT-TYPE
+    SYNTAX	RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the source address."
+	DEFVAL{1}	   
+    ::= { rlPNPParamsEntry   25}
+
+rlPNPWatchdogTimeout	OBJECT-TYPE
+    SYNTAX Unsigned32 (1..180)
+    MAX-ACCESS read-write
+    STATUS current    
+    DESCRIPTION
+       "The time to wait a reply from a PnP or File server."
+	DEFVAL{ 30 }	   
+    ::= { rlPNPParamsEntry   26}
+
+rlPNPWatchdogTimeoutOwner	OBJECT-TYPE
+    SYNTAX	RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current	
+    DESCRIPTION
+       "The entity that configured the watchdog timeout."
+	DEFVAL{1}
+    ::= { rlPNPParamsEntry   27}
+
+rlPNPAdminState        OBJECT-TYPE
+    SYNTAX      INTEGER{enable(0), disable(1)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The value represents the admin state of the PnP feature."
+	DEFVAL{ 0 }		  
+    ::= { rlPNPParamsEntry 28 }
+
+rlPNPAdminStateOwner	OBJECT-TYPE
+    SYNTAX	RlOwnerType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The entity that configured the admin state."
+	DEFVAL{1}	   
+    ::= { rlPNPParamsEntry   29}
+
+
+rlPNPRowStatus       OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       "This variable displays the validity or invalidity of the entry.
+         Setting it to 'destroy' has the effect of rendering it inoperative.
+         The internal effect (row removal) is implementation dependent."
+    ::= { rlPNPParamsEntry   30}
+
+rlPNPResume     OBJECT-TYPE
+    SYNTAX      INTEGER{off(0), on(1)}
+    MAX-ACCESS  read-write
+    STATUS      current	
+    DESCRIPTION
+          "Action scalar - take out immediately the PnP agent from waiting state."
+	DEFVAL{ 0 }
+    ::= { rlPNP 2 }
+
+rlPNPNreadyReason     OBJECT-TYPE
+    SYNTAX      INTEGER{serverIP(0),certificate(1),tod(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Displays the reason for the not ready operational state."
+    ::= { rlPNP 3 }
+
+rlPNPState     OBJECT-TYPE
+    SYNTAX      INTEGER{bootup(0),discovery(1),discoveryWait(2),session(3),sessionWait(4),disabled(5),notReady(6)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Displays the PnP agent state."
+    ::= { rlPNP 4 }
+
+rlPNPTimerRemainder     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Displays the session/discovery timer remainder."
+    ::= { rlPNP 5 }
+END
+

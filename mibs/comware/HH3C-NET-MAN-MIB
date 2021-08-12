@@ -1,0 +1,189 @@
+-- ==========================================================================
+-- Copyright (C) 2008 by New H3C Technologies Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide object definition
+--              of network management parameters.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2008-04-16 Initial version, created by Longyin
+-- ==========================================================================
+HH3C-NET-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+hh3cNetMan MODULE-IDENTITY
+    LAST-UPDATED "200804161700Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB file is to provide the object definition of the network
+        management parameters.  These parameters are used to identify devices.
+        It is useful for devices management in a dynamic address assignment
+        network."
+    REVISION "200804161700Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 90 }
+
+--
+-- Object definitions
+--
+hh3cNMConfigObjects OBJECT IDENTIFIER ::= { hh3cNetMan 1 }
+
+hh3cNMMonitorObjects OBJECT IDENTIFIER ::= { hh3cNetMan 2 }
+
+hh3cNMNotify OBJECT IDENTIFIER ::= { hh3cNetMan 3 }
+
+-- Scalar Objects for Notify
+hh3cNMNotifyScalarObjects OBJECT IDENTIFIER ::= { hh3cNMNotify 1 }
+
+hh3cNMIpAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of specified interface on the device."
+    ::= { hh3cNMNotifyScalarObjects 1 }
+
+hh3cNMIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of specified interface on the device."
+    ::= { hh3cNMNotifyScalarObjects 2 }
+
+hh3cNMCustomBuildInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The customer-required information of devices, for example,
+        OUI (Organizational Unique Identifier)."
+    ::= { hh3cNMNotifyScalarObjects 3 }
+
+hh3cNMSerialNum OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The serial number used by NMS (Network Management Station) for
+        mapping IP address and device."
+    ::= { hh3cNMNotifyScalarObjects 4 }
+
+-- Notification Objects
+hh3cNMNotifyObjects OBJECT IDENTIFIER ::= { hh3cNMNotify 2 }
+
+hh3cNMNotifyObjectsPrefix OBJECT IDENTIFIER ::= { hh3cNMNotifyObjects 0 }
+
+hh3cIpAddrChangeNotify NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNMIpAddressType,
+            hh3cNMIpAddress,
+            hh3cNMCustomBuildInfo,
+            hh3cNMSerialNum
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification will be generated when the IP address of active
+        management interface is changed.  The change maybe originate from NMS,
+        DHCP server or administrator.
+
+        The management interfaces are the interfaces that assigned by
+        administrator, which can be used to manage device, but may be inactive
+        for link fault or IP address (IPv4 or IPv6) missing.
+
+        The active management interface means an active interface, the IP
+        address of which can be used for network management.
+
+        This notification announces useful management IP address change.  So it
+        is triggered by significative IP address change.
+
+        Suppose that two management interfaces on a device, Interface-A and
+        Interface-B.  Initially both interfaces are down and assigned no IP
+        address. Configure Interface-A as the primary monitored interface,
+        Interface-B as the secondary.
+
+        Significative IP address change in following cases:
+        1. If Interface-A is assigned an IP address primarily, and it is linking
+        up, then Interface-B will be ignored.  A notification will be triggered,
+        appending IP address of Interface-A.
+
+        2. If Interface-B is assigned an IP address primarily, and it is linking
+        up, then Interface-A will be ignored.  A notification will be triggered,
+        appending IP address of Interface-B.
+
+        3. If IP address of that interface, which had its IP address announced
+        to NMS, is changed since last notification triggered, then another
+        notification will be sent to NMS.
+
+        4. Suppore that Interface-A was linked up and assigned an IP address
+        primarily.  If for some unknown reason, Interface-A is down or loses IP
+        address, and Interface-B is assigned an IP address which is different
+        with that announced to NMS before, then a notification will be
+        triggered, appending the new IP address that Interface-B assigned.
+
+        5. A notification appending new IP address that Interface-A assigned
+        will be triggered, if 4 occurs to Interface-B."
+
+    ::= { hh3cNMNotifyObjectsPrefix 1 }
+
+-- Compliances Objects
+hh3cNetManConformance OBJECT IDENTIFIER ::= { hh3cNetMan 4 }
+
+hh3cNetManCompliances OBJECT IDENTIFIER ::= { hh3cNetManConformance 1 }
+
+hh3cNetManCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The statement of compliance for those implementing
+        the network management MIB."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            hh3cNMMonitorGroup,
+            hh3cNMNotificationGroup
+        }
+    ::= { hh3cNetManCompliances 1 }
+
+hh3cNetManGroups OBJECT IDENTIFIER ::= { hh3cNetManConformance 2 }
+
+hh3cNMMonitorGroup OBJECT-GROUP
+    OBJECTS
+        {
+            hh3cNMIpAddressType,
+            hh3cNMIpAddress,
+            hh3cNMCustomBuildInfo,
+            hh3cNMSerialNum
+        }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects in net management monitor group."
+    ::= { hh3cNetManGroups 1 }
+
+hh3cNMNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        {
+            hh3cIpAddrChangeNotify
+        }
+    STATUS      current
+    DESCRIPTION
+         "A collection of objects in net management notification group."
+    ::= { hh3cNetManGroups 2 }
+
+END

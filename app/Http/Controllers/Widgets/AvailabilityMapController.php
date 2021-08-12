@@ -139,7 +139,7 @@ class AvailabilityMapController extends WidgetController
             $data[] = $row;
         }
 
-        return [$data, ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0]];
+        return [$data, $totals];
     }
 
     private function getServices($request)
@@ -183,6 +183,6 @@ class AvailabilityMapController extends WidgetController
             $data[] = $row;
         }
 
-        return [$services, $totals];
+        return [$data, $totals];
     }
 }
