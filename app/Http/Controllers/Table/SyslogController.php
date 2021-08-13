@@ -79,8 +79,8 @@ class SyslogController extends TableController
             ->when($request->to, function ($query) use ($request) {
                 $query->where('timestamp', '<=', $request->to);
             })
-+            ->when($request->level, function ($query) use ($request) {
-+                $query->where('level', '<=', $request->level);
+            ->when($request->level, function ($query) use ($request) {
+                $query->where('level', '<=', $request->level);
             });
     }
 
