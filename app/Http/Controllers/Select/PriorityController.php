@@ -22,13 +22,30 @@
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\Syslog;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 
 class PriorityController extends SelectController
 {
-    protected function searchFields($request)
+
+    /**
+     * The default method called by the route handler
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function __invoke(Request $request)
     {
-        return ['level'];
+        $this->validate($request, $this->rules());
+        $limit  = $request->get('limit', 50);
+        $levels = app('translator')->get('syslog.severity');
+	$items  = array_map(function ($id, $name) {
+            return ['id' => $id, 'name' => $name];
+	}, array_keys($levels), array_values($levels));
+
+        $paginator = new Paginator($items, $limit, 0);
+
+        return $this->formatResponse($paginator);
     }
 
     /**
@@ -39,18 +56,16 @@ class PriorityController extends SelectController
      */
     protected function baseQuery($request)
     {
-        return Syslog::query()
-          ->distinct()
-          ->select('level')
-          ->orderBy('level', 'asc');
+        // implementation not required for static lists
+        return null;
     }
 
-    public function formatItem($syslog)
+    public function formatItem($item)
     {
         /** @var Syslog $syslog */
         return [
-            'id' => $syslog->level,
-            'text' => app('translator')->get('syslog.severity.' . $syslog->level),
+            'id' => $item['id'],
+            'text' => $item['name'],
         ];
     }
 }
