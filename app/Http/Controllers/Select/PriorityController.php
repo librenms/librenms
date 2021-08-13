@@ -22,6 +22,7 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Models\Syslog;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 
@@ -55,13 +56,11 @@ class PriorityController extends SelectController
      */
     protected function baseQuery($request)
     {
-        // implementation not required for static lists
-        return null;
+        return Syslog::query();
     }
 
     public function formatItem($item)
     {
-        /** @var Syslog $syslog */
         return [
             'id' => $item['id'],
             'text' => $item['name'],
