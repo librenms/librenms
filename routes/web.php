@@ -121,6 +121,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('template', 'ServiceTemplateController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
+            Route::get('priority', 'PriorityController');
         });
 
         // jquery bootgrid data controllers
