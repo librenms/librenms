@@ -542,7 +542,7 @@ devices:
     - { Field: port_association_mode, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: max_depth, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: disable_notify, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: user_logged_in, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: users_logged_in, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     devices_hostname_index: { Name: devices_hostname_index, Columns: [hostname], Unique: false, Type: BTREE }

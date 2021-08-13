@@ -14,7 +14,7 @@ class AddUsersLoggedInToDevices extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->integer('users_logged_in')->nullable()->default(0)->after('disable_notify');
+            $table->unsignedInteger('users_logged_in')->default(0)->after('disable_notify');
         });
     }
 
