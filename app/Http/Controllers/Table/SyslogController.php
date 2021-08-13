@@ -37,6 +37,7 @@ class SyslogController extends TableController
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
+            'level' => 'nullable|string',
         ];
     }
 
@@ -77,6 +78,9 @@ class SyslogController extends TableController
             })
             ->when($request->to, function ($query) use ($request) {
                 $query->where('timestamp', '<=', $request->to);
+            })
++            ->when($request->level, function ($query) use ($request) {
++                $query->where('level', '<=', $request->level);
             });
     }
 
