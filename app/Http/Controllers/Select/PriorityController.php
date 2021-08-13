@@ -27,7 +27,6 @@ use Illuminate\Pagination\Paginator;
 
 class PriorityController extends SelectController
 {
-
     /**
      * The default method called by the route handler
      *
@@ -39,9 +38,9 @@ class PriorityController extends SelectController
         $this->validate($request, $this->rules());
         $limit = $request->get('limit', 50);
         $levels = app('translator')->get('syslog.severity');
-	    $items = array_map(function ($id, $name) {
+        $items = array_map(function ($id, $name) {
             return ['id' => $id, 'name' => $name];
-	    }, array_keys($levels), array_values($levels));
+        }, array_keys($levels), array_values($levels));
 
         $paginator = new Paginator($items, $limit, 0);
 
