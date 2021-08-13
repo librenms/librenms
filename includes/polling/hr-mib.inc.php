@@ -31,6 +31,10 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
 
     data_update($device, 'hr_users', $tags, $fields);
 
+    $update_array = ['users_logged_in' => $hrSystem[0]['hrSystemNumUsers']];
+
+    dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+
     $os->enableGraph('hr_users');
     echo ' Users';
 }
