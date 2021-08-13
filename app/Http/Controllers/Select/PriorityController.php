@@ -37,11 +37,11 @@ class PriorityController extends SelectController
     public function __invoke(Request $request)
     {
         $this->validate($request, $this->rules());
-        $limit  = $request->get('limit', 50);
+        $limit = $request->get('limit', 50);
         $levels = app('translator')->get('syslog.severity');
-	$items  = array_map(function ($id, $name) {
+	    $items = array_map(function ($id, $name) {
             return ['id' => $id, 'name' => $name];
-	}, array_keys($levels), array_values($levels));
+	    }, array_keys($levels), array_values($levels));
 
         $paginator = new Paginator($items, $limit, 0);
 
