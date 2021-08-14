@@ -65,7 +65,7 @@ class StringHelpers
             'opengridscheduler' => 'Open Grid Scheduler',
             'os-updates' => 'OS Updates',
             'php-fpm' => 'PHP-FPM',
-            'pi-hole' => 'pi-hole',
+            'pi-hole' => 'Pi-hole',
             'powerdns' => 'PowerDNS',
             'powerdns-dnsdist' => 'PowerDNS dnsdist',
             'powerdns-recursor' => 'PowerDNS Recursor',
