@@ -45,7 +45,7 @@ abstract class DeviceOverviewHook
         ];
     }
 
-    final public function handle(Device $device)
+    final public function handle(Device $device): \View
     {
         \View::addLocation(\PluginManager::pluginPath($this));
 
