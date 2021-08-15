@@ -44,7 +44,7 @@ abstract class SettingsHook
         ];
     }
 
-    final public function handle(string $plugin, array $settings): \View
+    final public function handle(string $plugin, array $settings): ?\View
     {
         // only if this is the selected plugin
         if ($plugin !== \PluginManager::getPluginName($this)) {
