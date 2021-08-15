@@ -7222,3 +7222,13 @@
   div[role=listbox]{
     background: rgb(70, 76, 83);
   }
+  .overlib, .overlib-contents{
+    background: #353a41;
+    color: #bebfbf;
+  }
+  .overlib-text, .overlib-contents list-large{
+    color: #bebfbf;
+  }
+  #overDiv{
+    background: #353a41;
+  }

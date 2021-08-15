@@ -82,11 +82,11 @@ echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) .
 
 if ($port_details) {
     $port['graph_type'] = 'port_bits';
-    echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
     $port['graph_type'] = 'port_upkts';
-    echo generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
     $port['graph_type'] = 'port_errors';
-    echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
 }
 
 echo "</td><td width=120 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
