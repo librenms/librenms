@@ -7210,6 +7210,15 @@
     color: black;
   }
 
-.expandable:hover span {
-    background-color: #2e3338;
-}
+  .expandable:hover span {
+      background-color: #2e3338;
+  }
+  table.table tr:not(:first-child){
+    background: #3e444c!important;
+  }
+  table.table tr:not(:first-child):hover{
+    background: #4f565f!important;
+  }
+  div[role=listbox]{
+    background: rgb(70, 76, 83);
+  }
