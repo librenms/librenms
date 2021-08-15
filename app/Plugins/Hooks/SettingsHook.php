@@ -44,11 +44,11 @@ abstract class SettingsHook
         ];
     }
 
-    final public function handle(string $plugin, array $settings): ?\View
+    final public function handle(string $plugin, array $settings): mixed
     {
         // only if this is the selected plugin
         if ($plugin !== \PluginManager::getPluginName($this)) {
-            return;
+            return null;
         }
 
         \View::addLocation(\PluginManager::pluginPath($this));
