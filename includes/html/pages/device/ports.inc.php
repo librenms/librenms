@@ -103,7 +103,7 @@ if ($vars['view'] == 'minigraphs') {
 
     foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', [$device['device_id']]) as $port) {
         $port = cleanPort($port, $device);
-        echo "<div class='minigraph-div'><div style='font-weight: bold;'>" . generate_port_link($port) . "</div>";
+        echo "<div class='minigraph-div'><div style='font-weight: bold;'>" . generate_port_link($port) . '</div>';
     }
 
     echo '</div>';
