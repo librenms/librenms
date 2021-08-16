@@ -7232,3 +7232,7 @@
   #overDiv{
     background: #353a41;
   }
+  .bootgrid-table td.loading, .bootgrid-table td.no-results {
+    background: #3e444c;
+    text-align: center;
+  }
