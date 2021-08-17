@@ -7,26 +7,13 @@ modules:
 
   sensors:
     state:
-      data:
-        - oid: mServStatusTable
-          value: mServServiceStatus
-          num_oid: '.1.3.6.1.4.1.4130.10.3.1.1.2.1.1.2.{{ $index }}'
-          state_name: 'mServServiceName.{{ $index }}'
-          descr: 'mServServiceName'
-          group: Service Status
-          index: 'mServStatusEntry.{{ $index }}'
-          states:
-            - { descr: running, graph: 0, value: 0, generic: 0 }
-            - { descr: disabled, graph: 0, value: 1, generic: 3 }
-            - { descr: error, graph: 0, value: 2, generic: 2 }
-            - { descr: not running, graph: 0, value: 3, generic: 3 }
-        
+      data:   
         - oid: mIfCellStatusTable
           value: mIfCellServiceState
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.11.{{ $index }}'
           state_name: mIfCellServiceState
-          group: Cell Information
-          descr: 'Cell Service State'
+          group: Cellular Information
+          descr: 'Service State'
           index: 'mIfCellServiceState.{{ $index }}'
           states:
             - { descr: gprs, graph: 0, value: 1, generic: 0 }
@@ -49,8 +36,8 @@ modules:
           value: mIfCellSimState
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.8.{{ $index }}'
           state_name: mIfCellSimState
-          group: Cell Information
-          descr: 'Cell Sim State'
+          group: Cellular Information
+          descr: 'Sim State'
           index: 'mIfCellSimState.{{ $index }}'
           states:
               - { descr: not inserted, graph: 0, value: 0, generic: 3 }
@@ -63,8 +50,8 @@ modules:
           value: mIfCellModemType
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.17.{{ $index }}'
           state_name: mIfCellModemType
-          group: Cell Information
-          descr: 'Cell Modem Type'
+          group: Cellular Information
+          descr: 'Modem Type'
           index: 'mIfCellModemType.{{ $index }}'
           states:
               - { descr: unknown, graph: 0, value: 0, generic: 3 }
@@ -84,10 +71,10 @@ modules:
 
         - oid: mIfCellStatusTable
           value: mIfCellModemState
-          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.17.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.9.{{ $index }}'
           state_name: mIfCellModemState
-          group: Cell Information
-          descr: 'Cell Modem State'
+          group: Cellular Information
+          descr: 'Modem State'
           index: 'mIfCellModemState.{{ $index }}'
           states:
               - { descr: unknown, graph: 0, value: 0, generic: 3 }
@@ -97,6 +84,35 @@ modules:
               - { descr: idle, graph: 0, value: 4, generic: 3 }
               - { descr: connected, graph: 0, value: 5, generic: 0 }
               - { descr: fwRequired, graph: 0, value: 6, generic: 1 }
+
+        - oid: mIfCellStatusTable
+          value: mIfCellBandwidth
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.23.{{ $index }}'
+          state_name: mIfCellBandwidth
+          group: Cellular Information
+          descr: 'Bandwidth'
+          index: 'mIfCellBandwidth.{{ $index }}'
+          states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: 1.4Mhz, graph: 0, value: 1, generic: 0 }
+              - { descr: 3Mhz, graph: 0, value: 2, generic: 0 }
+              - { descr: 5Mhz, graph: 0, value: 3, generic: 0 }
+              - { descr: 10Mhz, graph: 0, value: 4, generic: 0 }
+              - { descr: 15Mhz, graph: 0, value: 5, generic: 0 }
+              - { descr: 20Mhz, graph: 0, value: 6, generic: 0 }
+
+        - oid: mIfCellStatusTable
+          value: mIfCellRoamingState
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.10.{{ $index }}'
+          state_name: mIfCellRoamingState
+          group: Cellular Information
+          descr: 'Roaming State'
+          index: 'mIfCellRoamingState.{{ $index }}'
+          states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: home, graph: 0, value: 1, generic: 0 }
+              - { descr: roaming, graph: 0, value: 2, generic: 1 }
+
     temperature:
       data:
         - oid: mSysTemperature
@@ -122,7 +138,33 @@ modules:
         - oid: mIfCellStatusTable
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.12.{{ $index }}'
           index: 'mIfCellRssi.{{ $index }}'
-          descr: 'Cell RSSI (signal)'
+          descr: 'Cellular RSSI'
           value: mIfCellRssi
-          low_warn_limit: -70
-          low_limit: -60
+          low_warn_limit: -60
+          low_limit: -70
+          high_limit: -5
+
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.13.{{ $index }}'
+          index: 'mIfCellRsrp.{{ $index }}'
+          descr: 'Cellular RSRP'
+          value: mIfCellRsrp
+          low_warn_limit: -106
+          low_limit: -120
+          high_limit: -20
+
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.14.{{ $index }}'
+          index: 'mIfCellRsrq.{{ $index }}'
+          descr: 'Cellular RSRQ'
+          value: mIfCellRsrq
+          low_warn_limit: -10
+          low_limit: -13
+          high_limit: -1
+
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.15.{{ $index }}'
+          index: 'mIfCellSnr.{{ $index }}'
+          descr: 'Cellular SNR'
+          value: mIfCellSnr
+          high_limit: 100
