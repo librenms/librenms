@@ -524,7 +524,7 @@ Per OS:
 ```bash
 lnms config:set os.ios.discovery_modules.arp-table false
 
-lnms config:set discovery_modules.entity-state true
+lnms config:set os.ios.discovery_modules.entity-state true
 lnms config:set os.ios.poller_modules.entity-state true
 ```
 
