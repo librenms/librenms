@@ -504,13 +504,22 @@ $config['allow_duplicate_sysName'] = false;
 
 ## Global poller and discovery modules
 
-Generally, it is a better to set these [per
-OS](../Developing/os/Settings.md#poller-and-discovery-modules) or
-device.
+You can globally disable or enable modules.
 
-```php
-$config['discovery_modules']['arp-table'] = true;
-$config['poller_modules']['bgp-peers']    = false;
+This setting has an order of precedence Device > OS > Global.
+So if the module is set at a more specific level, it will override the
+less specific settings.
+
+```bash
+lnms config:set discovery_modules.arp-table true
+lnms config:set poller_modules.arp-table false
+```
+
+Per OS setting:
+
+```bash
+lnms config:set os.ios.discovery_modules.arp-table true
+lnms config:set os.ios.poller_modules.arp-table false
 ```
 
 ## SNMP Settings
