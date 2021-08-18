@@ -99,9 +99,9 @@ per-device in the webui and per os or globally in config.php. Usually,
 a poller module will not work if it's corresponding discovery module
 is not enabled.
 
-You should avoid setting these in the OS definitions unless it has a
-significant negative impact on polling.  Setting modules in the OS reduces
-user control of modules.
+You should avoid setting these to false the OS definitions unless it has a
+significant negative impact on polling.  Setting modules in the definition
+reduces user control of modules.
 
 ```yaml
 poller_modules:
