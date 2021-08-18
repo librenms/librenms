@@ -15,7 +15,7 @@ class PluginsAddVersionAndSettings extends Migration
     {
         Schema::table('plugins', function (Blueprint $table) {
             $table->integer('version')->default(1);
-            $table->json('settings')->nullable();
+            $table->longText('settings')->nullable();
         });
     }
 
