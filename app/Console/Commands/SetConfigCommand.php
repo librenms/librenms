@@ -50,7 +50,7 @@ class SetConfigCommand extends LnmsCommand
         if (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
             $os = $matches['os'];
             try {
-                $this->isValidOSSetting($os, $matches['setting'], $value);
+                $this->validateOsSetting($os, $matches['setting'], $value);
             } catch (ValidationException $e) {
                 $this->error(trans('commands.config:set.errors.invalid'));
                 $this->line($e->getMessage());
@@ -209,7 +209,7 @@ class SetConfigCommand extends LnmsCommand
      * @param  mixed   $value
      * @throws \JsonSchema\Exception\ValidationException
      */
-    private function isValidOSSetting(string $os, string $setting, $value)
+    private function validateOsSetting(string $os, string $setting, $value)
     {
         // prep data to be validated
         OS::loadDefinition($os);
