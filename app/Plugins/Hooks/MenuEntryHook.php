@@ -41,7 +41,8 @@ abstract class MenuEntryHook
         return [];
     }
 
-    final public function handle(): \Illuminate\View\View
+    final public function handle(): array
+    {
         \View::addLocation(\PluginManager::pluginPath($this));
 
         return [$this->view, $this->data()];
