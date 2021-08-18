@@ -52,7 +52,7 @@ if ($if_list) {
         }
 
         echo "<tr class='iftype'>
-            <td><span class=list-large>" . $port['port_descr_descr'] . ' ' . generate_port_link($port) . "</span><br />
+            <td><span class=list-large>" . generate_port_link($port, $port['port_descr_descr']) . "</span><br />
             <span class=interface-desc style='float: left;'>" . generate_device_link($port) . ' - ' . generate_port_link($port) . ' </span></td>
             <td>' . $port['port_descr_speed'] . '</td>
             <td>' . $port['port_descr_circuit'] . '</td>
