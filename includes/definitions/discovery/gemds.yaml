@@ -1,14 +1,170 @@
-mib: MDS-SYSTEM-MIB
-modules: 
-  os: 
-    hardware: "MDS-SYSTEM-MIB::mSysProductConfiguration.0"
-    serial: "MDS-SYSTEM-MIB::mSysSerialNumberPlatform.0"
-    version: "MDS-SYSTEM-MIB::mSysVersion.2"
-  sensors: 
-    temperature: 
-      data: 
-        - 
-          descr: "System Temperature"
-          index: "mSysTemperature.{{ $index }}"
-          num_oid: ".1.3.6.1.4.1.4130.10.1.1.1.2.6.{{ $index }}"
-          oid: mSysTemperature
+mib: MDS-SYSTEM-MIB:MDS-SERVICES-MIB:MDS-SERVICE-GPS-MIB:MDS-SERIAL-MIB:MDS-IF-CELL-MIB:MDS-EVENT-MIB:MDS-REG-MIB:MDS-ORBIT-SMI-MIB:MDS-IF-NX-MIB:MDS-IF-LW-MIB:MDS-IF-LN-MIB:MDS-IF-IEEE80211-MIB
+modules:
+  os:
+    hardware: 'MDS-SYSTEM-MIB::mSysProductConfiguration.0'
+    serial: 'MDS-SYSTEM-MIB::mSysSerialNumberPlatform.0'
+    version: 'MDS-SYSTEM-MIB::mSysVersion.2'
+
+  sensors:
+    state:
+      data:   
+        - oid: mIfCellStatusTable
+          value: mIfCellServiceState
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.11.{{ $index }}'
+          state_name: mIfCellServiceState
+          group: Cellular Information
+          descr: 'Service State'
+          index: 'mIfCellServiceState.{{ $index }}'
+          states:
+            - { descr: gprs, graph: 0, value: 1, generic: 0 }
+            - { descr: edge, graph: 0, value: 2, generic: 0 }
+            - { descr: umts, graph: 0, value: 3, generic: 0 }
+            - { descr: hsdpa, graph: 0, value: 4, generic: 0 }
+            - { descr: hsupa, graph: 0, value: 5, generic: 0 }
+            - { descr: hspaPlus, graph: 0, value: 6, generic: 0 }
+            - { descr: is95a, graph: 0, value: 7, generic: 0 }
+            - { descr: is95b, graph: 0, value: 8, generic: 0 }
+            - { descr: onexRtt, graph: 0, value: 9, generic: 0 }
+            - { descr: evdoRev0, graph: 0, value: 10, generic: 0 }
+            - { descr: evdoReva, graph: 0, value: 11, generic: 0 }
+            - { descr: evdoRevb, graph: 0, value: 12, generic: 0 }
+            - { descr: evdoEhrpd, graph: 0, value: 13, generic: 0 }
+            - { descr: lte, graph: 0, value: 14, generic: 0 }
+            - { descr: not running, graph: 0, value: 0, generic: 3 }
+                
+        - oid: mIfCellStatusTable
+          value: mIfCellSimState
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.8.{{ $index }}'
+          state_name: mIfCellSimState
+          group: Cellular Information
+          descr: 'Sim State'
+          index: 'mIfCellSimState.{{ $index }}'
+          states:
+              - { descr: not inserted, graph: 0, value: 0, generic: 3 }
+              - { descr: locked, graph: 0, value: 1, generic: 1 }
+              - { descr: ready, graph: 0, value: 2, generic: 0 }
+              - { descr: failed, graph: 0, value: 3, generic: 2 }
+              - { descr: unknown, graph: 0, value: 4, generic: 1 }
+
+        - oid: mIfCellStatusTable
+          value: mIfCellModemType
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.17.{{ $index }}'
+          state_name: mIfCellModemType
+          group: Cellular Information
+          descr: 'Modem Type'
+          index: 'mIfCellModemType.{{ $index }}'
+          states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: E4VLteNaVerizon, graph: 0, value: 1, generic: 3 }
+              - { descr: 3G1GsmGlobal, graph: 0, value: 2, generic: 3 }
+              - { descr: E4xLteEmea, graph: 0, value: 3, generic: 3 }
+              - { descr: 4GxLteNa, graph: 0, value: 4, generic: 3 }
+              - { descr: 4GPLteNa, graph: 0, value: 5, generic: 3 }
+              - { descr: EZ1LteEmea, graph: 0, value: 6, generic: 3 }
+              - { descr: 4GyLteNaEu, graph: 0, value: 7, generic: 3 }
+              - { descr: 4GzLteApac, graph: 0, value: 8, generic: 3 }
+              - { descr: 4GaLteGlobal, graph: 0, value: 9, generic: 3 }
+              - { descr: 4GbLteAmericas, graph: 0, value: 10, generic: 3 }
+              - { descr: 4GcLteEu, graph: 0, value: 11, generic: 3 }
+              - { descr: 4GdLteGlobal, graph: 0, value: 12, generic: 3 }
+              - { descr: evdoEhrpd, graph: 0, value: 13, generic: 0 }
+
+        - oid: mIfCellStatusTable
+          value: mIfCellModemState
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.9.{{ $index }}'
+          state_name: mIfCellModemState
+          group: Cellular Information
+          descr: 'Modem State'
+          index: 'mIfCellModemState.{{ $index }}'
+          states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: notRegistered, graph: 0, value: 1, generic: 3 }
+              - { descr: searching, graph: 0, value: 2, generic: 3 }
+              - { descr: registrationDenied, graph: 0, value: 3, generic: 2 }
+              - { descr: idle, graph: 0, value: 4, generic: 3 }
+              - { descr: connected, graph: 0, value: 5, generic: 0 }
+              - { descr: fwRequired, graph: 0, value: 6, generic: 1 }
+
+        - oid: mIfCellStatusTable
+          value: mIfCellBandwidth
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.23.{{ $index }}'
+          state_name: mIfCellBandwidth
+          group: Cellular Information
+          descr: 'Bandwidth'
+          index: 'mIfCellBandwidth.{{ $index }}'
+          states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: 1.4Mhz, graph: 0, value: 1, generic: 0 }
+              - { descr: 3Mhz, graph: 0, value: 2, generic: 0 }
+              - { descr: 5Mhz, graph: 0, value: 3, generic: 0 }
+              - { descr: 10Mhz, graph: 0, value: 4, generic: 0 }
+              - { descr: 15Mhz, graph: 0, value: 5, generic: 0 }
+              - { descr: 20Mhz, graph: 0, value: 6, generic: 0 }
+
+        - oid: mIfCellStatusTable
+          value: mIfCellRoamingState
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.10.{{ $index }}'
+          state_name: mIfCellRoamingState
+          group: Cellular Information
+          descr: 'Roaming State'
+          index: 'mIfCellRoamingState.{{ $index }}'
+          states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: home, graph: 0, value: 1, generic: 0 }
+              - { descr: roaming, graph: 0, value: 2, generic: 1 }
+
+    temperature:
+      data:
+        - oid: mSysTemperature
+          num_oid: '.1.3.6.1.4.1.4130.10.1.1.1.2.6.{{ $index }}'
+          index: 'mSysTemperature.{{ $index }}'
+          descr: 'System Temperature'
+          low_warn_limit: -35
+          low_limit: -40
+          warn_limit: 65
+          high_limit: 70
+    voltage:
+      data:
+        - oid: mSysPowerSupplyVoltage
+          num_oid: '.1.3.6.1.4.1.4130.10.1.1.1.2.9.{{ $index }}'
+          index: 'mSysPowerSupplyVoltage.{{ $index }}'
+          descr: 'Input Voltage'
+          low_warn_limit: 12
+          low_limit: 10
+          warn_limit: 58
+          high_limit: 61
+    signal:
+      data:
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.12.{{ $index }}'
+          index: 'mIfCellRssi.{{ $index }}'
+          descr: 'Cellular RSSI'
+          value: mIfCellRssi
+          low_warn_limit: -60
+          low_limit: -70
+          high_limit: -5
+
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.13.{{ $index }}'
+          index: 'mIfCellRsrp.{{ $index }}'
+          descr: 'Cellular RSRP'
+          value: mIfCellRsrp
+          low_warn_limit: -106
+          low_limit: -120
+          high_limit: -20
+
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.14.{{ $index }}'
+          index: 'mIfCellRsrq.{{ $index }}'
+          descr: 'Cellular RSRQ'
+          value: mIfCellRsrq
+          low_warn_limit: -10
+          low_limit: -13
+          high_limit: -1
+
+        - oid: mIfCellStatusTable
+          num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.15.{{ $index }}'
+          index: 'mIfCellSnr.{{ $index }}'
+          descr: 'Cellular SNR'
+          value: mIfCellSnr
+          high_limit: 100
