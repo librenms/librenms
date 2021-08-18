@@ -213,13 +213,16 @@ class SetConfigCommand extends LnmsCommand
     {
         // prep data to be validated
         OS::loadDefinition($os);
-        $os = \LibreNMS\Config::get("os.$os");
-        Arr::set($os, $setting, $this->juggleType($value));
-        unset($os['definition_loaded']);
+        $os_data = \LibreNMS\Config::get("os.$os");
+        if ($os_data === null) {
+            throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));
+        }
+        Arr::set($os_data, $setting, $this->juggleType($value));
+        unset($os_data['definition_loaded']);
 
         $validator = new Validator;
         $validator->validate(
-            $os,
+            $os_data,
             (object) ['$ref' => 'file://' . base_path('/misc/os_schema.json')],
             Constraint::CHECK_MODE_TYPE_CAST
         );

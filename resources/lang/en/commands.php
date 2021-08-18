@@ -25,6 +25,7 @@ return [
             'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
             'invalid' => 'This is not a valid setting. Please check your input',
+            'invalid_os' => 'Specified OS (:os) does not exist',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],
