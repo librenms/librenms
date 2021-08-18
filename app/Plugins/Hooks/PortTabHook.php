@@ -46,7 +46,7 @@ abstract class PortTabHook implements Hook
         ];
     }
 
-    final public function handle(Port $port): \View
+    final public function handle(Port $port): \Illuminate\View\View
     {
         \View::addLocation(\PluginManager::pluginPath($this));
 
