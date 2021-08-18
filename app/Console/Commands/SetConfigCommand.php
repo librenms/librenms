@@ -224,9 +224,7 @@ class SetConfigCommand extends LnmsCommand
             Constraint::CHECK_MODE_TYPE_CAST
         );
 
-        $errors = collect($validator->getErrors());
-
-        $errors = $errors->filter(function ($error) use ($value) {
+        $errors = collect($validator->getErrors())->filter(function ($error) use ($value) {
             if ($error['constraint'] == 'additionalProp') {
                 return true;
             }
