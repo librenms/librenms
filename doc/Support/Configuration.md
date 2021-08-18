@@ -504,22 +504,28 @@ $config['allow_duplicate_sysName'] = false;
 
 ## Global poller and discovery modules
 
-You can globally disable or enable modules.
+Enable or disable discovery or poller modules.
 
 This setting has an order of precedence Device > OS > Global.
 So if the module is set at a more specific level, it will override the
 less specific settings.
 
+Global:
+
 ```bash
-lnms config:set discovery_modules.arp-table true
-lnms config:set poller_modules.arp-table false
+lnms config:set discovery_modules.arp-table false
+
+lnms config:set discovery_modules.entity-state true
+lnms config:set poller_modules.entity-state true
 ```
 
-Per OS setting:
+Per OS:
 
 ```bash
-lnms config:set os.ios.discovery_modules.arp-table true
-lnms config:set os.ios.poller_modules.arp-table false
+lnms config:set os.ios.discovery_modules.arp-table false
+
+lnms config:set discovery_modules.entity-state true
+lnms config:set os.ios.poller_modules.entity-state true
 ```
 
 ## SNMP Settings
