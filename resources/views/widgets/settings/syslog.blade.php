@@ -27,9 +27,11 @@
     </div>
     <div class="form-group">
         <label for="level-{{ $id }}" class="control-label">@lang('Priority')</label>
-        <select class="form-control" name="level" id="level-{{ $id }}" data-placeholder="@lang('All Priorities')">
+        <select class="form-control" name="level" id="level-{{ $id }}">
             @if($level)
-                <option value="{{ $level }}" selected>{{ $priority }}</option>
+                @foreach($priorities as $name => $val)
+                    <option value="{{ $val }}" @if($level == $val) selected @endif>{{ $name }}</option>
+                @endforeach
             @endif
         </select>
     </div>
@@ -39,7 +41,6 @@
     <script type="text/javascript">
         init_select2('#device-{{ $id }}', 'device', {}, '{{ $device ? $device->device_id : '' }}');
         init_select2('#device_group-{{ $id }}', 'device-group', {});
-        init_select2('#level-{{ $id }}', 'priority', {});
 
         $('#hidenavigation-{{ $id }}')
             .bootstrapSwitch('offColor','danger')
