@@ -24,7 +24,7 @@ return [
         'errors' => [
             'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
-            'invalid' => 'This is not a valid setting. Please check your spelling',
+            'invalid' => 'This is not a valid setting. Please check your input',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],
