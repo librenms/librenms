@@ -30,7 +30,7 @@ use LibreNMS\Tests\InMemoryDbTestCase;
 
 class TestConfigCommands extends InMemoryDbTestCase
 {
-    public function testSetting()
+    public function testSetting(): void
     {
         // simple
         Config::set('login_message', null);
@@ -69,7 +69,7 @@ class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
     }
 
-    public function testInvalidSetting()
+    public function testInvalidSetting(): void
     {
         // non-existent setting
         $this->artisan('config:set', ['setting' => 'this_will_never_be.a.setting'])
@@ -98,7 +98,11 @@ class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(2);
     }
 
-    private function assertCliSets($setting, $expected)
+    /**
+     * @param  string  $setting
+     * @param  mixed   $expected
+     */
+    private function assertCliSets(string $setting, $expected): void
     {
         $this->assertCliGets($setting, null);
         $this->artisan('config:set', ['setting' => $setting, 'value' => json_encode($expected)])->assertExitCode(0);
@@ -109,7 +113,11 @@ class TestConfigCommands extends InMemoryDbTestCase
         $this->assertCliGets($setting, null);
     }
 
-    private function assertCliGets($setting, $expected)
+    /**
+     * @param  string  $setting
+     * @param  mixed   $expected
+     */
+    private function assertCliGets(string $setting, $expected): void
     {
         $this->assertSame($expected, \LibreNMS\Config::get($setting));
 
