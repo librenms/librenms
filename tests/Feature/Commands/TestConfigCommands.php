@@ -109,7 +109,6 @@ class TestConfigCommands extends InMemoryDbTestCase
         $this->assertCliGets($setting, null);
     }
 
-
     private function assertCliGets($setting, $expected)
     {
         $this->assertSame($expected, \LibreNMS\Config::get($setting));
