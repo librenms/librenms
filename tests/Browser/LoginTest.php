@@ -27,7 +27,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $password = 'some_password';
             $user = User::factory()->create([
-                'password' => password_hash($password, PASSWORD_DEFAULT), // @phpstan-ignore-line PHP 7.4 bug
+                'password' => password_hash($password, PASSWORD_DEFAULT), // @phpstan-ignore-line
             ]); /** @var User $user */
             $browser->visit(new LoginPage())
                 ->type('username', $user->username)
@@ -52,7 +52,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $password = 'another_password';
             $user = User::factory()->create([
-                'password' => password_hash($password, PASSWORD_DEFAULT), // @phpstan-ignore-line PHP 7.4 bug
+                'password' => password_hash($password, PASSWORD_DEFAULT), // @phpstan-ignore-line
             ]); /** @var User $user */
             Config::persist('twofactor', true); // set to db
             UserPref::setPref($user, 'twofactor', [
