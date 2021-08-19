@@ -101,7 +101,7 @@ class SetConfigCommand extends LnmsCommand
         }
 
         // handle setting value inside multi-dimensional array
-        if ($parent) {
+        if ($parent && $parent !== $setting) {
             $parent_data = Config::get($parent);
             Arr::set($parent_data, $this->getChildPath($setting, $parent), $value);
             $value = $parent_data;
@@ -227,21 +227,27 @@ class SetConfigCommand extends LnmsCommand
             Constraint::CHECK_MODE_TYPE_CAST
         );
 
-        $errors = collect($validator->getErrors())->filter(function ($error) use ($value) {
+        $code = 0;
+
+        $errors = collect($validator->getErrors())->filter(function ($error) use ($value, &$code) {
             if ($error['constraint'] == 'additionalProp') {
+                $code = 1;
                 return true;
             }
 
             // only check type if value is set (otherwise we are unsetting it)
-            if (empty($value)) {
-                return false;
+            if (! empty($value) && $error['constraint'] == 'type') {
+                if ($code === 0) {
+                    $code = 2; // wrong path takes precedence over wrong type
+                }
+                return true;
             }
 
-            return $error['constraint'] == 'type';
+            return false;
         });
 
         if ($errors->isNotEmpty()) {
-            throw new ValidationException($errors->pluck('message')->implode(PHP_EOL));
+            throw new ValidationException($errors->pluck('message')->implode(PHP_EOL), $code);
         }
     }
 }

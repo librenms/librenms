@@ -70,7 +70,7 @@ lnms config:set snmp.community
   > yes
 
 
-lnms config:get snmp.community --json
+lnms config:get snmp.community
   ["public"]
 ```
 

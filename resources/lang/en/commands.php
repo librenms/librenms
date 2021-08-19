@@ -7,7 +7,7 @@ return [
             'setting' => 'setting to get value of in dot notation (example: snmp.community.0)',
         ],
         'options' => [
-            'json' => 'Output setting or entire config as json',
+            'dump' => 'Output the entire config as json',
         ],
     ],
     'config:set' => [
