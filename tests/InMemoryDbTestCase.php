@@ -38,5 +38,4 @@ class InMemoryDbTestCase extends TestCase
         config(['database.default' => $this->connection]);
         \DB::purge($current);
     }
-
 }

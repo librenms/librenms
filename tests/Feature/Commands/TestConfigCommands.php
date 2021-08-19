@@ -30,7 +30,6 @@ use LibreNMS\Tests\InMemoryDbTestCase;
 
 class TestConfigCommands extends InMemoryDbTestCase
 {
-
     public function testSetting()
     {
         // simple
@@ -55,7 +54,6 @@ class TestConfigCommands extends InMemoryDbTestCase
         $community[] = 'extra_community';
         $this->artisan('config:set', ['setting' => 'snmp.community.+', 'value' => 'extra_community'])->assertExitCode(0);
         $this->assertCliGets('snmp.community', $community);
-
 
         // os bool
         $this->assertCliSets('os.ios.rfc1628_compat', true);
@@ -98,7 +96,6 @@ class TestConfigCommands extends InMemoryDbTestCase
         $this->artisan('config:set', ['setting' => 'login_message.+', 'value' => 'something', '--no-ansi' => true])
             ->expectsOutput(trans('commands.config:set.errors.append'))
             ->assertExitCode(2);
-
     }
 
     private function assertCliSets($setting, $expected)
@@ -120,6 +117,7 @@ class TestConfigCommands extends InMemoryDbTestCase
         $command = $this->artisan('config:get', ['setting' => $setting]);
         if ($expected === null) {
             $command->assertExitCode(1);
+
             return;
         }
 

@@ -232,6 +232,7 @@ class SetConfigCommand extends LnmsCommand
         $errors = collect($validator->getErrors())->filter(function ($error) use ($value, &$code) {
             if ($error['constraint'] == 'additionalProp') {
                 $code = 1;
+
                 return true;
             }
 
@@ -240,6 +241,7 @@ class SetConfigCommand extends LnmsCommand
                 if ($code === 0) {
                     $code = 2; // wrong path takes precedence over wrong type
                 }
+
                 return true;
             }
 
