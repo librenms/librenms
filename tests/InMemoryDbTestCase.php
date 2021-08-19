@@ -27,7 +27,8 @@ namespace LibreNMS\Tests;
 
 class InMemoryDbTestCase extends TestCase
 {
-    protected $connection = 'testing_memory'; /** @var string */
+    /** @var string */
+    protected $connection = 'testing_memory';
 
     protected function setUp(): void
     {
