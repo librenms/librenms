@@ -96,7 +96,7 @@ class Isis implements Module
         $os->getDevice()->isisAdjacencies()->delete();
     }
 
-    public function discoverIsIsMib($os): Collection
+    public function discoverIsIsMib(OS $os): Collection
     {
         // Check if the device has any ISIS enabled interfaces
         $circuits = snmpwalk_cache_oid($os->getDeviceArray(), 'ISIS-MIB::isisCirc', []);
@@ -138,12 +138,7 @@ class Isis implements Module
         return $adjacencies;
     }
 
-    /**
-     * @param $adjacencies
-     * @param  \LibreNMS\OS  $os
-     * @return Collection
-     */
-    private function pollIsIsMib($adjacencies, OS $os)
+    public function pollIsIsMib(Collection $adjacencies, OS $os): Collection
     {
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjState', [], 'ISIS-MIB');
 
@@ -166,7 +161,7 @@ class Isis implements Module
         return $adjacencies;
     }
 
-    private function parseAdjacencyTime($data): int
+    protected function parseAdjacencyTime($data): int
     {
         return (int) max($data['isisISAdjLastUpTime'] ?? 100, 1) / 100;
     }
