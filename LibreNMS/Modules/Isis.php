@@ -118,20 +118,27 @@ class Isis implements Module
 
                 $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);
 
-                $adjacencies->push(new IsisAdjacency([
+                $attributes = [
                     'device_id' => $os->getDeviceId(),
                     'ifIndex' => $circuit_data['isisCircIfIndex'],
                     'port_id' => $ifIndex_port_id_map[$circuit_data['isisCircIfIndex']] ?? null,
                     'isisCircAdminState' => $circuit_data['isisCircAdminState'],
                     'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? 'down',
-                    'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
-                    'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['isisISAdjNeighSysID'] ?? '')),
-                    'isisISAdjNeighPriority' => $adjacency_data['isisISAdjNeighPriority'] ?? '',
-                    'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
-                    'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['isisISAdjAreaAddress'] ?? '')),
-                    'isisISAdjIPAddrType' => $adjacency_data['isisISAdjIPAddrType'] ?? '',
-                    'isisISAdjIPAddrAddress' => (string) IP::fromHexstring($adjacency_data['isisISAdjIPAddrAddress'] ?? null, true),
-                ]));
+                ];
+
+                if (! empty($adjacency_data)) {
+                    array_merge($attributes, [
+                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
+                        'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['isisISAdjNeighSysID'] ?? '')),
+                        'isisISAdjNeighPriority' => $adjacency_data['isisISAdjNeighPriority'] ?? '',
+                        'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
+                        'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['isisISAdjAreaAddress'] ?? '')),
+                        'isisISAdjIPAddrType' => $adjacency_data['isisISAdjIPAddrType'] ?? '',
+                        'isisISAdjIPAddrAddress' => (string) IP::fromHexstring($adjacency_data['isisISAdjIPAddrAddress'] ?? null, true),
+                    ]);
+                }
+
+                $adjacencies->push(new IsisAdjacency($attributes));
             }
         }
 
@@ -142,7 +149,7 @@ class Isis implements Module
     {
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjState', [], 'ISIS-MIB');
 
-        if (count($data) !== $adjacencies->count()) {
+        if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
             echo 'New Adjacencies, running discovery';
             // don't enable, might be a bad heuristic
             return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
@@ -152,7 +159,7 @@ class Isis implements Module
 
         $adjacencies->each(function (IsisAdjacency $adjacency) use (&$data) {
             $adjacency_data = Arr::last($data[$adjacency->ifIndex]);
-            $adjacency->isisISAdjState = $adjacency_data['isisISAdjState'];
+            $adjacency->isisISAdjState = $adjacency_data['isisISAdjState'] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
             $adjacency->save();
             unset($data[$adjacency->ifIndex]);
@@ -163,6 +170,6 @@ class Isis implements Module
 
     protected function parseAdjacencyTime($data): int
     {
-        return (int) max($data['isisISAdjLastUpTime'] ?? 100, 1) / 100;
+        return (int) max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100;
     }
 }
