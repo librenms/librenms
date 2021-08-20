@@ -35,11 +35,12 @@ use ReflectionException;
 
 class PluginManager
 {
+    /** @var array */
     private $hooks = [];
     /** @var Collection */
     private $plugins;
 
-    public function publishHook(string $hook_type, string $implementation_class)
+    public function publishHook(string $hook_type, string $implementation_class): void
     {
         try {
             if ($this->pluginEnabled($implementation_class)) {
@@ -117,6 +118,8 @@ class PluginManager
 
     /**
      * @param  string|object  $plugin
+     * @param  string  $file
+     * @return string|null
      */
     public function pluginPath($plugin, $file = null): ?string
     {
