@@ -123,13 +123,13 @@ class Isis implements Module
                     'ifIndex' => $circuit_data['isisCircIfIndex'],
                     'port_id' => $ifIndex_port_id_map[$circuit_data['isisCircIfIndex']] ?? null,
                     'isisCircAdminState' => $circuit_data['isisCircAdminState'],
-                    'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? $circuit_data['isisCircAdminState'],
-                    'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['isisISAdjNeighSysType'] ?? null, 'unknown'),
+                    'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? 'down',
+                    'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
                     'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['isisISAdjNeighSysID'] ?? '')),
-                    'isisISAdjNeighPriority' => $adjacency_data['isisISAdjNeighPriority'],
+                    'isisISAdjNeighPriority' => $adjacency_data['isisISAdjNeighPriority'] ?? '',
                     'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
                     'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['isisISAdjAreaAddress'] ?? '')),
-                    'isisISAdjIPAddrType' => $adjacency_data['isisISAdjIPAddrType'] ?? null,
+                    'isisISAdjIPAddrType' => $adjacency_data['isisISAdjIPAddrType'] ?? '',
                     'isisISAdjIPAddrAddress' => (string) IP::fromHexstring($adjacency_data['isisISAdjIPAddrAddress'] ?? null, true),
                 ]));
             }
