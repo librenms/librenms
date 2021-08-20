@@ -15,13 +15,14 @@ class IsisAdjacenciesNullable extends Migration
     {
         Schema::table('isis_adjacencies', function (Blueprint $table) {
             $table->integer('port_id')->nullable()->change();
-            $table->integer('isisISAdjNeighSysType')->nullable()->change();
-            $table->integer('isisISAdjNeighSysID')->nullable()->change();
-            $table->integer('isisISAdjNeighPriority')->nullable()->change();
-            $table->integer('isisISAdjLastUpTime')->nullable()->change();
-            $table->integer('isisISAdjAreaAddress')->nullable()->change();
-            $table->integer('isisISAdjIPAddrType')->nullable()->change();
-            $table->integer('isisISAdjIPAddrAddress')->nullable()->change();
+            $table->string('isisISAdjState', 13)->nullable()->change();
+            $table->string('isisISAdjNeighSysType', 128)->nullable()->change();
+            $table->string('isisISAdjNeighSysID', 128)->nullable()->change();
+            $table->string('isisISAdjNeighPriority', 128)->nullable()->change();
+            $table->unsignedBigInteger('isisISAdjLastUpTime')->nullable()->change();
+            $table->string('isisISAdjAreaAddress', 128)->nullable()->change();
+            $table->string('isisISAdjIPAddrType', 128)->nullable()->change();
+            $table->string('isisISAdjIPAddrAddress', 128)->nullable()->change();
         });
     }
 
@@ -34,13 +35,14 @@ class IsisAdjacenciesNullable extends Migration
     {
         Schema::table('isis_adjacencies', function (Blueprint $table) {
             $table->integer('port_id')->change();
-            $table->integer('isisISAdjNeighSysType')->change();
-            $table->integer('isisISAdjNeighSysID')->change();
-            $table->integer('isisISAdjNeighPriority')->change();
-            $table->integer('isisISAdjLastUpTime')->change();
-            $table->integer('isisISAdjAreaAddress')->change();
-            $table->integer('isisISAdjIPAddrType')->change();
-            $table->integer('isisISAdjIPAddrAddress')->change();
+            $table->string('isisISAdjState', 13)->change();
+            $table->string('isisISAdjNeighSysType', 128)->change();
+            $table->string('isisISAdjNeighSysID', 128)->change();
+            $table->string('isisISAdjNeighPriority', 128)->change();
+            $table->unsignedBigInteger('isisISAdjLastUpTime')->change();
+            $table->string('isisISAdjAreaAddress', 128)->change();
+            $table->string('isisISAdjIPAddrType', 128)->change();
+            $table->string('isisISAdjIPAddrAddress', 128)->change();
         });
     }
 }
