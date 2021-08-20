@@ -90,7 +90,7 @@ if (! Auth::user()->hasGlobalRead()) {
           <tr>
               <td></td>
               <td>' . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'isis']) . '</td>
-              <td>' . \LibreNMS\Util\Url::portLink($adj->port) .  '</td>
+              <td>' . \LibreNMS\Util\Url::portLink($adj->port) . '</td>
               <td>' . $adj->isisISAdjIPAddrAddress . '</td>
               <td>' . $adj->isisISAdjNeighSysID . '</td>
               <td>' . $adj->isisISAdjAreaAddress . '</td>
