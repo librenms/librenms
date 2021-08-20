@@ -127,7 +127,7 @@ class Isis implements Module
                 ];
 
                 if (! empty($adjacency_data)) {
-                    array_merge($attributes, [
+                    $attributes = array_merge($attributes, [
                         'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
                         'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['isisISAdjNeighSysID'] ?? '')),
                         'isisISAdjNeighPriority' => $adjacency_data['isisISAdjNeighPriority'] ?? '',
