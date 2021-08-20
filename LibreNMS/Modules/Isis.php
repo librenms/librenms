@@ -122,7 +122,7 @@ class Isis implements Module
                     'device_id' => $os->getDeviceId(),
                     'ifIndex' => $circuit_data['isisCircIfIndex'],
                     'port_id' => $ifIndex_port_id_map[$circuit_data['isisCircIfIndex']] ?? null,
-                    'isisCircAdminState' => $circuit_data['isisCircAdminState'],
+                    'isisCircAdminState' => $circuit_data['isisCircAdminState'] ?? 'down',
                     'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? 'down',
                 ];
 

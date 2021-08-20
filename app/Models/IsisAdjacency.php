@@ -49,6 +49,17 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
         'isisISAdjIPAddrAddress',
     ];
 
+    protected $attributes = [
+        'isisISAdjState' => '',
+        'isisISAdjNeighSysType' => '',
+        'isisISAdjNeighSysID' => '',
+        'isisISAdjNeighPriority' => '',
+        'isisISAdjLastUpTime' => '',
+        'isisISAdjAreaAddress' => '',
+        'isisISAdjIPAddrType' => '',
+        'isisISAdjIPAddrAddress' => '',
+        ];
+
     // ---- Define Relationships ----
 
     public function device()

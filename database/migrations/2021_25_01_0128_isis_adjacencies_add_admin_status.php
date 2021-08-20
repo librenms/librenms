@@ -14,7 +14,7 @@ class IsisAdjacenciesAddAdminStatus extends Migration
     public function up()
     {
         Schema::table('isis_adjacencies', function (Blueprint $table) {
-            $table->string('isisCircAdminState', 16)->nullable();
+            $table->string('isisCircAdminState', 16);
         });
     }
 
