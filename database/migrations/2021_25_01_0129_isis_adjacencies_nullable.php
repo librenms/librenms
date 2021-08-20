@@ -22,7 +22,6 @@ class IsisAdjacenciesPortNullable extends Migration
             $table->integer('isisISAdjAreaAddress')->nullable()->change();
             $table->integer('isisISAdjIPAddrType')->nullable()->change();
             $table->integer('isisISAdjIPAddrAddress')->nullable()->change();
-
         });
     }
 
