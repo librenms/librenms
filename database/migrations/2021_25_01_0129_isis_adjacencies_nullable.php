@@ -15,7 +15,6 @@ class IsisAdjacenciesNullable extends Migration
     {
         Schema::table('isis_adjacencies', function (Blueprint $table) {
             $table->integer('port_id')->nullable()->change();
-            $table->string('isisISAdjState', 13)->nullable()->change();
             $table->string('isisISAdjNeighSysType', 128)->nullable()->change();
             $table->string('isisISAdjNeighSysID', 128)->nullable()->change();
             $table->string('isisISAdjNeighPriority', 128)->nullable()->change();
@@ -35,7 +34,6 @@ class IsisAdjacenciesNullable extends Migration
     {
         Schema::table('isis_adjacencies', function (Blueprint $table) {
             $table->integer('port_id')->change();
-            $table->string('isisISAdjState', 13)->change();
             $table->string('isisISAdjNeighSysType', 128)->change();
             $table->string('isisISAdjNeighSysID', 128)->change();
             $table->string('isisISAdjNeighPriority', 128)->change();
