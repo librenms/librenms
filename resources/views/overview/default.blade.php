@@ -583,18 +583,18 @@
             if(this.contains(data)) {
                 widget_id = $(this).parent().attr('id');
                 widget_type = $(this).parent().data('type');
-                $(this).parent().data('settings','0');
+                $(this).parent().data('settings', '0');
             }
         });
-        if( widget_id > 0 && widget_settings != {} ) {
+        if(widget_id > 0 && widget_settings != {}) {
             $.ajax({
                 type: 'PUT',
                 url: '{{ url('/ajax/form/widget-settings/') }}/' + widget_id,
-                data: {settings: widget_settings},
+                data: { settings: widget_settings },
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
-                        widget_reload(widget_id, widget_type);
+                        widget_reload(widget_id, widget_type, true);
                         toastr.success(data.message);
                     }
                     else {
@@ -609,9 +609,15 @@
     return false;
     }
 
-    function widget_reload(id, data_type) {
+    function widget_reload(id, data_type, forceDomInject = false) {
         const $widget_body = $(`#widget_body_${id}`);
         const $widget_bootgrid = $(`#widget_body_${id} .bootgrid-table`);
+        const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
+
+        if (settings === 1) {
+            $(`#widget_body_${id} .bootgrid-table`).bootgrid('destroy');
+            $(`#widget_body_${id} *`).off();
+        }
 
         $.ajax({
             type: 'POST',
@@ -619,14 +625,14 @@
             data: {
                 id,
                 dimensions: { x: $widget_body.width(), y: $widget_body.height() },
-                settings: $widget_body.parent().data('settings') == 1 ? 1 : 0,
+                settings,
             },
             dataType: 'json',
             success: function (data) {
                 if (data.status === 'ok') {
                     // Check to see if a bootgrid already exists and has ajax reloading enabled.
                     // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
-                    if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
+                    if (!forceDomInject && settings === 0 && $widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
                         $widget_bootgrid.bootgrid('reload');
                     } else {
                         $widget_body.html(data.html);
