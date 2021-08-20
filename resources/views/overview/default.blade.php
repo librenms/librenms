@@ -610,56 +610,50 @@
     }
 
     function widget_reload(id, data_type) {
-        $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
-        $("#widget_body_"+id+" *").off();
-        var $widget_body = $("#widget_body_"+id);
-        if ($widget_body.parent().data('settings') == 1 ) {
-            settings = 1;
-        } else {
-            settings = 0;
-        }
+        const $widget_body = $(`#widget_body_${id}`);
+        const $widget_bootgrid = $(`#widget_body_${id} .bootgrid-table`);
+
         $.ajax({
             type: 'POST',
-            url: ajax_url + '/dash/' + data_type,
+            url: `${ajax_url}/dash/${data_type}`,
             data: {
-                id: id,
-                dimensions: {x:$widget_body.width(), y:$widget_body.height()},
-                settings:settings
+                id,
+                dimensions: { x: $widget_body.width(), y: $widget_body.height() },
+                settings: $widget_body.parent().data('settings') == 1 ? 1 : 0,
             },
-            dataType: "json",
+            dataType: 'json',
             success: function (data) {
-                var $widget_body = $("#widget_body_"+id);
-                $widget_body.empty();
                 if (data.status === 'ok') {
-                    $("#widget_title_"+id).html(data.title);
-                    $widget_body.html(data.html).parent().data('settings', data.show_settings);
-                    $widget_body.html(data.html).parent().data('refresh', data.settings.refresh);
+                    // Check to see if a bootgrid already exists and has ajax reloading enabled.
+                    // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
+                    if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
+                        $widget_bootgrid.bootgrid('reload');
+                    } else {
+                        $widget_body.html(data.html);
+                    }
+                    
+                    $(`#widget_title_${id}`).html(data.title);
+                    $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
-                    $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
+                    $widget_body.html(`<div class="alert alert-info">${data.message}</div>`);
                 }
             },
             error: function (data) {
-                var $widget_body = $("#widget_body_"+id);
-                $widget_body.empty();
-                if (data.responseJSON.error) {
-                    $widget_body.html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
-                } else {
-                    $widget_body.html('<div class="alert alert-info">{{ __('Problem with backend') }}</div>');
-                }
+                $widget_body.html(`<div class="alert alert-info">${ data.responseJSON.error || '{{ __('Problem with backend') }}'}</div>`);
             }
         });
     }
 
     function grab_data(id, data_type) {
-        var parent = $("#widget_body_"+id).parent();
+        const $parent = $(`#widget_body_${id}`).parent();
 
-        if( parent.data('settings') == 0 ) {
+        if($parent.data('settings') == 0) {
             widget_reload(id, data_type);
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             grab_data(id, data_type);
-        }, (parent.data('refresh') > 0 ? parent.data('refresh') : 60) * 1000);
+        }, ($parent.data('refresh') > 0 ? $parent.data('refresh') : 60) * 1000);
     }
 
     $('#new-widget').popover();
