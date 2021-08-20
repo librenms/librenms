@@ -61,6 +61,7 @@ trait SyncsModels
 
     /**
      * Combine a list of existing and potentially new models
+     * If the model exists fill any new data from the new models
      *
      * @param  \Illuminate\Support\Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
      * @param  \Illuminate\Support\Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
