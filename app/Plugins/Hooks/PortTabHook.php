@@ -31,6 +31,7 @@ use App\Plugins\Hook;
 
 abstract class PortTabHook implements Hook
 {
+    /** @var string */
     public $view = 'resources.views.port-tab';
 
     public function authorize(User $user, Port $port): bool

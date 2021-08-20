@@ -30,6 +30,7 @@ use App\Models\User;
 
 abstract class DeviceOverviewHook
 {
+    /** @var string */
     public $view = 'resources.views.device-overview';
 
     public function authorize(User $user, Device $device): bool

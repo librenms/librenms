@@ -40,7 +40,7 @@ class PluginProvider extends ServiceProvider
         });
     }
 
-    public function boot()
+    public function boot(): void
     {
         $manager = $this->app->make(PluginManager::class);
 
@@ -54,7 +54,7 @@ class PluginProvider extends ServiceProvider
     /**
      * Load any local plugins these plugins must implement only one hook.
      */
-    protected function loadLocalPlugins(PluginManager $manager)
+    protected function loadLocalPlugins(PluginManager $manager): void
     {
         foreach (glob(base_path('app/Plugins/*/*.php')) as $file) {
             if (preg_match('#([^/]+)/([^/.]+)\.php#', $file, $matches)) {
@@ -69,7 +69,7 @@ class PluginProvider extends ServiceProvider
         }
     }
 
-    protected function hookName($class)
+    protected function hookName(string $class): string
     {
         foreach (class_parents($class) as $parent) {
             if (Str::startsWith($parent, 'App\Plugins\Hooks\\')) {
@@ -80,7 +80,7 @@ class PluginProvider extends ServiceProvider
         throw new PluginDoesNotImplementHookException($class);
     }
 
-    protected function className($dir, $name)
+    protected function className(string $dir, string $name): string
     {
         return 'App\Plugins\\' . $dir . '\\' . $name;
     }

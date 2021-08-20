@@ -29,6 +29,7 @@ use App\Models\User;
 
 abstract class MenuEntryHook
 {
+    /** @var string */
     public $view = 'resources.views.menu';
 
     public function authorize(User $user): bool

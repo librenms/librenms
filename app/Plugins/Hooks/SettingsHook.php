@@ -29,6 +29,7 @@ use App\Models\User;
 
 abstract class SettingsHook
 {
+    /** @var string */
     public $view = 'resources.views.settings';
 
     public function authorize(User $user, array $settings): bool
@@ -44,7 +45,7 @@ abstract class SettingsHook
         ];
     }
 
-    final public function handle(string $plugin, array $settings): mixed
+    final public function handle(string $plugin, array $settings): ?\Illuminate\View\View
     {
         // only if this is the selected plugin
         if ($plugin !== \PluginManager::getPluginName($this)) {

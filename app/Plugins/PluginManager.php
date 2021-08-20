@@ -30,10 +30,13 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Log;
+use ReflectionClass;
+use ReflectionException;
 
 class PluginManager
 {
-    private $hooks;
+    private $hooks = [];
+    /** @var Collection */
     private $plugins;
 
     public function publishHook(string $hook_type, string $implementation_class)
@@ -59,7 +62,7 @@ class PluginManager
         return ! empty($this->hooks);
     }
 
-    public function hasHooks(string $hook, array $args = [])
+    public function hasHooks(string $hook, array $args = []): bool
     {
         return $this->hooksFor($hook)
             ->filter(function ($plugin) use ($args) {
@@ -88,6 +91,10 @@ class PluginManager
         }
     }
 
+    /**
+     * @param  string|object  $name_or_hook
+     * @return array
+     */
     public function getSettings($name_or_hook): array
     {
         $name = $this->getPluginName($name_or_hook);
@@ -95,6 +102,11 @@ class PluginManager
         return (array) $this->getPlugin($name)->settings;
     }
 
+    /**
+     * @param  string|object  $name_or_hook
+     * @param  array  $settings
+     * @return bool
+     */
     public function setSettings($name_or_hook, array $settings): bool
     {
         $plugin = $this->getPlugin($this->getPluginName($name_or_hook));
@@ -106,21 +118,25 @@ class PluginManager
     /**
      * @param  string|object  $plugin
      */
-    public function pluginPath($plugin, $file = null): string
+    public function pluginPath($plugin, $file = null): ?string
     {
-        $reflection = new \ReflectionClass($plugin);
+        try {
+            $reflection = new ReflectionClass($plugin);
 
-        return dirname($reflection->getFileName()) . '/' . $file;
+            return dirname($reflection->getFileName()) . '/' . $file;
+        } catch (ReflectionException $e) {
+            return null;
+        }
     }
 
-    public function pluginEnabled(string $name_or_hook): bool
+    public function pluginEnabled(string $class): bool
     {
-        $name = $this->getPluginName($name_or_hook);
+        $name = $this->getPluginName($class);
 
         return $this->getPlugin($name)->plugin_active;
     }
 
-    private function getPlugin(string $name)
+    private function getPlugin(string $name): Plugin
     {
         $plugin = $this->getPlugins()->get($name);
 
@@ -155,13 +171,21 @@ class PluginManager
         return $this->plugins;
     }
 
-    public function getPluginName($class)
+    /**
+     * @param string|object $class
+     * @return string
+     */
+    public function getPluginName($class): string
     {
         // if it is a plugin hook, get the namespace
         if (is_object($class) || class_exists($class)) {
-            $reflection = new \ReflectionClass($class);
+            try {
+                $reflection = new ReflectionClass($class);
 
-            return $reflection->getNamespaceName();
+                return $reflection->getNamespaceName();
+            } catch (ReflectionException $e) {
+                // fail
+            }
         }
 
         return $class;
