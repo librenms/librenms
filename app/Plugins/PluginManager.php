@@ -136,7 +136,7 @@ class PluginManager
         return $this->getPlugin($name)->plugin_active;
     }
 
-    private function getPlugin(string $name): Plugin
+    private function getPlugin(string $name): ?Plugin
     {
         $plugin = $this->getPlugins()->get($name);
 
