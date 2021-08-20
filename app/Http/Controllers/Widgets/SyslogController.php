@@ -44,7 +44,7 @@ class SyslogController extends WidgetController
 
         $data['device'] = Device::hasAccess($request->user())->find($data['device']);
 
-        $data['priorities'] = array_flip(app('translator')->get('syslog.severity'));
+        $data['priorities'] = app('translator')->get('syslog.severity');
 
         return view('widgets.settings.syslog', $data);
     }

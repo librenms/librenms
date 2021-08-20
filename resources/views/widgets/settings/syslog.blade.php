@@ -28,11 +28,9 @@
     <div class="form-group">
         <label for="level-{{ $id }}" class="control-label">@lang('Priority')</label>
         <select class="form-control" name="level" id="level-{{ $id }}">
-            @if($level)
-                @foreach($priorities as $name => $val)
-                    <option value="{{ $val }}" @if($level == $val) selected @endif>{{ $name }}</option>
-                @endforeach
-            @endif
+            @foreach($priorities as $val => $name)
+                <option value="{{ $val }}" @if($level == $val) selected @endif>{{ $name }}</option>
+            @endforeach
         </select>
     </div>
 @endsection
