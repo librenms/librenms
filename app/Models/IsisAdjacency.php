@@ -38,6 +38,7 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
         'device_id',
         'port_id',
         'ifIndex',
+        'isisCircAdminState',
         'isisISAdjState',
         'isisISAdjNeighSysType',
         'isisISAdjNeighSysID',

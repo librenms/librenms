@@ -69,6 +69,7 @@ if (! Auth::user()->hasGlobalRead()) {
               <th>System ID</th>
               <th>Area</th>
               <th>System type</th>
+              <th>Admin</th>
               <th>State</th>
               <th>Last uptime</th>
             </tr>
@@ -99,6 +100,7 @@ if (! Auth::user()->hasGlobalRead()) {
               <td>' . $adj->isisISAdjNeighSysID . '</td>
               <td>' . $adj->isisISAdjAreaAddress . '</td>
               <td>' . $adj->isisISAdjNeighSysType . '</td>
+              <td>' . $adj->isisCircAdminState . '</td>
               <td><strong><span style="color: ' . $color . ';">' . $adj->isisISAdjState . '</span></strong></td>
               <td>' . \LibreNMS\Util\Time::formatInterval($adj->isisISAdjLastUpTime) . '</td>
           </tr>
