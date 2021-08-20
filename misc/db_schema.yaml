@@ -796,7 +796,7 @@ isis_adjacencies:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int, 'Null': false, Extra: '' }
-    - { Field: port_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int, 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: int, 'Null': false, Extra: '' }
     - { Field: isisISAdjState, Type: varchar(13), 'Null': false, Extra: '' }
     - { Field: isisISAdjNeighSysType, Type: varchar(128), 'Null': false, Extra: '' }
@@ -806,6 +806,7 @@ isis_adjacencies:
     - { Field: isisISAdjAreaAddress, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: isisISAdjIPAddrType, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: isisISAdjIPAddrAddress, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisCircAdminState, Type: varchar(16), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
