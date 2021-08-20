@@ -24,18 +24,20 @@
 
 namespace LibreNMS\DB;
 
+use Illuminate\Support\Collection;
+
 trait SyncsModels
 {
     /**
      * Sync several models for a device's relationship
      * Model must implement \LibreNMS\Interfaces\Models\Keyable interface
      *
-     * @param \App\Models\Device $device
-     * @param string $relationship
-     * @param \Illuminate\Support\Collection $models
+     * @param  \App\Models\Device  $device
+     * @param  string  $relationship
+     * @param  \Illuminate\Support\Collection  $models  \LibreNMS\Interfaces\Models\Keyable
      * @return \Illuminate\Support\Collection
      */
-    protected function syncModels($device, $relationship, $models)
+    protected function syncModels($device, $relationship, $models): Collection
     {
         $models = $models->keyBy->getCompositeKey();
         $existing = $device->$relationship->keyBy->getCompositeKey();
@@ -55,5 +57,26 @@ trait SyncsModels
         $device->$relationship()->saveMany($new);
 
         return $existing->merge($new);
+    }
+
+    /**
+     * Combine a list of existing and potentially new models
+     *
+     * @param  \Illuminate\Support\Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
+     * @param  \Illuminate\Support\Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
+     * @return \Illuminate\Support\Collection
+     */
+    protected function fillNew(Collection $existing, Collection $discovered): Collection
+    {
+        $all = $existing->keyBy->getCompositeKey();
+        foreach ($discovered as $new) {
+            if ($found = $all->get($new->getCompositeKey())) {
+                $found->fill($new->getAttributes());
+            } else {
+                $all->put($new->getCompositeKey(), $new);
+            }
+        }
+
+        return $all;
     }
 }

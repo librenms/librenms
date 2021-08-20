@@ -143,9 +143,9 @@ class Isis implements Module
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjState', [], 'ISIS-MIB');
 
         if (count($data) !== $adjacencies->count()) {
-            d_echo('New Adjacencies');
+            echo 'New Adjacencies, running discovery';
             // don't enable, might be a bad heuristic
-            return $this->discoverIsIsMib($os);
+            return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
         }
 
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjLastUpTime', $data, 'ISIS-MIB', null, '-OQUst');
