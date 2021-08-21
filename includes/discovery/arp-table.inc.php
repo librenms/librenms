@@ -24,15 +24,9 @@
 
 use LibreNMS\Config;
 
-if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
-    $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} else {
-    $vrfs_lite_cisco = [['context_name'=>'']];
-}
-
-foreach ($vrfs_lite_cisco as $vrf) {
-    $context = $vrf['context_name'];
-    $device['context_name'] = $context;
+foreach (DeviceCache::getPrimary()->getContexts() as $vrf) {
+    $context = $vrf;
+    $device['context_name'] = $vrf;
 
     if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
@@ -42,7 +36,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
     }
 
     $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
-    $existing_data = dbFetchRows($sql, [$device['device_id'], $context]);
+    $existing_data = dbFetchRows($sql, [$device['device_id'], $vrf]);
 
     $ipv4_addresses = array_map(function ($data) {
         return $data['ipv4_address'];
@@ -73,7 +67,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 if ($mac != $old_mac && $mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $mac\n");
                     log_event("MAC change: $ip : " . \LibreNMS\Util\Rewrite::readableMac($old_mac) . ' -> ' . \LibreNMS\Util\Rewrite::readableMac($mac), $device, 'interface', 4, $port_id);
-                    dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context]);
+                    dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $vrf]);
                 }
                 d_echo("$raw_mac => $ip\n", '.');
             } elseif (isset($interface['port_id'])) {
@@ -83,7 +77,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     'device_id'    => $device['device_id'],
                     'mac_address'  => $mac,
                     'ipv4_address' => $ip,
-                    'context_name' => (string) $context,
+                    'context_name' => (string) $vrf,
                 ];
             }
         }
@@ -108,7 +102,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $entry_if = $entry['port_id'];
         $entry_ip = $entry['ipv4_address'];
         if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', [$entry_if, $entry_mac, $entry_ip, $context]);
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', [$entry_if, $entry_mac, $entry_ip, $vrf]);
             d_echo(null, '-');
         }
     }
@@ -123,9 +117,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $insert_data,
         $sql,
         $params,
-        $context,
         $entry,
         $device['context_name']
     );
 }
-unset($vrfs_lite_cisco);

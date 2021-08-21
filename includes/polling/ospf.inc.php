@@ -8,12 +8,9 @@ use App\Models\OspfPort;
 use LibreNMS\RRD\RrdDefinition;
 
 $device_model = DeviceCache::getPrimary();
-$vrfs_lite_cisco = empty($device['vrf_lite_cisco'])
-    ? [['context_name' => null]]
-    : $device['vrf_lite_cisco'];
 
-foreach ($vrfs_lite_cisco as $vrf_lite) {
-    $device['context_name'] = $vrf_lite['context_name'];
+foreach (DeviceCache::getPrimary()->getContexts() as $vrf_lite) {
+    $device['context_name'] = $vrf_lite;
 
     echo ' Processes: ';
 
@@ -160,7 +157,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     echo $ospf_tos_metrics->count();
 }
 
-unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
+unset($device['context_name'], $vrf_lite);
 
 if ($instance_count) {
     // Create device-wide statistics RRD

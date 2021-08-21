@@ -117,6 +117,17 @@ class Device extends BaseModel
     }
 
     /**
+     * Get contexts to poll, such as VRF instances,
+     * If no contexts are found, return the default context ''
+     *
+     * @return array
+     */
+    public function getContexts(): array
+    {
+        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name');
+    }
+
+    /**
      * Get the display name of this device (hostname) unless force_ip_to_sysname is set
      * and hostname is an IP and sysName is set
      *
