@@ -226,8 +226,6 @@ lnms config:set nagios_plugins /usr/lib/nagios/plugins
 lnms config:set ipmitool /usr/bin/ipmitool
 lnms config:set virsh /usr/bin/virsh
 lnms config:set dot /usr/bin/dot
-lnms config:set unflatten /usr/bin/unflatten
-lnms config:set neato /usr/bin/neato
 lnms config:set sfdp /usr/bin/sfdp
 ```
 
@@ -235,8 +233,10 @@ lnms config:set sfdp /usr/bin/sfdp
 
 Generic Authentication settings.
 
+Password minimum length for auth that allows user creation
+
 ```php
-lnms config:set password.min_length 8  // password minimum length for auth that allows user creation
+lnms config:set password.min_length 8
 ```
 
 ## Proxy support
@@ -325,7 +325,7 @@ lnms config:set login_message "Unauthorised access or use shall render the user 
 This is the default message on the login page displayed to users.
 
 ```php
-lnms config:set public_status false
+lnms config:set public_status true
 ```
 
 If this is set to true then an overview will be shown on the login page of devices and the status.
@@ -333,14 +333,14 @@ If this is set to true then an overview will be shown on the login page of devic
 ```php
 lnms config:set show_locations true  # Enable Locations on menu
 lnms config:set show_locations_dropdown true  # Enable Locations dropdown on menu
-lnms config:set show_services false  # Enable Services on menu
+lnms config:set show_services false  # Disable Services on menu
 lnms config:set int_customers true  # Enable Customer Port Parsing
 lnms config:set summary_errors false  # Show Errored ports in summary boxes on the dashboard
-lnms config:set customers_descr cust  # The description to look for in ifDescr. Can be an array as well array('cust','cid');
-lnms config:set transit_descr transit  # Add custom transit descriptions (can be an array)
-lnms config:set peering_descr peering  # Add custom peering descriptions (can be an array)
-lnms config:set core_descr core  # Add custom core descriptions (can be an array)
-lnms config:set custom_descr ''  # Add custom interface descriptions (can be an array)
+lnms config:set customers_descr '["cust"]'  # The description to look for in ifDescr. Can have multiple '["cust","cid"]'
+lnms config:set transit_descr '["transit"]'  # Add custom transit descriptions (array)
+lnms config:set peering_descr '["peering"]'  # Add custom peering descriptions (array)
+lnms config:set core_descr '["core"]'  # Add custom core descriptions  (array)
+lnms config:set custom_descr '["This is Custom"]'  # Add custom interface descriptions (array)
 lnms config:set int_transit true  # Enable Transit Types
 lnms config:set int_peering true  # Enable Peering Types
 lnms config:set int_core true  # Enable Core Port Types
@@ -356,21 +356,21 @@ Quick select:
 
 ```php
 lnms config:set graphs.mini.normal '{
-    "day": "24 Hours"
-    "week": "One Week"
-    "month": "One Month"
+    "day": "24 Hours",
+    "week": "One Week",
+    "month": "One Month",
     "year": "One Year"
 }'
 
 lnms config:set graphs.mini.widescreen '{
-    "sixhour": "6 Hours"
-    "day": "24 Hours"
-    "twoday": "48 Hours"
-    "week": "One Week"
-    "twoweek": "Two Weeks"
-    "month": "One Month"
-    "twomonth": "Two Months"
-    "year": "One Year"
+    "sixhour": "6 Hours",
+    "day": "24 Hours",
+    "twoday": "48 Hours",
+    "week": "One Week",
+    "twoweek": "Two Weeks",
+    "month": "One Month",
+    "twomonth": "Two Months",
+    "year": "One Year",
     "twoyear": "Two Years"
 }'
 ```
@@ -379,14 +379,14 @@ Mini graphs:
 
 ```php
 lnms config:set graphs.row.normal '{
-    "sixhour": "6 Hours"
-    "day": "24 Hours"
-    "twoday": "48 Hours"
-    "week": "One Week"
-    "twoweek": "Two Weeks"
-    "month": "One Month"
-    "twomonth": "Two Months"
-    "year": "One Year"
+    "sixhour": "6 Hours",
+    "day": "24 Hours",
+    "twoday": "48 Hours",
+    "week": "One Week",
+    "twoweek": "Two Weeks",
+    "month": "One Month",
+    "twomonth": "Two Months",
+    "year": "One Year",
     "twoyear": "Two Years"
 }'
 ```
@@ -402,12 +402,6 @@ lnms config:set enable_lazy_load true
 ```
 
 You can disable image lazy loading by setting this to false.
-
-```php
-lnms config:set show_overview_tab true
-```
-
-Enable or disable the overview tab for a device.
 
 ```php
 lnms config:set overview_show_sysDescr true
@@ -592,13 +586,13 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 ```php
 lnms config:set email_backend mail
-lnms config:set email_from NULL
+lnms config:set email_from librenms@yourdomain.local
 lnms config:set email_user `lnms config:get project_id`
 lnms config:set email_sendmail_path /usr/sbin/sendmail
 lnms config:set email_smtp_host localhost
 lnms config:set email_smtp_port 25
 lnms config:set email_smtp_timeout 10
-lnms config:set email_smtp_secure NULL
+lnms config:set email_smtp_secure tls
 lnms config:set email_smtp_auth false
 lnms config:set email_smtp_username NULL
 lnms config:set email_smtp_password NULL
@@ -624,7 +618,6 @@ lnms config:set enable_syslog false # Enable Syslog
 lnms config:set enable_inventory true # Enable Inventory
 lnms config:set enable_pseudowires true # Enable Pseudowires
 lnms config:set enable_vrfs true # Enable VRFs
-lnms config:set enable_sla false # Enable Cisco SLA collection and display
 ```
 
 ## Port extensions
@@ -756,7 +749,7 @@ Examples:
 ```php
 lnms config:set bad_if.+ voip-null
 lnms config:set bad_iftype.+ voiceEncap
-lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    // loopback
+lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    # loopback
 ```
 
 **Override default bad_if values**
@@ -816,7 +809,7 @@ ignore globally or on a per os basis.
 
 ```php
 lnms config:set bad_entity_sensor_regex.+ '/Physical id [0-9]+/'
-lnms config:set os.cisco.bad_entity_sensor_regex '/Physical id [0-9]+/'
+lnms config:set os.ios.bad_entity_sensor_regex '["/Physical id [0-9]+/"]'
 ```
 
 ## Entity sensors limit values
@@ -896,7 +889,6 @@ Custom storage warning percentage
 
 ```php
 lnms config:set storage_perc_warn 60
-lnms config:set os.linux.storage_perc_warn 60
 ```
 
 ## IRC Bot
@@ -919,7 +911,7 @@ Please refer to [Syslog](../Extensions/Syslog.md)
 
 ```php
 lnms config:set enable_libvirt true
-lnms config:set libvirt_protocols ["qemu+ssh","xen+ssh"]
+lnms config:set libvirt_protocols '["qemu+ssh","xen+ssh"]'
 lnms config:set libvirt_username root
 ```
 
