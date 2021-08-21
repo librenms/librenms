@@ -55,7 +55,7 @@ class GetConfigCommand extends LnmsCommand
         if (Config::has($setting)) {
             $output = Config::get($setting);
             if (! is_string($output)) {
-                $output = json_encode($output, JSON_PRETTY_PRINT);
+                $output = json_encode($output, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
             }
 
             $this->line($output);
