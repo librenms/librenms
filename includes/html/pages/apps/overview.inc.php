@@ -43,7 +43,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
         $overlib_content = generate_overlib_content($graph_array, optional($app->device)->displayName() . ' - ' . $app->displayName() . $content_add);
 
         echo "<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-width: " . $width_div . 'px; max-width:' . $width_div . "px; min-height:165px; max-height:165px;
-                      text-align: center; float: left; background-color: #f5f5f5;'>";
+                      text-align: center; float: left;'>";
         echo \LibreNMS\Util\Url::overlibLink($overlib_url, $overlib_link, $overlib_content);
         echo '</div>';
     }//end foreach
