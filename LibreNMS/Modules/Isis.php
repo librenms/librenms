@@ -59,7 +59,7 @@ class Isis implements Module
             ? $os->discoverIsIs()
             : $this->discoverIsIsMib($os);
 
-        MempoolObserver::observe('\App\Models\IsIsAdjacency');
+        MempoolObserver::observe('\App\Models\IsisAdjacency');
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
@@ -94,6 +94,9 @@ class Isis implements Module
     public function cleanup(OS $os)
     {
         $os->getDevice()->isisAdjacencies()->delete();
+
+        // clean up legacy components from old code
+        $os->getDevice()->components()->where('type', 'ISIS')->delete();
     }
 
     public function discoverIsIsMib(OS $os): Collection
