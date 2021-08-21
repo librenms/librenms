@@ -217,7 +217,17 @@ class SetConfigCommand extends LnmsCommand
         if ($os_data === null) {
             throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));
         }
-        Arr::set($os_data, $setting, $this->juggleType($value));
+        $value = $this->juggleType($value);
+
+        // append value if requested
+        if (Str::endsWith($setting, '.+')) {
+            $setting = substr($setting, 0, -2);
+            $container = Arr::get($os_data, $setting, []);
+            $container[] = $value;
+            $value = $container;
+        }
+
+        Arr::set($os_data, $setting, $value);
         unset($os_data['definition_loaded']);
 
         $validator = new Validator;

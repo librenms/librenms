@@ -672,6 +672,13 @@
                 "/-K9W8-/"
             ]
         },
+        "bad_entity_sensor_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
+        },
         "bad_disk_regexp": {
             "default": [],
             "type": "array"

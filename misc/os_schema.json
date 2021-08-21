@@ -407,7 +407,10 @@
             "type": "boolean"
         },
         "disabled_sensors": {
-            "type": "array"
+            "type": "object",
+            "patternProperties": {
+                ".": {"type": "boolean"}
+            }
         },
         "disabled_sensors_regex": {"$ref": "#/definitions/regex_group"},
         "bad_ifname_regexp": {"$ref": "#/definitions/regex_group"},
