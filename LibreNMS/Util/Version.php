@@ -40,12 +40,12 @@ class Version
         $this->is_git_install = Git::repoPresent() && Git::binaryExists();
     }
 
-    public static function get()
+    public static function get(): Version
     {
         return new static;
     }
 
-    public function local()
+    public function local(): string
     {
         if ($this->is_git_install && $version = $this->fromGit()) {
             return $version;
@@ -54,7 +54,7 @@ class Version
         return self::VERSION;
     }
 
-    public function database()
+    public function database(): array
     {
         if (Eloquent::isConnected()) {
             try {
@@ -72,34 +72,48 @@ class Version
         return ['last' => 'Not Connected', 'total' => 0];
     }
 
-    private function fromGit()
+    private function fromGit(): string
     {
         return rtrim(shell_exec('git describe --tags 2>/dev/null'));
     }
 
-    public function gitChangelog()
+    public function gitChangelog(): string
     {
         return $this->is_git_install
             ? rtrim(shell_exec('git log -10'))
             : '';
     }
 
-    public function gitDate()
+    public function gitDate(): string
     {
         return $this->is_git_install
             ? rtrim(shell_exec("git show --pretty='%ct' -s HEAD"))
             : '';
     }
 
-    public static function python()
+    public function python(): string
     {
         $proc = new Process(['python3', '--version']);
         $proc->run();
 
         if ($proc->getExitCode() !== 0) {
-            return null;
+            return '';
         }
 
-        return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? null;
+        return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? '';
+    }
+
+    public function rrdtool(): string
+    {
+        return str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
+            \LibreNMS\Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
+        )), 1, 1)));
+    }
+
+    public function netSnmp(): string
+    {
+        return str_replace('version: ', '', rtrim(shell_exec(
+            \LibreNMS\Config::get('snmpget', 'snmpget') . ' -V 2>&1'
+        )));
     }
 }
