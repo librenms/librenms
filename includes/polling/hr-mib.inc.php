@@ -31,9 +31,28 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
 
     data_update($device, 'hr_users', $tags, $fields);
 
-    $update_array = ['users_logged_in' => $hrSystem[0]['hrSystemNumUsers']];
+    $device_id = $device['device_id'];
+    $options = [
+        'filter' => [
+            'device_id' => ['=', $device_id],
+            'type' => ['=', 'device'],
+        ],
+    ];
 
-    dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+    $component = new LibreNMS\Component();
+    $components = $component->getComponents($device_id, $options);
+
+    if (isset($components[$device_id])) {
+        $component_data = $components[$device_id];
+    } else {
+        $component_data = $component->createComponent($device_id, 'device');
+    }
+
+    $id = $component->getFirstComponentID($component_data);
+    $component_data[$id]['label'] = 'system';
+    $component_data[$id]['users_logged_in'] = $hrSystem[0]['hrSystemNumUsers'];
+
+    $component->setComponentPrefs($device_id, $component_data);
 
     $os->enableGraph('hr_users');
     echo ' Users';
