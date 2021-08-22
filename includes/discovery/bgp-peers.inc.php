@@ -16,8 +16,8 @@ if (Config::get('enable_bgp')) {
         $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
     }
 
-    foreach (DeviceCache::getPrimary()->getContexts() as $vrf) {
-        $device['context_name'] = $vrf;
+    foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+        $device['context_name'] = $context_name;
         if (is_numeric($bgpLocalAs)) {
             echo "AS$bgpLocalAs ";
             if ($bgpLocalAs != $device['bgpLocalAs']) {
@@ -175,7 +175,7 @@ if (Config::get('enable_bgp')) {
         [$device['device_id']]
     );
 
-    $existing_contexts = DeviceCache::getPrimary()->getContexts();
+    $existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
     foreach ($contexts as $context) {
         if (! in_array($context, $existing_contexts)) {
             dbDelete('bgpPeers', 'device_id=? and context_name=?', [$device['device_id'], $context]);

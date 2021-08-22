@@ -9,8 +9,8 @@ use LibreNMS\RRD\RrdDefinition;
 
 $device_model = DeviceCache::getPrimary();
 
-foreach (DeviceCache::getPrimary()->getContexts() as $vrf_lite) {
-    $device['context_name'] = $vrf_lite;
+foreach ($device_model->getVrfContexts() as $context_name) {
+    $device['context_name'] = $context_name;
 
     echo ' Processes: ';
 
@@ -157,7 +157,7 @@ foreach (DeviceCache::getPrimary()->getContexts() as $vrf_lite) {
     echo $ospf_tos_metrics->count();
 }
 
-unset($device['context_name'], $vrf_lite);
+unset($device['context_name'], $context_name);
 
 if ($instance_count) {
     // Create device-wide statistics RRD

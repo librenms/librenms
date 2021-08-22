@@ -3,8 +3,8 @@
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
 
-foreach (DeviceCache::getPrimary()->getContexts() as $vrf) {
-    $device['context_name'] = $vrf;
+foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+    $device['context_name'] = $context_name;
 
     $oids = trim(snmp_walk($device, 'ipAdEntIfIndex', '-Osq', 'IP-MIB'));
     $oids = str_replace('ipAdEntIfIndex.', '', $oids);

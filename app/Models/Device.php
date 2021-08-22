@@ -117,14 +117,14 @@ class Device extends BaseModel
     }
 
     /**
-     * Get contexts to poll, such as VRF instances,
+     * Get VRF contexts to poll.
      * If no contexts are found, return the default context ''
      *
      * @return array
      */
-    public function getContexts(): array
+    public function getVrfContexts(): array
     {
-        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name');
+        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
     }
 
     /**

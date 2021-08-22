@@ -1,7 +1,7 @@
 <?php
 
-foreach (DeviceCache::getPrimary()->getContexts() as $vrf) {
-    $device['context_name'] = $vrf;
+foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+    $device['context_name'] = $context_name;
 
     $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', ['-Osq', '-Ln'], 'IP-MIB');
     $oids = str_replace('ipAddressIfIndex.ipv6.', '', $oids);
