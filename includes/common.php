@@ -315,7 +315,6 @@ function device_by_id_cache($device_id, $refresh = false)
     $device['lat'] = $model->location->lat ?? null;
     $device['lng'] = $model->location->lng ?? null;
     $device['attribs'] = $model->getAttribs();
-    $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
 
     return $device;
 }

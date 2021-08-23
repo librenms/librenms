@@ -91,7 +91,7 @@ class Splunk extends Transport
             $splunk_prefix .= $key . '="' . $val . '", ';
         }
 
-        $ignore = ['attribs', 'vrf_lite_cisco', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'snmpver', 'port'];
+        $ignore = ['attribs', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'snmpver', 'port'];
         foreach ($device as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;
