@@ -34,10 +34,15 @@ use Log;
 
 class PluginManager
 {
-    /** @var array */
-    private $hooks = [];
+    /** @var Collection */
+    private $hooks;
     /** @var Collection */
     private $plugins;
+
+    public function __construct()
+    {
+        $this->hooks = new Collection;
+    }
 
     /**
      * Publish plugin hook, this is the main way to hook into different parts of LibreNMS.
@@ -47,13 +52,21 @@ class PluginManager
      * @param  string  $pluginName
      * @param  string  $hookType
      * @param  string  $implementationClass
+     * @return bool
      */
     public function publishHook(string $pluginName, string $hookType, string $implementationClass): bool
     {
         try {
             $instance = new $implementationClass;
             if ($instance instanceof $hookType && $this->pluginEnabled($pluginName)) {
-                $this->hooks[$hookType][$pluginName] = $instance;
+                if (! $this->hooks->has($hookType)) {
+                    $this->hooks->put($hookType, new Collection);
+                }
+
+                $this->hooks->get($hookType)->push([
+                    'plugin_name' => $pluginName,
+                    'instance' => $instance,
+                ]);
 
                 return true;
             }
@@ -69,11 +82,12 @@ class PluginManager
      *
      * @param  string  $hookType
      * @param  array  $args
+     * @param  string|null  $plugin only for this plugin if set
      * @return bool
      */
-    public function hasHooks(string $hookType, array $args = []): bool
+    public function hasHooks(string $hookType, array $args = [], ?string $plugin = null): bool
     {
-        return $this->hooksFor($hookType, $args)->isNotEmpty();
+        return $this->hooksFor($hookType, $args, $plugin)->isNotEmpty();
     }
 
     /**
@@ -83,14 +97,15 @@ class PluginManager
      *
      * @param  string  $hookType
      * @param  array  $args
+     * @param  string|null  $plugin only for this plugin if set
      * @return \Illuminate\Support\Collection
      */
-    public function call(string $hookType, array $args = []): Collection
+    public function call(string $hookType, array $args = [], ?string $plugin = null): Collection
     {
         try {
-            return $this->hooksFor($hookType, $args)
-                ->map(function ($hook, $plugin_name) use ($args) {
-                    return app()->call([$hook, 'handle'], $this->fillArgs($args, $plugin_name));
+            return $this->hooksFor($hookType, $args, $plugin)
+                ->map(function ($hook) use ($args) {
+                    return app()->call([$hook['instance'], 'handle'], $this->fillArgs($args, $hook['plugin_name']));
                 });
         } catch (Exception $e) {
             Log::error("Error calling hook $hookType: " . $e->getMessage());
@@ -127,7 +142,20 @@ class PluginManager
     }
 
     /**
+     * Check if plugin exists.
+     * Does not create a DB entry if it does not exist.
+     *
+     * @param  string  $pluginName
+     * @return bool
+     */
+    public function pluginExists(string $pluginName): bool
+    {
+        return $this->getPlugins()->has($pluginName);
+    }
+
+    /**
      * Check if plugin of the given name is enabled.
+     * Creates DB entry if one does not exist yet.
      *
      * @param  string  $pluginName
      * @return bool
@@ -143,7 +171,7 @@ class PluginManager
     public function cleanupPlugins(): void
     {
         try {
-            $valid = collect($this->hooks)->map('array_keys')->flatten()->unique();
+            $valid = collect($this->hooks)->map->pluck('plugin_name')->flatten()->unique();
             Plugin::versionTwo()->whereNotIn('plugin_name', $valid)->get()->each->delete();
         } catch (QueryException $qe) {
             Log::error("Failed to clean up plugins: " . $qe->getMessage());
@@ -185,15 +213,23 @@ class PluginManager
     }
 
     /**
-     * @param  string  $hook_type
+     * @param  string  $hookType
      * @param  array  $args
+     * @param  string|null  $onlyPlugin
      * @return \Illuminate\Support\Collection
      */
-    protected function hooksFor(string $hook_type, array $args = []): Collection
+    protected function hooksFor(string $hookType, array $args, ?string $onlyPlugin): Collection
     {
-        return collect($this->hooks[$hook_type] ?? [])
-            ->filter(function ($hook, $plugin_name) use ($args) {
-                return app()->call([$hook, 'authorize'], $this->fillArgs($args, $plugin_name));
+        if (! $this->hooks->has($hookType)) {
+            return new Collection;
+        }
+
+        return $this->hooks->get($hookType)
+            ->when($onlyPlugin, function (Collection $hooks, $only) {
+                return $hooks->where('plugin_name', $only);
+            })
+            ->filter(function ($hook) use ($args) {
+                return app()->call([$hook['instance'], 'authorize'], $this->fillArgs($args, $hook['plugin_name']));
             });
     }
 

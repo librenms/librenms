@@ -46,13 +46,8 @@ abstract class SettingsHook
         ];
     }
 
-    final public function handle(string $plugin, string $pluginName, array $settings): ?\Illuminate\Contracts\View\View
+    final public function handle(string $pluginName, array $settings): array
     {
-        // only if this is the selected plugin
-        if ($plugin !== $pluginName) {
-            return null;
-        }
-
-        return view(Str::start($this->view, "$pluginName::"), $this->data($settings));
+        return [Str::start($this->view, "$pluginName::"), $this->data($settings)];
     }
 }
