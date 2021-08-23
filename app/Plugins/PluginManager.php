@@ -51,8 +51,9 @@ class PluginManager
     public function publishHook(string $pluginName, string $hookType, string $implementationClass): bool
     {
         try {
-            if ($implementationClass instanceof $hookType && $this->pluginEnabled($pluginName)) {
-                $this->hooks[$hookType][$pluginName] = new $implementationClass;
+            $instance = new $implementationClass;
+            if ($instance instanceof $hookType && $this->pluginEnabled($pluginName)) {
+                $this->hooks[$hookType][$pluginName] = $instance;
 
                 return true;
             }
