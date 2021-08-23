@@ -47,17 +47,14 @@ foreach ($pre_cache['timos_oids'] as $index => $entry) {
         discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, 'timos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_func);
     }
 }
+
 /** new code follows for multi-lane optics
-
-tmnxPortsSFPNumLanes MIB shows number of lanes for the optic
-
-$pre_cache['timos_lane_oids'] = snmpwalk_cache_multi_oid($device, 'tmnxPortEntry', [], 'TIMETRA-PORT-MIB', 'timos');
-tmnxPortSFPNumLanes is in tmnxPortEntry which is part of tmnxPortTable
-
-$pre_cache['timos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'tmnxDDMLaneEntry', [], 'TIMETRA-PORT-MIB', 'timos');
-tmnxDDMLaneRX(TX)OpticalPower is in tmnxDDMLaneEntry which is in table tmnxDDMLaneTable
-
-snmpbulkwalk -m +ALL -M +/opt/librenms/mibs/nokia -v [snmpversionnumber] -c [communitystring] devicename -On tmnxPortSFPNumLanes
+*tmnxPortsSFPNumLanes MIB shows number of lanes for the optic
+*$pre_cache['timos_lane_oids'] = snmpwalk_cache_multi_oid($device, 'tmnxPortEntry', [], 'TIMETRA-PORT-MIB', 'timos');
+*tmnxPortSFPNumLanes is in tmnxPortEntry which is part of tmnxPortTable
+*$pre_cache['timos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'tmnxDDMLaneEntry', [], 'TIMETRA-PORT-MIB', 'timos');
+*tmnxDDMLaneRX(TX)OpticalPower is in tmnxDDMLaneEntry which is in table tmnxDDMLaneTable
+*snmpbulkwalk -m +ALL -M +/opt/librenms/mibs/nokia -v [snmpversionnumber] -c [communitystring] devicename -On tmnxPortSFPNumLanes
 **/
 
 foreach ($pre_cache['timos_lane_oids'] as $index => $entry) {
