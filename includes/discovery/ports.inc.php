@@ -73,7 +73,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
             $port_id = dbInsert($snmp_data, 'ports');
 
             //default Port Group for new Ports defined?
-            if (! empty($default_port_group) ) {
+            if (! empty($default_port_group)) {
                 $port_group = PortGroup::find($default_port_group);
                 if (isset($port_group)) {
                     $port_group->ports()->attach([$port_id]);
