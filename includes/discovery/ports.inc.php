@@ -1,6 +1,7 @@
 <?php
 
 // Build SNMP Cache Array
+use App\Models\PortGroup;
 use LibreNMS\Config;
 
 $port_stats = [];
@@ -54,6 +55,8 @@ if ($device['os'] == 'ekinops') {
     require_once 'ports/ekinops.inc.php';
 }
 
+$default_port_group = Config::get('port_group');
+
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
@@ -68,6 +71,15 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         if (! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
+
+            //default Port Group for new Ports defined?
+            if (! empty($default_port_group) ) {
+                $port_group = PortGroup::find($default_port_group);
+                if (isset($port_group)) {
+                    $port_group->ports()->attach([$port_id]);
+                }
+            }
+
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
             echo 'Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')';
         } elseif ($ports_db[$port_id]['deleted'] == 1) {
