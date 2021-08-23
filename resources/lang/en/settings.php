@@ -726,8 +726,8 @@ return [
         ],
         'graphs' => [
             'port_speed_zoom' => [
-                'description' => 'Fixed scale port graphs',
-                'help' => 'Scale port graphs so the max is always the port speed',
+                'description' => 'Zoom port graphs to port speed',
+                'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',
             ],
         ],
         'graylog' => [
