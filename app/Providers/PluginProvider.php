@@ -43,7 +43,7 @@ class PluginProvider extends ServiceProvider
     {
         $this->loadLocalPlugins($this->app->make(PluginManager::class));
 
-        $this->booted(function (PluginManager $manager) {
+        \App::terminating(function (PluginManager $manager) {
             $manager->cleanupPlugins();
         });
     }

@@ -141,8 +141,12 @@ class PluginManager
      */
     public function cleanupPlugins(): void
     {
-        $valid = collect($this->hooks)->map('array_keys')->flatten()->unique();
-        Plugin::versionTwo()->whereNotIn('plugin_name', $valid)->get()->each->delete();
+        try {
+            $valid = collect($this->hooks)->map('array_keys')->flatten()->unique();
+            Plugin::versionTwo()->whereNotIn('plugin_name', $valid)->get()->each->delete();
+        } catch (QueryException $qe) {
+            Log::error("Failed to clean up plugins: " . $qe->getMessage());
+        }
     }
 
     protected function getPlugin(string $name): ?Plugin
