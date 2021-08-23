@@ -207,6 +207,7 @@ modules:
                 -
                     oid: dellNetVirtualLinkDetailsTable
                     value: dellNetVLTDetailLocalStatus
+                    num_oid: '.1.3.6.1.4.1.6027.3.17.1.3.1.3.{{ $index }}'
                     descr: 'Port-channel {{ $dellNetVLTDetailLocalLagID }}'
                     group: 'VIRTUAL-LINK-TRUNK'
                     skip_values:
@@ -221,6 +222,7 @@ modules:
                 -
                     oid: dellNetVirtualLinkTrunkTable
                     value: dellNetVLTIclBwStatus
+                    num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.20.{{ $index }}'
                     descr: 'ICL Bandwidth'
                     group: 'VIRTUAL-LINK-TRUNK'
                     skip_values:
@@ -231,6 +233,7 @@ modules:
                 -
                     oid: dellNetVirtualLinkTrunkTable
                     value: dellNetVLTIclStatus
+                    num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.7.{{ $index }}'
                     descr: 'Link Status'
                     group: 'VIRTUAL-LINK-TRUNK'
                     skip_values:
@@ -243,6 +246,7 @@ modules:
                 -
                     oid: dellNetVirtualLinkTrunkTable
                     value: dellNetVLTRole
+                    num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.5.{{ $index }}'
                     descr: 'Role'
                     group: 'VIRTUAL-LINK-TRUNK'
                     skip_values:
