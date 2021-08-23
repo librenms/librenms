@@ -14231,7 +14231,6 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-<<<<<<< HEAD
                     "sensor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.7.1.4.2.1.1",
                     "sensor_index": "2.1.1",
                     "sensor_type": "dellNetFanTrayOperStatus",
@@ -14400,8 +14399,6 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-=======
->>>>>>> 2585c0c85552da12a68d7d161fdb0edf03f3d7ca
                     "sensor_oid": ".1.3.6.1.4.1.6027.3.17.1.3.1.3.1",
                     "sensor_index": "1",
                     "sensor_type": "dellNetVLTDetailLocalStatus",
@@ -14856,7 +14853,6 @@
                 },
                 {
                     "sensor_deleted": 0,
-<<<<<<< HEAD
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6027.3.17.1.1.1.20.1",
@@ -14953,8 +14949,6 @@
                 },
                 {
                     "sensor_deleted": 0,
-=======
->>>>>>> 2585c0c85552da12a68d7d161fdb0edf03f3d7ca
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6027.3.11.1.3.1.1.16.2097156",
