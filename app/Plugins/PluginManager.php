@@ -25,13 +25,12 @@
 
 namespace App\Plugins;
 
+use App\Exceptions\PluginException;
 use App\Models\Plugin;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Log;
-use ReflectionClass;
-use ReflectionException;
 
 class PluginManager
 {
@@ -40,111 +39,117 @@ class PluginManager
     /** @var Collection */
     private $plugins;
 
-    public function publishHook(string $hook_type, string $implementation_class): void
+    /**
+     * Publish plugin hook, this is the main way to hook into different parts of LibreNMS.
+     * plugin_name should be unique. For internal (user) plugins in the app/Plugins directory, the directory name will be used.
+     * Hook type will be the full class name of the hook from app/Plugins/Hooks.
+     *
+     * @param  string  $pluginName
+     * @param  string  $hookType
+     * @param  string  $implementationClass
+     */
+    public function publishHook(string $pluginName, string $hookType, string $implementationClass): bool
     {
         try {
-            if ($this->pluginEnabled($implementation_class)) {
-                $this->hooks[$hook_type][] = new $implementation_class;
+            if ($implementationClass instanceof $hookType && $this->pluginEnabled($pluginName)) {
+                $this->hooks[$hookType][$pluginName] = new $implementationClass;
+
+                return true;
             }
         } catch (Exception $e) {
-            Log::error("Error when loading hook $hook_type for $implementation_class: " . $e->getMessage());
+            Log::error("Error when loading hook $implementationClass of type $hookType for $pluginName: " . $e->getMessage());
         }
 
-        // plugin disabled, log?
+        return false;
     }
 
-    public function hooksFor(string $hook): Collection
+    /**
+     * Check if there are any valid hooks
+     *
+     * @param  string  $hookType
+     * @param  array  $args
+     * @return bool
+     */
+    public function hasHooks(string $hookType, array $args = []): bool
     {
-        return collect($this->hooks[$hook] ?? []);
+        return $this->hooksFor($hookType, $args)->isNotEmpty();
     }
 
-    public function hasPlugins(): bool
-    {
-        return ! empty($this->hooks);
-    }
-
-    public function hasHooks(string $hook, array $args = []): bool
-    {
-        return $this->hooksFor($hook)
-            ->filter(function ($plugin) use ($args) {
-                return app()->call([$plugin, 'authorize'], $args);
-            })->isNotEmpty();
-    }
-
-    public function call(string $hook, array $args = []): Collection
+    /**
+     * Coll all hooks for the given hook type.
+     * args will be available for injection into the handle method to pass data through
+     * settings is automatically injected
+     *
+     * @param  string  $hookType
+     * @param  array  $args
+     * @return \Illuminate\Support\Collection
+     */
+    public function call(string $hookType, array $args = []): Collection
     {
         try {
-            return $this->hooksFor($hook)
-                ->filter(function ($hookInstance) use ($args) {
-                    $settings = ['settings' => $this->getSettings($hookInstance)];
-
-                    return app()->call([$hookInstance, 'authorize'], $args + $settings);
-                })
-                ->map(function ($hookInstance) use ($args) {
-                    $settings = ['settings' => $this->getSettings($hookInstance)];
-
-                    return app()->call([$hookInstance, 'handle'], $args + $settings);
+            return $this->hooksFor($hookType, $args)
+                ->map(function ($hook, $plugin_name) use ($args) {
+                    return app()->call([$hook, 'handle'], $this->fillArgs($args, $plugin_name));
                 });
         } catch (Exception $e) {
-            Log::error("Error calling hook $hook: " . $e->getMessage());
+            Log::error("Error calling hook $hookType: " . $e->getMessage());
 
             return new Collection;
         }
     }
 
     /**
-     * @param  string|object  $name_or_hook
+     * Get the settings stored in the database for a plugin.
+     * One plugin shares the settings across all hooks
+     *
+     * @param  string $pluginName
      * @return array
      */
-    public function getSettings($name_or_hook): array
+    public function getSettings(string $pluginName): array
     {
-        $name = $this->getPluginName($name_or_hook);
-
-        return (array) $this->getPlugin($name)->settings;
+        return (array) $this->getPlugin($pluginName)->settings;
     }
 
     /**
-     * @param  string|object  $name_or_hook
+     * Save settings array to the database for the given plugin
+     *
+     * @param  string $pluginName
      * @param  array  $settings
      * @return bool
      */
-    public function setSettings($name_or_hook, array $settings): bool
+    public function setSettings(string $pluginName, array $settings): bool
     {
-        $plugin = $this->getPlugin($this->getPluginName($name_or_hook));
+        $plugin = $this->getPlugin($pluginName);
         $plugin->settings = $settings;
 
         return $plugin->save();
     }
 
     /**
-     * @param  string|object  $plugin
-     * @param  string  $file
-     * @return string|null
+     * Check if plugin of the given name is enabled.
+     *
+     * @param  string  $pluginName
+     * @return bool
      */
-    public function pluginPath($plugin, $file = null): ?string
+    public function pluginEnabled(string $pluginName): bool
     {
-        try {
-            $reflection = new ReflectionClass($plugin);
-
-            return dirname($reflection->getFileName()) . '/' . $file;
-        } catch (ReflectionException $e) {
-            return null;
-        }
+        return $this->getPlugin($pluginName)->plugin_active;
     }
 
-    public function pluginEnabled(string $class): bool
+    /**
+     * Remove plugins that do not have any registered hooks.
+     */
+    public function cleanupPlugins(): void
     {
-        $name = $this->getPluginName($class);
-
-        return $this->getPlugin($name)->plugin_active;
+        $valid = collect($this->hooks)->map('array_keys')->flatten()->unique();
+        Plugin::versionTwo()->whereNotIn('plugin_name', $valid)->get()->each->delete();
     }
 
-    private function getPlugin(string $name): ?Plugin
+    protected function getPlugin(string $name): ?Plugin
     {
         $plugin = $this->getPlugins()->get($name);
 
         if (! $plugin) {
-            // FIXME do not add plugins that don't exist
             try {
                 $plugin = Plugin::create([
                     'plugin_name' => $name,
@@ -160,7 +165,7 @@ class PluginManager
         return $plugin;
     }
 
-    private function getPlugins(): Collection
+    protected function getPlugins(): Collection
     {
         if ($this->plugins === null) {
             try {
@@ -175,22 +180,31 @@ class PluginManager
     }
 
     /**
-     * @param string|object $class
-     * @return string
+     * @param  string  $hook_type
+     * @param  array  $args
+     * @return \Illuminate\Support\Collection
      */
-    public function getPluginName($class): string
+    protected function hooksFor(string $hook_type, array $args = []): Collection
     {
-        // if it is a plugin hook, get the namespace
-        if (is_object($class) || class_exists($class)) {
-            try {
-                $reflection = new ReflectionClass($class);
+        return collect($this->hooks[$hook_type] ?? [])
+            ->filter(function ($hook, $plugin_name) use ($args) {
+                return app()->call([$hook, 'authorize'], $this->fillArgs($args, $plugin_name));
+            });
+    }
 
-                return $reflection->getNamespaceName();
-            } catch (ReflectionException $e) {
-                // fail
-            }
+    protected function fillArgs(array $args, $plugin_name)
+    {
+        if (isset($args['settings'])) {
+            throw new PluginException('You cannot inject "settings", this is a reserved name');
         }
 
-        return $class;
+        if (isset($args['pluginName'])) {
+            throw new PluginException('You cannot inject "pluginName", this is a reserved name');
+        }
+
+        return array_merge($args, [
+            'pluginName' => $plugin_name,
+            'settings' => $this->getSettings($plugin_name),
+        ]);
     }
 }

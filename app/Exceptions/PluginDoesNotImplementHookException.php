@@ -27,7 +27,7 @@ namespace App\Exceptions;
 
 use Throwable;
 
-class PluginDoesNotImplementHookException extends \Exception
+class PluginDoesNotImplementHookException extends PluginException
 {
     public function __construct(string $plugin, int $code = 0, Throwable $previous = null)
     {

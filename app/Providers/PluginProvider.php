@@ -29,7 +29,6 @@ use App\Exceptions\PluginDoesNotImplementHookException;
 use App\Plugins\PluginManager;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use View;
 
 class PluginProvider extends ServiceProvider
 {
@@ -42,13 +41,11 @@ class PluginProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $manager = $this->app->make(PluginManager::class);
+        $this->loadLocalPlugins($this->app->make(PluginManager::class));
 
-        $this->loadLocalPlugins($manager);
-
-        if ($manager->hasPlugins()) {
-            View::addLocation(base_path('app/Plugins'));
-        }
+        $this->booted(function (PluginManager $manager) {
+            $manager->cleanupPlugins();
+        });
     }
 
     /**
@@ -56,20 +53,38 @@ class PluginProvider extends ServiceProvider
      */
     protected function loadLocalPlugins(PluginManager $manager): void
     {
+        $plugin_view_location_registered = [];
+
         foreach (glob(base_path('app/Plugins/*/*.php')) as $file) {
-            if (preg_match('#([^/]+)/([^/.]+)\.php#', $file, $matches)) {
-                if ($matches[1] == 'Hooks') {
+            if (preg_match('#^(.*/([^/]+))/([^/.]+)\.php#', $file, $matches)) {
+                $plugin_name = $matches[2]; // containing directory name
+                if ($plugin_name == 'Hooks') {
                     continue;  // don't load the hooks :D
                 }
 
-                $class = $this->className($matches[1], $matches[2]);
-                $hook = $this->hookName($class);
-                $manager->publishHook($hook, $class);
+                $class = $this->className($plugin_name, $matches[3]);
+                $hook_type = $this->hookType($class);
+
+                // publish hooks in class
+                $hook_published = $manager->publishHook($plugin_name, $hook_type, $class);
+
+                // register view namespace
+                if ($hook_published && ! in_array($plugin_name, $plugin_view_location_registered)) {
+                    $plugin_view_location_registered[] = $plugin_name;  // don't register twice
+                    $this->loadViewsFrom($matches[1], $plugin_name);
+                }
             }
         }
     }
 
-    protected function hookName(string $class): string
+    /**
+     * Check if a hook is extended by the given class.
+     *
+     * @param  string  $class
+     * @return string
+     * @throws \App\Exceptions\PluginDoesNotImplementHookException
+     */
+    protected function hookType(string $class): string
     {
         foreach (class_parents($class) as $parent) {
             if (Str::startsWith($parent, 'App\Plugins\Hooks\\')) {

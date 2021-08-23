@@ -28,13 +28,14 @@ namespace App\Plugins\Hooks;
 use App\Models\Port;
 use App\Models\User;
 use App\Plugins\Hook;
+use Illuminate\Support\Str;
 
 abstract class PortTabHook implements Hook
 {
     /** @var string */
     public $view = 'resources.views.port-tab';
 
-    public function authorize(User $user, Port $port): bool
+    public function authorize(User $user, Port $port, array $settings): bool
     {
         return true;
     }
@@ -47,10 +48,8 @@ abstract class PortTabHook implements Hook
         ];
     }
 
-    final public function handle(Port $port): \Illuminate\View\View
+    final public function handle(string $pluginName, Port $port): \Illuminate\Contracts\View\View
     {
-        \View::addLocation(\PluginManager::pluginPath($this));
-
-        return view($this->view, $this->data($port));
+        return view(Str::start($this->view, "$pluginName::"), $this->data($port));
     }
 }

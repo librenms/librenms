@@ -26,6 +26,7 @@
 namespace App\Plugins\Hooks;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 
 abstract class SettingsHook
 {
@@ -45,15 +46,13 @@ abstract class SettingsHook
         ];
     }
 
-    final public function handle(string $plugin, array $settings): ?\Illuminate\View\View
+    final public function handle(string $plugin, string $pluginName, array $settings): ?\Illuminate\Contracts\View\View
     {
         // only if this is the selected plugin
-        if ($plugin !== \PluginManager::getPluginName($this)) {
+        if ($plugin !== $pluginName) {
             return null;
         }
 
-        \View::addLocation(\PluginManager::pluginPath($this));
-
-        return view($this->view, $this->data($settings));
+        return view(Str::start($this->view, "$pluginName::"), $this->data($settings));
     }
 }

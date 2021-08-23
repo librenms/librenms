@@ -1,6 +1,6 @@
 <?php
 /*
- * PluginMenuEntry.php
+ * PluginException.php
  *
  * -Description-
  *
@@ -23,28 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Plugins\Hooks;
+namespace App\Exceptions;
 
-use App\Models\User;
-use Illuminate\Support\Str;
-
-abstract class MenuEntryHook
+class PluginException extends \Exception
 {
-    /** @var string */
-    public $view = 'resources.views.menu';
 
-    public function authorize(User $user, array $settings): bool
-    {
-        return true;
-    }
-
-    public function data(): array
-    {
-        return [];
-    }
-
-    final public function handle(string $pluginName): array
-    {
-        return [Str::start($this->view, "$pluginName::"), $this->data()];
-    }
 }
