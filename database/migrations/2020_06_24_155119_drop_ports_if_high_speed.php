@@ -25,7 +25,7 @@ class DropPortsIfHighSpeed extends Migration
      */
     public function down()
     {
-        Schema::create('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table) {
             $table->integer('ifHighSpeed')->nullable()->after('ifPromiscuousMode');
             $table->integer('ifHighSpeed_prev')->nullable()->after('ifHighSpeed');
         });
