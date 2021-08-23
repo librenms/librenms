@@ -46,7 +46,6 @@ if (isset($_POST['device_id'])) {
         try {
             foreach ($device->ports()->get() as $port) {
                 $port->ifSpeed_prev = null;
-                $port->ifHighSpeed_prev = null;
                 $port->ifOperStatus_prev = null;
                 $port->ifAdminStatus_prev = null;
 
