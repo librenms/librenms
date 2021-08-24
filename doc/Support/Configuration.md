@@ -624,6 +624,15 @@ $config['enable_ports_poe']             = 0;
 
 Enable / disable additional port statistics.
 
+## Port Group
+
+Assign a new discovered Port automatically to Port Group with this Port Group ID
+(0 means no Port Group assignment)
+
+```php
+$config['default_port_group']          = 0;
+```
+
 ## External integration
 
 ### Rancid

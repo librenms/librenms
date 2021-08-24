@@ -55,7 +55,7 @@ if ($device['os'] == 'ekinops') {
     require_once 'ports/ekinops.inc.php';
 }
 
-$default_port_group = Config::get('port_group');
+$default_port_group = Config::get('default_port_group');
 
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
