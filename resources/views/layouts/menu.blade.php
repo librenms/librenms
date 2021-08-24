@@ -90,11 +90,12 @@
                                     <li>@include($view, $data)</li>
                                 @endforeach
                                 @admin
-                                    @if($has_v1_plugins || $has_v2_plugins)
-                                        <li role="presentation" class="divider"></li>
-                                    @endif
-                                <li><a href="{{ url('plugin/view=admin') }}"> <i class="fa fa-lock fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i>@lang('Plugin Admin')
+                                @if($has_v1_plugins || $has_v2_plugins)
+                                    <li role="presentation" class="divider"></li>
+                                @endif
+                                <li>
+                                    <a href="{{ route('plugin.admin') }}">
+                                        <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>@lang('Plugin Admin')
                                     </a>
                                 </li>
                                 @endadmin

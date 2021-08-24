@@ -41,13 +41,15 @@ abstract class SettingsHook
     public function data(array $settings): array
     {
         return [
-            'title' => __CLASS__,
             'settings' => $settings,
         ];
     }
 
     final public function handle(string $pluginName, array $settings): array
     {
-        return [Str::start($this->view, "$pluginName::"), $this->data($settings)];
+        return array_merge([
+            'title' => trans('plugins.settings_title', ['plugin' => $pluginName]),
+            'settings_view' => Str::start($this->view, "$pluginName::"),
+        ], $this->data($settings));
     }
 }

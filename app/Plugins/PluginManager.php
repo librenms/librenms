@@ -39,6 +39,9 @@ class PluginManager
     /** @var Collection */
     private $plugins;
 
+    /** @var array */
+    private $validPlugins = [];
+
     public function __construct()
     {
         $this->hooks = new Collection;
@@ -58,6 +61,8 @@ class PluginManager
     {
         try {
             $instance = new $implementationClass;
+            $this->validPlugins[$pluginName] = 1;
+
             if ($instance instanceof $hookType && $this->pluginEnabled($pluginName)) {
                 if (! $this->hooks->has($hookType)) {
                     $this->hooks->put($hookType, new Collection);
@@ -171,7 +176,7 @@ class PluginManager
     public function cleanupPlugins(): void
     {
         try {
-            $valid = collect($this->hooks)->map->pluck('plugin_name')->flatten()->unique();
+            $valid = array_keys($this->validPlugins);
             Plugin::versionTwo()->whereNotIn('plugin_name', $valid)->get()->each->delete();
         } catch (QueryException $qe) {
             Log::error("Failed to clean up plugins: " . $qe->getMessage());
@@ -233,7 +238,7 @@ class PluginManager
             });
     }
 
-    protected function fillArgs(array $args, $plugin_name)
+    protected function fillArgs(array $args, $pluginName)
     {
         if (isset($args['settings'])) {
             throw new PluginException('You cannot inject "settings", this is a reserved name');
@@ -244,8 +249,8 @@ class PluginManager
         }
 
         return array_merge($args, [
-            'pluginName' => $plugin_name,
-            'settings' => $this->getSettings($plugin_name),
+            'pluginName' => $pluginName,
+            'settings' => $this->getSettings($pluginName),
         ]);
     }
 }

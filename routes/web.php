@@ -77,6 +77,13 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
     });
 
+    Route::get('plugin/admin', 'PluginAdminController')->name('plugin.admin');
+    Route::post('plugin/admin/{plugin}', 'PluginAdminController@update')->name('plugin.update');
+    Route::get('plugin/settings/{pluginName}', 'PluginSettingsController')->name('plugin.settings');
+    Route::get('plugin', 'PluginLegacyController@redirect');
+    Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
+    Route::get('plugin/v1/{pluginName}', 'PluginLegacyController')->name('plugin.legacy');
+
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
 
