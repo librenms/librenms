@@ -48,7 +48,6 @@ abstract class SettingsHook
     final public function handle(string $pluginName, array $settings): array
     {
         return array_merge([
-            'title' => trans('plugins.settings_title', ['plugin' => $pluginName]),
             'settings_view' => Str::start($this->view, "$pluginName::"),
         ], $this->data($settings));
     }

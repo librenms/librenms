@@ -18,7 +18,7 @@
                     <tr class="{{ $plugin->plugin_active ? 'bg-success' : 'bg-danger' }}">
                         <td>{{ $plugin->plugin_name }}</td>
                         <td>
-                            <form class="form-inline" role="form" action="{{ route('plugin.update', ['plugin' => $plugin->plugin_id]) }}" method="post" id="{{ $plugin->plugin_id }}" name="{{ $plugin->plugin_id }}">
+                            <form class="form-inline" role="form" action="{{ route('plugin.update', ['plugin' => $plugin->plugin_name]) }}" method="post" id="{{ $plugin->plugin_id }}" name="{{ $plugin->plugin_id }}">
                                 @csrf
                                 @if($plugin->plugin_active)
                                     <input type="hidden" name="plugin_active" value="0">

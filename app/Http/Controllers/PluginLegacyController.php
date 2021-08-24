@@ -7,28 +7,21 @@ use Illuminate\Http\Request;
 
 class PluginLegacyController extends Controller
 {
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $pluginName
-     * @return \Illuminate\Http\RedirectResponse|void
-     */
-    public function redirect(Request $request, ?string $pluginName)
+    public function redirect(Request $request, ?string $pluginName = null): \Illuminate\Http\RedirectResponse
     {
         if ($request->get('view') == 'admin') {
             return redirect(null, 301)->route('plugin.admin');
         }
 
-        if ($plugin = $request->get('p', $pluginName)) {
-            return redirect(null, 301)->route('plugin.legacy', ['pluginName' => $plugin]);
+        if ($resolved_plugin_name = $request->get('p', $pluginName)) {
+            return redirect(null, 301)->route('plugin.legacy', ['plugin' => $resolved_plugin_name]);
         }
 
-        abort(404);
+        return redirect()->route('plugin.admin');
     }
 
-    public function __invoke(string $pluginName)
+    public function __invoke(?Plugin $plugin)
     {
-        $plugin = Plugin::firstWhere('plugin_name', $pluginName);
-
         if (! empty($plugin)) {
             $plugin_path = \LibreNMS\Config::get('plugin_dir') . '/' . $plugin->plugin_name . '/' . $plugin->plugin_name . '.inc.php';
 
