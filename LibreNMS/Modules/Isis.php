@@ -115,7 +115,7 @@ class Isis implements Module
                     continue;
                 }
 
-                if ($circuit_data['isisCircPassiveCircuit']) {
+                if ($circuit_data['isisCircPassiveCircuit'] == 'true') {
                     continue; // Do not poll passive interfaces
                 }
 
