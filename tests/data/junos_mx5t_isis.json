@@ -13016,5 +13016,36 @@
             ],
             "ports_vlans": []
         }
+    },
+    "isis": {
+        "discovery": {
+            "isis_adjacencies": [
+                {
+                    "ifIndex": 559,
+                    "isisISAdjState": "up",
+                    "isisISAdjNeighSysType": "L2",
+                    "isisISAdjNeighSysID": "01.00.99.19.12.55",
+                    "isisISAdjNeighPriority": "0",
+                    "isisISAdjLastUpTime": 1224167,
+                    "isisISAdjAreaAddress": "49.00.01",
+                    "isisISAdjIPAddrType": "ipv4",
+                    "isisISAdjIPAddrAddress": "10.99.252.255",
+                    "isisCircAdminState": "on"
+                },
+                {
+                    "ifIndex": 572,
+                    "isisISAdjState": "up",
+                    "isisISAdjNeighSysType": "L2",
+                    "isisISAdjNeighSysID": "10.99.20.40.00.51",
+                    "isisISAdjNeighPriority": "0",
+                    "isisISAdjLastUpTime": 1206503,
+                    "isisISAdjAreaAddress": "49.00.01",
+                    "isisISAdjIPAddrType": "ipv4",
+                    "isisISAdjIPAddrAddress": "10.99.252.253",
+                    "isisCircAdminState": "on"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
