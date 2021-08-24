@@ -639,7 +639,7 @@ Assign a new discovered Port automatically to Port Group with this Port Group ID
 (0 means no Port Group assignment)
 
 ```php
-$config['default_port_group']          = 0;
+lnms config:set default_port_group 0
 ```
 
 ## External integration
