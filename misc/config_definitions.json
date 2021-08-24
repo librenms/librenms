@@ -858,13 +858,13 @@
             "hidden": true,
             "type": "boolean"
         },
-        "default_port_group": {
-            "default": 0,
-            "type": "integer"
-        },
         "debug.run_trace": {
             "default": false,
             "type": "boolean"
+        },
+        "default_port_group": {
+            "default": 0,
+            "type": "integer"
         },
         "device_location_map_open": {
             "order": 2,
