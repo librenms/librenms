@@ -33,25 +33,27 @@ If you set up bash completion, you can use tab completion to find config setting
 
 ```bash
 lnms config:get snmp.community
-  array (
-    0 => 'public',
-  )
+  [
+      "public"
+  ]
+
 
 lnms config:set snmp.community.+ testing
 
 lnms config:get snmp.community
-  array (
-    0 => 'public',
-    1 => 'testing',
-  )
+  [
+      "public",
+      "testing"
+  ]
+
 
 lnms config:set snmp.community.0 private
 
 lnms config:get snmp.community
-  array (
-    0 => 'private',
-    1 => 'testing',
-  )
+  [
+      "private",
+      "testing"
+  ]
 
 lnms config:set snmp.community test
   Invalid format
@@ -59,10 +61,10 @@ lnms config:set snmp.community test
 lnms config:set snmp.community '["test", "othercommunity"]'
 
 lnms config:get snmp.community
-  array (
-    0 => 'test',
-    1 => 'othercommunity',
-  )
+  [
+      "test",
+      "othercommunity"
+  ]
 
 lnms config:set snmp.community
 
@@ -71,28 +73,30 @@ lnms config:set snmp.community
 
 
 lnms config:get snmp.community
-  ["public"]
+  [
+      "public"
+  ]
 ```
 
 
 ## Directories
 
-```php
-$config['temp_dir'] = "/tmp";
+```bash
+lnms config:set temp_dir /tmp
 ```
 
 The temporary directory is where images and other temporary files are
 created on your filesystem.
 
-```php
-$config['log_dir'] = "/opt/librenms/logs";
+```bash
+lnms config:set log_dir /opt/librenms/logs
 ```
 
 Log files created by LibreNMS will be stored within this directory.
 
 ## Database config
 
-Set these variables either in .env or in the environment.
+Set these variables either in .env (/opt/librenms/.env by default) or in the environment.
 
 ```dotenv
 DB_HOST=127.0.0.1
@@ -120,7 +124,7 @@ DB_SOCKET=/run/mysqld/mysqld.sock
 You can change the memory limits for php within `config.php`. The
 value is in Megabytes and should just be an int value:
 
-`$config['php_memory_limit'] = 128;`
+`lnms config:set php_memory_limit 128`
 
 ### Programs
 
@@ -135,8 +139,8 @@ be linked to rather than having the config provided.
 >
 > Settings -> External Settings -> RRDTool Setup
 
-```php
-$config['rrdtool'] = "/usr/bin/rrdtool";
+```bash
+lnms config:set rrdtool /usr/bin/rrdtool
 ```
 
 Please see [1 Minute polling](1-Minute-Polling.md) for information on
@@ -144,12 +148,12 @@ configuring your install to record data more frequently.
 
 #### fping
 
-```php
-$config['fping']                     = "/usr/bin/fping";
-$config['fping6']                    = "fping6";
-$config['fping_options']['timeout']  = 500;
-$config['fping_options']['count']    = 3;
-$config['fping_options']['interval'] = 500;
+```bash
+lnms config:set fping /usr/bin/fping
+lnms config:set fping6 fping6
+lnms config:set fping_options.timeout 500
+lnms config:set fping_options.count 3
+lnms config:set fping_options.interval 500
 ```
 
 `fping` configuration options:
@@ -185,8 +189,8 @@ to timeout.**
 
 Globally disable fping / icmp check:
 
-```php
-$config['icmp_check'] = false;
+```bash
+lnms config:set icmp_check false
 ```
 
 If you would like to do this on a per device basis then you can do so
@@ -196,43 +200,43 @@ under Device -> Edit -> Misc -> Disable ICMP Test? On
 
 LibreNMS uses traceroute / traceroute6 to record debug information
 when a device is down due to icmp AND you have
-`$config['debug']['run_trace'] = true;` set.
+`lnms config:set debug.run_trace true` set.
 
-```php
-$config['traceroute']  = '/usr/bin/traceroute';
-$config['traceroute6'] = '/usr/bin/traceroute6';
+```bash
+lnms config:set traceroute /usr/bin/traceroute
+lnms config:set traceroute6 /usr/bin/traceroute6
 ```
 
 #### SNMP
 
-```php
-$config['snmpwalk']         = "/usr/bin/snmpwalk";
-$config['snmpget']          = "/usr/bin/snmpget";
-$config['snmpbulkwalk']     = "/usr/bin/snmpbulkwalk";
+```bash
+lnms config:set snmpwalk /usr/bin/snmpwalk
+lnms config:set snmpget /usr/bin/snmpget
+lnms config:set snmpbulkwalk /usr/bin/snmpbulkwalk
 ```
 
 SNMP program locations.
 
-```php
-$config['whois']            = "/usr/bin/whois";
-$config['ping']             = "/bin/ping";
-$config['mtr']              = "/usr/bin/mtr";
-$config['nmap']             = "/usr/bin/nmap";
-$config['nagios_plugins']   = "/usr/lib/nagios/plugins";
-$config['ipmitool']         = "/usr/bin/ipmitool";
-$config['virsh']            = "/usr/bin/virsh";
-$config['dot']              = "/usr/bin/dot";
-$config['unflatten']        = "/usr/bin/unflatten";
-$config['neato']            = "/usr/bin/neato";
-$config['sfdp']             = "/usr/bin/sfdp";
+```bash
+lnms config:set whois /usr/bin/whois
+lnms config:set ping /bin/ping
+lnms config:set mtr /usr/bin/mtr
+lnms config:set nmap /usr/bin/nmap
+lnms config:set nagios_plugins /usr/lib/nagios/plugins
+lnms config:set ipmitool /usr/bin/ipmitool
+lnms config:set virsh /usr/bin/virsh
+lnms config:set dot /usr/bin/dot
+lnms config:set sfdp /usr/bin/sfdp
 ```
 
 ## Authentication
 
 Generic Authentication settings.
 
-```php
-$config['password']['min_length'] = 8;  // password minimum length for auth that allows user creation
+Password minimum length for auth that allows user creation
+
+```bash
+lnms config:set password.min_length 8
 ```
 
 ## Proxy support
@@ -240,9 +244,9 @@ $config['password']['min_length'] = 8;  // password minimum length for auth that
 For alerting and the callback functionality, we support the use of a
 http proxy setting. These can be any one of the following:
 
-```php
-$config['callback_proxy'] = 'proxy.domain.com';
-$config['http_proxy']     = 'proxy.domain.com';
+```bash
+lnms config:set callback_proxy proxy.domain.com
+lnms config:set http_proxy proxy.domain.com
 ```
 
 We can also make use of one of these environment variables which can be set in `/etc/environment`:
@@ -258,21 +262,21 @@ Please refer to [RRDCached](../Extensions/RRDCached.md)
 
 ## WebUI Settings
 
-```php
-$config['base_url'] = "http://demo.librenms.org";
+```bash
+lnms config:set base_url http://demo.librenms.org
 ```
 
 LibreNMS will attempt to detect the URL you are using but you can override that here.
 
-```php
-$config['site_style']       = "light";
+```bash
+lnms config:set site_style light
 ```
 
 Currently we have a number of styles which can be set which will alter
 the navigation bar look. dark, light and mono with light being the default.
 
-```php
-$config['webui']['custom_css'][]       = "css/custom/styles.css";
+```bash
+lnms config:set webui.custom_css.+ css/custom/styles.css
 ```
 
 You can override a large number of visual elements by creating your
@@ -281,31 +285,31 @@ into  `html/css/custom` so they will be ignored by auto updates. You
 can specify as many css files as you like, the order they are within
 your config will be the order they are loaded in the browser.
 
-```php
-$config['title_image'] = "images/custom/yourlogo.png";
+```bash
+lnms config:set title_image images/custom/yourlogo.png
 ```
 
 You can override the default logo with yours, place any custom images
 files into `html/images/custom` so they will be ignored by auto updates.
 
-```php
-$config['page_refresh']     = "300";
+```bash
+lnms config:set page_refresh 300
 ```
 
 Set how often pages are refreshed in seconds. The default is every 5
 minutes. Some pages don't refresh at all by design.
 
-```php
-$config['front_page']       = "default";
+```bash
+lnms config:set front_page default
 ```
 
 You can create your own front page by adding a blade file in `resources/views/overview/custom/`
 and setting `front_page` to it's name.
 For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
 
-```php
+```bash
 // This option exists in the web UI, edit it under Global Settings -> webui
-$config['webui']['default_dashboard_id'] = 0;
+lnms config:set webui.default_dashboard_id 0
 ```
 
 Allows the specification of a global default dashboard page for any user who
@@ -314,33 +318,33 @@ existing dashboard that is shared or shared(read).  Otherwise, the system will
 automatically create each user an empty dashboard called `Default` on their
 first login.
 
-```php
-$config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
+```bash
+lnms config:set login_message "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
 ```
 
 This is the default message on the login page displayed to users.
 
-```php
-$config['public_status']    = false;
+```bash
+lnms config:set public_status true
 ```
 
 If this is set to true then an overview will be shown on the login page of devices and the status.
 
-```php
-$config['show_locations']          = 1;  # Enable Locations on menu
-$config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
-$config['show_services']           = 0;  # Enable Services on menu
-$config['int_customers']           = 1;  # Enable Customer Port Parsing
-$config['summary_errors']          = 0;  # Show Errored ports in summary boxes on the dashboard
-$config['customers_descr']         = 'cust';  # The description to look for in ifDescr. Can be an array as well array('cust','cid');
-$config['transit_descr']           = 'transit';  # Add custom transit descriptions (can be an array)
-$config['peering_descr']           = 'peering';  # Add custom peering descriptions (can be an array)
-$config['core_descr']              = 'core';  # Add custom core descriptions (can be an array)
-$config['custom_descr']            = '';  # Add custom interface descriptions (can be an array)
-$config['int_transit']             = 1;  # Enable Transit Types
-$config['int_peering']             = 1;  # Enable Peering Types
-$config['int_core']                = 1;  # Enable Core Port Types
-$config['int_l2tp']                = 0;  # Enable L2TP Port Types
+```bash
+lnms config:set show_locations true  # Enable Locations on menu
+lnms config:set show_locations_dropdown true  # Enable Locations dropdown on menu
+lnms config:set show_services false  # Disable Services on menu
+lnms config:set int_customers true  # Enable Customer Port Parsing
+lnms config:set summary_errors false  # Show Errored ports in summary boxes on the dashboard
+lnms config:set customers_descr '["cust"]'  # The description to look for in ifDescr. Can have multiple '["cust","cid"]'
+lnms config:set transit_descr '["transit"]'  # Add custom transit descriptions (array)
+lnms config:set peering_descr '["peering"]'  # Add custom peering descriptions (array)
+lnms config:set core_descr '["core"]'  # Add custom core descriptions  (array)
+lnms config:set custom_descr '["This is Custom"]'  # Add custom interface descriptions (array)
+lnms config:set int_transit true  # Enable Transit Types
+lnms config:set int_peering true  # Enable Peering Types
+lnms config:set int_core true  # Enable Core Port Types
+lnms config:set int_l2tp false  # Disable L2TP Port Types
 ```
 
 Enable / disable certain menus from being shown in the WebUI.
@@ -350,68 +354,63 @@ time options for graphs and the mini graphs shown per row.
 
 Quick select:
 
-```php
-$config['graphs']['mini']['normal'] = array(
-    'day' => '24 Hours',
-    'week' => 'One Week',
-    'month' => 'One Month',
-    'year' => 'One Year',
-);
-$config['graphs']['mini']['widescreen'] = array(
-    'sixhour' => '6 Hours',
-    'day' => '24 Hours',
-    'twoday' => '48 Hours',
-    'week' => 'One Week',
-    'twoweek' => 'Two Weeks',
-    'month' => 'One Month',
-    'twomonth' => 'Two Months',
-    'year' => 'One Year',
-    'twoyear' => 'Two Years',
-);
+```bash
+lnms config:set graphs.mini.normal '{
+    "day": "24 Hours",
+    "week": "One Week",
+    "month": "One Month",
+    "year": "One Year"
+}'
+
+lnms config:set graphs.mini.widescreen '{
+    "sixhour": "6 Hours",
+    "day": "24 Hours",
+    "twoday": "48 Hours",
+    "week": "One Week",
+    "twoweek": "Two Weeks",
+    "month": "One Month",
+    "twomonth": "Two Months",
+    "year": "One Year",
+    "twoyear": "Two Years"
+}'
 ```
 
 Mini graphs:
 
-```php
-$config['graphs']['row']['normal'] = array(
-    'sixhour' => '6 Hours',
-    'day' => '24 Hours',
-    'twoday' => '48 Hours',
-    'week' => 'One Week',
-    'twoweek' => 'Two Weeks',
-    'month' => 'One Month',
-    'twomonth' => 'Two Months',
-    'year' => 'One Year',
-    'twoyear' => 'Two Years',
-);
+```bash
+lnms config:set graphs.row.normal '{
+    "sixhour": "6 Hours",
+    "day": "24 Hours",
+    "twoday": "48 Hours",
+    "week": "One Week",
+    "twoweek": "Two Weeks",
+    "month": "One Month",
+    "twomonth": "Two Months",
+    "year": "One Year",
+    "twoyear": "Two Years"
+}'
 ```
 
-```php
-$config['web_mouseover']      = true;
+```bash
+lnms config:set web_mouseover true
 ```
 
 You can disable the mouseover popover for mini graphs by setting this to false.
 
-```php
-$config['enable_lazy_load'] = true;
+```bash
+lnms config:set enable_lazy_load true
 ```
 
 You can disable image lazy loading by setting this to false.
 
-```php
-$config['show_overview_tab'] = true;
-```
-
-Enable or disable the overview tab for a device.
-
-```php
-$config['overview_show_sysDescr'] = true;
+```bash
+lnms config:set overview_show_sysDescr true
 ```
 
 Enable or disable the sysDescr output for a device.
 
-```php
-$config['force_ip_to_sysname'] = false;
+```bash
+lnms config:set force_ip_to_sysname false
 ```
 
 When using IP addresses as a hostname you can instead represent the
@@ -419,30 +418,30 @@ devices on the WebUI by its SNMP sysName resulting in an easier to
 read overview of your network. This would apply on networks where you
 don't have DNS records for most of your devices.
 
-```php
-$config['force_hostname_to_sysname'] = false;
+```bash
+lnms config:set force_hostname_to_sysname false
 ```
 
 When using a dynamic DNS hostname or one that does not resolve, this
 option would allow you to make use of the SNMP sysName instead as the
 preferred reference to the device.
 
-```php
-$config['device_traffic_iftype'][] = '/loopback/';
+```bash
+lnms config:set device_traffic_iftype.+ '/loopback/'
 ```
 
 Interface types that aren't graphed in the WebUI. The default array
 contains more items, please see misc/config_definitions.json for the full list.
 
-```php
-$config['enable_clear_discovery'] = 1;
+```bash
+lnms config:set enable_clear_discovery true
 ```
 
 Administrators are able to clear the last discovered time of a device
 which will force a full discovery run within the configured 5 minute cron window.
 
-```php
-$config['enable_footer'] = 1;
+```bash
+lnms config:set enable_footer true
 ```
 
 Disable the footer of the WebUI by setting `enable_footer` to 0.
@@ -450,18 +449,18 @@ Disable the footer of the WebUI by setting `enable_footer` to 0.
 You can enable the old style network map (only available for
 individual devices with links discovered via xDP) by setting:
 
-```php
-$config['gui']['network-map']['style'] = 'old';
+```bash
+lnms config:set gui.network-map.style old
 ```
 
-```php
-$config['percentile_value'] = X;
+```bash
+lnms config:set percentile_value 90
 ```
 
 Show the `X`th percentile in the graph instead of the default 95th percentile.
 
-```php
-$config['shorthost_target_length'] = X;
+```bash
+lnms config:set shorthost_target_length 15
 ```
 
 The target maximum hostname length when applying the shorthost() function.
@@ -490,16 +489,16 @@ by hostname this check is not performed.  If the setting is true
 hostnames are resolved and the check is also performed.  This helps
 prevents accidental duplicate hosts.
 
-```php
-$config['addhost_alwayscheckip']   = false; # true - check for duplicate ips even when adding host by name.
+```bash
+lnms config:set addhost_alwayscheckip false # true - check for duplicate ips even when adding host by name.
                                             # false- only check when adding host by ip.
 ```
 
 By default we allow hosts to be added with duplicate sysName's, you
 can disable this with the following config:
 
-```php
-$config['allow_duplicate_sysName'] = false;
+```bash
+lnms config:set allow_duplicate_sysName false
 ```
 
 ## Global poller and discovery modules
@@ -533,13 +532,13 @@ lnms config:set os.ios.poller_modules.entity-state true
 Default SNMP options including retry and timeout settings and also
 default version and port.
 
-```php
-$config['snmp']['timeout'] = 1;                         # timeout in seconds
-$config['snmp']['retries'] = 5;                         # how many times to retry the query
-$config['snmp']['transports'] = ['udp', 'udp6', 'tcp', 'tcp6'];    # Transports to use
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];       # Default versions to use
-$config['snmp']['port'] = 161;                          # Default port
-$config['snmp']['exec_timeout'] = 1200;                 # execution time limit in seconds
+```bash
+lnms config:set snmp.timeout 1                         # timeout in seconds
+lnms config:set snmp.retries 5                         # how many times to retry the query
+lnms config:set snmp.transports '["udp", "udp6", "tcp", "tcp6"]'    # Transports to use
+lnms config:set snmp.version '["v2c", "v3", "v1"]'       # Default versions to use
+lnms config:set snmp.port 161                          # Default port
+lnms config:set snmp.exec_timeout 1200                 # execution time limit in seconds
 ```
 
 > NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
@@ -548,21 +547,32 @@ $config['snmp']['exec_timeout'] = 1200;                 # execution time limit i
 The default v1/v2c snmp community to use, you can expand this array
 with `[1]`, `[2]`, `[3]`, etc.
 
-```php
-$config['snmp']['community'][0] = "public";
+```bash
+lnms config:set snmp.community.0 public
 ```
 >NOTE: This list of SNMP communities is used for auto discovery, and as a default set for any manually added device.
 
 The default v3 snmp details to use, you can expand this array with
 `[1]`, `[2]`, `[3]`, etc.
 
-```php
-$config['snmp']['v3'][0]['authlevel'] = "noAuthNoPriv";  # noAuthNoPriv | authNoPriv | authPriv
-$config['snmp']['v3'][0]['authname'] = "root";           # User Name (required even for noAuthNoPriv)
-$config['snmp']['v3'][0]['authpass'] = "";               # Auth Passphrase
-$config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA
-$config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) Passphrase
-$config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
+```bash
+lnms config:set snmp.v3.0 '{
+    authlevel: "noAuthNoPriv",
+    authname: "root",
+    authpass: "",
+    authalgo: "MD5",
+    cryptopass: "",
+    cryptoalgo: "AES"
+}'
+```
+
+```
+authlevel   noAuthNoPriv | authNoPriv | authPriv
+authname    User Name (required even for noAuthNoPriv)
+authpass    Auth Passphrase
+authalgo    MD5 | SHA | SHA-224 | SHA-256 | SHA-384 | SHA-512
+cryptopass  Privacy (Encryption) Passphrase
+cryptoalgo  AES | AES-192 | AES-256 | AES-256-C | DES
 ```
 
 ## Auto discovery settings
@@ -574,18 +584,18 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 > You can configure these options within the WebUI now, please avoid
 > setting these options within config.php
 
-```php
-$config['email_backend']              = 'mail';
-$config['email_from']                 = NULL;
-$config['email_user']                 = $config['project_id'];
-$config['email_sendmail_path']        = '/usr/sbin/sendmail';
-$config['email_smtp_host']            = 'localhost';
-$config['email_smtp_port']            = 25;
-$config['email_smtp_timeout']         = 10;
-$config['email_smtp_secure']          = NULL;
-$config['email_smtp_auth']            = false;
-$config['email_smtp_username']        = NULL;
-$config['email_smtp_password']        = NULL;
+```bash
+lnms config:set email_backend mail
+lnms config:set email_from librenms@yourdomain.local
+lnms config:set email_user `lnms config:get project_id`
+lnms config:set email_sendmail_path /usr/sbin/sendmail
+lnms config:set email_smtp_host localhost
+lnms config:set email_smtp_port 25
+lnms config:set email_smtp_timeout 10
+lnms config:set email_smtp_secure tls
+lnms config:set email_smtp_auth false
+lnms config:set email_smtp_username NULL
+lnms config:set email_smtp_password NULL
 ```
 
 What type of mail transport to use for delivering emails. Valid
@@ -602,24 +612,23 @@ Please refer to [Billing](../Extensions/Billing-Module.md)
 
 ## Global module support
 
-```php
-$config['enable_bgp']                   = 1; # Enable BGP session collection and display
-$config['enable_syslog']                = 0; # Enable Syslog
-$config['enable_inventory']             = 1; # Enable Inventory
-$config['enable_pseudowires']           = 1; # Enable Pseudowires
-$config['enable_vrfs']                  = 1; # Enable VRFs
-$config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
+```bash
+lnms config:set enable_bgp true # Enable BGP session collection and display
+lnms config:set enable_syslog false # Enable Syslog
+lnms config:set enable_inventory true # Enable Inventory
+lnms config:set enable_pseudowires true # Enable Pseudowires
+lnms config:set enable_vrfs true # Enable VRFs
 ```
 
 ## Port extensions
 
 Please refer to [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
-```php
-$config['enable_ports_etherlike']       = 0;
-$config['enable_ports_junoseatmvp']     = 0;
-$config['enable_ports_adsl']            = 1;
-$config['enable_ports_poe']             = 0;
+```bash
+lnms config:set enable_ports_etherlike false
+lnms config:set enable_ports_junoseatmvp false
+lnms config:set enable_ports_adsl true
+lnms config:set enable_ports_poe false
 ```
 
 Enable / disable additional port statistics.
@@ -628,10 +637,10 @@ Enable / disable additional port statistics.
 
 ### Rancid
 
-```php
-$config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
-$config['rancid_repo_type']             = 'svn';
-$config['rancid_ignorecomments']        = 0;
+```bash
+lnms config:set rancid_configs.+ /var/lib/rancid/network/configs/
+lnms config:set rancid_repo_type svn
+lnms config:set rancid_ignorecomments false
 ```
 
 Rancid configuration, `rancid_configs` is an array containing all of
@@ -644,15 +653,15 @@ Please refer to [Oxidized](../Extensions/Oxidized.md)
 
 ### CollectD
 
-```php
-$config['collectd_dir']                 = '/var/lib/collectd/rrd';
+```bash
+lnms config:set collectd_dir /var/lib/collectd/rrd
 ```
 
 Specify the location of the collectd rrd files. Note that the location
 in config.php should be consistent with the location set in
 /etc/collectd.conf and etc/collectd.d/rrdtool.conf
 
-```php
+```bash
 <Plugin rrdtool>
         DataDir "/var/lib/collectd/rrd"
         CreateFilesAsync false
@@ -664,7 +673,7 @@ in config.php should be consistent with the location set in
 
 /etc/collectd.conf
 
-```php
+```bash
 LoadPlugin rrdtool
 <Plugin rrdtool>
        DataDir "/var/lib/collectd/rrd"
@@ -675,8 +684,8 @@ LoadPlugin rrdtool
 
 /etc/collectd.d/rrdtool.conf
 
-```php
-$config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
+```bash
+lnms config:set collectd_sock unix:///var/run/collectd.sock
 ```
 
 Specify the location of the collectd unix socket. Using a socket
@@ -699,20 +708,20 @@ there.
 
 Exact Matching:
 
-```php
-$config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
+```bash
+lnms config:set location_map '["Under the Sink": "Under The Sink, The Office, London, UK"]'
 ```
 
 Regex Matching:
 
-```php
-$config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
+```bash
+lnms config:set location_map_regex '["/Sink/": "Under The Sink, The Office, London, UK"]'
 ```
 
 Regex Match Substitution:
 
-```php
-$config['location_map_regex_sub']['/Sink/'] = "Under The Sink, The Office, London, UK [lat, long]";
+```bash
+lnms config:set location_map_regex_sub '["/Sink/": "Under The Sink, The Office, London, UK [lat, long]"]'
 ```
 
 If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match
@@ -737,25 +746,21 @@ manipulation of the definition files will block updating:
 Examples:
 
 **Add entries to default arrays**
-```php
-$config['bad_if'][] = "voip-null";
-$config['bad_iftype'][] = "voiceEncap";
-$config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
+```bash
+lnms config:set bad_if.+ voip-null
+lnms config:set bad_iftype.+ voiceEncap
+lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    # loopback
 ```
 
-**Unset and customize a default array**
-```php
-unset($config['bad_if']);
-$config['bad_if'][] = "voip-null";
-$config['bad_if'][] = "voiceEncap";
-$config['bad_if'][] = "voiceFXO";
-...
+**Override default bad_if values**
+```bash
+lnms config:set bad_if '["voip-null", "voiceEncap", "voiceFXO"]'
 ```
 
 **Create an OS specific array**
-```php
-$config['os']['iosxe']['bad_iftype'][] = "macSecControlledIF";
-$config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
+```bash
+lnms config:set os.iosxe.bad_iftype.+ macSecControlledIF
+lnms config:set os.iosxe.bad_iftype.+ macSecUncontrolledIF
 ```
 
 **Various bad_if\* selection options available**
@@ -774,9 +779,9 @@ $config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
 
 Examples:
 
-```php
-$config['good_if'][] = 'FastEthernet';
-$config['os']['ios']['good_if'][] = 'FastEthernet';
+```bash
+lnms config:set good_if.+ FastEthernet
+lnms config:set os.ios.good_if.+ FastEthernet
 ```
 
 `good_if` is matched against ifDescr value. This can be a bad_if value
@@ -786,9 +791,9 @@ the ifDescr will be valid.
 
 ## Interfaces to be rewritten
 
-```php
-$config['rewrite_if']['cpu'] = 'Management Interface';
-$config['rewrite_if_regexp']['/cpu /'] = 'Management ';
+```bash
+lnms config:set rewrite_if '{"cpu": "Management Interface"}'
+lnms config:set rewrite_if_regexp '{"/cpu /": "Management "}'
 ```
 
 Entries defined in `rewrite_if` are being replaced completely.
@@ -802,9 +807,9 @@ either don't exist or just don't return data. This allows you to
 ignore those based on the descr field in the database. You can either
 ignore globally or on a per os basis.
 
-```php
-$config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
-$config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
+```bash
+lnms config:set bad_entity_sensor_regex.+ '/Physical id [0-9]+/'
+lnms config:set os.ios.bad_entity_sensor_regex '["/Physical id [0-9]+/"]'
 ```
 
 ## Entity sensors limit values
@@ -816,8 +821,8 @@ limit values are guessed, based on the value measured during the initial discove
 When it is preferred to have no high and/or low limit values at all if
 these are not provided by the vendor, the guess method can be disabled:
 
-```php
-$config['sensors']['guess_limits'] = false;
+```bash
+lnms config:set sensors.guess_limits false
 ```
 
 ## Ignoring Health Sensors
@@ -826,65 +831,64 @@ It is possible to filter some sensors from the configuration:
 
 * Ignore all temperature sensors
 
-```php
-$config['disabled_sensors']['current'] = true;
+```bash
+lnms config:set disabled_sensors.current true
 ```
 
 * Filter all sensors matching regexp ```'/PEM Iout/'```.
 
-```php
-$config['disabled_sensors_regex'][] = '/PEM Iout/';
+```bash
+lnms config:set disabled_sensors_regex.+ '/PEM Iout/'
 ```
 
 * Filter all 'current' sensors for Operating System 'vrp'.
 
-```php
-$config['os']['vrp']['disabled_sensors']['current'] = true;
+```bash
+lnms config:set os.vrp.disabled_sensors.current true
 ```
 
 * Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
 
-```php
-$config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
+```bash
+lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 ```
 
 ## Storage configuration
 
 Mounted storage / mount points to ignore in discovery and polling.
 
-```php
-$config['ignore_mount_removable']  = 1;
-$config['ignore_mount_network']    = 1;
-$config['ignore_mount_optical']    = 1;
+```bash
+lnms config:set ignore_mount_removable true
+lnms config:set ignore_mount_network true
+lnms config:set ignore_mount_optical true
 
-$config['ignore_mount'][] = "/kern";
-$config['ignore_mount'][] = "/mnt/cdrom";
-$config['ignore_mount'][] = "/proc";
-$config['ignore_mount'][] = "/dev";
+lnms config:set ignore_mount.+ /kern
+lnms config:set ignore_mount.+ /mnt/cdrom
+lnms config:set ignore_mount.+ /proc
+lnms config:set ignore_mount.+ /dev
 
-$config['ignore_mount_string'][] = "packages";
-$config['ignore_mount_string'][] = "devfs";
-$config['ignore_mount_string'][] = "procfs";
-$config['ignore_mount_string'][] = "UMA";
-$config['ignore_mount_string'][] = "MALLOC";
+lnms config:set ignore_mount_string.+ packages
+lnms config:set ignore_mount_string.+ devfs
+lnms config:set ignore_mount_string.+ procfs
+lnms config:set ignore_mount_string.+ UMA
+lnms config:set ignore_mount_string.+ MALLOC
 
-$config['ignore_mount_regexp'][] = "/on: \/packages/";
-$config['ignore_mount_regexp'][] = "/on: \/dev/";
-$config['ignore_mount_regexp'][] = "/on: \/proc/";
-$config['ignore_mount_regexp'][] = "/on: \/junos^/";
-$config['ignore_mount_regexp'][] = "/on: \/junos\/dev/";
-$config['ignore_mount_regexp'][] = "/on: \/jail\/dev/";
-$config['ignore_mount_regexp'][] = "/^(dev|proc)fs/";
-$config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
-$config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
-$config['ignore_mount_regexp'][] = "/UMA/";
+lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
+lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
+lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
+lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
+lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
+lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
+lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
+lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
+lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
+lnms config:set ignore_mount_regexp.+ '/UMA/'
 ```
 
 Custom storage warning percentage
 
-```php
-$config['storage_perc_warn'] = 60;
-$config['os']['linux']['storage_perc_warn'] = 60;
+```bash
+lnms config:set storage_perc_warn 60
 ```
 
 ## IRC Bot
@@ -905,10 +909,10 @@ Please refer to [Syslog](../Extensions/Syslog.md)
 
 ## Virtualization
 
-```php
-$config['enable_libvirt'] = 1;
-$config['libvirt_protocols']    = array("qemu+ssh","xen+ssh");
-$config['libvirt_username'] = 'root';
+```bash
+lnms config:set enable_libvirt true
+lnms config:set libvirt_protocols '["qemu+ssh","xen+ssh"]'
+lnms config:set libvirt_username root
 ```
 
 Enable this to switch on support for libvirt along with `libvirt_protocols`
@@ -928,8 +932,8 @@ To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
 
 ## BGP Support
 
-```php
-$config['astext']['65332'] = "Cymru FullBogon Feed";
+```bash
+lnms config:set astext.65332 "Cymru FullBogon Feed"
 ```
 
 You can use this array to rewrite the description of ASes that you have discovered.
@@ -943,12 +947,8 @@ Please refer to [Updating](../General/Updating.md)
 Setup the types of IPMI protocols to test a host for and in what
 order. Don't forget to install ipmitool on the monitoring host.
 
-```php
-$config['ipmi']['type'] = array();
-$config['ipmi']['type'][] = "lanplus";
-$config['ipmi']['type'][] = "lan";
-$config['ipmi']['type'][] = "imb";
-$config['ipmi']['type'][] = "open";
+```bash
+lnms config:set ipmi.type '["lanplus", "lan", "imb", "open"]'
 ```
 
 ## Distributed poller settings
@@ -964,12 +964,15 @@ Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
 CORS support for the API is disabled by default. Below you will find
 the standard options, all of which you can configure.
 
-```php
-$config['api']['cors']['enabled'] = false;
-$config['api']['cors']['origin'] = ['*'];
-$config['api']['cors']['maxage'] = '86400';
-$config['api']['cors']['allowmethods'] = ['POST', 'GET', 'PUT', 'DELETE', 'PATCH'];
-$config['api']['cors']['allowheaders'] = ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token'];
-$config['api']['cors']['exposeheaders'] = ['Cache-Control', 'Content-Language', 'Content-Type', 'Expires', 'Last-Modified', 'Pragma'];
-$config['api']['cors']['allowcredentials'] = false;
+```bash
+lnms config:set api.cors.enabled false
+lnms config:set api.cors.origin '["*"]'
+lnms config:set api.cors.maxage '86400'
+lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
+lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
+lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
+lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
+lnms config:set api.cors.allowcredentials false
 ```

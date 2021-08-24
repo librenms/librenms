@@ -58,10 +58,14 @@ class TestConfigCommands extends InMemoryDbTestCase
         // os bool
         $this->assertCliSets('os.ios.rfc1628_compat', true);
 
-        // os array and append
+        // os array
         $this->assertCliSets('os.netonix.bad_iftype', ['ethernet', 'psuedowire']);
-//        $this->artisan('config:set', ['setting' => 'os.netonix.bad_iftype.+', 'value' => 'other'])->assertExitCode(0);
-//        $this->assertCliGets('os.netonix.bad_iftype', ['ethernet', 'psuedowire', 'other']);
+
+        // os array append
+        $this->artisan('config:set', ['setting' => 'os.netonix.bad_iftype', 'value' => '["ethernet","psuedowire"]'])->assertExitCode(0);
+        $this->assertEquals(['ethernet', 'psuedowire'], Config::get('os.netonix.bad_iftype'));
+        $this->artisan('config:set', ['setting' => 'os.netonix.bad_iftype.+', 'value' => 'other'])->assertExitCode(0);
+        $this->assertCliGets('os.netonix.bad_iftype', ['ethernet', 'psuedowire', 'other']);
 
         // dump
         $this->artisan('config:get', ['--dump' => true])
