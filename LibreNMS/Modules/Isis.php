@@ -115,8 +115,8 @@ class Isis implements Module
                     continue;
                 }
 
-                if ($os instanceof Junos && $circuit_id == 16) {
-                    continue; // Do not poll loopback interface
+                if ($circuit_data['isisCircPassiveCircuit']) {
+                    continue; // Do not poll passive interfaces
                 }
 
                 $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);
