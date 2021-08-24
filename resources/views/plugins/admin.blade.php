@@ -18,7 +18,7 @@
                     <tr class="{{ $plugin->plugin_active ? 'bg-success' : 'bg-danger' }}">
                         <td>{{ $plugin->plugin_name }}</td>
                         <td>
-                            <form class="form-inline" role="form" action="{{ route('plugin.update', ['plugin' => $plugin->plugin_id]) }}" method="post" id="{{ $plugin->plugin_id }}" name=="{{ $plugin->plugin_id }}">
+                            <form class="form-inline" role="form" action="{{ route('plugin.update', ['plugin' => $plugin->plugin_id]) }}" method="post" id="{{ $plugin->plugin_id }}" name="{{ $plugin->plugin_id }}">
                                 @csrf
                                 @if($plugin->plugin_active)
                                     <input type="hidden" name="plugin_active" value="0">
@@ -27,7 +27,11 @@
                                     <input type="hidden" name="plugin_active" value="1">
                                     <button type="submit" class="btn btn-sm btn-success" style="min-width: 66px">@lang('Enable')</button>
                                 @endif
-                                <a href="{{ route('plugin.settings', $plugin->plugin_name) }}" class="btn btn-sm btn-primary">@lang('Settings')</a>
+                                @if($plugin->version == 1)
+                                    <a href="{{ route('plugin.legacy', $plugin->plugin_name) }}" class="btn btn-sm btn-primary" style="min-width: 72px">@lang('Page')</a>
+                                @else
+                                    <a href="{{ route('plugin.settings', $plugin->plugin_name) }}" class="btn btn-sm btn-primary" style="min-width: 72px">@lang('Settings')</a>
+                                @endif
                             </form>
                         </td>
                     </tr>
