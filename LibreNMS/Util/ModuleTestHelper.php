@@ -56,13 +56,14 @@ class ModuleTestHelper
     private $exclude_from_all = ['arp-table', 'fdb-table'];
     private static $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
-        'vlans' => ['ports', 'vlans'],
-        'vrf' => ['ports', 'vrf'],
+        'isis' => ['ports', 'isis'],
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
-        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
+        'vlans' => ['ports', 'vlans'],
+        'vrf' => ['ports', 'vrf'],
     ];
 
     /**

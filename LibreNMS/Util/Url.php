@@ -129,6 +129,10 @@ class Url
      */
     public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
     {
+        if ($port === null) {
+            return $text;
+        }
+
         $label = Rewrite::normalizeIfName($port->getLabel());
         if (! $text) {
             $text = $label;

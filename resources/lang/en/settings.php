@@ -724,6 +724,12 @@ return [
                 'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
             ],
         ],
+        'graphs' => [
+            'port_speed_zoom' => [
+                'description' => 'Zoom port graphs to port speed',
+                'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',
+            ],
+        ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
