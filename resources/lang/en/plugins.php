@@ -8,6 +8,5 @@ return [
         'not_exist' => 'Plugin :plugin does not exist.',
         'disabled' => 'Plugin :plugin is disabled.',
         'view_missing' => 'Missing view.',
-    ]
+    ],
 ];
-

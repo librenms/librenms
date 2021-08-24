@@ -18,8 +18,8 @@ class PluginAdminController extends Controller
 
         $plugins = Plugin::get();
 
-        return view('plugins.admin',[
-            'plugins' => $plugins
+        return view('plugins.admin', [
+            'plugins' => $plugins,
         ]);
     }
 }

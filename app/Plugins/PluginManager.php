@@ -179,7 +179,7 @@ class PluginManager
             $valid = array_keys($this->validPlugins);
             Plugin::versionTwo()->whereNotIn('plugin_name', $valid)->get()->each->delete();
         } catch (QueryException $qe) {
-            Log::error("Failed to clean up plugins: " . $qe->getMessage());
+            Log::error('Failed to clean up plugins: ' . $qe->getMessage());
         }
     }
 

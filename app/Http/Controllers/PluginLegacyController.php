@@ -29,7 +29,6 @@ class PluginLegacyController extends Controller
                 $init_modules = ['web', 'auth'];
                 require base_path('/includes/init.php');
 
-
                 chdir(base_path('html'));
                 ob_start();
                 include $plugin_path;

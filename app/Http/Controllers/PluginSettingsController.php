@@ -29,7 +29,6 @@ class PluginSettingsController extends Controller
         return view('plugins.settings', $data);
     }
 
-
     public function update(Request $request, Plugin $plugin): \Illuminate\Http\RedirectResponse
     {
         $validated = $this->validate($request, [
