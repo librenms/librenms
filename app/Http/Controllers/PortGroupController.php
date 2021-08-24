@@ -17,7 +17,7 @@ class PortGroupController extends Controller
     public function index()
     {
         return view('port-group.index', [
-            'port_groups' => PortGroup::orderBy('name')->get(),
+            'port_groups' => PortGroup::orderBy('name')->withCount('ports')->get(),
         ]);
     }
 
