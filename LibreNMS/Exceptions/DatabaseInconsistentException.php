@@ -57,7 +57,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
             });
 
             if ($results) {
-                return new static($results, $exception->getMessage(), $exception->getCode(), $exception);
+                return new static($results, $exception->getMessage(), 0, $exception);
             }
         }
 
