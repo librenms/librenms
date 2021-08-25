@@ -18,18 +18,21 @@
 <script>
     var alerts_grid = $("#alerts_{{ $id }}").bootgrid({
         ajax: true,
-        post: function ()
-        {
-            return {
-                id: "alerts",
-                acknowledged: '{{ $acknowledged }}',
-                fired: '{{ $fired }}',
-                min_severity: '{{ $min_severity }}',
-                group: '{{ $device_group }}',
-                proc: '{{ $proc }}',
-                sort: '{{ $sort }}',
-                device_id: '{{ $device }}'
-            }
+        requestHandler: request => ({
+            ...request,
+            id: "alerts",
+            acknowledged: '{{ $acknowledged }}',
+            fired: '{{ $fired }}',
+            min_severity: '{{ $min_severity }}',
+            group: '{{ $device_group }}',
+            proc: '{{ $proc }}',
+            sort: '{{ $sort }}',
+            device_id: '{{ $device }}'
+        }),
+        responseHandler: response => {
+            $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')
+
+            return response
         },
         url: "ajax_table.php",
         navigation: ! {{ $hidenavigation }},
