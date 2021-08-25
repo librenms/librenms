@@ -68,6 +68,11 @@ class KeyRotate extends LnmsCommand
         $this->decrypt = $this->createEncrypter($this->argument('old_key'), $cipher);
         $this->encrypt = $this->createEncrypter($new, $cipher);
 
+        $this->line(trans('commands.key:rotate.backups'));
+        if (! $this->confirm(trans('commands.key:rotate.confirm'))) {
+            return 1;
+        }
+
         $this->rekeyConfigData('validation.encryption.test');
 
         return 0;

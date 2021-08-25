@@ -66,6 +66,8 @@ return [
             'old_key' => 'The old APP_KEY which is valid for encrypted data',
         ],
         'cleared-cache' => 'Config was cached, cleared cache to make sure APP_KEY is correct. Please re-run lnms key:rotate',
+        'backups' => 'This command could cause irreversible loss of data and will invalidate all browser sessions. Make sure you have backups.',
+        'confirm' => 'I have backups and want to continue',
         'decrypt-failed' => 'Failed to decrypt :item, skipping',
         'validation-errors' => [
             'not_in' => ':attribute must not match current APP_KEY',
