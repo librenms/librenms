@@ -862,6 +862,10 @@
             "default": false,
             "type": "boolean"
         },
+        "default_port_group": {
+            "default": 0,
+            "type": "integer"
+        },
         "device_location_map_open": {
             "order": 2,
             "group": "webui",
@@ -3318,7 +3322,7 @@
             "type": "array"
         },
         "graphs.port_speed_zoom": {
-            "default": true,
+            "default": false,
             "type": "boolean",
             "group": "webui",
             "section": "graph",

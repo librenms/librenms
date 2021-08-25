@@ -33,7 +33,6 @@ use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\OS;
-use LibreNMS\OS\Junos;
 use LibreNMS\Util\IP;
 
 class Isis implements Module
