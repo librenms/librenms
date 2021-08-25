@@ -8,7 +8,6 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 
 class KeyRotate extends LnmsCommand
@@ -61,12 +60,13 @@ class KeyRotate extends LnmsCommand
         if (is_file(base_path('bootstrap/cache/config.php'))) {
             Artisan::call('config:clear'); // clear config cache
             $this->warn(trans('commands.key:rotate.cleared-cache'));
+
             return 0;
         }
 
         // init encrypters
-        $this->decrypt = $this->createEncrypter($new, $cipher);
-        $this->encrypt = $this->createEncrypter($this->argument('old_key'), $cipher);
+        $this->decrypt = $this->createEncrypter($this->argument('old_key'), $cipher);
+        $this->encrypt = $this->createEncrypter($new, $cipher);
 
         $this->rekeyConfigData('validation.encryption.test');
 
@@ -80,9 +80,13 @@ class KeyRotate extends LnmsCommand
 
     private function rekeyConfigData(string $key): bool
     {
+        if (! \LibreNMS\Config::has($key)) {
+            return true;
+        }
+
         try {
-            $data = $this->decrypt->decryptString(Config::get($key));
-            Config::set($key, $this->encrypt->encryptString($data));
+            $data = $this->decrypt->decryptString(\LibreNMS\Config::get($key));
+            \LibreNMS\Config::persist($key, $this->encrypt->encryptString($data));
 
             return true;
         } catch (DecryptException $e) {
