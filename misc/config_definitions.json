@@ -3322,7 +3322,7 @@
             "type": "array"
         },
         "graphs.port_speed_zoom": {
-            "default": true,
+            "default": false,
             "type": "boolean",
             "group": "webui",
             "section": "graph",
