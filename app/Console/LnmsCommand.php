@@ -111,7 +111,11 @@ abstract class LnmsCommand extends Command
      */
     protected function validate($rules, $messages = [])
     {
-        $validator = Validator::make($this->arguments() + $this->options(), $rules, $messages);
+        $validator = Validator::make(
+            $this->arguments() + $this->options(),
+            $rules,
+            array_merge(trans('commands.' . $this->getName() . '.validation-errors'), $messages)
+        );
 
         try {
             $validator->validate();

@@ -60,6 +60,17 @@ return [
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
     ],
+    'key:rotate' => [
+        'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
+        'arguments' => [
+            'old_key' => 'The old APP_KEY which is valid for encrypted data',
+        ],
+        'cleared-cache' => 'Config was cached, cleared cache to make sure APP_KEY is correct. Please re-run lnms key:rotate',
+        'decrypt-failed' => 'Failed to decrypt :item, skipping',
+        'validation-errors' => [
+            'not_in' => ':attribute must not match current APP_KEY',
+        ],
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',
