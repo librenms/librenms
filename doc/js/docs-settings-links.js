@@ -24,7 +24,7 @@ function isValidHttpUrl(string) {
 
 function promptSettingUrl(e) {
     e.preventDefault();
-    let librenmsUrl = prompt("Enter your LibreNMS URL to get direct settings link");
+    let librenmsUrl = prompt("Enter your LibreNMS URL to get direct settings link.\nNote: This URL is only stored in your browser.");
 
     if (! isValidHttpUrl(librenmsUrl)) {
         alert("Invalid url, must start with http:// or https://")
