@@ -28,7 +28,7 @@
                     },
                     "options": {
                         "type": "object",
-                        "minProperties": 2
+                        "minProperties": 1
                     },
                     "units": {
                         "type": "string"
