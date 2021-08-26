@@ -439,7 +439,7 @@ config:
   Columns:
     - { Field: config_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: config_name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: config_value, Type: varchar(512), 'Null': false, Extra: '' }
+    - { Field: config_value, Type: mediumtext, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
     config_config_name_unique: { Name: config_config_name_unique, Columns: [config_name], Unique: true, Type: BTREE }
