@@ -85,7 +85,12 @@ class Config
     {
         $config_data = json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
 
-        $port_group_data = PortGroup::all()->sortBy('name');
+        try {
+            $port_group_data = PortGroup::all()->sortBy('name');
+        } catch (QueryException $e) {
+            // possibly table config doesn't exist yet
+            $port_group_data = [];
+        }
 
         $port_group_list = ['0' => 'no default Portgroup'];
         foreach ($port_group_data as $port_group) {
