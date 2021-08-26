@@ -298,8 +298,8 @@ class DeviceController extends TableController
                     'href' => Url::deviceUrl($device, ['tab' => 'alerts']),
                     'icon' => 'fa-exclamation-circle',
                     'external' => false,
-                ]
-            ]
+                ],
+            ],
         ];
 
         if (\Auth::user()->hasGlobalAdmin()) {
@@ -341,7 +341,7 @@ class DeviceController extends TableController
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
             if ($custom['action'] ?? false) {
                 $row = $this->isDetailed() ? $index % 2 : 0;
-                $custom['href'] = view(['template' => $custom['url']], ['device' => $device]);
+                $custom['href'] = view(['template' => $custom['url']], ['device' => $device])->__toString(); // @phpstan-ignore-line
                 $actions[$row][] = $custom;
             }
         }
