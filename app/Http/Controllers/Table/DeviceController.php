@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
@@ -150,7 +151,7 @@ class DeviceController extends TableController
             'os' => $this->getOsText($device),
             'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
             'location' => $this->getLocation($device),
-            'actions' => $this->getActions($device),
+            'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
         ];
     }
@@ -282,38 +283,68 @@ class DeviceController extends TableController
             : substr($device->location, 0, 32);
     }
 
-    /**
-     * @param Device $device
-     * @return string
-     */
-    private function getActions($device)
+    private function getActions(Device $device): array
     {
-        $actions = '<div class="container-fluid"><div class="row">';
-        $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device) . '"> <i class="fa fa-id-card fa-lg icon-theme" title="View device"></i></a></div>';
-        $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device, ['tab' => 'alerts']) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>';
+        $actions = [
+            [
+                [
+                    'title' => 'View Device',
+                    'href' => Url::deviceUrl($device),
+                    'icon' => 'fa-id-card',
+                    'external' => false,
+                ],
+                [
+                    'title' => 'View alerts',
+                    'href' => Url::deviceUrl($device, ['tab' => 'alerts']),
+                    'icon' => 'fa-exclamation-circle',
+                    'external' => false,
+                ]
+            ]
+        ];
 
         if (\Auth::user()->hasGlobalAdmin()) {
-            $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device, ['tab' => 'edit']) . '"> <i class="fa fa-gear fa-lg icon-theme" title="Edit device"></i></a></div>';
+            $actions[0][] = [
+                'title' => 'Edit device',
+                'href' => Url::deviceUrl($device, ['tab' => 'edit']),
+                'icon' => 'fa-gear',
+                'external' => false,
+            ];
         }
+        $row = $this->isDetailed() ? 1 : 0;
 
-        if ($this->isDetailed()) {
-            $actions .= '</div><div class="row">';
-        }
+        $actions[$row][] = [
+            'title' => 'Telnet to ' . $device->hostname,
+            'href' => 'telnet://' . $device->hostname,
+            'icon' => 'fa-terminal',
+        ];
 
-        $actions .= '<div class="col-xs-1"><a href="telnet://' . $device->hostname . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device->hostname . '"></i></a></div>';
-
+        $ssh_href = 'ssh://' . $device->hostname;
         if ($server = Config::get('gateone.server')) {
-            if (Config::get('gateone.use_librenms_user')) {
-                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
-            } else {
-                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
-            }
-        } else {
-            $actions .= '<div class="col-xs-1"><a href="ssh://' . $device->hostname . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+            $ssh_href = Config::get('gateone.use_librenms_user')
+                ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
+                : $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname;
         }
 
-        $actions .= '<div class="col-xs-1"><a href="https://' . $device->hostname . '" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device->hostname . '"></i></a></div>';
-        $actions .= '</div></div>';
+        $actions[$row][] = [
+            'title' => 'SSH to ' . $device->hostname,
+            'href' => $ssh_href,
+            'icon' => 'fa-lock',
+        ];
+
+        $actions[$row][] = [
+            'title' => 'Launch browser to ' . $device->hostname,
+            'href' => 'https://' . $device->hostname,
+            'onclick' => 'http_fallback(this); return false;',
+            'icon' => 'fa-globe',
+        ];
+
+        foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
+            if ($custom['action'] ?? false) {
+                $row = $this->isDetailed() ? $index % 2 : 0;
+                $custom['href'] = view(['template' => $custom['url']], ['device' => $device]);
+                $actions[$row][] = $custom;
+            }
+        }
 
         return $actions;
     }

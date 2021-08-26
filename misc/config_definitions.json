@@ -3390,6 +3390,19 @@
                 "new": "New"
             }
         },
+        "html.device.links": {
+            "default": [],
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "object",
+                "value.*.action": "boolean",
+                "value.*.icon": "string",
+                "value.*.external": "boolean",
+                "value.*.title": "required|string",
+                "value.*.url": "required|string"
+            }
+        },
         "html.device.primary_link": {
             "group": "webui",
             "section": "device",
