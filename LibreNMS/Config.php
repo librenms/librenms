@@ -25,6 +25,7 @@
 namespace LibreNMS;
 
 use App\Models\GraphType;
+use App\Models\PortGroup;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
@@ -82,7 +83,18 @@ class Config
      */
     public static function getDefinitions()
     {
-        return json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
+        $config_data = json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
+
+        $port_group_data = PortGroup::all()->sortBy("name");
+
+        $port_group_list = ["0" => "no default Portgroup"];
+        foreach ($port_group_data as $port_group) {
+            $port_group_list[$port_group->id] = $port_group->name;
+        }
+
+        $config_data['default_port_group']['options'] = $port_group_list;
+
+        return $config_data;
     }
 
     private static function loadDefaults()

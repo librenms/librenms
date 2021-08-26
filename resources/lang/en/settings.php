@@ -1185,6 +1185,10 @@ return [
             'description' => 'Max number of routes allowed for discovery',
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
         ],
+        'default_port_group' => [
+            'description' => 'Default Port Group',
+            'help' => 'New discovered Ports will be assigned to this port Group.',
+        ],
         'nets' => [
             'description' => 'Autodiscovery Networks',
             'help' => 'Networks from which devices will be discovered automatically.',

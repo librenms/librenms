@@ -863,8 +863,14 @@
             "type": "boolean"
         },
         "default_port_group": {
+            "order": 0,
+            "group": "discovery",
+            "section": "networks",
             "default": 0,
-            "type": "integer"
+            "type": "select",
+            "options": {
+                "0": "no default group"
+            }
         },
         "device_location_map_open": {
             "order": 2,
