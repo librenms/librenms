@@ -40,8 +40,27 @@ systems, as shown in the example of Open-audIT.
 The Links value is parsed by Laravel Blade's templating engine so you
 can use Device variables such as `hostname`, `sysName` and more.
 
-`config.php:`
+```bash
+lnms config:set html.device.links.+ '{"url": "http://atssrv/open-audit/index/devices/{{ $device->sysName }}", "title": "Open-AudIT"}'
+```
 
-```php
-$config['html']['device']['links'][] = ['url' => 'http://atssrv/open-audit/index/devices/{{ $device[\'sysName\'] }}', 'title' => 'Open-AudIT'];
+### Launching Windows programs from the LibreNMS device menu
+
+You can launch windows programs from links in LibrNMS, but it does take
+some registry entries on the client device
+
+```
+[HKEY_CLASSES_ROOT\winbox]
+@="URL:winbox Protocol"
+"URL Protocol"=""
+[HKEY_CLASSES_ROOT\winbox\shell]
+[HKEY_CLASSES_ROOT\winbox\shell\open]
+[HKEY_CLASSES_ROOT\winbox\shell\open\command]
+@="c:\winbox.exe" "%1"
+```
+
+Now we can use that in the device menu entry to open winbox
+
+```bash
+lnms config:set html.device.links.+ '{"url": "winbox://{{ $device->ip }}", "title": "Winbox"}'
 ```
