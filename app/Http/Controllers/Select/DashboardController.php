@@ -36,7 +36,7 @@ class DashboardController extends SelectController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -60,7 +60,7 @@ class DashboardController extends SelectController
     public function formatResponse($paginator)
     {
         if (! request()->has('term')) {
-            $paginator->prepend((object)['dashboard_id' => 0]);
+            $paginator->prepend((object) ['dashboard_id' => 0]);
         }
 
         return parent::formatResponse($paginator);
