@@ -66,11 +66,18 @@ return [
             'old_key' => 'The old APP_KEY which is valid for encrypted data',
         ],
         'cleared-cache' => 'Config was cached, cleared cache to make sure APP_KEY is correct. Please re-run lnms key:rotate',
+        'backup_keys' => 'Document BOTH keys! In case something goes wrong set the new key in .env and use the old key as an argument to this command',
         'backups' => 'This command could cause irreversible loss of data and will invalidate all browser sessions. Make sure you have backups.',
         'confirm' => 'I have backups and want to continue',
         'decrypt-failed' => 'Failed to decrypt :item, skipping',
+        'failed' => 'Failed to decrypt item(s).  Set new key as APP_KEY and run this again with the old key as an argument.',
+        'new_key' => 'New key: :key',
+        'old_key' => 'Old key: :key',
+        'save_key' => 'Save new key to .env?',
+        'success' => 'Successfully rotated keys!',
         'validation-errors' => [
             'not_in' => ':attribute must not match current APP_KEY',
+            'required' => 'Either old key or --generate-new-key is required.',
         ],
     ],
     'smokeping:generate' => [

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use LibreNMS\Util\EnvHelper;
 use Symfony\Component\Console\Input\InputArgument;
 
 class KeyRotate extends LnmsCommand
@@ -36,7 +37,8 @@ class KeyRotate extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->addArgument('old_key', InputArgument::REQUIRED);
+        $this->addArgument('old_key', InputArgument::OPTIONAL);
+        $this->addOption('generate-new-key', InputArgument::OPTIONAL);
     }
 
     /**
@@ -50,7 +52,13 @@ class KeyRotate extends LnmsCommand
         $cipher = config('app.cipher');
 
         $this->validate([
+            'generate-new-key' => [
+                'exclude_unless:old_key,null',
+                'boolean',
+            ],
             'old_key' => [
+                'exclude_if:generate-new-key,true',
+                'required',
                 'starts_with:base64:',
                 Rule::notIn([$new]),
             ],
@@ -64,8 +72,21 @@ class KeyRotate extends LnmsCommand
             return 0;
         }
 
+        $old = $this->argument('old_key');
+        if ($this->option('generate-new-key')) {
+            $old = $new; // use key in env as existing key
+            $new = 'base64:' . base64_encode(
+                    Encrypter::generateKey($this->laravel['config']['app.cipher'])
+                );
+        }
+
+        $this->line(trans('commands.key:rotate.old_key', ['key' => $old]));
+        $this->line(trans('commands.key:rotate.new_key', ['key' => $new]));
+        $this->error(trans('commands.key:rotate.backup_keys'));
+        $this->newLine();
+
         // init encrypters
-        $this->decrypt = $this->createEncrypter($this->argument('old_key'), $cipher);
+        $this->decrypt = $this->createEncrypter($old, $cipher);
         $this->encrypt = $this->createEncrypter($new, $cipher);
 
         $this->line(trans('commands.key:rotate.backups'));
@@ -73,7 +94,23 @@ class KeyRotate extends LnmsCommand
             return 1;
         }
 
-        $this->rekeyConfigData('validation.encryption.test');
+        $success = $this->rekeyConfigData('validation.encryption.test');
+
+        if (! $success) {
+            $this->line(trans('commands.key:rotate.old_key', ['key' => $old]));
+            $this->line(trans('commands.key:rotate.new_key', ['key' => $new]));
+            $this->error(trans('commands.key:rotate.failed'));
+            return 1;
+        }
+
+        $this->info(trans('commands.key:rotate.success'));
+
+        if ($this->option('generate-new-key') && $this->confirm(trans('commands.key:rotate.save_key'))) {
+            EnvHelper::writeEnv([
+                'OLD_APP_KEY' => $old,
+                'APP_KEY' => $new,
+            ], ['OLD_APP_KEY', 'APP_KEY']);
+        }
 
         return 0;
     }
@@ -95,9 +132,15 @@ class KeyRotate extends LnmsCommand
 
             return true;
         } catch (DecryptException $e) {
-            $this->warn(trans('commands.key:rotate.decrypt-failed', ['item' => $key]));
+            try {
+                $this->encrypt->decryptString(\LibreNMS\Config::get($key));
 
-            return false;
+                return true; // already rotated
+            } catch (DecryptException $e) {
+                $this->warn(trans('commands.key:rotate.decrypt-failed', ['item' => $key]));
+
+                return false;
+            }
         }
     }
 }
