@@ -72,6 +72,20 @@
                     },
                     {
                         "properties": {
+                            "type": {"const": "select-dynamic"},
+                            "options": {
+                                "type": "object",
+                                "properties": {
+                                    "target": "string"
+                                },
+                                "required": ["target"],
+                                "additionalProperties": false
+                            }
+                        },
+                        "required": ["options"]
+                    },
+                    {
+                        "properties": {
                             "type": {
                                 "type": "string",
                                 "enum": [

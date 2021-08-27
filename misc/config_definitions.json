@@ -1309,10 +1309,16 @@
         },
         "default_poller_group": {
             "default": 0,
-            "type": "integer",
+            "type": "select-dynamic",
             "group": "poller",
             "section": "distributed",
-            "order": 3
+            "order": 3,
+            "options": {
+                "target": "poller-group"
+            },
+            "validate": {
+                "value": "integer"
+            }
         },
         "distributed_poller_memcached_host": {
             "default": "example.net",
