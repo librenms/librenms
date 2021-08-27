@@ -84,6 +84,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
     Route::get('plugin/v1/{plugin:plugin_name}', 'PluginLegacyController')->name('plugin.legacy');
+    Route::get('plugin/{plugin:plugin_name}', 'PluginPageController')->name('plugin.page');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
