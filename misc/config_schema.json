@@ -104,7 +104,6 @@
                                     "color",
                                     "float",
                                     "graph",
-                                    "dashboard-select",
                                     "snmp3auth",
                                     "ldap-groups",
                                     "ad-groups",

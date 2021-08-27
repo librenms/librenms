@@ -55,7 +55,7 @@ export default {
             return {
                 ajax: {
                     url: route('ajax.select.' + this.options.target).toString(),
-                    delay: 150
+                    delay: 250
                 }
             }
         }

@@ -1317,7 +1317,7 @@
                 "target": "poller-group"
             },
             "validate": {
-                "value": "integer"
+                "value": "integer|zero_or_exists:poller_groups,id"
             }
         },
         "distributed_poller_memcached_host": {
@@ -5432,9 +5432,12 @@
             "group": "webui",
             "section": "dashboard",
             "order": 0,
-            "type": "dashboard-select",
+            "type": "select-dynamic",
+            "options": {
+                "target": "dashboard"
+            },
             "validate": {
-                "value": "zero_or_exists:dashboards,dashboard_id"
+                "value": "integer|zero_or_exists:dashboards,dashboard_id"
             }
         },
         "webui.dynamic_graphs": {

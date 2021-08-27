@@ -30,7 +30,7 @@ class DashboardController extends SelectController
 {
     protected function searchFields($request)
     {
-        return ['dashboard_name'];
+        return ['dashboard_name', 'username'];
     }
 
     /**
@@ -43,23 +43,36 @@ class DashboardController extends SelectController
     {
         return Dashboard::query()
             ->where('access', '>', 0)
-            ->with('user')
-            ->orderBy('user_id')
-            ->orderBy('dashboard_name');
+            ->leftJoin('users', 'dashboards.user_id', 'users.user_id') // left join so we can search username
+            ->orderBy('dashboards.user_id')
+            ->orderBy('dashboard_name')
+            ->select(['dashboard_id', 'username', 'dashboard_name']);
     }
 
-    public function formatItem($dashboard)
+    public function formatItem($dashboard): array
     {
-        /** @var Dashboard $dashboard */
         return [
             'id' => $dashboard->dashboard_id,
             'text' => $this->describe($dashboard),
         ];
     }
 
-    private function describe($dashboard)
+    public function formatResponse($paginator)
     {
-        return "{$dashboard->user->username}: {$dashboard->dashboard_name} ("
+        if (! request()->has('term')) {
+            $paginator->prepend((object)['dashboard_id' => 0]);
+        }
+
+        return parent::formatResponse($paginator);
+    }
+
+    private function describe($dashboard): string
+    {
+        if ($dashboard->dashboard_id == 0) {
+            return 'No Default Dashboard';
+        }
+
+        return "{$dashboard->username}: {$dashboard->dashboard_name} ("
             . ($dashboard->access == 1 ? __('read-only') : __('read-write')) . ')';
     }
 }
