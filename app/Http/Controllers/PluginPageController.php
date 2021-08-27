@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Plugin;
 use App\Plugins\Hooks\PageHook;
 use App\Plugins\PluginManager;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class PluginPageController extends Controller
