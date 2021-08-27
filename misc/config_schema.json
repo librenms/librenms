@@ -76,8 +76,9 @@
                             "options": {
                                 "type": "object",
                                 "properties": {
-                                    "target": "string"
+                                    "target": {"type": "string"}
                                 },
+                                "minProperties": 1,
                                 "required": ["target"],
                                 "additionalProperties": false
                             }
