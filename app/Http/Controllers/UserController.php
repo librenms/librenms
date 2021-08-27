@@ -165,6 +165,10 @@ class UserController extends Controller
             $user->setPassword($request->new_password);
         }
 
+        if ($request->get('kick_user_session')) {
+            $this->kick($user);
+        }
+
         $user->fill($request->all());
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
@@ -182,6 +186,20 @@ class UserController extends Controller
         }
 
         return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
+    }
+
+    /**
+     * kick User Sessions.
+     *
+     * @param User $user
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function kick(User $user)
+    {
+        $user->sessions()->delete();
+
+        return response()->json(__('User :username kicked.', ['username' => $user->username]));
     }
 
     /**

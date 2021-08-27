@@ -88,6 +88,17 @@
 </div>
 @endif
 
+
+<div class="form-group">
+    <label for="kick_user_session" class="control-label col-sm-3">@lang('Kick User Sessions')</label>
+    <div class="col-sm-9">
+        <input type="hidden" value="0" name="kick_user_session">
+        <input type="checkbox" id="kick_user_session" name="kick_user_session" data-size="small" @if(Auth::id() == $user->user_id) disabled @endif>
+        @if ( $user->sessions()->count() ) {{ $user->sessions()->count() }} @lang('active Sessions') @else @lang('no active Session') @endif
+        <span class="help-block">{{ $errors->first('kick_user_session') }}</span>
+    </div>
+</div>
+
 <script>
 $("[type='checkbox']").bootstrapSwitch();
 </script>

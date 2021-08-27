@@ -40,6 +40,15 @@ class User extends Authenticatable
         'can_modify_passwd' => 'integer',
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (User $user) {
+            $user->sessions()->delete();
+        });
+    }
+
     // ---- Helper Functions ----
 
     /**
@@ -231,4 +240,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
     }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(\App\Models\Sessions::class, 'user_id', 'user_id');
+    }
+
 }

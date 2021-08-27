@@ -33,7 +33,7 @@
                     @foreach($users as $user)
                         <tr>
                             <td>{{ $user->user_id }}</td>
-                            <td>{{ $user->username }}</td>
+                            <td>{{ $user->username }} @if($user->sessions()->count() ) (@lang('active')) @endif</td>
                             <td>{{ $user->realname }}</td>
                             <td>{{ $user->level }}</td>
                             <td>{{ $user->auth_type }}</td>
