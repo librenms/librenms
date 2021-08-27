@@ -238,7 +238,7 @@ class PluginManager
             });
     }
 
-    protected function fillArgs(array $args, $pluginName)
+    protected function fillArgs(array $args, string $pluginName): array
     {
         if (isset($args['settings'])) {
             throw new PluginException('You cannot inject "settings", this is a reserved name');

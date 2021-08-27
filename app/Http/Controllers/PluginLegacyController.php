@@ -20,7 +20,7 @@ class PluginLegacyController extends Controller
         return redirect()->route('plugin.admin');
     }
 
-    public function __invoke(?Plugin $plugin)
+    public function __invoke(?Plugin $plugin): \Illuminate\Contracts\View\View
     {
         if (! empty($plugin)) {
             $plugin_path = \LibreNMS\Config::get('plugin_dir') . '/' . $plugin->plugin_name . '/' . $plugin->plugin_name . '.inc.php';
