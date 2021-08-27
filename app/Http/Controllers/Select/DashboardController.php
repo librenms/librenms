@@ -49,6 +49,10 @@ class DashboardController extends SelectController
             ->select(['dashboard_id', 'username', 'dashboard_name']);
     }
 
+    /**
+     * @param  object  $dashboard
+     * @return array
+     */
     public function formatItem($dashboard): array
     {
         return [
