@@ -38,7 +38,7 @@ class KeyRotate extends LnmsCommand
     {
         parent::__construct();
         $this->addArgument('old_key', InputArgument::OPTIONAL);
-        $this->addOption('generate-new-key', InputArgument::OPTIONAL);
+        $this->addOption('generate-new-key');
     }
 
     /**
