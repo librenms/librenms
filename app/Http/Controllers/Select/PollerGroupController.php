@@ -53,7 +53,7 @@ class PollerGroupController extends SelectController
         return parent::formatResponse($paginator);
     }
 
-    private function includeGeneral()
+    private function includeGeneral(): bool
     {
         if (request()->has('id') && request('id') !== 0) {
             return false;
