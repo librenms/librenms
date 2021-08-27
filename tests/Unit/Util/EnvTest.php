@@ -65,7 +65,7 @@ class EnvTest extends TestCase
 
         // replace
         $this->assertEquals("#COMMENT=something\nCOMMENT=else\n", EnvHelper::setEnv("COMMENT=nothing\n#COMMENT=something", [
-            'COMMENT' => 'else'
+            'COMMENT' => 'else',
         ], ['COMMENT']));
     }
 }

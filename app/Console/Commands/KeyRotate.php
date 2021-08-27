@@ -100,6 +100,7 @@ class KeyRotate extends LnmsCommand
             $this->line(trans('commands.key:rotate.old_key', ['key' => $old]));
             $this->line(trans('commands.key:rotate.new_key', ['key' => $new]));
             $this->error(trans('commands.key:rotate.failed'));
+
             return 1;
         }
 
