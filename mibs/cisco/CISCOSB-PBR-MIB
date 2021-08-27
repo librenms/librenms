@@ -1,0 +1,192 @@
+CISCOSB-PBR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                                   FROM CISCOSB-MIB
+    InetAddressType,InetAddress,InetAddressIPv6                 FROM INET-ADDRESS-MIB -- RFC2851
+    TEXTUAL-CONVENTION, DisplayString, RowStatus                FROM SNMPv2-TC
+    InterfaceIndexOrZero, InterfaceIndex                        FROM IF-MIB              -- [RFC2863]
+    OBJECT-TYPE, Unsigned32                                     FROM SNMPv2-SMI
+    rlRouteMapPbrRouteMapName, rlRouteMapPbrRouteMapSectionId   FROM CISCOSB-ROUTEMAP-MIB;
+
+
+rlPolicyBasedRouting   MODULE-IDENTITY
+        LAST-UPDATED "201506080000A"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+         
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for Policy-Based Routing mechanism."
+        REVISION "201506080000A"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 228 }
+
+RlPBRInetType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The inet type of a policy"
+     SYNTAX INTEGER {
+            ipv4(1),
+            ipv6(2)
+     }
+
+RlPBRStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The types of status for policy-based routing entry"
+     SYNTAX INTEGER {
+            active(1),
+            noIp(2),
+            interfaceDown(3)
+     }
+
+
+-- ============================================================
+--                     rlPBRTable
+-- ============================================================
+
+rlPBRTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlPBREntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "Table containing policy-based routing binding information."
+   ::= { rlPolicyBasedRouting 1 }
+
+rlPBREntry OBJECT-TYPE
+    SYNTAX  RlPBREntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlPBRIfIndex,
+            rlPBRInetType }
+    ::= { rlPBRTable 1 }
+
+RlPBREntry ::= SEQUENCE {
+    rlPBRIfIndex            InterfaceIndex,
+    rlPBRInetType           RlPBRInetType,
+    rlPBRRouteMapName       DisplayString,
+    rlPBRStatus             RlPBRStatusType,
+    rlPBRRowStatus          RowStatus
+}
+
+rlPBRIfIndex OBJECT-TYPE
+   SYNTAX       InterfaceIndex
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION  "IfIndex on which policy based routing is applied."
+   ::= { rlPBREntry 1 }
+
+rlPBRInetType OBJECT-TYPE
+   SYNTAX       RlPBRInetType
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION  "Inet type of this entry."
+   ::= { rlPBREntry 2 }
+
+rlPBRRouteMapName OBJECT-TYPE
+   SYNTAX       DisplayString(SIZE(1..32))
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "Route map name to apply."
+   ::= { rlPBREntry 3 }
+
+rlPBRStatus OBJECT-TYPE
+   SYNTAX       RlPBRStatusType
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "The route status for this entry."
+   ::= { rlPBREntry 4 }
+
+rlPBRRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "The row status of this entry."
+   ::= { rlPBREntry 5 }
+
+
+-- ============================================================
+--                     rlPBRInfoTable
+-- ============================================================
+
+RlPBRNexthopStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The types of status of nexthop for policy-based routing entry"
+     SYNTAX INTEGER {
+            active(1),
+            notReachable(2),
+            notDirect(3)
+     }
+
+rlPBRInfoTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlPBRInfoEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "Table containing policy-based routing information."
+   ::= { rlPolicyBasedRouting 2 }
+
+rlPBRInfoEntry OBJECT-TYPE
+    SYNTAX  RlPBRInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlPBRInetType,
+            rlPBRIfIndex,
+            rlRouteMapPbrRouteMapName,
+            rlRouteMapPbrRouteMapSectionId }
+    ::= { rlPBRInfoTable 1 }
+
+RlPBRInfoEntry ::= SEQUENCE {
+    rlPBRInfoAccessListName         DisplayString,
+    rlPBRInfoNexthopInetAddressType InetAddressType,
+    rlPBRInfoNexthopInetAddress     InetAddress,
+    rlPBRInfoNexthopIfIndex         InterfaceIndexOrZero,
+    rlPBRInfoNexthopStatus          RlPBRNexthopStatusType
+}
+
+rlPBRInfoAccessListName OBJECT-TYPE
+   SYNTAX       DisplayString(SIZE(1..32))
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Access-list name of policy-based routing."
+   ::= { rlPBRInfoEntry 1 }
+
+rlPBRInfoNexthopInetAddressType OBJECT-TYPE
+   SYNTAX       InetAddressType
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Inet type of rlPBRInfoNexthopInetAddress"
+   ::= { rlPBRInfoEntry 2 }
+
+rlPBRInfoNexthopInetAddress OBJECT-TYPE
+   SYNTAX       InetAddress
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Inet address of nexthop, if used for action."
+   ::= { rlPBRInfoEntry 3 }
+
+rlPBRInfoNexthopIfIndex OBJECT-TYPE
+   SYNTAX       InterfaceIndexOrZero
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Inet address of nexthop, if used for action."
+   ::= { rlPBRInfoEntry 4 }
+
+rlPBRInfoNexthopStatus OBJECT-TYPE
+   SYNTAX       RlPBRNexthopStatusType
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Status of nexthop."
+   ::= { rlPBRInfoEntry 5 }
+
+END

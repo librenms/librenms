@@ -7,6 +7,7 @@
 */5  *    * * *   librenms    /opt/librenms/poll-billing.php >> /dev/null 2>&1
 01   *    * * *   librenms    /opt/librenms/billing-calculate.php >> /dev/null 2>&1
 */5  *    * * *   librenms    /opt/librenms/check-services.php >> /dev/null 2>&1
+*    *    * * *   librenms    cd /opt/librenms/ && php artisan schedule:run >> /dev/null 2>&1
 
 # Daily maintenance script. DO NOT DISABLE!
 # If you want to modify updates:

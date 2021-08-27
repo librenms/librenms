@@ -95,6 +95,12 @@ return [
         'unit' => '%',
         'unit_long' => '百分比',
     ],
+    'loss' => [
+        'short' => '百分比',
+        'long' => '遺失百分比',
+        'unit' => '%',
+        'unit_long' => '百分比',
+    ],
     'power' => [
         'short' => '電力',
         'long' => '電力',
@@ -137,6 +143,12 @@ return [
         'unit' => 'dBm',
         'unit_long' => '毫瓦分貝',
     ],
+    'tv_signal' => [
+        'short' => '訊號',
+        'long' => 'TV 訊號',
+        'unit' => 'dBmV',
+        'unit_long' => '毫伏分貝',
+    ],
     'snr' => [
         'short' => 'SNR',
         'long' => '訊號雜訊比',
@@ -165,5 +177,11 @@ return [
         'long' => '水流',
         'unit' => 'l/m',
         'unit_long' => '升每分鐘',
+    ],
+    'percent' => [
+        'short' => '百分比',
+        'long' => '百分比',
+        'unit' => '%',
+        'unit_long' => '百分比',
     ],
 ];

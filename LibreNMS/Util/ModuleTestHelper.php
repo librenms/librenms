@@ -56,13 +56,14 @@ class ModuleTestHelper
     private $exclude_from_all = ['arp-table', 'fdb-table'];
     private static $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
-        'vlans' => ['ports', 'vlans'],
-        'vrf' => ['ports', 'vrf'],
+        'isis' => ['ports', 'isis'],
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
-        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
+        'vlans' => ['ports', 'vlans'],
+        'vrf' => ['ports', 'vrf'],
     ];
 
     /**
@@ -651,7 +652,7 @@ class ModuleTestHelper
         $module_output = [];
         $module_start = "#### Load $type module ";
         $module_end = "#### Unload $type module %s ####";
-        $parts = explode($module_start, $output); /* @phpstan-ignore-line */
+        $parts = explode($module_start, $output);
         array_shift($parts); // throw away first part of output
         foreach ($parts as $part) {
             // find the module name

@@ -1,0 +1,90 @@
+-- =====================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is for configuring and monitoring the working mode of
+--    FCoE (Fibre Channel over Ethernet) features.
+-- Reference:
+-- Version: V1.1
+-- History:
+--   V1.0 Initial version
+--        created by linlongjun 2013-03-08
+--   V1.1 Added FCF-NPV mode of hh3cFcoeModeCfgMode by chengzhipeng 2014-02-07
+-- =====================================================================
+HH3C-FCOE-MODE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cFcoeMode MODULE-IDENTITY
+    LAST-UPDATED   "201303081100Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+        "
+    DESCRIPTION
+        "This MIB module is for configuring and monitoring the working mode of
+         FCoE (Fibre Channel over Ethernet) features."
+    REVISION       "201303081100Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 135 }
+
+--
+-- Node definitions
+--
+hh3cFcoeModeMibObjects OBJECT IDENTIFIER ::= { hh3cFcoeMode 1 }
+
+hh3cFcoeModeCfgMode OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object specifies the FCoE modes the switch supports.
+
+         The object has five available values:
+         1: non-FCoE mode.
+         2: FCF mode.
+         3: NPV mode.
+         4: Transit mode.
+         5: FCF-NPV mode.
+
+         The switch mode can only be converted from non-FCoE mode to one of FCoE
+         modes, or vice versa, but cannot be converted directly among the other
+         four FCoE modes.
+
+         To convert among the other four FCoE modes, the switch should first
+         be converted to non-FCoE mode.  After converting the switch to non-FCoE
+         mode, FCoE-related configurations in the original FCoE mode will be
+         cleared."
+    ::= { hh3cFcoeModeMibObjects 1 }
+
+hh3cFcoeModeCfgLastResult OBJECT-TYPE
+    SYNTAX INTEGER {
+                      success(1),
+                      noLicence(2),
+                      needReset(3),
+                      unknownFault(4)
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This object specifies the result of the latest FCoE mode configuration.
+
+        The object has four values:
+        success      - Configured successfully.
+        noLicence    - Configured unsuccessfully for lack of license.
+        needReset    - Configured unsuccessfully, because the desired mode is
+                       not non-FCoE mode, and the mode should be first set to
+                       non-FCoE mode.
+        unknownFault - Configured unsuccessfully for unknown fault."
+    ::= { hh3cFcoeModeMibObjects 2 }
+
+END

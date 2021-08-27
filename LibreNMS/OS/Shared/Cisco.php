@@ -317,11 +317,15 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         }
 
         foreach ($sla_data as $index => $sla_config) {
+            if (empty($sla_config['rttMonCtrlAdminRttType'])) {
+                continue; // skip garbage entries
+            }
+
             $slas->push(new Sla([
                 'sla_nr' => $index,
                 'owner' => $sla_config['rttMonCtrlAdminOwner'] ?? '',
                 'tag' => $this->getSlaTag($sla_config),
-                'rtt_type' => $sla_config['rttMonCtrlAdminRttType'] ?? '',
+                'rtt_type' => $sla_config['rttMonCtrlAdminRttType'],
                 'rtt' => $sla_config['rttMonLatestRttOperCompletionTime'] ?? null,
                 'status' => ($sla_config['rttMonCtrlAdminStatus'] == 'active') ? 1 : 0,
                 'opstatus' => ($sla_config['rttMonLatestRttOperSense'] == 'ok') ? 0 : 2,

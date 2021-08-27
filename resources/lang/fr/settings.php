@@ -355,11 +355,11 @@ return [
             'help' => 'Durée de conservation de l\'utilisateur quand la case "Se souvenir de moi" est cochée',
         ],
         'authlog_purge' => [
-            'description' => 'Journaux de connexions plus anciens que (jours)',
+            'description' => 'Journaux de connexions plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'device_perf_purge' => [
-            'description' => 'Stats de performances plus anciennes que (jours)',
+            'description' => 'Stats de performances plus anciennes que',
             'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh',
         ],
         'discovery_modules' => [
@@ -565,7 +565,7 @@ return [
             'help' => 'Nom utilisé dans le champ "from" de l\'adresse',
         ],
         'eventlog_purge' => [
-            'description' => 'Journaux d\'évenements plus anciens que (jours)',
+            'description' => 'Journaux d\'évenements plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'favicon' => [
@@ -774,7 +774,7 @@ return [
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Interfaces, entrées plus anciennes que (jours)',
+            'description' => 'Interfaces, entrées plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'public_status' => [
@@ -798,7 +798,7 @@ return [
             'help' => 'Emplacement des fichiers rrd.  Défaut: fichiers rrd dans le répertoire de LibreNMS. La modification de cette valeur ne déplace pas les fichiers RRD.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD, fichiers non modifiés depuis plus de (jours)',
+            'description' => 'RRD, fichiers non modifiés depuis plus de',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'rrd_rra' => [
@@ -898,7 +898,7 @@ return [
             'description' => 'Filtrer les messages syslog contenant',
         ],
         'syslog_purge' => [
-            'description' => 'Entrées syslogs plus anciennes que (jours)',
+            'description' => 'Entrées syslogs plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'title_image' => [

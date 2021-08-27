@@ -40,6 +40,7 @@ return [
             'location' => '位置資訊設定',
             'graylog' => 'Graylog 整合',
             'oxidized' => 'Oxidized 整合',
+            'mac_oui' => 'Mac OUI 查詢整合',
             'peeringdb' => 'PeeringDB 整合',
             'nfsen' => 'NfSen 整合',
             'unix-agent' => 'Unix-Agent 整合',
@@ -57,6 +58,7 @@ return [
             'rrdtool' => 'RRDTool 設定',
             'snmp' => 'SNMP',
             'poller_modules' => '輪詢器模組',
+            'interface_types' => 'RFC 7224 介面類型',
         ],
         'system' => [
             'cleanup' => '清理',
@@ -361,7 +363,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => '驗證記錄項目大於 (天)',
+            'description' => '驗證記錄項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -369,7 +371,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => '裝置效能項目大於 (天)',
+            'description' => '裝置效能項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'distributed_poller' => [
@@ -446,7 +448,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => '事件記錄大於 (天)',
+            'description' => '事件記錄大於',
             'help' => '由 daily.sh 進行清理作業',
         ],
         'favicon' => [
@@ -595,6 +597,12 @@ return [
             'description' => '登入訊息',
             'help' => '顯示於登入頁面',
         ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => '啟用 MAC OUI 查詢',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
+        ],
         'mono_font' => [
             'description' => 'Monospaced 字型',
         ],
@@ -700,6 +708,10 @@ return [
                 ],
             ],
         ],
+        'bad_iftype' => [
+            'description' => '捨棄介面',
+            'help' => '應該被忽略的網路介面類型',
+        ],
         'ping' => [
             'description' => 'ping 路徑',
         ],
@@ -708,7 +720,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '連接埠大於 (天)',
+            'description' => '連接埠大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -748,7 +760,7 @@ return [
             ],
         ],
         'route_purge' => [
-            'description' => '路由記錄大於 (天)',
+            'description' => '路由記錄大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -764,7 +776,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD 檔案項目大於 (天)',
+            'description' => 'RRD 檔案項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -868,7 +880,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog 項目大於 (天)',
+            'description' => 'Syslog 項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [
@@ -880,6 +892,14 @@ return [
         ],
         'traceroute6' => [
             'description' => 'traceroute6 路徑',
+        ],
+        'twofactor' => [
+            'description' => '雙因素驗證',
+            'help' => '允許使用者啟用基於時間 (TOTP) 或基於雜湊訊息驗證 (HOTP) 的一次性密碼 (OTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => '雙因素驗證碼有效時間 (秒)',
+            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
         'unix-agent' => [
             'connection-timeout' => [

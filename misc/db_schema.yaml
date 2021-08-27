@@ -313,6 +313,8 @@ bill_history:
     - { Field: traf_in, Type: bigint, 'Null': false, Extra: '' }
     - { Field: traf_out, Type: bigint, 'Null': false, Extra: '' }
     - { Field: traf_total, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: bill_peak_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bill_peak_in, Type: bigint, 'Null': true, Extra: '' }
     - { Field: pdf, Type: longblob, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bill_hist_id], Unique: true, Type: BTREE }
@@ -794,16 +796,17 @@ isis_adjacencies:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int, 'Null': false, Extra: '' }
-    - { Field: port_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int, 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: int, 'Null': false, Extra: '' }
     - { Field: isisISAdjState, Type: varchar(13), 'Null': false, Extra: '' }
-    - { Field: isisISAdjNeighSysType, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: isisISAdjNeighSysID, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: isisISAdjNeighPriority, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: isisISAdjLastUpTime, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: isisISAdjAreaAddress, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: isisISAdjIPAddrType, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: isisISAdjIPAddrAddress, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: isisISAdjNeighSysType, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjNeighSysID, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjNeighPriority, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjLastUpTime, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: isisISAdjAreaAddress, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjIPAddrType, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjIPAddrAddress, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisCircAdminState, Type: varchar(16), 'Null': false, Extra: '', Default: 'off' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1417,8 +1420,6 @@ ports:
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifConnectorPresent, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Extra: '' }
-    - { Field: ifHighSpeed, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifHighSpeed_prev, Type: int, 'Null': true, Extra: '' }
     - { Field: ifOperStatus, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifOperStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifAdminStatus, Type: varchar(16), 'Null': true, Extra: '' }
@@ -1966,6 +1967,8 @@ syslog:
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
+    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
+    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

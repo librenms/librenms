@@ -625,6 +625,7 @@
         },
         "authlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 4,
@@ -670,6 +671,13 @@
             "default": [
                 "/-K9W8-/"
             ]
+        },
+        "bad_entity_sensor_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "bad_disk_regexp": {
             "default": [],
@@ -767,6 +775,14 @@
             "default": "https://stats.librenms.org/log.php",
             "type": "text"
         },
+        "callback_proxy": {
+            "default": null,
+            "type": "text"
+        },
+        "collectd_dir": {
+            "default": null,
+            "type": "directory"
+        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
@@ -842,6 +858,14 @@
             "hidden": true,
             "type": "boolean"
         },
+        "debug.run_trace": {
+            "default": false,
+            "type": "boolean"
+        },
+        "default_port_group": {
+            "default": 0,
+            "type": "integer"
+        },
         "device_location_map_open": {
             "order": 2,
             "group": "webui",
@@ -861,6 +885,7 @@
         },
         "device_perf_purge": {
             "default": 7,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 7,
@@ -953,6 +978,17 @@
                 }
             ],
             "type": "array"
+        },
+        "disabled_sensors": {
+            "default": null,
+            "type": "array"
+        },
+        "disabled_sensors_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "discover_services": {
             "default": false,
@@ -1551,6 +1587,7 @@
         },
         "eventlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 0,
@@ -1685,6 +1722,10 @@
         "github_api": {
             "default": "https://api.github.com/repos/librenms/librenms/",
             "type": "text"
+        },
+        "good_if": {
+            "default": null,
+            "type": "array"
         },
         "graph_colours.blues": {
             "default": [
@@ -3280,6 +3321,13 @@
             },
             "type": "array"
         },
+        "graphs.port_speed_zoom": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "graph",
+            "order": 4
+        },
         "graphs.row.normal": {
             "default": {
                 "sixhour": "6 Hours",
@@ -3699,6 +3747,10 @@
             ],
             "type": "array"
         },
+        "libvirt_username": {
+            "default": null,
+            "type": "text"
+        },
         "list_colour.even": {
             "default": "#ffffff",
             "type": "color"
@@ -3726,6 +3778,27 @@
         "list_colour.odd_alt2": {
             "default": "#e3e3e3",
             "type": "color"
+        },
+        "location_map": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
+        "location_map_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
+        "location_map_regex_sub": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
         },
         "log_dir": {
             "type": "directory"
@@ -4252,6 +4325,10 @@
             "section": "device-group",
             "type": "boolean"
         },
+        "php_memory_limit": {
+            "default": null,
+            "type": "integer"
+        },
         "ping": {
             "default": "/bin/ping",
             "group": "external",
@@ -4673,6 +4750,10 @@
             "order": 7,
             "type": "boolean"
         },
+        "rancid_configs": {
+            "default": [],
+            "type": "array"
+        },
         "rancid_ignorecomments": {
             "default": false,
             "type": "boolean"
@@ -4703,6 +4784,7 @@
         },
         "route_purge": {
             "default": 10,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 2,
@@ -4733,6 +4815,7 @@
             "section": "cleanup",
             "order": 8,
             "default": 0,
+            "units": "days",
             "type": "integer"
         },
         "rrd_rra": {
@@ -5012,6 +5095,11 @@
                 "public"
             ]
         },
+        "snmp.exec_timeout": {
+            "default": 1200,
+            "type": "integer",
+            "units": "seconds"
+        },
         "snmp.max_repeaters": {
             "group": "poller",
             "section": "snmp",
@@ -5145,8 +5233,8 @@
             "type": "text"
         },
         "summary_errors": {
-            "default": 0,
-            "type": "integer"
+            "default": false,
+            "type": "boolean"
         },
         "syslog_filter": {
             "default": [
@@ -5159,9 +5247,10 @@
         },
         "syslog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
-            "order": 2,
+            "order": 1,
             "type": "integer"
         },
         "temp_dir": {
@@ -5327,6 +5416,10 @@
             "section": "availability-map",
             "order": 2,
             "type": "boolean"
+        },
+        "webui.custom_css": {
+            "default": [],
+            "type": "array"
         },
         "webui.default_dashboard_id": {
             "default": 0,

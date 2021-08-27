@@ -24,60 +24,42 @@
 
 namespace LibreNMS\Modules;
 
-use App\Models\Device;
 use App\Models\IsisAdjacency;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
-use LibreNMS\Component;
+use Illuminate\Support\Collection;
+use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\OS;
-use LibreNMS\OS\Junos;
 use LibreNMS\Util\IP;
 
 class Isis implements Module
 {
+    use SyncsModels;
+
+    protected $isis_codes = [
+        'l1IntermediateSystem' => 'L1',
+        'l2IntermediateSystem' => 'L2',
+        'l1L2IntermediateSystem' => 'L1L2',
+        'unknown' => 'unknown',
+    ];
+
     /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param OS $os
+     * @param  OS  $os
      */
     public function discover(OS $os)
     {
-        $device_array = $os->getDeviceArray();
-        $device_id = $os->getDeviceId();
-        $options = [
-            'filter' => [
-                'device_id' => ['=', $device_id],
-                'type' => ['=', 'ISIS'],
-            ],
-        ];
+        $adjacencies = $os instanceof IsIsDiscovery
+            ? $os->discoverIsIs()
+            : $this->discoverIsIsMib($os);
 
-        $component = new Component();
-        $components = $component->getComponents($device_id, $options);
-
-        // Check if the device has any ISIS enabled interfaces
-        $circuits_poll = snmpwalk_group($device_array, 'ISIS-MIB::isisCirc', 'ISIS-MIB');
-
-        // No ISIS enabled interfaces -> delete the component
-        if (empty($circuits_poll)) {
-            if (isset($components[$device_id])) {
-                foreach ($components[$device_id] as $component_id => $_unused) {
-                    $component->deleteComponent($component_id);
-                }
-                echo "\nISIS components deleted";
-            }
-
-            // ISIS enabled interfaces found -> create the component
-        } else {
-            if (isset($components[$device_id])) {
-                $isis_component = $components[$device_id];
-            } else {
-                $isis_component = $component->createComponent($device_id, 'ISIS');
-            }
-
-            $component->setComponentPrefs($device_id, $isis_component);
-            echo "\nISIS component updated";
-        }
+        ModuleModelObserver::observe('\App\Models\IsisAdjacency');
+        $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
     /**
@@ -85,132 +67,111 @@ class Isis implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param OS $os
+     * @param  OS  $os
      */
     public function poll(OS $os)
     {
-        // Translate system state codes into meaningful strings
-        $isis_codes = ['1' => 'L1',
-            '2' => 'L2',
-            '3' => 'L1L2',
-            '4' => 'unknown',
-        ];
+        $adjacencies = $os->getDevice()->isisAdjacencies;
 
-        // Get device objects
-        $device_array = $os->getDeviceArray();
-        $device = $os->getDevice();
-        $device_id = $os->getDeviceId();
-
-        // Check if device has any ISIS enabled circuits previously discovered
-        $options = [
-            'filter' => [
-                'device_id' => ['=', $device_id],
-                'type' => ['=', 'ISIS'],
-            ],
-        ];
-
-        $component = new Component();
-        $components = $component->getComponents($device_id, $options);
-
-        if (! empty($components)) {
-
-            // Poll all ISIS enabled interfaces from the device
-            $circuits_poll = snmpwalk_group($device_array, 'ISIS-MIB::isisCirc', 'ISIS-MIB');
-
-            // Poll all available adjacencies
-            $adjacencies_poll = snmpwalk_group($device_array, 'ISIS-MIB::isisISAdj', 'ISIS-MIB');
-            $adjacencies = collect();
-            $isis_data = [];
-
-            if ($os instanceof Junos) {
-                // Do not poll loopback interface
-                unset($circuits_poll['16']);
-            }
-
-            // Loop through all configured adjacencies on the device
-            foreach ($circuits_poll as $circuit => $circuit_data) {
-                if (is_numeric($circuit)) {
-                    echo "\nAdjacency found on ifIndex: " . $circuit;
-                    $port_id = (int) $device->ports()->where('ifIndex', $circuit)->value('port_id');
-
-                    if ($circuit_data['isisCircPassiveCircuit'] != '1') {
-                        // Adjacency is UP
-                        if (! empty($adjacencies_poll[$circuit]) && Arr::last($adjacencies_poll[$circuit]['isisISAdjState']) == '3') {
-                            $isis_data['isisISAdjState'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjState']);
-                            $isis_data['isisISAdjNeighSysID'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjNeighSysID']);
-                            $isis_data['isisISAdjNeighSysType'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjNeighSysType']);
-                            $isis_data['isisISAdjNeighPriority'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjNeighPriority']);
-                            $isis_data['isisISAdjLastUpTime'] = Arr::last($adjacencies_poll[$circuit]['isisISAdjLastUpTime']);
-                            $isis_data['isisISAdjAreaAddress'] = Arr::last(Arr::last($adjacencies_poll[$circuit]['isisISAdjAreaAddress']));
-                            $isis_data['isisISAdjIPAddrType'] = Arr::last(Arr::last($adjacencies_poll[$circuit]['isisISAdjIPAddrType']));
-                            $isis_data['isisISAdjIPAddrAddress'] = Arr::last(Arr::last($adjacencies_poll[$circuit]['isisISAdjIPAddrAddress']));
-
-                            // Format data
-                            $isis_data['isisISAdjNeighSysID'] = str_replace(' ', '.', $isis_data['isisISAdjNeighSysID']);
-                            $isis_data['isisISAdjLastUpTime'] = (int) $isis_data['isisISAdjLastUpTime'] / 100;
-                            $isis_data['isisISAdjAreaAddress'] = str_replace(' ', '.', $isis_data['isisISAdjAreaAddress']);
-
-                            // Save data into the DB
-                            $adjacency = IsisAdjacency::updateOrCreate([
-                                'device_id' => $device_id,
-                                'ifIndex' => $circuit,
-                            ], [
-                                'device_id' => $device_id,
-                                'ifIndex' => $circuit,
-                                'port_id' => $port_id,
-                                'isisISAdjState' => 'up',
-                                'isisISAdjNeighSysType' => $isis_codes[$isis_data['isisISAdjNeighSysType']],
-                                'isisISAdjNeighSysID' => $isis_data['isisISAdjNeighSysID'],
-                                'isisISAdjNeighPriority' => $isis_data['isisISAdjNeighPriority'],
-                                'isisISAdjLastUpTime' => $isis_data['isisISAdjLastUpTime'],
-                                'isisISAdjAreaAddress' => $isis_data['isisISAdjAreaAddress'],
-                                'isisISAdjIPAddrType' => $isis_data['isisISAdjIPAddrType'],
-                                'isisISAdjIPAddrAddress' => IP::fromHexstring($isis_data['isisISAdjIPAddrAddress']),
-                            ]);
-                        } else {
-                            /*
-                            * Adjacency is configured on the device but not available
-                            * Update existing record to down state
-                            * Set the status of the adjacency to down
-                            * Also if the adjacency was never up, create a record
-                            */
-                            if ($circuit_data['isisCircAdminState'] != '1') {
-                                $state = 'disabled';
-                            } else {
-                                $state = 'down';
-                            }
-                            $adjacency = IsisAdjacency::updateOrCreate([
-                                'device_id' => $device_id,
-                                'ifIndex' => $circuit,
-                            ], [
-                                'device_id' => $device_id,
-                                'ifIndex' => $circuit,
-                                'port_id' => $port_id,
-                                'isisISAdjState' => $state,
-                            ]);
-                        }
-                        $adjacencies->push($adjacency);
-                    }
-                }
-            }
-
-            echo "\nFound " . $adjacencies->count() . ' configured adjacencies';
-
-            // Cleanup
-            IsisAdjacency::query()
-                ->where(['device_id' => $device['device_id']])
-                ->whereNotIn('ifIndex', $adjacencies->pluck('ifIndex'))->delete();
+        if (empty($adjacencies)) {
+            return; // no data to poll
         }
+
+        $updated = $os instanceof IsIsPolling
+            ? $os->pollIsIs($adjacencies)
+            : $this->pollIsIsMib($adjacencies, $os);
+
+        $updated->each->save();
     }
 
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      *
-     * @param OS $os
+     * @param  OS  $os
      */
     public function cleanup(OS $os)
     {
         $os->getDevice()->isisAdjacencies()->delete();
+
+        // clean up legacy components from old code
+        $os->getDevice()->components()->where('type', 'ISIS')->delete();
+    }
+
+    public function discoverIsIsMib(OS $os): Collection
+    {
+        // Check if the device has any ISIS enabled interfaces
+        $circuits = snmpwalk_cache_oid($os->getDeviceArray(), 'ISIS-MIB::isisCirc', []);
+        $adjacencies = new Collection;
+
+        if (! empty($circuits)) {
+            $adjacencies_data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'ISIS-MIB::isisISAdj', [], null, null, '-OQUstx');
+            $ifIndex_port_id_map = $os->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+            // No ISIS enabled interfaces -> delete the component
+            foreach ($circuits as $circuit_id => $circuit_data) {
+                if (! isset($circuit_data['isisCircIfIndex'])) {
+                    continue;
+                }
+
+                if ($circuit_data['isisCircPassiveCircuit'] == 'true') {
+                    continue; // Do not poll passive interfaces
+                }
+
+                $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);
+
+                $attributes = [
+                    'device_id' => $os->getDeviceId(),
+                    'ifIndex' => $circuit_data['isisCircIfIndex'],
+                    'port_id' => $ifIndex_port_id_map[$circuit_data['isisCircIfIndex']] ?? null,
+                    'isisCircAdminState' => $circuit_data['isisCircAdminState'] ?? 'down',
+                    'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? 'down',
+                ];
+
+                if (! empty($adjacency_data)) {
+                    $attributes = array_merge($attributes, [
+                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
+                        'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['isisISAdjNeighSysID'] ?? '')),
+                        'isisISAdjNeighPriority' => $adjacency_data['isisISAdjNeighPriority'] ?? '',
+                        'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
+                        'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['isisISAdjAreaAddress'] ?? '')),
+                        'isisISAdjIPAddrType' => $adjacency_data['isisISAdjIPAddrType'] ?? '',
+                        'isisISAdjIPAddrAddress' => (string) IP::fromHexstring($adjacency_data['isisISAdjIPAddrAddress'] ?? null, true),
+                    ]);
+                }
+
+                $adjacencies->push(new IsisAdjacency($attributes));
+            }
+        }
+
+        return $adjacencies;
+    }
+
+    public function pollIsIsMib(Collection $adjacencies, OS $os): Collection
+    {
+        $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjState', [], 'ISIS-MIB');
+
+        if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
+            echo 'New Adjacencies, running discovery';
+            // don't enable, might be a bad heuristic
+            return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
+        }
+
+        $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjLastUpTime', $data, 'ISIS-MIB', null, '-OQUst');
+
+        $adjacencies->each(function (IsisAdjacency $adjacency) use (&$data) {
+            $adjacency_data = Arr::last($data[$adjacency->ifIndex]);
+            $adjacency->isisISAdjState = $adjacency_data['isisISAdjState'] ?? $adjacency->isisISAdjState;
+            $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
+            $adjacency->save();
+            unset($data[$adjacency->ifIndex]);
+        });
+
+        return $adjacencies;
+    }
+
+    protected function parseAdjacencyTime($data): int
+    {
+        return (int) max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100;
     }
 }

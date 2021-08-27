@@ -1,0 +1,1181 @@
+-- =================================================================
+-- Copyright (C) 1996-2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: QOS Profile MIB
+-- Version: V2.1
+-- History:
+--   V1.0(Initial version) 6th Jul 2004
+--     V2.0 2004-10-12 updated by gaolong
+--        Import Integer32.
+--        Modify hh3cQoSProfile to hh3cQosProfile
+--        Replace INTEGER with Integer32.
+--        Change value of hh3cQoSTrafPrioPolicedServiceType from underscores to hyphens.
+--        Fix a default value error of hh3cQoSTrafPrioPolicedServiceType.
+--        Add MODULE clause for hh3cQoSProfMibCompliance.
+--   v2.1 2004-12-23 changed by zhuangyu
+--        1 Add an enumeration in hh3cQoSTrafLmtConformActionType
+--        2 Add hh3cQoSTrafLmtConformCos and hh3cQoSTrafLmtConformDscp in hh3cQoSTrafficLimitTable
+--
+-- =================================================================
+HH3C-QOS-PROFILE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cCommon
+                FROM HH3C-OID-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI
+            RowStatus, TruthValue, MacAddress, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+        hh3cQosProfile MODULE-IDENTITY
+            LAST-UPDATED "200407060000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "The private MIB file includes the general information QoS profile."
+            ::= { hh3cCommon 17 }
+
+
+--
+-- Textual conventions
+--
+        Hh3cQoSDirection ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Description."
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                input(1),
+                ouput(2)
+                }
+
+
+--
+-- Node definitions
+--
+        hh3cQoSProfObjects OBJECT IDENTIFIER ::= { hh3cQosProfile 1 }
+
+        hh3cQoSProf OBJECT IDENTIFIER ::= { hh3cQoSProfObjects 1 }
+
+        hh3cQoSProfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSProfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS profile table is used to config the qos profiles."
+            ::= { hh3cQoSProf 1 }
+
+        hh3cQoSProfEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSProfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSProfIndex }
+            ::= { hh3cQoSProfTable 1 }
+
+        Hh3cQoSProfEntry ::=
+            SEQUENCE {
+                hh3cQoSProfIndex
+                    Integer32,
+                hh3cQoSProfName
+                    OCTET STRING,
+                hh3cQoSProfActionNumber
+                    Integer32,
+                hh3cQoSProfRowStatus
+                    RowStatus
+             }
+
+        hh3cQoSProfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS profile table index."
+            ::= { hh3cQoSProfEntry 1 }
+
+        hh3cQoSProfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS profile name."
+            ::= { hh3cQoSProfEntry 2 }
+
+        hh3cQoSProfActionNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total number of actions of a QoS profile."
+            ::= { hh3cQoSProfEntry 3 }
+
+        hh3cQoSProfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+            ::= { hh3cQoSProfEntry 4 }
+
+        hh3cQoSAction OBJECT IDENTIFIER ::= { hh3cQoSProfObjects 2 }
+
+        hh3cQoSTrafficLimitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSTrafficLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Traffic limit table is used to set the average rate or peak rate of the flow.
+                IP and Link ACL rules can be applied simultaneously,
+                IP and User based ACL rules can not be applied simultaneously,
+                Link and User based ACL rules can not be applied simultaneously.
+                Unused ones is represented with default values."
+            ::= { hh3cQoSAction 1 }
+
+        hh3cQoSTrafficLimitEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSTrafficLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSTrafLmtProfIndex, hh3cQoSTrafLmtActionIndex }
+            ::= { hh3cQoSTrafficLimitTable 1 }
+
+        Hh3cQoSTrafficLimitEntry ::=
+            SEQUENCE {
+                hh3cQoSTrafLmtProfIndex
+                    Integer32,
+                hh3cQoSTrafLmtActionIndex
+                    Integer32,
+                hh3cQoSTrafLmtDirection
+                    Hh3cQoSDirection,
+                hh3cQoSTrafLmtUserAclNum
+                    Integer32,
+                hh3cQoSTrafLmtUserAclRule
+                    Integer32,
+                hh3cQoSTrafLmtIpAclNum
+                    Integer32,
+                hh3cQoSTrafLmtIpAclRule
+                    Integer32,
+                hh3cQoSTrafLmtLinkAclNum
+                    Integer32,
+                hh3cQoSTrafLmtLinkAclRule
+                    Integer32,
+                hh3cQoSTrafLmtTargetRateMbps
+                    Integer32,
+                hh3cQoSTrafLmtTargetRateKbps
+                    Integer32,
+                hh3cQoSTrafLmtPeakRate
+                    Integer32,
+                hh3cQoSTrafLmtCIR
+                    Integer32,
+                hh3cQoSTrafLmtCBS
+                    Integer32,
+                hh3cQoSTrafLmtEBS
+                    Integer32,
+                hh3cQoSTrafLmtPIR
+                    Integer32,
+                hh3cQoSTrafLmtConformLocalPre
+                    Integer32,
+                hh3cQoSTrafLmtConformActionType
+                    INTEGER,
+                hh3cQoSTrafLmtExceedActionType
+                    INTEGER,
+                hh3cQoSTrafLmtExceedDscp
+                    Integer32,
+                hh3cQoSTrafLmtExceedCos
+                    Integer32,
+                hh3cQoSTrafLmtRowStatus
+                    RowStatus,
+                hh3cQoSTrafLmtConformCos
+                    Integer32,
+                hh3cQoSTrafLmtConformDscp
+                    Integer32
+             }
+
+        hh3cQoSTrafLmtProfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of QoS profile which the traffic-limit action belongs to."
+            ::= { hh3cQoSTrafficLimitEntry 1 }
+
+        hh3cQoSTrafLmtActionIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of traffic-limit action."
+            ::= { hh3cQoSTrafficLimitEntry 2 }
+
+        hh3cQoSTrafLmtDirection OBJECT-TYPE
+            SYNTAX Hh3cQoSDirection
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The direction of traffic-limit action."
+            ::= { hh3cQoSTrafficLimitEntry 3 }
+
+        hh3cQoSTrafLmtUserAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 5000..5999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of user-based acl group."
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficLimitEntry 4 }
+
+        hh3cQoSTrafLmtUserAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of user-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficLimitEntry 5 }
+
+        hh3cQoSTrafLmtIpAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 2000..3999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of Ip-based acl group."
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficLimitEntry 6 }
+
+        hh3cQoSTrafLmtIpAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of IP-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficLimitEntry 7 }
+
+        hh3cQoSTrafLmtLinkAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 4000..4999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of Link-based acl group"
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficLimitEntry 8 }
+
+        hh3cQoSTrafLmtLinkAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of Link-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficLimitEntry 9 }
+
+        hh3cQoSTrafLmtTargetRateMbps OBJECT-TYPE
+            SYNTAX Integer32 (0..10000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Target rate:Mbps
+                Some products only support Mbps,but others support Kbps,so
+                Kbps and Mbps should be supportted mutually exclusively on the same
+                product."
+            ::= { hh3cQoSTrafficLimitEntry 10 }
+
+        hh3cQoSTrafLmtTargetRateKbps OBJECT-TYPE
+            SYNTAX Integer32 (0..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Target rate:Kbps.
+                Some products only support Kbps,but others support Mbps,so
+                Kbps and Mbps should be supportted mutually exclusively on the same
+                product."
+            ::= { hh3cQoSTrafficLimitEntry 11 }
+
+        hh3cQoSTrafLmtPeakRate OBJECT-TYPE
+            SYNTAX Integer32 (0 | 64..8388608)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Peak rate"
+            ::= { hh3cQoSTrafficLimitEntry 12 }
+
+        hh3cQoSTrafLmtCIR OBJECT-TYPE
+            SYNTAX Integer32 (0..34120000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Information Rate.
+                unit:kbps."
+            ::= { hh3cQoSTrafficLimitEntry 13 }
+
+        hh3cQoSTrafLmtCBS OBJECT-TYPE
+            SYNTAX Integer32 (0..1048575)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Burst Size.
+                unit:byte."
+            ::= { hh3cQoSTrafficLimitEntry 14 }
+
+        hh3cQoSTrafLmtEBS OBJECT-TYPE
+            SYNTAX Integer32 (0..268435455)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Excess Burst Size.
+                unit:byte."
+            ::= { hh3cQoSTrafficLimitEntry 15 }
+
+        hh3cQoSTrafLmtPIR OBJECT-TYPE
+            SYNTAX Integer32 (0..34120000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Peak Information Rate.
+                unit:kbps."
+            ::= { hh3cQoSTrafficLimitEntry 16 }
+
+        hh3cQoSTrafLmtConformLocalPre OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The local precedence of conformed flow."
+            ::= { hh3cQoSTrafficLimitEntry 17 }
+
+        hh3cQoSTrafLmtConformActionType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                remark-cos(1),
+                remark-drop-priority(2),
+                remark-cos-drop-priority(3),
+                remark-policed-service(4),
+                remark-dscp(5)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The action type of conformed flow."
+            DEFVAL { 1 }
+            ::= { hh3cQoSTrafficLimitEntry 18 }
+
+        hh3cQoSTrafLmtExceedActionType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                forward(1),
+                drop(2),
+                remarkdscp(3),
+                exceed-cos(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The action type of non-conformed flow."
+            DEFVAL { 1 }
+            ::= { hh3cQoSTrafficLimitEntry 19 }
+
+        hh3cQoSTrafLmtExceedDscp OBJECT-TYPE
+            SYNTAX Integer32 (0..63 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The remarked DSCP value of non-conformed flow.
+                DSCP 255 is used as default value and for get/get-next operation of this
+                node. If the user does not set exceeding action as remarking DSCP, then value 255
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficLimitEntry 20 }
+
+        hh3cQoSTrafLmtExceedCos OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The remarked COS value of non-conformed flow.
+                COS 255 is used as default value and for get/get-next operation of this
+                node. If the user does not set exceeding action as remarking COS, then value 255
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficLimitEntry 21 }
+
+        hh3cQoSTrafLmtRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+            ::= { hh3cQoSTrafficLimitEntry 22 }
+
+        hh3cQoSTrafLmtConformCos OBJECT-TYPE
+            SYNTAX Integer32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If the user chooses remark-cos value of the hh3cQoSTrafLmtConformActionType,
+                this object can be used to set the conform cos value.
+                There are some enumerations as follows:
+                best-effort         Specify best-effort priority(0)
+                background          Specify background priority(1)
+                spare               Specify spare priority(2)
+                excellent-effort    Specify excellent-effort priority(3)
+                controlled-load     Specify controlled-load priority(4)
+                video               Specify video priority(5)
+                voice               Specify voice priority(6)
+                network-management  Specify network-management priority(7)
+                255 indicates invalid value. "
+              DEFVAL      { 255 }
+            ::= { hh3cQoSTrafficLimitEntry 23 }
+
+        hh3cQoSTrafLmtConformDscp OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If the user chooses remark-dscp value of the hh3cQoSTrafLmtConformActionType,
+                this object can be used to set the conform dscp value.
+                There are some enumerations as follows:
+                <0-63>  Value of DSCP
+                af11    Specify Assured Forwarding 11 service(10)
+                af12    Specify Assured Forwarding 12 service(12)
+                af13    Specify Assured Forwarding 13 service(14)
+                af21    Specify Assured Forwarding 21 service(18)
+                af22    Specify Assured Forwarding 22 service(20)
+                af23    Specify Assured Forwarding 23 service(22)
+                af31    Specify Assured Forwarding 31 service(26)
+                af32    Specify Assured Forwarding 32 service(28)
+                af33    Specify Assured Forwarding 33 service(30)
+                af41    Specify Assured Forwarding 41 service(34)
+                af42    Specify Assured Forwarding 42 service(36)
+                af43    Specify Assured Forwarding 43 service(38)
+                be      Specify Best Effort service(0)
+                cs1     Specify Class Selector 1 service(8)
+                cs2     Specify Class Selector 2 service(16)
+                cs3     Specify Class Selector 3 service(24)
+                cs4     Specify Class Selector 4 service(32)
+                cs5     Specify Class Selector 5 service(40)
+                cs6     Specify Class Selector 6 service(48)
+                cs7     Specify Class Selector 7 service(56)
+                ef      Specify Expedited Forwarding service(46)
+                255 indicates invalid value. "
+              DEFVAL      { 255 }
+              ::= { hh3cQoSTrafficLimitEntry 24 }
+
+        hh3cQoSTrafficPriorityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSTrafficPriorityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Traffic priority table is used to remark the IP-precedence, DSCP or COS priority of packets.
+                IP and Link ACL rules can be applied simultaneously,
+                IP and User based ACL rules can not be applied simultaneously,
+                Link and User based ACL rules can not be applied simultaneously.
+                Unused ones is represented with default values.
+                QOS policed service from DSCP mapping table is pre-defined in the hh3cDscpMapTable in the HH3C-LswQos-MIB.
+                Policed service can decide what kind of QOS service the flow should get by the DSCP vlaue in the packets.
+                Policed service includes remarking new DSCP,new EXP,new 802.1p priority,new local precedence and new drop priority.
+                "
+            ::= { hh3cQoSAction 2 }
+
+        hh3cQoSTrafficPriorityEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSTrafficPriorityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSTrafPrioProfIndex, hh3cQoSTrafPrioActionIndex }
+            ::= { hh3cQoSTrafficPriorityTable 1 }
+
+        Hh3cQoSTrafficPriorityEntry ::=
+            SEQUENCE {
+                hh3cQoSTrafPrioProfIndex
+                    Integer32,
+                hh3cQoSTrafPrioActionIndex
+                    Integer32,
+                hh3cQoSTrafPrioDirection
+                    Hh3cQoSDirection,
+                hh3cQoSTrafPrioUserAclNum
+                    Integer32,
+                hh3cQoSTrafPrioUserAclRule
+                    Integer32,
+                hh3cQoSTrafPrioIpAclNum
+                    Integer32,
+                hh3cQoSTrafPrioIpAclRule
+                    Integer32,
+                hh3cQoSTrafPrioLinkAclNum
+                    Integer32,
+                hh3cQoSTrafPrioLinkAclRule
+                    Integer32,
+                hh3cQoSTrafPrioDscp
+                    Integer32,
+                hh3cQoSTrafPrioIpPre
+                    Integer32,
+                hh3cQoSTrafPrioIpPreFromCos
+                    TruthValue,
+                hh3cQoSTrafPrioCos
+                    Integer32,
+                hh3cQoSTrafPrioCosFromIpPre
+                    TruthValue,
+                hh3cQoSTrafPrioLocalPre
+                    Integer32,
+                hh3cQoSTrafPrioPolicedServiceType
+                    INTEGER,
+                hh3cQoSTrafPrioPolicedServiceDscp
+                    Integer32,
+                hh3cQoSTrafPrioPolicedServiceExp
+                    Integer32,
+                hh3cQoSTrafPrioPolicedServiceCos
+                    Integer32,
+                hh3cQoSTrafPrioPolicedServiceLoaclPre
+                    Integer32,
+                hh3cQoSTrafPrioPolicedServiceDropPriority
+                    Integer32,
+                hh3cQoSTrafPrioRowStatus
+                    RowStatus
+             }
+
+        hh3cQoSTrafPrioProfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of QoS profile which the traffic-priority action belongs to."
+            ::= { hh3cQoSTrafficPriorityEntry 1 }
+
+        hh3cQoSTrafPrioActionIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of traffic-priority action."
+            ::= { hh3cQoSTrafficPriorityEntry 2 }
+
+        hh3cQoSTrafPrioDirection OBJECT-TYPE
+            SYNTAX Hh3cQoSDirection
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The direction of traffic-priority action."
+            ::= { hh3cQoSTrafficPriorityEntry 3 }
+
+        hh3cQoSTrafPrioUserAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 5000..5999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of user-based acl group."
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficPriorityEntry 4 }
+
+        hh3cQoSTrafPrioUserAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of user-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficPriorityEntry 5 }
+
+        hh3cQoSTrafPrioIpAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 2000..3999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of Ip-based acl group."
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficPriorityEntry 6 }
+
+        hh3cQoSTrafPrioIpAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of IP-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficPriorityEntry 7 }
+
+        hh3cQoSTrafPrioLinkAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 4000..4999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of Link-based acl group"
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficPriorityEntry 8 }
+
+        hh3cQoSTrafPrioLinkAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of Link-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficPriorityEntry 9 }
+
+        hh3cQoSTrafPrioDscp OBJECT-TYPE
+            SYNTAX Integer32 (0..63 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set new DSCP value of specifed flow.
+                DSCP 255 is used as default value and for get/get-next operation of this
+                node. If the user does not set action as remarking DSCP, then value 255
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 10 }
+
+        hh3cQoSTrafPrioIpPre OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set Ip precedence value of specifed flow.
+                Ip precedence 255 is used as default value and for get/get-next operation of this
+                node. If the user does not set action as remarking Ip precedence, then value 255
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 11 }
+
+        hh3cQoSTrafPrioIpPreFromCos OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set Ip precedence according to vlan priority.
+                False(2)is used as default value and for get/get-next operation of this
+                node. If the user does not set action as remarking Ip precedence from COS, then value 2
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 2 }
+            ::= { hh3cQoSTrafficPriorityEntry 12 }
+
+        hh3cQoSTrafPrioCos OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set vlan priority of specifed flow.
+                COS 255 is used as default value and for get/get-next operation of this
+                node. If the user does not set action as remarking COS, then value 255
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 13 }
+
+        hh3cQoSTrafPrioCosFromIpPre OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set vlan priority according to IP precedence.
+                False(2)is used as default value and for get/get-next operation of this
+                node. If the user does not set action as remarking COS from Ip precedence, then value 2
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 2 }
+            ::= { hh3cQoSTrafficPriorityEntry 14 }
+
+        hh3cQoSTrafPrioLocalPre OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set local precedence of specifed flow.
+                Local precedence 255 is used as default value and for get/get-next operation of this
+                node. If the user does not set action as remarking local precedence, then value 255
+                is returned for get/get-next operation.
+                "
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 15 }
+
+        hh3cQoSTrafPrioPolicedServiceType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                trust-dscp(2),
+                new-dscp(3),
+                untrusted(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service type of policed Priority.
+                Policed Service is not allowed to be set with remarking DSCP,IpPrecedence,IpPrecedenceFromCOS,COS,COSFromIpPrecedence and LocalPrecedence action simultaneously on the same product.
+                Policed service is user-predefined qos policy parameters.
+                trust-dscp(2) means to decide new police service parameters by the DSCP value in the packets.
+                new-dscp(3) means to decide new police service parameters by the new DSCP value set by the user.
+                And a DSCP mapping table should be pre-defined in the hh3cDscpMapTable in the HH3C-LswQos-MIB.
+                Untrusted(4) means to set all the new DSCP,EXP,COS,Local precedence and Drop priority by the user.
+
+                "
+            DEFVAL { invalid }
+            ::= { hh3cQoSTrafficPriorityEntry 16 }
+
+        hh3cQoSTrafPrioPolicedServiceDscp OBJECT-TYPE
+            SYNTAX Integer32 (0..63 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service Dscp of policed Priority"
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 17 }
+
+        hh3cQoSTrafPrioPolicedServiceExp OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service Exp of policed Priority"
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 18 }
+
+        hh3cQoSTrafPrioPolicedServiceCos OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service cos of policed Priority"
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 19 }
+
+        hh3cQoSTrafPrioPolicedServiceLoaclPre OBJECT-TYPE
+            SYNTAX Integer32 (0..7 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service local pre of policed Priority"
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 20 }
+
+        hh3cQoSTrafPrioPolicedServiceDropPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..2 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service drop priority of proliced Priority"
+            DEFVAL { 255 }
+            ::= { hh3cQoSTrafficPriorityEntry 21 }
+
+        hh3cQoSTrafPrioRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+            ::= { hh3cQoSTrafficPriorityEntry 22 }
+
+        hh3cQoSTrafficFilterTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSTrafficFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Traffic filter table is used to deny or permit packets.
+                IP and Link ACL rules can be applied simultaneously,
+                IP and User based ACL rules can not be applied simultaneously,
+                Link and User based ACL rules can not be applied simultaneously.
+                Unused ones is represented with default values.
+                To deny or permit packets,the ACL rules should be defined in hh3cAcl table.
+                The 'deny' or 'permit' action should be defined with ACL rules.
+                In this table,a predefined ACL rules can be referenced in a specified QOS profile group.
+                'Direction' means the ACL rules can be applied to the inbound or outbound packets.
+
+                "
+            ::= { hh3cQoSAction 3 }
+
+        hh3cQoSTrafficFilterEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSTrafficFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSTrafFilterProfIndex, hh3cQoSTrafFilterActionIndex }
+            ::= { hh3cQoSTrafficFilterTable 1 }
+
+        Hh3cQoSTrafficFilterEntry ::=
+            SEQUENCE {
+                hh3cQoSTrafFilterProfIndex
+                    Integer32,
+                hh3cQoSTrafFilterActionIndex
+                    Integer32,
+                hh3cQoSTrafFilterDirection
+                    Hh3cQoSDirection,
+                hh3cQoSTrafFilterUserAclNum
+                    Integer32,
+                hh3cQoSTrafFilterUserAclRule
+                    Integer32,
+                hh3cQoSTrafFilterIpAclNum
+                    Integer32,
+                hh3cQoSTrafFilterIpAclRule
+                    Integer32,
+                hh3cQoSTrafFilterLinkAclNum
+                    Integer32,
+                hh3cQoSTrafFilterLinkAclRule
+                    Integer32,
+                hh3cQoSTrafFilterRowStatus
+                    RowStatus
+             }
+
+        hh3cQoSTrafFilterProfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of QoS profile which the traffic-filter action belongs to."
+            ::= { hh3cQoSTrafficFilterEntry 1 }
+
+        hh3cQoSTrafFilterActionIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of traffic-filter action."
+            ::= { hh3cQoSTrafficFilterEntry 2 }
+
+        hh3cQoSTrafFilterDirection OBJECT-TYPE
+            SYNTAX Hh3cQoSDirection
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The direction of traffic-filter action."
+            ::= { hh3cQoSTrafficFilterEntry 3 }
+
+        hh3cQoSTrafFilterUserAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 5000..5999 )
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of user-based acl group."
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficFilterEntry 4 }
+
+        hh3cQoSTrafFilterUserAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of user-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficFilterEntry 5 }
+
+        hh3cQoSTrafFilterIpAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 2000..3999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of Ip-based acl group."
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficFilterEntry 6 }
+
+        hh3cQoSTrafFilterIpAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of IP-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficFilterEntry 7 }
+
+        hh3cQoSTrafFilterLinkAclNum OBJECT-TYPE
+            SYNTAX Integer32 (0 | 4000..4999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of Link-based acl group"
+            DEFVAL { 0 }
+            ::= { hh3cQoSTrafficFilterEntry 8 }
+
+        hh3cQoSTrafFilterLinkAclRule OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subitem of Link-based acl rule."
+            DEFVAL { 65535 }
+            ::= { hh3cQoSTrafficFilterEntry 9 }
+
+        hh3cQoSTrafFilterRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+            ::= { hh3cQoSTrafficFilterEntry 10 }
+
+        hh3cQoSProfPortMapping OBJECT IDENTIFIER ::= { hh3cQoSProfObjects 3 }
+
+        hh3cQoSProfPortMappingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSProfPortMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port mapping table is used to apply the qos profile to the port.
+                If a qos profile is applied to the port,
+                then the port will have an entry in the table."
+            ::= { hh3cQoSProfPortMapping 1 }
+
+        hh3cQoSProfPortMappingEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSProfPortMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSProfPortMappingIfIndex, hh3cQoSProfPortMappingProfIndex }
+            ::= { hh3cQoSProfPortMappingTable 1 }
+
+        Hh3cQoSProfPortMappingEntry ::=
+            SEQUENCE {
+                hh3cQoSProfPortMappingIfIndex
+                    Integer32,
+                hh3cQoSProfPortMappingProfIndex
+                    Integer32,
+                hh3cQoSProfPortMappingRowStatus
+                    RowStatus
+             }
+
+        hh3cQoSProfPortMappingIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ifindex which the specified QoS profile group is applied to."
+            ::= { hh3cQoSProfPortMappingEntry 1 }
+
+        hh3cQoSProfPortMappingProfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of specified QoS profile group."
+            ::= { hh3cQoSProfPortMappingEntry 2 }
+
+        hh3cQoSProfPortMappingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+            ::= { hh3cQoSProfPortMappingEntry 3 }
+
+        hh3cQoSProfPortMappingModeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSProfPortMappingModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port mapping mode table is used to set mapping mode of the port.
+                When a qos profile is applied to a port, the profile can have two working ways:
+                1)The profile is the same for all the users connected to the port;
+                2)The profile can be different for different users connected to the port;
+                Port-based mode means the profile is the same for all the users.
+                User-based mode means the profile is different for different users.
+                Default value is port-based."
+            ::= { hh3cQoSProfPortMapping 2 }
+
+        hh3cQoSProfPortMappingModeEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSProfPortMappingModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSProfPortMappingModeIfIndex }
+            ::= { hh3cQoSProfPortMappingModeTable 1 }
+
+        Hh3cQoSProfPortMappingModeEntry ::=
+            SEQUENCE {
+                hh3cQoSProfPortMappingModeIfIndex
+                    Integer32,
+                hh3cQoSProfPortMappingMode
+                    INTEGER
+             }
+
+        hh3cQoSProfPortMappingModeIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ifindex which the QoS profile mapping mode is applied to."
+            ::= { hh3cQoSProfPortMappingModeEntry 1 }
+
+        hh3cQoSProfPortMappingMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                user-based(1),
+                port-based(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The QoS profile mapping mode of specifed port."
+            DEFVAL { 2 }
+            ::= { hh3cQoSProfPortMappingModeEntry 2 }
+
+        hh3cQoSProfDynPortMappingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSProfDynPortMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Dynamic port mapping table is used to get user' port,MAC address,IP address,VLAN ID and user-specified qos profiles.
+                Network managers can allocate different QOS profile groups to different users.
+                Once the user is on line, then the user-specified QOS profiles will be dynamically applied to the port the user connects.
+                Each port can have different groups of users simultaneously connected.
+                Each group of users can have assiociation with multiple QOS profiles simultaneously.
+                So the user's port,MAC address,IP address and VLAN ID will replace the source information in the ACL rules refered in the QOS profiles.
+                Once the user is off line, then the user-specified QOS profiles will be dynamically deleted from the port the user connects."
+            ::= { hh3cQoSProfPortMapping 3 }
+
+        hh3cQoSProfDynPortMappingEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSProfDynPortMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION             " "
+            INDEX { hh3cQoSProfDynPortMappingIfIndex, hh3cQoSProfDynPortMappingUserSrcMAC }
+            ::= { hh3cQoSProfDynPortMappingTable 1 }
+
+        Hh3cQoSProfDynPortMappingEntry ::=
+            SEQUENCE {
+                hh3cQoSProfDynPortMappingIfIndex
+                    Integer32,
+                hh3cQoSProfDynPortMappingUserSrcMAC
+                    MacAddress,
+                hh3cQoSProfDynPortMappingUserName
+                    OCTET STRING,
+                hh3cQoSProfDynPortMappingUserIPAddr
+                    IpAddress,
+                hh3cQoSProfDynPortMappingUserVLANID
+                    Integer32,
+                hh3cQoSProfDynPortMappingUserProfName
+                    OCTET STRING
+             }
+
+        hh3cQoSProfDynPortMappingIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "if index of the port user profile is applied."
+            ::= { hh3cQoSProfDynPortMappingEntry 1 }
+
+        hh3cQoSProfDynPortMappingUserSrcMAC OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "User sourc MAC address."
+            ::= { hh3cQoSProfDynPortMappingEntry 2 }
+
+        hh3cQoSProfDynPortMappingUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "User name."
+            ::= { hh3cQoSProfDynPortMappingEntry 3 }
+
+        hh3cQoSProfDynPortMappingUserIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "User IP address"
+            ::= { hh3cQoSProfDynPortMappingEntry 4 }
+
+        hh3cQoSProfDynPortMappingUserVLANID OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "User VLAN ID."
+            ::= { hh3cQoSProfDynPortMappingEntry 5 }
+
+        hh3cQoSProfDynPortMappingUserProfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "User profile name."
+            ::= { hh3cQoSProfDynPortMappingEntry 6 }
+
+        hh3cQoSProfPortMappingTraps OBJECT IDENTIFIER ::= { hh3cQosProfile 2 }
+
+        hh3cQoSProfPortMappingError NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "An hh3cQoSProfPortMappingError notification is generated
+                when a qos profile fails to be applied on the port."
+            ::= { hh3cQoSProfPortMappingTraps 1 }
+
+        hh3cQoSProfMibConformance OBJECT IDENTIFIER ::= { hh3cQosProfile 3 }
+
+        hh3cQoSProfMibCompliances OBJECT IDENTIFIER ::= { hh3cQoSProfMibConformance 1 }
+
+        hh3cQoSProfMibCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The compliance statement for QoS Profile MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hh3cQoSProfGroup, hh3cQoSActionGroup, hh3cQoSProfPortMappingGroup, hh3cQoSProfPortMappingTrapsGroup }
+            ::= { hh3cQoSProfMibCompliances 1 }
+
+        hh3cQoSProfMibGroups OBJECT IDENTIFIER ::= { hh3cQoSProfMibConformance 2 }
+
+        hh3cQoSProfGroup OBJECT-GROUP
+            OBJECTS { hh3cQoSProfName, hh3cQoSProfActionNumber, hh3cQoSProfRowStatus }
+            STATUS current
+            DESCRIPTION
+                "Included table:
+                hh3cQoSProfTable."
+            ::= { hh3cQoSProfMibGroups 1 }
+
+        hh3cQoSActionGroup OBJECT-GROUP
+            OBJECTS { hh3cQoSTrafLmtDirection, hh3cQoSTrafLmtUserAclNum, hh3cQoSTrafLmtUserAclRule, hh3cQoSTrafLmtIpAclNum, hh3cQoSTrafLmtIpAclRule,
+                hh3cQoSTrafLmtLinkAclNum, hh3cQoSTrafLmtLinkAclRule, hh3cQoSTrafLmtTargetRateMbps, hh3cQoSTrafLmtTargetRateKbps, hh3cQoSTrafLmtPeakRate,
+                hh3cQoSTrafLmtCIR, hh3cQoSTrafLmtCBS, hh3cQoSTrafLmtEBS, hh3cQoSTrafLmtPIR, hh3cQoSTrafLmtConformLocalPre,
+                hh3cQoSTrafLmtConformActionType, hh3cQoSTrafLmtExceedActionType, hh3cQoSTrafLmtExceedDscp, hh3cQoSTrafLmtExceedCos, hh3cQoSTrafLmtRowStatus,
+                hh3cQoSTrafLmtConformCos,hh3cQoSTrafLmtConformDscp,
+                hh3cQoSTrafPrioDirection, hh3cQoSTrafPrioUserAclNum, hh3cQoSTrafPrioUserAclRule, hh3cQoSTrafPrioIpAclNum, hh3cQoSTrafPrioIpAclRule,
+                hh3cQoSTrafPrioLinkAclNum, hh3cQoSTrafPrioLinkAclRule, hh3cQoSTrafPrioDscp, hh3cQoSTrafPrioIpPre, hh3cQoSTrafPrioIpPreFromCos,
+                hh3cQoSTrafPrioCos, hh3cQoSTrafPrioCosFromIpPre, hh3cQoSTrafPrioLocalPre, hh3cQoSTrafPrioPolicedServiceType, hh3cQoSTrafPrioPolicedServiceDscp,
+                hh3cQoSTrafPrioPolicedServiceExp, hh3cQoSTrafPrioPolicedServiceCos, hh3cQoSTrafPrioPolicedServiceLoaclPre, hh3cQoSTrafPrioPolicedServiceDropPriority, hh3cQoSTrafPrioRowStatus,
+                hh3cQoSTrafFilterDirection, hh3cQoSTrafFilterUserAclNum, hh3cQoSTrafFilterUserAclRule, hh3cQoSTrafFilterIpAclNum, hh3cQoSTrafFilterIpAclRule,
+                hh3cQoSTrafFilterLinkAclNum, hh3cQoSTrafFilterLinkAclRule, hh3cQoSTrafFilterRowStatus }
+            STATUS current
+            DESCRIPTION
+                "Included table:
+                1)hh3cQoSTrafficLimitTable.
+                2)hh3cQoSTrafficPriorityTable.
+                3)hh3cQoSTrafficFilterTable
+                "
+            ::= { hh3cQoSProfMibGroups 2 }
+
+        hh3cQoSProfPortMappingGroup OBJECT-GROUP
+            OBJECTS { hh3cQoSProfPortMappingRowStatus, hh3cQoSProfPortMappingMode, hh3cQoSProfDynPortMappingUserName, hh3cQoSProfDynPortMappingUserIPAddr, hh3cQoSProfDynPortMappingUserVLANID,
+                hh3cQoSProfDynPortMappingUserProfName }
+            STATUS current
+            DESCRIPTION
+                "Included tables:
+                1)hh3cQoSProfPortMappingTable.
+                2)hh3cQoSProfPortMappingModeTable.
+                3)hh3cQoSProfDynPortMappingTable.
+                "
+            ::= { hh3cQoSProfMibGroups 3 }
+
+        hh3cQoSProfPortMappingTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hh3cQoSProfPortMappingError }
+            STATUS current
+            DESCRIPTION
+                "Included:
+                hh3cQoSProfPortMappingTraps."
+            ::= { hh3cQoSProfMibGroups 4 }
+
+
+    END

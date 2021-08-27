@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\OspfPort;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<OspfPort> */
 class OspfPortFactory extends Factory
 {
     /**

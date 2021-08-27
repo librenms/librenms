@@ -1,0 +1,92 @@
+-- =========================================================================
+-- Copyright (c) 2008-2020 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: The MIB is designed to set rbm configuration or get rbm information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--  V1.0 2020-05-19 created by liuzhengrui 17656
+--       Initial version.
+-- =========================================================================
+HH3C-RBM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+    FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY , NOTIFICATION-TYPE
+    FROM SNMPv2-SMI;
+
+
+hh3cRbm MODULE-IDENTITY
+    LAST-UPDATED "202005191105Z"  -- May 19, 2020
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The MIB is designed to manage Rbm products."
+
+ -- Revision History
+    REVISION     "202005191105Z"  -- May 19, 2020
+    DESCRIPTION  "Initial version."
+    ::= { hh3cCommon 187 }
+
+--
+-- Table definitions
+--
+
+hh3cRbmTables OBJECT IDENTIFIER ::= { hh3cRbm 1 }
+
+-- Describe objects for rbm abrupt trap
+
+hh3cRbmTrapObjects OBJECT IDENTIFIER ::= { hh3cRbmTables 1 }
+
+hh3cRbmTrapVar OBJECT-TYPE
+  SYNTAX Integer32 (0..1)
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+        "The value is RBM trap."
+::= { hh3cRbmTrapObjects 1 }
+
+
+
+hh3cRbmMonitor OBJECT IDENTIFIER ::= { hh3cRbmTables 2 }
+
+hh3cRbmTrap OBJECT IDENTIFIER ::= { hh3cRbmMonitor 0 }
+
+hh3cRbmKeepaliveNormal NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapVar
+  }
+  STATUS current
+  DESCRIPTION
+        "This notification is generated when RBM keepalive channel connected."
+::= { hh3cRbmTrap 1 }
+
+hh3cRbmKeepaliveFailure NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapVar
+  }
+  STATUS current
+  DESCRIPTION
+        "This notification is generated when RBM keepalive channel disconnected."
+::= { hh3cRbmTrap 2 }
+
+hh3cRbmStateChange NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapVar
+  }
+  STATUS current
+  DESCRIPTION
+        "This notification is generated when RBM running status changes(0:new-state = Active,1:new-state = Standby)."
+::= { hh3cRbmTrap 3 }
+
+
+END

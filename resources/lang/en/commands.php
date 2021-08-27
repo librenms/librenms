@@ -7,7 +7,7 @@ return [
             'setting' => 'setting to get value of in dot notation (example: snmp.community.0)',
         ],
         'options' => [
-            'json' => 'Output setting or entire config as json',
+            'dump' => 'Output the entire config as json',
         ],
     ],
     'config:set' => [
@@ -24,7 +24,8 @@ return [
         'errors' => [
             'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
-            'invalid' => 'This is not a valid setting. Please check your spelling',
+            'invalid' => 'This is not a valid setting. Please check your input',
+            'invalid_os' => 'Specified OS (:os) does not exist',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],

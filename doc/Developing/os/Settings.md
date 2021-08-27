@@ -33,6 +33,12 @@ $config['os']['vrp']['disabled_sensors']['current'] = true;
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
+- Filter all 'power' sensors with description matching regexp ```'/ Power [TR]x /'``` for Operating System iosxr.
+
+```php
+$config['os']['iosxr']['disabled_sensors_regex']['power'][] = '/ Power [TR]x /';
+```
+
 - Ignore all temperature sensors
 
 ```php
@@ -92,6 +98,10 @@ to change more than a few. These modules can be enabled or disabled
 per-device in the webui and per os or globally in config.php. Usually,
 a poller module will not work if it's corresponding discovery module
 is not enabled.
+
+You should avoid setting these to false in the OS definitions unless it has a
+significant negative impact on polling.  Setting modules in the definition
+reduces user control of modules.
 
 ```yaml
 poller_modules:

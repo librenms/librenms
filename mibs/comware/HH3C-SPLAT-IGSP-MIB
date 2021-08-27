@@ -1,0 +1,393 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Igmp snooping MIB
+-- Reference:
+-- Version: V1.4
+-- History:
+--(1) Created by Zhangshilin, 2001.06.29
+--(2) Revised by Qi Zhenglin, 2002.1.8
+-- V1.1 2004-10-12 updated by gaolong
+--        Import TEXTUAL-CONVENTION.
+--        Relocate hh3cLswIgmpsnoopingMib MODULE-IDENTITY clause.
+-- V1.2 Revised by yaochunyan, 2004.11.28
+--        V1.2 Add hh3cIgmpSnoopingGroupLimitTable,
+--        hh3cIgmpSnoopingFastLeaveTable and
+--        hh3cIgmpSnoopingGroupPolicyTable.
+--      Adjust format of the whole file by gaolong.
+-- V1.3 2005-3-9 updated by fuzhenyu
+--       Add object hh3cIgmpSnoopingNonFloodingStatus.
+--       Change the descriptions of hh3cIgmpSnoopingGroupIfIndex,
+--       hh3cIgmpSnoopingFastLeaveIfIndex, hh3cIgmpSnoopingGroupPolicyIfIndex
+-- V1.4 2005-3-22 updated by wangxiaodong
+--      Add hh3cIgmpSnoopingVlanStatusTable
+--      Add hh3cRecvIGMPGQueryNum, hh3cRecvIGMPSQueryNum,
+--          hh3cRecvIGMPV1ReportNum, hh3cRecvIGMPV2ReportNum,
+--          hh3cRecvIGMPLeaveNum, hh3cRecvErrorIGMPPacketNum,
+--          hh3cSentIGMPSQueryNum, hh3cIgmpSnoopingClearStats
+--      Adjust file format
+-- ==================================================================
+--
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-LswIGSP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    Integer32,MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,Counter32
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,RowStatus
+        FROM SNMPv2-TC
+
+    hh3clswCommon
+        FROM HH3C-OID-MIB
+
+    InterfaceIndex
+        FROM IF-MIB;
+
+    hh3cLswIgmpsnoopingMib MODULE-IDENTITY
+        LAST-UPDATED "200106290000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            ""
+        REVISION "200106290000Z"
+        DESCRIPTION
+            ""
+        ::= { hh3clswCommon  7 }
+
+    EnabledStatus ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A simple status value for the object."
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cLswIgmpsnoopingMibObject OBJECT IDENTIFIER ::= {   hh3cLswIgmpsnoopingMib 1  }
+
+    hh3cIgmpSnoopingStatus    OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Configure to enable IGMP Snooping."
+        ::= { hh3cLswIgmpsnoopingMibObject  1 }
+
+    hh3cIgmpSnoopingRouterPortAge  OBJECT-TYPE
+        SYNTAX  INTEGER (1..1000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Configure the aging time of the router port."
+        DEFVAL  {105}
+        ::= { hh3cLswIgmpsnoopingMibObject  2 }
+
+    hh3cIgmpSnoopingResponseTime  OBJECT-TYPE
+        SYNTAX  INTEGER   (1..25)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Configure the maximum query response time."
+        DEFVAL  {10}
+        ::= { hh3cLswIgmpsnoopingMibObject  3 }
+
+    hh3cIgmpSnoopingHostTime   OBJECT-TYPE
+        SYNTAX  INTEGER  (200..1000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Configure the aging time of the multicast group port."
+        DEFVAL  {260}
+        ::= { hh3cLswIgmpsnoopingMibObject  4 }
+
+    hh3cIgmpSnoopingGroupLimitTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cIgmpSnoopingGroupLimitEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table lists the maximum group number that one
+             interface could do IGMP Snooping."
+        ::= { hh3cLswIgmpsnoopingMibObject  5 }
+
+    hh3cIgmpSnoopingGroupLimitEntry OBJECT-TYPE
+        SYNTAX  Hh3cIgmpSnoopingGroupLimitEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry (conceptual row) representing  the maximum
+             group number on an interface which IGMP Snooping operation
+             is enabled."
+        INDEX  { hh3cIgmpSnoopingGroupIfIndex }
+        ::= { hh3cIgmpSnoopingGroupLimitTable 1 }
+
+    Hh3cIgmpSnoopingGroupLimitEntry ::= SEQUENCE {
+        hh3cIgmpSnoopingGroupIfIndex    InterfaceIndex,
+        hh3cIgmpSnoopingGroupLimitNumber  Unsigned32
+        }
+
+    hh3cIgmpSnoopingGroupIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ifIndex value of the port on which IGMP
+             snooping is enabled."
+        ::= { hh3cIgmpSnoopingGroupLimitEntry 1 }
+
+    hh3cIgmpSnoopingGroupLimitNumber OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maxmum group number of IGMP Snooping on a port."
+        DEFVAL  { 4294967295 }
+        ::= { hh3cIgmpSnoopingGroupLimitEntry 2 }
+
+    hh3cIgmpSnoopingFastLeaveTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cIgmpSnoopingFastLeaveEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table specifies the fast leave status
+             on those ports that do IGMP Snooping."
+        ::= { hh3cLswIgmpsnoopingMibObject  6 }
+
+    hh3cIgmpSnoopingFastLeaveEntry OBJECT-TYPE
+        SYNTAX  Hh3cIgmpSnoopingFastLeaveEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry specifies the fast leave status
+             on those ports that do IGMP Snooping."
+        INDEX  { hh3cIgmpSnoopingFastLeaveIfIndex }
+        ::= { hh3cIgmpSnoopingFastLeaveTable 1 }
+
+    Hh3cIgmpSnoopingFastLeaveEntry ::= SEQUENCE {
+        hh3cIgmpSnoopingFastLeaveIfIndex  InterfaceIndex,
+        hh3cIgmpSnoopingFastLeaveStatus  EnabledStatus
+        }
+
+    hh3cIgmpSnoopingFastLeaveIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ifIndex value of the port on which IGMP
+             snooping is enabled."
+        ::= { hh3cIgmpSnoopingFastLeaveEntry 1 }
+
+    hh3cIgmpSnoopingFastLeaveStatus OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The fast leave status of the port on which IGMP
+             Snooping is enabled."
+        DEFVAL  { 2 }
+        ::= { hh3cIgmpSnoopingFastLeaveEntry 2 }
+
+    hh3cIgmpSnoopingGroupPolicyTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cIgmpSnoopingGroupPolicyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This is a table specifies the group policy parameter and
+             Vlan ID of the IGMP Snooping port."
+        ::= { hh3cLswIgmpsnoopingMibObject  7 }
+
+    hh3cIgmpSnoopingGroupPolicyEntry OBJECT-TYPE
+        SYNTAX  Hh3cIgmpSnoopingGroupPolicyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry representing the group policy parameter and Vlan ID
+             of a port on which IGMP Snooping operation is enabled."
+        INDEX  { hh3cIgmpSnoopingGroupPolicyIfIndex,
+            hh3cIgmpSnoopingGroupPolicyVlanID }
+        ::= { hh3cIgmpSnoopingGroupPolicyTable 1 }
+
+    Hh3cIgmpSnoopingGroupPolicyEntry ::= SEQUENCE {
+        hh3cIgmpSnoopingGroupPolicyIfIndex  InterfaceIndex,
+        hh3cIgmpSnoopingGroupPolicyVlanID  Integer32,
+        hh3cIgmpSnoopingGroupPolicyParameter  Integer32,
+        hh3cIgmpSnoopingGroupPolicyStatus  RowStatus
+        }
+
+    hh3cIgmpSnoopingGroupPolicyIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ifIndex value of the port on which
+             IGMP Snooping is enabled."
+        ::= { hh3cIgmpSnoopingGroupPolicyEntry 1 }
+
+    hh3cIgmpSnoopingGroupPolicyVlanID OBJECT-TYPE
+        SYNTAX  Integer32(1..4094)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Vlan ID which the IGMP Snooping port
+             is attached to."
+        ::= { hh3cIgmpSnoopingGroupPolicyEntry 2 }
+
+    hh3cIgmpSnoopingGroupPolicyParameter OBJECT-TYPE
+        SYNTAX  Integer32(2000..2999)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The ACL Number which is used as the group policy parameter
+             of the IGMP Snooping port."
+        ::= { hh3cIgmpSnoopingGroupPolicyEntry 3 }
+
+    hh3cIgmpSnoopingGroupPolicyStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to create or delete a row
+             and represent the current status of this row.
+             Now support three state:CreateAndGo,Active,Destroy."
+        ::= { hh3cIgmpSnoopingGroupPolicyEntry 4 }
+
+    hh3cIgmpSnoopingNonFloodingStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Configure to disable multicast flooding when no member exists
+             in the destinated group. To use this function,IGMP snooping
+             must be enabled."
+        ::= { hh3cLswIgmpsnoopingMibObject 8 }
+
+    hh3cIgmpSnoopingVlanStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Hh3cIgmpSnoopingVlanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The table used to enable or disable IGMP snooping 
+             on the specified VLAN."
+        ::= { hh3cLswIgmpsnoopingMibObject 9 }
+
+    hh3cIgmpSnoopingVlanStatusEntry OBJECT-TYPE
+        SYNTAX     Hh3cIgmpSnoopingVlanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry representing the IGMP snooping status on 
+             the specified VLAN."
+        INDEX      {  hh3cIgmpSnoopingVlanID }
+        ::= { hh3cIgmpSnoopingVlanStatusTable 1 }
+
+    Hh3cIgmpSnoopingVlanStatusEntry ::= SEQUENCE {
+        hh3cIgmpSnoopingVlanID            Integer32,
+        hh3cIgmpSnoopingVlanEnabled       EnabledStatus
+        }
+        
+    hh3cIgmpSnoopingVlanID OBJECT-TYPE
+        SYNTAX     Integer32(1..4094)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An index uniquely identifies on which VLAN IGMP 
+             snooping is enabled or disabled. "
+        ::= { hh3cIgmpSnoopingVlanStatusEntry 1 }
+
+    hh3cIgmpSnoopingVlanEnabled OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "Indicating whether IGMP snooping is enabled on this VLAN."
+        DEFVAL     { disabled }
+        ::= { hh3cIgmpSnoopingVlanStatusEntry 2 }
+
+    hh3cIgmpSnoopingStatsObjects OBJECT IDENTIFIER ::= { hh3cLswIgmpsnoopingMibObject 10 }
+
+    hh3cRecvIGMPGQueryNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of IGMP general query packets received on
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 1 }
+
+    hh3cRecvIGMPSQueryNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of IGMP specific query packets received on
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 2 }
+
+    hh3cRecvIGMPV1ReportNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of IGMP V1 report packets received on
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 3 }
+
+    hh3cRecvIGMPV2ReportNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of IGMP V2 report packets received on
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 4 }
+
+    hh3cRecvIGMPLeaveNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of IGMP leave packets received on
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 5 }
+
+    hh3cRecvErrorIGMPPacketNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of error IGMP packets received on
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 6 }
+
+    hh3cSentIGMPSQueryNum OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The statistics of IGMP specific query packets sent from
+             the device."
+        ::= { hh3cIgmpSnoopingStatsObjects 7 }
+
+    hh3cIgmpSnoopingClearStats  OBJECT-TYPE
+        SYNTAX     INTEGER { clear(1),
+                             counting(2)
+                           }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "The configuration to clear the statistics of IGMP packets."
+        DEFVAL  { counting }
+        ::= { hh3cIgmpSnoopingStatsObjects 8 }
+
+        
+END

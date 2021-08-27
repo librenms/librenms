@@ -309,7 +309,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => '验证记录项目大于 (天)',
+            'description' => '验证记录项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -317,7 +317,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => '装置效能项目大于 (天)',
+            'description' => '装置效能项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'distributed_poller' => [
@@ -394,7 +394,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => '事件记录大于 (天)',
+            'description' => '事件记录大于',
             'help' => '由 daily.sh 进行清理作业',
         ],
         'favicon' => [
@@ -593,7 +593,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '连接埠大于 (天)',
+            'description' => '连接埠大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'public_status' => [
@@ -605,7 +605,7 @@ return [
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
         ],
         'route_purge' => [
-            'description' => '路由记录大于 (天)',
+            'description' => '路由记录大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -621,7 +621,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD 档案项目大于 (天)',
+            'description' => 'RRD 档案项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -715,7 +715,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog 项目大于 (天)',
+            'description' => 'Syslog 项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [

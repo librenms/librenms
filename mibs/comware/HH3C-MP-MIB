@@ -1,0 +1,312 @@
+-- =================================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+-- 
+-- Description: This MIB file is used for inquiring for MP (Multilink PPP)
+--              link status information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 tianli,2004.5.18,publish 
+-- =================================================================
+
+HH3C-MP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            ifIndex			
+                FROM RFC1213-MIB
+            hh3cRhw
+                FROM HH3C-OID-MIB                                                     
+            OBJECT-GROUP, MODULE-COMPLIANCE                 
+                FROM SNMPv2-CONF                        
+            Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY                   
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION, DisplayString
+                FROM SNMPv2-TC;        
+
+        hh3cMultilinkPPP MODULE-IDENTITY 
+                LAST-UPDATED "200405180000Z"            -- May 18, 2004 at 00:00 GMT
+                ORGANIZATION
+                    "New H3C Tech. Co., Ltd."
+                CONTACT-INFO
+                    "Platform Team New H3C Tech. Co., Ltd.
+                    Hai-Dian District Beijing P.R. China
+                    http://www.h3c.com
+                    Zip:100085
+                    "
+                DESCRIPTION 
+                        "The HH3C-MP-MIB provides read access to MP(Multilink PPP) link
+                        status information. The information available through this MIB includes:
+                        the father channel, the bundled son channel, the slot on which MP bundled, 
+                        the number of son channels, the bundle name,
+                        the statistic of lost fragments, reordered packets, unassigned packets, 
+                        interleaved packets, and the received/sent sequence, etc.
+                        "
+                ::= { hh3cRhw 33 }
+
+--
+-- Node definitions
+--        
+        
+        hh3cMpObjects OBJECT IDENTIFIER ::= { hh3cMultilinkPPP  1 }
+        
+        hh3cMpMultilinkTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF Hh3cMpMultilinkEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table describes the information of MP link. 
+                        The index of this table is the interface index of MP group or 
+                        VT(Virtual Template)."
+                ::= { hh3cMpObjects 1 }
+
+        hh3cMpMultilinkEntry OBJECT-TYPE
+                SYNTAX Hh3cMpMultilinkEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Each entry in this table describes the information of MP link.
+                        The available information includes: 
+                        the father channel, the slot on which MP bundled, 
+                        the number of bundled son channels, 
+                        the statistics of lost fragments, reordered packets, 
+                        unassigned packets, interleaved packets, 
+                        and received/sent sequence.                         
+                        "
+                INDEX { ifIndex }
+                ::= { hh3cMpMultilinkTable 1 }
+        
+        Hh3cMpMultilinkEntry ::=
+                SEQUENCE {
+                        hh3cMpMultilinkDescr
+                                DisplayString,   
+                        hh3cMpBundleName
+                                DisplayString,                                               
+                        hh3cMpBundledSlot
+                                Integer32,
+                        hh3cMpBundledMemberCnt
+                                Integer32,
+			hh3cMpLostFragments
+				Counter32,
+			hh3cMpReorderedPkts
+				Counter32,
+			hh3cMpUnassignedPkts
+				Counter32,
+			hh3cMpInterleavedPkts
+				Counter32,
+			hh3cMpRcvdSequence
+				Integer32,
+			hh3cMpSentSequence
+				Integer32																														
+                 } 
+                                         
+        hh3cMpMultilinkDescr OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The interface name of the father interface on which MP bundled. 
+                        It is the name of a Virtual Temblate or a MP group."
+                ::= { hh3cMpMultilinkEntry 1 } 
+                
+        hh3cMpBundleName OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The bundle name of the multilink. 
+                        when authentication is configured, the bundle name is the authenticated
+                        user name; when authentication not configured, the bundle name is
+                        multilink.
+                        "
+                ::= { hh3cMpMultilinkEntry 2 }                 
+                
+        hh3cMpBundledSlot OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The slot on which MP bundled. 
+                        "
+                ::= { hh3cMpMultilinkEntry 3 }
+        
+        hh3cMpBundledMemberCnt OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of the bundled son channel of the MP link. "
+                ::= { hh3cMpMultilinkEntry 4 }
+
+        hh3cMpLostFragments OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of fragments of the MP link discarded because 
+                        bad fragments received, or assembling packet failed, etc."
+                ::= { hh3cMpMultilinkEntry 5 }
+
+         hh3cMpReorderedPkts OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of received packets of the MP link reordered.
+                        "
+                ::= { hh3cMpMultilinkEntry 6 }                       
+
+         hh3cMpUnassignedPkts OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of received packets of the MP link waiting for reordering.
+                        "
+                ::= { hh3cMpMultilinkEntry 7 }      
+                
+         hh3cMpInterleavedPkts OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of received packets of the MP link interleaved by the 
+                        packets queued in RTPQ(Real-time Transport Protocol Queue) or 
+                        LLQ(Low Latency Queue).
+                        "
+                ::= { hh3cMpMultilinkEntry 8 }  
+                
+         hh3cMpRcvdSequence OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The current sequence number of the MP link for receiving.
+                        "
+                ::= { hh3cMpMultilinkEntry 9 }   
+
+         hh3cMpSentSequence OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The current sequence number of the MP link for sending.
+                        "
+                ::= { hh3cMpMultilinkEntry 10 }
+
+
+        hh3cMpMemberlinkTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF Hh3cMpMemberlinkEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table describes the information of son channels of the MP link.
+                        The index of this table is the interface index of MP group or
+                        VT(Virtual Template). 
+                        "
+                ::= { hh3cMpObjects 2 }
+
+        hh3cMpMemberlinkEntry OBJECT-TYPE
+                SYNTAX Hh3cMpMemberlinkEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Each entry in this table describes the information of the bundled
+                        son channels of MP link. The available information includes: 
+                        the interface index of the son channel, 
+                        the interface name of the son channel.
+                        "
+                INDEX { ifIndex, hh3cMpMemberlinkSeqNumber }
+                ::= { hh3cMpMemberlinkTable 1 }
+        
+        Hh3cMpMemberlinkEntry ::=
+                SEQUENCE {
+                        hh3cMpMemberlinkSeqNumber
+                                Integer32,
+                        hh3cMpMemberlinkIfIndex
+                                Integer32,
+                        hh3cMpMemberlinkDescr
+                                DisplayString,
+                        hh3cMpMemberlinkMpStatus
+                                Integer32																													
+                 } 
+
+        hh3cMpMemberlinkSeqNumber OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The bundled sequence number of the son channels of the MP link.
+                        This object is one of the index of the table.
+                        "
+                ::= { hh3cMpMemberlinkEntry 1 }  
+
+        hh3cMpMemberlinkIfIndex OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The interface index of the son channels of the MP link.
+                        "
+                ::= { hh3cMpMemberlinkEntry 2 } 
+                
+        hh3cMpMemberlinkDescr OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The interface name of the son channels of the MP link.
+                        "
+                ::= { hh3cMpMemberlinkEntry 3 } 
+                
+        hh3cMpMemberlinkMpStatus OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The MP status of the son channels of the MP link.
+                        "
+                ::= { hh3cMpMemberlinkEntry 4 } 
+                                
+         hh3cMpNotifications OBJECT IDENTIFIER ::= { hh3cMultilinkPPP 2 }
+
+         
+         hh3cMpConformance OBJECT IDENTIFIER ::= { hh3cMultilinkPPP 3 }
+
+         
+         hh3cMpCompliances OBJECT IDENTIFIER ::= { hh3cMpConformance 1 }
+
+         
+         hh3cMpCompliance MODULE-COMPLIANCE
+                 STATUS current
+                 DESCRIPTION 
+                         "The compliance statement for entities which 
+                         implement the Multilink PPP MIB."
+                 MODULE -- this module
+                         MANDATORY-GROUPS { hh3cMpMandatoryGroup }
+                 ::= { hh3cMpCompliances 1 }
+
+         
+         hh3cMpGroups OBJECT IDENTIFIER ::= { hh3cMpConformance 2 }
+
+         
+         hh3cMpMandatoryGroup OBJECT-GROUP
+                 OBJECTS { hh3cMpBundledMemberCnt, hh3cMpMemberlinkSeqNumber, hh3cMpMemberlinkIfIndex }
+                 STATUS current
+                 DESCRIPTION 
+                         "A collection of objects providing mandatory MP information."
+                 ::= { hh3cMpGroups 1 }
+         
+         hh3cMpInfoGroup OBJECT-GROUP
+                 OBJECTS { hh3cMpMultilinkDescr, hh3cMpBundleName, 
+                         hh3cMpBundledSlot, hh3cMpBundledMemberCnt,
+                         hh3cMpLostFragments, hh3cMpReorderedPkts, 
+                         hh3cMpUnassignedPkts, hh3cMpInterleavedPkts, 
+                         hh3cMpRcvdSequence, hh3cMpSentSequence,
+                         hh3cMpMemberlinkDescr,hh3cMpMemberlinkMpStatus }
+                 STATUS current
+                 DESCRIPTION 
+                         "All running information of MP feature."
+                 ::= { hh3cMpGroups 2 }                                                                                        
+                                                                                                                                                                                    
+   END
+                                                                                                       

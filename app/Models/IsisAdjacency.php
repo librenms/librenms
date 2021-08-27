@@ -25,8 +25,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class IsisAdjacency extends PortRelatedModel
+class IsisAdjacency extends PortRelatedModel implements Keyable
 {
     use HasFactory;
 
@@ -37,6 +38,7 @@ class IsisAdjacency extends PortRelatedModel
         'device_id',
         'port_id',
         'ifIndex',
+        'isisCircAdminState',
         'isisISAdjState',
         'isisISAdjNeighSysType',
         'isisISAdjNeighSysID',
@@ -52,5 +54,10 @@ class IsisAdjacency extends PortRelatedModel
     public function device()
     {
         return $this->belongsTo(\App\Models\Port::class, 'device_id');
+    }
+
+    public function getCompositeKey()
+    {
+        return $this->ifIndex;
     }
 }
