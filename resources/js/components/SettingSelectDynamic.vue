@@ -53,9 +53,15 @@ export default {
     computed: {
         settings() {
             return {
+                theme: "bootstrap",
+                dropdownAutoWidth : true,
+                width: "auto",
+                allowClear: Boolean(this.options.allowClear),
+                placeholder: this.options.placeholder,
                 ajax: {
                     url: route('ajax.select.' + this.options.target).toString(),
-                    delay: 250
+                    delay: 250,
+                    data: this.options.callback
                 }
             }
         }

@@ -81,6 +81,9 @@
                             "options": {
                                 "type": "object",
                                 "properties": {
+                                    "allowClear": {"type": "boolean"},
+                                    "callback": {"type": "string"},
+                                    "placeholder": {"type": "string"},
                                     "target": {"type": "string"}
                                 },
                                 "minProperties": 1,
