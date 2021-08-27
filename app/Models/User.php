@@ -245,5 +245,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Sessions::class, 'user_id', 'user_id');
     }
-
 }
