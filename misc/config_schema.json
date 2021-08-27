@@ -27,8 +27,7 @@
                         "type": "integer"
                     },
                     "options": {
-                        "type": "object",
-                        "minProperties": 2
+                        "type": "object"
                     },
                     "units": {
                         "type": "string"
@@ -67,7 +66,13 @@
                 "additionalProperties": false,
                 "anyOf": [
                     {
-                        "properties": { "type": {"const": "select"} },
+                        "properties": {
+                            "type": {"const": "select"},
+                            "options": {
+                                "type": "object",
+                                "minProperties": 2
+                            }
+                        },
                         "required": ["options"]
                     },
                     {
