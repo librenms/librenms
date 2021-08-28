@@ -60,7 +60,7 @@ class BashCompletionCommand extends Command
                 if (method_exists($command, 'completeArgument')) {
                     foreach ($input->getArguments() as $name => $value) {
                         if ($current == $value) {
-                            $values = $command->completeArgument($name, $value);
+                            $values = $command->completeArgument($name, $value, $previous);
                             if (! empty($values)) {
                                 echo implode(PHP_EOL, $values);
 
