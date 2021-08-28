@@ -99,7 +99,7 @@
                             output += delete_button;
                         }
 
-                        return output
+                        return output;
                     },
                     level: function (column, row) {
                         var level = row[column.id];

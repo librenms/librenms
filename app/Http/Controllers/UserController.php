@@ -165,7 +165,7 @@ class UserController extends Controller
             $user->setPassword($request->new_password);
         }
 
-        if ($request->get('kick_user_session')) {
+        if ($request->get('kick_user')) {
             $this->kick($user);
         }
 
