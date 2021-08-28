@@ -863,13 +863,16 @@
             "type": "boolean"
         },
         "default_port_group": {
-            "order": 0,
+            "default": 0,
+            "type": "select-dynamic",
             "group": "discovery",
             "section": "networks",
-            "default": 0,
-            "type": "select",
+            "order": 0,
             "options": {
-                "0": "no default group"
+                "target": "port-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:port_groups,id"
             }
         },
         "device_location_map_open": {

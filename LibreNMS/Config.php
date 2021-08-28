@@ -83,23 +83,7 @@ class Config
      */
     public static function getDefinitions()
     {
-        $config_data = json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
-
-        try {
-            $port_group_data = PortGroup::all()->sortBy('name');
-        } catch (QueryException $e) {
-            // possibly table config doesn't exist yet
-            $port_group_data = [];
-        }
-
-        $port_group_list = ['0' => 'no default Portgroup'];
-        foreach ($port_group_data as $port_group) {
-            $port_group_list[$port_group->id] = $port_group->name;
-        }
-
-        $config_data['default_port_group']['options'] = $port_group_list;
-
-        return $config_data;
+        return json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
     }
 
     private static function loadDefaults()
@@ -566,3 +550,4 @@ class Config
         self::set('db_socket', config("database.connections.$db.unix_socket"));
     }
 }
+
