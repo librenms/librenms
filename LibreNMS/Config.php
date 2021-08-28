@@ -25,7 +25,6 @@
 namespace LibreNMS;
 
 use App\Models\GraphType;
-use App\Models\PortGroup;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
