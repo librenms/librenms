@@ -73,5 +73,4 @@ VEEAM-MIB::vmBackupComment ";
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle onBackupCompleted');
     }
-
 }
