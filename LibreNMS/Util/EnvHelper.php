@@ -90,8 +90,9 @@ class EnvHelper
 
             $value = self::escapeValue($value);
 
-            if (strpos($content, "$key=") !== false) {
-                // only replace ones that aren't already set for safety and uncomment
+            if (preg_match("/^(#$key=$|$key=)/m", $content)) {
+                // enter this block if we have commented and empty or uncommented key
+                // only replace ones that aren't already set to a value for safety and uncomment
                 // escape $ in the replacement
                 $content = preg_replace("/#?$key=\n/", addcslashes("$key=$value\n", '$'), $content);
             } else {
