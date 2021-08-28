@@ -549,4 +549,3 @@ class Config
         self::set('db_socket', config("database.connections.$db.unix_socket"));
     }
 }
-
