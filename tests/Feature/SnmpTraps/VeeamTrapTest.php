@@ -8,7 +8,7 @@ use LibreNMS\Snmptrap\Trap;
 
 class VeeamTrapTest extends SnmpTrapTestCase
 {
-    public function testVeeamOnVmBackupCompleted()
+    public function testVeeamOnVmBackupCompleted(): void
     {
         $device = Device::factory()->create();
 
@@ -30,7 +30,7 @@ VEEAM-MIB::vmBackupComment";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle onVmBackupCompleted');
     }
 
-    public function testVeeamOnBackupCompleted()
+    public function testVeeamOnBackupCompleted(): void
     {
         $device = Device::factory()->create();
 
@@ -52,7 +52,7 @@ VEEAM-MIB::vmBackupComment ";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle onBackupCompleted');
     }
 
-    public function testVeeamOnBackupCompletedFails()
+    public function testVeeamOnBackupCompletedFails(): void
     {
         $device = Device::factory()->create();
 
