@@ -302,7 +302,7 @@ if ($format == 'graph') {
                     <th data-column-id="os">Operating System</th>
                     <th data-column-id="uptime" data-formatter="uptime">Up/Down Time</th>
                     <th data-column-id="location" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Location</th>
-                    <th data-column-id="actions" data-width="<?php echo $detailed ? '90px' : '200px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
+                    <th data-column-id="actions" data-width="<?php echo $detailed ? '120px' : '240px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
             </thead>
         </table>

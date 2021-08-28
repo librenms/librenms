@@ -105,16 +105,19 @@ abstract class LnmsCommand extends Command
     /**
      * Validate the input of this command.  Uses Laravel input validation
      * merging the arguments and options together to check.
-     *
-     * @param array $rules
-     * @param array $messages
      */
-    protected function validate($rules, $messages = [])
+    protected function validate(array $rules, array $messages = []): array
     {
-        $validator = Validator::make($this->arguments() + $this->options(), $rules, $messages);
+        $validator = Validator::make(
+            $this->arguments() + $this->options(),
+            $rules,
+            array_merge(trans('commands.' . $this->getName() . '.validation-errors'), $messages)
+        );
 
         try {
             $validator->validate();
+
+            return $validator->validated();
         } catch (ValidationException $e) {
             collect($validator->getMessageBag()->all())->each(function ($message) {
                 $this->error($message);
