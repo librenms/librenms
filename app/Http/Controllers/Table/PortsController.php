@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Port;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -70,8 +71,12 @@ class PortsController extends TableController
     {
         return [
             'hostname',
+            'ifIndex',
             'ifDescr',
             'secondsIfLastChange',
+            'ifConnectorPresent',
+            'ifInErrors_delta',
+            'ifOutErrors_delta',
             'ifInOctets_rate',
             'ifOutOctets_rate',
             'ifInUcastPkts_rate',
@@ -114,13 +119,19 @@ class PortsController extends TableController
                     default:
                         return $query;
                 }
-            })->select([
-                'ports.*',
-                'hostname',
-                DB::raw('`devices`.`uptime` - `ports`.`ifLastChange` / 100 as secondsIfLastChange'),
-            ]);
+            });
 
-        return $query;
+        $select = [
+            'ports.*',
+            'hostname',
+        ];
+
+        if (array_key_exists('secondsIfLastChange', Arr::wrap($request->get('sort')))) {
+            // for sorting
+            $select[] = DB::raw('`devices`.`uptime` - `ports`.`ifLastChange` / 100 as secondsIfLastChange');
+        }
+
+        return $query->select($select);
     }
 
     /**
@@ -136,8 +147,8 @@ class PortsController extends TableController
         return [
             'status' => $status,
             'device' => Url::deviceLink($port->device),
-            'ifDescr' => Url::portLink($port),
-            'ifLastChange' => ceil($port->secondsIfLastChange),
+            'port' => Url::portLink($port),
+            'ifLastChange' => ceil($port->device->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
             'ifMtu' => $port->ifMtu,
