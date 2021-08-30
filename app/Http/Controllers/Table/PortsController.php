@@ -90,7 +90,7 @@ class PortsController extends TableController
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->when($request->get('hostname'), function (Builder $query, $hostname) {
                 $query->where(function (Builder $query) use ($hostname) {
-                    $query->where('hostname', 'like',"%$hostname%")
+                    $query->where('hostname', 'like', "%$hostname%")
                         ->orWhere('sysName', 'like', "%$hostname%");
                 });
             })
