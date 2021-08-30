@@ -26,6 +26,7 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Alert;
 use Illuminate\Http\Request;
+
 // use LibreNMS\Enum\AlertState;
 
 class AlertsController extends WidgetController
