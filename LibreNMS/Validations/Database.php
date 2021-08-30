@@ -319,6 +319,11 @@ class Database extends BaseValidation
             $schema_update[] = $this->dropTableSql($table);
         }
 
+        // set utc timezone if timestamp issues
+        if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $schema_update)) {
+            array_unshift($schema_update, "SET TIME_ZONE='+00:00';");
+        }
+
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
