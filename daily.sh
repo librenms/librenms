@@ -133,14 +133,20 @@ check_dependencies() {
     local branch ver_56 ver_71 ver_72 ver_73 python3 python_deps phpver pythonver old_branches msg
 
     branch=$(git rev-parse --abbrev-ref HEAD)
-    scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
+    
+    python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
+    if [ $python3 -eq 0 ]; then
+        python3 scripts/check_requirements.py > /dev/null 2>&1 || $(type -p python3) -m pip install -r requirements.txt > /dev/null 2>&1
+        python_deps=$(python3 "${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
+    else
+        scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
+        python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
+    fi
 
     ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
     ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
     ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
     ver_73=$(php -r "echo (int)version_compare(PHP_VERSION, '7.3', '<');")
-    python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
-    python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     phpver="master"
     pythonver="master"
 
