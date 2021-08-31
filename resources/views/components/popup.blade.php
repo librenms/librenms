@@ -21,15 +21,17 @@
           x-on:mouseenter="clearTimeout(hideTimeout)"
           x-on:mouseleave="hide(500)"
           x-bind:class="{'hidden': !popupShow, 'block': popupShow}"
-          class="hidden border-2 ml-3 z-50 font-normal leading-normal text-sm max-w-xs text-left no-underline break-words rounded-lg"
+          class=" hidden bg-white border-2 ml-3 z-50 font-normal leading-normal text-sm max-w-xs text-left no-underline break-words rounded-lg"
     >
-        <div>
-            <div class="bg-white opacity-90 text-lg font-semibold p-3 mb-0 border-b border-solid border-blueGray-100 rounded-t-lg">
+        @isset($title)
+            <div class="opacity-90 text-lg font-semibold p-3 mb-0 border-b border-solid border-blueGray-100 rounded-t-lg">
                 {{ $title }}
             </div>
-            <div class="p-3">
-                {{ $body }}
-            </div>
+        @endisset
+        @isset($body)
+        <div class="p-3">
+            {{ $body }}
         </div>
+        @endisset
     </span>
 </span>
