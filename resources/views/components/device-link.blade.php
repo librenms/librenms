@@ -1,11 +1,30 @@
 <x-popup>
-    <a href="{{ route('device', ['device' => $device->device_id, 'tab' => $tab, 'section' => $section]) }}">
+    <a class="{{ $linkClass() }}" href="{{ route('device', ['device' => $device->device_id, 'tab' => $tab, 'section' => $section]) }}">
         {{ $slot->isNotEmpty() ? $slot : $device->displayName() }}
     </a>
     <x-slot name="title">
-        {{ $device->displayName() }}
+        <span class="text-nowrap pr-1">
+            <span class="text-lg font-bold">{{ $device->displayName() }}</span>
+            @if($device->hardware)- {{ $device->hardware }}@endif
+        </span>
+        <span class="text-nowrap pl-2 pr-1">
+            @if($device->os){{ \LibreNMS\Config::getOsSetting($device->os, 'text') }}@endif
+            {{ $device->version }}
+        </span>
+        <span class="text-nowrap pl-2">
+            @if($device->feature)({{ $device->features }})@endif
+            @if($device->location)[{{ $device->location }}]@endif
+        </span>
     </x-slot>
     <x-slot name="body">
-        Some body
+        @foreach($graphs as $graph)
+            @isset($graph['text'], $graph['graph'])
+                <div class="font-semibold">{{ $graph['text'] }}</div>
+                <div class="flex flex-wrap sm:flex-nowrap">
+                    <x-mini-graph :device="$device" :start="$graphStart" :end="$graphEnd" :type="$graph['graph']" loading="lazy" />
+                    <x-mini-graph :device="$device" :start="$secondGraphStart" :end="$graphEnd" :type="$graph['graph']" loading="lazy" />
+                </div>
+            @endisset
+        @endforeach
     </x-slot>
 </x-popup>
