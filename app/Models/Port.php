@@ -101,6 +101,14 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * Get the description of this port either the parsed description or ifAlias
+     */
+    public function getDescription(): string
+    {
+        return (string) ($this->port_descr_descr ?: $this->ifAlias);
+    }
+
+    /**
      * Check if user can access this port.
      *
      * @param User|int $user

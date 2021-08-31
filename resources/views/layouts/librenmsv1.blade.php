@@ -22,6 +22,7 @@
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="#ffffff">
 
+    <link href="{{ asset('css/tailwind.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet" type="text/css" />
@@ -49,6 +50,8 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
+    <script src="{{ asset('js/alpine.min.js') }}" defer></script>
+    <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>

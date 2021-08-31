@@ -139,10 +139,8 @@ class Url
         }
 
         $content = '<div class=list-large>' . addslashes(htmlentities($port->device->displayName() . ' - ' . $label)) . '</div>';
-        if ($port['port_descr_descr']) {
-            $content .= addslashes(\LibreNMS\Util\Clean::html($port['port_descr_descr'], [])) . '<br />';
-        } elseif ($port['ifAlias']) {
-            $content .= addslashes(htmlentities($port->ifAlias)) . '<br />';
+        if ($description = $port->getDescription()) {
+            $content .= addslashes(htmlentities($description)) . '<br />';
         }
 
         $content .= "<div style=\'width: 850px\'>";
