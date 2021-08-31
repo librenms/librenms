@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #  -*- coding: utf-8 -*-
 #
 # This file is part of LibreNMS
@@ -52,7 +52,10 @@ def parse_requirements(filename):
 
 
 base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-requirements = parse_requirements(os.path.join(base_dir, "requirements.txt"))
+if sys.version_info < (3, 4):
+    requirements = ["PyMySQL"]
+else:
+    requirements = parse_requirements(os.path.join(base_dir, "requirements.txt"))
 if verbose:
     print("Required packages:", requirements)
 
