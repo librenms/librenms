@@ -133,9 +133,9 @@ check_dependencies() {
     local branch ver_56 ver_71 ver_72 ver_73 python3 python_deps phpver pythonver old_branches msg
 
     branch=$(git rev-parse --abbrev-ref HEAD)
-    
+
     python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
-    if [ $python3 -eq 0 ]; then
+    if [ "$python3" -eq 0 ]; then
         python3 scripts/check_requirements.py > /dev/null 2>&1 || $(type -p python3) -m pip install -r requirements.txt > /dev/null 2>&1
         python_deps=$(python3 "${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     else
