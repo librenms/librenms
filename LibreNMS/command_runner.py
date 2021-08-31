@@ -344,7 +344,7 @@ def command_runner(
                 break
             if process.poll() is not None:
                 break
-            sleep(.1)
+            sleep(0.1)
 
     def _monitor_process(
         process,  # type: Union[subprocess.Popen[str], subprocess.Popen]
