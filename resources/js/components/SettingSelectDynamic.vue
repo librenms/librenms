@@ -79,7 +79,11 @@ export default {
 
         this.select2 = $(this.$el)
             .find('select')
-            .select2(this.settings);
+            .select2(this.settings)
+            .on('select2:select select2:unselect', ev => {
+                this.$emit('change', this.select2.val());
+                this.$emit('select', ev['params']['data']);
+            });
     },
     beforeDestroy() {
         this.select2.select2('destroy');

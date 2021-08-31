@@ -72,7 +72,7 @@ class SetConfigCommand extends LnmsCommand
             return 1;
         }
 
-        if (! $force && ! $value) {
+        if (! $force && $value === null) {
             $message = $parent
                 ? trans('commands.config:set.forget_from', ['path' => $this->getChildPath($setting, $parent), 'parent' => $parent])
                 : trans('commands.config:set.confirm', ['setting' => $setting]);
