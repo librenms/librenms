@@ -89,9 +89,12 @@
                                 "minProperties": 1,
                                 "required": ["target"],
                                 "additionalProperties": false
+                            },
+                            "validation": {
+                                "minProperties": 1
                             }
                         },
-                        "required": ["options"]
+                        "required": ["options", "validation"]
                     },
                     {
                         "properties": {
