@@ -64,7 +64,7 @@
                 },
                 "required": ["type"],
                 "additionalProperties": false,
-                "anyOf": [
+                "oneOf": [
                     {
                         "properties": {
                             "type": {"const": "select"},
@@ -90,11 +90,11 @@
                                 "required": ["target"],
                                 "additionalProperties": false
                             },
-                            "validation": {
+                            "validate": {
                                 "minProperties": 1
                             }
                         },
-                        "required": ["options", "validation"]
+                        "required": ["options", "validate"]
                     },
                     {
                         "properties": {
