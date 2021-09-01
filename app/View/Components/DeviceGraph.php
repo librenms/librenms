@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class MiniGraph extends Component
+class DeviceGraph extends Component
 {
     public $device;
     public $class;
@@ -18,7 +18,7 @@ class MiniGraph extends Component
      *
      * @return void
      */
-    public function __construct($device, $type, $start = null, $end = null, $legend = 'no', $width = 275, $height = 100, $class = 'minigraph-image', $loading = 'eager', $absolute_size = 0)
+    public function __construct($device, $type, $start = null, $end = null, $legend = 'no', $width = 340, $height = 100, $class = 'graph-image', $loading = 'eager', $absolute_size = 0)
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
         $this->link = url('graph.php') . '?' . implode('&', $vars);
@@ -37,6 +37,6 @@ class MiniGraph extends Component
      */
     public function render()
     {
-        return view('components.mini-graph');
+        return view('components.graph');
     }
 }

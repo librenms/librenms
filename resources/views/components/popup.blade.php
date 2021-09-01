@@ -18,7 +18,7 @@
 }"
  x-on:click.away="hide(0)"
 >
-    <div class="inline-block" x-ref="targetRef" x-on:mouseenter='show(100)' x-on:mouseleave="hide(1000)">
+    <div class="inline-block" x-ref="targetRef" x-on:mouseenter='show(100)' x-on:mouseleave="hide(800)">
         {{ $slot }}
     </div>
     <div x-ref="popupRef"

@@ -4,8 +4,8 @@
     </a>
     <x-slot name="title">
         <span class="text-nowrap pr-1">
-            <span class="text-lg font-bold">{{ $device->displayName() }}</span>
-            @if($device->hardware)- {{ $device->hardware }}@endif
+            <span class="text-xl font-bold">{{ $device->displayName() }}</span>
+            {{ $device->hardware }}
         </span>
         <span class="text-nowrap pl-2 pr-1">
             @if($device->os){{ \LibreNMS\Config::getOsSetting($device->os, 'text') }}@endif
@@ -21,8 +21,8 @@
             @isset($graph['text'], $graph['graph'])
                 <div class="font-semibold">{{ $graph['text'] }}</div>
                 <div class="flex flex-wrap sm:flex-nowrap">
-                    <x-mini-graph :device="$device" :start="$graphStart" :end="$graphEnd" :type="$graph['graph']" loading="lazy" />
-                    <x-mini-graph :device="$device" :start="$secondGraphStart" :end="$graphEnd" :type="$graph['graph']" loading="lazy" />
+                    <x-device-graph :device="$device" start="-1d" :type="$graph['graph']" loading="lazy" trim="1" />
+                    <x-device-graph :device="$device" start="-1w" :type="$graph['graph']" loading="lazy" trim="1" />
                 </div>
             @endisset
         @endforeach

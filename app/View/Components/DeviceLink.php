@@ -4,7 +4,6 @@ namespace App\View\Components;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
-use Carbon\Carbon;
 use Illuminate\View\Component;
 use LibreNMS\Util\Graph;
 
@@ -14,10 +13,7 @@ class DeviceLink extends Component
      * @var \App\Models\Device
      */
     public $device;
-    public $graphStart;
-    public $graphEnd;
     public $tab;
-    public $secondGraphStart;
     public $section;
 
     /**
@@ -25,12 +21,9 @@ class DeviceLink extends Component
      *
      * @param int|\App\Models\Device $device
      */
-    public function __construct($device, ?string $tab = null, ?string $section = null, ?string $graphStart = null, ?string $graphEnd = null)
+    public function __construct($device, ?string $tab = null, ?string $section = null)
     {
         $this->device = $device instanceof Device ? $device : DeviceCache::get($device);
-        $this->graphStart = $graphStart;
-        $this->graphEnd = $graphEnd;
-        $this->secondGraphStart = Carbon::parse($graphStart)->subWeek()->timestamp;
         $this->tab = $tab;
         $this->section = $section;
     }

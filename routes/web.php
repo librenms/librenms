@@ -16,6 +16,35 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
+    Route::get('test', function () {
+        $port = \App\Models\Port::inRandomOrder()->first();
+        $device = \App\Models\Device::inRandomOrder()->first();
+        $vars = ['device' => $device->device_id];
+        return view(['template' => '@extends("layouts.librenmsv1")
+
+@section("title", "Test")
+
+@section("content")
+<div style="margin-top: 500px">
+  <x-graph class="bg-blue-200 border-1" type="device_bits" :vars="$vars" height="200"></x-graph>
+  <br />
+  <x-device-link :device="$device"/>
+</div>
+<div>' .
+            \LibreNMS\Util\Url::deviceLink($device)
+            . '</div>
+<br />
+  <x-port-link :port="$port" />
+<div>' .
+            \LibreNMS\Util\Url::portLink($port)
+            . '</div>
+<div style="height: 1200px" class="bg-red-200">
+</div>
+@endsection
+'], ['port' => $port, 'device' => $device, 'vars' => $vars]);
+    });
+
+
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
     Route::resource('port-groups', 'PortGroupController');
