@@ -15,7 +15,6 @@ class PortLink extends Component
     public $label;
     public $description;
     public $graphs;
-    public $vars;
 
     /**
      * Create a new component instance.
@@ -29,7 +28,10 @@ class PortLink extends Component
         $this->label = Rewrite::normalizeIfName($port->getLabel());
         $this->description = $port->getDescription();
         $this->graphs = Arr::wrap($graphs);
-        $this->vars = ['port' => $port->port_id];
+
+        if ($this->description == $this->label) {
+            $this->description = '';
+        }
     }
 
     /**

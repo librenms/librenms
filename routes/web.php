@@ -26,7 +26,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
 @section("content")
 <div style="margin-top: 500px">
-  <x-graph class="bg-blue-200 border-1" type="device_bits" :vars="$vars" height="200"></x-graph>
+  <x-graph class="bg-blue-200 border-1" type="device_bits" :vars="$vars" height="200" :device="$device"></x-device-graph>
   <br />
   <x-device-link :device="$device"/>
 </div>

@@ -2,36 +2,47 @@
 
 namespace App\View\Components;
 
+use App\Models\Device;
+use App\Models\Port;
 use Illuminate\View\Component;
 
 class Graph extends Component
 {
-    public $class;
+    public $vars;
     public $width;
     public $height;
-    public $link;
-    public $loading;
+    public $type;
+    public $start;
+    public $end;
+    public $legend;
+    public $absolute_size;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($type = '', $vars = [], $start = null, $end = null, $legend = 'no', $width = 340, $height = 100, $class = 'graph-image', $loading = 'eager', $absolute_size = 0, $trim = 0)
+    public function __construct($type = '', $vars = [], $start = '-1d', $end = null, $legend = 'no', $width = 340, $height = 100, $absolute_size = 0, $device = null, $port = null)
     {
-        $this->link = url('graph.php') . '?' . http_build_query($vars + [
-            'type' => $type,
-            'legend' => $legend,
-            'trim' => $trim,
-            'absolute_size' => $absolute_size,
-            'width' => $width,
-            'height' => $height,
-            'from' => $start,
-            'to' => $end,
-            ]);
+        $this->type = $type;
+        $this->vars = $vars;
+        $this->start = $start;
+        $this->end = $end;
+        $this->legend = $legend;
+        $this->width = $width;
+        $this->height = $height;
+        $this->absolute_size = $absolute_size;
 
-        $this->class = $class;
-        $this->loading = $loading;
+        // handle device and port ids/models for convenience could be set in $vars
+        if ($device instanceof Device) {
+            $this->vars['device'] = $device->device_id;
+        } elseif (is_numeric($device)) {
+            $this->vars['device'] = $device;
+        } elseif ($port instanceof Port) {
+            $this->vars['id'] = $port->port_id;
+        } elseif (is_numeric($port)) {
+            $this->vars['id'] = $port;
+        }
     }
 
     /**
@@ -41,6 +52,16 @@ class Graph extends Component
      */
     public function render()
     {
-        return view('components.graph');
+        return view('components.graph', [
+            'link' => url('graph.php') . '?' . http_build_query($this->vars + [
+                        'type' => $this->type,
+                        'legend' => $this->legend,
+                        'absolute_size' => $this->absolute_size,
+                        'width' => $this->width,
+                        'height' => $this->height,
+                        'from' => $this->start,
+                        'to' => $this->end,
+                    ])
+        ]);
     }
 }

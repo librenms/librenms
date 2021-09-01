@@ -7,11 +7,17 @@
         <div>{{ $description }}</div>
     </x-slot>
     <x-slot name="body">
-        @foreach($graphs as $graph)
-            <x-graph :vars="$vars" :type="$graph" from="-1d" width="340" height="100" legend="yes"></x-graph>
-            <x-graph :vars="$vars" :type="$graph" from="-1w" width="340" height="100" legend="yes"></x-graph>
-            <x-graph :vars="$vars" :type="$graph" from="-1m" width="340" height="100" legend="yes"></x-graph>
-            <x-graph :vars="$vars" :type="$graph" from="-1y" width="340" height="100" legend="yes"></x-graph>
-        @endforeach
+        <div>
+            @foreach($graphs as $graph)
+                <div class="flex flex-wrap sm:flex-nowrap">
+                    <x-graph :port="$port" :type="$graph" from="-1d" width="340" height="100" legend="yes" />
+                    <x-graph :port="$port" :type="$graph" from="-1w" width="340" height="100" legend="yes" />
+                </div>
+                <div class="flex flex-wrap sm:flex-nowrap">
+                    <x-graph :port="$port" :type="$graph" from="-1m" width="340" height="100" legend="yes" />
+                    <x-graph :port="$port" :type="$graph" from="-1y" width="340" height="100" legend="yes" />
+                </div>
+            @endforeach
+        </div>
     </x-slot>
 </x-popup>

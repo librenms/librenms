@@ -21,8 +21,8 @@
             @isset($graph['text'], $graph['graph'])
                 <div class="font-semibold">{{ $graph['text'] }}</div>
                 <div class="flex flex-wrap sm:flex-nowrap">
-                    <x-device-graph :device="$device" start="-1d" :type="$graph['graph']" loading="lazy" trim="1" />
-                    <x-device-graph :device="$device" start="-1w" :type="$graph['graph']" loading="lazy" trim="1" />
+                    <x-graph :device="$device" start="-1d" :type="$graph['graph']" loading="lazy" trim="1" />
+                    <x-graph :device="$device" start="-1w" :type="$graph['graph']" loading="lazy" trim="1" />
                 </div>
             @endisset
         @endforeach
