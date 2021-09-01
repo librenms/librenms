@@ -44,14 +44,14 @@
               class="form-horizontal col-md-8 col-md-offset-2">
             {{ method_field('PUT') }}
             @csrf
-            <input type="hidden" id="kick_user" name="kick_user" value="1">
+            <input type="hidden" id="revoke_user" name="revoke_user" value="1">
             <div class="form-group">
                 <div class="col-sm-9 col-sm-offset-3">
                     <button type="submit" class="btn btn-warning"
                     @if(Auth::id() == $user->user_id) disabled
                     @elseif(! $user->sessions()->count()) disabled
                     @endif>
-                    @lang('Kick User')
+                    @lang('Revoke User Session')
                     </button>
                 </div>
             </div>

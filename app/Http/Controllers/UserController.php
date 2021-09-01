@@ -165,8 +165,8 @@ class UserController extends Controller
             $user->setPassword($request->new_password);
         }
 
-        if ($request->get('kick_user')) {
-            $this->kick($user);
+        if ($request->get('revoke_user')) {
+            $this->revoke($user);
         }
 
         $user->fill($request->all());
@@ -189,17 +189,17 @@ class UserController extends Controller
     }
 
     /**
-     * kick User Sessions.
+     * Revoke User Sessions.
      *
      * @param User $user
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function kick(User $user)
+    public function revoke(User $user)
     {
         $user->sessions()->delete();
 
-        return response()->json(__('User :username kicked.', ['username' => $user->username]));
+        return response()->json(__('User :username revoked.', ['username' => $user->username]));
     }
 
     /**
