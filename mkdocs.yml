@@ -11,6 +11,7 @@ theme:
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
+    - admonition
     - pymdownx.tasklist
     - pymdownx.tilde
     - pymdownx.superfences
@@ -35,7 +36,8 @@ extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
 extra_javascript:
-    - librenms-docs.js
+    - js/docs-install-tab.js
+    - js/docs-settings-links.js
 extra:
     article_nav_top: false
     article_nav_bottom: true

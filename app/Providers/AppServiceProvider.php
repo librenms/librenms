@@ -163,7 +163,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
-            if ($value === 0) {
+            if ($value === 0 || $value === '0') {
                 return true;
             }
 

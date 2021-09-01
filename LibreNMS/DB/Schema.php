@@ -346,6 +346,8 @@ class Schema
         $output = [];
         $db_name = DB::connection($connection)->getDatabaseName();
 
+        DB::statement("SET TIME_ZONE='+00:00'"); // set timezone to UTC to avoid timezone issues
+
         foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
             $table = $table->TABLE_NAME;
             foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")) as $data) {
