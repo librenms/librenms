@@ -1,7 +1,8 @@
-<div class="inline-block" x-data="{
+<div {{ $attributes->merge(['class' => 'inline-block']) }} x-data="{
  popupShow: false,
  showTimeout: null,
  hideTimeout: null,
+ delay: 300,
  show(timeout) {
     clearTimeout(this.hideTimeout);
     this.showTimeout = setTimeout(() => {
@@ -18,12 +19,12 @@
 }"
  x-on:click.away="hide(0)"
 >
-    <div class="inline-block" x-ref="targetRef" x-on:mouseenter='show(100)' x-on:mouseleave="hide(500)">
+    <div class="inline-block" x-ref="targetRef" x-on:mouseenter='show(100)' x-on:mouseleave="hide(delay)">
         {{ $slot }}
     </div>
     <div x-ref="popupRef"
           x-on:mouseenter="clearTimeout(hideTimeout)"
-          x-on:mouseleave="hide(500)"
+{{--          x-on:mouseleave="hide(delay)"--}}
           x-bind:class="{'hidden': !popupShow, 'block': popupShow}"
           class="hidden bg-white border-2 ml-3 z-50 font-normal leading-normal text-sm text-left no-underline rounded-lg"
     >

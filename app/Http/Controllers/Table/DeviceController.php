@@ -203,13 +203,10 @@ class DeviceController extends TableController
      */
     private function getHostname($device)
     {
-        $hostname = Url::deviceLink($device);
-
-        if ($this->isDetailed()) {
-            $hostname .= '<br />' . $device->name();
-        }
-
-        return $hostname;
+        return (string) view('device.list.hostname', [
+            'device' => $device,
+            'detailed' => $this->isDetailed(),
+        ]);
     }
 
     /**

@@ -9,11 +9,11 @@
     <x-slot name="body">
         <div>
             @foreach($graphs as $graph)
-                <div class="flex flex-wrap sm:flex-nowrap">
+                <div class="flex flex-nowrap sm:flex-wrap">
                     <x-graph :port="$port" :type="$graph" from="-1d" width="340" height="100" legend="yes" />
                     <x-graph :port="$port" :type="$graph" from="-1w" width="340" height="100" legend="yes" />
                 </div>
-                <div class="flex flex-wrap sm:flex-nowrap">
+                <div class="flex flex-nowrap sm:flex-wrap">
                     <x-graph :port="$port" :type="$graph" from="-1m" width="340" height="100" legend="yes" />
                     <x-graph :port="$port" :type="$graph" from="-1y" width="340" height="100" legend="yes" />
                 </div>
