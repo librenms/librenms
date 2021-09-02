@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\PollerGroup;
-use Illuminate\Support\Str;
 
 class PollerGroupController extends SelectController
 {
