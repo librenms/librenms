@@ -24,7 +24,7 @@
     </div>
     <div x-ref="popupRef"
           x-on:mouseenter="clearTimeout(hideTimeout)"
-{{--          x-on:mouseleave="hide(delay)"--}}
+          x-on:mouseleave="hide(delay)"
           x-bind:class="{'hidden': !popupShow, 'block': popupShow}"
           class="hidden bg-white border-2 ml-3 z-50 font-normal leading-normal text-sm text-left no-underline rounded-lg"
     >

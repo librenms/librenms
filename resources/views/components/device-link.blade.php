@@ -20,7 +20,7 @@
         @foreach($graphs as $graph)
             @isset($graph['text'], $graph['graph'])
                 <div class="font-semibold">{{ $graph['text'] }}</div>
-                <div class="flex flex-wrap sm:flex-nowrap">
+                <div class="flex flex-row flex-wrap">
                     <x-graph :device="$device" start="-1d" :type="$graph['graph']" loading="lazy" trim="1" />
                     <x-graph :device="$device" start="-1w" :type="$graph['graph']" loading="lazy" trim="1" />
                 </div>

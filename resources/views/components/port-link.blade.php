@@ -8,14 +8,14 @@
     </x-slot>
     <x-slot name="body">
         <div>
-            @foreach($graphs as $graph)
-                <div class="flex flex-nowrap sm:flex-wrap">
-                    <x-graph :port="$port" :type="$graph" from="-1d" width="340" height="100" legend="yes" />
-                    <x-graph :port="$port" :type="$graph" from="-1w" width="340" height="100" legend="yes" />
+            @foreach($graphs as $text => $inner)
+                <div class="border-b">
+                    {{ $text }}
                 </div>
-                <div class="flex flex-nowrap sm:flex-wrap">
-                    <x-graph :port="$port" :type="$graph" from="-1m" width="340" height="100" legend="yes" />
-                    <x-graph :port="$port" :type="$graph" from="-1y" width="340" height="100" legend="yes" />
+                <div class="flex flex-row flex-wrap">
+                    @foreach($inner as $graph)
+                        <x-graph loading="defer" :port="$port" :type="$graph['type'] ?? 'port_bits'" :vars="$fillDefaultVars($graph['vars'] ?? [])"/>
+                    @endforeach
                 </div>
             @endforeach
         </div>

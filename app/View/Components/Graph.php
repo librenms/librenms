@@ -12,8 +12,8 @@ class Graph extends Component
     public $width;
     public $height;
     public $type;
-    public $start;
-    public $end;
+    public $from;
+    public $to;
     public $legend;
     public $absolute_size;
 
@@ -22,12 +22,12 @@ class Graph extends Component
      *
      * @return void
      */
-    public function __construct($type = '', $vars = [], $start = '-1d', $end = null, $legend = 'no', $width = 340, $height = 100, $absolute_size = 0, $device = null, $port = null)
+    public function __construct($type = '', $vars = [], $from = '-1d', $to = null, $legend = 'no', $width = 340, $height = 100, $absolute_size = 0, $device = null, $port = null)
     {
         $this->type = $type;
         $this->vars = $vars;
-        $this->start = $start;
-        $this->end = $end;
+        $this->from = $from;
+        $this->to = $to;
         $this->legend = $legend;
         $this->width = $width;
         $this->height = $height;
@@ -59,8 +59,8 @@ class Graph extends Component
                         'absolute_size' => $this->absolute_size,
                         'width' => $this->width,
                         'height' => $this->height,
-                        'from' => $this->start,
-                        'to' => $this->end,
+                        'from' => $this->from,
+                        'to' => $this->to,
                     ])
         ]);
     }

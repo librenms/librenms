@@ -21,13 +21,19 @@ class PortLink extends Component
      *
      * @return void
      */
-    public function __construct(Port $port, $graphs = ['port_bits'])
+    public function __construct(Port $port, $graphs = null)
     {
         $this->port = $port;
         $this->link = Url::portUrl($port);
         $this->label = Rewrite::normalizeIfName($port->getLabel());
         $this->description = $port->getDescription();
-        $this->graphs = Arr::wrap($graphs);
+
+        $this->graphs = collect($graphs === null ? [
+            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-1d']],
+            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-7d']],
+            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-30d']],
+            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-1y']],
+        ] : Arr::wrap($graphs))->groupBy('text');
 
         if ($this->description == $this->label) {
             $this->description = '';
@@ -55,5 +61,15 @@ class PortLink extends Component
         }
 
         return 'interface-upup';
+    }
+
+    public function fillDefaultVars($vars): array
+    {
+        return [
+                'from' => '-1d',
+                'type' => 'port_bits',
+                'legend' => 'yes',
+                'text' => '',
+            ] + Arr::wrap($vars);
     }
 }
