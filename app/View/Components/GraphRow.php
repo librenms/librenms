@@ -30,13 +30,17 @@ class GraphRow extends Component
      * @var string|null
      */
     public $title;
+    /**
+     * @var float|int
+     */
+    public $rowWidth;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(string $type = '', string $title = null, string $loading = 'eager', $device = null, $port = null, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']])
+    public function __construct(string $type = '', string $title = null, string $loading = 'eager', $device = null, $port = null, int $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']])
     {
         $this->type = $type;
         $this->loading = $loading;
@@ -44,6 +48,7 @@ class GraphRow extends Component
         $this->port = $port;
         $this->graphs = $graphs;
         $this->title = $title;
+        $this->rowWidth = (max(array_column($graphs, 'width') + [0]) ?: Graph::DEFAULT_WIDTH) * $columns;
     }
 
     /**

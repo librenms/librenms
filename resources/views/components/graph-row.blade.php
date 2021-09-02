@@ -3,7 +3,7 @@
         {{ $title }}
     </div>
 @endisset
-<div class="tw-flex flex-row tw-flex-wrap">
+<div class="tw-inline-flex flex-row tw-flex-wrap" style="max-width: {{ $rowWidth }}px">
     @foreach($graphs as $graph)
         <x-graph :type="$type" :loading="$loading" :port="$port" :device="$device" :vars="$graph"></x-graph>
     @endforeach

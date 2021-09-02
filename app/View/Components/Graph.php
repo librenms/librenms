@@ -8,6 +8,9 @@ use Illuminate\View\Component;
 
 class Graph extends Component
 {
+    const DEFAULT_WIDTH = 340;
+    const DEFAULT_HEIGHT = 100;
+
     public $vars;
     public $width;
     public $height;
@@ -22,7 +25,7 @@ class Graph extends Component
      *
      * @return void
      */
-    public function __construct($type = '', $vars = [], $from = '-1d', $to = null, $legend = 'no', $width = 340, $height = 100, $absolute_size = 0, $device = null, $port = null)
+    public function __construct($type = '', $vars = [], $from = '-1d', $to = null, $legend = 'no', $width = self::DEFAULT_WIDTH, $height = self::DEFAULT_HEIGHT, $absolute_size = 0, $device = null, $port = null)
     {
         $this->type = $type;
         $this->vars = $vars;
