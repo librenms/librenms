@@ -48,7 +48,7 @@ class GraphRow extends Component
         $this->port = $port;
         $this->graphs = $graphs;
         $this->title = $title;
-        $this->rowWidth = (max(array_column($graphs, 'width') + [0]) ?: Graph::DEFAULT_WIDTH) * $columns;
+        $this->rowWidth = (max(array_column($graphs, 'width') + [0]) ?: Graph::DEFAULT_WIDTH) * min($columns, count($graphs));
     }
 
     /**
