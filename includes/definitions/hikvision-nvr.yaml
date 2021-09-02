@@ -2,8 +2,7 @@ os: hikvision-nvr
 text: 'Hikvision NVR'
 type: network
 icon: hikvision
-mib_dir:
-    - hikvision
+mib_dir: hikvision
 over:
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_uptime, text: 'Device Uptime' }

@@ -1,0 +1,17 @@
+os: vmware-vcsa
+group: unix
+type: server
+text: VMware vCenter
+icon: vmware
+mib_dir: vmware
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6876.4.7
+            - .1.3.6.1.4.1.6876.4.8
+    -
+        sysDescr_regex:
+            - '/^VMware-vCenter-Server-Appliance/'
+            - '/^VMware vCenter Server/'

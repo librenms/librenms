@@ -1,20 +1,21 @@
 <?php
+
 $name = 'postgres';
 $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo "postgres";
+echo 'postgres';
 
-$options      = '-Oqv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
+$options = '-Oqv';
+$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
 
-list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del) = explode("\n", $postgres);
+[$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
+    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del] = explode("\n", $postgres);
 
-$rrd_name = array('app', $name, $app_id);
-$metrics = array();
+$rrd_name = ['app', $name, $app_id];
+$metrics = [];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('backends', 'GAUGE', 0)
@@ -35,7 +36,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('upd', 'DERIVE', 0)
     ->addDataset('del', 'DERIVE', 0);
 
-$fields = array(
+$fields = [
     'backends' => $backends,
     'commits' => $commits,
     'rollbacks' => $rollbacks,
@@ -52,27 +53,27 @@ $fields = array(
     'fetch' => $fetch,
     'ins' => $ins,
     'upd' => $upd,
-    'del' => $del
-);
+    'del' => $del,
+];
 $metrics['none'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //process each database
-$db_lines=explode("\n", $postgres);
-$db_lines_int=17;
-$found_dbs=array();
+$db_lines = explode("\n", $postgres);
+$db_lines_int = 17;
+$found_dbs = [];
 
 while (isset($db_lines[$db_lines_int])) {
-    list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname) = explode(" ", $db_lines[$db_lines_int]);
+    [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
+        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname] = explode(' ', $db_lines[$db_lines_int]);
 
-    $rrd_name = array('app', $name, $app_id, $dbname);
+    $rrd_name = ['app', $name, $app_id, $dbname];
 
-    $found_dbs[]=$dbname;
+    $found_dbs[] = $dbname;
 
-    $fields = array(
+    $fields = [
         'backends' => $backends,
         'commits' => $commits,
         'rollbacks' => $rollbacks,
@@ -89,11 +90,11 @@ while (isset($db_lines[$db_lines_int])) {
         'fetch' => $fetch,
         'ins' => $ins,
         'upd' => $upd,
-        'del' => $del
-    );
+        'del' => $del,
+    ];
 
     $metrics[$dbname] = $fields;
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $db_lines_int++;
@@ -103,22 +104,22 @@ update_application($app, $postgres, $metrics);
 //
 // component processing for postgres
 //
-$device_id=$device['device_id'];
+$device_id = $device['device_id'];
 
-$options=array(
-    'filter' => array(
-        'device_id' => array('=', $device_id),
-        'type' => array('=', 'postgres'),
-    ),
-);
+$options = [
+    'filter' => [
+        'device_id' => ['=', $device_id],
+        'type' => ['=', 'postgres'],
+    ],
+];
 
-$component=new LibreNMS\Component();
-$pg_components=$component->getComponents($device_id, $options);
+$component = new LibreNMS\Component();
+$pg_components = $component->getComponents($device_id, $options);
 
 if (empty($found_dbs)) {
     if (isset($pg_components[$device_id])) {
         foreach ($pg_components[$device_id] as $component_id => $_unused) {
-                 $component->deleteComponent($component_id);
+            $component->deleteComponent($component_id);
         }
     }
 } else {

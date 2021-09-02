@@ -2,6 +2,7 @@ os: hpblmos
 text: 'HP Blade Management'
 type: appliance
 icon: hpe
+mib_dir: hp
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }

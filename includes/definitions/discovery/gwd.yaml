@@ -1,5 +1,16 @@
 mib: GW-EPON-DEV-MIB:GWTT-SMI:GW-EPON-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: .1.3.6.1.4.1.10072.2.20.1.1.2.1.1.28.1.1
+                used: .1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1
+                index: 0
+                precision: 1048576
+    os:
+        hardware: .1.3.6.1.4.1.10072.2.20.1.1.1.1.1.9.1
+        serial: .1.3.6.1.4.1.10072.2.20.1.1.2.1.1.18.1.1
+        version: .1.3.6.1.4.1.10072.2.20.1.1.1.1.1.8.1
     processors:
         data:
             -

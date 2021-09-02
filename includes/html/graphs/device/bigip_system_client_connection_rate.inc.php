@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'bigip_system_client_connection_rate');
+$rrd_filename = Rrd::name($device['hostname'], 'bigip_system_client_connection_rate');
 
 require 'includes/html/graphs/common.inc.php';
 

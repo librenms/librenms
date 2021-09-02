@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -41,6 +40,7 @@ class DynamicConfig
 
         $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($config) {
             $item['overridden'] = Arr::has($config, $key);
+
             return new DynamicConfigItem($key, $item);
         });
     }
@@ -49,7 +49,7 @@ class DynamicConfig
      * Check if a setting is valid
      *
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public function isValidSetting($name)
     {
@@ -86,6 +86,7 @@ class DynamicConfig
             return $key;
         });
         $sections->prepend($sections->pull('', []), 'global'); // rename '' to global
+
         return $sections;
     }
 
@@ -104,6 +105,7 @@ class DynamicConfig
             });
         });
         $grouped->prepend($grouped->pull(''), 'global'); // rename '' to global
+
         return $grouped;
     }
 

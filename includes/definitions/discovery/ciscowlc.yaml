@@ -1,5 +1,11 @@
 mib: AIRESPACE-SWITCHING-MIB
 modules:
+    mempools:
+        data:
+            -
+                free: AIRESPACE-SWITCHING-MIB::agentFreeMemory
+                total: AIRESPACE-SWITCHING-MIB::agentTotalMemory
+                precision: 1024
     processors:
         data:
             -

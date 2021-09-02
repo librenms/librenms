@@ -30,12 +30,12 @@ __Conditions__ can be any of:
 - Not Equals `!=`
 - In `IN`
 - Not In `NOT IN`
-- Begins with `LIKE ('%...')`
-- Doesn't begin with `NOT LIKE ('%...')`
+- Begins with `LIKE ('...%')`
+- Doesn't begin with `NOT LIKE ('...%')`
 - Contains `LIKE ('%...%')`
 - Doesn't Contain `NOT LIKE ('%...%')`
-- Ends with `LIKE ('...%')`
-- Doesn't end with `NOT LIKE ('...%')`
+- Ends with `LIKE ('%...')`
+- Doesn't end with `NOT LIKE ('%...')`
 - Between `BETWEEN`
 - Not Between `NOT BETWEEN`
 - Is Empty `= ''`

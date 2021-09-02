@@ -1,0 +1,6 @@
+modules:
+    os:
+        features: RAY-MIB::unitType
+        hardware: RAY-MIB::productName
+        serial: RAY-MIB::serialNumber
+        version: RAY-MIB::swVer

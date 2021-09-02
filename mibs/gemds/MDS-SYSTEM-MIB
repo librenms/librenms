@@ -1,0 +1,279 @@
+MDS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    TruthValue,DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    mdsSystem
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201805160000Z" -- May 16, 2018
+    ORGANIZATION 
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The MIB module to describe the system."
+	REVISION      "201911180000Z"
+    DESCRIPTION
+        "Added boot and current time."
+    REVISION      "201805160000Z"
+    DESCRIPTION
+        "Updated conformance statments based on smilint."
+    REVISION      "201402100000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { mdsSystem 1 }
+
+mSysMIBObjects OBJECT IDENTIFIER
+    ::= { mdsSystemMIB 1 }
+
+mSysConfig OBJECT IDENTIFIER
+    ::= { mSysMIBObjects 1 }
+
+mSysStatus OBJECT IDENTIFIER
+    ::= { mSysMIBObjects 2 }
+
+-- Textual Conventions
+FirmwareLocation ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "FirmwareLocation"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+-- System Status Objects
+mSysSerialNumberCore OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Core board serial number."
+    ::= { mSysStatus 1 }
+
+mSysSerialNumberPlatform OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Platform board serial number."
+    ::= { mSysStatus 2 }
+
+mSysProductConfiguration OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product configuration."
+    ::= { mSysStatus 3 }
+
+mSysGuid OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GUID of the unit."
+    ::= { mSysStatus 4 }
+
+mSysUptime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "System uptime (in secs) since bootup."
+    ::= { mSysStatus 5 }
+
+mSysTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "System temperature (in Celsius)."
+    ::= { mSysStatus 6 }
+
+mSysFirmwareVersionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MSysFirmwareVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains status of system firmware."
+    ::= { mSysStatus 7 }
+
+mSysPowerSupplyVoltage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Power Supply Voltage (in VDC)."
+    ::= { mSysStatus 9 }
+
+mSysCurrentDateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current system date and time."
+    ::= { mSysStatus 10 }
+
+mSysBootDateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "system date and time on boot."
+    ::= { mSysStatus 11 }
+
+mSysFirmwareVersionEntry OBJECT-TYPE
+    SYNTAX      MSysFirmwareVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry contains information about the stored firmware image."
+    INDEX   { mSysLocation }
+    ::= { mSysFirmwareVersionTable 1 }
+
+MSysFirmwareVersionEntry ::=
+    SEQUENCE {
+        mSysLocation FirmwareLocation,
+        mSysVersion OCTET STRING,
+        mSysActive TruthValue
+    }
+
+mSysLocation OBJECT-TYPE
+    SYNTAX      FirmwareLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Firmware location."
+    ::= { mSysFirmwareVersionEntry 1 }
+
+mSysVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware version."
+    ::= { mSysFirmwareVersionEntry 2 }
+
+mSysActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware state."
+    ::= { mSysFirmwareVersionEntry 3 }
+
+mSysAutoUpdateState OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current state of the auto-update daemon."
+    ::= { mSysStatus 12 }
+
+mSysAutoUpdateDetails OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Detailed information on auto-update state."
+    ::= { mSysStatus 13 }
+
+-- OIDs in the mSysMprStatus subtree only exists on MPR devices.
+mSysMprStatus OBJECT IDENTIFIER
+    ::= { mSysStatus 8 }
+
+mSysMprHeatsinkTemperature1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current heatsink #1 temperature in degrees Celsius."
+    ::= { mSysMprStatus 1 }
+
+mSysMprHeatsinkTemperature2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current heatsink #2 temperature in degrees Celsius."
+    ::= { mSysMprStatus 2 }
+
+mSysMprPowerSupplyVoltage1 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current output voltage of power supply #1."
+    ::= { mSysMprStatus 3 }
+
+mSysMprPowerSupplyVoltage2 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current output voltage of power supply #2."
+    ::= { mSysMprStatus 4 }
+
+mSysMprRelaySwitchPosition OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current state of the manual override switch on the relay card."
+    ::= { mSysMprStatus 5 }
+
+-- conformance information
+mdsSysMIBConformance   OBJECT IDENTIFIER ::= { mdsSystemMIB 3 }
+mdsSysMIBCompliances OBJECT IDENTIFIER ::= { mdsSysMIBConformance 1 }
+mdsSysMIBGroups      OBJECT IDENTIFIER ::= { mdsSysMIBConformance 2 }
+
+-- compliance statements
+mSysCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that 
+            implement the MDS-SYSTEM-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mSysStatusGroup
+        }
+        GROUP  mSysMprStatusGroup
+        DESCRIPTION
+            "This group is for SNMP entities that
+            support Orbit MPR status."
+
+    ::= { mdsSysMIBCompliances 1 }
+
+-- units of conformance
+mSysStatusGroup OBJECT-GROUP
+    OBJECTS {
+        mSysSerialNumberCore,
+        mSysSerialNumberPlatform,
+        mSysProductConfiguration,
+        mSysGuid,
+        mSysUptime,
+        mSysTemperature,
+        mSysPowerSupplyVoltage,
+        mSysLocation,
+        mSysVersion,
+        mSysActive
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        Orbit system status."
+    ::= { mdsSysMIBGroups 1 }
+
+mSysMprStatusGroup OBJECT-GROUP
+    OBJECTS {
+        mSysMprHeatsinkTemperature1,
+        mSysMprHeatsinkTemperature2,
+        mSysMprPowerSupplyVoltage1,
+        mSysMprPowerSupplyVoltage2,
+        mSysMprRelaySwitchPosition
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        Orbit MPR system status."
+    ::= { mdsSysMIBGroups 2 }
+
+END

@@ -27,6 +27,7 @@ class SnmptrapProvider extends ServiceProvider
     {
         $this->app->bind(SnmptrapHandler::class, function ($app, $options) {
             $oid = reset($options);
+
             return $app->make(config('snmptraps.trap_handlers')[$oid] ?? Fallback::class);
         });
     }

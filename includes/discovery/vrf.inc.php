@@ -19,8 +19,8 @@ if (Config::get('enable_vrfs')) {
         $rds = snmp_walk($device, 'mplsL3VpnVrfRD', '-Osqn', 'MPLS-L3VPN-STD-MIB', null);
 
         if (empty($rds)) {
-            $rds    = snmp_walk($device, 'mplsVpnVrfRouteDistinguisher', '-Osqn', 'MPLS-VPN-MIB', null);
-            
+            $rds = snmp_walk($device, 'mplsVpnVrfRouteDistinguisher', '-Osqn', 'MPLS-VPN-MIB', null);
+
             if (empty($rds) && $device['os_group'] == 'cisco') {
                 // Use CISCO-VRF-MIB if others don't work
                 $rds = snmp_walk($device, 'cvVrfName', '-Osqn', 'CISCO-VRF-MIB', null);
@@ -32,17 +32,17 @@ if (Config::get('enable_vrfs')) {
                 $ports_oid = '.1.3.6.1.4.1.9.9.711.1.2.1.1.2';
             } else {
                 $vpnmib = 'MPLS-VPN-MIB';
-                $rds    = str_replace('.1.3.6.1.3.118.1.2.2.1.3.', '', $rds);
+                $rds = str_replace('.1.3.6.1.3.118.1.2.2.1.3.', '', $rds);
 
                 $descr_oid = '.1.3.6.1.3.118.1.2.2.1.2';
-                $ports_oid  = '.1.3.6.1.3.118.1.2.1.1.2';
+                $ports_oid = '.1.3.6.1.3.118.1.2.1.1.2';
             }
         } else {
             $vpnmib = 'MPLS-L3VPN-STD-MIB';
-            $rds    = str_replace('.1.3.6.1.2.1.10.166.11.1.2.2.1.4.', '', $rds);
+            $rds = str_replace('.1.3.6.1.2.1.10.166.11.1.2.2.1.4.', '', $rds);
 
             $descr_oid = '.1.3.6.1.2.1.10.166.11.1.2.2.1.3';
-            $ports_oid  = '.1.3.6.1.2.1.10.166.11.1.2.1.1.2';
+            $ports_oid = '.1.3.6.1.2.1.10.166.11.1.2.1.1.2';
         }
 
         d_echo("\n[DEBUG]\nUsing $vpnmib\n[/DEBUG]\n");
@@ -60,12 +60,12 @@ if (Config::get('enable_vrfs')) {
             }
         }
 
-        $ports  = snmp_walk($device, $ports_oid, '-Osqn', $vpnmib, null);
-        $ports  = trim(str_replace("$ports_oid.", '', $ports));
+        $ports = snmp_walk($device, $ports_oid, '-Osqn', $vpnmib, null);
+        $ports = trim(str_replace("$ports_oid.", '', $ports));
         $port_table = [];
         foreach (explode("\n", $ports) as $port) {
-            $t       = explode(' ', $port);
-            $dotpos  = strrpos($t[0], '.');
+            $t = explode(' ', $port);
+            $dotpos = strrpos($t[0], '.');
             $vrf_oid = substr($t[0], 0, $dotpos);
             $port_id = substr($t[0], ($dotpos + 1));
 
@@ -85,16 +85,16 @@ if (Config::get('enable_vrfs')) {
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
                 // First digit gives number of chars in VRF Name, then it's ASCII
-                list($vrf_oid, $vrf_rd) = explode(' ', $oid);
-                $oid_values             = explode('.', $vrf_oid);
-                $vrf_name               = '';
+                [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                $oid_values = explode('.', $vrf_oid);
+                $vrf_name = '';
                 for ($i = 1; $i <= $oid_values[0]; $i++) {
                     $vrf_name .= chr($oid_values[$i]);
                 }
 
                 // Some VRP versions output VRF RD values as Null terminated Hex-STRING rather than string.
                 // This has to be converted to decimal
-                if ($device['os'] == 'vrp'  && preg_match('/^([^ ]+) +(([^ ]+) +.*) 00/', $oid, $matches)) {
+                if ($device['os'] == 'vrp' && preg_match('/^([^ ]+) +(([^ ]+) +.*) 00/', $oid, $matches)) {
                     //.1.3.6.1.2.1.10.166.11.1.2.2.1.4.5.116.101.115.116.49 36 35 33 30 31 3A 31 00
                     // regexp result => 5.116.101.115.116.49 -- 36 35 33 30 31 3A 31 -- 00
                     d_echo("  [DEBUG] VRP: RD HexString handling: $matches[2]");
@@ -119,21 +119,21 @@ if (Config::get('enable_vrfs')) {
 
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
                 echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
-                echo "\n  [VRF $vrf_name] DESC  - ".$descr_table[$vrf_oid];
+                echo "\n  [VRF $vrf_name] DESC  - " . $descr_table[$vrf_oid];
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                    dbUpdate(['mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
                     dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']], 'vrfs');
                 }
 
-                $vrf_id             = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
+                $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
                 $valid_vrf[$vrf_id] = 1;
 
                 echo "\n  [VRF $vrf_name] PORTS - ";
                 foreach ($port_table[$vrf_oid] as $if_id) {
                     $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
-                    echo makeshortif($interface['ifDescr']).' ';
+                    echo makeshortif($interface['ifDescr']) . ' ';
                     dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                     $if = $interface['port_id'];
                     $valid_vrf_if[$vrf_id][$if] = 1;
@@ -157,11 +157,11 @@ if (Config::get('enable_vrfs')) {
             // Type 1 specifies two subfields as a 4-octet administrative field which must contain an IP address and a 2-octet assigned number subfield.
             // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
             // FIXME Hardcoded to Type 0
-            $vrf_rd   = str_replace(' ', '', $vrf_rd);
-            if ($vrf_rd <> "000000000000") {
-                $vrf_rd_1   = substr($vrf_rd, 4, 4);
-                $vrf_rd_2   = substr($vrf_rd, 8);
-                $vrf_rd   = hexdec($vrf_rd_1) . ":" . hexdec($vrf_rd_2);
+            $vrf_rd = str_replace(' ', '', $vrf_rd);
+            if ($vrf_rd != '000000000000') {
+                $vrf_rd_1 = substr($vrf_rd, 4, 4);
+                $vrf_rd_2 = substr($vrf_rd, 8);
+                $vrf_rd = hexdec($vrf_rd_1) . ':' . hexdec($vrf_rd_2);
             } else {
                 $vrf_rd = null;
             }
@@ -190,7 +190,7 @@ if (Config::get('enable_vrfs')) {
             echo "\n  [VRF $vrf_name] PORTS - ";
             foreach ($port_table[$vrf_oid] as $if_index => $if_name) {
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-                echo makeshortif($interface['ifDescr']).' ';
+                echo makeshortif($interface['ifDescr']) . ' ';
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
@@ -238,7 +238,7 @@ if (Config::get('enable_vrfs')) {
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $ifVrfName]);
                 $valid_vrf[$vrf_id] = 1;
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-                echo makeshortif($interface['ifDescr']).' ';
+                echo makeshortif($interface['ifDescr']) . ' ';
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
@@ -254,12 +254,12 @@ if (Config::get('enable_vrfs')) {
     );
     echo "\n";
 
-    $sql = "SELECT * FROM ports WHERE device_id = '".$device['device_id']."'";
+    $sql = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
     foreach (dbFetchRows($sql) as $row) {
-        $if     = $row['port_id'];
+        $if = $row['port_id'];
         $vrf_id = $row['ifVrf'];
         if ($row['ifVrf']) {
-            if (!$valid_vrf_if[$vrf_id][$if]) {
+            if (! $valid_vrf_if[$vrf_id][$if]) {
                 echo '-';
                 dbUpdate(['ifVrf' => 'NULL'], 'ports', 'port_id=?', [$if]);
             } else {
@@ -268,10 +268,10 @@ if (Config::get('enable_vrfs')) {
         }
     }
 
-    $sql = "SELECT * FROM vrfs WHERE device_id = '".$device['device_id']."'";
+    $sql = "SELECT * FROM vrfs WHERE device_id = '" . $device['device_id'] . "'";
     foreach (dbFetchRows($sql) as $row) {
         $vrf_id = $row['vrf_id'];
-        if (!$valid_vrf[$vrf_id]) {
+        if (! $valid_vrf[$vrf_id]) {
             echo '-';
             dbDelete('vrfs', '`vrf_id` = ?', [$vrf_id]);
         } else {

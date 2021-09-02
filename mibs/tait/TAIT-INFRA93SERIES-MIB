@@ -1,0 +1,2379 @@
+TAIT-INFRA93SERIES-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Change log is now represented using the standard MODULE-IDENTITY REVISION and DESCRIPTION pairs below
+--
+
+IMPORTS
+   OBJECT-TYPE, MODULE-IDENTITY, 
+   Counter32, Unsigned32
+      FROM SNMPv2-SMI
+   TruthValue, DisplayString
+      FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP
+      FROM SNMPv2-CONF
+   SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+   taitGeneric
+      FROM TAIT-COMMON-MIB
+   infra93-94MibModule
+      FROM TAIT-INFRA93-94SERIES-COMMON-MIB
+   AlarmState,
+   BaseStationMode,
+   Condition,
+   CurrentmA,
+   FrequencyHz,
+   PowerW,
+   TransmitterStatus,
+   VoltageV,
+   ChannelGroupStatus,
+   Milliseconds,
+   TimingControlType,
+   GateState,
+   OptionState
+      FROM TAIT-INFRA93-94SERIES-TC-MIB
+   Ratio,
+   StandaloneNodeStatus,
+   ControlProtocolStatus,
+   LogicalChannelState,
+   LeveldBm,
+   SINADLevel,  
+   Temperature,
+   FrequencydHz,
+   SubAudibleType,
+   TxFrequencyResponse,
+   RxFrequencyResponse,
+   OperationalMode,
+   DcsCode,
+   MPTControlProtocolStatus,
+   FallbackNodeStatus,
+   ColourCode,
+   TransmitterSyncStatus,
+   ReceiverSyncStatus
+      FROM TAIT-INFRA93SERIES-TC-MIB;
+
+infra93MibMonitored MODULE-IDENTITY
+    LAST-UPDATED  "201908301538Z"
+    ORGANIZATION  "www.taitradio.com"
+    CONTACT-INFO  "Tait Communications
+                   245 Wooldridge Road
+                   PO Box 1645
+                   Christchurch
+                   New Zealand
+
+           phone:  +64 3358 3399
+           email:  support@taitradio.com"
+
+    DESCRIPTION   "rctRfTransmitter, rctRfReceiver, rctSelectedChannel related Monitored values 
+                   in the TB93XX series Base Stations"
+
+    REVISION      "201908301538Z"
+    DESCRIPTION   "Version 1.24.00 - Added linearTransmissionCapability object group.
+                                     - This group is optional and will be present only for systems
+                                       equipped with a linear power amplifier.
+                                     - This group contains the following alarms:
+                                       rctAlarmTxRSynthOutOfLock
+                                       systemAlarmCartesianLoopUnstable
+                                       systemAlarmTxRCableAbsent
+                                   - Added optional pmuInfoGroup object group.
+				   - pmuAlarmsGroup and pmuStateGroup are now optional."
+
+    REVISION      "201905290000Z"
+    DESCRIPTION   "Version 1.23.00 - Minor text revisions"
+
+    REVISION      "201903300000Z"
+    DESCRIPTION   "Version 1.22.00 - healthNetworkConnLogChan1State, healthNetworkConnLogChan2State references updated"
+
+    REVISION      "201808300000Z"
+    DESCRIPTION   "Version 1.21.00 - Added audio line configured levels, tx-key, rx-gate and rf repeat
+                                   - Added receiver disabled state monitored value."
+
+    REVISION      "201807300000Z"
+    DESCRIPTION   "Version 1.20.00 - Clarified the meaning of the configuration invalid alarm"
+
+    REVISION      "201805220026Z"
+    DESCRIPTION   "Version 1.19.00 - Added new logical channel states TEST and POLL
+                                   - modified textual convention value for INVALID from 4 to 255"
+
+    REVISION      "201709140130Z"
+    DESCRIPTION   "Version 1.18.00 - Add channel group name to current channel properties
+                                   - nwSvpPort Monitored value in the TB93XX series Base Stations"
+
+    REVISION      "201708241400Z"
+    DESCRIPTION   "Version 1.17.00 - Two backup NTP servers added
+                                   - Added channelgroup properties - status, localBufferLevel, furthestBufferLevel, marshalingType, marshallingDuration, Receiver and Transmitter synchronization status/reason
+                                   - Added DMR Central Voter and DMR IP Networking Satellite licences
+                                   - Added single-base-station as an option for channelgroup status
+                                   - Added monitoring parameters for channelgroup network characteristics - 
+                                     nwChannelGroupLateStreamsCount, nwChannelGroupOverflowCount, nwChannelGroupUnderflowCount
+                                     nwChannelGroupLostPacketsCount, nwChannelGroupJitter
+                                   - TX Buffer alarm added"
+
+    REVISION      "201705051500Z"
+    DESCRIPTION   "Version 1.16.00 - Simulcast related alarms added"
+
+    REVISION      "201703070000Z"
+    DESCRIPTION   "Version 1.15.00 - Fixed missing MAX-ACCESS entires on OIDs: linkInfoDMRNodeIPAddress, linkInfoDMRNodePriority, linkInfoMPTNodeIPAddress, linkInfoMPTNodePriority"
+
+    REVISION      "201702030000Z"
+    DESCRIPTION   "Version 1.14.01 - Fixed missing MAX-ACCESS entires on OIDs: linkInfoDMRNodeIPAddress, linkInfoDMRNodePriority, linkInfoMPTNodeIPAddress, linkInfoMPTNodePriority"
+
+    REVISION      "201612050000Z"
+    DESCRIPTION   "Version 1.14.00 - Added support for MPT conventional fallback
+                                   - Added status of the MPT fallback node
+                                   - Added status of the DMR fallback node
+                                   - Added state of the receiver's analog gate
+                                   - Added the node controller IP addresses and priorities for DMR and MPT
+                                   - Added the colour code of the channel"
+
+    REVISION      "201607010000Z"
+    DESCRIPTION   "Version 1.13.00 - Added configured Ntp server visibility
+                                   - Copied PMU State items from TB9400 MIB
+                                   - Updated DCS formatting description"
+
+    REVISION      "201602180000Z"
+    DESCRIPTION   "Version 1.12.00 - Updated ControlProtocolStatus description tfor name change from dmr-rx-only to dmr-hibernate.
+                                   - Updated ControlProtocolStatus description to include dmr-tier2-aligned mode.
+                                   - Updated where logical receiver gating information comes from."
+
+    REVISION      "201511030400Z"
+    DESCRIPTION   "Version 1.11.00 - Fixed missing alarm getters for pa reverse power high, pa final 2 temperature high and pmu output current high
+                                   - Added licenceAnalogConventional
+                                   - Updated description for infoStandaloneNodeStatus
+                                   - updated alarm range descriptions
+                                   - added temperature for reciter board (rctTemperatureBoard)"
+
+    REVISION      "201503230400Z"
+    DESCRIPTION   "Version 1.10.00 - Added DMR Conventional license state"
+
+    REVISION      "201410301500Z"
+    DESCRIPTION   "Version 1.09.00 - Description text reviewed"
+
+    REVISION      "201407290000Z"
+    DESCRIPTION   "Version 1.08.00 - Report the number of interference events"
+
+    REVISION      "201407100000Z"
+    DESCRIPTION   "1.07.00 - Able to monitor the running state of the secure shell interface"
+
+    REVISION      "201404140000Z"
+    DESCRIPTION   "1.06.00 - Add system alarms for TDMA"
+
+    REVISION      "201404130000Z"
+    DESCRIPTION   "1.05.00 - Added values for use during coverage testing"
+
+    REVISION      "201403140000Z"
+    DESCRIPTION   "1.04.01 - Modified description of the inactive logical channel state"
+
+    REVISION      "201401260000Z"
+    DESCRIPTION   "1.04.00 - Moved textual convention module identity OID to start at 1"
+
+    REVISION      "201401141100Z"
+    DESCRIPTION   "1.03.03 - Addition of interference counter and interference over threshold"
+
+    REVISION      "201401010000Z"
+    DESCRIPTION   "These versions were recorded prior to utilization of the MODULE-IDENTITY change log:
+                   1.03.02 - Modified textual convention for states of logical channels, OFF(0)=>INACTIVE(0)
+                   1.03.01 - Updated description for dmr-two-slot-data now that it is supported
+                   1.03.00 - Addition of packet lost counters
+                   1.02.00 - Addition of licenses and module detail information
+                   1.00.04 - New standalone node alarms
+                             Two alarms have been added for the standalone node. This resulted in two new traps:
+                             systemFallbackControlled and systemDuplicateNodePriority. Also two new OIDs in the MIB:
+                             systemAlarmFallbackControlled and systemAlarmDuplicateNodePriority
+                   1.00.03 - Modifications to names of states
+                              ControlProtocolStatus:
+                                 offline(0) enum has been renamed to unconnected(0)
+                                 unconnected(1) enum has been DEPRECATED and will no longer be used by new base station
+                                                software.
+                                 idle(2) enum has been renamed to standby(2)
+
+                                 The consequences for mismatched old base stations with new MIBs and new base
+                                 stations with old MIBs are as follows:
+
+                                    Old base station queried with new MIBs in NMS:
+                                    offline(0)     => unconnected(0)
+                                    unconnected(1) => deprecated_unconnected(1)
+                                    idle(2)        => standby(2)
+
+                                    New base station queried with old MIBs in NMS:
+                                    unconnected(0) => offline(0)
+                                    standby(2) => idle(2)
+
+                              LogicalChannelState:
+                                 offline(0) enum has been renamed to off(0)
+
+                   1.00.02 - Initial version prior to change log entries"
+    ::= { infra93-94MibModule 2 }
+
+infra93MIB OBJECT IDENTIFIER ::= { taitGeneric 2 }
+
+monitored                   OBJECT IDENTIFIER ::= { infra93MIB 2 }
+
+mibObjects                  OBJECT IDENTIFIER ::= { monitored 1 }
+productInfo                     OBJECT IDENTIFIER ::= { mibObjects 1 }
+productSummary                      OBJECT IDENTIFIER ::= { productInfo 1 }
+info                                    OBJECT IDENTIFIER ::= { productSummary 1  }
+health                                  OBJECT IDENTIFIER ::= { productSummary 2  }
+productEnabledFeatures              OBJECT IDENTIFIER ::= { productInfo 2 }
+
+modules                         OBJECT IDENTIFIER ::= { mibObjects 2 }
+reciter                             OBJECT IDENTIFIER ::= { modules 2 }
+rctSummary                              OBJECT IDENTIFIER ::= { reciter 1}
+rctInfo                                     OBJECT IDENTIFIER ::= { rctSummary 1 }
+rctHealth                                   OBJECT IDENTIFIER ::= { rctSummary 2 }
+rctSelectedChannel                      OBJECT IDENTIFIER ::= { reciter 2 }
+rctRfReceiveQuality                     OBJECT IDENTIFIER ::= { reciter 3 }
+rctRfReceiver                           OBJECT IDENTIFIER ::= { reciter 4 }
+rctRfTransmitter                        OBJECT IDENTIFIER ::= { reciter 5 }
+rctTemperature                          OBJECT IDENTIFIER ::= { reciter 6 }
+rctSystemInterface                      OBJECT IDENTIFIER ::= { reciter 7 }
+
+powerAmplifier                      OBJECT IDENTIFIER ::= { modules 3 }
+paSummary                               OBJECT IDENTIFIER ::= { powerAmplifier 1 }
+paInfo                                      OBJECT IDENTIFIER ::= { paSummary 1 }
+paHealth                                    OBJECT IDENTIFIER ::= { paSummary 2 }
+paTxOutput                              OBJECT IDENTIFIER ::= { powerAmplifier 2 }
+paTemperature                           OBJECT IDENTIFIER ::= { powerAmplifier 4 }
+paGeneral                               OBJECT IDENTIFIER ::= { powerAmplifier 5 }
+
+powerManagementUnit                 OBJECT IDENTIFIER ::= { modules 4 }
+pmuSummary                              OBJECT IDENTIFIER ::= { powerManagementUnit 1 }
+pmuInfo                                     OBJECT IDENTIFIER ::= { pmuSummary 1 }
+pmuHealth                                   OBJECT IDENTIFIER ::= { pmuSummary 2 }
+pmuSubmodules                               OBJECT IDENTIFIER ::= { pmuSummary 3 }
+pmuState                                OBJECT IDENTIFIER ::= { powerManagementUnit 2 }
+
+frontPanel                          OBJECT IDENTIFIER ::= { modules 5 }
+fpSummary                               OBJECT IDENTIFIER ::= { frontPanel 1 }
+fpInfo                                      OBJECT IDENTIFIER ::= { fpSummary 1 }
+fpHealth                                    OBJECT IDENTIFIER ::= { fpSummary 2 }
+
+alarms                          OBJECT IDENTIFIER ::= { mibObjects 3 }
+alarmSummary                        OBJECT IDENTIFIER ::= { alarms 1 }
+reciterAlarms                       OBJECT IDENTIFIER ::= { alarms 3 }
+paAlarms                            OBJECT IDENTIFIER ::= { alarms 4 }
+pmuAlarms                           OBJECT IDENTIFIER ::= { alarms 5 }
+customAlarms                        OBJECT IDENTIFIER ::= { alarms 6 }
+fpAlarms                            OBJECT IDENTIFIER ::= { alarms 7 }
+systemAlarms                        OBJECT IDENTIFIER ::= { alarms 8 }
+
+networkLinks                    OBJECT IDENTIFIER ::= { mibObjects 4 }
+networkLinksSummary                 OBJECT IDENTIFIER ::= { networkLinks 1 }
+linkInfo                                OBJECT IDENTIFIER ::= { networkLinksSummary 1 }
+linkHealth                              OBJECT IDENTIFIER ::= { networkLinksSummary 2 }
+
+networkInterfaces               OBJECT IDENTIFIER ::= { mibObjects 5 }
+nwNtpInterface                     OBJECT IDENTIFIER ::= { networkInterfaces 1 }
+nwChannelGroup                     OBJECT IDENTIFIER ::= { networkInterfaces 2 }
+nwPorts                            OBJECT IDENTIFIER ::= { networkInterfaces 3 } 
+
+mibConformance              OBJECT IDENTIFIER ::= { monitored 5}
+mibGroups                       OBJECT IDENTIFIER ::= { mibConformance 1}
+mibCompliance                   OBJECT IDENTIFIER ::= { mibConformance 2}
+
+--
+-- Monitored Objects
+--
+
+--
+-- Product Summary
+--
+licenceDmrFull                OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR Full license. The base station is licensed for operation on a DMR Full system. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 300 }
+
+licenceDmrExpress             OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR Express 6 license. The base station is licensed for operation on a DMR Express system. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 302 }
+
+licenceDmrAccess              OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR Access license. The base station is licensed for operation on a DMR Access system. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 303 }
+
+licenceDmrConventional        OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR Conventional license. The base station is licensed for operation on a DMR concentional system. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 304 }
+
+licenceAnalogConventional     OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Analog Conventional licence. The base station is licenced for Analog conventional operation
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 301 }
+
+licenceDmrExpress20           OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR Express 20 license. The base station is licensed for operation on a DMR Express 20 system. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 305 }
+
+licenceDmrCentralVoter        OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR Central Voter license. The base station is licensed for operation as a DMR Central Voter. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 306 }
+
+licenceDmrNetworkSatellite    OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "DMR IP Networking Satellite license. The base station is licensed for operation as a DMR IP
+                                           Networking satellite. 
+                                           Range: true(1), false(2)"
+                              ::= { productEnabledFeatures 307 }
+
+--
+-- Base Station Info
+--
+infoTransmitterStatus OBJECT-TYPE
+                              SYNTAX TransmitterStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current status of the transmitter.
+
+                                           unknown(0): The transmitter is in an unknown, probably faulty state.
+                                           unconfigured(1): The transmitter requires configuration before it can transmit.
+                                           untuned(2): Something is wrong with the configuration, so the exciter is unable to set the selected frequency.
+                                           idle(3): The transmitter is not transmitting on either channel.
+                                           transmitting(4): The transmitter is actively transmitting.
+                                           calibrating(5): The transmitter is being calibrated.
+                                           fault(6): There is a detected fault with the transmitter."
+                              ::= { info 1 }
+
+infoStandaloneNodeStatus OBJECT-TYPE
+                              SYNTAX StandaloneNodeStatus
+                              MAX-ACCESS read-only
+                              STATUS deprecated
+                              DESCRIPTION "The current status of standalone mode.
+                                           offline(0): A maintainer has taken the base station offline.  The base station is not under node control.
+                                           standby(1): The standalone node is enabled and ready to become active if the base station loses contact with the node.
+                                                       The standby state can also occur if the base station has lost contact with the node, but an activated major alarm at the base station prevents the standalone node from becoming active.
+                                           active(2): The base station has lost connection with the node and is in standalone node mode.
+                                           disabled(4): The standalone node feature is disabled in configuration.
+                                           running(5): The standalone node is contending with other embedded nodes on the site to take over as the master node.
+                                           master(6): The standalone node is acting as a master node and has set up a control channel on this base station."
+                              ::= { info 2 }
+
+infoMPTFallbackNodeStatus OBJECT-TYPE
+                              SYNTAX FallbackNodeStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current status of the MPT fallback node."
+                              ::= { info 3 }
+
+infoDMRFallbackNodeStatus OBJECT-TYPE
+                              SYNTAX FallbackNodeStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current status of the DMR fallback node."
+                              ::= { info 4 }
+
+
+--
+-- Base Station Health
+--
+healthRunMode OBJECT-TYPE
+                              SYNTAX BaseStationMode
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Indicates the current base station mode.
+                                           Offline means that a maintainer has taken the base station out of service.
+
+                                           offline(0): The base station is currently offline. It is out of service. It does not transmit or receive user traffic. It communicates with a web browser but not with nodes.
+                                           online(1): The base station is currently online. This is its normal operating mode.
+                                           unknown(2): The base station mode is unknown. This indicates a faulty condition."
+                              ::= { health 2 }
+
+healthNetworkConnLogChan1State OBJECT-TYPE
+                              SYNTAX LogicalChannelState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Indicates the state of logical channel 1.
+
+                                           inactive(0): The logical channel is not transmitting.
+                                           idle(1): The logical channel is currently idle. It is not currently a traffic channel or a control channel.
+                                           traffic(2): The logical channel is currently operating as a traffic channel (voice/data).
+                                           control(3): The logical channel is currently operating as a control channel.
+                                           test(4): The logical channel is currently operating as a test channel.
+                                           poll(5): The logical channel is currently operating as a poll channel.
+                                           invalid(255): The logical channel configuration is invalid."
+                              ::= { health 3 }
+
+healthNetworkConnLogChan2State OBJECT-TYPE
+                              SYNTAX LogicalChannelState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Indicates the state of logical channel 2.
+
+                                           inactive(0): The logical channel is not transmitting.
+                                           idle(1): The logical channel is currently idle. It is not currently a traffic channel or a control channel.
+                                           traffic(2): The logical channel is currently operating as a traffic channel (voice/data).
+                                           control(3): The logical channel is currently operating as a control channel.
+                                           test(4): The logical channel is currently operating as a test channel.
+                                           poll(5): The logical channel is currently operating as a poll channel.
+                                           invalid(255): The logical channel configuration is invalid."
+                              ::= { health 4 }
+
+healthSecureShellRunning OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Indicates whether the remote secure shell interface is running.
+                                           Range: true(1), false(2)"
+                              ::= { health 5 }
+
+
+--
+-- Reciter Information
+--
+
+rctInfoProductCode            OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The reciter product code. Product codes are explained in the Specifications Manual." 
+                              ::= { rctInfo 1 }
+
+rctInfoSerialNumber           OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The reciter serial number. A unique identifier assigned to the module in the factory."
+                              ::= { rctInfo 2 }
+
+rctInfoHardwareVersion        OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The reciter hardware version number."
+                              ::= { rctInfo 3 }
+
+rctInfoFirmwareVersion        OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The version number of the firmware currently installed on the Reciter."
+                              ::= { rctInfo 4 }
+
+
+--
+-- Reciter Receiver
+--
+
+rctRfReceiverRSSI OBJECT-TYPE
+                              SYNTAX LeveldBm
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current strength of the received signal in dBm.
+                                           Range: -12000..-6000"
+                              ::= { rctRfReceiver 1 }
+                              
+rctRfReceiverLC1RSSI OBJECT-TYPE
+                              SYNTAX LeveldBm
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current strength of the received signal on logical channel 1 in dBm.
+                                           Range: -12000..-6000"
+                              ::= { rctRfReceiver 2 }
+                              
+rctRfReceiverLC2RSSI OBJECT-TYPE
+                              SYNTAX LeveldBm
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current strength of the received signal on logical channel 2 in dBm.
+                                           Range: -12000..-6000"
+                              ::= { rctRfReceiver 3 }       
+                              
+rctRfReceiverLC1RxGateState OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Receiver gate state of logical channel 1. Only valid if the logical channel has received anything since powering up.
+                                           Range: true(1), false(2)"
+                              ::= { rctRfReceiver 4 }                                                                                   
+                              
+rctRfReceiverLC2RxGateState OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Receiver gate state of logical channel 2. Only valid if the logical channel has received anything since powering up.
+                                           Range: true(1), false(2)"
+                              ::= { rctRfReceiver 5 }                                                                                   
+
+rctRfReceiverSelectedDecodeCTCSS OBJECT-TYPE
+                              SYNTAX FrequencydHz
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The CTCSS value that the base station unmutes to."
+                              ::= { rctRfReceiver 8 }
+
+rctRfReceiverSelectedDecodeSubAudibleType OBJECT-TYPE
+                              SYNTAX SubAudibleType
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured receive sub-audible signaling type."
+                              ::= { rctRfReceiver 9 }
+
+rctRfReceiverSelectedSINADGatingLevel OBJECT-TYPE
+                              SYNTAX SINADLevel
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured signal-to-noise gating threshold in dB."
+                              ::= { rctRfReceiver 10 }
+
+rctRfReceiverSelectedDecodeDCS OBJECT-TYPE
+                              SYNTAX DcsCode
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The DCS value that the base station unmutes to."
+                              ::= { rctRfReceiver 11 }
+
+rctRfReceiverSelectedFrequencyResponse OBJECT-TYPE
+                              SYNTAX RxFrequencyResponse
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Specifies the receive baseband frequency response that applies to the channel.
+                                           MPT Control channels have a flat speech charactieristic.
+                                           MPT Traffic channels have a de-emphasis characteristic.
+                                           Conventional analog channels take their setting from channel profile configuration.
+                                           'Flat speech' applies a constant gain to frequencies in the speech band (high pass above 300 Hz).
+                                           'De-emph speech' is a de-emphasis characteristic over the speech band (high pass above 300 Hz)."
+                              ::= { rctRfReceiver 12 }
+
+rctRfReceiverAnalogGateState OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Analog receiver gate state of the channel.
+                                           Range: true(1), false(2)"
+                              ::= { rctRfReceiver 13 }
+                              
+rctRfReceiverIsDisabled       OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Status of the receiver; if it is unavailable then the receiver can't be disabled in the current mode of operation.
+                                           Range: true(1), false(2)"
+                              ::= { rctRfReceiver 14}                              
+
+--
+-- Reciter RF transmitter
+--
+rctRfTxSelectedEncodeCTCSS OBJECT-TYPE
+                              SYNTAX FrequencydHz
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured transmit CTCSS tone frequency in dHz."
+                              ::= { rctRfTransmitter 10 }
+
+rctRfTxSelectedEncodeSubAudibleType OBJECT-TYPE
+                              SYNTAX SubAudibleType
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured transmit sub-audible signaling type"
+                              ::= { rctRfTransmitter 11 }
+
+rctRfTxSelectFrequencyResponse OBJECT-TYPE
+                              SYNTAX TxFrequencyResponse
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Specifies the transmit baseband frequency response that applies to the channel.
+                                           MPT Control channels have a flat speech charactieristic.
+                                           MPT Traffic channels have a pre-emphasis characteristic.
+                                           Conventional analog channels take their setting from channel profile configuration.
+                                           'Flat speech' applies a constant gain to frequencies in the speech band (high pass above 300 Hz).
+                                           'Pre-emph speech' is a pre-emphasis characteristic over the speech band (high pass above 300 Hz)."
+                              ::= { rctRfTransmitter 12 }
+
+rctRfTxSelectedEncodeDCS OBJECT-TYPE
+                              SYNTAX DcsCode
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The DCS sub-audible signalling value that the base station applies while transmitting."
+                              ::= { rctRfTransmitter 13 }
+
+rctRfTxSelectedEncodeSubAudibleDeviation OBJECT-TYPE
+                              SYNTAX Unsigned32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The deviation that CTCSS or DCS signaling will cause to the carrier frequency. It is in Hz."
+                              ::= { rctRfTransmitter 14 }
+
+rctRfTxRfRepeatState OBJECT-TYPE
+                              SYNTAX OptionState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The current RF repeat state.
+
+                                           disabled(0): RF is not repeated. The reciter acts as a base station.
+                                           enabled(1): RF is repeated. The reciter acts as a repeater."
+                              ::= { rctRfTransmitter 16 }
+
+--
+-- Reciter temperature
+--
+rctTemperatureBoard OBJECT-TYPE
+                              SYNTAX Temperature
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The reciter temperature in degrees Celsius, measured on the reciter circuit board.
+                                           Range: -30..125"
+                              ::= { rctTemperature 1 }
+
+--
+-- Reciter system interface
+--
+rctSiConfiguredBalancedLineInLevel OBJECT-TYPE
+                              SYNTAX LeveldBm
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured level of the balanced line input in dBm.
+                                           Range: -30..0"
+                              ::= { rctSystemInterface 1 } 
+
+rctSiConfiguredBalancedLineOutLevel OBJECT-TYPE
+                              SYNTAX LeveldBm
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured level of the balanced line output in dBm.
+                                           Range: -30..0"
+                              ::= { rctSystemInterface 2 } 
+
+rctSiTxKey                    OBJECT-TYPE
+                              SYNTAX GateState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The state of the Tx key input.
+                                           Range: Active(1), Inactive(2)"
+                              ::= { rctSystemInterface 3 } 
+
+rctSiRxGate                   OBJECT-TYPE
+                              SYNTAX GateState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The state of the Rx Gate output.
+                                           Range: Active(1), Inactive(2)"
+                              ::= { rctSystemInterface 4 } 
+
+--
+-- PA Information
+--
+
+paInfoProductCode             OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The power amplifier product code. Product codes are explained in the Specifications Manual."
+                              ::= { paInfo 1 }
+
+paInfoSerialNumber            OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Power amplifier serial number. A unique identifier assigned to the module in the factory."
+                              ::= { paInfo 2 }
+
+paInfoHardwareVersion         OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The power amplifier hardware version number."
+                              ::= { paInfo 3 }
+
+paInfoFirmwareVersion         OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The version number of the firmware currently installed on the power amplifier."
+                              ::= { paInfo 4 }
+
+
+--
+-- Front panel Information
+--
+
+fpInfoProductCode             OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The product code for the front panel."
+                              ::= { fpInfo 1 }
+
+fpInfoSerialNumber            OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Front panel serial number. A unique identifier assigned to the front panel in the factory."
+                              ::= { fpInfo 2 }
+
+fpInfoHardwareVersion         OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Front panel hardware version number."
+                              ::= { fpInfo 3 }
+
+fpInfoFirmwareVersion         OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The version number of the firmware currently installed on the front panel."
+                              ::= { fpInfo 4 }
+
+
+--
+-- PMU Information
+--
+
+pmuInfoProductCode		      OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The product code for the PMU."
+                              ::= { pmuInfo 1 }
+
+pmuInfoSerialNumber           OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU serial number. A unique identifier assigned to the PMU in the factory."
+                              ::= { pmuInfo 2 }
+
+pmuInfoHardwareVersion        OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The PMU hardware version number."
+                              ::= { pmuInfo 3 }
+
+pmuInfoFirmwareVersion    	  OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The version number of the firmware currently installed on the PMU."
+                              ::= { pmuInfo 4 }
+
+pmuInfoCalibrationUpdateDate OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Indicates when the PMU was last calibrated."
+                              ::= { pmuInfo 5 }
+
+--
+-- PMU state
+--
+pmuStateMainsInState OBJECT-TYPE
+                              SYNTAX Condition
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The condition of the PMU's AC power input.
+                                           Range:
+                                           bad(0): The AC power input is off, or too low, or too high.
+                                           good(1): The AC power input is usable.
+                                           not fitted(2): The AC power input module is not fitted."
+                              ::= { pmuState 1 }
+
+pmuStateBatteryInState OBJECT-TYPE
+                              SYNTAX Condition
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The condition of the PMU's DC power input.
+                                           Range:
+                                           bad(0): The DC power input is off, or too low, or too high.
+                                           good(1): The DC power input is usable.
+                                           not fitted(2): The DC power input module is not fitted."
+                              ::= { pmuState 2 }
+
+pmuStateBatteryInVoltage OBJECT-TYPE
+                              SYNTAX VoltageV
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The measured voltage of the DC (battery) power supply to the PMU.
+                                           Range: 10.5..15.5."
+                              ::= { pmuState 3 }
+
+pmuStateOutCurrent OBJECT-TYPE
+                              SYNTAX CurrentmA
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The output current in mA that the PMU is supplying to the subrack (PA(s), reciter(s) and control panel).
+                                           Range: 0..20000."
+                              ::= { pmuState 4 }
+
+pmuStateOutVoltage OBJECT-TYPE
+                              SYNTAX VoltageV
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The actual voltage of the PMU output(s) to the PA(s) and reciter(s) in the subrack (nominally 28 V).
+                                           Range: 0..32."
+                              ::= { pmuState 5 }
+
+pmuStateOutStatus OBJECT-TYPE
+                              SYNTAX Condition
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The condition of the PMU power supply to the PA.
+                                           Range:
+                                           bad(0): The power supply is absent or its voltage is too low or too high.
+                                           good(1): The power supply is OK."
+                              ::= { pmuState 6 }
+
+pmuStateAuxOutState OBJECT-TYPE
+                              SYNTAX Condition
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The condition of the auxiliary power output.
+                                           Range:
+                                           bad(0): The auxiliary power is off, or its voltage is too high or too low.
+                                           good(1): The auxiliary power output is on.
+                                           not fitted(2): The auxiliary power module is not fitted."
+                              ::= { pmuState 7 }
+
+pmuStateBusConnect OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The state of the DC supply to the PMU's standby converter.
+                                           Range: connected(1), not connected(2)"
+                              ::= { pmuState 9 }
+
+--
+--
+-- Reciter Selected Channel
+--
+
+rctSelectedChannelNumber OBJECT-TYPE
+                              SYNTAX Unsigned32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Number of the currently selected channel.
+                                           Range: 1..1000"
+                              ::= { rctSelectedChannel 1 }
+
+rctSelectedChannelName OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Name of the current channel."
+                              ::= { rctSelectedChannel 2 }
+
+rctSelectedChannelProfileName OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Name of the channel profile assigned to the currently selected channel."
+                              ::= { rctSelectedChannel 3 }
+
+rctSelectedChannelSigProfileName OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Name of the signalling profile assigned to the currently selected channel."
+                              ::= { rctSelectedChannel 4 }
+
+rctSelectedChannelTransmitPower OBJECT-TYPE
+                              SYNTAX PowerW
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Configured PA RF transmit power in watts for the current channel when it is powered by mains.
+                                           Range: 0..100"
+                              ::= { rctSelectedChannel 5 }
+
+rctSelectedChannelTxFreq OBJECT-TYPE
+                              SYNTAX FrequencyHz
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The transmit frequency of the current channel in Hz.
+                                           Range: 100000000..1000000000"
+                              ::= { rctSelectedChannel 6 }
+
+rctSelectedChannelRxFreq OBJECT-TYPE
+                              SYNTAX FrequencyHz
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The receive frequency of the current channel in Hz.
+                                           Range: 100000000..1000000000"
+                              ::= { rctSelectedChannel 7 }
+
+rctSelectedChannelSystemType OBJECT-TYPE
+                              SYNTAX OperationalMode
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The type of network configured in the channel profile of the currently selected channel,
+                                           analogConventional(1), dmrConventional(2), dmrTrunking(3), mptTrunking(4)"
+                              ::= { rctSelectedChannel 10 }
+
+rctSelectedChannelColourCode OBJECT-TYPE
+                              SYNTAX ColourCode
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The configured colour code for the currently selected channel"
+                              ::= { rctSelectedChannel 11 }
+
+rctSelectedChannelGroupName OBJECT-TYPE
+                              SYNTAX SnmpAdminString
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Name of the channel group assigned to the currently selected channel."
+                              ::= { rctSelectedChannel 12 }
+
+rctRfRcvInterference OBJECT-TYPE
+                              SYNTAX TruthValue
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Interference level is above configured RSSI threshold.
+                                           Range: true(1), false(2)"
+                              ::= { rctRfReceiveQuality 2 }
+                              
+rctRfInterferenceCounter OBJECT-TYPE
+                              SYNTAX Counter32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Counter indicating cumulative number of seconds that interference has been present.
+                                           Range: 0..4294967295"
+                              ::= { rctRfReceiveQuality 3 }  
+
+rctRfInterferenceEvents OBJECT-TYPE
+                              SYNTAX Counter32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The number of times the receiver detects interference."
+                              ::= { rctRfReceiveQuality 4 }  
+
+--
+-- PA Tx Output
+--
+paTxOutputForwardPower OBJECT-TYPE
+                              SYNTAX PowerW
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The measured forward power of the PA output in Watts.
+                                           Range: 0..100"
+                              ::= { paTxOutput 1 }
+                              
+paTxOutputVSWR             OBJECT-TYPE
+                              SYNTAX Ratio
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The transmitter's voltage standing wave ratio (VSWR)."
+                              ::= { paTxOutput 2 }                              
+
+--
+-- Link Info (Network Connections)
+--
+linkInfoCtrlProtocolStatus OBJECT-TYPE
+                              SYNTAX ControlProtocolStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The status of the base station as reported to the node using the control protocol.
+                                           Range:
+                                           unconnected(0): The base station is not under node control.
+                                           deprecatedUnconnected(1): DEPRECATED - The base station is not in contact with a node.
+                                           standby(2): The base station is in contact with a node. Its air interface is not transmitting or receiving.
+                                           dmr-aligned(3): The base station is transmitting a framesync structure together with an idle pattern or a payload.
+                                           dmr-offset(4): Not currently used.
+                                           dmr-two-slot-data(5): The base station is carrying a data call that uses both logical channels.
+                                           dmr-hibernate(6): the base station is hibernating
+                                           analogue(7): Not currently used.
+                                           test-mode(8): Reserved.
+                                           dmr-tier2-aligned(9): The base station is transmitting a framesync struture for Tier 2 operation"
+                              ::= { linkInfo 1 }
+
+linkInfoNetworkPacketCount          OBJECT-TYPE
+                                        SYNTAX Counter32
+                                        MAX-ACCESS read-only
+                                        STATUS current
+                                        DESCRIPTION "Total packets received from the network on control and data protocols. This is an accumulating number. The counter is large enough that the number rolls over infrequently, such as once every few months, depending on call volumes."
+                                        ::= { linkInfo 2 }
+
+linkInfoMPTCtrlProtocolStatus OBJECT-TYPE
+                              SYNTAX MPTControlProtocolStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The status of the base station as reported to the node using the control protocol.
+                                           unconnected(0): The base-station is not connected to any MPT-IP node, neither external nor fallback.
+                                           idle(1): The base-station is connected to a MPT-IP node (either external or fallback). It is not transmitting anything on its air interface (transmitter is off).
+                                           control(2): The base-station is connected to a MPT-IP node (either external or fallback). Air interface transmitting and receiving MPT control channel signalling only.
+                                           traffic(3):      The base-station is connected to a MPT-IP node (either external or fallback). Voice/Data packets are sent to and received from node, Air interface is transmitting as well as receiving.
+                                           conventional(4): The base-station is connected to a fallback node. Voice/Data packets are repeated locally from uplink to downlink. Air interface is transmitting as well as receiving."
+                              ::= { linkInfo 3 }
+
+linkInfoDMRNodeIPAddress OBJECT-TYPE
+                         SYNTAX SnmpAdminString
+                         MAX-ACCESS read-only
+                         STATUS current
+                         DESCRIPTION "The IP address of the DMR Node Controlling the base station."
+                         ::= {linkInfo 4 }
+
+linkInfoDMRNodePriority  OBJECT-TYPE
+                         SYNTAX Unsigned32
+                         MAX-ACCESS read-only
+                         STATUS current
+                         DESCRIPTION "The priority of the DMR Node Controlling the base station."
+                         ::= {linkInfo 5 }
+
+linkInfoMPTNodeIPAddress OBJECT-TYPE
+                         SYNTAX SnmpAdminString
+                         MAX-ACCESS read-only
+                         STATUS current
+                         DESCRIPTION "The IP address of the MPT Node Controlling the base station."
+                         ::= {linkInfo 6 }
+
+linkInfoMPTNodePriority  OBJECT-TYPE
+                         SYNTAX Unsigned32
+                         MAX-ACCESS read-only
+                         STATUS current
+                         DESCRIPTION "The priority of the MPT Node Controlling the base station."
+                         ::= {linkInfo 7 }
+
+
+linkHealthNetworkPacketLostCount OBJECT-TYPE
+                                       SYNTAX Counter32
+                                       MAX-ACCESS read-only
+                                       STATUS current
+                                       DESCRIPTION "Total accumulated number of lost voice and control packets sent from the control and switching nodes. An increasing number indicates that the linking infrastructure has a problem or is congested."
+                              			::= { linkHealth 2 }     
+                              			
+linkHealthNetworkJitterLastOver    OBJECT-TYPE
+                                        SYNTAX Unsigned32
+                                        MAX-ACCESS read-only
+                                        STATUS current
+                                        DESCRIPTION "The maximum jitter measured in the last over."
+                                        ::= { linkHealth 3 }      
+                                        
+linkHealthNetworkJitterCount        OBJECT-TYPE
+                                        SYNTAX Counter32
+                                        MAX-ACCESS read-only
+                                        STATUS current
+                                        DESCRIPTION "The total number of times the configured jitter threshold has been exceeded."
+                                        ::= { linkHealth 4 }                           			                         
+
+linkHealthSequenceErrorsCount    OBJECT-TYPE
+                                        SYNTAX Counter32
+                                        MAX-ACCESS read-only
+                                        STATUS current
+                                        DESCRIPTION "The result of lost packets - i.e. the number of times packets have been received out of sequence. This is an accumulating number."
+                                        ::= { linkHealth 5 }  
+                                        
+nwConfiguredNtpServerAddress  OBJECT-TYPE
+                              SYNTAX      DisplayString
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION
+                                  "The IP address configured for the preferred NTP server used by the base-station.
+                                   The current status of NTP for the base-station including the selected server is
+                                   available via the NTPv4-MIB (RFC 5907)"
+                              ::= { nwNtpInterface 1 }
+
+nwConfiguredNtpBackupServerAddress1  OBJECT-TYPE
+                              SYNTAX      DisplayString
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION
+                                  "The IP address configured for a backup NTP server used by the base-station.
+                                   The current status of NTP for the base-station including the backup servers is
+                                   available via the NTPv4-MIB (RFC 5907)"
+                              ::= { nwNtpInterface 2 }
+
+nwConfiguredNtpBackupServerAddress2  OBJECT-TYPE
+                              SYNTAX      DisplayString
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION
+                                  "The IP address configured for a backup NTP server used by the base-station.
+                                   The current status of NTP for the base-station including the backup servers is
+                                   available via the NTPv4-MIB (RFC 5907)"
+                              ::= { nwNtpInterface 3 }
+
+--
+--
+-- Monitored Alarms: Summary -----------------------------------------------------------------------------
+--
+alarmSummaryBaseStation OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Base station summary alarm. The base station currently has one or more active alarms.
+                                           Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 1 }
+
+alarmSummaryReciter OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Reciter summary alarm. The reciter currently has one or more active alarms. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 2 }
+
+alarmSummaryPowerAmplifier OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PA summary alarm. The PA currently has one or more active alarms. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 3 }
+
+alarmSummaryPowerManagementUnit OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU summary alarm. The PMU currently has one or more active alarms. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 4 }
+
+alarmSummaryCustomAlarms OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom summary alarm. There are currently one or more active custom alarms. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 5 }
+
+alarmSummaryFrontPanel OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Front panel summary alarm. The front panel currently has one or more active alarms. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 6 }
+
+alarmSummarySystem OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "System summary alarm. One or more system conditions have triggered alarms. This does not indicate a base station fault. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 7 }
+
+alarmSummaryMinor OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Minor summary alarm. The base station currently has one or more minor alarms. The node will select other channels in preference. Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 8 }
+
+alarmSummaryMajor OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Major summary alarm. The base station currently has one or more major alarms. The node will take it out of service.
+                                           Connect to the base station to see what these alarms are.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { alarmSummary 9 }
+
+--
+-- Monitored Alarms: Reciter -----------------------------------------------------------------------------
+--
+rctAlarmRxSynthOutOfLock OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Receiver synthesizer alarm. The receiver synthesizer is unable to lock on to the frequency it is configured to operate at.
+                                           In response, the base station disabled the receiver.
+                                           Check that this frequency is within the receiver's RF frequency range. If it is, send the reciter for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 2 }
+
+rctAlarmInvalidChannelSelected OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Channel invalid alarm. An invalid channel number was selected. The base station has stopped operating.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 3 }
+
+rctAlarmOverTemperature OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Temperature high alarm. The reciter is approaching its maximum operating temperature.
+                                           Check if the ambient temperature high alarm is active (Monitor > Alarms > System) and that the reciter, PMU and PA fan                                         Diagnose > Sub-Systems > Fan Tests).
+                                           This alarm could be caused by a high ambient temperature or a fan failure.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 10 }
+
+rctAlarmTxCalibrationInvalid OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Transmitter calibration invalid alarm. This alarm activates if the exciter has become uncalibrated. Send the reciter for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 13 }
+
+rctAlarmRxCalibrationInvalid OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Reciter receiver calibration invalid alarm. The RSSI needs to be calibrated for the operational frequency of the channel.
+                                           Connect to the base station and re-calibrate the RSSI.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 14 }
+
+rctAlarmInvalidConfiguration OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Reciter hardware configuration invalid alarm, the base station modules are not compatible
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 15 }
+
+rctAlarm25MHzSynthOutOfLock OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Synthesizer out of lock alarm. The reciter's 25 MHz synthesizer cannot remain locked to the external reference.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 16 }
+
+rctAlarm6144MHzSynthOutOfLock OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Synthesizer out of lock alarm. The reciter's 61.44 MHz synthesizer cannot remain locked to the external reference.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 17 }
+
+rctAlarmTxFSynthOutOfLock     OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The TxF synthesizer is unable to lock on to the frequency it is configured to operate at. In response, the base station disabled the transmitter.
+                              						 Send the reciter for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 18 }
+
+rctAlarmSimulcastSynch        OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The base station cannot achieve synchronization to common time reference required for simulcast operation.
+                                          If simulcast not needed, uncheck simulcast box in channel profile. Otherwise, check 1PPS and External reference units and NTP server and connectors.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 19 }
+
+rctAlarmReceiverSynch         OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Reports whether the receiver is aligned with the transmit TDMA frame synchronization of the transmitters of the channel group.
+                                           Possible causes for the receiver unsynchronized alarm are:
+                                           1.  The reciter does not have a valid 1PPS input and is not able to free run 1PPS [ref].
+                                           2.  The reciter is not synchronized to a valid NTP server and is not able to free run NTP time.
+                                           This alarm should be disabled for other system types.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 20 }
+
+rctAlarmTxRSynthOutOfLock OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The TxR synthesizer is unable to lock on to the frequency it is configured to operate at. In response, the base station disabled the transmitter.
+                                                Send the reciter for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { reciterAlarms 21 }
+
+--
+-- Monitored Alarms: Power Amplifier -----------------------------------------------------------------------------
+--
+paAlarmNoPADetected OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PA not detected alarm. The reciter has not received a response from a PA over the control bus.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 1 }
+
+paAlarmInvalidFirmware OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PA firmware invalid alarm. The firmware in the PA is invalid.
+                                           1. Connect to the base station and activate the latest PA firmware.
+                                           2. Replace the PA and send it for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 2 }
+
+paAlarmInvalidCalibration OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Invalid PA calibration alarm. This alarm can only be triggered on start-up, when the PA carries out self-tests.
+                                           It indicates that settings stored in firmware have values outside acceptable limits. In response, the base station disables the transmitter.
+                                           Contact your regional Tait office for assistance.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 3 }
+
+paAlarmForwardPowerLow OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Forward power low alarm. The PA forward power output is below the configured minimum limit.
+                                           If the VSWR is also raised, check for a load mismatch. Otherwise, there may be a fault in the output driver(s).
+                                           Replace the PA and send for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 5 }
+
+paAlarmPowerFoldback OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Power foldback alarm. The PA has detected a fault condition and, to prevent damage, reduced its power output to 35 Watts. (But only if the configured power output is higher than 35 Watts. If the configured output is less than or equal to 35, it stays the same.)
+																					 Check the other alarms to see what fault condition(s) have caused this. If the fault clears, the PA automatically returns to its previous power output level and the alarm returns to green.
+																					 This alarm causes the node to take the base station out of service. Once the problem is fixed, you need to send a test transmission to clear the alarm. Only then will the node bring the channel back into service.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 7 }
+
+paAlarmReversePowerHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Reverse power high alarm. The PA's reverse power is above the configured maximum.
+                              						 Check for a load mismatch. This alarm has a resolution of only 1W so it isn't sufficiently sensitive for power outputs below 20W.
+                                           Note: This alarm will not show if the transmit combiner uses an isolator.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 8 }
+
+paAlarmShutdownImminent OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PA shut-down alarm. The PA is not operational. It detected a fault condition and  disabled the transmitter to prevent damage.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 9 }
+
+paAlarmVSWRFault OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "VSWR alarm. The PA's Voltage Standing Wave Ratio (VSWR) is above the configured threshold. A normal VSWR is <= 2:1.
+                                           A high VSWR automatically means reduced output power. If the VSWR increases to 10:1 or more,
+                                           the PA folds back its power output to a low level. If the VSWR returns to 5:1 or less, the PA recovers.
+                                           Check for a load mismatch on the RF output.
+																				   This alarm causes the node to take the base station out of service.
+																				   Once the problem is fixed, you need to send a test transmission to clear the alarm. Only then will the node bring the channel back into service.
+																				   Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 10 }
+
+paAlarmDriverCurrentHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Driver current high alarm. The driver is drawing excessive current. A fixed limit has been exceeded. Replace the PA and send it for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 11 }
+
+paAlarmFinal1CurrentHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Final 1 current high alarm. The current in the PA's final 1 output stage has exceeded a fixed limit.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 12 }
+
+paAlarmFinal2CurrentHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Final 2 current high alarm. The current in the PA's final 2 output stage has exceeded a fixed limit.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 13 }
+
+paAlarmCurrentImbalance OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Current imbalance alarm. One of the PA's final stages is drawing significantly more current than the other.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 14 }
+
+paAlarmSupplyVoltageLow OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Supply voltage low alarm. The PA supply voltage is 26 V or less, probably because the battery supply to the PMU is running low.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 15 }
+
+paAlarmSupplyVoltageHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Supply voltage high alarm. The power supplied to the PA is 29 V or more. The PMU is faulty and needs replacing,
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 16 }
+
+paAlarmDriverTemperatureHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Driver temperature high alarm. The temperature in the PA's driver output stage has exceeded the configured threshold.
+                                           If it continues to rise and exceeds a built-in limit, the PA will fold back its power output.
+                                           To see the actual temperature, connect to the base station and select Diagnose > Sub-Systems > Fan Tests.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 17 }
+
+paAlarmFinal1TemperatureHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Final 1 temperature high alarm. The temperature in the PA's final 1 output stage has exceeded the configured threshold.
+                                           If it continues to rise and exceeds a built-in limit, the PA will fold back its power output.
+                                           To see the actual temperature, connect to the base station and select Diagnose > Sub-Systems > Fan Tests.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 18 }
+
+paAlarmFinal2TemperatureHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Final 2 temperature high alarm. The temperature in the PA's final 2 output stage has exceeded the configured threshold.
+                                           If it continues to rise and exceeds a built-in limit, the PA will fold back its power output.
+                                           To see the actual temperature, connect to the base station and select Diagnose > Sub-Systems > Fan Tests.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { paAlarms 19 }
+
+--
+-- Monitored Alarms: Power Management Unit
+--
+pmuAlarmNoPMUDetected OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU not detected alarm. The reciter has not received a response from the PMU over the control bus.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 1 }
+
+pmuAlarmInvalidFirmware OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU firmware invalid alarm. The firmware in the PMU is invalid.
+                                           1. Connect to the base station and activate the PMU firmware.
+                                           2. Replace the PMU and send it for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 2 }
+
+pmuAlarmMainsFailure OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Mains supply alarm. The mains power supply to the PMU is absent or its voltage is outside acceptable limits.
+                                           The PMU is using DC power instead.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 4 }
+
+pmuAlarmSelfTestFailure OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU power-up fault. During start-up, the PMU detected an internal error and will reset itself.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 5 }
+
+pmuAlarmShutdownImminent OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Shut-down imminent alarm. A battery is currently powering the base station and its voltage has fallen below the configured power shut-down voltage.
+                                           The PMU will shut down 30 seconds after activating this alarm.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 6 }
+
+pmuAlarmTemperatureHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU temperature alarm. One of the PMU temperature sensors has detected a temperature that is above the fixed limit.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 7 }
+
+pmuAlarmBatteryProtect OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Battery protection mode alarm. Battery protection mode is on. If mains power fails, the PMU will shut down to protect the battery.
+                                           Battery protection mode is entered when the battery voltage falls below the configured power shutdown voltage. Check the battery backup system.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 8 }
+
+pmuAlarmBatteryVoltageLow OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Low battery voltage alarm. The DC voltage supply to the PMU is below the configured alarm threshold.
+                                           If mains power is lost, the PMU is likely to reduce its output voltage or shut down. Check the charging system.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 9 }
+
+pmuAlarmBatteryVoltageHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Battery voltage high alarm. The voltage of the DC power supply to the PMU is higher than the configured maximum.
+                                           The base station takes no action until the voltage reaches the fixed maximum, when it shuts down.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 10 }
+
+pmuAlarmCurrentOutHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PMU high current alarm. The PMU is providing > 15 A of current and is automatically lowering its output voltage.
+                                           There is a short circuit or the PMU is faulty.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 11 }
+
+pmuAlarmVoltageOutLow OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Output voltage low alarm. The PMU's DC output (nominally 28 V) is lower than the fixed minimum of 24 V.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 12 }
+
+pmuAlarmVoltageOutHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "High voltage alarm. The PMU's DC output (nominally 28 V) is higher than the fixed maximum of 32 V.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { pmuAlarms 13 }
+
+--
+-- Monitored Alarms: System
+--
+systemAlarmAmbientTempLow OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Ambient temperature low alarm. The ambient temperature at the front panel air intake is below the configured minimum.
+                                           Fan operation and PA power output are unaffected by this alarm.
+                                           This alarm could indicate an air conditioning failure.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 1 }
+
+systemAlarmAmbientTempHigh OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Ambient temperature high alarm. The ambient temperature at the front panel air intake has exceeded the configured maximum.
+                                           Fan operation and PA power output are unaffected by this alarm.
+                                           This alarm could indicate an air conditioning failure."
+                              ::= { systemAlarms 2 }
+
+systemAlarmExternalRefAbsent OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "External frequency reference absent alarm. The base station did not detect an external reference frequency source. It is now using its own source. An external reference is critical for simulcast applications and for K-band operation.
+                                           1.  The source has become unplugged.
+                                           2.  The source is not working.
+                                           3.  There is no external reference source and the alarm was not disabled at installation time. You can disable the alarm (Configure > Alarms > Control).
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 3 }
+
+systemAlarmQoSJitter OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "QoS jitter alarm. The incoming voice stream has a jitter equal to or greater than the configured threshold.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 4 }
+
+systemAlarmQoSLostPackets OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "QoS lost packets alarm. The number of lost packets in the incoming voice stream has equalled or exceeded the configured threshold.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 5 }
+
+systemAlarmFallbackControlled OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "This base station is controlled by an Embedded Node in fallback mode."
+                              ::= { systemAlarms 6 }
+
+systemAlarmDuplicateNodePriority OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The base station's BSP priority is being used by another base station on the same site. This alarm is raised only if the base station has been configured as 'CCH Capable'."
+                              ::= { systemAlarms 7 }
+
+systemAlarmNTPSynchronisation OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The base station hasn't had received an NTP signal from a server and the clock might be out of synchronization.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 8 }
+
+
+systemAlarm1PPSAbsent         OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "In a simulcast system base stations must have a 1PPS pulse. This alarm should be disabled for other systems.
+                                           It is not applicable to receive only base stations. The alarm warns that the base station isn't receiving
+                                           a 1PPS pulse. If the base station loses the pulse but is still receiving its external reference, it phase-locks its transmit clock to
+                                           the external frequency reference in order to maintain synchronization. This is called Holdover mode and is a temporary measure. When the
+                                           holdover duration expires the base station becomes unsynchronized.
+                                           The 'Simulcast unsynchronized' alarm under 'Reciter' below indicates whether the base station is synchronized for simulcast operation.
+                                           The 'Receiver unsynchronised' alarm in this section indicates whether the base station receiver is synchronized.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 9 }
+
+systemAlarmQoSTransmitBuffer OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Simulcast satellite base station is receiving packets that cannot fit into the transmit buffer.
+                                           The alarm can be raised due to one of the two reasons: packets arriving too late or too early.
+                                           See nwQosUnderflowCount and nwQosOverflowCount for the events that cause the alarm condition.
+                                           Most likely causes for packets being late are jitter, delay and configuration errors.
+                                           Most likely cause for packets being too early is preemption.
+                                           Use SNMP monitoring tools and base station's WUI (Monitoring->Interfaces->Channel Group) to identify the cause.
+                                           Refer to logs, if the event has happened too far in the past.
+                                           The alarm is asserted when rate of non-transmitted packets exceeds 1 percent. 
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 10 }
+
+systemAlarmCartesianLoopUnstable OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PA feedback loop to linearise transmitter can't achieve specified tolerances.
+                                           Check TxR cable connected properly, otherwise return for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 11 }
+
+systemAlarmTxRCableAbsent OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "PA feedback cable to reciter TxR is not working correctly/not present.
+                                            Ensure that the TxR cable between PA and Reciter TxR is unbroken and connected securely, or return for repair.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { systemAlarms 12 }
+
+--
+-- Monitored Alarms: Front Panel
+--
+fpAlarmFan1 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Fan alarm. The reciter has failed to detect Fan 1 when attempting to activate it upon start-up or when a module temperature threshold is exceeded. The fan may need replacing.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { fpAlarms 1 }
+
+fpAlarmFan2 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Fan alarm. The reciter has failed to detect Fan 2 when attempting to activate it upon start-up or when a module temperature threshold is exceeded. The fan may need replacing.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { fpAlarms 2 }
+
+fpAlarmFan3 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Fan alarm. The reciter has failed to detect Fan 3 when attempting to activate it upon start-up or when a module temperature threshold is exceeded. The fan may need replacing.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { fpAlarms 3 }
+
+fpAlarmNoFPDetected OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The base station is unable to detect the front panel on the control bus. Check the connections of the D-range connector and system control bus cable.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { fpAlarms 4 }
+
+fpAlarmInvalidFirmware OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Invalid front panel firmware alarm. Connect to the base station and select Tools > Firmware Download to acquire valid firmware. If the firmware is valid contact your regional Tait office for assistance.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { fpAlarms 5 }
+
+--
+-- Monitored Alarms: Custom -----------------------------------------------------------------------------
+--
+customAlarm1 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 1. The state of digital input 1 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 1 }
+
+customAlarm2 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 2. The state of digital input 2 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 2 }
+
+customAlarm3 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 3. The state of digital input 3 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 3 }
+
+customAlarm4 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 4. The state of digital input 4 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 4 }
+
+customAlarm5 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 5. The state of digital input 5 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 5 }
+
+customAlarm6 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 6. The state of digital input 6 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 6 }
+
+customAlarm7 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 7. The state of digital input 7 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 7 }
+
+customAlarm8 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 8. The state of digital input 8 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 8 }
+
+customAlarm9 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 9. The state of digital input 9 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 9 }
+
+customAlarm10 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 10. The state of digital input 10 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 10 }
+
+customAlarm11 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 11. The state of digital input 11 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 11 }
+
+customAlarm12 OBJECT-TYPE
+                              SYNTAX AlarmState
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "Custom alarm 12. The state of digital input 12 has changed, triggering this alarm.
+                                           This occurs when external equipment has been connected to the input.
+                                           When configured as 'active high', a custom alarm is triggered when its input goes to 'high' (4.75V) and it is cleared when its input goes to 'low'.
+                                           When configured as 'active low', a custom alarm is triggered when its input goes to 'low' (0V) and it is cleared when its input goes to 'high'.
+                                           Range: unavailable(0), cleared(1), raised(2), disabled(3)"
+                              ::= { customAlarms 12 }
+
+-- Monitored network ports: -----------------------------------------------------------------------------
+--
+nwSvpPort              OBJECT-TYPE
+                              SYNTAX      Unsigned32
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION "The configured Simulcast Voted protocol UDP port."
+                              ::= { nwPorts 1 }
+
+--
+-- Monitored Channelgroup: -----------------------------------------------------------------------------
+--
+nwChannelGroupStatus  OBJECT-TYPE
+                              SYNTAX      ChannelGroupStatus
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION "The voting role that the base station is currently playing within the channel group."
+                              ::= { nwChannelGroup 1 }
+
+
+nwChannelGroupLocalBufferLevel  OBJECT-TYPE
+                              SYNTAX      Milliseconds
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION "The lowest level of the transmit buffer, measured in milliseconds over a 5-second period."
+                              ::= { nwChannelGroup 2 }
+
+nwChannelGroupEmptiestBufferLevel OBJECT-TYPE
+                              SYNTAX Milliseconds
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The level of the transmit buffer (in ms) at the member that has got emptiest buffer-level.
+                              It is the smallest transmit buffer of any channel group member.
+                              If marshalling is self-regulating, the central voter is responsible for ensuring that there are no buffer underruns.
+                              If marshalling is fixed, the marshalling duration must be long enough to prevent buffer underruns."
+                              ::= { nwChannelGroup 3 }
+
+
+nwChannelGroupMarshallingType OBJECT-TYPE
+                              SYNTAX TimingControlType
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "[Simulcast] The Marshalling Type configuration setting indicates how the marshalling time is determined.
+                                           Range:
+                                           fixed(0): Configuration defines the marshalling time.
+                                           self-regulating(1): The network element dynamically adjusts the marshalling time based on the size of the smallest transmit buffer in the channel group."
+                              ::= { nwChannelGroup 4 }
+
+nwChannelGroupMarshallingDuration OBJECT-TYPE
+                              SYNTAX Milliseconds
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "In simulcast, the current marshalling duration (in ms). This is fixed in configuration or automatically regulated. This parameter is only used by the central voter (channel group master).
+                                           Range: 0..300"
+                              ::= { nwChannelGroup 5 }
+
+nwChannelGroupReceiverSynchStatus OBJECT-TYPE
+                              SYNTAX ReceiverSyncStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The receiver synchronization status indicates whether the base station's receiver is synchronized and if not then gives reasons why.
+                                           Range:
+                                           no-license(0): The base station does not have a license to operate in Simulcast mode.
+                                           non-channelgroup-operation(1):The current channel group profile does not enable channel group operation.
+                                           synchronized(2): The transmitter is able to synchronize its transmissions with the other members of the channel group. Simulcast is functioning properly.
+                                           never-had-1pps(3): The base station has never had a 1PPS signal. It is either faulty or absent and is therefore unsynchronized.
+                                           never-had-ntp(4): The base station has never had NTP so it is therefore unsynchronized.
+                                           missing-1pps-or-ntp(5): 1PPS or NTP is faulty or absent after initial synchronisation."
+                              ::= { nwChannelGroup 6 }
+
+nwChannelGroupTransmitterSynchStatus OBJECT-TYPE
+                              SYNTAX TransmitterSyncStatus
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The Synchronization status indicates whether the base station's transmission is synchronized and if not then gives reasons why. A base station transmitter in a simulcast channel group must be synchronized for simulcast operation. An unsynchronized base station does not transmit, unless it is specifically configured to transmit even though unsynchronized.
+                                           Range:
+                                           no-license(0): The base station does not have a license to operate in Simulcast mode.
+                                           non-simulcast-operation(1): The current channel profile does not enable simulcast.
+                                           bad-frequency-reference(2): The base station has frequency reference either faulty or absent and is therefore unsynchronized.
+                                           never-had-1pps(3): The base station has never had a 1PPS. It is either faulty or absent and is therefore unsynchronized.
+                                           never-had-ntp(4): The base station has never had NTP so it is therefore unsynchronized.
+                                           missing-1pps-or-ntp(5): 1PPS or NTP is faulty or absent after initial synchronisation.
+                                           synchronized(6): The transmitter is able to synchronize its transmissions with the other members of the channel group. Simulcast is functioning properly.
+                                           non-channelgroup-operation(7):The current channel profile does not enable channel group operation."
+                              ::= { nwChannelGroup 7 }
+
+nwChannelGroupLateStreamsCount OBJECT-TYPE
+                              SYNTAX Counter32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The number of times any transmission stream arrives later than the required transmit time.
+                              The count is aggregated one since system-startup."
+                              ::= { nwChannelGroup 8 } 
+
+
+nwChannelGroupOverflowCount OBJECT-TYPE
+                              SYNTAX Counter32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The number of channelgroup messages that did not fit in the transmit buffer or were too far into the future.
+                              The count is total such messages since system-startup."
+                              ::= { nwChannelGroup 9 }
+                              
+nwChannelGroupUnderflowCount OBJECT-TYPE
+                              SYNTAX Counter32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The number of times transmit-buffer ran empty, since system-startup."
+                              ::= { nwChannelGroup 10 }
+                              
+nwChannelGroupLostPacketsCount OBJECT-TYPE
+                              SYNTAX Counter32
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The number of packets that were lost during a transmission stream, based on the packet sequence numbering.
+                              The count is aggregated one since system-startup."
+                              ::= { nwChannelGroup 11 }
+                              
+nwChannelGroupJitter OBJECT-TYPE
+                              SYNTAX INTEGER
+                              MAX-ACCESS read-only
+                              STATUS current
+                              DESCRIPTION "The jitter-value calculated in compliance with RFC-1889. It is the mean deviation (absolute value) 
+                              of the difference in packet spacing at the receiver compared to the sender for a pair of packets. The value is in milliseconds."
+                              ::= { nwChannelGroup 12 }
+
+
+healthGroup OBJECT-GROUP
+  OBJECTS {
+      healthRunMode,
+      healthNetworkConnLogChan1State,
+      healthNetworkConnLogChan2State,
+      healthSecureShellRunning
+   }
+   STATUS current
+   DESCRIPTION "The health Group."
+      ::= { mibGroups 1 }
+
+alarmSummaryGroup OBJECT-GROUP
+  OBJECTS {
+      alarmSummaryPowerAmplifier,
+      alarmSummaryFrontPanel,
+      alarmSummaryReciter,
+      alarmSummaryBaseStation,
+      alarmSummarySystem,
+      alarmSummaryPowerManagementUnit,
+      alarmSummaryCustomAlarms,
+      alarmSummaryMinor,
+      alarmSummaryMajor
+   }
+   STATUS current
+   DESCRIPTION "The alarmSummary Group."
+      ::= { mibGroups 2 }
+
+rctSelectedChannelGroup OBJECT-GROUP
+  OBJECTS {
+      rctSelectedChannelNumber,
+      rctSelectedChannelName,
+      rctSelectedChannelProfileName,
+      rctSelectedChannelSigProfileName,
+      rctSelectedChannelTransmitPower,
+      rctSelectedChannelTxFreq,
+      rctSelectedChannelRxFreq,
+      rctSelectedChannelSystemType,
+      rctSelectedChannelColourCode,
+      rctSelectedChannelGroupName
+   }
+   STATUS current
+   DESCRIPTION "The rctSelectedChannel Group."
+      ::= { mibGroups 3 }
+
+paTxOutputGroup OBJECT-GROUP
+  OBJECTS {
+      paTxOutputForwardPower,
+      paTxOutputVSWR
+   }
+   STATUS current
+   DESCRIPTION "The paTxOutput Group."
+      ::= { mibGroups 5 }
+
+linkInfoGroup OBJECT-GROUP
+  OBJECTS {
+      linkInfoCtrlProtocolStatus,
+      linkInfoNetworkPacketCount,
+      linkInfoMPTCtrlProtocolStatus,
+      linkInfoDMRNodeIPAddress,
+      linkInfoDMRNodePriority,
+      linkInfoMPTNodeIPAddress,
+      linkInfoMPTNodePriority,
+      linkHealthSequenceErrorsCount,
+      linkHealthNetworkPacketLostCount,
+      linkHealthNetworkJitterLastOver,
+      linkHealthNetworkJitterCount
+   }
+   STATUS current
+   DESCRIPTION "The linkInfo Group."
+      ::= { mibGroups 6 }
+
+customAlarmsGroup OBJECT-GROUP
+  OBJECTS {
+     customAlarm1,
+     customAlarm2,
+     customAlarm3,
+     customAlarm4,
+     customAlarm5,
+     customAlarm6,
+     customAlarm7,
+     customAlarm8,
+     customAlarm9,
+     customAlarm10,
+     customAlarm11,
+     customAlarm12
+  }
+  STATUS current
+  DESCRIPTION "The customAlarms group."
+    ::= { mibGroups 7 }
+
+systemAlarmsGroup OBJECT-GROUP
+  OBJECTS {
+      systemAlarmExternalRefAbsent,
+      systemAlarmAmbientTempHigh,
+      systemAlarmAmbientTempLow,
+      systemAlarmQoSJitter,
+      systemAlarmQoSLostPackets,
+      systemAlarmFallbackControlled,
+      systemAlarmDuplicateNodePriority,
+      systemAlarmNTPSynchronisation,
+      systemAlarm1PPSAbsent,
+      systemAlarmQoSTransmitBuffer
+   }
+   STATUS current
+   DESCRIPTION "The systemAlarms Group."
+      ::= { mibGroups 8 }
+
+fpAlarmsGroup OBJECT-GROUP
+  OBJECTS {
+      fpAlarmInvalidFirmware,
+      fpAlarmFan2,
+      fpAlarmNoFPDetected,
+      fpAlarmFan3,
+      fpAlarmFan1
+   }
+   STATUS current
+   DESCRIPTION "The fpAlarms Group."
+      ::= { mibGroups 9 }
+
+paAlarmsGroup OBJECT-GROUP
+  OBJECTS {
+      paAlarmFinal1CurrentHigh,
+      paAlarmDriverCurrentHigh,
+      paAlarmSupplyVoltageLow,
+      paAlarmFinal2TemperatureHigh,
+      paAlarmFinal2CurrentHigh,
+      paAlarmVSWRFault,
+      paAlarmDriverTemperatureHigh,
+      paAlarmForwardPowerLow,
+      paAlarmNoPADetected,
+      paAlarmFinal1TemperatureHigh,
+      paAlarmSupplyVoltageHigh,
+      paAlarmPowerFoldback,
+      paAlarmInvalidCalibration,
+      paAlarmInvalidFirmware,
+      paAlarmShutdownImminent,
+      paAlarmReversePowerHigh,
+      paAlarmCurrentImbalance
+   }
+   STATUS current
+   DESCRIPTION "The paAlarms Group."
+      ::= { mibGroups 10 }
+
+pmuAlarmsGroup OBJECT-GROUP
+  OBJECTS {
+      pmuAlarmMainsFailure,
+      pmuAlarmBatteryVoltageLow,
+      pmuAlarmBatteryVoltageHigh,
+      pmuAlarmBatteryProtect,
+      pmuAlarmInvalidFirmware,
+      pmuAlarmVoltageOutHigh,
+      pmuAlarmNoPMUDetected,
+      pmuAlarmVoltageOutLow,
+      pmuAlarmShutdownImminent,
+      pmuAlarmCurrentOutHigh,
+      pmuAlarmSelfTestFailure,
+      pmuAlarmTemperatureHigh
+   }
+   STATUS current
+   DESCRIPTION "The pmuAlarms Group."
+      ::= { mibGroups 11 }
+
+reciterAlarmsGroup OBJECT-GROUP
+  OBJECTS {
+      rctAlarmRxSynthOutOfLock,
+      rctAlarmInvalidChannelSelected,
+      rctAlarmRxCalibrationInvalid,
+      rctAlarmOverTemperature,
+      rctAlarmInvalidConfiguration,
+      rctAlarm25MHzSynthOutOfLock,
+      rctAlarmTxCalibrationInvalid,
+      rctAlarmTxFSynthOutOfLock,
+      rctAlarm6144MHzSynthOutOfLock,
+      rctAlarmSimulcastSynch,
+      rctAlarmReceiverSynch
+   }
+   STATUS current
+   DESCRIPTION "The reciterAlarms Group."
+      ::= { mibGroups 12 }
+
+infoGroup OBJECT-GROUP
+   OBJECTS {
+      infoTransmitterStatus,
+      infoMPTFallbackNodeStatus,
+      infoDMRFallbackNodeStatus,
+      rctInfoProductCode,
+      rctInfoSerialNumber,
+      rctInfoHardwareVersion,
+      rctInfoFirmwareVersion,
+      paInfoProductCode,
+      paInfoSerialNumber,
+      paInfoHardwareVersion,
+      paInfoFirmwareVersion,
+      fpInfoProductCode,
+      fpInfoSerialNumber,
+      fpInfoHardwareVersion,
+      fpInfoFirmwareVersion,
+      licenceDmrFull,
+      licenceDmrExpress,
+      licenceDmrAccess,
+      licenceDmrConventional,
+      licenceAnalogConventional,
+      licenceDmrExpress20,
+      licenceDmrCentralVoter,
+      licenceDmrNetworkSatellite
+   }
+   STATUS current
+   DESCRIPTION "The info Group."
+      ::= { mibGroups 13 }
+      
+rctReceiveQualityGroup OBJECT-GROUP
+   OBJECTS {
+      rctRfRcvInterference,
+      rctRfInterferenceCounter,
+	  rctRfInterferenceEvents
+   }
+   STATUS current
+   DESCRIPTION "The receive quality Group."
+      ::= { mibGroups 14 }
+      
+rctReceiverGroup OBJECT-GROUP
+    OBJECTS {
+       rctRfReceiverRSSI,
+       rctRfReceiverLC1RSSI,
+       rctRfReceiverLC2RSSI,
+       rctRfReceiverLC1RxGateState, 
+       rctRfReceiverLC2RxGateState,
+       rctRfReceiverSelectedDecodeCTCSS,
+       rctRfReceiverSelectedDecodeSubAudibleType,
+       rctRfReceiverSelectedSINADGatingLevel,
+       rctRfReceiverSelectedDecodeDCS,
+       rctRfReceiverSelectedFrequencyResponse,
+       rctRfReceiverAnalogGateState,
+       rctRfReceiverIsDisabled
+     }
+     STATUS current
+   DESCRIPTION "The receiver Group."
+      ::= { mibGroups 15 }
+
+rctTemperatureGroup OBJECT-GROUP
+   OBJECTS {
+      rctTemperatureBoard
+   }
+   STATUS current
+   DESCRIPTION "The reciter temperature group."
+      ::= { mibGroups 16 }
+
+pmuStateGroup OBJECT-GROUP
+   OBJECTS {
+      pmuStateMainsInState,
+      pmuStateBatteryInState,
+      pmuStateBatteryInVoltage,
+      pmuStateOutCurrent,
+      pmuStateOutVoltage,
+      pmuStateOutStatus,
+      pmuStateAuxOutState,
+      pmuStateBusConnect
+   }
+   STATUS current
+   DESCRIPTION "The pmu status indications group."
+      ::= { mibGroups 17 }
+
+nwNtpInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        nwConfiguredNtpServerAddress,
+        nwConfiguredNtpBackupServerAddress1,
+        nwConfiguredNtpBackupServerAddress2
+    } 
+    STATUS current
+    DESCRIPTION "The network ntp interface group."
+        ::= { mibGroups 18 }
+
+rctTransmitterGroup OBJECT-GROUP
+    OBJECTS {
+        rctRfTxSelectedEncodeCTCSS,
+        rctRfTxSelectedEncodeSubAudibleType,
+        rctRfTxSelectFrequencyResponse,
+        rctRfTxSelectedEncodeDCS,
+        rctRfTxSelectedEncodeSubAudibleDeviation,
+        rctRfTxRfRepeatState
+    }
+    STATUS current
+    DESCRIPTION "The transmitter group."
+        ::= { mibGroups 19 }
+
+nwChannelGroupGroup OBJECT-GROUP
+    OBJECTS {
+        nwChannelGroupStatus,
+        nwChannelGroupLocalBufferLevel,
+        nwChannelGroupEmptiestBufferLevel,
+        nwChannelGroupMarshallingType,
+        nwChannelGroupMarshallingDuration,
+        nwChannelGroupReceiverSynchStatus,
+        nwChannelGroupTransmitterSynchStatus,
+        nwChannelGroupLateStreamsCount,
+        nwChannelGroupOverflowCount,
+        nwChannelGroupUnderflowCount,
+        nwChannelGroupLostPacketsCount,
+        nwChannelGroupJitter
+    }
+    STATUS current
+    DESCRIPTION "The group for channelgroup."
+        ::= { mibGroups 20 }
+
+nwPortsGroup OBJECT-GROUP
+    OBJECTS {
+        nwSvpPort
+    }
+    STATUS current
+    DESCRIPTION "Network ports"
+        ::= { mibGroups 21 }
+
+mibComplianceList MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+      "The requirements for conformance to the TAIT-INFRA93SERIES-MIB."
+   MODULE -- this module
+   MANDATORY-GROUPS {
+      rctTransmitterGroup,
+      rctReceiverGroup,
+      rctReceiveQualityGroup,
+      infoGroup,
+      healthGroup,
+      alarmSummaryGroup,
+      rctSelectedChannelGroup,
+      paTxOutputGroup,
+      linkInfoGroup,
+      customAlarmsGroup,
+      systemAlarmsGroup,
+      fpAlarmsGroup,
+      paAlarmsGroup,
+      reciterAlarmsGroup,
+      rctTemperatureGroup,
+      nwNtpInterfaceGroup,
+      nwChannelGroupGroup,
+      nwPortsGroup
+   }
+   GROUP linearTransmissionCapability
+   DESCRIPTION "Information about linear PA or features requiring a linear PA
+                not reported if software running on TB7300 platform"   
+   GROUP pmuAlarmsGroup
+   DESCRIPTION "PMU information not reported if software running on TB7300 platform"
+   GROUP pmuInfoGroup
+   DESCRIPTION "PMU information not reported if software running on TB7300 platform"
+   GROUP pmuStateGroup
+   DESCRIPTION "PMU information not reported if software running on TB7300 platform"
+      ::= { mibCompliance 1 }
+
+rctSystemInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        rctSiConfiguredBalancedLineInLevel,
+        rctSiConfiguredBalancedLineOutLevel,
+        rctSiTxKey,
+        rctSiRxGate
+    }
+    STATUS current
+    DESCRIPTION "Reciter system interface"
+        ::= { mibGroups 22 }
+
+linearTransmissionCapability OBJECT-GROUP
+  OBJECTS {
+     rctAlarmTxRSynthOutOfLock,
+     systemAlarmCartesianLoopUnstable,
+     systemAlarmTxRCableAbsent
+  }
+  STATUS current
+  DESCRIPTION "Information depending on existence of a linear power amplifier"
+     ::= { mibGroups 23 }
+
+pmuInfoGroup OBJECT-GROUP
+    OBJECTS {
+        pmuInfoProductCode,
+        pmuInfoSerialNumber,
+        pmuInfoHardwareVersion,
+        pmuInfoFirmwareVersion,
+        pmuInfoCalibrationUpdateDate
+    }
+    STATUS current
+    DESCRIPTION "The PMU info group."
+        ::= { mibGroups 24 }
+
+deprecatedOidGroup OBJECT-GROUP
+   OBJECTS {
+      infoStandaloneNodeStatus
+   }
+   STATUS deprecated
+   DESCRIPTION "Deprecated OIDs"
+      ::= { mibGroups 27 }
+END
+

@@ -7,8 +7,8 @@
                     "sysObjectID": ".1.3.6.1.4.1.318.1.3.8.4",
                     "sysDescr": "APC Web/SNMP Management Card (MB:v3.9.2 PF:v3.5.9 PN:apc_hw03_aos_359.bin AF1:v3.5.6 AN1:apc_hw03_nb200_356.bin MN:NBRK0200 HR:05 SN: FFFFFFFFFFFF MD:07/07/2012)",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "AOS v3.5.9 / App v3.5.6",
+                    "hardware": "Web/SNMP Management Card",
                     "features": null,
                     "os": "apc",
                     "type": "power",
@@ -18,23 +18,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.318.1.3.8.4",
-                    "sysDescr": "APC Web/SNMP Management Card (MB:v3.9.2 PF:v3.5.9 PN:apc_hw03_aos_359.bin AF1:v3.5.6 AN1:apc_hw03_nb200_356.bin MN:NBRK0200 HR:05 SN: FFFFFFFFFFFF MD:07/07/2012)",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": " ",
-                    "features": null,
-                    "os": "apc",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "apc.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -33,10 +32,9 @@ class Template
     public $template;
 
     /**
-     *
      * Get the template details
      *
-     * @param null $obj
+     * @param array|null $obj
      * @return mixed
      */
     public function getTemplate($obj = null)
@@ -48,9 +46,10 @@ class Template
         $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj) {
             $query->where('alert_rule_id', '=', $obj['rule_id']);
         })->first();
-        if (!$this->template) {
+        if (! $this->template) {
             $this->template = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
         }
+
         return $this->template;
     }
 
@@ -65,10 +64,9 @@ class Template
     }
 
     /**
-     *
      * Parse Blade body
      *
-     * @param $data
+     * @param array $data
      * @return string
      */
     public function bladeBody($data)
@@ -82,10 +80,9 @@ class Template
     }
 
     /**
-     *
      * Parse Blade title
      *
-     * @param $data
+     * @param array $data
      * @return string
      */
     public function bladeTitle($data)
@@ -94,12 +91,11 @@ class Template
         try {
             return view(['template' => $data['title']], $alert)->__toString();
         } catch (\Exception $e) {
-            return $data['title'] ?: view(['template' => "Template " . $data['name']], $alert)->__toString();
+            return $data['title'] ?: view(['template' => 'Template ' . $data['name']], $alert)->__toString();
         }
     }
 
     /**
-     *
      * Get the default template
      *
      * @return string
@@ -108,7 +104,7 @@ class Template
     {
         return '{{ $alert->title }}' . PHP_EOL .
             'Severity: {{ $alert->severity }}' . PHP_EOL .
-            '@if ($alert->state == '.AlertState::RECOVERED.')Time elapsed: {{ $alert->elapsed }} @endif ' . PHP_EOL .
+            '@if ($alert->state == ' . AlertState::RECOVERED . ')Time elapsed: {{ $alert->elapsed }} @endif ' . PHP_EOL .
             'Timestamp: {{ $alert->timestamp }}' . PHP_EOL .
             'Unique-ID: {{ $alert->uid }}' . PHP_EOL .
             'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif ' . PHP_EOL .

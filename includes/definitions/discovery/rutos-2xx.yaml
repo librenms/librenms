@@ -1,5 +1,9 @@
 mib: TELTONIKA-MIB
 modules:
+    os:
+        hardware: TELTONIKA-MIB::RouterName.0
+        serial: TELTONIKA-MIB::ModemSerial.0
+        version: TELTONIKA-MIB::FirmwareVersion.0
     sensors:
         pre-cache:
             data:

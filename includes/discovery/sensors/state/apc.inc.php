@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-$temp = snmp_get($device, "upsAdvBatteryReplaceIndicator.0", "-Ovqe", "PowerNet-MIB");
+$temp = snmp_get($device, 'upsAdvBatteryReplaceIndicator.0', '-Ovqe', 'PowerNet-MIB');
 $cur_oid = '.1.3.6.1.4.1.318.1.1.1.2.2.4.0';
 $index = '0';
 
@@ -117,8 +117,8 @@ unset(
 
 foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     if ($data['memSensorsCommStatus']) {
-        $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.7.' . $index;
-        $state_name     = 'memSensorsCommStatus';
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.7.' . $index;
+        $state_name = 'memSensorsCommStatus';
         $states = [
             ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'notInstalled'],
             ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'commsOK'],
@@ -128,8 +128,8 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 
         $current = $data['memSensorsCommStatus'];
     }
-    $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
-    $divisor    = 1;
+    $descr = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $divisor = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
@@ -137,8 +137,8 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     }
 
     if ($data['memSensorsAlarmStatus']) {
-        $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.8.' . $index;
-        $state_name     = 'memSensorsAlarmStatus';
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.8.' . $index;
+        $state_name = 'memSensorsAlarmStatus';
         $states = [
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'memNormal'],
             ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'memWarning'],
@@ -148,8 +148,8 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 
         $current = $data['memSensorsAlarmStatus'];
     }
-    $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
-    $divisor    = 1;
+    $descr = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $divisor = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
@@ -164,8 +164,8 @@ $apcContactData = snmpwalk_cache_oid($device, 'iemStatusContactsTable', $apcCont
 foreach (array_keys($apcContactData) as $index) {
     // APC disabled (1), enabled (2)
     if ($apcContactData[$index]['iemConfigContactEnable'] == 2) {
-        $current        = $apcContactData[$index]['iemStatusContactStatus'];
-        $sensorType     = 'apc';
+        $current = $apcContactData[$index]['iemStatusContactStatus'];
+        $sensorType = 'apc';
         $cur_oid = '.1.3.6.1.4.1.318.1.1.10.2.3.4.1.3.' . $index;
         $severity = $apcContactData[$index]['iemConfigContactSeverity'];
 
@@ -186,7 +186,7 @@ foreach (array_keys($apcContactData) as $index) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name.'.'.$index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 }

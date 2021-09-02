@@ -3,7 +3,7 @@ text: Automatic Transfer Switch
 type: power
 icon: ats
 mib_dir: ats
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

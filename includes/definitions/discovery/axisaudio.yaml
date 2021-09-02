@@ -1,0 +1,3 @@
+modules:
+    os:
+        sysDescr_regex: '(?<hardware>[^;]+); [^;]+; (?<version>[^;]+)'

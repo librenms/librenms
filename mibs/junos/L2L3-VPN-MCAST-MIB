@@ -1,0 +1,232 @@
+
+-- ==============================
+-- jnxL2L3-VPN-MCAST-MIB
+-- ==============================
+
+L2L3-VPN-MCAST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        experimental, Unsigned32
+           FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+           FROM SNMPv2-CONF
+
+        TEXTUAL-CONVENTION, TruthValue, RowPointer, RowStatus, TimeStamp, TimeInterval
+           FROM SNMPv2-TC
+
+        SnmpAdminString
+           FROM SNMP-FRAMEWORK-MIB
+
+        InetAddress, InetAddressType
+           FROM INET-ADDRESS-MIB
+
+        MplsLabel
+           FROM MPLS-TC-STD-MIB
+
+-- Juniper specific
+    
+	jnxMibs
+	    FROM JUNIPER-SMI
+
+	jnxL2L3VpnMcastExperiment
+	    FROM JUNIPER-EXPERIMENT-MIB
+
+	;
+
+jnxL2L3VpnMcastMIB MODULE-IDENTITY
+        LAST-UPDATED "201211051200Z"  -- 05 November 2012 12:00:00 GMT
+        ORGANIZATION "IETF Layer-3 Virtual Private
+                      Networks Working Group."
+        CONTACT-INFO
+
+        "
+        Comments and discussion to l3vpn@ietf.org
+        Jeffrey (Zhaohui) Zhang
+        Juniper Networks, Inc.
+        10 Technology Park Drive
+        Westford, MA 01886
+        USA
+        Email: zzhang@juniper.net
+        "
+
+        DESCRIPTION
+         "This MIB contains common managed object definitions for
+          multicast in Layer 2 and Layer 3 VPNs, defined by
+          [I-D.ietf-l2vpn-vpls-mcast] and RFC 6513/6514.
+          Copyright (C) The Internet Society (2012)."
+
+        -- Revision history.
+        REVISION "201211051200Z"  -- 05 November 2012 12:00:00 GMT
+        DESCRIPTION
+               "Initial version of the draft."
+        ::= { jnxL2L3VpnMcastExperiment 1 } -- number to be assigned
+
+-- Textual Conventions.
+
+    JnxL2L3VpnMcastProviderTunnelType ::= TEXTUAL-CONVENTION
+      STATUS       current
+      DESCRIPTION
+	    "Types of provider tunnels used for multicast in a l2/l3vpn."
+      SYNTAX       INTEGER { unconfigured (0),
+                           rsvp-p2mp (1),
+                           ldp-p2mp (2),
+                           pim-ssm  (3),
+                           pim-asm  (4),
+                           pim-bidir (5),
+                           ingress-replication (6),
+                           ldp-mp2mp (7)
+                         }
+
+-- Top level components of this MIB.
+-- tables, scalars
+    jnxL2L3VpnMcastObjects	    OBJECT IDENTIFIER ::= { jnxL2L3VpnMcastMIB 1 }
+    jnxL2L3VpnMcastPmsiStates  	    OBJECT IDENTIFIER ::= { jnxL2L3VpnMcastObjects 1 }
+
+-- Table of PMSI attributes
+
+jnxL2L3VpnMcastPmsiTunnelAttributeTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF JnxL2L3VpnMcastPmsiTunnelAttributeEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table is for advertised/received PMSI attributes,
+        to be referred to by I-PMSI or S-PMSI table entries"
+   ::= {jnxL2L3VpnMcastPmsiStates 1 }
+
+jnxL2L3VpnMcastPmsiTunnelAttributeEntry OBJECT-TYPE
+   SYNTAX        JnxL2L3VpnMcastPmsiTunnelAttributeEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table corresponds to an PMSI attribute
+        that is advertised/received on this router.
+        For BGP-based signaling (for I-PMSI via auto-discovery
+        procedure, or for S-PMSI via S-PMSI A-D routes),
+        they are just as signaled by BGP (RFC 6514 section 5,
+        'PMSI Tunnel attribute').
+        For UDP-based S-PMSI signaling for PIM-MVPN,
+        they're derived from S-PMSI Join Message
+        (RFC 6513 section 7.4.2, 'UDP-based Protocol')..
+
+        Note that BGP-based signaling may be used for
+        PIM-MVPN as well."
+   INDEX {
+           jnxL2L3VpnMcastPmsiTunnelAttributeFlags,
+           jnxL2L3VpnMcastPmsiTunnelAttributeType,
+           jnxL2L3VpnMcastPmsiTunnelAttributeLabel,
+           jnxL2L3VpnMcastPmsiTunnelAttributeId
+          }
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeTable 1 }
+
+JnxL2L3VpnMcastPmsiTunnelAttributeEntry ::= SEQUENCE {
+   jnxL2L3VpnMcastPmsiTunnelAttributeFlags     OCTET STRING,
+   jnxL2L3VpnMcastPmsiTunnelAttributeType      JnxL2L3VpnMcastProviderTunnelType,
+   jnxL2L3VpnMcastPmsiTunnelAttributeLabel     MplsLabel,
+   jnxL2L3VpnMcastPmsiTunnelAttributeId        OCTET STRING,
+   jnxL2L3VpnMcastPmsiTunnelPointer            RowPointer,
+   jnxL2L3VpnMcastPmsiTunnelIf                 RowPointer
+   }
+
+jnxL2L3VpnMcastPmsiTunnelAttributeFlags OBJECT-TYPE
+   SYNTAX        OCTET STRING (SIZE (1))
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "For UDP-based S-PMSI signaling for PIM-MVPN, this is 0.
+        For BGP-based I/S-PMSI signaling,
+        per RFC 6514 section 5, 'PMSI Tunnel Attribute':
+
+   The Flags field has the following format:
+
+                 0 1 2 3 4 5 6 7
+                +-+-+-+-+-+-+-+-+
+                |  reserved   |L|
+                +-+-+-+-+-+-+-+-+
+
+   This document defines the following flags:
+
+     + Leaf Information Required (L)"
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeEntry 1 }
+
+jnxL2L3VpnMcastPmsiTunnelAttributeType OBJECT-TYPE
+   SYNTAX        JnxL2L3VpnMcastProviderTunnelType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "For BGP-based I/S-PMSI signaling for either PIM or BGP-MVPN,
+        per RFC 6514 section 5, 'PMSI Tunnel Attribute':
+
+   The Tunnel Type identifies the type of the tunneling technology used
+   to establish the PMSI tunnel. The type determines the syntax and
+   semantics of the Tunnel Identifier field. This document defines the
+   following Tunnel Types:
+
+     0 - No tunnel information present
+     1 - RSVP-TE P2MP LSP
+     2 - mLDP P2MP LSP
+     3 - PIM-SSM Tree
+     4 - PIM-SM Tree
+     5 - PIM-Bidir Tree
+     6 - Ingress Replication
+     7 - mLDP MP2MP LSP
+
+        For UDP-based S-PMSI signaling for PIM-MVPN, RFC 6513 does not
+        specify if a PIM provider tunnel is SSM, SM or Bidir,
+        and an agent can use either type 3, 4, or 5 based on its
+        best knowledge."
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeEntry 2 }
+
+jnxL2L3VpnMcastPmsiTunnelAttributeLabel OBJECT-TYPE
+   SYNTAX        MplsLabel
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "For BGP-based I/S-PMSI signaling,
+        per RFC 6514 section 5, 'PMSI Tunnel Attribute':
+
+   If the MPLS Label field is non-zero, then it contains an MPLS label
+   encoded as 3 octets, where the high-order 20 bits contain the label
+   value. Absence of MPLS Label is indicated by setting the MPLS Label
+   field to zero.
+
+        For UDP-based S-PMSI signaling for PIM-MVPN, this is not
+        applicable for now, as RFC 6513 does not specify
+        mpls encapsulation and tunnel aggregation with UDP-based
+        signaling."
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeEntry 3 }
+
+jnxL2L3VpnMcastPmsiTunnelAttributeId OBJECT-TYPE
+   SYNTAX        OCTET STRING (SIZE(0..37))
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "For BGP-based signaling, as defined in RFC 6514 section 5,
+        'PMSI Tunnel Attribute'.
+
+        For UDP-based S-PMSI signaling for PIM-MVPN, RFC 6513 only
+        specifies the 'P-Group' address, and that is filled into
+        the first four octets of this field."
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeEntry 4 }
+
+jnxL2L3VpnMcastPmsiTunnelPointer OBJECT-TYPE
+
+   SYNTAX        RowPointer
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "If the tunnel exists in some MIB table, this is the row pointer
+        to it."
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeEntry 5 }
+
+jnxL2L3VpnMcastPmsiTunnelIf OBJECT-TYPE
+   SYNTAX        RowPointer
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "If the tunnel has a corresponding interface, this is the
+        row pointer to the ifName table."
+   ::= { jnxL2L3VpnMcastPmsiTunnelAttributeEntry 6 }
+
+END

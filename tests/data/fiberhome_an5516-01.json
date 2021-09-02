@@ -37,7 +37,7 @@
                     "sysDescr": "AN5516-01",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "AN5516-01",
                     "features": null,
                     "os": "fiberhome",
                     "type": "network",
@@ -47,24 +47,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.5875.800.1001.11",
-                    "sysDescr": "AN5516-01",
-                    "sysContact": null,
-                    "version": " - ",
-                    "hardware": "Fiberhome AN5516-01",
-                    "features": "Olt AN5516-01",
-                    "os": "fiberhome",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {
@@ -72,14 +55,18 @@
                 {
                     "mempool_index": "9",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fiberhome",
-                    "mempool_precision": 100,
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
                     "mempool_descr": "Hswa 9 Memory",
                     "mempool_perc": 0,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.5875.800.3.9.8.1.1.6.9",
                     "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_used_oid": null,
+                    "mempool_free": 268435456,
+                    "mempool_free_oid": null,
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -88,14 +75,18 @@
                 {
                     "mempool_index": "10",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fiberhome",
-                    "mempool_precision": 100,
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
                     "mempool_descr": "Hswa 10 Memory",
                     "mempool_perc": 0,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.5875.800.3.9.8.1.1.6.10",
                     "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_used_oid": null,
+                    "mempool_free": 268435456,
+                    "mempool_free_oid": null,
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -103,41 +94,6 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "9",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fiberhome",
-                    "mempool_precision": 100,
-                    "mempool_descr": "Hswa 9 Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 268435456,
-                    "mempool_total": 268435456,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fiberhome",
-                    "mempool_precision": 100,
-                    "mempool_descr": "Hswa 10 Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 268435456,
-                    "mempool_total": 268435456,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

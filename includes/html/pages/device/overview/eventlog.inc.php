@@ -4,7 +4,7 @@ echo '  <div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
               <div class="panel-heading">';
-echo '<a href="device/device='.$device['device_id'].'/tab=logs/section=eventlog/">';
+echo '<a href="device/device=' . $device['device_id'] . '/tab=logs/section=eventlog/">';
 echo '<i class="fa fa-bookmark fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Events</strong></a>';
 echo '        </div>
               <table class="table table-hover table-condensed table-striped">';

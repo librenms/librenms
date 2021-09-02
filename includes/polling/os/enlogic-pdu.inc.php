@@ -15,18 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $tmp_enlogic = snmp_get_multi_oid($device, 'pduNamePlateModelNumber pduNamePlateSerialNumber pduNamePlateFirmwareVersion', '-OUQn', 'ENLOGIC-PDU-MIB');
 
 $hardware = $tmp_enlogic['.1.3.6.1.4.1.38446.1.1.2.1.10.1'];
-$serial   = $tmp_enlogic['.1.3.6.1.4.1.38446.1.1.2.1.11.1'];
-$version  = $tmp_enlogic['.1.3.6.1.4.1.38446.1.1.2.1.13.1'];
+$serial = $tmp_enlogic['.1.3.6.1.4.1.38446.1.1.2.1.11.1'];
+$version = $tmp_enlogic['.1.3.6.1.4.1.38446.1.1.2.1.13.1'];
 
 unset($tmp_enlogic);

@@ -11,19 +11,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Nagios Transport
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Nagios extends Transport
@@ -31,6 +29,7 @@ class Nagios extends Transport
     public function deliverAlert($obj, $opts)
     {
         $opts = $this->config['nagios-fifo'];
+
         return $this->contactNagios($obj, $opts);
     }
 
@@ -54,12 +53,13 @@ class Nagios extends Transport
         $format .= strtotime($obj['timestamp']) . "\t";
         $format .= $obj['hostname'] . "\t";
         $format .= md5($obj['rule']) . "\t"; //FIXME: Better entity
-        $format .= ($obj['state'] ? $obj['severity'] : "ok") . "\t";
+        $format .= ($obj['state'] ? $obj['severity'] : 'ok') . "\t";
         $format .= "0\t";
         $format .= "0\t";
-        $format .= str_replace("\n", "", nl2br($obj['msg'])) . "\t";
-        $format .= "NULL"; //FIXME: What's the HOSTPERFDATA equivalent for LibreNMS? Oo
+        $format .= str_replace("\n", '', nl2br($obj['msg'])) . "\t";
+        $format .= 'NULL'; //FIXME: What's the HOSTPERFDATA equivalent for LibreNMS? Oo
         $format .= "\n";
+
         return file_put_contents($opts, $format);
     }
 
@@ -76,7 +76,7 @@ class Nagios extends Transport
             ],
             'validation' => [
                 'nagios-fifo' => 'required',
-            ]
+            ],
         ];
     }
 }

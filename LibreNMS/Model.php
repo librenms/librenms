@@ -11,10 +11,11 @@ abstract class Model
     {
         $instance = new static();
         $instance->fill($data);
+
         return $instance;
     }
 
-    protected function fill(array $data = array())
+    protected function fill(array $data = [])
     {
         foreach ($data as $field => $value) {
             $this->$field = $value;
@@ -31,10 +32,10 @@ abstract class Model
      * @param array $unique_fields fields to search for an existing entry
      * @param array $ignored_update_fields Don't compare these field when updating
      */
-    final public static function sync($device_id, array $models, $unique_fields = array(), $ignored_update_fields = array())
+    final public static function sync($device_id, array $models, $unique_fields = [], $ignored_update_fields = [])
     {
         // save and collect valid ids
-        $valid_ids = array();
+        $valid_ids = [];
         foreach ($models as $model) {
             /** @var $this $model */
             if ($model->isValid()) {
@@ -57,10 +58,10 @@ abstract class Model
         $table = static::$table;
         $key = static::$primaryKey;
 
-        $params = array($device_id);
+        $params = [$device_id];
         $where = '`device_id`=?';
 
-        if (!empty($model_ids)) {
+        if (! empty($model_ids)) {
             $where .= " AND `$key` NOT IN " . dbGenPlaceholders(count($model_ids));
             $params = array_merge($params, $model_ids);
         }
@@ -69,7 +70,7 @@ abstract class Model
         foreach ($rows as $row) {
             static::onDelete(static::create($row));
         }
-        if (!empty($rows)) {
+        if (! empty($rows)) {
             dbDelete($table, $where, $params);
         }
     }
@@ -81,23 +82,23 @@ abstract class Model
      * @param array $ignored_update_fields Don't compare these field when updating
      * @return int the id of this model in the database
      */
-    final public function save($unique_fields = array(), $ignored_update_fields = array())
+    final public function save($unique_fields = [], $ignored_update_fields = [])
     {
         $db_model = $this->fetch($unique_fields);
         $key = static::$primaryKey;
 
         if ($db_model) {
-            $new_model = $this->toArray(array_merge(array($key), $ignored_update_fields));
+            $new_model = $this->toArray(array_merge([$key], $ignored_update_fields));
             $update = array_diff($new_model, $db_model);
 
             if (empty($update)) {
                 static::onNoUpdate();
             } else {
-                dbUpdate($update, static::$table, "`$key`=?", array($this->$key));
+                dbUpdate($update, static::$table, "`$key`=?", [$this->$key]);
                 static::onUpdate($this);
             }
         } else {
-            $new_model = $this->toArray(array($key));
+            $new_model = $this->toArray([$key]);
             $this->$key = dbInsert($new_model, static::$table);
             if ($this->$key !== null) {
                 static::onCreate($this);
@@ -114,7 +115,7 @@ abstract class Model
      * @param array $unique_fields fields to search for an existing entry
      * @return array|null
      */
-    protected function fetch($unique_fields = array())
+    protected function fetch($unique_fields = [])
     {
         $table = static::$table;
         $key = static::$primaryKey;
@@ -122,12 +123,12 @@ abstract class Model
         if (isset($this->id)) {
             return dbFetchRow(
                 "SELECT `$table` FROM ? WHERE `$key`=?",
-                array($this->$key)
+                [$this->$key]
             );
         }
 
-        $where = array();
-        $params = array();
+        $where = [];
+        $params = [];
         foreach ($unique_fields as $field) {
             if (isset($this->$field)) {
                 $where[] = " $field=?";
@@ -145,6 +146,7 @@ abstract class Model
         );
 
         $this->$key = $row[$key];
+
         return $row;
     }
 
@@ -154,7 +156,7 @@ abstract class Model
      * @param array $exclude Exclude the listed fields
      * @return array
      */
-    abstract public function toArray($exclude = array());
+    abstract public function toArray($exclude = []);
 
     /**
      * Returns if this model passes validation and should be saved to the database
@@ -168,7 +170,7 @@ abstract class Model
      */
     public static function onDelete($model)
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo '-';
         }
     }
@@ -178,7 +180,7 @@ abstract class Model
      */
     public static function onCreate($model)
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo '+';
         }
     }
@@ -188,14 +190,14 @@ abstract class Model
      */
     public static function onUpdate($model)
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo 'U';
         }
     }
 
     public static function onNoUpdate()
     {
-        if (isCli()) {
+        if (\App::runningInConsole()) {
             echo '.';
         }
     }

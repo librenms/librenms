@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertLocationMapTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,7 +16,7 @@ class CreateAlertLocationMapTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('rule_id');
             $table->unsignedInteger('location_id');
-            $table->unique(['rule_id','location_id'], 'alert_location_map_rule_id_location_id_uindex');
+            $table->unique(['rule_id', 'location_id'], 'alert_location_map_rule_id_location_id_uindex');
         });
     }
 

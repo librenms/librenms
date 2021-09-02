@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','f5-ltm-vs');
+$options = [];
+$options['filter']['type'] = ['=', 'f5-ltm-vs'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -24,24 +24,24 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
-    include "includes/html/graphs/common.inc.php";
-    $rrd_options .= " -l 0 -E ";
+    include 'includes/html/graphs/common.inc.php';
+    $rrd_options .= ' -l 0 -E ';
     $rrd_options .= " COMMENT:'Bits           Now      Ave      Max\\n'";
 
-    $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-vs', $label, $hash));
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
-        $rrd_options .= " DEF:INBYTES=" . $rrd_filename . ":bytesin:AVERAGE ";
-        $rrd_options .= " CDEF:INBITS=INBYTES,8,* ";
+    $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
+        $rrd_options .= ' DEF:INBYTES=' . $rrd_filename . ':bytesin:AVERAGE ';
+        $rrd_options .= ' CDEF:INBITS=INBYTES,8,* ';
         $rrd_options .= " LINE1.25:INBITS#330033:'Bits In '";
-        $rrd_options .= " GPRINT:INBITS:LAST:%6.2lf%s ";
-        $rrd_options .= " GPRINT:INBITS:AVERAGE:%6.2lf%s ";
+        $rrd_options .= ' GPRINT:INBITS:LAST:%6.2lf%s ';
+        $rrd_options .= ' GPRINT:INBITS:AVERAGE:%6.2lf%s ';
         $rrd_options .= " GPRINT:INBITS:MAX:%6.2lf%s\l ";
 
-        $rrd_options .= " DEF:OUTBYTES=" . $rrd_filename . ":bytesout:AVERAGE ";
-        $rrd_options .= " CDEF:OUTBITS=OUTBYTES,8,* ";
+        $rrd_options .= ' DEF:OUTBYTES=' . $rrd_filename . ':bytesout:AVERAGE ';
+        $rrd_options .= ' CDEF:OUTBITS=OUTBYTES,8,* ';
         $rrd_options .= " LINE1.25:OUTBITS#FF6600:'Bits Out'";
-        $rrd_options .= " GPRINT:OUTBITS:LAST:%6.2lf%s ";
-        $rrd_options .= " GPRINT:OUTBITS:AVERAGE:%6.2lf%s ";
+        $rrd_options .= ' GPRINT:OUTBITS:LAST:%6.2lf%s ';
+        $rrd_options .= ' GPRINT:OUTBITS:AVERAGE:%6.2lf%s ';
         $rrd_options .= " GPRINT:OUTBITS:MAX:%6.2lf%s\l ";
     }
 }

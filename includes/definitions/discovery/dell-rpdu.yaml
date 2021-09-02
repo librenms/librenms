@@ -1,5 +1,12 @@
 mib: DellrPDU-MIB
 modules:
+    os:
+        hardware:
+            - DellrPDU-MIB::rPDUIdentModelNumberD.1
+            - DellrPDU-MIB::rPDUIdentHardwareRevD.1
+        hardware_template: '{{ DellrPDU-MIB::rPDUIdentModelNumberD.1 }} {{ DellrPDU-MIB::rPDUIdentHardwareRevD.1 }}'
+        serial: DellrPDU-MIB::rPDUIdentSerialNumberD.1
+        version: DellrPDU-MIB::rPDUIdentFirmwareRevD.1
     sensors:
         pre-cache:
             data:
@@ -13,7 +20,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.130.2.2.1.6.{{ $index }}'
                     index: 'rPDUOutletMeteredStatusIndex.{{ $index }}'
                     descr: Outlet, {{ $rPDUOutletMeteredStatusName }}, Current
-                    divisor: 0
                 -
                     oid: rPDUPhaseStatusCurrent
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.4.{{ $index }}'
@@ -27,13 +33,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.130.2.2.1.8.{{ $index }}'
                     index: 'rPDUOutletMeteredStatusIndex.{{ $index }}'
                     descr: Outlet, {{ $rPDUOutletMeteredStatusName }}, Power
-                    divisor: 0
                 -
                     oid: rPDUPhaseStatusPower
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.6.{{ $index }}'
                     index: 'rPDUPhaseStatusIndex.{{ $index }}'
                     descr: 'Power, Phase #{{ $index }}'
-                    divisor: 0
                     multiplier: 10
         voltage:
             data:
@@ -42,7 +46,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.5.{{ $index }}'
                     index: 'rPDUPhaseStatusIndex.{{ $index }}'
                     descr: 'Voltage, Phase #{{ $index }}'
-                    divisor: 0
         state:
             data:
                 -

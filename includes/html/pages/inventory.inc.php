@@ -39,12 +39,12 @@ var grid = $("#inventory").bootgrid({
                 "<option value=\"\">All Parts</option>"+
 <?php
 foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY `entPhysicalModelName` ORDER BY `entPhysicalModelName`') as $data) {
-    echo '"<option value=\"'.$data['entPhysicalModelName'].'\""+';
+    echo '"<option value=\"' . $data['entPhysicalModelName'] . '\""+';
     if ($data['entPhysicalModelName'] == $_POST['part']) {
         echo '" selected"+';
     }
 
-    echo '">'.$data['entPhysicalModelName'].'</option>"+';
+    echo '">' . $data['entPhysicalModelName'] . '</option>"+';
 }
 ?>
                  "</select>"+
@@ -59,12 +59,12 @@ foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY 
 <?php
 foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
     if (device_permitted($data['device_id'])) {
-        echo '"<option value=\"'.$data['device_id'].'\""+';
+        echo '"<option value=\"' . $data['device_id'] . '\""+';
         if ($data['device_id'] == $_POST['device']) {
             echo '" selected"+';
         }
 
-        echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
+        echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
     }
 }
 ?>
@@ -75,7 +75,7 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
                     <?php
                     if ($_POST['device_string']) {
                         echo $_POST['device_string'];
-                    };
+                    }
                     ?>
                  "\" placeholder=\"Description\" class=\"form-control input-sm\"/>"+
                  "</div>"+
@@ -88,10 +88,10 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
         return {
             id: "inventory",
             device: '<?php echo htmlspecialchars($_POST['device']); ?>',
-            string: '<?php echo mres($_POST['string']); ?>',
-            device_string: '<?php echo mres($_POST['device_string']); ?>',
-            part: '<?php echo mres($_POST['part']); ?>',
-            serial: '<?php echo mres($_POST['serial']); ?>'
+            string: '<?php echo $_POST['string']; ?>',
+            device_string: '<?php echo $_POST['device_string']; ?>',
+            part: '<?php echo $_POST['part']; ?>',
+            serial: '<?php echo $_POST['serial']; ?>'
         };
     },
     url: "ajax_table.php"

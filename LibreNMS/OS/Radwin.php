@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran<nguyen_vivia@hotmail.com>
  */
@@ -45,9 +44,10 @@ class Radwin extends OS implements
     public function discoverWirelessDistance()
     {
         $oid = '.1.3.6.1.4.1.4458.1000.1.5.29.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirLinkDistance.0
-        return array(
-            new WirelessSensor('distance', $this->getDeviceId(), $oid, 'radwin', 0, 'Link distance', null, 1, 1000)
-        );
+
+        return [
+            new WirelessSensor('distance', $this->getDeviceId(), $oid, 'radwin', 0, 'Link distance', null, 1, 1000),
+        ];
     }
 
     /**
@@ -56,16 +56,15 @@ class Radwin extends OS implements
      *
      * @return array
      */
-
     public function discoverWirelessPower()
     {
         $transmit = '.1.3.6.1.4.1.4458.1000.1.5.4.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirTxPower.0
         $receive = '.1.3.6.1.4.1.4458.1000.1.5.9.1.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirRxPower.0
 
-        return array(
+        return [
             new WirelessSensor('power', $this->getDeviceId(), $transmit, 'Radwin-Tx', 0, 'Tx Power'),
-            new WirelessSensor('power', $this->getDeviceId(), $receive, 'Radwin-Rx', 0, 'Rx Power')
-        );
+            new WirelessSensor('power', $this->getDeviceId(), $receive, 'Radwin-Rx', 0, 'Rx Power'),
+        ];
     }
 
     /**
@@ -73,13 +72,13 @@ class Radwin extends OS implements
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array
-    */
-
+     */
     public function discoverWirelessRssi()
     {
         $oid = '.1.3.6.1.4.1.4458.1000.1.1.51.7.0'; // RADWIN-MIB-WINLINK1000::winlink1000OduAdmWifiRssi.0
-        return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'radwin', 0, 'RSSI')
-        );
+
+        return [
+            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'radwin', 0, 'RSSI'),
+        ];
     }
 }

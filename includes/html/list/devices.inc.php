@@ -15,32 +15,30 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $query = '';
 $where = [];
 $params = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where[] = " `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where[] = ' `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $params = array_merge($params, $device_ids);
 }
 
-if (!empty($_REQUEST['search'])) {
+if (! empty($_REQUEST['search'])) {
     $where[] = '(`hostname` LIKE ? OR `sysName` LIKE ?)';
-    $search = '%' . mres($_REQUEST['search']) . '%';
+    $search = '%' . $_REQUEST['search'] . '%';
     $params[] = $search;
     $params[] = $search;
 }
 
-if (!empty($where)) {
+if (! empty($where)) {
     $query .= ' WHERE ';
     $query .= implode(' AND ', $where);
 }
@@ -48,7 +46,7 @@ if (!empty($where)) {
 $total = dbFetchCell("SELECT COUNT(*) FROM `devices` $query", $params);
 $more = false;
 
-if (!empty($_REQUEST['limit'])) {
+if (! empty($_REQUEST['limit'])) {
     $limit = (int) $_REQUEST['limit'];
     $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $offset = ($page - 1) * $limit;

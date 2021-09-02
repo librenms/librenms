@@ -26,24 +26,6 @@
                     "sysDescr": "Terra four channel DVB-T/T2/C to IP streamer sti440",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "terra",
-                    "type": "appliance",
-                    "serial": null,
-                    "icon": "terra.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.30631.1.18",
-                    "sysDescr": "Terra four channel DVB-T/T2/C to IP streamer sti440",
-                    "sysContact": null,
-                    "version": null,
                     "hardware": "sti440",
                     "features": null,
                     "os": "terra",
@@ -53,7 +35,8 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

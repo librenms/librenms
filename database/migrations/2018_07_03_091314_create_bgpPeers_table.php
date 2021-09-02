@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateBgpPeersTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,7 +30,7 @@ class CreateBgpPeersTable extends Migration
             $table->integer('bgpPeerFsmEstablishedTime');
             $table->integer('bgpPeerInUpdateElapsedTime');
             $table->string('context_name', 128)->nullable();
-            $table->index(['device_id','context_name']);
+            $table->index(['device_id', 'context_name']);
         });
     }
 

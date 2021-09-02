@@ -1,15 +1,16 @@
 <?php
-echo("ZTE ZXDSL:");
+
+echo 'ZTE ZXDSL:';
 
 // System temperature
-$high_limit         = 70;
-$high_warn_limit    = 60;
-$low_warn_limit     = -20;
-$low_limit          = -30;
+$high_limit = 70;
+$high_warn_limit = 60;
+$low_warn_limit = -20;
+$low_limit = -30;
 
-$descr   =  "System Temperature";
-$valueoid     = ".1.3.6.1.4.1.3902.1004.3.1.2.1.0";
-$value   = snmp_get($device, $valueoid, '-Oqv');
+$descr = 'System Temperature';
+$valueoid = '.1.3.6.1.4.1.3902.1004.3.1.2.1.0';
+$value = snmp_get($device, $valueoid, '-Oqv');
 $value = str_replace('"', '', $value);
 
 if (is_numeric($value)) {

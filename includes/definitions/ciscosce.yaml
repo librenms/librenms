@@ -15,7 +15,7 @@ poller_modules:
     cisco-mac-accounting: false
     cisco-voice: false
     cisco-remote-access-monitor: false
-    cisco-sla: false
+    slas: false
     cisco-ipsec-flow-monitor: false
     cipsec-tunnels: false
     cisco-otv: false
@@ -23,14 +23,13 @@ poller_modules:
     wireless: false
 discovery_modules:
     cisco-cef: false
-    cisco-sla: false
+    slas: false
     cisco-mac-accounting: false
     cisco-otv: false
     cisco-pw: false
     vrf: false
     cisco-vrf-lite: false
-mib_dir:
-    - cisco
+mib_dir: cisco
 discovery:
     -
         sysDescr:

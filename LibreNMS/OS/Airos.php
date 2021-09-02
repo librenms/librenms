@@ -15,17 +15,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+use App\Models\Location;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -40,6 +42,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\OS;
 
 class Airos extends OS implements
+    OSDiscovery,
     WirelessCapacityDiscovery,
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
@@ -52,6 +55,29 @@ class Airos extends OS implements
     WirelessRssiDiscovery,
     WirelessUtilizationDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        $oids = ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'];
+        $data = snmp_getnext_multi($this->getDeviceArray(), $oids, '-OQUs', 'IEEE802dot11-MIB');
+
+        $device->hardware = $data['dot11manufacturerProductName'] ?? null;
+
+        if (isset($data['dot11manufacturerProductVersion'])) {
+            preg_match('/\.v(.*)$/', $data['dot11manufacturerProductVersion'], $matches);
+            $device->version = $matches[1] ?? null;
+        }
+    }
+
+    public function fetchLocation(): Location
+    {
+        $location = parent::fetchLocation();
+
+        // fix longitude having an extra - in the middle after the decimal point
+        $location->lng = (float) preg_replace('/(-?\d+)\.-?(\d+)/', '$1.$2', $location->getAttributes()['lng']);
+
+        return $location;
+    }
+
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -61,9 +87,10 @@ class Airos extends OS implements
     public function discoverWirelessFrequency()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.1.1.4.1'; //UBNT-AirMAX-MIB::ubntRadioFreq.1
-        return array(
+
+        return [
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'airos', 1, 'Radio Frequency'),
-        );
+        ];
     }
 
     /**
@@ -75,9 +102,10 @@ class Airos extends OS implements
     public function discoverWirelessCapacity()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.6.1.4.1'; //UBNT-AirMAX-MIB::ubntAirMaxCapacity.1
-        return array(
+
+        return [
             new WirelessSensor('capacity', $this->getDeviceId(), $oid, 'airos', 1, 'airMAX Capacity'),
-        );
+        ];
     }
 
     /**
@@ -89,9 +117,10 @@ class Airos extends OS implements
     public function discoverWirelessCcq()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.7.1'; //UBNT-AirMAX-MIB::ubntWlStatCcq.1
-        return array(
+
+        return [
             new WirelessSensor('ccq', $this->getDeviceId(), $oid, 'airos', 1, 'CCQ'),
-        );
+        ];
     }
 
     /**
@@ -103,9 +132,10 @@ class Airos extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.15.1'; //UBNT-AirMAX-MIB::ubntWlStatStaCount.1
-        return array(
+
+        return [
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'airos', 1, 'Clients'),
-        );
+        ];
     }
 
     /**
@@ -117,9 +147,10 @@ class Airos extends OS implements
     public function discoverWirelessDistance()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.1.1.7.1'; //UBNT-AirMAX-MIB::ubntRadioDistance.1
-        return array(
+
+        return [
             new WirelessSensor('distance', $this->getDeviceId(), $oid, 'airos', 1, 'Distance', null, 1, 1000),
-        );
+        ];
     }
 
     /**
@@ -131,9 +162,10 @@ class Airos extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.8.1'; //UBNT-AirMAX-MIB::ubntWlStatNoiseFloor.1
-        return array(
+
+        return [
             new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'airos', 1, 'Noise Floor'),
-        );
+        ];
     }
 
     /**
@@ -146,10 +178,11 @@ class Airos extends OS implements
     {
         $tx_oid = '.1.3.6.1.4.1.41112.1.4.1.1.6.1'; //UBNT-AirMAX-MIB::ubntRadioTxPower.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.5.1'; //UBNT-AirMAX-MIB::ubntWlStatSignal.1
-        return array(
+
+        return [
             new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Power'),
             new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Signal Level'),
-        );
+        ];
     }
 
     /**
@@ -161,9 +194,10 @@ class Airos extends OS implements
     public function discoverWirelessQuality()
     {
         $oidAirMax = '.1.3.6.1.4.1.41112.1.4.6.1.3.1'; //OLD UBNT-AirMAX-MIB::ubntAirMaxQuality.1
-        return array(
+
+        return [
             new WirelessSensor('quality', $this->getDeviceId(), $oidAirMax, 'airos', 1, 'airMAX Quality'),
-        );
+        ];
     }
 
     /**
@@ -176,10 +210,11 @@ class Airos extends OS implements
     {
         $tx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.9.1'; //UBNT-AirMAX-MIB::ubntWlStatTxRate.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.10.1'; //UBNT-AirMAX-MIB::ubntWlStatRxRate.1
-        return array(
+
+        return [
             new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Rate'),
             new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Rx Rate'),
-        );
+        ];
     }
 
     /**
@@ -191,11 +226,11 @@ class Airos extends OS implements
     public function discoverWirelessRssi()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.6.1'; //UBNT-AirMAX-MIB::ubntWlStatRssi.1
-        $sensors = array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'airos', 0, 'Overall RSSI')
-        );
+        $sensors = [
+            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'airos', 0, 'Overall RSSI'),
+        ];
 
-        $data = snmpwalk_cache_oid($this->getDevice(), 'ubntRadioRssi', array(), 'UBNT-AirMAX-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'ubntRadioRssi', [], 'UBNT-AirMAX-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rssi',
@@ -210,11 +245,13 @@ class Airos extends OS implements
 
         return $sensors;
     }
+
     public function discoverWirelessUtilization()
     {
         $oidAirTime = '.1.3.6.1.4.1.41112.1.4.6.1.7.1'; //UBNT-AirMMAX-MIB::ubntAirMaxAirtime.1
-        return array(
+
+        return [
             new WirelessSensor('utilization', $this->getDeviceId(), $oidAirTime, 'airos', 1, 'Airtime', null, 1, 10),
-        );
+        ];
     }
 }

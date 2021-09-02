@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMplsTunnelCHopsTable extends Migration
 {
@@ -19,11 +19,11 @@ class CreateMplsTunnelCHopsTable extends Migration
             $table->unsignedInteger('mplsTunnelCHopIndex');
             $table->unsignedInteger('device_id')->index();
             $table->unsignedInteger('lsp_path_id')->nullable();
-            $table->enum('mplsTunnelCHopAddrType', array('unknown','ipV4','ipV6','asNumber','lspid','unnum'))->nullable();
+            $table->enum('mplsTunnelCHopAddrType', ['unknown', 'ipV4', 'ipV6', 'asNumber', 'lspid', 'unnum'])->nullable();
             $table->string('mplsTunnelCHopIpv4Addr', 15)->nullable();
             $table->string('mplsTunnelCHopIpv6Addr', 45)->nullable();
             $table->unsignedInteger('mplsTunnelCHopAsNumber')->nullable();
-            $table->enum('mplsTunnelCHopStrictOrLoose', array('strict','loose'))->nullable();
+            $table->enum('mplsTunnelCHopStrictOrLoose', ['strict', 'loose'])->nullable();
             $table->string('mplsTunnelCHopRouterId', 15)->nullable();
         });
     }

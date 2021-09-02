@@ -7,24 +7,6 @@
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "enexus",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "eltek.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": null,
-                    "sysContact": null,
                     "version": "2.7.4",
                     "hardware": "Micropack System",
                     "features": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

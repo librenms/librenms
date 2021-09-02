@@ -1,5 +1,20 @@
 mib: ZMTEL-ODU-MIB
 modules:
+    os:
+        features:
+            - ZMTEL-ODU-MIB::eNBID.0
+            - ZMTEL-ODU-MIB::pCID.0
+            - ZMTEL-ODU-MIB::dlMCS.0
+            - ZMTEL-ODU-MIB::ulMCS.0
+            - ZMTEL-ODU-MIB::bootROM.0
+            - ZMTEL-ODU-MIB::lteBand.0
+        features_template: 'eNodeB: {{ ZMTEL-ODU-MIB::eNBID.0 }} Physical Cell: {{ ZMTEL-ODU-MIB::pCID.0 }} DL Modulation: {{ ZMTEL-ODU-MIB::dlMCS.0 }} UL Modulation: {{ ZMTEL-ODU-MIB::ulMCS.0 }} bootROM: {{ ZMTEL-ODU-MIB::bootROM.0 }} LTE Band: {{ ZMTEL-ODU-MIB::lteBand.0 }}'
+        hardware:
+            - ZMTEL-ODU-MIB::modelName.0
+            - ZMTEL-ODU-MIB::hardwareVersion.0
+        hardware_template: '{{ ZMTEL-ODU-MIB::modelName.0 }} {{ ZMTEL-ODU-MIB::hardwareVersion.0 }}'
+        serial: ZMTEL-ODU-MIB::SN.0
+        version: ZMTEL-ODU-MIB::softwareVersion.0
     sensors:
         count:
             data:

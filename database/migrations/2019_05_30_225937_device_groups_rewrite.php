@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class DeviceGroupsRewrite extends Migration
 {
@@ -28,7 +28,6 @@ class DeviceGroupsRewrite extends Migration
      */
     public function down()
     {
-//        dd(Schema::getColumnListing('device_groups'), \LibreNMS\DB\Eloquent::getDriver());
 //        Schema::table('device_groups', function (Blueprint $table) {
 //            $table->string('desc')->change();
 //            $table->dropColumn(['type', 'rules']);

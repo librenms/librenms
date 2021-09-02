@@ -106,5 +106,14 @@ return [
         'long' => 'Interférence polaire croisée',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => 'Cellule',
+        'long' => 'Cellule',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => 'Canal',
+        'long' => 'Canal',
+        'unit' => '',
+    ],
 ];

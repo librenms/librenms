@@ -1,8 +1,7 @@
 os: icotera
 text: 'Icotera OS'
 type: network
-mib_dir:
-    - icotera
+mib_dir: icotera
 ifname: true
 icon: icotera
 over:

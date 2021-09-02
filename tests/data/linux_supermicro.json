@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux hostname 4.9.0-8-amd64 #1 SMP Debian 4.9.110-3+deb9u4 (2018-08-21) x86_64",
+                    "sysContact": null,
+                    "version": "4.9.0-8-amd64",
+                    "hardware": "Supermicro X9SRL-F",
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": "ZM145S015127",
+                    "icon": "linux.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

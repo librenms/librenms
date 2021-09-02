@@ -30,7 +30,7 @@ class AuthEventListener
     public function login(Login $event)
     {
         /** @var User $user */
-        $user = $event->user ?: (object)['username' => 'Not found'];
+        $user = $event->user ?: (object) ['username' => 'Not found'];
 
         DB::table('authlog')->insert(['user' => $user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged In']);
 
@@ -46,7 +46,7 @@ class AuthEventListener
     public function logout(Logout $event)
     {
         /** @var User $user */
-        $user = $event->user ?: (object)['username' => 'Not found'];
+        $user = $event->user ?: (object) ['username' => 'Not found'];
 
         DB::table('authlog')->insert(['user' => $user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged Out']);
     }

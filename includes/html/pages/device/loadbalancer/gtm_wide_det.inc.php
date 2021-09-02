@@ -26,16 +26,15 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                         </div>
                         <div class="panel-body">
                             <?php
-                            $graph_array = array ();
-                            $graph_array['device'] = $device['device_id'];
-                            $graph_array['height'] = '100';
-                            $graph_array['width'] = '215';
-                            $graph_array['legend'] = 'no';
-                            $graph_array['to'] = \LibreNMS\Config::get('time.now');
-                            $graph_array['type'] = 'device_bigip_gtm_wide_requests';
-                            $graph_array['id'] = $vars['wideid'];
-                            require 'includes/html/print-graphrow.inc.php';
-                            ?>
+                            $graph_array = [];
+    $graph_array['device'] = $device['device_id'];
+    $graph_array['height'] = '100';
+    $graph_array['width'] = '215';
+    $graph_array['legend'] = 'no';
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['type'] = 'device_bigip_gtm_wide_requests';
+    $graph_array['id'] = $vars['wideid'];
+    require 'includes/html/print-graphrow.inc.php'; ?>
                         </div>
                     </div>
 
@@ -45,16 +44,15 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                         </div>
                         <div class="panel-body">
                             <?php
-                            $graph_array = array ();
-                            $graph_array['device'] = $device['device_id'];
-                            $graph_array['height'] = '100';
-                            $graph_array['width'] = '215';
-                            $graph_array['legend'] = 'no';
-                            $graph_array['to'] = \LibreNMS\Config::get('time.now');
-                            $graph_array['type'] = 'device_bigip_gtm_wide_resolved';
-                            $graph_array['id'] = $vars['wideid'];
-                            require 'includes/html/print-graphrow.inc.php';
-                            ?>
+                            $graph_array = [];
+    $graph_array['device'] = $device['device_id'];
+    $graph_array['height'] = '100';
+    $graph_array['width'] = '215';
+    $graph_array['legend'] = 'no';
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['type'] = 'device_bigip_gtm_wide_resolved';
+    $graph_array['id'] = $vars['wideid'];
+    require 'includes/html/print-graphrow.inc.php'; ?>
                         </div>
                     </div>
                     <div class="panel panel-default" id="dropped">
@@ -63,16 +61,15 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                         </div>
                         <div class="panel-body">
                             <?php
-                            $graph_array = array ();
-                            $graph_array['device'] = $device['device_id'];
-                            $graph_array['height'] = '100';
-                            $graph_array['width'] = '215';
-                            $graph_array['legend'] = 'no';
-                            $graph_array['to'] = \LibreNMS\Config::get('time.now');
-                            $graph_array['type'] = 'device_bigip_gtm_wide_dropped';
-                            $graph_array['id'] = $vars['wideid'];
-                            require 'includes/html/print-graphrow.inc.php';
-                            ?>
+                            $graph_array = [];
+    $graph_array['device'] = $device['device_id'];
+    $graph_array['height'] = '100';
+    $graph_array['width'] = '215';
+    $graph_array['legend'] = 'no';
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['type'] = 'device_bigip_gtm_wide_dropped';
+    $graph_array['id'] = $vars['wideid'];
+    require 'includes/html/print-graphrow.inc.php'; ?>
                         </div>
                     </div>
                 </div>

@@ -2,8 +2,7 @@ os: drac
 text: 'Dell DRAC'
 icon: dell
 type: appliance
-mib_dir:
-    - dell
+mib_dir: dell
 discovery:
     -
         sysObjectID:

@@ -6,26 +6,8 @@
                     "sysName": "my_ict_inverter",
                     "sysObjectID": ".1.3.6.1.4.1.39145.12",
                     "sysDescr": "ICT Sine Wave Inverter",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ict-swi",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "ict.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "my_ict_inverter",
-                    "sysObjectID": ".1.3.6.1.4.1.39145.12",
-                    "sysDescr": "ICT Sine Wave Inverter",
                     "sysContact": "Example, Inc",
-                    "version": "v1.03",
+                    "version": "1.03",
                     "hardware": "1",
                     "features": null,
                     "os": "ict-swi",
@@ -35,7 +17,8 @@
                     "location": "my_ict_inverter"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

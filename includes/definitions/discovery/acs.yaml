@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/^Cisco Secure Access Control System (?<version>[^,]+)$/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1

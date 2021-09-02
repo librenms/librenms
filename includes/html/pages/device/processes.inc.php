@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -56,22 +56,22 @@ if ($vars['by'] == 'desc') {
     $by = 'asc';
 }
 
-$heads = array(
+$heads = [
     'PID'     => '',
     'VSZ'     => 'Virtual Memory',
     'RSS'     => 'Resident Memory',
     'cputime' => '',
     'user'    => '',
     'command' => '',
-);
+];
 
 echo "<div class='table-responsive'><table class='table table-hover'><thead><tr>";
 foreach ($heads as $head => $extra) {
     unset($lhead, $bhead);
     $lhead = strtolower($head);
     $bhead = 'asc';
-    $icon  = '';
-    if ('`'.$lhead.'`' == $order) {
+    $icon = '';
+    if ('`' . $lhead . '`' == $order) {
         $icon = " class='fa fa-chevron-";
         if ($by == 'asc') {
             $bhead = 'desc';
@@ -83,8 +83,8 @@ foreach ($heads as $head => $extra) {
         $icon .= "'";
     }
 
-    echo '<th><a href="' . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'processes', 'order'=>$lhead, 'by'=>$bhead)) . '"><span'.$icon.'>&nbsp;';
-    if (!empty($extra)) {
+    echo '<th><a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'processes', 'order' => $lhead, 'by' => $bhead]) . '"><span' . $icon . '>&nbsp;';
+    if (! empty($extra)) {
         echo "<abbr title='$extra'>$head</abbr>";
     } else {
         echo $head;
@@ -95,14 +95,14 @@ foreach ($heads as $head => $extra) {
 
 echo '</tr></thead><tbody>';
 
-foreach (dbFetchRows('SELECT * FROM `processes` WHERE `device_id` = ? ORDER BY '.$order.' '.$by, array($device['device_id'])) as $entry) {
+foreach (dbFetchRows('SELECT * FROM `processes` WHERE `device_id` = ? ORDER BY ' . $order . ' ' . $by, [$device['device_id']]) as $entry) {
     echo '<tr>';
-    echo '<td>'.$entry['pid'].'</td>';
-    echo '<td>'.format_si(($entry['vsz'] * 1024)).'</td>';
-    echo '<td>'.format_si(($entry['rss'] * 1024)).'</td>';
-    echo '<td>'.$entry['cputime'].'</td>';
-    echo '<td>'.$entry['user'].'</td>';
-    echo '<td>'.$entry['command'].'</td>';
+    echo '<td>' . $entry['pid'] . '</td>';
+    echo '<td>' . \LibreNMS\Util\Number::formatSi(($entry['vsz'] * 1024), 2, 3, '') . '</td>';
+    echo '<td>' . \LibreNMS\Util\Number::formatSi(($entry['rss'] * 1024), 2, 3, '') . '</td>';
+    echo '<td>' . $entry['cputime'] . '</td>';
+    echo '<td>' . $entry['user'] . '</td>';
+    echo '<td>' . $entry['command'] . '</td>';
     echo '</tr>';
 }
 

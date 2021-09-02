@@ -300,24 +300,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.615",
                     "sysDescr": "Cisco IOS Software, C3560 Software (C3560-IPSERVICESK9-M), Version 15.0(2)SE11, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Sat 19-Aug-17 09:21 by prod_rel_team",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ios",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.615",
-                    "sysDescr": "Cisco IOS Software, C3560 Software (C3560-IPSERVICESK9-M), Version 15.0(2)SE11, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Sat 19-Aug-17 09:21 by prod_rel_team",
                     "sysContact": "<private>",
                     "version": "15.0(2)SE11",
                     "hardware": "WS-C3560G-24TS-S",
@@ -329,6 +311,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

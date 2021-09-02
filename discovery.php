@@ -6,22 +6,20 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    LibreNMS
- * @subpackage discovery
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Util\FileLock;
+use LibreNMS\Util\Debug;
 
-$init_modules = array('discovery');
+$init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
-$start         = microtime(true);
-$sqlparams     = array();
-$options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
+$start = microtime(true);
+$sqlparams = [];
+$options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
-if (!isset($options['q'])) {
-    echo \LibreNMS\Config::get('project_name')." Discovery\n";
+if (! isset($options['q'])) {
+    echo \LibreNMS\Config::get('project_name') . " Discovery\n";
 }
 
 if (isset($options['h'])) {
@@ -35,36 +33,36 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
-        $new_discovery_lock = FileLock::lockOrDie('new-discovery');
+        $new_discovery_lock = Cache::lock('new-discovery', 300);
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
-            $where = "AND `device_id` = '".$options['h']."'";
+            $where = "AND `device_id` = '" . $options['h'] . "'";
             $doing = $options['h'];
         } else {
-            $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
+            $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
             $doing = $options['h'];
         }
     }//end if
 }//end if
 
 if (isset($options['os'])) {
-        $where .= " AND os = ?";
-        $sqlparams[] = $options['os'];
+    $where .= ' AND os = ?';
+    $sqlparams[] = $options['os'];
 }
 
 if (isset($options['type'])) {
-        $where .= " AND type = ?";
-        $sqlparams[] = $options['type'];
+    $where .= ' AND type = ?';
+    $sqlparams[] = $options['type'];
 }
 
 if (isset($options['i']) && $options['i'] && isset($options['n'])) {
-    $where .= ' AND MOD(device_id,'.$options['i'].") = '".$options['n']."'";
-    $doing = $options['n'].'/'.$options['i'];
+    $where .= ' AND MOD(device_id,' . $options['i'] . ") = '" . $options['n'] . "'";
+    $doing = $options['n'] . '/' . $options['i'];
 }
 
-if (set_debug(isset($options['d'])) || isset($options['v'])) {
+if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -80,13 +78,11 @@ SNMP: {$versions['netsnmp_ver']}
 EOH;
 
     echo "DEBUG!\n";
-    if (isset($options['v'])) {
-        $vdebug = true;
-    }
+    Debug::setVerbose(isset($options['v']));
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
-if (!$where) {
+if (! $where) {
     echo "-h <device id> | <device hostname wildcard>  Poll single device\n";
     echo "-h odd             Poll odd numbered devices  (same as -i 2 -n 0)\n";
     echo "-h even            Poll even numbered devices (same as -i 2 -n 1)\n";
@@ -111,49 +107,41 @@ $module_override = parse_modules('discovery', $options);
 
 $discovered_devices = 0;
 
-if (!empty(\LibreNMS\Config::get('distributed_poller_group'))) {
+if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
     $where .= ' AND poller_group IN(' . \LibreNMS\Config::get('distributed_poller_group') . ')';
 }
 
 global $device;
 foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     DeviceCache::setPrimary($device['device_id']);
-    $discovered_devices += (int)discover_device($device, $module_override);
+    $discovered_devices += (int) discover_device($device, $module_override);
 }
 
-$end      = microtime(true);
-$run      = ($end - $start);
+$end = microtime(true);
+$run = ($end - $start);
 $proctime = substr($run, 0, 5);
 
 if ($discovered_devices) {
-    dbInsert([
-        'type' => 'discover',
-        'doing' => $doing,
-        'start' => $start,
-        'duration' => $proctime,
-        'devices' => $discovered_devices,
-        'poller' => \LibreNMS\Config::get('distributed_poller_name')
-    ], 'perf_times');
     if ($doing === 'new') {
         // We have added a new device by this point so we might want to do some other work
         oxidized_reload_nodes();
     }
 }
 
-if ($doing === 'new') {
+if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();
 }
 
 $string = $argv[0] . " $doing " . date(\LibreNMS\Config::get('dateformat.compact')) . " - $discovered_devices devices discovered in $proctime secs";
 d_echo("$string\n");
 
-if (!isset($options['q'])) {
+if (! isset($options['q'])) {
     printStats();
 }
 
 logfile($string);
 
 if ($doing !== 'new' && $discovered_devices == 0) {
-    # No discoverable devices, either down or disabled
+    // No discoverable devices, either down or disabled
     exit(5);
 }

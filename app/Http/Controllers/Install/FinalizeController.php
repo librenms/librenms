@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,7 +35,7 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     public function index()
     {
-        if (!$this->initInstallStep()) {
+        if (! $this->initInstallStep()) {
             return $this->redirectToIncomplete();
         }
 
@@ -89,6 +88,7 @@ class FinalizeController extends InstallationController implements InstallerStep
         $this->configureDatabase();
         $connection = config('database.default', $this->connection);
         $port = config("database.connections.$connection.port");
+
         return [
             'NODE_ID' => uniqid(),
             'DB_HOST' => config("database.connections.$connection.host"),
@@ -110,7 +110,7 @@ class FinalizeController extends InstallationController implements InstallerStep
             return;
         }
 
-        if (!copy(base_path('config.php.default'), $config_file)) {
+        if (! copy(base_path('config.php.default'), $config_file)) {
             throw new FileWriteFailedException($config_file);
         }
     }
@@ -133,7 +133,7 @@ class FinalizeController extends InstallationController implements InstallerStep
     {
         foreach ($this->hydrateControllers() as $step => $controller) {
             /** @var InstallerStep $controller */
-            if ($step !== 'finish' && !$controller->complete()) {
+            if ($step !== 'finish' && ! $controller->complete()) {
                 return false;
             }
         }

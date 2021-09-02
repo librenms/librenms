@@ -2,8 +2,7 @@ os: mgepdu
 text: 'Eaton MGE PDU'
 type: power
 icon: eaton
-mib_dir:
-    - mge
+mib_dir: eaton
 over:
     - { graph: device_current, text: Current }
 discovery:

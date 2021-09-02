@@ -1,0 +1,69 @@
+mib: DIGIPDU-MIB
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+) (?<version>\S+)?/'
+    sensors:
+        voltage:
+            data:
+                -   
+                    oid: inFeedVoltage
+                    value: inFeedVoltage
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.2.1.3.{{ $index }}'
+                    descr: "Voltage In"
+                    index: 3
+                    low_limit: 190
+                    high_limit: 260
+                -
+                    oid: outVoltage
+                    value: outVoltage
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.3.1.6.{{ $index }}'
+                    index: 'outVoltage.{{ $index }}'
+                    descr: "Voltage Out {{ $index }}"
+        current:
+            data: 
+                -
+                    oid: inFeedCurrent
+                    value: inFeedCurrent
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.2.1.5.{{ $index }}'
+                    descr: "Current In"
+                -
+                    oid: outCurrent
+                    value: outCurrent
+                    index: 'outCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.3.1.7.{{ $index }}'
+                    descr: "Current Out {{ $index }}"
+        power:
+            data:
+                - 
+                    oid: inFeedPowerLoad
+                    value: inFeedPowerLoad
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.2.1.6.{{ $index }}'
+                    descr: "Power In"
+                -
+                    oid: outPowerLoad
+                    value: outPowerLoad
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.3.1.9.{{ $index }}'
+                    index: 'outPowerLoad.{{ $index }}'
+                    descr: "Power Out {{ $index }}"
+        temperature:
+            data:
+                - 
+                    oid: inbuiltTemperature
+                    value: inbuiltTemperature
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.5.1.3.{{ $index }}'
+                    divisor: 10
+                    descr: "Device Temperature"
+                    low_limit: inbuiltTemperatureLowWarning
+                    high_limit: inbuiltTemperatureHighWarning                    
+       
+        state:
+            data:
+                -
+                    oid: outSwitchStatus
+                    value: outSwitchStatus
+                    num_oid: '.1.3.6.1.4.1.10456.3.3.3.1.4.{{ $index }}' 
+                    descr: "Switch status {{ $index }}"
+                    states:
+                        - { descr: Off, graph: 1, value: 0, generic: 0 }
+                        - { descr: On, graph: 1, value: 1, generic: 0 } 
+        

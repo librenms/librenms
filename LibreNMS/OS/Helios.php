@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +32,6 @@ use LibreNMS\OS;
 
 class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDiscovery, WirelessRssiDiscovery
 {
-
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -69,9 +67,9 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
 
     private function discoverOid($type, $oid, $oid_prefix)
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), $oid, array(), 'IGNITENET-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'IGNITENET-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $data) {
             $sensors[] = new WirelessSensor(
                 $type,
@@ -83,6 +81,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
                 $data[$oid]
             );
         }
+
         return $sensors;
     }
 }

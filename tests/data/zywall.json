@@ -8,24 +8,6 @@
                     "sysDescr": "ZyWALL 2X",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "zywall",
-                    "type": "firewall",
-                    "serial": null,
-                    "icon": "zyxel.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.890.1.15",
-                    "sysDescr": "ZyWALL 2X",
-                    "sysContact": null,
-                    "version": null,
                     "hardware": "ZyWALL 2X",
                     "features": null,
                     "os": "zywall",
@@ -35,7 +17,8 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

@@ -15,20 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.38446.1.3.4.1.6.' . $index;
         $descr = "Input Phase $index";
         $divisor = 1;
-        $type = "enlogic-pdu";
+        $type = 'enlogic-pdu';
         $low_limit = $data['pduInputPhaseConfigVoltageLowerCriticalThreshold'];
         $low_warn = $data['pduInputPhaseConfigVoltageLowerWarningThreshold'];
         $high_limit = $data['pduInputPhaseConfigVoltageUpperCriticalThreshold'];

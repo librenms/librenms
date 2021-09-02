@@ -14,6 +14,6 @@ class ComponentStatusLog extends Model
 
     public function setStatusAttribute($status)
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
     }
 }

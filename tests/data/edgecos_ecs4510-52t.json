@@ -5,14 +5,18 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "edgecos",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 79,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 211349504,
+                    "mempool_used_oid": null,
+                    "mempool_free": 57085952,
+                    "mempool_free_oid": ".1.3.6.1.4.1.259.10.1.24.1.39.3.3.0",
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -20,26 +24,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "edgecos",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 79,
-                    "mempool_used": 211349504,
-                    "mempool_free": 57085952,
-                    "mempool_total": 268435456,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {
@@ -66,26 +51,8 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.259.10.1.24.104",
                     "sysDescr": "ECS4510-52T",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "edgecos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "edge-core.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.259.10.1.24.104",
-                    "sysDescr": "ECS4510-52T",
                     "sysContact": "<private>",
-                    "version": " ",
+                    "version": null,
                     "hardware": null,
                     "features": null,
                     "os": "edgecos",
@@ -95,6 +62,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

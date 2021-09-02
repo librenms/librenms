@@ -15,14 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.0';
 $current = (snmp_get($device, $oid, '-Oqv') / 10);
 discover_sensor($valid['sensor'], 'temperature', $device, $oid, 0, 'sitemonitor', 'Temperature', 10, 1, null, null, null, null, $current);

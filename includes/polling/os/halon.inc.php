@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-$explodeddata = explode("Halon ", $device['sysDescr']);
+$explodeddata = explode('Halon ', $device['sysDescr']);
 $version = $explodeddata['1'];
 $serial = trim(snmp_get($device, 'HALON-SP-MIB::serialNumber.0', '-OQv'), '"');

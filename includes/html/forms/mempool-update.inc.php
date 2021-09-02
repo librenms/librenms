@@ -14,30 +14,30 @@
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $response = array(
+if (! Auth::user()->hasGlobalAdmin()) {
+    $response = [
         'status'  => 'error',
         'message' => 'Need to be admin',
-    );
-    echo _json_encode($response);
+    ];
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$status  = 'error';
+$status = 'error';
 $message = 'Error updating mempool information';
 
-$device_id = mres($_POST['device_id']);
-$mempool_id = mres($_POST['mempool_id']);
-$data = mres($_POST['data']);
+$device_id = $_POST['device_id'];
+$mempool_id = $_POST['mempool_id'];
+$data = $_POST['data'];
 
-if (!is_numeric($device_id)) {
+if (! is_numeric($device_id)) {
     $message = 'Missing device id';
-} elseif (!is_numeric($mempool_id)) {
+} elseif (! is_numeric($mempool_id)) {
     $message = 'Missing mempool id';
-} elseif (!is_numeric($data)) {
+} elseif (! is_numeric($data)) {
     $message = 'Missing value';
 } else {
-    if (dbUpdate(array('mempool_perc_warn'=>$data), 'mempools', '`mempool_id`=? AND `device_id`=?', array($mempool_id,$device_id)) >= 0) {
+    if (dbUpdate(['mempool_perc_warn'=>$data], 'mempools', '`mempool_id`=? AND `device_id`=?', [$mempool_id, $device_id]) >= 0) {
         $message = 'Memory information updated';
         $status = 'ok';
     } else {
@@ -45,9 +45,9 @@ if (!is_numeric($device_id)) {
     }
 }
 
-$response = array(
+$response = [
     'status'        => $status,
     'message'       => $message,
     'extra'         => $extra,
-);
-echo _json_encode($response);
+];
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

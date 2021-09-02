@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -47,5 +46,26 @@ class EnvTest extends TestCase
 
         // clean the environment
         putenv('PARSETEST');
+    }
+
+    public function testSetEnv()
+    {
+        $this->assertEquals("ONE=one\nTWO=2\$\nTHREE=\"space space\"\n", EnvHelper::setEnv("ONE=one\nTWO=\n", [
+            'ONE' => 'zero',
+            'TWO' => '2$',
+            'THREE' => 'space space',
+        ]));
+
+        $this->assertEquals("A=a\nB=b\nC=c\nD=d\n", EnvHelper::setEnv("#A=\nB=b\nF=blah\nC=\n", [
+            'C' => 'c',
+            'D' => 'd',
+            'B' => 'nope',
+            'A' => 'a',
+        ], ['F', 'A']));
+
+        // replace
+        $this->assertEquals("#COMMENT=something\nCOMMENT=else\n", EnvHelper::setEnv("COMMENT=nothing\n#COMMENT=something", [
+            'COMMENT' => 'else',
+        ], ['COMMENT']));
     }
 }

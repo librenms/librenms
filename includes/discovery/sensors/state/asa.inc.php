@@ -41,7 +41,7 @@ if (is_array($temp)) {
                 $index = 7;
             }
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][' cfwHardwareStatusValue'], 'snmp', $index);
+            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][' cfwHardwareStatusValue'], 'snmp', $index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);

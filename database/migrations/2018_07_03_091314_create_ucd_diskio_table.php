@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateUcdDiskioTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

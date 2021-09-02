@@ -2,8 +2,7 @@ os: eaton-ats
 text: 'Eaton ATS'
 type: power
 icon: eaton
-mib_dir:
-    - eaton
+mib_dir: eaton
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nginx';
 $app_id = $app['app_id'];
-if (!empty($agent_data['app'][$name])) {
+if (! empty($agent_data['app'][$name])) {
     $nginx = $agent_data['app'][$name];
 } else {
     // Polls nginx statistics from script via SNMP
@@ -14,10 +14,10 @@ $nginx = trim($nginx, '"');
 
 echo ' nginx';
 
-list($active, $reading, $writing, $waiting, $req) = array_map('rtrim', explode("\n", $nginx));
+[$active, $reading, $writing, $waiting, $req] = array_map('rtrim', explode("\n", $nginx));
 d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req\n");
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('Requests', 'DERIVE', 0, 125000000000)
     ->addDataset('Active', 'GAUGE', 0, 125000000000)
@@ -25,13 +25,13 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('Writing', 'GAUGE', 0, 125000000000)
     ->addDataset('Waiting', 'GAUGE', 0, 125000000000);
 
-$fields = array(
+$fields = [
     'Requests' => $req,
     'Active'   => $active,
     'Reading'  => $reading,
     'Writing'  => $writing,
     'Waiting'  => $waiting,
-);
+];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

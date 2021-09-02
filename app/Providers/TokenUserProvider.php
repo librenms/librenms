@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -52,7 +51,6 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return;
     }
 
     /**
@@ -63,17 +61,18 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (!ApiToken::isValid($credentials['api_token'])) {
+        if (! ApiToken::isValid($credentials['api_token'])) {
             return null;
         }
 
         $user = ApiToken::userFromToken($credentials['api_token']);
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             return $user;
         }
 
         // missing user for existing token, create it assuming legacy auth_id
         $api_token = ApiToken::where('token_hash', $credentials['api_token'])->first();
+        /** @var \App\Models\User|null */
         $user = $this->retrieveByLegacyId($api_token->user_id);
 
         // update token user_id
@@ -94,6 +93,7 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
+        /** @var \App\Models\User $user */
         return ApiToken::isValid($credentials['api_token'], $user->user_id);
     }
 }

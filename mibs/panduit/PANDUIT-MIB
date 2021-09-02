@@ -1,0 +1,2826 @@
+-- ****************************************************************************
+--   Copyright(C) 2019 Panduit 
+--   G5 PDU SNMP MIB DEFINITIONS
+-- ****************************************************************************
+
+-- ====================================================================================
+PANDUIT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises   FROM RFC1155-SMI
+    Counter       FROM RFC1155-SMI
+    DisplayString FROM RFC1213-MIB
+    ifIndex       FROM RFC1213-MIB
+    ifDescr       FROM RFC1213-MIB
+    sysName       FROM RFC1213-MIB
+    sysDescr      FROM RFC1213-MIB
+    sysContact    FROM RFC1213-MIB
+    sysLocation   FROM RFC1213-MIB  
+    OBJECT-TYPE   FROM RFC-1212
+    NOTIFICATION-TYPE     FROM RFC-1215;
+
+panduit                  OBJECT IDENTIFIER 	::= { enterprises 19536 }
+
+g5 MODULE-IDENTITY
+       LAST-UPDATED "201902021200Z"  -- 2 February 2019
+       ORGANIZATION "Panduit"
+       CONTACT-INFO "Panduit
+
+        Postal:     Panduit
+                    18900 Panduit Drive
+                    Tinley Park, IL 60487
+                    USA
+
+        Tel:        +1 708 532-1800/888-506-5400
+
+        E-mail:     techsupport@panduit.com"
+       DESCRIPTION
+               "SmartZone G5 iPDU"
+       REVISION "201902021200Z"  -- 12 February 2019 
+       DESCRIPTION
+                "Fix the index and access hub and added the Energy Thresholds"
+       REVISION "201801121200Z"  -- 12 January 2018
+       DESCRIPTION
+                "First Major Release"
+        ::= { panduit 10 }
+
+--
+-- pdug5 Monitored Managed PDU object identifiers
+--
+pdug5                     OBJECT IDENTIFIER       ::= {g5 1}  
+
+pdug5Ident                OBJECT IDENTIFIER       ::= { pdug5 1 }
+pdug5Input                OBJECT IDENTIFIER       ::= { pdug5 2 }
+pdug5Group                OBJECT IDENTIFIER       ::= { pdug5 3 }
+pdug5Environment          OBJECT IDENTIFIER       ::= { pdug5 4 }
+pdug5Outlet               OBJECT IDENTIFIER       ::= { pdug5 5 }
+pdug5Traps                OBJECT IDENTIFIER       ::= { pdug5 6 }
+pdug5TrapInfo             OBJECT IDENTIFIER       ::= { pdug5 7 }
+
+-- ====================================================================================
+-- ====================================================================================
+--             pdug5 - monitored and managed PDU line
+--             pdug5  (Panduit PDU) - Metered PDU - Switched PDU - Metered+Switched PDU
+-- ====================================================================================
+--  
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}  
+--  pdug5Ident                OBJECT IDENTIFIER       ::= { pdug5 1 }
+--  PDU identification group
+--  OID= .1.3.6.1.4.1.19536.10.1.1
+
+pdug5NumberPDU OBJECT-TYPE
+    SYNTAX INTEGER (1..4)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of PDUs detected (in its daisy chain)."
+    ::= { pdug5Ident 1 }
+    
+-- ======= pdug5 Identification ===========
+
+pdug5IdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF pdug5IdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to pdug5NumberPDU ."
+    ::= { pdug5Ident 2 }
+
+pdug5IdentEntry OBJECT-TYPE
+    SYNTAX pdug5IdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The Identity table entry containing the name, model, manufacturer, 
+                 firmware version, part number, etc."
+    INDEX { pdug5IdentIndex }
+    ::= { pdug5IdentTable 1 }
+
+pdug5IdentEntry ::= SEQUENCE {
+      	pdug5IdentIndex         		INTEGER,
+      	pdug5Name               		DisplayString,
+      	pdug5Model              		DisplayString,
+      	pdug5Manufacturer       		DisplayString,
+      	pdug5FirmwareVersion    		DisplayString,
+		pdug5FirmwareVersionTimeStamp  	DisplayString,
+      	pdug5PartNumber         		DisplayString,
+      	pdug5SerialNumber       		DisplayString,
+      	pdug5Status             		INTEGER,
+      	pdug5Controllable       		INTEGER,
+      	pdug5InputPhaseCount			INTEGER,
+		pdug5GroupCount					INTEGER,
+        pdug5OutletCount	 			INTEGER,
+		pdug5MACAddress					DisplayString,
+		pdug5IPv4Address				DisplayString,
+		pdug5IPv6Address				DisplayString    
+    }
+
+pdug5IdentIndex OBJECT-TYPE
+    SYNTAX INTEGER	(1..4)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the pdug5IdentEntry table."
+    ::= { pdug5IdentEntry 1 }
+
+pdug5Name OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The string identify the device in daisy chain. Example PDU A."
+    ::= { pdug5IdentEntry 2 }
+
+pdug5Model OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Model."
+    ::= { pdug5IdentEntry 3 }
+
+pdug5Manufacturer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Manufacturer Name."
+    ::= { pdug5IdentEntry 4 }
+
+pdug5FirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The firmware revision level of the device."
+    ::= { pdug5IdentEntry 5 }
+
+pdug5FirmwareVersionTimeStamp  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION 
+	   "Timestamp of when the PDU firmware was last updated"
+	::= { pdug5IdentEntry 6 }
+
+pdug5PartNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device part number. Example P36E09M."
+    ::= { pdug5IdentEntry 7 }
+
+pdug5SerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device serial number, 10-digit."
+    ::= { pdug5IdentEntry 8 }
+
+pdug5Status OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+      other(1),    
+      ok(2),
+      degraded(3),
+      failed(4)
+    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+    "The overall status of the device.  A value of OK(2) indicates the device is operating normally.
+    A value of degraded(3) indicates the device is operating with warning indicators.  A value of
+    failed(4) indicates the device is operating with critical indicators."
+    ::= { pdug5IdentEntry 9 }
+
+pdug5Controllable OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+      yes(1),
+      no(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object indicates whether or not the device is controllable."
+    ::= { pdug5IdentEntry 10 }
+
+pdug5InputPhaseCount  OBJECT-TYPE
+    SYNTAX     INTEGER (1..3)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION 
+     	"The number of input phase on this pdu 1 or 3."
+    ::= { pdug5IdentEntry 11 }
+
+pdug5GroupCount  OBJECT-TYPE
+    SYNTAX     INTEGER (0..12)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION 
+	"The number of groups (breakers) on this pdu."
+    ::= { pdug5IdentEntry 12 }
+
+pdug5OutletCount  OBJECT-TYPE
+    SYNTAX     INTEGER (1..48)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION 
+	"The number of outlets in this PDU."
+         ::= { pdug5IdentEntry 13 }
+
+pdug5MACAddress	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The assigned MAC address for this PDU."
+	::={ pdug5IdentEntry 14 }
+
+pdug5IPv4Address  OBJECT-TYPE
+	SYNTAX		IpAddress
+	ACCESS		read-only
+	STATUS 		mandatory
+	DESCRIPTION
+		"The current IPv4 Address. 
+		A value of 0.0.0.0 indicates an error or an unset option."
+	::={ pdug5IdentEntry 15 }
+
+pdug5IPv6Address  OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS   	read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The current IPv6 Address.
+		A vale of 0.0.0.0.0.0 indicates an error or an unset option."
+	::={ pdug5IdentEntry 16 }
+
+-- ============ pdug5 Configuration ======= 
+
+pdug5ConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF pdug5ConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to pdug5NumberPDU."
+    ::= { pdug5Ident 3 }
+	
+pdug5ConfigEntry	OBJECT-TYPE
+	SYNTAX pdug5ConfigEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION	
+		"Read Configuration data from the PDU being queried."
+	INDEX {pdug5ConfigIndex}
+	::=	{pdug5ConfigTable 1}
+	
+pdug5ConfigEntry	::= SEQUENCE{
+		pdug5ConfigIndex				INTEGER,
+		pdug5ConfigSsh				INTEGER,
+		pdug5ConfigFtps				INTEGER,
+		pdug5ConfigHttp				INTEGER,
+		pdug5ConfigHttps				INTEGER,
+		pdug5ConfigIPv4IPv6Switch		INTEGER,
+		pdug5ConfigRedfishAPI			INTEGER,
+		pdug5ConfigOledDispalyOrientation	INTEGER,
+		pdug5ConfigEnergyReset			INTEGER,
+		pdug5ConfigNetworkManagementCardReset	INTEGER,
+		pdug5ConfigDaisyChainStatus		INTEGER
+		}
+
+pdug5ConfigIndex	OBJECT-TYPE
+		SYNTAX  INTEGER (1..4)
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of PDU configuration entry."
+		::={pdug5ConfigEntry 1}
+
+pdug5ConfigSsh	OBJECT-TYPE
+		SYNTAX	INTEGER{
+			off(0),
+			on(1)
+		}
+		ACCESS  read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to off(0) will disable the SSH conneciton.
+			 Setting this OID to on(1) will enable the SSH connection. iNC reboot will be required for the settings to take effect."
+		::={pdug5ConfigEntry 2}
+		
+pdug5ConfigFtps	OBJECT-TYPE
+		SYNTAX	INTEGER{
+			off(0),
+			on(1)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to off(0) will disable the FTPS connection.
+			 Setting this OID to on(1) will enable the FTPS connection. iNC reboot will be required for the settings to take effect"
+		::={pdug5ConfigEntry 3}
+		
+pdug5ConfigHttp	OBJECT-TYPE
+		SYNTAX	INTEGER{
+			off(0),
+			on(1)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to off(0) will disable the HTTP connection.
+			 Setting this OID to on(1) will enable the HTTP connection.iNC reboot will be required for the settings to take effect"
+		::={pdug5ConfigEntry 4}
+
+pdug5ConfigHttps	OBJECT-TYPE
+		SYNTAX	INTEGER{
+			off(0),
+			on(1)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to off(0) will disable the HTTPS connection.
+			 Setting this OID to on(1) will enable the HTTPS connection.iNC reboot will be required for the settings to take effect"
+		::={pdug5ConfigEntry 5}
+
+pdug5ConfigIPv4IPv6Switch	OBJECT-TYPE
+		SYNTAX	INTEGER{
+			iPv4(1),
+			iPv6(2),
+			iPv4IPv6(3)
+		}
+		ACCESS read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to IPv4(1) will enable the IPv4 configuration.
+			 Setting this OID to IPv6(2) will enable the IPv6 configuration.
+			 Setting this OID to IPv4&IPv6(3) will enable both IPv4 and IPv6 configuration.iNC reboot will be required for the settings to take effect"
+		::={pdug5ConfigEntry 6}		
+		
+pdug5ConfigRedfishAPI OBJECT-TYPE
+		SYNTAX  INTEGER{
+			off(0),
+			on(1)
+		}
+		ACCESS read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to off(0) will disable the Redfish API.
+			 Setting this OID to on(1) will enable the Redfish API.iNC reboot will be required for the settings to take effect"
+		::={pdug5ConfigEntry 7}
+		
+pdug5ConfigOledDispalyOrientation	OBJECT-TYPE
+		SYNTAX INTEGER{
+			displayNormal(1),
+			displayReverse(2)
+		}
+		ACCESS read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Indicates the intended physical orientation of OLED display.
+			 displayNormal(1) indicates normal orientation.
+			 displayReverse(2) indicates upside down orientation."
+		::={pdug5ConfigEntry 8}
+		
+pdug5ConfigEnergyReset	OBJECT-TYPE
+		SYNTAX INTEGER{
+			noOperation(1),
+			reset(2),
+			notSupported(3)
+		}
+		ACCESS read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this OID to reset(2) will cause the device energy meter value 
+			 to be reset to zero. Getting this OID in models that support this feature
+			 will do nothing and return the noOperation(1) value. Models that do not
+			 supported this feature will respond to this OID with a value of notSupported(3).
+			 Attempts to set this OID in these models will fail."
+		::={pdug5ConfigEntry 9}
+		
+pdug5ConfigNetworkManagementCardReset  OBJECT-TYPE
+		SYNTAX INTEGER{
+			noOperation(0),
+			reset(1)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"Getting this OID will return noOperation(0).
+			 Getting this OID to reset(1) will reset iNC."
+		::={pdug5ConfigEntry 10} 
+		
+pdug5ConfigDaisyChainStatus	OBJECT-TYPE 
+		SYNTAX INTEGER{
+			daisychain(0),
+            rna(1)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"Setting this OID will change daisychain mode. 0:QNA,1:DNA."
+		::={pdug5ConfigEntry 11}
+		
+-- ====================================================================================--
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}
+--  pdug5Ident                OBJECT IDENTIFIER       ::= { pdug5 2 }
+--  PDU input group
+--  OID= .1.3.6.1.4.1.19536.10.1.2
+   
+pdug5InputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF pdug5InputEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to pdug5NumberPDU ."
+	::= { pdug5Input 1 }
+
+pdug5InputEntry  OBJECT-TYPE
+	SYNTAX 	pdug5InputEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"The ident table entry containing the VA, Watts, WH, etc."
+	INDEX { pdug5IdentIndex }
+	::= { pdug5InputTable 1 }
+
+pdug5InputEntry ::= SEQUENCE {
+	pdug5InputType			INTEGER,
+	pdug5InputFrequency		INTEGER,
+	pdug5InputFrequencyStatus	INTEGER,
+	pdug5InputPowerVA		INTEGER,
+	pdug5InputPowerWatts		INTEGER,
+	pdug5InputTotalEnergy		INTEGER,
+	pdug5InputPowerWattHourTimer	DisplayString,
+	pdug5InputResettableEnergy	INTEGER,
+	pdug5InputPowerFactor		INTEGER,
+	pdug5InputPowerVAR		INTEGER,
+	pdug5InputTotalCurrent		INTEGER
+        }
+
+pdug5InputType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		splitPhase (2),
+		threePhaseDelta (3),
+		threePhaseWye (4)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Type of input - single phase, split phase, three phase delta, or three
+				phase wye."
+	::= { pdug5InputEntry 1 }
+
+pdug5InputFrequency  OBJECT-TYPE
+	SYNTAX     INTEGER (0..2147483647) -- UNITS RMS 0.001 Hz
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"The measured input frequency from the PDU meters in tenths of Hz."
+	::= { pdug5InputEntry 2 }
+
+pdug5InputFrequencyStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		outOfRange (2)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Status of the measured input frequency relative to the nominal frequency and the admitted tolerance."
+	::= { pdug5InputEntry 3 }
+
+pdug5InputPowerVA  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Units in VA
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input VA of all phases.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputEntry 4 }
+
+pdug5InputPowerWatts  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Units in Watts
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input Watts of all phases.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputEntry 5 }
+
+pdug5InputTotalEnergy  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Units in KWh
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input Watt-Hour value for all phases.  Units are KWh. This value is accumulated since PDU in service.   
+                 A negative value indicates that this object is not available."
+	::= { pdug5InputEntry 6 }
+
+pdug5InputPowerWattHourTimer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..22))  -- display Date Time Since Last Reset
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Timestamp of when the Total Input WH was last reset."
+	::= { pdug5InputEntry 7 }
+
+pdug5InputResettableEnergy  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Units in Wh
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input Watt-Hour value for all phases.  Units are Wh. This value can be reset to 0 
+                using GUI. In that case, the pdug5InputPowerWattHourTimer will be reset as well  
+                A negative value indicates that this object is not available."
+	::= { pdug5InputEntry 8 }
+
+pdug5InputPowerFactor  OBJECT-TYPE
+	SYNTAX     INTEGER	-- units 0.01
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An input PF value.  Units are in thousandths, for example a power factor
+		 of 0.95 would be returned as 95, and 0.92 would be returned as 92.  
+                 A negative value indicates that this object is not available."
+	::= { pdug5InputEntry 9 }
+
+pdug5InputPowerVAR  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Units in VAR
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An input VAR value.  Units are VAR.  A negative value indicates
+		 that this object is not available."
+	::= { pdug5InputEntry 10 }
+
+pdug5InputTotalCurrent  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Units are 0.01 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"All phases total current value.  Units are 0.01 amps. 
+		For 3 phase, mathematically add totally 3 phase current together."
+	::= { pdug5InputEntry 11 }
+
+-- ==========Input per Phase =============
+
+pdug5InputPhaseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF pdug5InputPhaseEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+           "Aggregate Object with number of entries equal to number of PDUs (pdug5NumberPDU) and
+            number of input phase (pdug5InputPhaseCount)."
+    ::= {pdug5Input 2}
+
+pdug5InputPhaseEntry OBJECT-TYPE
+    SYNTAX pdug5InputPhaseEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The input table entry containing the voltage, current, frequency, power for each phase.
+            Entries are given with number of pdu and number of input phase 1, 2, or 3."
+    INDEX { pdug5IdentIndex, pdug5InputPhaseIndex }
+    ::= { pdug5InputPhaseTable 1 }
+
+pdug5InputPhaseEntry ::= SEQUENCE {
+      pdug5InputPhaseIndex      			INTEGER,
+      pdug5InputPhaseVoltageMeasType  		INTEGER,
+      pdug5InputPhaseVoltage    			INTEGER,
+      pdug5InputPhaseVoltageThStatus  		INTEGER,
+      pdug5InputPhaseVoltageThLowerWarning  	INTEGER,
+      pdug5InputPhaseVoltageThLowerCritical  	INTEGER,
+      pdug5InputPhaseVoltageThUpperWarning  	INTEGER,
+      pdug5InputPhaseVoltageThUpperCritical  	INTEGER,
+      pdug5InputPhaseCurrentMeasType		INTEGER,
+      pdug5InputPhaseCurrentRating		INTEGER,
+      pdug5InputPhaseCurrent    			INTEGER,
+      pdug5InputPhaseCurrentThStatus		INTEGER,
+      pdug5InputPhaseCurrentThLowerWarning	INTEGER,
+      pdug5InputPhaseCurrentThLowerCritical	INTEGER,
+      pdug5InputPhaseCurrentThUpperWarning	INTEGER,
+      pdug5InputPhaseCurrentThUpperCritical	INTEGER,
+      pdug5InputPhaseCurrentPercentLoad		INTEGER,
+      pdug5InputPhasePowerMeasType		INTEGER,
+      pdug5InputPhasePowerVA			INTEGER,
+      pdug5InputPhasePowerWatts 			INTEGER,
+      pdug5InputPhasePowerWattHour		INTEGER,
+      pdug5InputPhasePowerWattHourTimer		DisplayString,
+      pdug5InputPhasePowerFactor			INTEGER,
+      pdug5InputPhasePowerVAR			INTEGER,
+      pdug5InputPhaseVoltageThResetThld  	INTEGER,
+      pdug5InputPhaseVoltageThChangeDelay  	INTEGER,
+      pdug5InputPhaseVoltageThCtrl			INTEGER,
+      pdug5InputPhaseCurrentThResetThld  	INTEGER,
+      pdug5InputPhaseCurrentThChangeDelay  	INTEGER,
+      pdug5InputPhaseCurrentThCtrl			INTEGER,
+      pdug5InputPowerThresholdThLowerWarning  	INTEGER,
+      pdug5InputPowerThresholdThLowerCritical  	INTEGER,
+      pdug5InputPowerThresholdThUpperWarning  	INTEGER,
+      pdug5InputPowerThresholdThUpperCritical  	INTEGER,
+      pdug5InputPowerThresholdThResetThld  	INTEGER,
+      pdug5InputPowerThresholdThChangeDelay  	INTEGER,
+      pdug5InputPowerThresholdThCtrl			INTEGER,
+	  pdug5InputEnergyThresholdThUpperWarning  	INTEGER,
+      pdug5InputEnergyThresholdThUpperCritical  	INTEGER,
+      pdug5InputEnergyThresholdThResetThld  	INTEGER,
+      pdug5InputEnergyThresholdThChangeDelay  	INTEGER,
+      pdug5InputEnergyThresholdThCtrl			INTEGER
+    }
+
+pdug5InputPhaseIndex OBJECT-TYPE
+    SYNTAX INTEGER	(1..3)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the pdug5InputEntry table."
+    ::= { pdug5InputPhaseEntry 1}
+
+pdug5InputPhaseVoltageMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Value indicates what input voltage is being measured in this table row - single phase
+		voltage, phase 1 to neutral, phase 2 to neutral, phase 3 to neutral, phase 1 to phase 2,
+		phase 2 to phase 3, or phase 3 to phase 1."
+	::= { pdug5InputPhaseEntry 2 }
+
+pdug5InputPhaseVoltage OBJECT-TYPE
+    SYNTAX   INTEGER    -- UNITS RMS 0.1 V
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+	"An input voltage measurement value.  Values is in 0.1 V."
+    ::= {pdug5InputPhaseEntry 3}
+
+pdug5InputPhaseVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured input voltage relative to the configured thresholds."
+	::= { pdug5InputPhaseEntry 4 }
+
+pdug5InputPhaseVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.1 V
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 5 }
+
+pdug5InputPhaseVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.1 V
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 6 }
+
+pdug5InputPhaseVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.1 V
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 7 }
+
+pdug5InputPhaseVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.1 V
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 8 }
+
+pdug5InputPhaseCurrentMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		neutral (2),
+		phase1 (3),
+		phase2 (4),
+		phase3 (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Which input wire is being measured in this table row - single phase, neutral, phase 1,
+		phase 2, or phase 3."
+	::= { pdug5InputPhaseEntry 9 }
+
+pdug5InputPhaseCurrentRating  OBJECT-TYPE
+	SYNTAX   INTEGER		-- Units in 0.01 A
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Rated current capacity of the input.  A negative value indicates that
+		the hardware current capacity is unknown.  Units are 0.01 amps."
+	::= { pdug5InputPhaseEntry 10 }
+
+pdug5InputPhaseCurrent  OBJECT-TYPE
+	SYNTAX   INTEGER		-- Units in 0.01 A
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"An input current measurement value.  Units are 0.01 amps."
+	::= { pdug5InputPhaseEntry 11 }
+
+pdug5InputPhaseCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured input current relative to the configured thresholds."
+	::= { pdug5InputPhaseEntry 12 }
+
+pdug5InputPhaseCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units in 0.01 A
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 13 }
+
+pdug5InputPhaseCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units in 0.01 A
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 14 }
+
+pdug5InputPhaseCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in 0.01 A
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 15 }
+
+pdug5InputPhaseCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in 0.01 A
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 16 }
+
+pdug5InputPhaseCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 17 }
+
+pdug5InputPhasePowerMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		neutral (2),
+		phase1 (3),
+		phase2 (4),
+		phase3 (5)
+	 }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Which input wire is being measured in this table row - single phase, neutral, phase 1,
+		phase 2, or phase 3."
+	::= { pdug5InputPhaseEntry 18 }
+
+pdug5InputPhasePowerVA  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 19 }
+
+pdug5InputPhasePowerWatts  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 20 }
+
+pdug5InputPhasePowerWattHour  OBJECT-TYPE
+	SYNTAX     INTEGER 
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Watt-Hour value for each Input phase.  Units are WH. This value can be reset to 0 
+                 using GUI. In that case, the pdug5InputPhasePowerWattHourTimer will be reset as well    
+                 A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 21 }
+
+pdug5InputPhasePowerWattHourTimer  OBJECT-TYPE
+	SYNTAX    DisplayString (SIZE (0..22))  -- display Date Time
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Timestamp of when input Watt-hours (inputWh) was last reset."
+	::= { pdug5InputPhaseEntry 22 }
+
+pdug5InputPhasePowerFactor  OBJECT-TYPE
+	SYNTAX    INTEGER		-- units 0.01
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input PF value.  Units are in thousandths, for example a power factor
+                 of 0.95 would be returned as 95, and 0.92 would be returned 
+		 as 92.  A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 23 }
+
+pdug5InputPhasePowerVAR  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 24 }
+	
+-- 1.3.6.1.4.1.19536.10.1.2.2.1.25
+pdug5InputPhaseVoltageThResetThld OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+    "Input phase voltage alarm reset threshold.  Units are 0.1 volts.  
+              A negative value indicates that this object is not available."
+	DEFVAL { 0 }
+	::= { pdug5InputPhaseEntry 25 }
+	
+-- 1.3.6.1.4.1.19536.10.1.2.2.1.26
+pdug5InputPhaseVoltageThChangeDelay OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Input phase voltage alarm change delay.  Units are 0.1 volts.  
+              A negative value indicates that this object is not available."
+	DEFVAL { 0 }
+	::= { pdug5InputPhaseEntry 26 }
+	
+-- 1.3.6.1.4.1.19536.10.1.2.2.1.27
+pdug5InputPhaseVoltageThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Input phase voltage alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5InputPhaseEntry 27 }
+
+-- 1.3.6.1.4.1.19536.10.1.2.2.1.28
+pdug5InputPhaseCurrentThResetThld  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in 0.01 A
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Input phase current alarm reset threshold.  Units are 0.01 amps.  
+              A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 28 }
+	
+-- 1.3.6.1.4.1.19536.10.1.2.2.1.29
+pdug5InputPhaseCurrentThChangeDelay  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in 0.01 A
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Input phase current alarm change delay.  Units are 0.01 amps.  
+              A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 29 }
+	
+-- 1.3.6.1.4.1.19536.10.1.2.2.1.30
+pdug5InputPhaseCurrentThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Input phase current alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5InputPhaseEntry 30 }
+
+pdug5InputPowerThresholdThLowerWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in  W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower warning Power threshold.  Units are in Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 31 }
+
+pdug5InputPowerThresholdThLowerCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower critical Power threshold.  Units are in Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 32 }
+
+pdug5InputPowerThresholdThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning Power threshold.  Units are in Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 33 }
+
+pdug5InputPowerThresholdThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical Power threshold.  Units are in Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 34 }
+
+pdug5InputPowerThresholdThResetThld  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Power alarm reset threshold.  Units are in Watts.  
+              A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 35 }
+	
+pdug5InputPowerThresholdThChangeDelay  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Power alarm change delay.  Units are in Watts.  
+              A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 36 }
+	
+pdug5InputPowerThresholdThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Power alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5InputPhaseEntry 37 }
+	
+pdug5InputEnergyThresholdThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning Energy threshold.  Units are in Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 38 }
+
+pdug5InputEnergyThresholdThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical Energy threshold.  Units are in Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5InputPhaseEntry 39 }
+
+pdug5InputEnergyThresholdThResetThld  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Energy alarm reset threshold.  Units are in Watts.  
+              A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 40 }
+	
+pdug5InputEnergyThresholdThChangeDelay  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in W
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Energy alarm change delay.  Units are in Watts.  
+              A negative value indicates that this object is not available."
+	::= { pdug5InputPhaseEntry 41 }
+	
+pdug5InputEnergyThresholdThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Energy alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5InputPhaseEntry 42 }
+
+-- ====================================================================================
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}
+--  pdug5Group                OBJECT IDENTIFIER       ::= { pdug5 3 }
+--  pdug5 Output groups of outlets 
+--  OID= .1.3.6.1.4.1.19536.10.1.3
+
+pdug5GroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF pdug5GroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to number of PDUs
+                 and number of breakers (pdug5GroupCount)."
+    ::= { pdug5Group 1 }
+
+pdug5GroupEntry OBJECT-TYPE
+    SYNTAX pdug5GroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The input table entry containing the name, voltages, currents, power, etc."
+    INDEX { pdug5IdentIndex, pdug5GroupIndex }
+    ::= { pdug5GroupTable 1 }
+
+pdug5GroupEntry ::= SEQUENCE {
+      pdug5GroupIndex         		INTEGER,
+      pdug5GroupName	     		DisplayString,
+      pdug5GroupType          		INTEGER,
+      pdug5GroupVoltageMeasType		INTEGER,
+      pdug5GroupVoltage          	INTEGER,
+      pdug5GroupVoltageThStatus		INTEGER,
+      pdug5GroupVoltageThLowerWarning	INTEGER,
+      pdug5GroupVoltageThLowerCritical	INTEGER,
+      pdug5GroupVoltageThUpperWarning	INTEGER,
+      pdug5GroupVoltageThUpperCritical	INTEGER,
+      pdug5groupCurrentRating		INTEGER,
+      pdug5GroupCurrent			INTEGER,
+      pdug5GroupCurrentThStatus		INTEGER,
+      pdug5GroupCurrentThLowerWarning	INTEGER,
+      pdug5GroupCurrentThLowerCritical	INTEGER,
+      pdug5GroupCurrentThUpperWarning	INTEGER,
+      pdug5GroupCurrentThUpperCritical	INTEGER,
+      pdug5GroupCurrentPercentLoad	INTEGER,
+      pdug5GroupPowerVA			INTEGER,
+      pdug5GroupPowerWatts		INTEGER,
+      pdug5GroupPowerWattHour		INTEGER,
+      pdug5GroupPowerWattHourTimer	DisplayString,
+      pdug5GroupPowerFactor		INTEGER,
+      pdug5GroupPowerVAR			INTEGER,
+      pdug5GroupOutletCount	 	INTEGER,
+      pdug5GroupBreakerStatus    	INTEGER,
+      pdug5GroupVoltageThCtrl    	INTEGER,
+      pdug5GroupCurrentThCtrl    	INTEGER
+    }
+
+pdug5GroupIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..12)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the pdug5GroupEntry table."
+    ::= { pdug5GroupEntry 1 }
+
+pdug5GroupName  OBJECT-TYPE
+	SYNTAX    DisplayString (SIZE(1..31))
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"A descriptive name for the group."
+	::= { pdug5GroupEntry 2 }
+
+pdug5GroupType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		breaker1pole (2),
+		breaker2pole (3),
+		breaker3pole (4),
+		outletSection (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"The type of the group. (5) has no breaker"
+	::= { pdug5GroupEntry 3 }
+
+pdug5GroupVoltageMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Value indicates what input voltage is being measured in this table row - single phase
+		voltage, phase 1 to neutral, phase 2 to neutral, phase 3 to neutral, phase 1 to phase 2,
+		phase 2 to phase 3, or phase 3 to phase 1."
+	::= { pdug5GroupEntry 4 }
+
+pdug5GroupVoltage  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.1 V
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Units are 0.1 volts."
+	::= { pdug5GroupEntry 5 }
+
+pdug5GroupVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Status of the measured group voltage relative to the configured thresholds."
+	::= { pdug5GroupEntry 6 }
+
+pdug5GroupVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..500000)		-- Units 0.1 V
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 7 }
+
+pdug5GroupVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..500000)		-- Units 0.1 V
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 8 }
+
+pdug5GroupVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..500000)		-- Units 0.1 V
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 9 }
+
+pdug5GroupVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..500000)		-- Units 0.1 V
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are 0.1 volts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 10 }
+
+pdug5groupCurrentRating  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.01 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Rated current capacity of the group.  Units are 0.01 amps.  A negative 
+		      value indicates that the hardware current capacity is unknown (it
+		      will always be unknown for custom groups)."
+	::= { pdug5GroupEntry 11 }
+
+pdug5GroupCurrent  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.01 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"A group current measurement value.  Units are 0.01 amps."
+	::= { pdug5GroupEntry 12 }
+
+pdug5GroupCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured group current relative to the configured thresholds."
+	::= { pdug5GroupEntry 13 }
+
+pdug5GroupCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units 0.01 A
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 14 }
+
+pdug5GroupCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.01 A
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 15 }
+
+pdug5GroupCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.01 A
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 16 }
+
+pdug5GroupCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.01 A
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are 0.01 amps.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 17 }
+
+
+pdug5GroupCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { pdug5GroupEntry 18 }
+
+pdug5GroupPowerVA  OBJECT-TYPE
+	SYNTAX     INTEGER  	-- units in VA
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 19 }
+
+pdug5GroupPowerWatts  OBJECT-TYPE
+	SYNTAX     INTEGER	-- units in Watt
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group power value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 20 }
+
+pdug5GroupPowerWattHour  OBJECT-TYPE
+	SYNTAX     INTEGER 	-- Units in Watt-Hour
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Watt-Hour value for each section.  Units are WH. This value can be reset to 0 
+                 using GUI. In that case, the pdug5GroupPowerWattHourTimer will be reset as well.    
+                 A negative value indicates that this object is not available."
+	::= { pdug5GroupEntry 21 }
+
+pdug5GroupPowerWattHourTimer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..22))	-- display Date and Time
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Timestamp of when group Watt-hours (groupWh) was last reset."
+	::= { pdug5GroupEntry 22 }
+
+pdug5GroupPowerFactor  OBJECT-TYPE
+	SYNTAX     INTEGER	-- Value is in 0.01							
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group PF value.  Units are in thousandths, for example a power factor
+                  of 0.95 would be returned as 95, and 0.92 would be returned as 92.  
+                 A negative value indicates that this object is not available."
+	::= { pdug5GroupEntry 23 }
+
+pdug5GroupPowerVAR  OBJECT-TYPE
+	SYNTAX     INTEGER		-- Units in VAR
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5GroupEntry 24 }
+
+pdug5GroupOutletCount  OBJECT-TYPE
+    	SYNTAX     INTEGER (0..48)
+    	ACCESS     read-only
+    	STATUS     mandatory
+    	DESCRIPTION 
+		"The number of outlets in each group (breaker)."
+         ::= { pdug5GroupEntry 25 }
+
+pdug5GroupBreakerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApplicable (1),
+		breakerOn (2),
+		breakerOff (3)
+	}
+	ACCESS 	   read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Only applicable to groups with breaker.  Indicates whether a breaker is turned
+		      off or on."
+	::= { pdug5GroupEntry 26 }
+	
+-- 1.3.6.1.4.1.19536.10.1.3.1.1.27
+pdug5GroupVoltageThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Circuit Breaker voltage alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5GroupEntry 27 }
+
+-- 1.3.6.1.4.1.19536.10.1.3.1.1.28
+pdug5GroupCurrentThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Circuit Breaker current alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	::= { pdug5GroupEntry 28 }
+
+-- ====================================================================================
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}
+--  pdug5Environment          OBJECT IDENTIFIER       ::= { pdug5 4 }
+--  pdug5 Environment group
+--  PDU identification group
+--  OID= .1.3.6.1.4.1.19536.10.1.4
+
+pdug5EnvProbeTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF pdug5EnvProbeEntry
+	ACCESS 	not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"A list of environment probe (1 per PDU) for temperature, humidity, and contacts.  
+                 The number of entries is given by number of PDUs in daisy chain."
+	::= { pdug5Environment 1 }
+
+pdug5EnvProbeEntry  OBJECT-TYPE
+	SYNTAX 	pdug5EnvProbeEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"Aggregate entries equal to number of PDUs."
+	INDEX { pdug5IdentIndex }
+	::= { pdug5EnvProbeTable 1 }
+
+pdug5EnvProbeEntry ::= SEQUENCE {
+	pdug5TemperatureScale		INTEGER,
+	pdug5TemperatureCount		INTEGER,
+	pdug5HumidityCount		INTEGER,
+	pdug5DoorCount		INTEGER,
+    pdug5DryCount       INTEGER,
+    pdug5SpotCount       INTEGER,
+    pdug5RopeCount       INTEGER,
+    pdug5HidCount       INTEGER
+}
+
+pdug5TemperatureScale  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		celsius (1),
+		fahrenheit (2)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION 
+		"Scale used to return temperature objects."
+	::= { pdug5EnvProbeEntry 1 }
+
+pdug5TemperatureCount  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS 	read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"The number of temperature measurements.The MAX is 6 (1 per probe)."
+	::= { pdug5EnvProbeEntry 2  }
+
+pdug5HumidityCount  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"The number of humidity measurements.The MAX is 6(1 per probe)."
+	::= { pdug5EnvProbeEntry 3 }
+
+pdug5DoorCount  OBJECT-TYPE
+	SYNTAX   INTEGER
+	ACCESS 	 read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"The number of door sensors.The MAX is 6(1 per probe)."
+	::= { pdug5EnvProbeEntry 4 }
+	
+pdug5DryCount OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The number of dry sensors.The MAX is 2(1 per probe)."
+	::= { pdug5EnvProbeEntry 5 }
+
+pdug5SpotCount OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The number of spot sensors.The MAX is 2(1 per probe)."
+	::= { pdug5EnvProbeEntry 6 }
+
+pdug5RopeCount OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The number of rope sensors.The MAX is 2(1 per probe)."
+	::= { pdug5EnvProbeEntry 7 }
+
+pdug5HidCount OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The number of hid sensors. The MAX is 2(1 per probe)."
+	::= { pdug5EnvProbeEntry 10 }
+
+-- ========Temperature Measurements ============
+
+pdug5TemperatureTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF pdug5TemperatureEntry
+	ACCESS 	not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"A list of temperature probe measurements.  The number of entries are
+		 given by number of pdu and pdug5TemperatureCount."
+	::= { pdug5Environment 2 }
+
+pdug5TemperatureEntry  OBJECT-TYPE
+	SYNTAX 	pdug5TemperatureEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"An entry for a temperature measurement."
+	INDEX { pdug5IdentIndex, pdug5TemperatureIndex }
+	::= { pdug5TemperatureTable 1 }
+
+pdug5TemperatureEntry ::= SEQUENCE {
+	pdug5TemperatureIndex		INTEGER,
+	pdug5TemperatureName		DisplayString,
+	pdug5TemperatureProbeStatus	INTEGER,
+	pdug5TemperatureValue		INTEGER,
+	pdug5TemperatureThStatus		INTEGER,
+	pdug5TemperatureThLowerWarning	INTEGER,
+	pdug5TemperatureThLowerCritical	INTEGER,
+	pdug5TemperatureThUpperWarning	INTEGER,
+	pdug5TemperatureThUpperCritical	INTEGER,
+	pdug5TemperatureThCtrl	INTEGER	
+}
+
+pdug5TemperatureIndex  OBJECT-TYPE
+	SYNTAX   INTEGER (1..6)
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A unique value for each temperature probe measurement.  Its value
+		      ranges from 1 to temperatureCount."
+	::= { pdug5TemperatureEntry 1 }
+
+pdug5TemperatureName  OBJECT-TYPE
+	SYNTAX   DisplayString (SIZE(1..31))
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"A descriptive name for the temperature probe."
+	::= { pdug5TemperatureEntry 2 }
+
+pdug5TemperatureProbeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disconnected (1),
+		connected (2),
+		bad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not."
+	::= { pdug5TemperatureEntry 3 }
+
+pdug5TemperatureValue  OBJECT-TYPE
+	SYNTAX    INTEGER  --0.1 Fahrenheit or Celsius
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Units are degree(either Fahrenheit or Celsius)."
+	::= { pdug5TemperatureEntry 4 }
+
+
+pdug5TemperatureThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured temperature relative to the configured thresholds."
+	::= { pdug5TemperatureEntry 5 }
+
+pdug5TemperatureThLowerWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..150000)
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are degrees.  A negative value
+                  indicates that this object is not available."
+	::= { pdug5TemperatureEntry 6 }
+
+pdug5TemperatureThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..150000)
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are degrees.  A negative value
+		          indicates that this object is not available."
+	::= { pdug5TemperatureEntry 7 }
+
+pdug5TemperatureThUpperWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..150000)
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are degrees.  A negative value
+                  indicates that this object is not available."
+	::= { pdug5TemperatureEntry 8 }
+
+pdug5TemperatureThUpperCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..150000)
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are degrees. A negative value
+                  indicates that this object is not available."
+	::= { pdug5TemperatureEntry 9 }
+	
+-- 1.3.6.1.4.1.19536.10.1.4.2.1.10
+pdug5TemperatureThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Temperature alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5TemperatureEntry 10 }
+
+-- ==========Humidity Measurements ==========
+
+pdug5HumidityTable  OBJECT-TYPE
+	SYNTAX   SEQUENCE OF pdug5HumidityEntry
+	ACCESS   not-accessible
+	STATUS   mandatory
+	DESCRIPTION 
+		"A list of humidity probe measurements.  The number of entries are
+		 given by number of pdu and pdug5HumidityCount."
+	::= { pdug5Environment 3 }
+
+pdug5HumidityEntry  OBJECT-TYPE
+	SYNTAX 	pdug5HumidityEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"An entry for a humidity measurement."
+	INDEX { pdug5IdentIndex, pdug5HumidityIndex }
+	::= { pdug5HumidityTable 1 }
+
+pdug5HumidityEntry ::= SEQUENCE {
+	pdug5HumidityIndex		INTEGER,
+	pdug5HumidityName		DisplayString,
+	pdug5HumidityProbeStatus		INTEGER,
+	pdug5HumidityValue		INTEGER,
+	pdug5HumidityThStatus		INTEGER,
+	pdug5HumidityThLowerWarning	INTEGER,
+	pdug5HumidityThLowerCritical	INTEGER,
+	pdug5HumidityThUpperWarning	INTEGER,
+	pdug5HumidityThUpperCritical	INTEGER,
+	pdug5HumidityThCtrl	INTEGER
+}
+
+pdug5HumidityIndex  OBJECT-TYPE
+	SYNTAX     INTEGER (1..6)
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A unique value for each humidity probe measurement.  Its value
+		 ranges from 1 to pdug5HumidityCount per PDU."
+	::= { pdug5HumidityEntry 1 }
+
+pdug5HumidityName  OBJECT-TYPE
+	SYNTAX   DisplayString (SIZE(1..31))
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"A descriptive name for the humidity probe."
+	::= { pdug5HumidityEntry 2 }
+
+pdug5HumidityProbeStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disconnected (1),
+		connected (2),
+		bad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not."
+	::= { pdug5HumidityEntry 3 }
+
+pdug5HumidityValue  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Units are %RH."
+	::= { pdug5HumidityEntry 4 }
+
+pdug5HumidityThStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured humidity relative to the configured thresholds."
+	::= { pdug5HumidityEntry 5 }
+
+pdug5HumidityThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..1000)
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdug5HumidityEntry 6 }
+
+pdug5HumidityThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..1000)
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdug5HumidityEntry 7 }
+
+pdug5HumidityThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..1000)
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdug5HumidityEntry 8 }
+
+pdug5HumidityThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..1000)
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdug5HumidityEntry 9 }
+
+-- 1.3.6.1.4.1.19536.10.1.4.3.1.10
+pdug5HumidityThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Humidity alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5HumidityEntry 10 }
+
+-- ======Door sensor Status==========
+
+pdug5DoorTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF pdug5DoorEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"A list of door sensors.  The number of entries are
+		 given by number of PDU and pdug5DoorCount."
+	::= { pdug5Environment 4 }
+
+pdug5DoorEntry  OBJECT-TYPE
+	SYNTAX 	 pdug5DoorEntry
+	ACCESS   not-accessible
+	STATUS   mandatory
+	DESCRIPTION 
+		"An entry for a door sensor"
+	INDEX { pdug5IdentIndex, pdug5DoorIndex }
+	::= { pdug5DoorTable 1 }
+
+pdug5DoorEntry ::= SEQUENCE {
+	pdug5DoorIndex	INTEGER,
+	pdug5DoorName		DisplayString,
+	pdug5DoorProbeStatus	INTEGER,
+	pdug5DoorState	INTEGER
+}
+
+pdug5DoorIndex  OBJECT-TYPE
+	SYNTAX   INTEGER (1..2)
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A unique value for each door sensor.  Its value ranges from 1 to
+		      doorCount."
+	::= { pdug5DoorEntry 1 }
+
+pdug5DoorName  OBJECT-TYPE
+	SYNTAX    DisplayString (SIZE(1..31))
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"A descriptive name for the door sensor."
+	::= { pdug5DoorEntry 2 }
+
+pdug5DoorProbeStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disconnected (1),
+		connected (2),
+		bad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not.
+		Will not be returned  if the door sensor is internal to the ePDU,
+		in that case only doorState should be read."
+	::= { pdug5DoorEntry 3 }
+
+pdug5DoorState  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		doorOpen (1),
+		doorClosed (2),
+		BaddoorSensor (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"The state of the door sensor."
+	::= { pdug5DoorEntry 4 }
+
+		
+--     ======Dry Sensor Status==========
+		-- 1.3.6.1.4.1.19536.10.1.4.5
+		pdug5DryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF pdug5DryEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A list of dry sensors.  The number of entries are
+				given by number of pdu and pdug5DryCount."
+			::= { pdug5Environment 5 }
+
+		
+
+		-- 1.3.6.1.4.1.19536.10.1.4.5.1
+		pdug5DryEntry OBJECT-TYPE
+			SYNTAX pdug5DryEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"An entry for a contact sensor"
+			INDEX { pdug5IdentIndex, pdug5DryIndex }
+			::= { pdug5DryTable 1 }
+
+		
+		pdug5DryEntry ::=
+			SEQUENCE { 
+				pdug5DryIndex
+					INTEGER,
+				pdug5DryName
+					DisplayString,
+				pdug5DryProbeStatus
+					INTEGER,
+				pdug5DryState
+					INTEGER
+			 }
+
+
+		-- 1.3.6.1.4.1.19536.10.1.4.5.1.1
+		pdug5DryIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..2)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"A unique value for each dry sensor.  Its value ranges from 1 to
+				dryCount."
+			::= { pdug5DryEntry 1 }
+
+		
+
+		-- 1.3.6.1.4.1.19536.10.1.4.5.1.2
+		pdug5DryName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"A descriptive name for the dry sensor."
+			::= { pdug5DryEntry 2 }
+
+		
+
+		-- 1.3.6.1.4.1.19536.10.1.4.5.1.3
+		pdug5DryProbeStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disconnected(1),
+				connected(2),
+				bad(3)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Indicates whether a probe is connected or not."
+			::= { pdug5DryEntry 3 }
+
+		
+
+		-- 1.3.6.1.4.1.19536.10.1.4.5.1.4
+		pdug5DryState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				good(1),
+				alarmed(2)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The state of the dry sensor."
+			::= { pdug5DryEntry 4 }
+
+		
+--     ====== Water Spot Sensor Status==========
+
+		-- 1.3.6.1.4.1.19536.10.1.4.6
+		pdug5SpotTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF pdug5SpotEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A list of contact sensors.  The number of entries are
+				given by number of pdu and pdug5SpotCount."
+			::= { pdug5Environment 6 }
+
+		
+
+		-- 1.3.6.1.4.1.19536.10.1.4.6.1
+		pdug5SpotEntry OBJECT-TYPE
+			SYNTAX pdug5SpotEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"An entry for a contact sensor"
+			INDEX { pdug5IdentIndex, pdug5SpotIndex }
+			::= { pdug5SpotTable 1 }
+
+		
+		pdug5SpotEntry ::=
+			SEQUENCE { 
+				pdug5SpotIndex
+					INTEGER,
+				pdug5SpotName
+					DisplayString,
+				pdug5SpotProbeStatus
+					INTEGER,
+				pdug5SpotState
+					INTEGER
+			 }
+
+
+		-- 1.3.6.1.4.1.19536.10.1.4.6.1.1
+		pdug5SpotIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..3)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"A unique value for each spot sensor.  Its value ranges from 1 to
+				spotCount."
+			::= { pdug5SpotEntry 1 }
+
+		
+
+		-- 1.3.6.1.4.1.19536.10.1.4.6.1.2
+		pdug5SpotName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"A descriptive name for the spot sensor."
+			::= { pdug5SpotEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.6.1.3
+		pdug5SpotProbeStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disconnected(1),
+				connected(2),
+				bad(3)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Indicates whether a probe is connected or not."
+			::= { pdug5SpotEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.6.1.4
+		pdug5SpotState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				noleak(1),
+				leak(2)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The state of the spot sensor."
+			::= { pdug5SpotEntry 4 }
+
+		
+--     ======Water Rope Sensor Status==========
+		-- 1.3.6.1.4.1.19536.10.1.4.7
+		pdug5RopeTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF pdug5RopeEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A list of rope sensors.  The number of entries are
+				given by number of pdu and pdug5RopeCount."
+			::= { pdug5Environment 7 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.7.1
+		pdug5RopeEntry OBJECT-TYPE
+			SYNTAX pdug5RopeEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"An entry for a contact sensor"
+			INDEX { pdug5IdentIndex, pdug5RopeIndex }
+			::= { pdug5RopeTable 1 }
+
+		
+		pdug5RopeEntry ::=
+			SEQUENCE { 
+				pdug5RopeIndex
+					INTEGER,
+				pdug5RopeName
+					DisplayString,
+				pdug5RopeProbeStatus
+					INTEGER,
+				pdug5RopeState
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.19536.10.1.4.7.1.1
+		pdug5RopeIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..3)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"A unique value for each rope sensor.  Its value ranges from 1 to
+				ropeCount."
+			::= { pdug5RopeEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.7.1.2
+		pdug5RopeName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"A descriptive name for the rope sensor."
+			::= { pdug5RopeEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.7.1.3
+		pdug5RopeProbeStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disconnected(1),
+				connected(2),
+				bad(3)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Indicates whether a probe is connected or not."
+			::= { pdug5RopeEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.7.1.4
+		pdug5RopeState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				noleak(1),
+				leak(2)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The state of the rope sensor."
+			::= { pdug5RopeEntry 4 }
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.10
+		pdug5EnvHID OBJECT IDENTIFIER ::= { pdug5Environment 10 }
+
+		
+--     ======Hid Sensor Status==========
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1
+		pdug5EnvHidTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF pdug5EnvHidEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A list of contact sensors.  The number of entries are
+				given by number of pdu and pdug5HidCount."
+			::= { pdug5EnvHID 1 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1.1
+		pdug5EnvHidEntry OBJECT-TYPE
+			SYNTAX pdug5EnvHidEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"An entry for a contact sensor"
+			INDEX { pdug5IdentIndex, pdug5HIDIndex }
+			::= { pdug5EnvHidTable 1 }
+
+		
+		pdug5EnvHidEntry ::=
+			SEQUENCE { 
+				pdug5HIDIndex
+					INTEGER,
+				pdug5HidAisle
+					INTEGER,
+				pdug5HidHandleOperation		
+					INTEGER	
+			 }
+
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1.1.1
+		pdug5HIDIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..2)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The index of the PDU HID table entry"
+			::= { pdug5EnvHidEntry 1 }
+
+		
+	
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1.1.2
+		pdug5HidAisle OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				COLD(1),
+				HOT(2)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Aisle of HID handle. "
+			::= { pdug5EnvHidEntry 2 }		
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1.1.3
+		pdug5HidHandleOperation OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unlock(1),
+				lock(2)
+				}
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"HID handle control opterations "
+			::= { pdug5EnvHidEntry 3 }	
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1.1.4
+		pduHIDVer OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..63))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The firmware revision level of the HID"
+			::= { pdug5EnvHidEntry 4 }
+		-- 1.3.6.1.4.1.19536.10.1.4.10.1.1.5
+		pdug5MechanicalLock OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unlock(1),
+				lock(2)
+				}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"HID Mechanical opterations "
+			::= { pdug5EnvHidEntry 5 }		
+--     ======Hid hid control table==========
+		-- 1.3.6.1.4.1.19536.10.1.4.10.2
+		pdug5EnvHidControlTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF pdug5EnvHidControlEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A list of smartcard.  The number of entries are
+				given by number of pdu and pdug5HidCount."
+			::= { pdug5EnvHID 2 }
+
+		
+		-- 1.3.6.1.4.1.19536.10.1.4.10.2.1
+		pdug5EnvHidControlEntry OBJECT-TYPE
+			SYNTAX pdug5EnvHidControlEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"The smartcard table entry containing the usrname, cardid, cardaisle etc."
+			INDEX { pdug5IdentIndex, pdug5HidControlIndex }
+			::= { pdug5EnvHidControlTable 1 }
+
+		
+		pdug5EnvHidControlEntry ::=
+			SEQUENCE { 
+				pdug5HidControlIndex			INTEGER,
+				pdug5HidControlUserName			DisplayString,
+				pdug5HidControlCardID			INTEGER,
+				pdug5HidControlTimestamp		DisplayString,
+				pdug5HidControlCardAisle		INTEGER
+			 }
+		-- 1.3.6.1.4.1.19536.10.1.4.10.2.1.1
+		pdug5HidControlIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..2)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The index of the PDU smartcard table entry"
+			::= { pdug5EnvHidControlEntry 1 }			 
+		-- 1.3.6.1.4.1.19536.10.1.4.10.2.1.2
+		pdug5HidControlUserName OBJECT-TYPE
+			SYNTAX DisplayString
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"User name of smartcard"
+			::= { pdug5EnvHidControlEntry 2 }	
+			
+		-- 1.3.6.1.4.19536.10.1.4.10.2.1.3
+		pdug5HidControlCardID OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"HID smartcard ID."
+			::= { pdug5EnvHidControlEntry 3 }	
+		
+		-- 1.3.6.1.4.19536.10.1.4.10.2.1.4
+		pdug5HidControlTimestamp OBJECT-TYPE
+			SYNTAX DisplayString
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Indicates the date and time of accessing"
+			::= { pdug5EnvHidControlEntry 4 }
+
+		
+		-- 1.3.6.1.4.19536.10.1.4.10.2.1.5
+		pdug5HidControlCardAisle OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				COLD(1),
+				HOT(2)
+				}
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Aisle of authorized card. "
+			::= { pdug5EnvHidControlEntry 5 }				
+		
+-- ====================================================================================
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}
+--  pdug5Outlet               OBJECT IDENTIFIER       ::= { pdug5 5 }
+--  OID= .1.3.6.1.4.1.19536.10.1.5
+
+pdug5OutletTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF pdug5OutletEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to Number of PDU (pdug5IdentIndex)
+                 and Number of outlet per PDU (pdug5OutletIndex)."
+	::= { pdug5Outlet 1 }
+
+pdug5OutletEntry  OBJECT-TYPE
+	SYNTAX 	pdug5OutletEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"The Outlet table entry containing the type, voltage, current etc."
+  INDEX { pdug5IdentIndex, pdug5OutletIndex }
+	::= { pdug5OutletTable 1 }
+
+pdug5OutletEntry ::= SEQUENCE {
+	pdug5OutletIndex				INTEGER,
+	pdug5OutletName				DisplayString,
+	pdug5OutletType				INTEGER,
+	pdug5OutletCurrentRating			INTEGER,
+	pdug5OutletCurrent			INTEGER,
+	pdug5OutletActivePowerThStatus		INTEGER,
+	pdug5OutletActivePowerThLowerWarning	INTEGER,
+	pdug5OutletActivePowerThLowerCritical	INTEGER,
+	pdug5OutletActivePowerThUpperWarning	INTEGER,
+	pdug5OutletActivePowerThUpperCritical	INTEGER,
+	pdug5OutletCurrentPercentLoad		INTEGER,
+	pdug5OutletVA				INTEGER,
+	pdug5OutletWatts				INTEGER,
+	pdug5OutletWh				INTEGER,
+	pdug5OutletWhTimer			DisplayString,
+	pdug5OutletPowerFactor			INTEGER,
+	pdug5OutletVAR				INTEGER,
+	pdug5OutletBranch           INTEGER,
+	pdug5OutletActivePowerThResetThld	INTEGER,
+	pdug5OutletActivePowerThChangeDelay	INTEGER,
+	pdug5OutletActivePowerThCtrl           INTEGER
+}
+
+pdug5OutletIndex OBJECT-TYPE
+    	SYNTAX INTEGER	(0..48)
+    	ACCESS read-only
+    	STATUS mandatory
+    	DESCRIPTION
+		"Index for each outlet, value from 1 to the number of outlets per PDU."
+    	::= { pdug5OutletEntry 1 }
+
+pdug5OutletName  OBJECT-TYPE
+	SYNTAX   DisplayString (SIZE(1..31))
+	ACCESS   read-write
+	STATUS   mandatory
+	DESCRIPTION 
+		"A descriptive name for the outlet."
+	::= { pdug5OutletEntry 2 }
+
+pdug5OutletType  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		iecC13 (1),
+		iecC19 (2),
+		i5-20R (3),
+		uk (10),
+		french (11),
+		schuko (12),
+		nema515 (20),
+		nema51520 (21),
+		nema520 (22),
+		nemaL520 (23),
+		nemaL530 (24),
+		nema615 (25),
+		nema620 (26),
+		nemaL620 (27),
+		nemaL630 (28),
+		nemaL715 (29),
+		rf203p277 (30)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Type of this outlet - C13, C19 ,5-20R."
+	::= { pdug5OutletEntry 3 }
+
+pdug5OutletCurrentRating  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.01 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Rated current capacity of this outlet.  Units are 0.01 amps.  A negative 
+		 value indicates that the hardware current capacity is unknown."
+	::= { pdug5OutletEntry 4 }
+
+pdug5OutletCurrent  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.01 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"A outlet current measurement value.  Units are 0.01 amps."
+	::= { pdug5OutletEntry 5 }
+
+pdug5OutletActivePowerThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured outlet active power relative to the configured thresholds."
+	::= { pdug5OutletEntry 6 }
+
+pdug5OutletActivePowerThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..10000)		
+	ACCESS    read-write
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are Watts(W).  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 7 }
+
+pdug5OutletActivePowerThLowerCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..10000)		
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are Watts(W).  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 8 }
+
+pdug5OutletActivePowerThUpperWarning  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..10000)		
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are Watts(W).  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 9 }
+
+pdug5OutletActivePowerThUpperCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..10000)		
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are Watts(W).  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 10 }
+
+
+pdug5OutletCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     INTEGER		-- unit in percentage
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { pdug5OutletEntry 11 }
+
+pdug5OutletVA  OBJECT-TYPE
+	SYNTAX     INTEGER  	-- units in VA
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A outlet VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 12 }
+
+pdug5OutletWatts  OBJECT-TYPE
+	SYNTAX     INTEGER	-- units in Watt
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A outlet Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 13 }
+
+pdug5OutletWh  OBJECT-TYPE
+	SYNTAX     INTEGER 	-- Units in Watt-Hour
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Watt-Hour value for each outlet.  Units are WH.
+This object is writable so that it can be reset to 0.  When it is
+		written to, the pdug5OutletWhTimer will be reset updated as well    
+      A negative value indicates that this object is not available."
+	::= { pdug5OutletEntry 14 }
+
+pdug5OutletWhTimer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..22))	-- display Date and Time
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Timestamp (date and time) of outlet Watt-hours was last reset."
+	::= { pdug5OutletEntry 15 }
+
+pdug5OutletPowerFactor  OBJECT-TYPE
+	SYNTAX     INTEGER		-- units are in 0.01
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An outlet PF value.  Units are in thousandths, for example a power factor
+                  of 0.95 would be returned as 95, and 0.92 would be returned 
+		          as 92.  A negative value indicates that this object is not available."
+	::= { pdug5OutletEntry 16 }
+
+pdug5OutletVAR  OBJECT-TYPE
+	SYNTAX     INTEGER		-- Units in VAR
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An outlet VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdug5OutletEntry 17 }
+
+pdug5OutletBranch  OBJECT-TYPE
+	SYNTAX     INTEGER		-- Units in VAR
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"The branch number outlet located."
+	::= { pdug5OutletEntry 18 }
+
+-- 1.3.6.1.4.1.19536.10.1.5.1.1.19
+pdug5OutletActivePowerThResetThld  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..10000)		
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Outlet Active Power alarm reset threshold.  Units are Watts(W).  
+              A negative value indicates that this object is not available."
+	::= { pdug5OutletEntry 19 }
+
+-- 1.3.6.1.4.1.19536.10.1.5.1.1.20
+pdug5OutletActivePowerThChangeDelay  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..10000)		
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Outlet Active Power generates alarm every outlet alarm times.   
+              A negative value indicates that this object is not available."
+	::= { pdug5OutletEntry 20 }
+	
+-- 1.3.6.1.4.1.19536.10.1.5.1.1.21
+pdug5OutletActivePowerThCtrl OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Outlet Active Power alarm threshold control:
+		bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
+		bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable
+		bit 2:  low warning alarm control bit, 0 -  enable, 1 -  disable
+		bit 3:  low critical alarm control bit,   0 -  enable, 1 -  disable"
+	DEFVAL { 0 }
+	::= { pdug5OutletEntry 21 }
+
+-- ====================== PDU Outlet Control=====================
+
+pdug5OutletControlTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF pdug5OutletControlEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to Number of PDU (pdug5IdentIndex) 
+                 and Number of outlets per PDU (pdug5OutletIndex)."
+	::= { pdug5Outlet 2 }
+
+pdug5OutletControlEntry  OBJECT-TYPE
+	SYNTAX 	pdug5OutletControlEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"The Outlet table entry containing the type, voltage, current etc."
+  INDEX { pdug5IdentIndex, pdug5OutletIndex }
+	::= { pdug5OutletControlTable 1 }
+
+pdug5OutletControlEntry ::= SEQUENCE {
+
+	pdug5OutletControlStatus			INTEGER,
+	pdug5OutletControlOffCmd			INTEGER,
+	pdug5OutletControlOnCmd			INTEGER,
+	pdug5OutletControlRebootCmd		INTEGER,
+	pdug5OutletControlPowerOnState		INTEGER,
+	pdug5OutletControlSequenceDelay		INTEGER,
+	pdug5OutletControlRebootOffTime		INTEGER,
+	pdug5OutletControlSwitchable		INTEGER,
+	pdug5OutletControlShutoffDelay		INTEGER,
+	pdug5OutletControlCommand			INTEGER
+}
+
+pdug5OutletControlStatus  OBJECT-TYPE
+    	SYNTAX 		INTEGER	{
+			off (1),
+			on (2),
+			pendingOff (3),
+			pendingOn (4)
+			}
+    	ACCESS 		read-only
+    	STATUS 		mandatory
+    	DESCRIPTION
+		"current state of a control outlet."
+    	::= { pdug5OutletControlEntry 1 }
+
+pdug5OutletControlOffCmd  OBJECT-TYPE
+    	SYNTAX 		 INTEGER (-1..99999)		
+    	ACCESS 		 read-write
+    	STATUS 		 mandatory
+    	DESCRIPTION
+		"When write, once issued, the outlet will turn Off immediately.
+                 0-n: Time in seconds until the outlet command is issued
+                 -1: Cancel a pending outlet Off command
+		 When read, returns -1 if no command is pending, or the current downcount in 
+                 seconds of a pending command."
+    	::= { pdug5OutletControlEntry 2 }
+
+pdug5OutletControlOnCmd  OBJECT-TYPE
+    	SYNTAX 		INTEGER (-1..99999)		
+    	ACCESS 		read-write
+    	STATUS 		mandatory
+    	DESCRIPTION
+		"When write, once issued, the outlet will turn On immediately.
+                 0-n: Time in seconds until the outlet command is issued
+                 -1: Cancel a pending outlet On command
+		 When read, returns -1 if no command is pending, or the current downcount in 
+                 seconds of a pending command."
+    	::= { pdug5OutletControlEntry 3 }
+
+pdug5OutletControlRebootCmd  OBJECT-TYPE
+    	SYNTAX 		    INTEGER (-1..99999)		
+    	ACCESS 		    read-write
+    	STATUS 		    mandatory
+    	DESCRIPTION
+		"When write, for outlets that are On prior to this Reboot command, they will 
+                 switch Off immediately when the command is issued, remain Off for 
+                 outletControlRebootOffTime seconds, and then turn back On.
+		 For outlets that are Off prior to the Reboot command, they will turn On after 
+                 a delay of outletControlRebootOffTime seconds from when the command is issued.
+		 0-n : Time in seconds until the Reboot command is issued
+		 -1 : Cancel a pending outlet Reboot command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in 
+                seconds of a pending command."
+    	::= { pdug5OutletControlEntry 4 }
+
+pdug5OutletControlPowerOnState  OBJECT-TYPE
+    	SYNTAX 		    INTEGER {
+		            off (1),
+		            on (2),
+		            lastState (3)
+                            }	
+    	ACCESS 		    read-write
+    	STATUS 		    mandatory
+    	DESCRIPTION
+		"Determines the outlet state when power is applied to the unit.
+		1 : not restart at device startup
+		2 : should sequence back ON in line with outletControlSequenceTime
+		3 : should take the state the outlet had when power was lost.
+		If the state was ON, should sequence back ON in line with outletControlSequenceTime."
+    	::= { pdug5OutletControlEntry 5 }
+
+pdug5OutletControlSequenceDelay  OBJECT-TYPE
+    	SYNTAX 		        INTEGER (-1..7200)		
+    	ACCESS 		        read-write
+    	STATUS 		        mandatory
+    	DESCRIPTION
+		"Time delay in seconds from when a Global Sequence On command is issued to
+		when the command is executed on this outlet.  This delay is also used as a power-on
+		delay. Set to -1 to exclude this outlet from Global Sequence On commands."
+    	::= { pdug5OutletControlEntry 6 }
+
+pdug5OutletControlRebootOffTime  OBJECT-TYPE
+    	SYNTAX 		        INTEGER (-1..7200)		
+    	ACCESS 		        read-write
+    	STATUS 		        mandatory
+    	DESCRIPTION
+		"Time delay in seconds that the outlet should remain in the Off state when executing a Reboot command."
+    	::= { pdug5OutletControlEntry 7 }
+
+pdug5OutletControlSwitchable  OBJECT-TYPE
+    	SYNTAX 		    INTEGER {
+		            switchable (1),
+		            notSwitchable (2)
+                            }	
+    	ACCESS 		    read-write
+    	STATUS 		    mandatory
+    	DESCRIPTION
+		"Determines the outlet capability to be controlled On/Off from the communication channels.
+		1 : control On/Off enabled
+		2 : control On/Off disabled."
+    	::= { pdug5OutletControlEntry 8 }
+
+pdug5OutletControlShutoffDelay  OBJECT-TYPE
+    	SYNTAX 		        INTEGER (-1..7200)		
+    	ACCESS 		        read-write
+    	STATUS 		        mandatory
+    	DESCRIPTION
+		"Time delay in seconds that could be taken in account before shutting of the outlet.
+    An application which need to shutoff properly an outlet will read this parameter first
+    then write it to the command pdug5OutletControlOffCmd."
+    	::= { pdug5OutletControlEntry 9 }
+
+		
+pdug5OutletControlCommand  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		immediateOff (1),
+		immediateOn (2),
+		delayedOff (3),
+		delayedOn (4),
+		immediateReboot (5),
+		delayedReboot (6),
+		outletUnknown (7)
+		}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Getting this variable will return the outlet state.
+            If the outlet is on, the immediateOn (2) 
+            value will be returned. If the outlet is off, 
+            the immediateOff (1) value will be returned. 
+            If the state of the outlet cannot be determined, the 
+            outletUnknown (7) value will be returned. If the 
+            outletUnknown condition should occur, all devices 
+            powered by the PDU should be shut down. The PDU's 
+            power should then be cycled to clear this condition. 
+            Setting this variable to immediateOn (2) will immediately 
+            turn the outlet on. Setting this variable to 
+            immediateOff (1) will immediately turn the outlet off. 
+            Setting this variable to immediateReboot (5) 
+            will cause the Switched PDU to perform an immediateOff 
+            command, wait the pdug5OutletControlRebootOffTime
+            OID time, and then perform an immediateOn command.
+            Setting this variable to delayedOn (4) will turn the 
+            outlet on after the pdug5OutletControlSequenceDelay
+            OID time has elapsed. Setting this variable to 
+            delayedOff (3) will turn the outlet off after the 
+            pdug5OutletControlShutoffDelay OID time has elapsed. 
+            Setting this variable to delayedReboot  (6) will cause 
+            the Switched PDU to perform a delayedOff command, wait 
+            the pdug5OutletControlRebootOffTime OID time, and 
+            then perform a delayedOn command."
+	::= { pdug5OutletControlEntry 10 }
+	
+-- ====================================================================================
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}  
+--  pdug5Traps                OBJECT IDENTIFIER       ::= { pdug5 6 }
+--  PDU identification group
+--  OID= .1.3.6.1.4.1.19536.10.1.6
+
+trapCritical NOTIFICATION-TYPE
+	OBJECTS  {
+	             trapCode, 
+	             trapDescription, 
+	             sysDescr, 
+	             pdug5IPv4Address}
+        STATUS      current
+	DESCRIPTION
+        "A critical alarm has occurred."
+        ::= {pdug5Traps 1}
+
+trapWarning NOTIFICATION-TYPE
+	OBJECTS  { 
+	             trapCode, 
+	             trapDescription, 
+	             sysDescr, 
+	             pdug5IPv4Address }
+        STATUS      current
+	DESCRIPTION
+        "A warning alarm has occurred."
+        ::= {pdug5Traps 2}
+
+trapInformation NOTIFICATION-TYPE
+	OBJECTS  {
+	             trapCode, 
+	             trapDescription, 
+	             sysDescr, 
+	             pdug5IPv4Address }
+        STATUS      current
+	DESCRIPTION
+        "An informational alarm has occurred."
+        ::= {pdug5Traps 3}
+
+trapCleared NOTIFICATION-TYPE
+	OBJECTS  {
+	             trapCode, 
+	             trapDescription, 
+	             sysDescr, 
+	             pdug5IPv4Address }
+        STATUS      current
+	DESCRIPTION
+        "An alarm has cleared."
+        ::= {pdug5Traps 4}
+
+trapTest NOTIFICATION-TYPE
+        OBJECTS  {
+                     trapCode,
+		             trapDescription,
+                     sysDescr, 
+                     pdug5IPv4Address } 
+        STATUS      current
+        DESCRIPTION
+        "Test trap sent to a trap receiver to check proper reception of traps" 
+        ::= {pdug5Traps 5}
+
+-- ====================================================================================  
+--  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
+--  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}  
+--  pdug5TrapInfo             OBJECT IDENTIFIER       ::= { pdug5 7 }
+--  PDU identification group
+--  OID= .1.3.6.1.4.1.19536.10.1.7
+
+pdug5TrapInfoEntry OBJECT IDENTIFIER ::= { pdug5TrapInfo 1 }
+
+trapCode OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"A number identifying the event for the trap that was sent."
+    ::= { pdug5TrapInfoEntry 1 }
+
+trapDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"A string identifying the event for that last trap that was sent."
+    ::= { pdug5TrapInfoEntry 2 }
+END

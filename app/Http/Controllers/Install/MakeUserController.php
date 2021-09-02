@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -37,7 +36,7 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function index(Request $request)
     {
-        if (!$this->initInstallStep()) {
+        if (! $this->initInstallStep()) {
             return $this->redirectToIncomplete();
         }
 
@@ -47,13 +46,14 @@ class MakeUserController extends InstallationController implements InstallerStep
 
         if (isset($user)) {
             $this->markStepComplete();
+
             return view('install.user-created', $this->formatData([
                 'user' => $user,
             ]));
         }
 
         return view('install.make-user', $this->formatData([
-            'messages' => Arr::wrap(session('message'))
+            'messages' => Arr::wrap(session('message')),
         ]));
     }
 
@@ -64,16 +64,17 @@ class MakeUserController extends InstallationController implements InstallerStep
             'password' => 'required',
         ]);
 
+        $message = trans('install.user.failure');
+
         try {
             // only allow the first admin to be created
-            if (!$this->complete()) {
+            if (! $this->complete()) {
                 $this->configureDatabase();
                 $user = new User($request->only(['username', 'password', 'email']));
                 $user->level = 10; // admin
                 $user->setPassword($request->get('password'));
                 $res = $user->save();
 
-                $message = trans('install.user.failure');
                 if ($res) {
                     $message = trans('install.user.success');
                     $this->markStepComplete();
@@ -98,11 +99,13 @@ class MakeUserController extends InstallationController implements InstallerStep
                 if ($exists) {
                     $this->markStepComplete();
                 }
+
                 return $exists;
             }
         } catch (QueryException $e) {
             //
         }
+
         return false;
     }
 

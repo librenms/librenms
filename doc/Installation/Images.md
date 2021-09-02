@@ -1,4 +1,5 @@
-# CentOS
+
+# LibreNMS VMs
 
 > NOTE: We highly advise that you change all passwords on this image
 > when you deploy it!!
@@ -16,7 +17,7 @@ At present we provide the following builds:
 - OVA Built with VirtualBox.
 
 - Any issues and or help with these images should be reported via
-  [Community Fourm](https://community.librenms.org) or our [Discord
+  [Community Forum](https://community.librenms.org) or our [Discord
   server](https://t.libren.ms/discord)
 
 ## Setup
@@ -57,7 +58,7 @@ Remember to edit/remove them if you change (and you should) the VM network confi
 - WebUI (http://localhost:8080)
   - username: librenms
   - password: `D32fwefwef`
-  
+
 - SSH (ssh://localhost:2023)
   - username: librenms
   - password: `CDne3fwdfds`

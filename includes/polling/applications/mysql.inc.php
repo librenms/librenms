@@ -5,7 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'mysql';
 $app_id = $app['app_id'];
-if (!empty($agent_data['app'][$name])) {
+if (! empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 } else {
     // Polls MySQL  statistics from script via SNMP
@@ -13,10 +13,10 @@ if (!empty($agent_data['app'][$name])) {
 }
 
 echo ' mysql';
-$metrics = array();
+$metrics = [];
 
 // General Stats
-$mapping = array(
+$mapping = [
     'IDBLBSe' => 'cr',
     'IBLFh'   => 'ct',
     'IBLWn'   => 'cu',
@@ -96,23 +96,24 @@ $mapping = array(
     'CSt'     => 'c5',
     'CUe'     => 'c3',
     'CUMi'    => 'c9',
-);
+    'SlLa'    => 'br',
+];
 
 $data = explode("\n", $mysql);
 
-$map = array();
+$map = [];
 foreach ($data as $str) {
-    list($key, $value) = explode(':', $str);
-    $map[$key]         = (float) trim($value);
+    [$key, $value] = explode(':', $str);
+    $map[$key] = (float) trim($value);
 }
 
-$fields = array();
+$fields = [];
 foreach ($mapping as $k => $v) {
     $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
 }
 $metrics = $fields;
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('IDBLBSe', 'GAUGE', 0, 125000000000)
     ->addDataset('IBLFh', 'DERIVE', 0, 125000000000)
@@ -192,13 +193,14 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('CRSt', 'DERIVE', 0, 125000000000)
     ->addDataset('CSt', 'DERIVE', 0, 125000000000)
     ->addDataset('CUe', 'DERIVE', 0, 125000000000)
-    ->addDataset('CUMi', 'DERIVE', 0, 125000000000);
+    ->addDataset('CUMi', 'DERIVE', 0, 125000000000)
+    ->addDataset('SlLa', 'GAUGE', 0, 125000000000);
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 // Process state statistics
-$mapping_status = array(
+$mapping_status = [
     'State_closing_tables'       => 'd2',
     'State_copying_to_tmp_table' => 'd3',
     'State_end'                  => 'd4',
@@ -215,14 +217,14 @@ $mapping_status = array(
     'State_writing_to_net'       => 'df',
     'State_none'                 => 'dg',
     'State_other'                => 'dh',
-);
+];
 
-$rrd_name = array('app', $name, $app_id, 'status');
+$rrd_name = ['app', $name, $app_id, 'status'];
 $rrd_def = new RrdDefinition();
 // because this sends different names for rrd and compared to other datastores, disable $fields name checks
 $rrd_def->disableNameChecking();
 
-$fields = array();
+$fields = [];
 foreach ($mapping_status as $desc => $id) {
     $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);

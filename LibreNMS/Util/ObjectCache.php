@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,16 +29,17 @@ use App\Models\BgpPeer;
 use App\Models\CefSwitching;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\IsisAdjacency;
+use App\Models\Mpls;
 use App\Models\OspfInstance;
 use App\Models\Port;
+use App\Models\PrinterSupply;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
-use App\Models\Toner;
-use App\Models\User;
 use App\Models\Vrf;
-use App\Models\Mpls;
 use Cache;
+use Illuminate\Support\Collection;
 
 class ObjectCache
 {
@@ -48,11 +48,14 @@ class ObjectCache
     public static function applications()
     {
         return Cache::remember('ObjectCache:applications_list:' . auth()->id(), self::$cache_time, function () {
-            return Application::hasAccess(auth()->user())
-                ->select('app_type', 'app_state', 'app_instance')
+            $user = auth()->user(); /** @var \App\Models\User $user */
+            $applications = Application::hasAccess($user)
+                ->select(['app_type', 'app_state', 'app_instance'])
                 ->groupBy('app_type', 'app_state', 'app_instance')
-                ->get()
-                ->sortBy('show_name', SORT_NATURAL|SORT_FLAG_CASE)
+                ->get(); /** @var Collection $applications */
+
+            return $applications
+                ->sortBy('show_name', SORT_NATURAL | SORT_FLAG_CASE)
                 ->groupBy('app_type');
         });
     }
@@ -60,11 +63,13 @@ class ObjectCache
     public static function routing()
     {
         return Cache::remember('ObjectCache:routing_counts:' . auth()->id(), self::$cache_time, function () {
-            $user = auth()->user();
+            $user = auth()->user(); /** @var \App\Models\User $user */
+
             return [
                 'vrf' => Vrf::hasAccess($user)->count(),
                 'mpls' => Mpls::hasAccess($user)->count(),
                 'ospf' => OspfInstance::hasAccess($user)->count(),
+                'isis' => IsisAdjacency::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),
                 'cef' => CefSwitching::hasAccess($user)->count(),
@@ -75,7 +80,8 @@ class ObjectCache
     public static function sensors()
     {
         return Cache::remember('ObjectCache:sensor_list:' . auth()->id(), self::$cache_time, function () {
-            $sensor_classes = Sensor::hasAccess(auth()->user())->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
+            $user = auth()->user(); /** @var \App\Models\User $user */
+            $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
 
             $sensor_menu = [];
             foreach ($sensor_classes as $sensor_model) {
@@ -95,21 +101,22 @@ class ObjectCache
                 $sensor_menu[$group][] = [
                     'class' => $class,
                     'icon' => $sensor_model->icon(),
-                    'descr' => $sensor_model->classDescr()
+                    'descr' => $sensor_model->classDescr(),
                 ];
             }
 
-            if (Toner::hasAccess(auth()->user())->exists()) {
+            if (PrinterSupply::hasAccess($user)->exists()) {
                 $sensor_menu[3] = [
                     [
                         'class' => 'toner',
                         'icon' => 'print',
-                        'descr' => __('Toner')
-                    ]
+                        'descr' => __('Toner'),
+                    ],
                 ];
             }
 
             ksort($sensor_menu); // ensure menu order
+
             return $sensor_menu;
         });
     }
@@ -125,6 +132,7 @@ class ObjectCache
         foreach ($fields as $field) {
             $result[$field] = self::getPortCount($field, $device_id);
         }
+
         return $result;
     }
 
@@ -168,6 +176,7 @@ class ObjectCache
         foreach ($fields as $field) {
             $result[$field] = self::getDeviceCount($field);
         }
+
         return $result;
     }
 
@@ -203,6 +212,7 @@ class ObjectCache
         foreach ($fields as $field) {
             $result[$field] = self::getServiceCount($field, $device_id);
         }
+
         return $result;
     }
 

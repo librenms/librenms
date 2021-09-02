@@ -36,25 +36,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.45.3.65",
                     "sysDescr": "Ethernet Routing Switch 5530-24TFD    HW:32       FW:6.0.0.18  SW:v6.3.2.011 BN:11 (c) Avaya Networks",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "boss",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "extremeboss.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.45.3.65",
-                    "sysDescr": "Ethernet Routing Switch 5530-24TFD    HW:32       FW:6.0.0.18  SW:v6.3.2.011 BN:11 (c) Avaya Networks",
-                    "sysContact": null,
-                    "version": "Unknown Version",
+                    "version": "6.3.2.011",
                     "hardware": "ERS-5530-24TFD",
                     "features": null,
                     "os": "boss",
@@ -64,28 +46,12 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {
-            "mempools": [
-                {
-                    "mempool_index": "",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "avaya-ers",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Unit 1 memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
+            "mempools": []
         },
         "poller": "matches discovery"
     },

@@ -10,12 +10,12 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Storage";
+$pagetitle[] = 'Health :: Storage';
 ?>
 
 <div class="panel panel-default panel-condensed">

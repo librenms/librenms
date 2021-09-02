@@ -15,23 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $battery_oid = '.1.3.6.1.4.1.13891.101.2.6.0';
 $battery_current = snmp_get($device, $battery_oid, '-Oqv');
 
-if (!empty($battery_current) || $battery_current == 0) {
-    $divisor          = 10;
-    $current          = $battery_current / $divisor;
-    $descr            = 'Battery';
-    $type             = 'sinetica';
-    $index            = '2.6.0';
+if (! empty($battery_current) || $battery_current == 0) {
+    $divisor = 10;
+    $current = $battery_current / $divisor;
+    $descr = 'Battery';
+    $type = 'sinetica';
+    $index = '2.6.0';
 
     discover_sensor($valid['sensor'], 'current', $device, $battery_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
@@ -42,14 +40,14 @@ foreach ($oids as $oid => $data) {
     $current_id = substr($oid, strrpos($oid, '.') + 1);
 
     $current_oid = ".$oid";
-    $descr   = 'Output';
+    $descr = 'Output';
     if (count($oids) > 1) {
         $descr .= " Phase $current_id";
     }
     $divisor = 100;
     $current = current($data) / $divisor;
-    $type    = 'sinetica';
-    $index   = '4.4.1.3.'.$current_id;
+    $type = 'sinetica';
+    $index = '4.4.1.3.' . $current_id;
 
     discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
@@ -60,14 +58,14 @@ foreach ($oids as $oid => $data) {
     $current_id = substr($oid, strrpos($oid, '.') + 1);
 
     $current_oid = ".$oid";
-    $descr   = 'Input';
+    $descr = 'Input';
     if (count($oids) > 1) {
         $descr .= " Phase $current_id";
     }
     $divisor = 10;
     $current = current($data) / $divisor;
-    $type    = 'sinetica';
-    $index   = '3.3.1.3.'.$current_id;
+    $type = 'sinetica';
+    $index = '3.3.1.3.' . $current_id;
 
     discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

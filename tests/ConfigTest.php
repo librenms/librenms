@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -61,7 +60,7 @@ class ConfigTest extends TestCase
 
     public function testGetDeviceSetting()
     {
-        $device = array('set' => true, 'null' => null);
+        $device = ['set' => true, 'null' => null];
         $this->setConfig(function (&$config) {
             $config['null'] = 'notnull!';
             $config['noprefix'] = true;
@@ -104,10 +103,10 @@ class ConfigTest extends TestCase
     public function testGetCombined()
     {
         $this->setConfig(function (&$config) {
-            $config['num'] = array('one', 'two');
-            $config['os']['nullos']['num'] = array('two', 'three');
-            $config['assoc'] = array('a' => 'same', 'b' => 'same');
-            $config['os']['nullos']['assoc'] = array('b' => 'different', 'c' => 'still same');
+            $config['num'] = ['one', 'two'];
+            $config['os']['nullos']['num'] = ['two', 'three'];
+            $config['assoc'] = ['a' => 'same', 'b' => 'same'];
+            $config['os']['nullos']['assoc'] = ['b' => 'different', 'c' => 'still same'];
             $config['os']['nullos']['osset'] = true;
             $config['gset'] = true;
         });
@@ -118,9 +117,9 @@ class ConfigTest extends TestCase
 
         $combined = Config::getCombined('nullos', 'num');
         sort($combined);
-        $this->assertEquals(array('one', 'three', 'two'), $combined);
+        $this->assertEquals(['one', 'three', 'two'], $combined);
 
-        $this->assertSame(array('a' => 'same', 'b' => 'different', 'c' => 'still same'), Config::getCombined('nullos', 'assoc'));
+        $this->assertSame(['a' => 'same', 'b' => 'different', 'c' => 'still same'], Config::getCombined('nullos', 'assoc'));
     }
 
     public function testSet()
@@ -173,17 +172,16 @@ class ConfigTest extends TestCase
         $this->assertNull(Config::get('cheese.and.bologna'));
     }
 
-
     public function testGetSubtree()
     {
         Config::set('words.top', 'August');
         Config::set('words.mid', 'And Everything');
         Config::set('words.bot', 'After');
-        $expected = array(
+        $expected = [
             'top' => 'August',
             'mid' => 'And Everything',
-            'bot' => 'After'
-        );
+            'bot' => 'After',
+        ];
 
         $this->assertEquals($expected, Config::get('words'));
     }

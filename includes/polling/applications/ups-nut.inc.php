@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 *
@@ -33,17 +33,17 @@ $ups_nut = snmp_get($device, $oid, '-Oqv');
 
 // If "extend" (used above) fails, try "exec" support.
 // Note, exec always splits outputs on newline, so need to use snmp_walk (not a single SNMP entry!)
-if (!$ups_nut) {
+if (! $ups_nut) {
     // Data is in an array, due to how "exec" works with ups-nut.sh output, so snmp_walk to retrieve it
     $oid = '.1.3.6.1.4.1.2021.7890.2.101';
-    $ups_nut=snmp_walk($device, $oid, '-Oqv');
+    $ups_nut = snmp_walk($device, $oid, '-Oqv');
 }
 //print_r(array_values(explode("\n", $ups_nut)));
 
-echo ' '.$name;
+echo ' ' . $name;
 
 // (2020-05-13, Jon.W) Added ups status data and updated ups-nut.sh script.
-list (
+[
     $charge,
     $battery_low,
     $remaining,
@@ -66,9 +66,9 @@ list (
     $UPSUPSBuck,
     $UPSUPSBoost,
     $UPSForcedShutdown
-    ) = explode("\n", $ups_nut);
+    ] = explode("\n", $ups_nut);
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('charge', 'GAUGE', 0, 100)
     ->addDataset('battery_low', 'GAUGE', 0, 100)
@@ -79,37 +79,37 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('input_voltage', 'GAUGE', 0)
     ->addDataset('load', 'GAUGE', 0, 100);
 
-$fields = array(
+$fields = [
     'charge' => $charge,
     'battery_low' => $battery_low,
-    'time_remaining' => $remaining/60,
+    'time_remaining' => $remaining / 60,
     'battery_voltage' => $bat_volt,
     'battery_nominal' => $bat_nom,
     'line_nominal' => $line_nom,
     'input_voltage' => $input_volt,
-    'load' => $load
-);
+    'load' => $load,
+];
 
 $sensors = [
-    ['state_name' => 'UPSOnLine'            , 'value' => $UPSOnLine],
-    ['state_name' => 'UPSOnBattery'         , 'value' => $UPSOnBattery],
-    ['state_name' => 'UPSLowBattery'        , 'value' => $UPSLowBattery],
-    ['state_name' => 'UPSHighBattery'       , 'value' => $UPSHighBattery],
-    ['state_name' => 'UPSBatteryReplace'    , 'value' => $UPSBatteryReplace],
-    ['state_name' => 'UPSBatteryCharging'   , 'value' => $UPSBatteryCharging],
+    ['state_name' => 'UPSOnLine', 'value' => $UPSOnLine],
+    ['state_name' => 'UPSOnBattery', 'value' => $UPSOnBattery],
+    ['state_name' => 'UPSLowBattery', 'value' => $UPSLowBattery],
+    ['state_name' => 'UPSHighBattery', 'value' => $UPSHighBattery],
+    ['state_name' => 'UPSBatteryReplace', 'value' => $UPSBatteryReplace],
+    ['state_name' => 'UPSBatteryCharging', 'value' => $UPSBatteryCharging],
     ['state_name' => 'UPSBatteryDischarging', 'value' => $UPSBatteryDischarging],
-    ['state_name' => 'UPSUPSBypass'         , 'value' => $UPSUPSBypass],
+    ['state_name' => 'UPSUPSBypass', 'value' => $UPSUPSBypass],
     ['state_name' => 'UPSRuntimeCalibration', 'value' => $UPSRuntimeCalibration],
-    ['state_name' => 'UPSOffline'           , 'value' => $UPSOffline],
-    ['state_name' => 'UPSUPSOverloaded'     , 'value' => $UPSUPSOverloaded],
-    ['state_name' => 'UPSUPSBuck'           , 'value' => $UPSUPSBuck],
-    ['state_name' => 'UPSUPSBoost'          , 'value' => $UPSUPSBoost],
-    ['state_name' => 'UPSForcedShutdown'    , 'value' => $UPSForcedShutdown]
+    ['state_name' => 'UPSOffline', 'value' => $UPSOffline],
+    ['state_name' => 'UPSUPSOverloaded', 'value' => $UPSUPSOverloaded],
+    ['state_name' => 'UPSUPSBuck', 'value' => $UPSUPSBuck],
+    ['state_name' => 'UPSUPSBoost', 'value' => $UPSUPSBoost],
+    ['state_name' => 'UPSForcedShutdown', 'value' => $UPSForcedShutdown],
 ];
 
 foreach ($sensors as $index => $sensor) {
     $rrd_def->addDataset($sensor['state_name'], 'GAUGE', 0);
-    $fields[$sensor['state_name']]= $sensor['value'];
+    $fields[$sensor['state_name']] = $sensor['value'];
 }
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');

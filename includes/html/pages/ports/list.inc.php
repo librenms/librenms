@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -107,18 +107,18 @@ var grid = $("#ports").bootgrid({
     {
         return {
             id: "ports",
-            device_id: '<?php echo mres($vars['device_id']); ?>',
+            device_id: '<?php echo $vars['device_id']; ?>',
             hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
-            state: '<?php echo mres($vars['state']); ?>',
-            ifSpeed: '<?php echo mres($vars['ifSpeed']); ?>',
-            ifType: '<?php echo mres($vars['ifType']); ?>',
-            port_descr_type: '<?php echo mres($vars['port_descr_type']); ?>',
+            state: '<?php echo $vars['state']; ?>',
+            ifSpeed: '<?php echo $vars['ifSpeed']; ?>',
+            ifType: '<?php echo $vars['ifType']; ?>',
+            port_descr_type: '<?php echo $vars['port_descr_type']; ?>',
             ifAlias: '<?php echo $vars['ifAlias']; ?>',
-            location: '<?php echo mres($vars['location']); ?>',
-            disabled: '<?php echo mres($vars['disabled']); ?>',
-            ignore: '<?php echo mres($vars['ignore']); ?>',
-            deleted: '<?php echo mres($vars['deleted']); ?>',
-            errors: '<?php echo mres($vars['errors']); ?>',
+            location: '<?php echo $vars['location']; ?>',
+            disabled: '<?php echo $vars['disabled']; ?>',
+            ignore: '<?php echo $vars['ignore']; ?>',
+            deleted: '<?php echo $vars['deleted']; ?>',
+            errors: '<?php echo $vars['errors']; ?>',
         };
     },
     url: "ajax_table.php"

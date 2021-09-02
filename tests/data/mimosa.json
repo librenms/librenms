@@ -16,8 +16,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -127,8 +125,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -230,24 +226,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.43356.1.1.1",
                     "sysDescr": "Mimosa B5c Firmware v92329ce",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "mimosa",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "mimosa.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.43356.1.1.1",
-                    "sysDescr": "Mimosa B5c Firmware v92329ce",
                     "sysContact": "<private>",
                     "version": "2.3.3",
                     "hardware": "mimosaB5",
@@ -259,7 +237,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

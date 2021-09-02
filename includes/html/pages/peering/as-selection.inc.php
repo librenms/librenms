@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * LibreNMS PeeringDB Integration
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,15 +13,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
-$cache_date = dbFetchCell("SELECT FROM_UNIXTIME(`timestamp`) FROM `pdb_ix` ORDER BY `timestamp` ASC LIMIT 1");
+$cache_date = dbFetchCell('SELECT FROM_UNIXTIME(`timestamp`) FROM `pdb_ix` ORDER BY `timestamp` ASC LIMIT 1');
 
 echo "<div class='alert alert-info' role='alert'>Cached date: $cache_date</div>";
 

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDevicesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,12 +18,12 @@ class CreateDevicesTable extends Migration
             $table->string('sysName', 128)->nullable()->index();
             $table->binary('ip')->nullable();
             $table->string('community')->nullable();
-            $table->enum('authlevel', array('noAuthNoPriv','authNoPriv','authPriv'))->nullable();
+            $table->enum('authlevel', ['noAuthNoPriv', 'authNoPriv', 'authPriv'])->nullable();
             $table->string('authname', 64)->nullable();
             $table->string('authpass', 64)->nullable();
-            $table->enum('authalgo', array('MD5','SHA'))->nullable();
+            $table->enum('authalgo', ['MD5', 'SHA'])->nullable();
             $table->string('cryptopass', 64)->nullable();
-            $table->enum('cryptoalgo', array('AES','DES',''))->nullable();
+            $table->enum('cryptoalgo', ['AES', 'DES', ''])->nullable();
             $table->string('snmpver', 4)->default('v2c');
             $table->smallInteger('port')->unsigned()->default(161);
             $table->string('transport', 16)->default('udp');
@@ -65,7 +64,7 @@ class CreateDevicesTable extends Migration
         });
 
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            \DB::statement("ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;");
+            \DB::statement('ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;');
         }
     }
 

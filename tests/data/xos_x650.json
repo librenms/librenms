@@ -6,28 +6,10 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1916.2.118",
                     "sysDescr": "ExtremeXOS (X650-24x(SSns)) version 15.3.5.2 v1535b2-patch1-14 by release-manager on Fri Jun 16 08:43:13 EDT 2017",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "xos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "extreme.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1916.2.118",
-                    "sysDescr": "ExtremeXOS (X650-24x(SSns)) version 15.3.5.2 v1535b2-patch1-14 by release-manager on Fri Jun 16 08:43:13 EDT 2017",
                     "sysContact": "<private>",
                     "version": "15.3.5.2",
                     "hardware": "Summit X650-24x(SSns)",
-                    "features": "v1535b2-patch1-14 Jun 16 2017",
+                    "features": "v1535b2-patch1-14",
                     "os": "xos",
                     "type": "network",
                     "serial": null,
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

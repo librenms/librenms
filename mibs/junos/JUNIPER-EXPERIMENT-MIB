@@ -1,0 +1,96 @@
+--
+-- Juniper Networks: SNMP Experimental MIB Registry
+-- 
+-- Copyright (c) 2003-2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-EXPERIMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI               -- RFC 2578
+    juniperMIB, jnxExperiment
+        FROM JUNIPER-SMI;
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Experimental MIB OID assignments.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jnxBgpM2Experiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft
+        for the BGPv2 MIB."
+    REFERENCE
+        "IETF Inter-Domain Routing Working Group documents:
+            draft-ietf-idr-bgp4-mibv2-03.txt"
+    ::= { jnxExperiment 1 }
+
+jnxLdapExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor mibs for the internal juniper ldap
+        applications."
+    ::= { jnxExperiment 2 }
+
+jnxBfdExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft 
+         for the BFD MIB."
+    ::= { jnxExperiment 3 }
+
+jnxOspfv3Experiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft 
+         for the OSPFv3 MIB."
+    ::= { jnxExperiment 4 }
+
+jnxExampleMibRoot OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This branch anchors mibs used for private, internal sample 
+         implementations."
+    ::= { jnxExperiment 5 }
+
+jnxInternalMibRoot OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This branch is reserved for internal use."
+    ::= { jnxExperiment 6 }
+
+jnxP2mpExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft
+         for the P2MP MIB."
+    ::= { jnxExperiment 7 }
+
+jnxL2L3VpnMcastExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This branch anchors the experimental IETF draft for L2L3VpnMcast 
+         MIB."
+    ::= { jnxExperiment 11 }
+
+jnxMvpnExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This branch anchors the experimental IETF draft for Multicast
+         VPN MIB."
+    ::= { jnxExperiment 12 }
+    
+jnxMldpExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft
+         for the mLDP MIB."
+    ::= { jnxExperiment 13 }
+    
+
+END

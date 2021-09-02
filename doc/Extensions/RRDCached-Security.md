@@ -38,7 +38,7 @@ server {
     allow $LibreNMS_IP;
     deny all;
 
-    proxy_pass unix:/var/run/rrdcached/rrdcached.sock;
+    proxy_pass unix:/run/rrdcached.sock;
 }
 
 ```

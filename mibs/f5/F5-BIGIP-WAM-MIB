@@ -4,12 +4,12 @@ F5-BIGIP-WAM-MIB DEFINITIONS ::= BEGIN
 -- F5-BIGIP-WAM-MIB 
 --     A private enterprise MIB for F5 wam traffic management 
 --     systems.
---     VERSION: 11.6.1
+--     VERSION: 14.1.2.7
 --================================================================
 
 IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
-    Integer32, Opaque, enterprises, Counter32, Counter64, TimeTicks
+    Opaque, enterprises, Counter32, Counter64, TimeTicks
         FROM SNMPv2-SMI
 
     Gauge 
@@ -29,7 +29,7 @@ IMPORTS
 
 --================================================================
 bigipWAM MODULE-IDENTITY
-    LAST-UPDATED "201507231522Z" -- Thu Jul 23 15:22:52 UTC 2015 
+    LAST-UPDATED "201609211918Z" -- Wed Sep 21 19:18:17 UTC 2016 
     ORGANIZATION "F5 Networks, Inc."
     CONTACT-INFO
          "postal: F5 Networks, Inc. 
@@ -56,8 +56,8 @@ wamAppStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  wamAppStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in wamAppStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { wamAppStat 1 } 
 
@@ -90,48 +90,48 @@ wamAppStatEntry OBJECT-TYPE
 
 WamAppStatEntry ::= 
 	SEQUENCE {
-        	wamAppStatName                                         LongDisplayString,
-        	wamAppStatVsName                                       LongDisplayString,
-        	wamAppStatRqstTotal                                    Counter64,
-        	wamAppStatProxied                                      Counter64,
-        	wamAppStatProxiedBytes                                 Counter64,
-        	wamAppStatProxied1500                                  Counter64,
-        	wamAppStatProxied10k                                   Counter64,
-        	wamAppStatProxied50k                                   Counter64,
-        	wamAppStatProxied100k                                  Counter64,
-        	wamAppStatProxied500k                                  Counter64,
-        	wamAppStatProxied1m                                    Counter64,
-        	wamAppStatProxied5m                                    Counter64,
-        	wamAppStatProxiedLarge                                 Counter64,
-        	wamAppStatProxiedNew                                   Counter64,
-        	wamAppStatProxiedExpired                               Counter64,
-        	wamAppStatProxiedPerPolicy                             Counter64,
-        	wamAppStatProxiedPerIrule                              Counter64,
-        	wamAppStatProxiedPerInvalidation                       Counter64,
-        	wamAppStatProxiedPerClientRequest                      Counter64,
-        	wamAppStatProxiedBypass                                Counter64,
-        	wamAppStatFromCache                                    Counter64,
-        	wamAppStatFromCacheBytes                               Counter64,
-        	wamAppStatFromCache1500                                Counter64,
-        	wamAppStatFromCache10k                                 Counter64,
-        	wamAppStatFromCache50k                                 Counter64,
-        	wamAppStatFromCache100k                                Counter64,
-        	wamAppStatFromCache500k                                Counter64,
-        	wamAppStatFromCache1m                                  Counter64,
-        	wamAppStatFromCache5m                                  Counter64,
-        	wamAppStatFromCacheLarge                               Counter64,
-        	wamAppStatOws2xx                                       Counter64,
-        	wamAppStatOws3xx                                       Counter64,
-        	wamAppStatOws4xx                                       Counter64,
-        	wamAppStatOws5xx                                       Counter64,
-        	wamAppStatOwsDropped                                   Counter64,
-        	wamAppStatOwsRejected                                  Counter64,
-        	wamAppStatWam2xx                                       Counter64,
-        	wamAppStatWam3xx                                       Counter64,
-        	wamAppStatWam4xx                                       Counter64,
-        	wamAppStatWam5xx                                       Counter64,
-        	wamAppStatWam503                                       Counter64,
-        	wamAppStatWamDropped                                   Counter64
+        	wamAppStatName                                            LongDisplayString,
+        	wamAppStatVsName                                          LongDisplayString,
+        	wamAppStatRqstTotal                                       Counter64,
+        	wamAppStatProxied                                         Counter64,
+        	wamAppStatProxiedBytes                                    Counter64,
+        	wamAppStatProxied1500                                     Counter64,
+        	wamAppStatProxied10k                                      Counter64,
+        	wamAppStatProxied50k                                      Counter64,
+        	wamAppStatProxied100k                                     Counter64,
+        	wamAppStatProxied500k                                     Counter64,
+        	wamAppStatProxied1m                                       Counter64,
+        	wamAppStatProxied5m                                       Counter64,
+        	wamAppStatProxiedLarge                                    Counter64,
+        	wamAppStatProxiedNew                                      Counter64,
+        	wamAppStatProxiedExpired                                  Counter64,
+        	wamAppStatProxiedPerPolicy                                Counter64,
+        	wamAppStatProxiedPerIrule                                 Counter64,
+        	wamAppStatProxiedPerInvalidation                          Counter64,
+        	wamAppStatProxiedPerClientRequest                         Counter64,
+        	wamAppStatProxiedBypass                                   Counter64,
+        	wamAppStatFromCache                                       Counter64,
+        	wamAppStatFromCacheBytes                                  Counter64,
+        	wamAppStatFromCache1500                                   Counter64,
+        	wamAppStatFromCache10k                                    Counter64,
+        	wamAppStatFromCache50k                                    Counter64,
+        	wamAppStatFromCache100k                                   Counter64,
+        	wamAppStatFromCache500k                                   Counter64,
+        	wamAppStatFromCache1m                                     Counter64,
+        	wamAppStatFromCache5m                                     Counter64,
+        	wamAppStatFromCacheLarge                                  Counter64,
+        	wamAppStatOws2xx                                          Counter64,
+        	wamAppStatOws3xx                                          Counter64,
+        	wamAppStatOws4xx                                          Counter64,
+        	wamAppStatOws5xx                                          Counter64,
+        	wamAppStatOwsDropped                                      Counter64,
+        	wamAppStatOwsRejected                                     Counter64,
+        	wamAppStatWam2xx                                          Counter64,
+        	wamAppStatWam3xx                                          Counter64,
+        	wamAppStatWam4xx                                          Counter64,
+        	wamAppStatWam5xx                                          Counter64,
+        	wamAppStatWam503                                          Counter64,
+        	wamAppStatWamDropped                                      Counter64
 	}
 
 wamAppStatName OBJECT-TYPE 

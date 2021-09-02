@@ -1,5 +1,7 @@
 mib: DOCS-IF-MIB
 modules:
+    os:
+        sysDescr_regex: '/hardware version:V(?<hardware>[^;]+);software version:V(?<version>[^;]+);/'
     sensors:
         pre-cache:
             data:

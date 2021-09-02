@@ -1,0 +1,105 @@
+mib: MCAFEE-MWG-MIB
+modules:
+    os:
+        version: MCAFEE-MWG-MIB::kProductVersion.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - stCategoryName
+        count:
+            data:
+                -
+                    oid: stMalwareDetected
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.2.{{ $index }}'
+                    descr: '1. Nr of infections detected by Antimalware'
+                    index: 'stMalwareDetected.{{ $index }}'
+                    skip_values:
+                        -
+                -
+                    oid: stConnectionsLegitimate
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.3.{{ $index }}'
+                    descr: '2. Nr of conn.  that not have been blocked'
+                    index: 'stConnectionsLegitimate.{{ $index }}'
+                    skip_values:
+                        -
+                -
+                    oid: stBlockedByAntiMalware
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.4.{{ $index }}'
+                    index: 'stBlockedByAntiMalware.{{ $index }}'
+                    descr: '3. Nr of conn. blocked by Anti-Malware'
+                    skip_values:
+                        -
+                -
+                    oid: stConnectionsBlocked
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.5.{{ $index }}'
+                    descr: '4. Nr of blocked connections'
+                    index: 'stConnectionsBlocked.{{ $index }}'
+                    skip_values:
+                        -
+                -
+                    oid: stBlockedByMediaFilter
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.6.{{ $index }}'
+                    index: 'stBlockedByMediaFilter.{{ $index }}'
+                    descr: '5. Nr of conn. that have been blocked by the Media-Type'
+                    skip_values:
+                        -
+                -
+                    oid: stBlockedByURLFilter
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.7.{{ $index }}'
+                    index: 'stBlockedByURLFilter.{{ $index }}'
+                    descr: '6. Nr of conn. that have been blocked by the URL filter'
+                    skip_values:
+                        -
+                -
+                    oid: stMimeType
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.8.{{ $index }}'
+                    index: 'stMimeType.{{ $index }}'
+                    descr: '7. Nr of media types detected by the Media Type filter'
+                    skip_values:
+                        -
+                -
+                    oid: stCategoryCount
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.10.1.2.{{ $index }}'
+                    index: 'stCategoryCount.{{ $index }}'
+                    descr: 'Conn. cat. {{ $stCategoryName }} Blocked'
+                    skip_values:
+                        -
+                -
+                    oid: stHttpRequests
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.2.1.{{ $index }}'
+                    index: 'stHttpRequests.{{ $index }}'
+                    descr: '8. Number of HTTP requests'
+                    skip_values:
+                        -
+                -
+                    oid: stHttpsRequests
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.3.1.{{ $index }}'
+                    index: 'stHttpsRequests.{{ $index }}'
+                    descr: '9. Number of HTTPS requests'
+                    skip_values:
+                        -
+
+                -
+                    oid: stClientCount
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.5.2.{{ $index }}'
+                    index: 'stClientCount.{{ $index }}'
+                    descr: '0. Currently connected clients'
+                    skip_values:
+                        -
+                -
+                    oid: stConnectedSockets
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.5.3.{{ $index }}'
+                    index: 'stConnectedSockets.{{ $index }}'
+                    descr: '10. Nr of open network sockets in use by the proxy'
+                    skip_values:
+                        -
+                -
+                    oid: stResolveHostViaDNS
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.5.6.{{ $index }}'
+                    index: 'stResolveHostViaDNS.{{ $index }}'
+                    descr: '11. Time to resolve DNS in ms'
+                    skip_values:
+                        -
+

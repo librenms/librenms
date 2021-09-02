@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -33,8 +32,7 @@ class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
     public function testCriticalAlarm()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68
@@ -50,7 +48,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Critical alarm test\"";
 
         $trap = new Trap($trapText);
 
-        $message = "System Alarm: Critical alarm test Status: critical";
+        $message = 'System Alarm: Critical alarm test Status: critical';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmSysAlmTrap critical');
@@ -58,8 +56,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Critical alarm test\"";
 
     public function testMajorAlarm()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68
@@ -75,7 +72,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Major alarm test\"";
 
         $trap = new Trap($trapText);
 
-        $message = "System Alarm: Major alarm test Status: major";
+        $message = 'System Alarm: Major alarm test Status: major';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmSysAlmTrap major');
@@ -83,8 +80,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Major alarm test\"";
 
     public function testMinorAlarm()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68
@@ -100,7 +96,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Minor alarm test\"";
 
         $trap = new Trap($trapText);
 
-        $message = "System Alarm: Minor alarm test Status: minor";
+        $message = 'System Alarm: Minor alarm test Status: minor';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmSysAlmTrap minor');
@@ -108,8 +104,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Minor alarm test\"";
 
     public function testClearedAlarm()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:15:22.68
@@ -125,7 +120,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 \"Cleared alarm test\"";
 
         $trap = new Trap($trapText);
 
-        $message = "System Alarm: Cleared alarm test Status: cleared";
+        $message = 'System Alarm: Cleared alarm test Status: cleared';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmSysAlmTrap major');

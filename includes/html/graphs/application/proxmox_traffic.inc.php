@@ -13,18 +13,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * See http://www.gnu.org/licenses/gpl.txt for the full license
+ * See https://www.gnu.org/licenses/gpl.txt for the full license
  */
 
 require 'includes/html/graphs/common.inc.php';
 
 $proxmox_rrd = Rrd::proxmoxName($vars['cluster'], $vars['vmid'], $vars['port']);
 
-if (rrdtool_check_rrd_exists($proxmox_rrd)) {
+if (Rrd::checkRrdExists($proxmox_rrd)) {
     $rrd_filename = $proxmox_rrd;
 }
 
-$ds_in  = 'INOCTETS';
+$ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
 require 'includes/html/graphs/generic_data.inc.php';

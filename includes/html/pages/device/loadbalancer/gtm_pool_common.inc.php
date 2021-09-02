@@ -13,19 +13,19 @@
  */
 
 // Pages
-$subtypes = array();
+$subtypes = [];
 $subtypes['gtm_pool_det'] = 'GTM Pool Details';
 // If we have a defautl pool, display the details.
 if ($vars['poolid'] != 0) {
     $subtypes['gtm_wide_pool'] = 'Default Pool Details';
 }
 
-if (!$vars['subtype']) {
+if (! $vars['subtype']) {
     $vars['subtype'] = 'gtm_pool_det';
 }
 
 // Determine a policy to show.
-if (!isset($vars['gtmpoolid'])) {
+if (! isset($vars['gtmpoolid'])) {
     foreach ($components as $id => $array) {
         if ($array['type'] != 'f5-gtm-pool') {
             continue;
@@ -53,7 +53,7 @@ foreach ($subtypes as $page => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $vars, array('subtype' => $page));
+    echo generate_link($text, $vars, ['subtype' => $page]);
     if ($vars['subtype'] == $page) {
         echo '</span>';
     }

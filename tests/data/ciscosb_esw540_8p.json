@@ -7,8 +7,8 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1176",
                     "sysDescr": "8-port 10/100/1000 Ethernet Switch with PoE",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "",
+                    "hardware": "",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",
@@ -18,23 +18,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.1176",
-                    "sysDescr": "8-port 10/100/1000 Ethernet Switch with PoE",
-                    "sysContact": null,
-                    "version": "Software ",
-                    "hardware": null,
-                    "features": null,
-                    "os": "ciscosb",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

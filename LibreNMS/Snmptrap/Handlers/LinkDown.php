@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,8 +45,9 @@ class LinkDown implements SnmptrapHandler
 
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
-        if (!$port) {
+        if (! $port) {
             Log::warning("Snmptrap linkDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+
             return;
         }
 
@@ -57,11 +57,11 @@ class LinkDown implements SnmptrapHandler
         Log::event("SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, $device->device_id, 'interface', 5, $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
-            Log::event("Interface Disabled : $port->ifDescr (TRAP)", $device->device_id, "interface", 3, $port->port_id);
+            Log::event("Interface Disabled : $port->ifDescr (TRAP)", $device->device_id, 'interface', 3, $port->port_id);
         }
 
         if ($port->isDirty('ifOperStatus')) {
-            Log::event("Interface went Down : $port->ifDescr (TRAP)", $device->device_id, "interface", 5, $port->port_id);
+            Log::event("Interface went Down : $port->ifDescr (TRAP)", $device->device_id, 'interface', 5, $port->port_id);
         }
 
         $port->save();

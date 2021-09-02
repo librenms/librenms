@@ -1,5 +1,9 @@
 mib: IMCO-BIG-MIB
 modules:
+    os:
+        hardware: IMCO-BIG-MIB::imco3IdentModel.0
+        serial: IMCO-BIG-MIB::imPM1SystemIDserNumb.0
+        version: IMCO-BIG-MIB::imco3IdentSwVersion.0
     sensors:
         current:
             data:

@@ -1,0 +1,17 @@
+os: raisecom-ros
+text: 'Raisecom ROS'
+type: network
+bad_snmpEngineTime: true
+mib_dir: raisecom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: raisecom
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8886
+        snmpget:
+            oid: ROSMGMT-VERSION-MIB::rosMgmtRosVersion.0
+            op: '!='
+            value: false

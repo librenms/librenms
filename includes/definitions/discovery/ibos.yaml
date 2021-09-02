@@ -1,5 +1,7 @@
 mib: WAYSTREAM-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.*), iBOS Version ibos-.*?-(?<version>.*)\s+Copyright/'
     sensors:
         temperature:
             data:

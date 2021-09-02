@@ -4,6 +4,7 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\BarPlot;
 use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
+use LibreNMS\Util\Number;
 
 $graph_data = getHistoricTransferGraphData($vars['id']);
 
@@ -16,9 +17,9 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
 
         if (date('m', $start) == date('m', $end) && date('d', $start == 1)) {
             // Calendar months, omit the date and the end!
-            $graph_data['ticklabels'][$i] = strftime("%b %Y", $start);
+            $graph_data['ticklabels'][$i] = strftime('%b %Y', $start);
         } else {
-            $graph_data['ticklabels'][$i] = strftime("%e %b %Y", $start) . "\n" . strftime("%e %b %Y", $end);
+            $graph_data['ticklabels'][$i] = strftime('%e %b %Y', $start) . "\n" . strftime('%e %b %Y', $end);
         }
     }
 }
@@ -56,7 +57,7 @@ $graph->xgrid->SetColor('#e0e0e0', '#efefef');
 
 function YCallback($value)
 {
-    return format_number($value, \LibreNMS\Config::get('billing.base'), 2, 1) . 'B';
+    return Number::formatBase($value, \LibreNMS\Config::get('billing.base'), 2, 1);
 }
 
 $graph->yaxis->SetFont(FF_FONT1);
@@ -98,7 +99,7 @@ $lineplot_allow->SetLegend('Traffic Allowed');
 $lineplot_allow->SetColor('black');
 $lineplot_allow->SetWeight(1);
 
-$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
+$gbplot = new GroupBarPlot([$barplot_in, $barplot_tot, $barplot_out, $barplot_over]);
 
 $graph->Add($gbplot);
 $graph->Add($lineplot_allow);

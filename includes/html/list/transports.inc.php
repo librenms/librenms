@@ -15,22 +15,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta>
  */
-
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     return [];
 }
 
 $query = '';
 $params = [];
 
-if (!empty($vars['search'])) {
+if (! empty($vars['search'])) {
     $query .= ' WHERE `transport_name` LIKE ?';
     $params[] = '%' . $vars['search'] . '%';
 }
@@ -38,7 +36,7 @@ if (!empty($vars['search'])) {
 $total = dbFetchCell("SELECT COUNT(*) FROM `alert_transports` $query", $params);
 $more = false;
 
-if (!empty($_REQUEST['limit'])) {
+if (! empty($_REQUEST['limit'])) {
     $limit = (int) $vars['limit'];
     $page = isset($vars['page']) ? (int) $vars['page'] : 1;
     $offset = ($page - 1) * $limit;
@@ -51,12 +49,14 @@ if (!empty($_REQUEST['limit'])) {
 $sql = "SELECT `transport_id` AS `id`, `transport_name` AS `text`, `transport_type` AS `type` FROM `alert_transports` $query";
 $transports = dbFetchRows($sql, $params);
 
-$more = ($offset + count($transports))<$total;
+$more = ($offset + count($transports)) < $total;
 $transports = array_map(function ($transport) {
-    $transport['text'] = ucfirst($transport['type']).": ".$transport['text'];
+    $transport['text'] = ucfirst($transport['type']) . ': ' . $transport['text'];
     unset($transport['type']);
+
     return $transport;
 }, $transports);
 
 $data = [['text' => 'Transports', 'children' => $transports]];
+
 return[$data, $more];

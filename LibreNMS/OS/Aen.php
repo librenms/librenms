@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,20 +38,20 @@ class Aen extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         // don't poll v5.3.1_22558 devices due to bug that crashes snmpd
         if ($device['version'] == 'AEN_5.3.1_22558') {
-            return array();
+            return [];
         }
 
-        return array(
+        return [
             Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.22420.1.1.20.0', // ACD-DESC-MIB::acdDescCpuUsageCurrent
                 0
-            )
-        );
+            ),
+        ];
     }
 }

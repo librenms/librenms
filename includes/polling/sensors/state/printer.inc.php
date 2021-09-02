@@ -1,4 +1,5 @@
 <?php
+
 if ($device['os_group'] == 'printer') {
     if ($sensor['sensor_type'] === 'hrPrinterDetectedErrorState') {
         $printer_states =
@@ -33,9 +34,9 @@ if ($device['os_group'] == 'printer') {
             // cannot create an index for each bit combination, instead warning or critical
             if (count($bit_flags) > 1) {
                 // multiple issues, check above list
-                $sensor_value = $is_critical?10:9;
+                $sensor_value = $is_critical ? 10 : 9;
             }
         }
-        d_echo('Polling hrPrinterDetectedErrorState: '.$sensor_value);
+        d_echo('Polling hrPrinterDetectedErrorState: ' . $sensor_value);
     }
 }

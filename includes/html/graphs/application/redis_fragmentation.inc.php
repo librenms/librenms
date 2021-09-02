@@ -2,27 +2,27 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min     = 0;
-$nototal       = 1;
-$unit_text     = 'Fragmentation';
-$unitlen       = 15;
-$bigdescrlen   = 20;
+$scale_min = 0;
+$nototal = 1;
+$unit_text = 'Fragmentation';
+$unitlen = 15;
+$bigdescrlen = 20;
 $smalldescrlen = 15;
-$colours       = 'mixed';
+$colours = 'mixed';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'redis', $app['app_id'], 'fragmentation'));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app['app_id'], 'fragmentation']);
 
-$array = array(
-          'bytes'   => 'Bytes',
-         );
+$array = [
+    'bytes'   => 'Bytes',
+];
 
-$rrd_list = array();
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+$rrd_list = [];
+if (Rrd::checkRrdExists($rrd_filename)) {
     $i = 0;
     foreach ($array as $ds => $descr) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $descr;
-        $rrd_list[$i]['ds']       = $ds;
+        $rrd_list[$i]['descr'] = $descr;
+        $rrd_list[$i]['ds'] = $ds;
         $i++;
     }
 } else {

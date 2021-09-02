@@ -1,12 +1,20 @@
 mib: ARUBA-MIB:WLSX-SYSTEMEXT-MIB
 modules:
+    os:
+        sysDescr_regex: '/(\(MODEL: (?<hardware>.+)\),)? Version (?<version>\S+)/'
+    mempools:
+        data:
+            -
+                total: WLSX-SWITCH-MIB::sysXMemorySize
+                used: WLSX-SWITCH-MIB::sysXMemoryUsed
+                free: WLSX-SWITCH-MIB::sysXMemoryFree
+                precision: 1024
+                type: arubaos
+                index: 0
     processors:
         data:
             -
-                oid: WLSX-SYSTEMEXT-MIB::sysExtProcessorLoad
+                oid: WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorTable
+                value: WLSX-SYSTEMEXT-MIB::sysExtProcessorLoad
                 num_oid: '.1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.{{ $index }}'
-                descr: 'Network Processor CPU{{ $index }}'
-            -
-                oid: WLSX-SYSTEMEXT-MIB::sysExtProcessorLoad.1
-                num_oid: '.1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.1.{{ $index }}'
-                descr: 'Supervisor Card CPU'
+                descr: WLSX-SYSTEMEXT-MIB::sysExtProcessorDescr

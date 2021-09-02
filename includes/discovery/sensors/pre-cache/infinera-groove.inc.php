@@ -15,17 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
-
-if (!is_array($pre_cache['infineragroove_portTable'])) {
+if (! is_array($pre_cache['infineragroove_portTable'])) {
     echo 'Caching OIDs:';
-    $pre_cache['infineragroove_portTable'] = array();
+    $pre_cache['infineragroove_portTable'] = [];
     echo ' portTable';
     $pre_cache['infineragroove_portTable'] = snmpwalk_cache_multi_oid($device, 'portTable', $pre_cache['infineragroove_portTable'], 'CORIANT-GROOVE-MIB');
     echo ' OchOsTable';
@@ -40,13 +38,13 @@ foreach (array_keys($pre_cache['infineragroove_portTable']) as $index) {
     } else {
         $pre_cache['infineragroove_portTable'][$index]['portAlias'] = 'port-';
     }
-    $pre_cache['infineragroove_portTable'][$index]['portAlias'] .= $indexids[0].'/'.$indexids[1].'/'.$indexids[3];
+    $pre_cache['infineragroove_portTable'][$index]['portAlias'] .= $indexids[0] . '/' . $indexids[1] . '/' . $indexids[3];
 
     unset($indexids);
 }
 
-if (!is_array($pre_cache['infineragroove_slotTable'])) {
-    $pre_cache['infineragroove_slotTable'] = array();
+if (! is_array($pre_cache['infineragroove_slotTable'])) {
+    $pre_cache['infineragroove_slotTable'] = [];
     echo ' slotTable';
     $pre_cache['infineragroove_slotTable'] = snmpwalk_cache_multi_oid($device, 'slotTable', $pre_cache['infineragroove_slotTable'], 'CORIANT-GROOVE-MIB');
     echo ' cardTable';

@@ -1,5 +1,10 @@
 mib: PRVT-SYS-MON-MIB
 modules:
+    mempools:
+        data:
+            -
+                used: PRVT-SYS-INFO-MIB::numBytesAlloc
+                free: PRVT-SYS-INFO-MIB::numBytesFree
     processors:
         data:
             -

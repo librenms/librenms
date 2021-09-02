@@ -366,14 +366,41 @@
                     "sysObjectID": ".1.3.6.1.4.1.22610.1.3.28",
                     "sysDescr": "Thunder Series Unified Application Service Gateway TH5630, ACOS 4.1.0-P5,",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "4.1.0-P5",
+                    "hardware": "TH5630",
                     "features": null,
                     "os": "acos",
                     "type": "network",
                     "serial": null,
                     "icon": "a10.png",
                     "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "acos",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "System Memory",
+                    "mempool_perc": 57,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 1204633600,
+                    "mempool_used_oid": ".1.3.6.1.4.1.22610.2.4.1.2.2.0",
+                    "mempool_free": 917536768,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2122170368,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         },

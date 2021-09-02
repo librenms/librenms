@@ -4,8 +4,7 @@ text: 'Microsoft Windows'
 ifname: true
 processor_stacked: true
 bad_hrSystemUptime: true
-mib_dir:
-    - dell
+mib_dir: dell
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }

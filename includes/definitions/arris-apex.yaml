@@ -2,8 +2,7 @@ os: arris-apex
 text: 'Arris Apex'
 type: network
 icon: arris
-mib_dir:
-    - arris
+mib_dir: arris
 over:
     - { graph: '', text: '' }
 discovery:

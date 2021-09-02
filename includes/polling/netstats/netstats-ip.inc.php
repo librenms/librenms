@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!Str::startsWith($device['os'], ['Snom', 'asa'])) {
+if (! Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' IP';
 
     $oids = [

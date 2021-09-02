@@ -15,15 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 preg_match('/<<HW_REV: (.+); VENDOR:.*SW_REV: (.+); MODEL: (.+)>>/', $device['sysDescr'], $matches);
 
-$hardware = $matches[3] . " (Rev: " . $matches[1] . ")";
+$hardware = $matches[3] . ' (Rev: ' . $matches[1] . ')';
 $version = $matches[2];

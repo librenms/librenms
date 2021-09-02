@@ -1,0 +1,5 @@
+modules:
+    os:
+        sysDescr_regex:
+            - '/ (?<version>\d+\.\d\S+) /'
+            - '/(?<hardware>aarch64|alpha|amd64|arm\w*|i386|ia64|mips\w*|pc98|powerpc\w*|risc\w*|sparc\w*)/i'

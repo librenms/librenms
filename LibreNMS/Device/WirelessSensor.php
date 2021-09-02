@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -102,6 +101,7 @@ class WirelessSensor extends Sensor
     {
         $sensor = parent::toArray();
         $sensor['access_point_id'] = $this->access_point_ip;
+
         return $sensor;
     }
 
@@ -200,11 +200,17 @@ class WirelessSensor extends Sensor
             'distance' => [
                 'icon' => 'space-shuttle',
             ],
+            'cell' => [
+                'icon' => 'line-chart',
+            ],
+            'channel' => [
+                'icon' => 'line-chart',
+            ],
         ];
 
         if ($valid) {
             $sql = 'SELECT `sensor_class` FROM `wireless_sensors`';
-            $params = array();
+            $params = [];
             if (isset($device_id)) {
                 $sql .= ' WHERE `device_id`=?';
                 $params[] = $device_id;
@@ -212,6 +218,7 @@ class WirelessSensor extends Sensor
             $sql .= ' GROUP BY `sensor_class`';
 
             $sensors = dbFetchColumn($sql, $params);
+
             return array_intersect_key($types, array_flip($sensors));
         }
 
@@ -241,12 +248,12 @@ class WirelessSensor extends Sensor
     /**
      * Convert a WiFi channel to a Frequency in MHz
      *
-     * @param $channel
+     * @param int $channel
      * @return int
      */
     public static function channelToFrequency($channel)
     {
-        $channels = array(
+        $channels = [
             1 => 2412,
             2 => 2417,
             3 => 2422,
@@ -289,7 +296,7 @@ class WirelessSensor extends Sensor
             157 => 5785,
             161 => 5805,
             165 => 5825,
-        );
+        ];
 
         return $channels[$channel];
     }

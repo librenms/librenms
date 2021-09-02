@@ -1,0 +1,1820 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": null,
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": "2.3",
+                    "hardware": "SmartPack2 Syst.",
+                    "features": null,
+                    "os": "enexus",
+                    "type": "power",
+                    "serial": "<private>",
+                    "icon": "eltek.png",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.6.5.0",
+                    "sensor_index": "battery.0",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "Overal Battery Current",
+                    "group": "Input",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 50,
+                    "sensor_limit_warn": 30,
+                    "sensor_limit_low": -30,
+                    "sensor_limit_low_warn": -30,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.18.4.1.6.1.1",
+                    "sensor_index": "battery.1.1",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "BattCurr bank 1",
+                    "group": "Input",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 50,
+                    "sensor_limit_warn": 30,
+                    "sensor_limit_low": -30,
+                    "sensor_limit_low_warn": -30,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.2.5.0",
+                    "sensor_index": "current.0",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "System Output Current",
+                    "group": "Output",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3,
+                    "sensor_limit": 500,
+                    "sensor_limit_warn": 400,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.3.1",
+                    "sensor_index": "output.1",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE G2 1 Output Current",
+                    "group": "Output",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 12.8,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.3.2",
+                    "sensor_index": "output.2",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE G2 2 Output Current",
+                    "group": "Output",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 10.2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.3.3",
+                    "sensor_index": "output.3",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE 3 Output Current",
+                    "group": "Output",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 9.6,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "runtime",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.8.5.0",
+                    "sensor_index": "0",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "BatterieRestzeit",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 345,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 20,
+                    "sensor_limit_low_warn": 25,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.18.2.1.2.1",
+                    "sensor_index": "1",
+                    "sensor_type": "batteryBankStatus",
+                    "sensor_descr": "Battery Bank 1 Status",
+                    "group": "Battery",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "batteryBankStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.18.5.1.2.1.1",
+                    "sensor_index": "1.1",
+                    "sensor_type": "batteryFuseStatus",
+                    "sensor_descr": "BattFuses  1",
+                    "group": "Battery",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "batteryFuseStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.1.0",
+                    "sensor_index": "0",
+                    "sensor_type": "batteryStatus",
+                    "sensor_descr": "Overal Battery Status",
+                    "group": "Battery",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "batteryStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.9.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "loadFusesStatus",
+                    "sensor_descr": "Overal Load Fuses Status",
+                    "group": "Load Fuse",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "loadFusesStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.9.7.1.1.1",
+                    "sensor_index": "1",
+                    "sensor_type": "loadFuseStatus",
+                    "sensor_descr": "LoadFuse 1",
+                    "group": "Load Fuse",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "loadFuseStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.3.1.0",
+                    "sensor_index": "0",
+                    "sensor_type": "mainsStatus",
+                    "sensor_descr": "Mains Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "mainsStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.12.2.1.2.1.1",
+                    "sensor_index": "1.1",
+                    "sensor_type": "outputStatus",
+                    "sensor_descr": "Output Batt contactor",
+                    "group": "Alarm Output",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "outputStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.12.2.1.2.1.2",
+                    "sensor_index": "1.2",
+                    "sensor_type": "outputStatus",
+                    "sensor_descr": "Output Load contactor 1",
+                    "group": "Alarm Output",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "outputStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.12.2.1.2.1.3",
+                    "sensor_index": "1.3",
+                    "sensor_type": "outputStatus",
+                    "sensor_descr": "Output Load contactor 2",
+                    "group": "Alarm Output",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "outputStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.2.1.0",
+                    "sensor_index": "0",
+                    "sensor_type": "powerSystemStatus",
+                    "sensor_descr": "System Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "powerSystemStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.2.1",
+                    "sensor_index": "1",
+                    "sensor_type": "rectifierStatus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE G2 1 Status",
+                    "group": "Rectifier",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "rectifierStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.2.2",
+                    "sensor_index": "2",
+                    "sensor_type": "rectifierStatus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE G2 2 Status",
+                    "group": "Rectifier",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "rectifierStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.2.3",
+                    "sensor_index": "3",
+                    "sensor_type": "rectifierStatus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE 3 Status",
+                    "group": "Rectifier",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "rectifierStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.7.5.0",
+                    "sensor_index": "0",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "Overal Battery Temperature",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 21,
+                    "sensor_limit": 40,
+                    "sensor_limit_warn": 30,
+                    "sensor_limit_low": -5,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.18.3.1.6.1.1",
+                    "sensor_index": "1.1",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "BatteryTemp1.1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 21,
+                    "sensor_limit": 40,
+                    "sensor_limit_warn": 30,
+                    "sensor_limit_low": -5,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.10.5.5.0",
+                    "sensor_index": "battery.0",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "Batt.Spannung",
+                    "group": null,
+                    "sensor_divisor": 100,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 54.55,
+                    "sensor_limit": 57,
+                    "sensor_limit_warn": 56.8,
+                    "sensor_limit_low": 46.3,
+                    "sensor_limit_low_warn": 48,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.4.1",
+                    "sensor_index": "input.1",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE G2 1 Input Voltage",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 223,
+                    "sensor_limit": 280,
+                    "sensor_limit_warn": 260,
+                    "sensor_limit_low": 80,
+                    "sensor_limit_low_warn": 100,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.4.2",
+                    "sensor_index": "input.2",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE G2 2 Input Voltage",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 221,
+                    "sensor_limit": 280,
+                    "sensor_limit_warn": 260,
+                    "sensor_limit_low": 80,
+                    "sensor_limit_low_warn": 100,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.5.6.1.4.3",
+                    "sensor_index": "input.3",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "FLATPACK2 48/3000 HE 3 Input Voltage",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 225,
+                    "sensor_limit": 280,
+                    "sensor_limit_warn": 260,
+                    "sensor_limit_low": 80,
+                    "sensor_limit_low_warn": 100,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.3.4.1.6.1",
+                    "sensor_index": "mains.1",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "NetzSpann 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 224,
+                    "sensor_limit": 280,
+                    "sensor_limit_warn": 260,
+                    "sensor_limit_low": 80,
+                    "sensor_limit_low_warn": 100,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.3.4.1.6.2",
+                    "sensor_index": "mains.2",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "NetzSpann 2",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 221,
+                    "sensor_limit": 280,
+                    "sensor_limit_warn": 260,
+                    "sensor_limit_low": 80,
+                    "sensor_limit_low_warn": 100,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12148.10.3.4.1.6.3",
+                    "sensor_index": "mains.3",
+                    "sensor_type": "enexus",
+                    "sensor_descr": "NetzSpann 3",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 225,
+                    "sensor_limit": 280,
+                    "sensor_limit_warn": 260,
+                    "sensor_limit_low": 80,
+                    "sensor_limit_low_warn": 100,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryBankStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryFuseStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "batteryStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFusesStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "loadFuseStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "mainsStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "outputStatus",
+                    "state_descr": "notenergized",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "outputStatus",
+                    "state_descr": "energized",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "outputStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "outputStatus",
+                    "state_descr": "connected",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "powerSystemStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "error",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "minorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "majorAlarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "disconnected",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "minorAndMajor",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "majorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "minorLow",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "majorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "minorHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "event",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "valueVolt",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "valueAmp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "valueTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "valueUnit",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "valuePerCent",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rectifierStatus",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

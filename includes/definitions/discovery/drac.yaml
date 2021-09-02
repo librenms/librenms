@@ -1,5 +1,9 @@
 mib: DELL-RAC-MIB:IDRAC-MIB-SMIv2
 modules:
+    os:
+        hardware: .1.3.6.1.4.1.674.10892.2.1.1.2.0
+        version: .1.3.6.1.4.1.674.10892.2.1.2.1.0
+        serial: .1.3.6.1.4.1.674.10892.2.1.1.11.0
     sensors:
         state:
             data:
@@ -133,7 +137,6 @@ modules:
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: drsBladeCurrStatus
-                    value: drsBladeCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.7.{{ $index }}'
                     descr: 'Blade Status'
                     index: 'drsBladeCurrStatus.{{ $index }}'
@@ -146,7 +149,6 @@ modules:
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: drsTempCurrStatus
-                    value: drsTempCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.8.{{ $index }}'
                     descr: 'Temperature Status'
                     index: 'drsTempCurrStatus.{{ $index }}'
@@ -159,7 +161,6 @@ modules:
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: drsCMCCurrStatus
-                    value: drsCMCCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.9.{{ $index }}'
                     descr: 'CMC Status'
                     index: 'drsCMCCurrStatus.{{ $index }}'
@@ -172,10 +173,11 @@ modules:
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::physicalDiskTable
-                    value: physicalDiskState
+                    value: DELL-RAC-MIB::physicalDiskState
                     num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.4.1.4.{{ $index }}'
-                    descr: '{{ $physicalDiskName }} State'
+                    descr: '{{ $DELL-RAC-MIB::physicalDiskName }} State'
                     index: 'physicalDiskStatus.{{ $index }}'
+                    state_name: DELL-RAC-MIB::physicalDiskTable
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: ready, graph: 1, generic: 0 }
@@ -189,10 +191,11 @@ modules:
                         - { value: 10, descr: readonly, graph: 1, generic: 0 }
                 -
                     oid: DELL-RAC-MIB::controllerTable
-                    value: controllerComponentStatus
+                    value: DELL-RAC-MIB::controllerComponentStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.1.1.38.{{ $index }}'
-                    descr: '{{ $controllerName }} {{ $controllerDisplayName }}  State'
+                    descr: '{{ $DELL-RAC-MIB::controllerName }} {{ $DELL-RAC-MIB::controllerDisplayName }}  State'
                     index: 'controllerComponentStatus.{{ $index }}'
+                    state_name: DELL-RAC-MIB::controllerTable
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3  }

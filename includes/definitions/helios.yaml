@@ -2,8 +2,7 @@ os: helios
 text: 'IgniteNet HeliOS'
 type: wireless
 icon: ignitenet
-mib_dir:
-    - ignitenet
+mib_dir: ignitenet
 discovery:
     -
         sysObjectID:

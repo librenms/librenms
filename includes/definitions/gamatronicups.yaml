@@ -1,8 +1,7 @@
 os: gamatronicups
 text: 'Gamatronic UPS Stack'
 type: power
-mib_dir:
-    - gamatronic
+mib_dir: gamatronic
 discovery:
     -
         sysObjectID:

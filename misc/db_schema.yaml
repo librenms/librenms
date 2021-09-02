@@ -70,6 +70,8 @@ alert_log:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_log_device_id_index: { Name: alert_log_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    alert_log_rule_id_device_id_index: { Name: alert_log_rule_id_device_id_index, Columns: [rule_id, device_id], Unique: false, Type: BTREE }
+    alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
     alert_log_rule_id_index: { Name: alert_log_rule_id_index, Columns: [rule_id], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
 alert_rules:
@@ -197,9 +199,8 @@ availability:
     - { Field: availability_perc, Type: 'decimal(9,6)', 'Null': false, Extra: '', Default: '0.000000' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [availability_id], Unique: true, Type: BTREE }
-    availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     availability_device_id_duration_unique: { Name: availability_device_id_duration_unique, Columns: [device_id, duration], Unique: true, Type: BTREE }
-
+    availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 bgpPeers:
   Columns:
     - { Field: bgpPeer_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -312,6 +313,8 @@ bill_history:
     - { Field: traf_in, Type: bigint, 'Null': false, Extra: '' }
     - { Field: traf_out, Type: bigint, 'Null': false, Extra: '' }
     - { Field: traf_total, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: bill_peak_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bill_peak_in, Type: bigint, 'Null': true, Extra: '' }
     - { Field: pdf, Type: longblob, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bill_hist_id], Unique: true, Type: BTREE }
@@ -319,13 +322,19 @@ bill_history:
     bill_history_bill_id_index: { Name: bill_history_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
 bill_perms:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 bill_ports:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bill_port_autoadded, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 bill_port_counters:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -337,6 +346,20 @@ bill_port_counters:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id, bill_id], Unique: true, Type: BTREE }
+cache:
+  Columns:
+    - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: value, Type: mediumtext, 'Null': false, Extra: '' }
+    - { Field: expiration, Type: int, 'Null': false, Extra: '' }
+  Indexes:
+    cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
+cache_locks:
+  Columns:
+    - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: expiration, Type: int, 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
 callback:
   Columns:
     - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -416,7 +439,7 @@ config:
   Columns:
     - { Field: config_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: config_name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: config_value, Type: varchar(512), 'Null': false, Extra: '' }
+    - { Field: config_value, Type: mediumtext, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
     config_config_name_unique: { Name: config_config_name_unique, Columns: [config_name], Unique: true, Type: BTREE }
@@ -478,9 +501,9 @@ devices:
     - { Field: authlevel, Type: 'enum(''noAuthNoPriv'',''authNoPriv'',''authPriv'')', 'Null': true, Extra: '' }
     - { Field: authname, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: authpass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: authalgo, Type: 'enum(''MD5'',''SHA'')', 'Null': true, Extra: '' }
+    - { Field: authalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: cryptoalgo, Type: 'enum(''AES'',''DES'','''')', 'Null': true, Extra: '' }
+    - { Field: cryptoalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }
     - { Field: port, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '161' }
     - { Field: transport, Type: varchar(16), 'Null': false, Extra: '', Default: udp }
@@ -547,9 +570,11 @@ devices_group_perms:
     devices_group_perms_user_id_index: { Name: devices_group_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 devices_perms:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 device_graphs:
   Columns:
@@ -570,15 +595,6 @@ device_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_groups_name_unique: { Name: device_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
-device_outages:
-  Columns:
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
-  Indexes:
-    device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
 device_group_device:
   Columns:
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -590,6 +606,14 @@ device_group_device:
   Constraints:
     device_group_device_device_group_id_foreign: { name: device_group_device_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+device_outages:
+  Columns:
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
+  Indexes:
+    device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
+    device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 device_perf:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -656,6 +680,7 @@ entPhysical:
     entphysical_device_id_index: { Name: entphysical_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 entPhysical_state:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: subindex, Type: varchar(64), 'Null': true, Extra: '' }
@@ -663,6 +688,7 @@ entPhysical_state:
     - { Field: key, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: value, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id_index: { Name: device_id_index, Columns: [device_id, entPhysicalIndex], Unique: false, Type: BTREE }
 eventlog:
   Columns:
@@ -729,12 +755,14 @@ ipv4_addresses:
     ipv4_addresses_port_id_index: { Name: ipv4_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_mac:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv4_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ipv4_mac_mac_address_index: { Name: ipv4_mac_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ipv4_mac_port_id_index: { Name: ipv4_mac_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_networks:
@@ -764,13 +792,35 @@ ipv6_networks:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_network_id], Unique: true, Type: BTREE }
+isis_adjacencies:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifIndex, Type: int, 'Null': false, Extra: '' }
+    - { Field: isisISAdjState, Type: varchar(13), 'Null': false, Extra: '' }
+    - { Field: isisISAdjNeighSysType, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjNeighSysID, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjNeighPriority, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjLastUpTime, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: isisISAdjAreaAddress, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjIPAddrType, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisISAdjIPAddrAddress, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: isisCircAdminState, Type: varchar(16), 'Null': false, Extra: '', Default: 'off' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    isis_adjacencies_ifindex_index: { Name: isis_adjacencies_ifindex_index, Columns: [ifIndex], Unique: false, Type: BTREE }
+    isis_adjacencies_port_id_index: { Name: isis_adjacencies_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 juniAtmVp:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: juniAtmVp_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: vp_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: vp_descr, Type: varchar(32), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     juniatmvp_port_id_index: { Name: juniatmvp_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 links:
   Columns:
@@ -800,11 +850,13 @@ loadbalancer_rservers:
     PRIMARY: { Name: PRIMARY, Columns: [rserver_id], Unique: true, Type: BTREE }
 loadbalancer_vservers:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: classmap_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: classmap, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: serverstate, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     loadbalancer_vservers_device_id_index: { Name: loadbalancer_vservers_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 locations:
   Columns:
@@ -813,6 +865,7 @@ locations:
     - { Field: lat, Type: 'double(10,6)', 'Null': true, Extra: '' }
     - { Field: lng, Type: 'double(10,6)', 'Null': true, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
+    - { Field: fixed_coordinates, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     locations_location_unique: { Name: locations_location_unique, Columns: [location], Unique: true, Type: BTREE }
@@ -866,15 +919,19 @@ mempools:
     - { Field: mempool_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: mempool_index, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: int, 'Null': true, Extra: '' }
-    - { Field: hrDeviceIndex, Type: int, 'Null': true, Extra: '' }
     - { Field: mempool_type, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mempool_class, Type: varchar(32), 'Null': false, Extra: '', Default: system }
     - { Field: mempool_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
-    - { Field: mempool_descr, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mempool_descr, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mempool_perc, Type: int, 'Null': false, Extra: '' }
+    - { Field: mempool_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_used, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_used_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_free, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_free_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_total, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_total_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_largestfree, Type: bigint, 'Null': true, Extra: '' }
     - { Field: mempool_lowestfree, Type: bigint, 'Null': true, Extra: '' }
     - { Field: mempool_deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
@@ -1147,7 +1204,7 @@ ospf_areas:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfAuthType, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: ospfAuthType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ospfImportAsExtern, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ospfSpfRuns, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfAreaBdrRtrCount, Type: int, 'Null': false, Extra: '' }
@@ -1230,6 +1287,11 @@ ospf_ports:
     - { Field: ospfIfMulticastForwarding, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfDemand, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfAuthType, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricIpAddress, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricAddressLessIf, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricTOS, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricValue, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricStatus, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1270,18 +1332,6 @@ pdb_ix_peers:
     - { Field: timestamp, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [pdb_ix_peers_id], Unique: true, Type: BTREE }
-perf_times:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: type, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: doing, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: start, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: duration, Type: 'double(8,2)', 'Null': false, Extra: '' }
-    - { Field: devices, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: poller, Type: varchar(255), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    perf_times_type_index: { Name: perf_times_type_index, Columns: [type], Unique: false, Type: BTREE }
 plugins:
   Columns:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1370,8 +1420,6 @@ ports:
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifConnectorPresent, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Extra: '' }
-    - { Field: ifHighSpeed, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifHighSpeed_prev, Type: int, 'Null': true, Extra: '' }
     - { Field: ifOperStatus, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifOperStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifAdminStatus, Type: varchar(16), 'Null': true, Extra: '' }
@@ -1496,8 +1544,11 @@ ports_nac:
     ports_nac_port_id_mac_address_index: { Name: ports_nac_port_id_mac_address_index, Columns: [port_id, mac_address], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ports_stack:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1578,8 +1629,42 @@ ports_vlans:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
+port_groups:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: desc, Type: varchar(255), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    port_groups_name_unique: { Name: port_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
+port_group_port:
+  Columns:
+    - { Field: port_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [port_group_id, port_id], Unique: true, Type: BTREE }
+    port_group_port_port_group_id_index: { Name: port_group_port_port_group_id_index, Columns: [port_group_id], Unique: false, Type: BTREE }
+    port_group_port_port_id_index: { Name: port_group_port_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints:
+    port_group_port_port_group_id_foreign: { name: port_group_port_port_group_id_foreign, foreign_key: port_group_id, table: port_groups, key: id, extra: 'ON DELETE CASCADE' }
+    port_group_port_port_id_foreign: { name: port_group_port_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE CASCADE' }
+printer_supplies:
+  Columns:
+    - { Field: supply_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_index, Type: int, 'Null': false, Extra: '' }
+    - { Field: supply_type, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: supply_oid, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: supply_descr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: supply_capacity, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_current, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: supply_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [supply_id], Unique: true, Type: BTREE }
+    toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 processes:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pid, Type: int, 'Null': false, Extra: '' }
     - { Field: vsz, Type: int, 'Null': false, Extra: '' }
@@ -1588,6 +1673,7 @@ processes:
     - { Field: user, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: command, Type: text, 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     processes_device_id_index: { Name: processes_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 processors:
   Columns:
@@ -1711,19 +1797,58 @@ services:
   Columns:
     - { Field: service_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: service_ip, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_ip, Type: text, 'Null': true, Extra: '' }
     - { Field: service_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: service_desc, Type: text, 'Null': false, Extra: '' }
-    - { Field: service_param, Type: text, 'Null': false, Extra: '' }
-    - { Field: service_ignore, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: service_desc, Type: text, 'Null': true, Extra: '' }
+    - { Field: service_param, Type: text, 'Null': true, Extra: '' }
+    - { Field: service_ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_changed, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: service_message, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_message, Type: text, 'Null': true, Extra: '' }
     - { Field: service_disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: service_ds, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_ds, Type: text, 'Null': true, Extra: '' }
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: service_name, Type: varchar(255), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     services_device_id_index: { Name: services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+service_templates:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: ip, Type: text, 'Null': true, Extra: '' }
+    - { Field: check, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: type, Type: varchar(16), 'Null': false, Extra: '', Default: static }
+    - { Field: rules, Type: text, 'Null': true, Extra: '' }
+    - { Field: desc, Type: text, 'Null': true, Extra: '' }
+    - { Field: param, Type: text, 'Null': true, Extra: '' }
+    - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: changed, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+service_templates_device:
+  Columns:
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [service_template_id, device_id], Unique: true, Type: BTREE }
+    service_templates_device_device_id_index: { Name: service_templates_device_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    service_templates_device_service_template_id_index: { Name: service_templates_device_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
+  Constraints:
+    service_templates_device_device_id_foreign: { name: service_templates_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+    service_templates_device_service_template_id_foreign: { name: service_templates_device_service_template_id_foreign, foreign_key: service_template_id, table: service_templates, key: id, extra: 'ON DELETE CASCADE' }
+service_templates_device_group:
+  Columns:
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [service_template_id, device_group_id], Unique: true, Type: BTREE }
+    service_templates_device_group_device_group_id_index: { Name: service_templates_device_group_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
+    service_templates_device_group_service_template_id_index: { Name: service_templates_device_group_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
+  Constraints:
+    service_templates_device_group_device_group_id_foreign: { name: service_templates_device_group_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
+    service_templates_device_group_service_template_id_foreign: { name: service_templates_device_group_service_template_id_foreign, foreign_key: service_template_id, table: service_templates, key: id, extra: 'ON DELETE CASCADE' }
 session:
   Columns:
     - { Field: session_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1735,14 +1860,27 @@ session:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [session_id], Unique: true, Type: BTREE }
     session_session_value_unique: { Name: session_session_value_unique, Columns: [session_value], Unique: true, Type: BTREE }
+sessions:
+  Columns:
+    - { Field: id, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: user_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ip_address, Type: varchar(45), 'Null': true, Extra: '' }
+    - { Field: user_agent, Type: text, 'Null': true, Extra: '' }
+    - { Field: payload, Type: text, 'Null': false, Extra: '' }
+    - { Field: last_activity, Type: int, 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    sessions_last_activity_index: { Name: sessions_last_activity_index, Columns: [last_activity], Unique: false, Type: BTREE }
+    sessions_user_id_index: { Name: sessions_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 slas:
   Columns:
     - { Field: sla_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: sla_nr, Type: int, 'Null': false, Extra: '' }
+    - { Field: sla_nr, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: tag, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: rtt, Type: 'double(8,2) unsigned', 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: opstatus, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
@@ -1829,6 +1967,8 @@ syslog:
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
+    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
+    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1844,24 +1984,13 @@ tnmsneinfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     tnmsneinfo_device_id_index: { Name: tnmsneinfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     tnmsneinfo_neid_index: { Name: tnmsneinfo_neid_index, Columns: [neID], Unique: false, Type: BTREE }
-toner:
-  Columns:
-    - { Field: toner_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: toner_index, Type: int, 'Null': false, Extra: '' }
-    - { Field: toner_type, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: toner_oid, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: toner_descr, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
-    - { Field: toner_capacity, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: toner_current, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: toner_capacity_oid, Type: varchar(64), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [toner_id], Unique: true, Type: BTREE }
-    toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 transport_group_transport:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: transport_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ucd_diskio:
   Columns:
     - { Field: diskio_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1935,7 +2064,7 @@ vminfo:
     - { Field: vmwVmGuestOS, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
-    - { Field: vmwVmState, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

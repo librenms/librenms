@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -47,7 +46,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index()
@@ -55,7 +54,7 @@ class UserController extends Controller
         $this->authorize('manage', User::class);
 
         return view('user.index', [
-            'users' => User::orderBy('username')->get(),
+            'users' => User::with('preferences')->orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
         ]);
     }
@@ -63,7 +62,7 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
@@ -71,7 +70,8 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $tmp_user = new User;
-        $tmp_user->can_modify_passwd = LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
+        $tmp_user->can_modify_passwd = (int) LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
+
         return view('user.create', [
             'user' => $tmp_user,
             'dashboard' => null,
@@ -83,7 +83,7 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreUserRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(StoreUserRequest $request)
     {
@@ -99,10 +99,12 @@ class UserController extends Controller
 
         if ($user->save()) {
             Toastr::success(__('User :username created', ['username' => $user->username]));
+
             return redirect(route('users.index'));
         }
 
         Toastr::error(__('Failed to create user'));
+
         return redirect()->back();
     }
 
@@ -110,7 +112,7 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param User $user
-     * @return \Illuminate\Http\Response
+     * @return string
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show(User $user)
@@ -124,7 +126,7 @@ class UserController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param User $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function edit(User $user)
@@ -144,7 +146,7 @@ class UserController extends Controller
 
             // if enabled and 3 or more failures
             $last_failure = isset($twofactor['last']) ? (time() - $twofactor['last']) : 0;
-            $data['twofactor_locked'] = isset($twofactor['fails']) && $twofactor['fails'] >= 3 && (!$lockout_time || $last_failure < $lockout_time);
+            $data['twofactor_locked'] = isset($twofactor['fails']) && $twofactor['fails'] >= 3 && (! $lockout_time || $last_failure < $lockout_time);
         }
 
         return view('user.edit', $data);
@@ -155,7 +157,7 @@ class UserController extends Controller
      *
      * @param UpdateUserRequest $request
      * @param User $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(UpdateUserRequest $request, User $user)
     {
@@ -174,6 +176,7 @@ class UserController extends Controller
                 Toastr::success(__('User :username updated', ['username' => $user->username]));
             } else {
                 Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
+
                 return redirect()->back();
             }
         }
@@ -185,7 +188,7 @@ class UserController extends Controller
      * Remove the specified resource from storage.
      *
      * @param User $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy(User $user)
@@ -199,7 +202,7 @@ class UserController extends Controller
 
     /**
      * @param User $user
-     * @param $dashboard
+     * @param mixed $dashboard
      * @return bool
      */
     protected function updateDashboard(User $user, $dashboard)
@@ -208,6 +211,7 @@ class UserController extends Controller
             $existing = UserPref::getPref($user, 'dashboard');
             if ($dashboard != $existing) {
                 UserPref::setPref($user, 'dashboard', $dashboard);
+
                 return true;
             }
         }

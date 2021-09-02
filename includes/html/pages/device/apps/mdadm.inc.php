@@ -1,17 +1,17 @@
 <?php
 
-$mdadm_arrays = get_arrays_with_application($device, $app['app_id'], 'mdadm');
+$mdadm_arrays = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'mdadm');
 
 print_optionbar_start();
 
-$link_array = array(
+$link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
     'tab'    => 'apps',
     'app'    => 'mdadm',
-);
+];
 
-$array_list = array();
+$array_list = [];
 
 foreach ($mdadm_arrays as $label) {
     $array = $label;
@@ -20,14 +20,14 @@ foreach ($mdadm_arrays as $label) {
         $label = sprintf('⚫ %s', $label);
     }
 
-    array_push($array_list, generate_link($label, $link_array, array('array' => $array)));
+    array_push($array_list, generate_link($label, $link_array, ['array' => $array]));
 }
 
-printf("%s | arrays: %s", generate_link('All RAID Arrays', $link_array), implode(', ', $array_list));
+printf('%s | arrays: %s', generate_link('All RAID Arrays', $link_array), implode(', ', $array_list));
 
 print_optionbar_end();
 
-$graphs = array(
+$graphs = [
     'mdadm_level'          => 'RAID level',
     'mdadm_size'           => 'RAID Size',
     'mdadm_disc_count'     => 'RAID Disc count',
@@ -35,24 +35,23 @@ $graphs = array(
     'mdadm_degraded'       => 'RAID degraded',
     'mdadm_sync_speed'     => 'RAID Sync speed',
     'mdadm_sync_completed' => 'RAID Sync completed',
-);
-
+];
 
 foreach ($graphs as $key => $text) {
-    $graph_type            = $key;
+    $graph_type = $key;
     $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
-    $graph_array['to']     = time();
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
+    $graph_array['width'] = '215';
+    $graph_array['to'] = time();
+    $graph_array['id'] = $app['app_id'];
+    $graph_array['type'] = 'application_' . $key;
 
     if (isset($vars['array'])) {
-        $graph_array['array']=$vars['array'];
+        $graph_array['array'] = $vars['array'];
     }
 
     echo '<div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">'.$text.'</h3>
+        <h3 class="panel-title">' . $text . '</h3>
     </div>
     <div class="panel-body">
     <div class="row">';

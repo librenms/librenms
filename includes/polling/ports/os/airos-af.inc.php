@@ -1,6 +1,6 @@
 <?php
 
-$airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', array(), 'UBNT-AirFIBER-MIB');
+$airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', [], 'UBNT-AirFIBER-MIB');
 
 if (isset($airos_stats[1]['rxOctetsOK'])) {
     foreach ($port_stats as $index => $afport_stats) {

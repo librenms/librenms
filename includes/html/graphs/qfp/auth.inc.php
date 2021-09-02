@@ -6,9 +6,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @package    LibreNMS
- * @subpackage Authentication
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
@@ -18,12 +16,12 @@
  */
 if (isset($vars['id'])) {
     $component = new LibreNMS\Component();
-    $filter = array(
-        'filter' => array(
-            'type' => array('=', 'cisco-qfp'),
-            'id' => array('=', $vars['id'])
-        )
-    );
+    $filter = [
+        'filter' => [
+            'type' => ['=', 'cisco-qfp'],
+            'id' => ['=', $vars['id']],
+        ],
+    ];
     $components = $component->getComponents(null, $filter);
     /*
      * Fist (and only) key is the device ID
@@ -40,21 +38,21 @@ if (isset($vars['id'])) {
          * Data is split into just two RRD files, memory resources and utilization
          */
         if ($subtype == 'memory') {
-            $rrd_filename = rrd_name($device['hostname'], array('cisco-qfp', 'memory', $components['entPhysicalIndex']));
+            $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'memory', $components['entPhysicalIndex']]);
         } else {
-            $rrd_filename = rrd_name($device['hostname'], array('cisco-qfp', 'util', $components['entPhysicalIndex']));
+            $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'util', $components['entPhysicalIndex']]);
         }
 
         /*
          * Build title with breadcrumbs for module's main subpage
          */
-        $link_array = array(
+        $link_array = [
             'page' => 'device',
             'device' => $device['device_id'],
             'tab' => 'health',
-        );
+        ];
         $title = generate_device_link($device);
-        $title .= ' :: ' . generate_link("QFP", $link_array, array('metric' => 'qfp'));
+        $title .= ' :: ' . generate_link('QFP', $link_array, ['metric' => 'qfp']);
         $title .= ' :: ' . $components['name'];
 
         $auth = true;

@@ -14,7 +14,7 @@ far right and selecting Capture.
 
 ## Discovery
 
-Discovery will run and output debug infomation.
+Discovery will run and output debug information.
 
 ## Poller
 

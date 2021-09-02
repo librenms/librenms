@@ -35,7 +35,7 @@ class RemoveMibPollingTables extends Migration
             } else {
                 $table->timestamp('last_modified')->useCurrent();
             }
-            $table->primary(['device_id','module','mib']);
+            $table->primary(['device_id', 'module', 'mib']);
         });
         Schema::create('device_oids', function (Blueprint $table) {
             $table->unsignedInteger('device_id');
@@ -50,7 +50,7 @@ class RemoveMibPollingTables extends Migration
             } else {
                 $table->timestamp('last_modified')->useCurrent();
             }
-            $table->primary(['device_id','oid']);
+            $table->primary(['device_id', 'oid']);
         });
         Schema::create('mibdefs', function (Blueprint $table) {
             $table->string('module');
@@ -67,7 +67,7 @@ class RemoveMibPollingTables extends Migration
             } else {
                 $table->timestamp('last_modified')->useCurrent();
             }
-            $table->primary(['module','mib','object_type']);
+            $table->primary(['module', 'mib', 'object_type']);
         });
     }
 }

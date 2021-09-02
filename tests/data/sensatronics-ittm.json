@@ -1,0 +1,103 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.16174.1.1.1",
+                    "sysDescr": "IT",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "sensatronics-ittm",
+                    "type": "environment",
+                    "serial": null,
+                    "icon": "sensatronics.png",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.16174.1.1.1.3.1.2.0",
+                    "sensor_index": "sensor1Name.0",
+                    "sensor_type": "sensatronics-ittm",
+                    "sensor_descr": "Sec Colo",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 20.4,
+                    "sensor_limit": 40.4,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 10.4,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.16174.1.1.1.3.2.2.0",
+                    "sensor_index": "sensor2Name.0",
+                    "sensor_type": "sensatronics-ittm",
+                    "sensor_descr": "Core",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 22.8,
+                    "sensor_limit": 42.8,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 12.8,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.16174.1.1.1.3.3.2.0",
+                    "sensor_index": "sensor3Name.0",
+                    "sensor_type": "sensatronics-ittm",
+                    "sensor_descr": "Sec Colo 2",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 23.2,
+                    "sensor_limit": 43.2,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 13.2,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": []
+        },
+        "poller": "matches discovery"
+    }
+}

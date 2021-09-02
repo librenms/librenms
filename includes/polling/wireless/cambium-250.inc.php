@@ -40,16 +40,16 @@ use LibreNMS\RRD\RrdDefinition;
 //     $os->enableGraph('cambium_250_receivePower');
 // }
 
-$txModulation = snmp_get($device, ".1.3.6.1.4.1.17713.250.5.9.0", "-Ovqn", "");
-$rxModulation = snmp_get($device, ".1.3.6.1.4.1.17713.250.5.8.0", "-Ovqn", "");
+$txModulation = snmp_get($device, '.1.3.6.1.4.1.17713.250.5.9.0', '-Ovqn', '');
+$rxModulation = snmp_get($device, '.1.3.6.1.4.1.17713.250.5.8.0', '-Ovqn', '');
 if (is_numeric($txModulation) && is_numeric($rxModulation)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('txModulation', 'GAUGE', 0, 24)
         ->addDataset('rxModulation', 'GAUGE', 0, 24);
-    $fields = array(
+    $fields = [
         'txModuation' => $txModulation,
         'rxModulation' => $rxModulation,
-    );
+    ];
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-modulationMode', $tags, $fields);
@@ -75,12 +75,12 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
 //     $os->enableGraph('cambium_250_dataRate');
 // }
 
-$ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
+$ssr = snmp_get($device, 'signalStrengthRatio.0', '-Ovqn', 'CAMBIUM-PTP250-MIB');
 if (is_numeric($ssr)) {
     $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-    $fields = array(
+    $fields = [
         'ssr' => $ssr,
-    );
+    ];
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-ssr', $tags, $fields);

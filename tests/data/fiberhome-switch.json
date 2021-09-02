@@ -6,28 +6,10 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.3807.1.582815",
                     "sysDescr": "S5800 FHN USP (R) Software, Version V210R240,Hw Version 2.0,Copyrig",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "fiberhome-switch",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3807.1.582815",
-                    "sysDescr": "S5800 FHN USP (R) Software, Version V210R240,Hw Version 2.0,Copyrig",
                     "sysContact": "<private>",
                     "version": "V210R240",
-                    "hardware": "FHN S5800 V 2.0",
-                    "features": null,
+                    "hardware": "S5800 FHN USP",
+                    "features": "2.0",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -327,14 +310,18 @@
                 {
                     "mempool_index": "3490910464",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fiberhome-switch",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory-1/0/1",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 74,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 65502560,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3807.1.8012.1.5.4.1.7.3490910464",
+                    "mempool_free": 23090592,
+                    "mempool_free_oid": null,
+                    "mempool_total": 88593152,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -343,14 +330,18 @@
                 {
                     "mempool_index": "3491959040",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fiberhome-switch",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory-1/0/2",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 67,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 89771840,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3807.1.8012.1.5.4.1.7.3491959040",
+                    "mempool_free": 44445888,
+                    "mempool_free_oid": null,
+                    "mempool_total": 134217728,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -358,42 +349,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "3490910464",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fiberhome-switch",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory-1/0/1",
-                    "mempool_perc": 74,
-                    "mempool_used": 65502560,
-                    "mempool_free": 23090592,
-                    "mempool_total": 88593152,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "3491959040",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fiberhome-switch",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory-1/0/2",
-                    "mempool_perc": 67,
-                    "mempool_used": 89771840,
-                    "mempool_free": 44445888,
-                    "mempool_total": 134217728,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {
@@ -408,45 +364,9 @@
                     "processor_descr": "Cpu-1/0/1",
                     "processor_precision": 100,
                     "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.",
-                    "processor_index": "",
-                    "processor_type": "fiberhome-switch",
-                    "processor_usage": 0,
-                    "processor_descr": "cpuIndexDescr",
-                    "processor_precision": 100,
-                    "processor_perc_warn": 75
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.3222475008",
-                    "processor_index": "3222475008",
-                    "processor_type": "fiberhome-switch",
-                    "processor_usage": 0,
-                    "processor_descr": "Cpu-1/0/1",
-                    "processor_precision": 100,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.",
-                    "processor_index": "",
-                    "processor_type": "fiberhome-switch",
-                    "processor_usage": 0,
-                    "processor_descr": "cpuIndexDescr",
-                    "processor_precision": 100,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

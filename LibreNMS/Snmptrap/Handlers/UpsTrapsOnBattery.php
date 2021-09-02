@@ -15,20 +15,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @author     TheGreatDoc
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
-use Illuminate\Support\Str;
 
 class UpsTrapsOnBattery implements SnmptrapHandler
 {
@@ -43,27 +42,30 @@ class UpsTrapsOnBattery implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $min_remaining = Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsEstimatedMinutesRemaining.0')), ' ');
-        $sec_time  = Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery.0')), ' ');
+        $sec_time = Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery.0')), ' ');
         Log::event("UPS running on battery for $sec_time seconds. Estimated $min_remaining minutes remaining", $device->device_id, 'trap', 5);
         $sensor_remaining = $device->sensors()->where('sensor_index', '200')->where('sensor_type', 'rfc1628')->first();
-        if (!$sensor_remaining) {
+        if (! $sensor_remaining) {
             Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
+
             return;
         }
         $sensor_remaining->sensor_current = $min_remaining / $sensor_remaining->sensor_divisor;
         $sensor_remaining->save();
 
         $sensor_time = $device->sensors()->where('sensor_index', '100')->where('sensor_type', 'rfc1628')->first();
-        if (!$sensor_time) {
+        if (! $sensor_time) {
             Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
+
             return;
         }
         $sensor_time->sensor_current = $sec_time / $sensor_time->sensor_divisor;
         $sensor_time->save();
 
         $sensor_output = $device->sensors()->where('sensor_type', 'upsOutputSourceState')->first();
-        if (!$sensor_output) {
+        if (! $sensor_output) {
             Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
+
             return;
         }
         $sensor_output->sensor_current = 5;

@@ -25,24 +25,6 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1226",
                     "sysDescr": "Cisco IOS Software, C3560E Software (C3560E-UNIVERSALK9-M), Version 15.0(2)SE7, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2014 by Cisco Systems, Inc.\r\nCompiled Thu 23-Oct-14 13:27 by prod_rel_team",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ios",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.1226",
-                    "sysDescr": "Cisco IOS Software, C3560E Software (C3560E-UNIVERSALK9-M), Version 15.0(2)SE7, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2014 by Cisco Systems, Inc.\r\nCompiled Thu 23-Oct-14 13:27 by prod_rel_team",
-                    "sysContact": null,
                     "version": "15.0(2)SE7",
                     "hardware": "cat3560x24",
                     "features": "UNIVERSALK9",
@@ -53,6 +35,7 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

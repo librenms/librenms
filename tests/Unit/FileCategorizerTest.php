@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -60,7 +59,7 @@ class FileCategorizerTest extends TestCase
                 'includes/polling/sensors.inc.php',
                 'misc/test.php',
                 'app/Http/Kernel.php',
-                'LibreNMS/Modules/Mpls.php'
+                'LibreNMS/Modules/Mpls.php',
             ],
         ]);
     }
@@ -72,7 +71,7 @@ class FileCategorizerTest extends TestCase
                 'doc/CNAME',
                 'doc/Developing/Creating-Release.md',
                 'mkdocs.yml',
-            ]
+            ],
         ]);
     }
 
@@ -82,7 +81,7 @@ class FileCategorizerTest extends TestCase
             'python' => [
                 'python.py',
                 'LibreNMS/__init__.py',
-            ]
+            ],
         ]);
     }
 
@@ -92,7 +91,7 @@ class FileCategorizerTest extends TestCase
             'bash' => [
                 'daily.sh',
                 'scripts/deploy-docs.sh',
-            ]
+            ],
         ]);
     }
 
@@ -102,8 +101,8 @@ class FileCategorizerTest extends TestCase
             'svg' => [
                 'html/images/os/zte.svg',
                 'html/images/logos/zyxel.svg',
-                'html/svg/403.svg'
-            ]
+                'html/svg/403.svg',
+            ],
         ]);
     }
 
@@ -113,11 +112,11 @@ class FileCategorizerTest extends TestCase
             'resources' => [
                 'resources/js/app.js',
                 'resources/js/components/LibrenmsSetting.vue',
-                'resources/views/layouts/librenmsv1.blade.php'
+                'resources/views/layouts/librenmsv1.blade.php',
             ],
             'php' => [
-                'resources/views/layouts/librenmsv1.blade.php'
-            ]
+                'resources/views/layouts/librenmsv1.blade.php',
+            ],
         ]);
     }
 
@@ -129,8 +128,8 @@ class FileCategorizerTest extends TestCase
                 'tests/data/ftd.json',
                 'tests/data/3com_4200.json',
                 'tests/data/adva_fsp150_ge114pro.json',
-                'tests/data/saf-integra-b.json'
-            ]
+                'tests/data/saf-integra-b.json',
+            ],
         ]);
 
         $this->assertCategorized([
@@ -139,20 +138,20 @@ class FileCategorizerTest extends TestCase
                 'tests/snmpsim/ciscowap.snmprec',
                 'tests/snmpsim/xos_x480.snmprec',
                 'tests/snmpsim/ciscosb_esw540_8p.snmprec',
-                'tests/snmpsim/linux_fbsd-nfs-client-v1.snmprec'
-            ]
+                'tests/snmpsim/linux_fbsd-nfs-client-v1.snmprec',
+            ],
         ]);
 
         $this->assertCategorized([
             'os' => ['arris-c4', 'ios'],
             'os-files' => [
                 'includes/discovery/sensors/temperature/arris-c4.inc.php',
-                'includes/polling/entity-physical/ios.inc.php'
+                'includes/polling/entity-physical/ios.inc.php',
             ],
             'php' => [
                 'includes/discovery/sensors/temperature/arris-c4.inc.php',
-                'includes/polling/entity-physical/ios.inc.php'
-            ]
+                'includes/polling/entity-physical/ios.inc.php',
+            ],
         ]);
 
         $this->assertCategorized([
@@ -168,7 +167,7 @@ class FileCategorizerTest extends TestCase
                 'LibreNMS/OS/ArrisDsr4410md.php',
                 'LibreNMS/OS/AdvaFsp3kr7.php',
                 'LibreNMS/OS/XirrusAos.php',
-            ]
+            ],
         ]);
 
         $this->assertCategorized([
@@ -176,14 +175,14 @@ class FileCategorizerTest extends TestCase
             'os-files' => [
                 'includes/definitions/dlink.yaml',
                 'includes/definitions/discovery/eltex-olt.yaml',
-            ]
+            ],
         ]);
     }
 
     public function testFullChecks()
     {
         $this->assertCategorized(['full-checks' => ['composer.lock']]);
-        $this->assertCategorized(['full-checks' => ['.travis.yml']], ['other', '.travis.yml']);
+        $this->assertCategorized(['full-checks' => ['.github/workflows/test.yml']], ['other', '.github/workflows/test.yml']);
 
         $this->assertCategorized([
             'os' => ['3com', 'calix', 'ptp650', 'dd-wrt', 'arista_eos'],
@@ -195,9 +194,9 @@ class FileCategorizerTest extends TestCase
                 'includes/definitions/discovery/arista_eos.yaml',
             ],
             'php' => [
-                'LibreNMS/OS/Ptp650.php'
+                'LibreNMS/OS/Ptp650.php',
             ],
-            'full-checks' => [true]
+            'full-checks' => [true],
         ], [
             'tests/data/3com.json',
             'tests/snmpsim/calix.snmprec',

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDeviceGroupDeviceTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,7 +15,7 @@ class CreateDeviceGroupDeviceTable extends Migration
         Schema::create('device_group_device', function (Blueprint $table) {
             $table->unsignedInteger('device_group_id')->unsigned()->index();
             $table->unsignedInteger('device_id')->unsigned()->index();
-            $table->primary(['device_group_id','device_id']);
+            $table->primary(['device_group_id', 'device_id']);
         });
     }
 

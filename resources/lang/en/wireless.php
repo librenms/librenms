@@ -122,5 +122,14 @@ return [
         'long' => 'Cross Polar Interference',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => 'Cell',
+        'long' => 'Cell',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => 'Channel',
+        'long' => 'Channel',
+        'unit' => '',
+    ],
 ];

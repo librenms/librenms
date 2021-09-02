@@ -1,0 +1,7 @@
+mib: ZYXEL-PRESTIGE-MIB
+modules:
+    os:
+        features: ZYXEL-PRESTIGE-MIB::prestigeXDSL.6.0
+        hardware: ZYXEL-PRESTIGE-MIB::sysHWVersion.0
+        version: ZYXEL-PRESTIGE-MIB::sysRasFWVersion.0
+        serial: .1.3.6.1.4.1.890.1.2.1.1.10.0

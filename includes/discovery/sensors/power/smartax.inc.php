@@ -15,14 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
-
 $power_frame_oid = '.1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11.0';
 
 $power = snmp_get($device, $power_frame_oid, '-Ovq');
@@ -40,8 +38,8 @@ $data = reset($data);
 $descr_data = reset($descr_data);
 
 foreach ($data as $index => $value) {
-        $powerCurr = $value;
-        $pow_oid = '.' . $power_oid . '.' . $index;
-        $descr = $descr_data[$index];
-        discover_sensor($valid['sensor'], 'power', $device, $pow_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $powerCurr);
+    $powerCurr = $value;
+    $pow_oid = '.' . $power_oid . '.' . $index;
+    $descr = $descr_data[$index];
+    discover_sensor($valid['sensor'], 'power', $device, $pow_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $powerCurr);
 }

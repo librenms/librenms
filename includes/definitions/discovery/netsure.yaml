@@ -1,0 +1,64 @@
+mib: VEC-MIBv5-9
+modules:
+    sensors:
+       state:
+            data:
+                -
+                  oid: psHighestSeverityLevel
+                  num_oid: '.1.3.6.1.4.1.885.3.2.1.10.0'
+                  descr: 'System Status'
+                  states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: minor, graph: 1, value: 1, generic: 1 }
+                        - { descr: major, graph: 1, value: 2, generic: 2 }
+       voltage:
+            data:
+                -
+                  oid: psSenseVoltage
+                  num_oid: '.1.3.6.1.4.1.885.3.2.1.5.{{ $index }}'
+                  index: 'psSenseVoltage.{{ $index }}'
+                  descr: 'Sense DC Voltage'
+                  low_limit: 45.0
+                  low_warn_limit: 50.0
+                  warn_limit: 56.5
+                  high_limit: 58.0
+                -
+                  oid: psSystemVoltage
+                  num_oid: '.1.3.6.1.4.1.885.3.2.1.1.{{ $index }}'
+                  index: 'psSystemVoltage.{{ $index }}'
+                  descr: 'System DC Voltage'
+                  low_limit: 45.0
+                  low_warn_limit: 50.0
+                  warn_limit: 56.5
+                  high_limit: 58.0
+       current:
+            data:
+                -
+                  oid: psSystemCurrent
+                  num_oid: '.1.3.6.1.4.1.885.3.2.1.2.{{ $index }}'
+                  index: 'psSystemCurrent.{{ $index }}'
+                  descr: 'System Current'
+                -
+                  oid: psPCUTotalCurrent
+                  num_oid: '.1.3.6.1.4.1.885.3.2.1.6.{{ $index }}'
+                  index: 'psPCUTotalCurrent.{{ $index }}'
+                  descr: 'Total PCU Current'
+                  user_func: string_to_float
+                -
+                  oid: psBatteryCurrent
+                  num_oid: '.1.3.6.1.4.1.885.3.2.1.7.{{ $index }}'
+                  index: 'psBatteryCurrent.{{ $index }}'
+                  descr: 'Total Battery Current'
+                  user_func: string_to_float
+                -
+                  oid: psDistributionTable
+                  num_oid: '.1.3.6.1.4.1.885.3.2.4.1.2.{{ $index }}'
+                  value: psShuntCurrent
+                  index: 'psShuntCurrent.{{ $index }}'
+                  descr: 'Shunt Current #{{ $index }}'
+                  user_func: string_to_float
+                -
+                  oid: psPCUCurrent
+                  num_oid: '.1.3.6.1.4.1.885.3.2.5.1.3.{{ $index }}'
+                  index: 'psPCUCurrent.{{ $index }}'
+                  descr: 'PCU Current #{{ $index }}'

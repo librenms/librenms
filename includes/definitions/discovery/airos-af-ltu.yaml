@@ -1,52 +1,18 @@
 mib: UBNT-AFLTU-MIB
 modules:
+    os:
+        hardware: UBNT-AFLTU-MIB::afLTUDevModel.0
+        version: UBNT-AFLTU-MIB::afLTUFirmwareVersion.0
+        lat: UBNT-AFLTU-MIB::afLTUgpsLat.0
+        long: UBNT-AFLTU-MIB::afLTUgpsLon.0
     processors:
         data:
             -
-                oid: ubntHostCpuLoad
-                num_oid: '.1.3.6.1.4.1.41112.1.4.8.3.{{ $index }}'
-                precision: 100
+                oid: afLTUCpuUsage
+                num_oid: '.1.3.6.1.4.1.41112.1.10.1.3.6'
     sensors:
         state:
             data:
-                -
-                    oid: afLTUStaTxRate
-                    value: afLTUStaTxRate
-                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.4.1.1.24.232.41.30.48.222'
-                    index: '1'
-                    descr: Tx Modulation Rate
-                    states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'qPSK-SISO-1-4x' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'qPSK-SISO-1x' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'qPSK-MIMO-2x' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'qAM8-MIMO-3x' }
-                        - { value: 4, generic: 1, graph: 1, descr: 'qAM16-MIMO-4x' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'qAM32-MIMO-5x' }
-                        - { value: 6, generic: 0, graph: 1, descr: 'qAM64-MIMO-6x' }
-                        - { value: 7, generic: 0, graph: 1, descr: 'qAM128-MIMO-7x' }
-                        - { value: 8, generic: 0, graph: 1, descr: 'qAM256-MIMO-8x' }
-                        - { value: 9, generic: 0, graph: 1, descr: 'qAM256-MIMO-9x' }
-                        - { value: 10, generic: 0, graph: 1, descr: 'qAM1024-MIMO-10x' }
-                        - { value: 11, generic: 0, graph: 1, descr: 'qAM2048-MIMO-11x' }
-                -
-                    oid: afLTUStaRxRate
-                    value: afLTUStaRxRate
-                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.4.1.2.24.232.41.30.48.222'
-                    index: '2'
-                    descr: Rx Modulation Rate
-                    states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'qPSK-SISO-1-4x' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'qPSK-SISO-1x' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'qPSK-MIMO-2x' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'qAM8-MIMO-3x' }
-                        - { value: 4, generic: 1, graph: 1, descr: 'qAM16-MIMO-4x' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'qAM32-MIMO-5x' }
-                        - { value: 6, generic: 0, graph: 1, descr: 'qAM64-MIMO-6x' }
-                        - { value: 7, generic: 0, graph: 1, descr: 'qAM128-MIMO-7x' }
-                        - { value: 8, generic: 0, graph: 1, descr: 'qAM256-MIMO-8x' }
-                        - { value: 9, generic: 0, graph: 1, descr: 'qAM256-MIMO-9x' }
-                        - { value: 10, generic: 0, graph: 1, descr: 'qAM1024-MIMO-10x' }
-                        - { value: 11, generic: 0, graph: 1, descr: 'qAM2048-MIMO-11x' }
                 -
                     oid: afLTURole
                     num_oid: '.1.3.6.1.4.1.41112.1.10.1.2.1.{{ $index }}'
@@ -75,15 +41,6 @@ modules:
                         - { value: 1, generic: 1, graph: 0, descr: Nofix }
                         - { value: 2, generic: 0, graph: 0, descr: Fix2d }
                         - { value: 3, generic: 0, graph: 0, descr: Fix3d }
-                -
-                    oid: afLTUethConnected
-                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.6.5.{{ $index }}'
-                    index: afLTUethConnected
-                    descr: Ethernet port
-                    state_name: afLTUethConnected
-                    states:
-                        - { value: 0, generic: 2, graph: 0, descr: Disconnected }
-                        - { value: 1, generic: 0, graph: 0, descr: Connected }
         count:
             data:
                 -
@@ -96,10 +53,3 @@ modules:
                     num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.8.{{ $index }}'
                     index: afLTUgpsSatsTracked
                     descr: Sat tracked
-        dbm:
-            data:
-                -
-                    oid: afLTUTxEIRP
-                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.2.6.{{ $index }}'
-                    index: afLTUTxEIRP
-                    descr: Tx EIRP

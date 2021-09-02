@@ -36,23 +36,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.8741.1",
-                    "sysDescr": "SonicWALL TZ 210 (SonicOS Enhanced 5.9.1.6-5o)",
-                    "sysContact": null,
-                    "version": "(Firmware  / ROM )",
-                    "hardware": null,
-                    "features": null,
-                    "os": "sonicwall",
-                    "type": "firewall",
-                    "serial": null,
-                    "icon": "sonicwall.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

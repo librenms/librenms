@@ -4,8 +4,7 @@ type: storage
 icon: tegile
 over:
     - { graph: device_storage, text: 'Storage Usage' }
-mib_dir:
-    - tegile
+mib_dir: tegile
 discovery:
     -
         sysObjectID:

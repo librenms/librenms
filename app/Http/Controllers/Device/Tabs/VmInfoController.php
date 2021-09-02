@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -52,6 +51,17 @@ class VmInfoController implements DeviceTab
 
     public function data(Device $device): array
     {
-        return [];
+        return [
+            'vms' => self::getVms($device),
+        ];
+    }
+
+    private static function getVms(Device $device)
+    {
+        return $device->vmInfo()
+        ->select('vmwVmDisplayName', 'vmwVmState', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus')
+        ->with('parentDevice')
+        ->orderBy('vmwVmDisplayName')
+        ->get();
     }
 }

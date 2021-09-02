@@ -1,5 +1,7 @@
 mib: SAF-INTEGRAB-MIB
 modules:
+    os:
+        sysDescr_regex: '/Prod: (?<hardware>[A-Za-z-_]+);Vers: (?<version>[0-9.]+);.*;S\/N: (?<serial>[0-9]+)/'
     processors:
         data:
             -

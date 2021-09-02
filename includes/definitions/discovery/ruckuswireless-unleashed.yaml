@@ -1,5 +1,17 @@
 mib: RUCKUS-UNLEASHED-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemStatsMemoryUtil
+                descr: 'System Memory'
+    os:
+        hardware: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemModel.0
+        serial: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemSerialNumber.0
+        version:
+            - RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemVersion.0
+            - RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemCountryCode.0
+        version_template: '{{ RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemVersion.0 }} ({{ RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemCountryCode.0 }})'
     processors:
         data:
             -

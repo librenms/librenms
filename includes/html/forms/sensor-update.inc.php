@@ -15,30 +15,30 @@
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $response = array(
+if (! Auth::user()->hasGlobalAdmin()) {
+    $response = [
         'status'  => 'error',
         'message' => 'Need to be admin',
-    );
-    echo _json_encode($response);
+    ];
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$status  = 'error';
+$status = 'error';
 $message = 'Error updating sensor limit';
 $device_id = $_POST['device_id'];
 $sensor_id = $_POST['sensor_id'];
 $value_type = $_POST['value_type'];
 $data = $_POST['data'];
 
-if (!is_numeric($device_id)) {
+if (! is_numeric($device_id)) {
     $message = 'Missing device id';
-} elseif (!is_numeric($sensor_id)) {
+} elseif (! is_numeric($sensor_id)) {
     $message = 'Missing sensor id';
-} elseif (!isset($data)) {
+} elseif (! isset($data)) {
     $message = 'Missing data';
 } else {
-    if (dbUpdate(array($value_type => set_null($data, array('NULL')), 'sensor_custom' => 'Yes'), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($sensor_id, $device_id)) >= 0) {
+    if (dbUpdate([$value_type => set_null($data, ['NULL']), 'sensor_custom' => 'Yes'], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$sensor_id, $device_id]) >= 0) {
         $message = 'Sensor value updated';
         $status = 'ok';
     } else {
@@ -46,8 +46,8 @@ if (!is_numeric($device_id)) {
     }
 }
 
-$response = array(
+$response = [
     'status'        => $status,
     'message'       => $message,
-);
-echo _json_encode($response);
+];
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

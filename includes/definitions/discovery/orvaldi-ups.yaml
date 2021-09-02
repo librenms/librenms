@@ -1,5 +1,9 @@
 mib: companyMIB
 modules:
+    os:
+        hardware: companyMIB::upsIdModelName.0
+        serial: companyMIB::upsIdSerialNumber.0
+        version: companyMIB::upsIdFWVersion.0
     sensors:
         state:
             data:

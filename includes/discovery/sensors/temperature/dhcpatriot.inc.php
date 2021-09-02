@@ -8,10 +8,10 @@
 */
 
 $class = 'temperature';
-$oid = ".1.3.6.1.4.1.2021.50.3.101.1";
+$oid = '.1.3.6.1.4.1.2021.50.3.101.1';
 $index = 1;
 $type = 'dhcpatriotTempCPU';
-$descr = "CPU";
+$descr = 'CPU';
 $divisor = 1;
 $multiplier = 1;
 $low_limit = 5;
@@ -25,7 +25,7 @@ $entPhysicalIndex_measured = null;
 $user_func = null;
 $group = null;
 
-if (!empty($current) && is_numeric($current)) {
+if (! empty($current) && is_numeric($current)) {
     discover_sensor(
         $valid['sensor'],
         $class,

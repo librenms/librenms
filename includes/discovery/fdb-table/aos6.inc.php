@@ -15,31 +15,34 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package   LibreNMS
- * @link      http://librenms.org
+ * @link      https://www.librenms.org
  * @copyright LibreNMS contributors
  * @author    Tony Murray <murraytony@gmail.com>
  * @author    JoseUPV
  */
-
 if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
-    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, array(), 'nokia');
-    if (!empty($dot1d)) {
+    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia');
+    if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
-        $fdbPort_table=array();
+        $fdbPort_table = [];
         foreach ($dot1d['slMacAddressDisposition'] as $portLocal => $data) {
             foreach ($data as $vlanLocal => $data2) {
-                $fdbPort_table[$vlanLocal]=array('dot1qTpFdbPort' => array_combine(array_keys($data2), array_fill(0, count($data2), $portLocal)));
+                if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
+                    $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
+                }
+                foreach ($data2 as $macLocal => $one) {
+                    $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
+                }
             }
         }
     }
 }
-if (!empty($fdbPort_table)) {
+if (! empty($fdbPort_table)) {
     // Build dot1dBasePort to port_id dictionary
-    $portid_dict = array();
+    $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
         $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);

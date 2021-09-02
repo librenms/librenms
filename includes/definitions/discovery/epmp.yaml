@@ -1,5 +1,10 @@
 mib: CAMBIUM-PMP80211-MIB
 modules:
+    os:
+        version: CAMBIUM-PMP80211-MIB::cambiumCurrentuImageVersion.0
+        serial: CAMBIUM-PMP80211-MIB::cambiumEPMPMSN.0
+        lat: CAMBIUM-PMP80211-MIB::cambiumDeviceLatitude.0
+        long: CAMBIUM-PMP80211-MIB::cambiumDeviceLongitude.0
     processors:
         data:
             -

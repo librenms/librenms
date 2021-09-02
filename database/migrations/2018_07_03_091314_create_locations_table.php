@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateLocationsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

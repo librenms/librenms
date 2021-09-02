@@ -2,8 +2,7 @@ os: hiveos-wireless
 text: 'Aerohive HiveOS'
 type: wireless
 icon: aerohive
-mib_dir:
-    - aerohive
+mib_dir: aerohive
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }

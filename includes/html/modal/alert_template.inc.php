@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -137,25 +137,21 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#convert-template').hide();
 });
 
-$('#create-template').click('', function(e) {
+$('#create-template').on("click", function(e) {
     e.preventDefault();
 
-    var rules_items = [];
-    $('#rules_list :selected').each(function(i, selectedElement) {
-        rules_items.push($(selectedElement).val());
-    });
-
+    var rules_items = $('#rules_list').select2('data');
     var template = $("#template").val();
     var template_id = $("#template_id").val();
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
 
-    alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items.join(','));
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items);
 });
 
 //FIXME remove Deprecated template
-$('#convert-template').click('', function(e) {
+$('#convert-template').on("click", function(e) {
     e.preventDefault();
     var template = $("#template").val();
     var title    = $("#title").val();
@@ -181,10 +177,17 @@ $('#convert-template').click('', function(e) {
 });
 
 function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules) {
+    var rule_ajax = [];
+    var row_rules = [];
+    for (var i=0; i < rules.length; i++) {
+        rule_ajax.push(rules[i].id);
+        row_rules.push({id: rules[i].id, name: rules[i].text});
+    }
+
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rules},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rule_ajax.join(',')},
         dataType: "json",
         success: function(output) {
             if(output.status == 'ok') {
@@ -198,7 +201,7 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rul
                         }
                     });
                 } else {
-                    var newrow = [{id: output.newid, templatename:name}];
+                    var newrow = [{id: output.newid, templatename: name, alert_rules: JSON.stringify(row_rules)}];
                     $('#templatetable').bootgrid("append", newrow);
                 }
             } else {

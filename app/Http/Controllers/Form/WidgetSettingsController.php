@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,15 +32,19 @@ class WidgetSettingsController extends Controller
 {
     public function update(Request $request, $widget_settings)
     {
-        $this->validate($request, ['settings' => 'array']);
+        $this->validate($request, [
+            'settings' => 'array',
+            'settings.refresh' => 'int|min:1',
+        ]);
 
         $widget = UserWidget::with('dashboard')->findOrFail($widget_settings);
-        $widget_settings = (array)$request->get('settings', []);
+        $widget_settings = (array) $request->get('settings', []);
+        unset($widget_settings['_token']);
 
-        if (!$widget->dashboard->canWrite($request->user())) {
+        if (! $widget->dashboard->canWrite($request->user())) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'ERROR: You have no write-access to this dashboard'
+                'message' => 'ERROR: You have no write-access to this dashboard',
             ]);
         }
 
@@ -49,13 +52,13 @@ class WidgetSettingsController extends Controller
         if ($widget->save()) {
             return response()->json([
                 'status' => 'ok',
-                'message' => 'Updated widget settings'
+                'message' => 'Updated widget settings',
             ]);
         }
 
         return response()->json([
             'status' => 'error',
-            'message' => 'ERROR: Could not update'
+            'message' => 'ERROR: Could not update',
         ]);
     }
 }

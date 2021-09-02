@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,7 +27,8 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
-use LibreNMS\Alert\AlertUtil;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -54,12 +54,13 @@ class DeviceController extends TableController
             'disable_notify' => 'nullable|in:0,1',
             'group' => 'nullable|int',
             'poller_group' => 'nullable|int',
+            'device_id' => 'nullable|int',
         ];
     }
 
     protected function filterFields($request)
     {
-        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location'];
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location', 'device_id' => 'device_id'];
     }
 
     protected function searchFields($request)
@@ -75,8 +76,9 @@ class DeviceController extends TableController
             'hostname' => 'hostname',
             'hardware' => 'hardware',
             'os' => 'os',
-            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW())"),
-            'location' => 'location'
+            'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
+            'location' => 'location',
+            'device_id' => 'device_id',
         ];
     }
 
@@ -89,7 +91,7 @@ class DeviceController extends TableController
     protected function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
+        $query = Device::hasAccess($request->user())->with('location')->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
         if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
@@ -112,11 +114,11 @@ class DeviceController extends TableController
 
     protected function adjustFilterValue($field, $value)
     {
-        if ($field == 'location' && !is_numeric($value)) {
+        if ($field == 'location' && ! is_numeric($value)) {
             return Location::query()->where('location', $value)->value('id');
         }
 
-        if ($field == 'state' && !is_numeric($value)) {
+        if ($field == 'state' && ! is_numeric($value)) {
             return str_replace(['up', 'down'], [1, 0], $value);
         }
 
@@ -141,15 +143,16 @@ class DeviceController extends TableController
         return [
             'extra' => $this->getLabel($device),
             'status' => $this->getStatus($device),
-            'maintenance' => AlertUtil::isMaintenance($device->device_id),
+            'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => $this->getOsText($device),
-            'uptime' => (!$device->status && !$device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
+            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
             'location' => $this->getLocation($device),
-            'actions' => $this->getActions($device),
+            'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
+            'device_id' => $device->device_id,
         ];
     }
 
@@ -230,9 +233,9 @@ class DeviceController extends TableController
      */
     private function getMetrics($device)
     {
-        $port_count = $device->ports()->count();
-        $sensor_count = $device->sensors()->count();
-        $wireless_count = $device->wirelessSensors()->count();
+        $port_count = $device->ports_count;
+        $sensor_count = $device->sensors_count;
+        $wireless_count = $device->wirelessSensors_count;
 
         $metrics = [];
         if ($port_count) {
@@ -249,14 +252,15 @@ class DeviceController extends TableController
 
         $glue = $this->isDetailed() ? '<br />' : ' ';
         $metrics_content = implode(count($metrics) == 2 ? $glue : '', $metrics);
+
         return '<div class="device-table-metrics">' . $metrics_content . '</div>';
     }
 
     /**
-     * @param $device
-     * @param $count
-     * @param $tab
-     * @param $icon
+     * @param int|Device $device
+     * @param mixed $count
+     * @param mixed $tab
+     * @param mixed $icon
      * @return string
      */
     private function formatMetric($device, $count, $tab, $icon)
@@ -264,6 +268,7 @@ class DeviceController extends TableController
         $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
         $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
         $html .= '</span></a> ';
+
         return $html;
     }
 
@@ -278,38 +283,68 @@ class DeviceController extends TableController
             : substr($device->location, 0, 32);
     }
 
-    /**
-     * @param Device $device
-     * @return string
-     */
-    private function getActions($device)
+    private function getActions(Device $device): array
     {
-        $actions = '<div class="container-fluid"><div class="row">';
-        $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device) . '"> <i class="fa fa-id-card fa-lg icon-theme" title="View device"></i></a></div>';
-        $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device, ['tab' => 'alerts']) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>';
+        $actions = [
+            [
+                [
+                    'title' => 'View Device',
+                    'href' => Url::deviceUrl($device),
+                    'icon' => 'fa-id-card',
+                    'external' => false,
+                ],
+                [
+                    'title' => 'View alerts',
+                    'href' => Url::deviceUrl($device, ['tab' => 'alerts']),
+                    'icon' => 'fa-exclamation-circle',
+                    'external' => false,
+                ],
+            ],
+        ];
 
         if (\Auth::user()->hasGlobalAdmin()) {
-            $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device, ['tab' => 'edit']) . '"> <i class="fa fa-gear fa-lg icon-theme" title="Edit device"></i></a></div>';
+            $actions[0][] = [
+                'title' => 'Edit device',
+                'href' => Url::deviceUrl($device, ['tab' => 'edit']),
+                'icon' => 'fa-gear',
+                'external' => false,
+            ];
         }
+        $row = $this->isDetailed() ? 1 : 0;
 
-        if ($this->isDetailed()) {
-            $actions .= '</div><div class="row">';
-        }
+        $actions[$row][] = [
+            'title' => 'Telnet to ' . $device->hostname,
+            'href' => 'telnet://' . $device->hostname,
+            'icon' => 'fa-terminal',
+        ];
 
-        $actions .= '<div class="col-xs-1"><a href="telnet://' . $device->hostname . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device->hostname . '"></i></a></div>';
-
+        $ssh_href = 'ssh://' . $device->hostname;
         if ($server = Config::get('gateone.server')) {
-            if (Config::get('gateone.use_librenms_user')) {
-                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . \Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
-            } else {
-                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
-            }
-        } else {
-            $actions .= '<div class="col-xs-1"><a href="ssh://' . $device->hostname . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+            $ssh_href = Config::get('gateone.use_librenms_user')
+                ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
+                : $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname;
         }
 
-        $actions .= '<div class="col-xs-1"><a href="https://' . $device->hostname . '" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device->hostname . '"></i></a></div>';
-        $actions .= '</div></div>';
+        $actions[$row][] = [
+            'title' => 'SSH to ' . $device->hostname,
+            'href' => $ssh_href,
+            'icon' => 'fa-lock',
+        ];
+
+        $actions[$row][] = [
+            'title' => 'Launch browser to ' . $device->hostname,
+            'href' => 'https://' . $device->hostname,
+            'onclick' => 'http_fallback(this); return false;',
+            'icon' => 'fa-globe',
+        ];
+
+        foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
+            if ($custom['action'] ?? false) {
+                $row = $this->isDetailed() ? $index % 2 : 0;
+                $custom['href'] = view(['template' => $custom['url']], ['device' => $device])->__toString(); // @phpstan-ignore-line
+                $actions[$row][] = $custom;
+            }
+        }
 
         return $actions;
     }

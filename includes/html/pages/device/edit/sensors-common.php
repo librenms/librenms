@@ -34,16 +34,16 @@ echo "<h3>$title</h3>";
     <th></th>
   </tr>
 <?php
-$rollback = array();
-foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_deleted`='0' order by sensor_class, sensor_type, sensor_descr", array($device['device_id'])) as $sensor) {
-    $rollback[] = array(
+$rollback = [];
+foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_deleted`='0' order by sensor_class, sensor_type, sensor_descr", [$device['device_id']]) as $sensor) {
+    $rollback[] = [
         'sensor_id'        => $sensor['sensor_id'],
         'sensor_limit'     => $sensor['sensor_limit'],
         'sensor_limit_warn'     => $sensor['sensor_limit_warn'],
         'sensor_limit_low_warn' => $sensor['sensor_limit_low_warn'],
         'sensor_limit_low' => $sensor['sensor_limit_low'],
         'sensor_alert'     => $sensor['sensor_alert'],
-    );
+    ];
     if ($sensor['sensor_alert'] == 1) {
         $alert_status = 'checked';
     } else {
@@ -58,35 +58,35 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
 
     echo '
         <tr>
-        <td>'.$sensor['sensor_class'].'</td>
-        <td>'.$sensor['sensor_type'].'</td>
-        <td style="white-space: nowrap">'.$sensor['sensor_descr'].'</td>
-        <td>'.$sensor['sensor_current'].'</td>
+        <td>' . $sensor['sensor_class'] . '</td>
+        <td>' . $sensor['sensor_type'] . '</td>
+        <td style="white-space: nowrap">' . $sensor['sensor_descr'] . '</td>
+        <td>' . $sensor['sensor_current'] . '</td>
         <td>
         <div class="form-group has-feedback">
-        <input type="text" class="form-control col-sm-1 input-sm sensor" id="high-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit'].'">
+        <input type="text" class="form-control col-sm-1 input-sm sensor" id="high-' . $sensor['device_id'] . '" data-device_id="' . $sensor['device_id'] . '" data-value_type="sensor_limit" data-sensor_id="' . $sensor['sensor_id'] . '" value="' . $sensor['sensor_limit'] . '">
         </div>
         </td>
         <td>
         <div class="form-group has-feedback">
-        <input type="text" class="form-control col-sm-1 input-sm sensor" id="high-'.$sensor['device_id'].'-warn" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_warn" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_warn'].'">
+        <input type="text" class="form-control col-sm-1 input-sm sensor" id="high-' . $sensor['device_id'] . '-warn" data-device_id="' . $sensor['device_id'] . '" data-value_type="sensor_limit_warn" data-sensor_id="' . $sensor['sensor_id'] . '" value="' . $sensor['sensor_limit_warn'] . '">
         </div>
         </td>
         <td>
         <div class="form-group has-feedback">
-        <input type="text" class="form-control col-sm-1 input-sm sensor" id="low-'.$sensor['device_id'].'-warn" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low_warn" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low_warn'].'">
+        <input type="text" class="form-control col-sm-1 input-sm sensor" id="low-' . $sensor['device_id'] . '-warn" data-device_id="' . $sensor['device_id'] . '" data-value_type="sensor_limit_low_warn" data-sensor_id="' . $sensor['sensor_id'] . '" value="' . $sensor['sensor_limit_low_warn'] . '">
         </div>
         </td>
         <td>
         <div class="form-group has-feedback">
-        <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low'].'">
+        <input type="text" class="form-control input-sm sensor" id="low-' . $sensor['device_id'] . '" data-device_id="' . $sensor['device_id'] . '" data-value_type="sensor_limit_low" data-sensor_id="' . $sensor['sensor_id'] . '" value="' . $sensor['sensor_limit_low'] . '">
         </div>
         </td>
         <td>
-        <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" data-sensor_desc="'.$sensor['sensor_descr'].'" '.$alert_status.'>
+        <input type="checkbox" name="alert-status" data-device_id="' . $sensor['device_id'] . '" data-sensor_id="' . $sensor['sensor_id'] . '" data-sensor_desc="' . $sensor['sensor_descr'] . '" ' . $alert_status . '>
         </td>
         <td>
-        <a type="button" class="btn btn-danger btn-sm '.$custom.' remove-custom" id="remove-custom" name="remove-custom" data-sensor_id="'.$sensor['sensor_id'].'">Reset</a>
+        <a type="button" class="btn btn-danger btn-sm ' . $custom . ' remove-custom" id="remove-custom" name="remove-custom" data-sensor_id="' . $sensor['sensor_id'] . '">Reset</a>
         </td>
         </tr>
         ';
@@ -99,12 +99,12 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
 echo csrf_field();
 foreach ($rollback as $reset_data) {
     echo '
-        <input type="hidden" name="sensor_id[]" value="'.$reset_data['sensor_id'].'">
-        <input type="hidden" name="sensor_limit[]" value="'.$reset_data['sensor_limit'].'">
-        <input type="hidden" name="sensor_limit_warn[]" value="'.$reset_data['sensor_limit_warn'].'">
-        <input type="hidden" name="sensor_limit_low_warn[]" value="'.$reset_data['sensor_limit_low_warn'].'">
-        <input type="hidden" name="sensor_limit_low[]" value="'.$reset_data['sensor_limit_low'].'">
-        <input type="hidden" name="sensor_alert[]" value="'.$reset_data['sensor_alert'].'">
+        <input type="hidden" name="sensor_id[]" value="' . $reset_data['sensor_id'] . '">
+        <input type="hidden" name="sensor_limit[]" value="' . $reset_data['sensor_limit'] . '">
+        <input type="hidden" name="sensor_limit_warn[]" value="' . $reset_data['sensor_limit_warn'] . '">
+        <input type="hidden" name="sensor_limit_low_warn[]" value="' . $reset_data['sensor_limit_low_warn'] . '">
+        <input type="hidden" name="sensor_limit_low[]" value="' . $reset_data['sensor_limit_low'] . '">
+        <input type="hidden" name="sensor_alert[]" value="' . $reset_data['sensor_alert'] . '">
         ';
 }
 ?>
@@ -146,7 +146,7 @@ $('.sensor').on('focusin', function(){
     $(this).data('val', $(this).val());
 });
 
-$( ".sensor" ).bind('blur keyup',function(e) {
+$( ".sensor" ).on('blur keyup',function(e) {
     if (e.type === 'keyup' && e.keyCode !== 13) return;
     var prev = $(this).data('val');
     var data = $(this).val();

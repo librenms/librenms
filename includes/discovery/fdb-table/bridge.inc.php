@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  LibreNMS contributors
  * @author     Tony Murray <murraytony@gmail.com>
  * @author     cjwbath
@@ -26,31 +25,33 @@
 
 // Try Q-BRIDGE-MIB::dot1qTpFdbPort first
 $fdbPort_table = snmpwalk_group($device, 'dot1qTpFdbPort', 'Q-BRIDGE-MIB');
-if (!empty($fdbPort_table)) {
+if (! empty($fdbPort_table)) {
     echo 'Q-BRIDGE-MIB:';
     $data_oid = 'dot1qTpFdbPort';
 } else {
     // If we don't have Q-BRIDGE-MIB::dot1qTpFdbPort, try BRIDGE-MIB::dot1dTpFdbPort
     $dot1d = snmpwalk_group($device, 'dot1dTpFdbPort', 'BRIDGE-MIB', 0);
     $data_oid = 'dot1dTpFdbPort';
-    if (!empty($dot1d)) {
+    if (! empty($dot1d)) {
         echo 'BRIDGE-MIB: ';
-        $fdbPort_table = array(0 => $dot1d);  // dont' have VLAN, so use 0
+        $fdbPort_table = [0 => $dot1d];  // dont' have VLAN, so use 0
     }
 }
 
-if (!empty($fdbPort_table)) {
+if (! empty($fdbPort_table)) {
     // Build dot1dBasePort to port_id dictionary
-    $portid_dict = array();
+    $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-        $portid_dict[$portLocal] = $port['port_id'];
+        if (isset($data['dot1dBasePortIfIndex'])) {
+            $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
+            $portid_dict[$portLocal] = $port['port_id'];
+        }
     }
-    
+
     // Build VLAN fdb index to real VLAN ID dictionary
     $vlan_cur_table = snmpwalk_group($device, 'dot1qVlanFdbId', 'Q-BRIDGE-MIB', 2);
-    $vlan_fdb_dict = array();
+    $vlan_fdb_dict = [];
 
     // Indexed first by dot1qVlanTimeMark, which we ignore
     foreach ($vlan_cur_table as $dot1qVlanTimeMark => $a) {
@@ -67,8 +68,8 @@ if (!empty($fdbPort_table)) {
         // index *is* the VLAN number. Code in fdb-table.inc.php to map to the
         // device VLANs table should catch anything invalid.
         $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
-        
-        foreach ($data[$data_oid] as $mac => $dot1dBasePort) {
+
+        foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 d_echo("No port known for $mac\n");
                 continue;

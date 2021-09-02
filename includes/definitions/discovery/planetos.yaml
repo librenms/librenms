@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/PLANET (?<hardware>\S+) .*(?<version>Ver\S+)?/'
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1

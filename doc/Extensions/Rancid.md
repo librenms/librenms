@@ -1,13 +1,13 @@
 source: Extensions/Rancid.md
 path: blob/master/doc/
 
-# Rancid integration
+# Rancid
 
 Librenms can generate a list of hosts that can be monitored by
 RANCID. We assume you have currently a running Rancid, and you just
 need to create and update the file 'router.db'
 
-# Included Rancid script
+## Included Rancid script
 
 To generate the config file (maybe even add a cron to schedule
 this). We've assumed a few locations for Rancid, the config file you
@@ -33,7 +33,7 @@ $config['rancid_ignorecomments'] = 0;
 
 After that, you should see some "config" tab on routers that have a rancid update.
 
-# Ubuntu Rancid Install
+## Ubuntu Rancid Install
 
 The options shown below also contains the default values.
 
@@ -79,7 +79,6 @@ Copy the output. Replace all ":" with ";" example:
 ```
 alphcr1:cisco:up will change to:
 alphcr1;cisco;up
-
 ```
 
 copy and past results into the below file:
@@ -112,7 +111,7 @@ Test config:
 `sudo /usr/lib/rancid/bin/clogin -f /var/lib/rancid/.cloginrc <device hostname>`
 
 NOTE: IF you run into a 'diffie-hellmen' kind of error, then it is
-because your Linux distro is using newer encyryprtion methods
+because your Linux distro is using newer encryption methods
 etc. This is basically just letting you know that the device you
 tested on is running an outdated encryption type. I recommend updating
 downstream device if able.  If not, the following should fix:
@@ -131,7 +130,8 @@ Upon success, run rancid:
 
 Ensure your configs pulled:
 
-```sudo su - rancid
+```
+sudo su - rancid
 cd librenms/configs/
 ls
 ```
@@ -139,8 +139,7 @@ ls
 Make sure your config files are there :-)
 
 ```
-sudo usermod -a -G rancid www-data
-cd /opt/librenms/
+sudo usermod -a -G rancid librenms
 ```
 
 Add Rancid into LibreNMS config.php:

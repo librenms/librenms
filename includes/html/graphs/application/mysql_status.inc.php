@@ -2,9 +2,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id'], 'status'));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id'], 'status']);
 
-$array = array(
+$array = [
     'State_closing_tables'       => 'd2',
     'State_copying_to_tmp_table' => 'd3',
     'State_end'                  => 'd4',
@@ -21,10 +21,10 @@ $array = array(
     'State_writing_to_net'       => 'df',
     'State_none'                 => 'dg',
     'State_other'                => 'dh',
-);
+];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $var => $ds) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         if (is_array($var)) {
@@ -35,15 +35,15 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
 
         $rrd_list[$i]['descr'] = str_replace('_', ' ', $rrd_list[$i]['descr']);
         $rrd_list[$i]['descr'] = str_replace('State ', '', $rrd_list[$i]['descr']);
-        $rrd_list[$i]['ds']    = $ds;
+        $rrd_list[$i]['ds'] = $ds;
         $i++;
     }
 } else {
     echo "file missing: $file";
 }
 
-$colours   = 'mixed';
-$nototal   = 1;
+$colours = 'mixed';
+$nototal = 1;
 $unit_text = 'activity';
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

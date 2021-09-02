@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Robrecht Plaisier
  * @author     Robbrecht Plaisier <librenms@mcq8.be>
  */
@@ -30,8 +29,8 @@ interface Transport
     /**
      * Gets called when an alert is sent
      *
-     * @param $alert_data array An array created by DescribeAlert
-     * @param $opts array|true The options from the alert_transports transport_config column
+     * @param array $alert_data An array created by DescribeAlert
+     * @param array|true $opts The options from the alert_transports transport_config column
      * @return mixed Returns if the call was successful
      */
     public function deliverAlert($alert_data, $opts);

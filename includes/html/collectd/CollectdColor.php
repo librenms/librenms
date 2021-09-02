@@ -15,11 +15,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  */
+
 namespace LibreNMS;
 
 class CollectdColor
@@ -46,7 +46,7 @@ class CollectdColor
                 }
             } else {
                 if (is_string($value)) {
-                    $matches = array();
+                    $matches = [];
                     if ($value == 'random') {
                         $this->randomize();
                     } else {
@@ -70,8 +70,9 @@ class CollectdColor
                 }
             }
         }//end if
-    }//end __construct()
+    }
 
+    //end __construct()
 
     public function randomize()
     {
@@ -88,12 +89,13 @@ class CollectdColor
         }
 
         $this->b = ($min + ((rand(0, 255) / 255.0) * ($max - $min)));
-    }//end randomize()
+    }
 
+    //end randomize()
 
     public function fade($bkgnd = null, $alpha = 0.25)
     {
-        if (is_null($bkgnd) || !is_a($bkgnd, 'CollectdColor')) {
+        if (is_null($bkgnd) || ! is_a($bkgnd, 'CollectdColor')) {
             $bg_r = 1.0;
             $bg_g = 1.0;
             $bg_b = 1.0;
@@ -106,24 +108,27 @@ class CollectdColor
         $this->r = ($alpha * $this->r + ((1.0 - $alpha) * $bg_r));
         $this->g = ($alpha * $this->g + ((1.0 - $alpha) * $bg_g));
         $this->b = ($alpha * $this->b + ((1.0 - $alpha) * $bg_b));
-    }//end fade()
+    }
 
+    //end fade()
 
     public function toArray()
     {
-        return array(
+        return [
             'r' => $this->r,
             'g' => $this->g,
             'b' => $this->b,
-        );
-    }//end as_array()
+        ];
+    }
 
+    //end as_array()
 
     public function toString()
     {
-        $r = (int)($this->r * 255);
-        $g = (int)($this->g * 255);
-        $b = (int)($this->b * 255);
+        $r = (int) ($this->r * 255);
+        $g = (int) ($this->g * 255);
+        $b = (int) ($this->b * 255);
+
         return sprintf('%02x%02x%02x', $r > 255 ? 255 : $r, $g > 255 ? 255 : $g, $b > 255 ? 255 : $b);
     }
 }

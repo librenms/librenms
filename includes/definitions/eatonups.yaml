@@ -1,15 +1,16 @@
 os: eatonups
 text: 'Eaton UPS'
+group: ups
 type: power
 icon: eaton
+mib_dir: eaton
 over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_current, text: Current }
-    - { graph: device_frequency, text: Frequencies }
-mib_dir:
-    - ups
+    - { graph: device_frequency, text: Load }
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.534.1
+        sysDescr_regex: '/^ConnectUPS Web\/SNMP Card .*/'
     -
         sysObjectID: .1.3.6.1.4.1.534.2

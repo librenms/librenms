@@ -14,13 +14,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Tests JnxDomAlertSet and JnxDomAlertCleared traps from Juniper devices.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -30,14 +29,12 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxPowerSupplyTest extends SnmpTrapTestCase
 {
     public function testJnxPowerSupplyFailureTrap()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:49716->[10.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 470:23:25:41.21
@@ -51,7 +48,7 @@ JUNIPER-MIB::jnxOperatingState.2.4.0.0 down
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
 
         $trap = new Trap($trapText);
-        $message = "Power Supply PEM 3 is down";
+        $message = 'Power Supply PEM 3 is down';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxPowerSupplyFailure');
@@ -59,12 +56,11 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
 
     public function testJnxPowerSupplyOkTrap()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:49716->[10.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 470:23:25:41.21
-SNMPv2-MIB::snmpTrapOID.0 JUNIPER-MIB::jnxPowerSupplyOk
+SNMPv2-MIB::snmpTrapOID.0 JUNIPER-MIB::jnxPowerSupplyOK
 JUNIPER-MIB::jnxContentsContainerIndex.2.4.0.0 2
 JUNIPER-MIB::jnxContentsL1Index.2.4.0.0 4
 JUNIPER-MIB::jnxContentsL2Index.2.4.0.0 0
@@ -74,9 +70,9 @@ JUNIPER-MIB::jnxOperatingState.2.4.0.0 ok
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
 
         $trap = new Trap($trapText);
-        $message = "Power Supply PEM 4 is OK";
+        $message = 'Power Supply PEM 4 is OK';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxPowerSupplyOk');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxPowerSupplyOK');
     }
 }

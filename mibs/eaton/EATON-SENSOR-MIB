@@ -1,0 +1,1574 @@
+EATON-SENSOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, 
+    Counter32, Integer32
+        FROM SNMPv2-SMI
+    NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    sensorAgent
+        FROM EATON-OIDS;
+
+eatonSensor MODULE-IDENTITY
+    LAST-UPDATED "201812171200Z"
+    ORGANIZATION 
+        "Eaton Corporation"
+    CONTACT-INFO 
+        "http://powerquality.eaton.com"
+    DESCRIPTION 
+        "The MIB module for Eaton Sensors."
+    REVISION "201812171200Z"
+    DESCRIPTION 
+        "Initial release."
+::= { sensorAgent 1 }
+
+-- eatonSensor { iso org(3) dod(6) internet(1) private(4)
+--       enterprises(1) eaton(534) products(6) sensorAgent(8) (1) }
+
+sensor               OBJECT IDENTIFIER ::= { eatonSensor 1 }
+temperature          OBJECT IDENTIFIER ::= { eatonSensor 2 }
+humidity             OBJECT IDENTIFIER ::= { eatonSensor 3 }
+digitalInput         OBJECT IDENTIFIER ::= { eatonSensor 4 }
+conformance          OBJECT IDENTIFIER ::= { eatonSensor 10 }
+
+-- Textual Conventions
+UnixTimeStamp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT      "dddddddddd"
+    STATUS     current
+    DESCRIPTION 
+        "Unix time stamp. Measured in seconds since January 1, 1970."
+    SYNTAX  Counter32
+
+PositionType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the position by reference to the data center aisle."
+    SYNTAX  INTEGER {
+        undefined(0),
+        other(1),
+        rackRear(2),
+        rackFront(3),
+        batteryRoom(4)
+        }
+
+ElevationType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the elevation in the rack."
+    SYNTAX  INTEGER {
+        undefined(0),
+        other(1),
+        bottom(2),
+        middle(3),
+        top(4)
+        }
+
+CommunicationStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the communication sensor status or probe status."
+    SYNTAX  INTEGER {
+        unknown(0),
+        communicationOK(2),
+        communicationLost(3)
+        }
+
+ProbeConnectionType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the probe connection to the sensor or probe."
+    SYNTAX  INTEGER {
+        undefined(0),
+        internal(1),
+        wired(2),
+        wireless(3)
+        }
+
+EnableType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes enable/disable."
+    SYNTAX  INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+
+AlarmType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the alarm according to a measured value by reference to the triggers."
+    SYNTAX  INTEGER {
+        good(0),
+        lowWarning(1),
+        lowCritical(2),
+        highWarning(3),
+        highCritical(4)
+        }
+
+ResetCommandType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Commands a reset."
+    SYNTAX  INTEGER {
+        none(0),
+        reset(1)
+        }
+
+PolarityType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the polarity configuration."
+    SYNTAX  INTEGER {
+        normallyOpened(0),
+        normallyClosed(1)
+        }
+
+AlarmSeverityType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the alarm severity."
+    SYNTAX  INTEGER {
+        informationnal(1),
+        warning(2),
+        critical(3)
+        }
+
+AlarmLevelType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the alarm level."
+    SYNTAX  INTEGER {
+        good(0),
+        informationnal(1),
+        warning(2),
+        critical(3)
+        }
+
+StateType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the state of a digital input that depends on its measure
+                 and the polrity configuration."
+    SYNTAX  INTEGER {
+        inactive(0),
+        active(1)
+        }
+
+TemperatureUnitType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Describes the temperature unit used to read/write the temperature data."
+    SYNTAX  INTEGER {
+        tenthOfDegKelvin(0),
+        tenthOfDegCelsius(1),
+        tenthOfDegFarhenheit(2)
+        }
+
+-- -----------------------------------------------------------------------------
+
+sensorCount  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Number of sensor managed on this device."
+    ::= { sensor 1 }
+
+sensorIdentificationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF SensorIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of sensor devices identification data.
+         The number of entries is given by sensorCount."
+    ::= { sensor  2}
+
+sensorIdentificationEntry  OBJECT-TYPE
+    SYNTAX     SensorIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a sensor device identification."
+    INDEX { sensorIndex }
+    ::= { sensorIdentificationTable 1 }
+
+SensorIdentificationEntry ::= SEQUENCE {
+    sensorIndex
+        Integer32,
+    sensorUuid
+        OCTET STRING,
+    sensorConnectionType
+        ProbeConnectionType,
+    sensorAddress
+        OCTET STRING,
+    sensorMonitoredBy
+        OBJECT IDENTIFIER,
+    sensorManufacturer
+        OCTET STRING,
+    sensorModel
+        OCTET STRING,
+    sensorPartNumber
+        OCTET STRING,
+    sensorSerialNumber
+        OCTET STRING,
+    sensorFirmwareVersion
+        OCTET STRING
+}
+
+sensorIndex  OBJECT-TYPE
+    SYNTAX     Integer32 (1..3)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION 
+        "A unique value for each sensor device.  Its value
+         ranges from 1 to sensorCount."
+    ::= { sensorIdentificationEntry 1 }
+
+sensorUuid  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "A unique uuid value for each sensor device."
+    ::= { sensorIdentificationEntry 2 }
+
+sensorConnectionType  OBJECT-TYPE
+    SYNTAX     ProbeConnectionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Sensor connection type with the device that monitors it."
+    ::= { sensorIdentificationEntry 3 }
+
+sensorAddress  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Depending of the connection implementation : Modbus Slave Id, BT Mac address, ..."
+    ::= { sensorIdentificationEntry 4 }
+
+sensorMonitoredBy  OBJECT-TYPE
+    SYNTAX     OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Parent oid device where the sensor is connected to and monitored by."
+    ::= { sensorIdentificationEntry 5 }
+
+sensorManufacturer  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The vendor name of the sensor device."
+    ::= { sensorIdentificationEntry 6 }
+
+sensorModel  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The model name of the sensor device."
+    ::= { sensorIdentificationEntry 7 }
+
+sensorPartNumber  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The catalog part number of the sensor device."
+    ::= { sensorIdentificationEntry 8 }
+
+sensorSerialNumber  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The serial number of the sensor device."
+    ::= { sensorIdentificationEntry 9 }
+
+sensorFirmwareVersion  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The firmware version of the sensor device."
+    ::= { sensorIdentificationEntry 10 }
+
+
+sensorConfigurationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF SensorConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of sensor devices configuration data.
+         The number of entries is given by sensorCount."
+    ::= { sensor 3 }
+
+sensorConfigurationEntry  OBJECT-TYPE
+    SYNTAX     SensorConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a sensor device configuration."
+    INDEX { sensorIndex }
+    ::= { sensorConfigurationTable 1 }
+
+SensorConfigurationEntry ::= SEQUENCE {
+    sensorName
+        OCTET STRING,
+    sensorLocation
+        OCTET STRING,
+    sensorPosition
+        PositionType,
+    sensorElevation
+        ElevationType,
+    sensorUElevation
+        Integer32
+}
+
+sensorName  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The friendly name of the sensor device."
+    ::= { sensorConfigurationEntry 1 }
+
+sensorLocation  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The location of the sensor device."
+    ::= { sensorConfigurationEntry 2 }
+  
+sensorPosition  OBJECT-TYPE
+    SYNTAX     PositionType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The Position by reference to the data center aisle."
+    ::= { sensorConfigurationEntry 3 }
+
+sensorElevation  OBJECT-TYPE
+    SYNTAX     ElevationType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The Elevation in the rack."
+    ::= { sensorConfigurationEntry 4 }
+  
+sensorUElevation  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The elevation in the rack in count of U position from the bottom."
+    ::= { sensorConfigurationEntry 5 }
+
+
+sensorMonitoringTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF SensorMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of sensor devices monitoring data.
+         The number of entries is given by sensorCount."
+    ::= { sensor 4 }
+
+sensorMonitoringEntry  OBJECT-TYPE
+    SYNTAX     SensorMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a sensor device monitoring."
+    INDEX { sensorIndex }
+    ::= { sensorMonitoringTable 1 }
+
+SensorMonitoringEntry ::= SEQUENCE {
+    sensorStatus
+        CommunicationStatus,
+    sensorStatusSince
+        UnixTimeStamp,
+    sensorTemperatureCount
+        Integer32,
+    sensorHumidityCount
+        Integer32,
+    sensorDigitalInputCount
+        Integer32,
+    sensorAnalogInputCount
+        Integer32
+}
+
+sensorStatus  OBJECT-TYPE
+    SYNTAX     CommunicationStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Indicates how the sensor is communicating or not."
+    ::= { sensorMonitoringEntry 1 }
+
+sensorStatusSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the sensor status last change."
+    ::= { sensorMonitoringEntry 2 }
+
+sensorTemperatureCount  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Number of temperature probes managed by the sensor device."
+    ::= { sensorMonitoringEntry 3 }
+
+sensorHumidityCount  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Number of humidity probes managed by the sensor device."
+    ::= { sensorMonitoringEntry 4 }
+
+sensorDigitalInputCount  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Number of digital input probes managed by the sensor device."
+    ::= { sensorMonitoringEntry 5 }
+
+sensorAnalogInputCount  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Number of analog input probes managed by the sensor device."
+    ::= { sensorMonitoringEntry 6 }
+
+sensorNotification OBJECT IDENTIFIER ::= { sensor 0 }
+
+notifySensorCount  NOTIFICATION-TYPE
+    OBJECTS { sensorCount }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the sensor count changes after a discovery or removing 
+         from the UI."
+    ::= { sensorNotification 1 }
+
+notifySensorStatus  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              sensorUuid,
+              sensorStatus,
+              sensorStatusSince }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the sensor status changes."
+    ::= { sensorNotification 2 }
+
+-- -----------------------------------------------------------------------------
+
+temperatureIdentificationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF TemperatureIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of temperature probe measurements. the number of entries
+         is given by the temperature count."
+    ::= { temperature 1 }
+
+temperatureIdentificationEntry  OBJECT-TYPE
+    SYNTAX     TemperatureIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a temperature probe identification."
+    INDEX { sensorIndex, temperatureIndex }
+    ::= { temperatureIdentificationTable 1 }
+
+TemperatureIdentificationEntry ::= SEQUENCE {
+    temperatureIndex
+        Integer32,
+    temperatureUuid
+        OCTET STRING,
+    temperatureConnectionType
+        ProbeConnectionType
+}
+
+temperatureIndex  OBJECT-TYPE
+    SYNTAX     Integer32 (1..2)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION 
+        "A unique value for each temperature probe measurement.  Its value
+              ranges from 1 to sensorTemperatureCount."
+    ::= { temperatureIdentificationEntry 1 }
+
+temperatureUuid  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "A unique uuid value for each temperature."
+    ::= { temperatureIdentificationEntry 2 }
+
+temperatureConnectionType  OBJECT-TYPE
+    SYNTAX     ProbeConnectionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Probe connection type with the sensor that monitors it."
+    ::= { temperatureIdentificationEntry 3 }
+
+
+temperatureConfigurationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF TemperatureConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of temperature probe configuration.  The number of entries is
+              given by sensorTemperatureCount."
+    ::= { temperature 2 }
+
+temperatureConfigurationEntry  OBJECT-TYPE
+    SYNTAX     TemperatureConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a temperature probe configuration."
+    INDEX { sensorIndex, temperatureIndex }
+    ::= { temperatureConfigurationTable 1 }
+
+TemperatureConfigurationEntry ::= SEQUENCE {
+    temperatureName
+        OCTET STRING,
+    temperatureEnable
+        EnableType,
+    temperatureOffset
+        Integer32,
+    temperatureAlarmEnable
+        EnableType,
+    temperatureThresholdLowWarning
+         Integer32,
+    temperatureThresholdLowCritical
+         Integer32,
+    temperatureThresholdHighWarning
+         Integer32,
+    temperatureThresholdHighCritical
+         Integer32,
+    temperatureThresholdHysteresis
+         Integer32,
+    temperatureAlarmGracePeriod
+         Integer32
+}
+
+temperatureName  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The friendly name of the sensor temperature probe."
+    ::= { temperatureConfigurationEntry 1 }
+
+temperatureEnable  OBJECT-TYPE
+    SYNTAX     EnableType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the temperature acquired or not.
+         0:disabled, 1:enabled"
+    ::= { temperatureConfigurationEntry 2 }
+
+temperatureOffset  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the offset (Minus or Plus) to be added to the acquired value
+         in order to correct the probe measurement error.
+         See temperatureUnit data for the units."
+    ::= { temperatureConfigurationEntry 3 }
+
+temperatureAlarmEnable  OBJECT-TYPE
+    SYNTAX     EnableType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the temperature alarm depending on the thresholds evaluated or not.
+         0:disabled, 1:enabled"
+    ::= { temperatureConfigurationEntry 4 }
+
+temperatureThresholdLowWarning  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Low warning temperature threshold.
+         See temperatureUnit data for the units."
+    ::= { temperatureConfigurationEntry 5 }
+
+temperatureThresholdLowCritical  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Low critical temperature threshold.
+         See temperatureUnit data for the units."
+    ::= { temperatureConfigurationEntry 6 }
+
+temperatureThresholdHighWarning  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "High warning temperature threshold.
+         See temperatureUnit data for the units."
+    ::= { temperatureConfigurationEntry 7 }
+
+temperatureThresholdHighCritical  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "High critical temperature threshold.
+         See temperatureUnit data for the units."
+    ::= { temperatureConfigurationEntry 8 }
+
+temperatureThresholdHysteresis  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Temperature threshold hysteresis.
+         See temperatureUnit data for the units."
+    ::= { temperatureConfigurationEntry 9 }
+
+temperatureAlarmGracePeriod  OBJECT-TYPE
+    SYNTAX     Integer32 (1..60)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The grace period the alarm triggers after the acquired value crosses
+         a trigger value (in seconds)."
+    ::= { temperatureConfigurationEntry 10 }
+
+
+temperatureMonitoringTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF TemperatureMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of temperature probe monitoring.  The number of entries is
+         given by sensorTemperatureCount."
+    ::= { temperature 3 }
+
+temperatureMonitoringEntry  OBJECT-TYPE
+    SYNTAX     TemperatureMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a temperature probe monitoring."
+    INDEX { sensorIndex, temperatureIndex }
+    ::= { temperatureMonitoringTable 1 }
+
+TemperatureMonitoringEntry ::= SEQUENCE {
+    temperatureAlarm
+         AlarmType,
+    temperatureAlarmChangeSince
+         UnixTimeStamp,
+    temperatureValue
+         Integer32,
+    temperatureCommunicationStatus
+         CommunicationStatus,
+    temperatureCommunicationStatusSince
+         UnixTimeStamp
+}
+
+temperatureAlarm  OBJECT-TYPE
+    SYNTAX     AlarmType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Alarm set according to the realtime measure compared to the thresholds."
+    ::= { temperatureMonitoringEntry 1 }
+
+temperatureAlarmChangeSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the temperature alarm last change."
+    ::= { temperatureMonitoringEntry 2 }
+
+temperatureValue  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Realtime measured value after correction with the offset.
+         See temperatureUnit data for the units."
+    ::= { temperatureMonitoringEntry 3 }
+
+temperatureCommunicationStatus  OBJECT-TYPE
+    SYNTAX     CommunicationStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Indicates how the temperature probe is communicating or not."
+    ::= { temperatureMonitoringEntry 4 }
+
+temperatureCommunicationStatusSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the temperature communication status last change."
+    ::= { temperatureMonitoringEntry 5 }
+
+
+temperatureMonitoringMinMaxTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF TemperatureMonitoringMinMaxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of temperature probe monitoring Min and Max.  The number of entries is
+         given by sensorTemperatureCount."
+    ::= { temperature 4 }
+
+temperatureMonitoringMinMaxEntry  OBJECT-TYPE
+    SYNTAX     TemperatureMonitoringMinMaxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a temperature probe monitoring Min and Max."
+    INDEX { sensorIndex, temperatureIndex }
+    ::= { temperatureMonitoringMinMaxTable 1 }
+
+TemperatureMonitoringMinMaxEntry ::= SEQUENCE {
+    temperatureMinValue
+         Integer32,
+    temperatureMinValueSince
+         UnixTimeStamp,
+    temperatureMaxValue
+         Integer32,
+    temperatureMaxValueSince
+         UnixTimeStamp,
+    temperatureResetMinMax
+         ResetCommandType
+}
+
+temperatureMinValue  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Minimum value registered since the 1st connection of the sensor or the last reset.
+         See temperatureUnit data for the units."
+    ::= { temperatureMonitoringMinMaxEntry 1 }
+
+temperatureMinValueSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the temperature min value last change."
+    ::= { temperatureMonitoringMinMaxEntry 2 }
+
+temperatureMaxValue  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Maximum value registered since the 1st connection of the sensor or the last reset.
+         See temperatureUnit data for the units."
+    ::= { temperatureMonitoringMinMaxEntry 3 }
+
+temperatureMaxValueSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the temperature max value last change."
+    ::= { temperatureMonitoringMinMaxEntry 4 }
+
+temperatureResetMinMax  OBJECT-TYPE
+    SYNTAX     ResetCommandType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Command that resets the min and max data with the current measure.
+         0:None, 1:Reset"
+    ::= { temperatureMonitoringMinMaxEntry 5 }
+
+temperatureUnit  OBJECT-TYPE
+    SYNTAX     TemperatureUnitType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Temperature unit configuration. It is a global setting for all the v1
+         and  v3 SNMP client. It does not involve the temperature unit of data
+         stored and managed in the card. But it does configure the unit the temperatures
+         data are red and written in this Mib.
+         The possible values are tenthOfDegCelsius(0), tenthOfDegFarhenheit(1),
+         tenthOfDegKelvin(2)."
+    ::= { temperature 5 }
+
+
+temperatureNotification OBJECT IDENTIFIER ::= { temperature 0 }
+
+notifyTemperatureAlarm  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              temperatureIndex,
+              temperatureUuid,
+              temperatureAlarm,
+              temperatureAlarmChangeSince,
+              temperatureValue }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the temperature alarm changes."
+    ::= { temperatureNotification 1 }
+
+notifyTemperatureCommunicationStatus  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              temperatureIndex,
+              temperatureUuid,
+              temperatureCommunicationStatus,
+              temperatureCommunicationStatusSince }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the temperature communication status changes.
+         Is not implemented when the probe is internal (see temperatureConnectionType)."
+    ::= { temperatureNotification 2 }
+
+-- -----------------------------------------------------------------------------
+
+
+humidityIdentificationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HumidityIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of humidity probe measurements. the number of entries
+         is given by the humidity count."
+    ::= { humidity 1 }
+
+humidityIdentificationEntry  OBJECT-TYPE
+    SYNTAX     HumidityIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a humidity probe identification."
+    INDEX { sensorIndex, humidityIndex }
+    ::= { humidityIdentificationTable 1 }
+
+HumidityIdentificationEntry ::= SEQUENCE {
+    humidityIndex
+        Integer32,
+    humidityUuid
+        OCTET STRING,
+    humidityConnectionType
+        ProbeConnectionType
+}
+
+humidityIndex  OBJECT-TYPE
+    SYNTAX     Integer32 (1..2)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION 
+        "A unique value for each humidity probe measurement.  Its value
+              ranges from 1 to sensorhumidityCount."
+    ::= { humidityIdentificationEntry 1 }
+
+humidityUuid  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "A unique uuid value for each humidity."
+    ::= { humidityIdentificationEntry 2 }
+
+humidityConnectionType  OBJECT-TYPE
+    SYNTAX     ProbeConnectionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Probe connection type with the sensor that monitors it."
+    ::= { humidityIdentificationEntry 3 }
+
+
+humidityConfigurationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HumidityConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of humidity probe configuration.  The number of entries is
+              given by sensorhumidityCount."
+    ::= { humidity 2 }
+
+humidityConfigurationEntry  OBJECT-TYPE
+    SYNTAX     HumidityConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a humidity probe configuration."
+    INDEX { sensorIndex, humidityIndex }
+    ::= { humidityConfigurationTable 1 }
+
+HumidityConfigurationEntry ::= SEQUENCE {
+    humidityName
+        OCTET STRING,
+    humidityEnable
+        EnableType,
+    humidityOffset
+        Integer32,
+    humidityAlarmEnable
+        EnableType,
+    humidityThresholdLowWarning
+         Integer32,
+    humidityThresholdLowCritical
+         Integer32,
+    humidityThresholdHighWarning
+         Integer32,
+    humidityThresholdHighCritical
+         Integer32,
+    humidityThresholdHysteresis
+         Integer32,
+    humidityAlarmGracePeriod
+         Integer32
+}
+
+humidityName  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The friendly name of the sensor humidity probe."
+    ::= { humidityConfigurationEntry 1 }
+
+humidityEnable  OBJECT-TYPE
+    SYNTAX     EnableType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the humidity acquired or not.
+         0:disabled, 1:enabled"
+    ::= { humidityConfigurationEntry 2 }
+
+humidityOffset  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the offset (Minus or Plus) to be added to the acquired value
+         in order to correct the probe measurement error. in tenth of % units."
+    ::= { humidityConfigurationEntry 3 }
+
+humidityAlarmEnable  OBJECT-TYPE
+    SYNTAX     EnableType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the humidity alarm depending on the thresholds evaluated or not.
+         0:disabled, 1:enabled"
+    ::= { humidityConfigurationEntry 4 }
+
+humidityThresholdLowWarning  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Low warning humidity threshold in tenth of % units."
+    ::= { humidityConfigurationEntry 5 }
+
+humidityThresholdLowCritical  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Low critical humidity threshold in tenth of % units."
+    ::= { humidityConfigurationEntry 6 }
+
+humidityThresholdHighWarning  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "High warning humidity threshold in tenth of % units."
+    ::= { humidityConfigurationEntry 7 }
+
+humidityThresholdHighCritical  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "High critical humidity threshold in tenth of % units."
+    ::= { humidityConfigurationEntry 8 }
+
+humidityThresholdHysteresis  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "humidity threshold hysteresis in tenth of % units."
+    ::= { humidityConfigurationEntry 9 }
+
+humidityAlarmGracePeriod  OBJECT-TYPE
+    SYNTAX     Integer32 (1..60)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The grace period the alarm triggers after the acquired value crosses
+         a trigger value (in seconds)."
+    ::= { humidityConfigurationEntry 10 }
+
+
+humidityMonitoringTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HumidityMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of humidity probe monitoring.  The number of entries is
+         given by sensorhumidityCount."
+    ::= { humidity 3 }
+
+humidityMonitoringEntry  OBJECT-TYPE
+    SYNTAX     HumidityMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a humidity probe monitoring."
+    INDEX { sensorIndex, humidityIndex }
+    ::= { humidityMonitoringTable 1 }
+
+HumidityMonitoringEntry ::= SEQUENCE {
+    humidityAlarm
+         AlarmType,
+    humidityAlarmChangeSince
+         UnixTimeStamp,
+    humidityValue
+         Integer32,
+    humidityCommunicationStatus
+         CommunicationStatus,
+    humidityCommunicationStatusSince
+         UnixTimeStamp
+}
+
+humidityAlarm  OBJECT-TYPE
+    SYNTAX     AlarmType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Alarm set according to the realtime measure compared to the thresholds."
+    ::= { humidityMonitoringEntry 1 }
+
+humidityAlarmChangeSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the humidity alarm last change."
+    ::= { humidityMonitoringEntry 2 }
+
+humidityValue  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Realtime measured value after correction with the offset. in tenth of % units."
+    ::= { humidityMonitoringEntry 3 }
+
+humidityCommunicationStatus  OBJECT-TYPE
+    SYNTAX     CommunicationStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Indicates how the humidity probe is communicating or not."
+    ::= { humidityMonitoringEntry 4 }
+
+humidityCommunicationStatusSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the humidity communication status last change."
+    ::= { humidityMonitoringEntry 5 }
+
+
+humidityMonitoringMinMaxTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HumidityMonitoringMinMaxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of humidity probe monitoring Min and Max.  The number of entries is
+         given by sensorhumidityCount."
+    ::= { humidity 4 }
+
+humidityMonitoringMinMaxEntry  OBJECT-TYPE
+    SYNTAX     HumidityMonitoringMinMaxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a humidity probe monitoring Min and Max."
+    INDEX { sensorIndex, humidityIndex }
+    ::= { humidityMonitoringMinMaxTable 1 }
+
+HumidityMonitoringMinMaxEntry ::= SEQUENCE {
+    humidityMinValue
+         Integer32,
+    humidityMinValueSince
+         UnixTimeStamp,
+    humidityMaxValue
+         Integer32,
+    humidityMaxValueSince
+         UnixTimeStamp,
+    humidityResetMinMax
+         ResetCommandType
+}
+
+humidityMinValue  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Minimum value registered since the 1st connection of the sensor or the last reset.
+         in tenth of % units."
+    ::= { humidityMonitoringMinMaxEntry 1 }
+
+humidityMinValueSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the humidity min value last change."
+    ::= { humidityMonitoringMinMaxEntry 2 }
+
+humidityMaxValue  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Maximum value registered since the 1st connection of the sensor or the last reset.
+         in tenth of % units."
+    ::= { humidityMonitoringMinMaxEntry 3 }
+
+humidityMaxValueSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the humidity max value last change."
+    ::= { humidityMonitoringMinMaxEntry 4 }
+
+humidityResetMinMax  OBJECT-TYPE
+    SYNTAX     ResetCommandType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Command that resets the min and max data with the current measure.
+         0:None, 1:Reset"
+    ::= { humidityMonitoringMinMaxEntry 5 }
+
+
+humidityNotification OBJECT IDENTIFIER ::= { humidity 0 }
+
+notifyHumidityAlarm  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              humidityIndex,
+              humidityUuid,
+              humidityAlarm,
+              humidityAlarmChangeSince,
+              humidityValue }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the humidity alarm changes."
+    ::= { humidityNotification 1 }
+
+notifyHumidityCommunicationStatus  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              humidityIndex,
+              humidityUuid,
+              humidityCommunicationStatus,
+              humidityCommunicationStatusSince }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the humidity communication status changes.
+         Is not implemented when the probe is internal (see humidityConnectionType)."
+    ::= { humidityNotification 2 }
+
+-- -----------------------------------------------------------------------------
+
+
+digitalInputIdentificationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF DigitalInputIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of digital input probe measurements.  The number of entries is
+              given by sensorDigitalInputCount."
+    ::= { digitalInput 1 }
+
+digitalInputIdentificationEntry  OBJECT-TYPE
+    SYNTAX     DigitalInputIdentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a digital input identification."
+    INDEX { sensorIndex, digitalInputIndex }
+    ::= { digitalInputIdentificationTable 1 }
+
+DigitalInputIdentificationEntry ::= SEQUENCE {
+    digitalInputIndex
+        Integer32,
+    digitalInputUuid
+        OCTET STRING,
+    digitalInputConnectionType
+        ProbeConnectionType
+}
+
+digitalInputIndex  OBJECT-TYPE
+    SYNTAX     Integer32 (1..2)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION 
+        "A unique value for each digital input probe measurement.  Its value
+              ranges from 1 to sensorDigitalInputCount."
+    ::= { digitalInputIdentificationEntry 1 }
+
+digitalInputUuid  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "A unique uuid value for each digital Input."
+    ::= { digitalInputIdentificationEntry 2 }
+
+digitalInputConnectionType  OBJECT-TYPE
+    SYNTAX     ProbeConnectionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Probe connection type with the sensor that monitors it."
+    ::= { digitalInputIdentificationEntry 3 }
+
+
+digitalInputConfigurationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF DigitalInputConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of digital input probe configuration.  The number of entries is
+              given by sensorDigitalInputCount."
+    ::= { digitalInput 2 }
+
+digitalInputConfigurationEntry  OBJECT-TYPE
+    SYNTAX     DigitalInputConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a digital input probe configuration."
+    INDEX { sensorIndex, digitalInputIndex }
+    ::= { digitalInputConfigurationTable 1 }
+
+DigitalInputConfigurationEntry ::= SEQUENCE {
+    digitalInputName
+        OCTET STRING,
+    digitalInputEnable
+        EnableType,
+    digitalInputPolarity
+        PolarityType,
+    digitalInputAlarmEnable
+        EnableType,
+    digitalInputAlarmSeverity
+        AlarmSeverityType,
+    digitalInputAlarmGracePeriod
+        Integer32
+}
+
+digitalInputName  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The friendly name of the digital input probe."
+    ::= { digitalInputConfigurationEntry 1 }
+
+digitalInputEnable  OBJECT-TYPE
+    SYNTAX     EnableType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the digital input acquired or not.
+         0:disabled, 1:enabled"
+    ::= { digitalInputConfigurationEntry 2 }
+
+digitalInputPolarity  OBJECT-TYPE
+    SYNTAX     PolarityType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the digitalInput polarity.
+        0 : Normally opened, 1 : Normally closed"
+    ::= { digitalInputConfigurationEntry 3 }
+
+digitalInputAlarmEnable  OBJECT-TYPE
+    SYNTAX     EnableType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the digitalInput alarm depending on the polarity evaluated or not.
+         0:disabled, 1:enabled"
+    ::= { digitalInputConfigurationEntry 4 }
+
+digitalInputAlarmSeverity  OBJECT-TYPE
+    SYNTAX     AlarmSeverityType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "Configure the alarm severity."
+    ::= { digitalInputConfigurationEntry 5 }
+
+digitalInputAlarmGracePeriod  OBJECT-TYPE
+    SYNTAX     Integer32 (1..60)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "The delay the alarm triggers when the state change event occurs (in seconds)."
+    ::= { digitalInputConfigurationEntry 6 }
+
+
+digitalInputMonitoringTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF DigitalInputMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A list of digital input probee monitoring.  The number of entries is
+         given by sensorDigitalInputCount."
+    ::= { digitalInput 3 }
+
+digitalInputMonitoringEntry  OBJECT-TYPE
+    SYNTAX     DigitalInputMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "An entry for a digital Input probe."
+    INDEX { sensorIndex, digitalInputIndex }
+    ::= { digitalInputMonitoringTable 1 }
+
+DigitalInputMonitoringEntry ::= SEQUENCE {
+    digitalInputAlarm
+         AlarmLevelType,
+    digitalInputAlarmChangeSince
+         UnixTimeStamp,
+    digitalInputState
+         Integer32,
+    digitalInputStateSince
+         UnixTimeStamp,
+    digitalInputCommunicationStatus
+         CommunicationStatus,
+    digitalInputCommunicationStatusSince
+         UnixTimeStamp
+}
+
+digitalInputAlarm  OBJECT-TYPE
+    SYNTAX     AlarmLevelType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Alarm set according to the polarity and alarm severity configuration."
+    ::= { digitalInputMonitoringEntry 1 }
+
+digitalInputAlarmChangeSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the digital input alarm last change."
+    ::= { digitalInputMonitoringEntry 2 }
+
+digitalInputState  OBJECT-TYPE
+    SYNTAX     StateType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Measure of the digital input after applying the polarity configured.
+         0 : Inactive, 1 : Active"
+    ::= { digitalInputMonitoringEntry 3 }
+
+digitalInputStateSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the digital input state last change."
+    ::= { digitalInputMonitoringEntry 4 }
+
+digitalInputCommunicationStatus  OBJECT-TYPE
+    SYNTAX     CommunicationStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "Indicates how the digital input is communicating or not."
+    ::= { digitalInputMonitoringEntry 5 }
+
+digitalInputCommunicationStatusSince  OBJECT-TYPE
+    SYNTAX     UnixTimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "UTC time in seconds since 1970/01/01 dating the digital input communication status last change."
+    ::= { digitalInputMonitoringEntry 6 }
+
+
+digitalInputNotification OBJECT IDENTIFIER ::= { digitalInput 0 }
+
+notifyDigitalInputAlarm  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              digitalInputIndex,
+              digitalInputUuid,
+              digitalInputAlarm,
+              digitalInputAlarmChangeSince,
+              digitalInputState,
+              digitalInputStateSince }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the digital input alarm changes."
+    ::= { digitalInputNotification 1 }
+
+notifydigitalInputCommunicationStatus  NOTIFICATION-TYPE
+    OBJECTS { sensorIndex,
+              digitalInputIndex,
+              digitalInputUuid,
+              digitalInputCommunicationStatus,
+              digitalInputCommunicationStatusSince }
+    STATUS     current
+    DESCRIPTION 
+        "Sent whenever the digital input communication status changes.
+         Is not implemented when the probe is internal (see digitalInputConnectionType)."
+    ::= { digitalInputNotification 2 }
+
+
+eatonSensorCompliances  MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION 
+        "The requirements for conforming to the Sensor MIB."
+    MODULE
+        MANDATORY-GROUPS { sensorRequiredGroup } 
+        GROUP sensorOptionalGroup
+        DESCRIPTION 
+        "Different sensors will support a subset of the defined objects."
+        GROUP sensorNotifyGroup
+        DESCRIPTION 
+        "Different sensors will support a subset of the defined notifications."
+    ::= { conformance 1 }
+
+objectGroups         OBJECT IDENTIFIER ::= { conformance 2 }
+
+sensorRequiredGroup  OBJECT-GROUP
+    OBJECTS { sensorCount,
+              sensorIndex,
+              sensorManufacturer,
+              sensorModel,
+              sensorPartNumber,
+              sensorSerialNumber,
+              sensorFirmwareVersion,
+              sensorName,
+              sensorStatus,
+              sensorStatusSince,
+              sensorTemperatureCount,
+              sensorHumidityCount,
+              sensorDigitalInputCount,
+              temperatureIndex,
+              temperatureName,
+              temperatureValue,
+              temperatureUnit,
+              humidityIndex,
+              humidityName,
+              humidityValue,
+              digitalInputIndex,
+              digitalInputName
+            }
+    STATUS     current
+    DESCRIPTION 
+        "These objects are required to conform to this MIB."
+    ::= { objectGroups 1 }
+
+sensorOptionalGroup  OBJECT-GROUP
+    OBJECTS { sensorUuid,
+              sensorConnectionType,
+              sensorAddress,
+              sensorMonitoredBy,
+              sensorLocation,
+              sensorPosition,
+              sensorElevation,
+              sensorUElevation,
+              sensorAnalogInputCount,
+              temperatureUuid,
+              temperatureConnectionType,
+              temperatureEnable,
+              temperatureOffset,
+              temperatureAlarmEnable,                                                 
+              temperatureThresholdLowWarning,
+              temperatureThresholdLowCritical,
+              temperatureThresholdHighWarning,
+              temperatureThresholdHighCritical,
+              temperatureThresholdHysteresis,
+              temperatureAlarmGracePeriod,
+              temperatureAlarm,
+              temperatureAlarmChangeSince,
+              temperatureCommunicationStatus,
+              temperatureCommunicationStatusSince,
+              temperatureMinValue,
+              temperatureMinValueSince,
+              temperatureMaxValue,
+              temperatureMaxValueSince,
+              temperatureResetMinMax,
+              humidityUuid,
+              humidityConnectionType,
+              humidityEnable,
+              humidityOffset,
+              humidityAlarmEnable,                                                 
+              humidityThresholdLowWarning,
+              humidityThresholdLowCritical,
+              humidityThresholdHighWarning,
+              humidityThresholdHighCritical,
+              humidityThresholdHysteresis,
+              humidityAlarmGracePeriod,
+              humidityAlarm,
+              humidityAlarmChangeSince,
+              humidityCommunicationStatus,
+              humidityCommunicationStatusSince,
+              humidityMinValue,
+              humidityMinValueSince,
+              humidityMaxValue,
+              humidityMaxValueSince,
+              humidityResetMinMax,
+              digitalInputUuid,
+              digitalInputConnectionType,
+              digitalInputEnable,
+              digitalInputPolarity,
+              digitalInputAlarmEnable,                                                 
+              digitalInputAlarmSeverity,
+              digitalInputAlarmGracePeriod,
+              digitalInputState,
+              digitalInputStateSince,
+              digitalInputAlarm,
+              digitalInputAlarmChangeSince,
+              digitalInputCommunicationStatus,
+              digitalInputCommunicationStatusSince
+         }
+    STATUS     current
+    DESCRIPTION 
+        "These objects in this MIB are optional."
+    ::= { objectGroups 2 }
+
+sensorNotifyGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS { notifySensorStatus,
+                    notifySensorCount,
+                    notifyTemperatureAlarm,
+                    notifyTemperatureCommunicationStatus,
+                    notifyHumidityAlarm,
+                    notifyHumidityCommunicationStatus,
+                    notifyDigitalInputAlarm,
+                    notifydigitalInputCommunicationStatus
+         }
+    STATUS     current
+    DESCRIPTION 
+        "These notifications will be supported depending on the features of the sensor."
+    ::= { objectGroups 3 }
+
+
+END

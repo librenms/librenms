@@ -1,5 +1,20 @@
 mib: FORTINET-FORTIWEB-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTIWEB-MIB::fwSysMemCapacity
+                percent_used: FORTINET-FORTIWEB-MIB::fwSysMemUsage
+                precision: 1048576
+                descr: 'Physical Memory'
+    os:
+        serial:
+            - FORTINET-CORE-MIB::fnSysSerial.0
+            - ENTITY-MIB::entPhysicalSerialNum.1
+        version: FORTINET-FORTIWEB-MIB::fwSysVersion.0
+        version_regex: '/ (?<version>[\d.]+)/'
+        hardware: FORTINET-FORTIWEB-MIB::fwSysVersion.0
+        hardware_regex: '/^(?<hardware>\S+)/'
     processors:
         data:
             -

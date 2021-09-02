@@ -13,16 +13,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -40,15 +40,11 @@ class AsuswrtMerlin extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
-    /**
-     * Retrieve basic information about the OS / device
-     */
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-        $info = explode(' ', trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
-        $device->hardware = $info[1];
-        $device->version = $info[2];
+        $info = explode(' ', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'));
+        $device->hardware = $info[1] ?? null;
+        $device->version = $info[2] ?? null;
     }
 
     /**
@@ -60,12 +56,13 @@ class AsuswrtMerlin extends OS implements
     private function getInterfaces()
     {
         // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
-        $interfaces = explode(PHP_EOL, snmp_get($this->getDevice(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
-        $arrIfaces = array();
+        $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
+        $arrIfaces = [];
         foreach ($interfaces as $interface) {
-            list($k, $v) = explode(',', $interface);
+            [$k, $v] = explode(',', $interface);
             $arrIfaces[$k] = $v;
         }
+
         return $arrIfaces;
     }
 
@@ -82,7 +79,7 @@ class AsuswrtMerlin extends OS implements
     private function getSensorData($type, $query = '', $system = false, $stats = false)
     {
         // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
-        $sensors = array();
+        $sensors = [];
         $interfaces = $this->getInterfaces();
         $count = 1;
 
@@ -154,6 +151,7 @@ class AsuswrtMerlin extends OS implements
     {
         $txrate = $this->getSensorData('rate', '-tx', false, true);
         $rxrate = $this->getSensorData('rate', '-rx', false, true);
+
         return array_merge($txrate, $rxrate);
     }
 

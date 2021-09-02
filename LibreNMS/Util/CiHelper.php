@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -186,7 +185,7 @@ class CiHelper
             $filter = implode('.*|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/");
+            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::testOSDetection|::test[A-Za-z]+ with data set \"$filter.*\"$/");
         } elseif ($this->flags['unit_docs']) {
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
@@ -206,15 +205,13 @@ class CiHelper
     public function checkStyle()
     {
         $cs_cmd = [
-            $this->checkPhpExec('phpcs'),
-            '-n',
-            '-p',
-            '--colors',
-            '--extensions=php',
-            '--standard=misc/phpcs_librenms.xml'
+            $this->checkPhpExec('php-cs-fixer'),
+            '--config=.php-cs-fixer.php',
+            'fix',
+            '-v',
         ];
 
-        $files = $this->flags['full'] ? ['./'] : $this->changed['php'];
+        $files = $this->flags['full'] ? [] : $this->changed['php'];
         $cs_cmd = array_merge($cs_cmd, $files);
 
         return $this->execute('style', $cs_cmd);
@@ -222,8 +219,9 @@ class CiHelper
 
     public function checkWeb()
     {
-        if (!$this->flags['ci']) {
+        if (! $this->flags['ci']) {
             echo "Warning: dusk may erase your primary database, do not use yet\n";
+
             return 0;
         }
 
@@ -262,7 +260,7 @@ class CiHelper
     public function checkLint()
     {
         $return = 0;
-        if (!$this->flags['lint_skip_php']) {
+        if (! $this->flags['lint_skip_php']) {
             $php_lint_cmd = [$this->checkPhpExec('parallel-lint')];
 
             // matches a substring of the relative path, leading / is treated as absolute path
@@ -274,7 +272,7 @@ class CiHelper
             $return += $this->execute('PHP lint', $php_lint_cmd);
         }
 
-        if (!$this->flags['lint_skip_python']) {
+        if (! $this->flags['lint_skip_python']) {
             $py_lint_cmd = [$this->checkPythonExec('pylint'), '-E', '-j', '0'];
 
             $files = $this->flags['full']
@@ -285,7 +283,7 @@ class CiHelper
             $return += $this->execute('Python lint', $py_lint_cmd);
         }
 
-        if (!$this->flags['lint_skip_bash']) {
+        if (! $this->flags['lint_skip_bash']) {
             $files = $this->flags['full']
                 ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.sh' -not -path './node_modules/*' -not -path './vendor/*'")))
                 : $this->changed['bash'];
@@ -309,12 +307,14 @@ class CiHelper
         if ($method = $this->canCheck($type)) {
             $ret = $this->$method();
             $this->completedChecks[$type] = true;
+
             return $ret;
         }
 
         if ($this->flags["{$type}_enable"] && $this->flags["{$type}_skip"]) {
             echo ucfirst($type) . " check skipped.\n";
         }
+
         return 0;
     }
 
@@ -357,10 +357,11 @@ class CiHelper
             }
 
             echo $prefix . $proc->getCommandLine() . PHP_EOL;
+
             return 250;
         }
 
-        if (!$silence) {
+        if (! $silence) {
             echo "Running $name check... ";
         }
 
@@ -369,7 +370,7 @@ class CiHelper
         $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
 
         $proc->setTimeout(3600)->setIdleTimeout(3600);
-        if (!($silence || $quiet)) {
+        if (! ($silence || $quiet)) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());
         }
@@ -378,20 +379,17 @@ class CiHelper
 
         $duration = sprintf('%.2fs', microtime(true) - $start);
         if ($proc->getExitCode() > 0) {
-            if (!$silence) {
+            if (! $silence) {
                 echo "failed ($duration)\n";
             }
-            if ($quiet || $silence) {
-                echo $proc->getOutput() . PHP_EOL;
-                echo $proc->getErrorOutput() . PHP_EOL;
-            }
-        } elseif (!$silence) {
+            echo $proc->getOutput() . PHP_EOL;
+            echo $proc->getErrorOutput() . PHP_EOL;
+        } elseif (! $silence) {
             echo "success ($duration)\n";
         }
 
         return $proc->getExitCode();
     }
-
 
     public function checkEnvSkips()
     {
@@ -415,8 +413,9 @@ class CiHelper
 
     private function parseChangedFiles()
     {
-        if ($this->flags['full'] || !empty($this->changed['full-checks'])) {
+        if ($this->flags['full'] || ! empty($this->changed['full-checks'])) {
             $this->flags['full'] = true; // make sure full is set and skip changed file parsing
+
             return;
         }
         $this->os = $this->os ?: $this->changed['os'];
@@ -425,16 +424,16 @@ class CiHelper
             'lint_skip_php' => empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
-            'unit_os' => $this->getFlag('unit_os') || (!empty($this->changed['os']) && empty(array_diff($this->changed['php'], $this->changed['os-files']))),
-            'unit_docs' => !empty($this->changed['docs']) && empty($this->changed['php']),
-            'unit_svg' => !empty($this->changed['svg']) && empty($this->changed['php']),
-            'docs_changed' => !empty($this->changed['docs']),
+            'unit_os' => $this->getFlag('unit_os') || (! empty($this->changed['os']) && empty(array_diff($this->changed['php'], $this->changed['os-files']))),
+            'unit_docs' => ! empty($this->changed['docs']) && empty($this->changed['php']),
+            'unit_svg' => ! empty($this->changed['svg']) && empty($this->changed['php']),
+            'docs_changed' => ! empty($this->changed['docs']),
         ]);
 
         $this->setFlags([
-            'unit_skip' => empty($this->changed['php']) && !array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
+            'unit_skip' => empty($this->changed['php']) && ! array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
             'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
-            'style_skip' => empty($this->changed['php']),
+            'style_skip' => ! $this->flags['ci'] && empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);
     }
@@ -456,14 +455,14 @@ class CiHelper
         }
 
         echo "Running composer install to install developer dependencies.\n";
-        passthru("scripts/composer_wrapper.php install");
+        passthru('scripts/composer_wrapper.php install');
 
         if (is_executable($path)) {
             return $path;
         }
 
         echo "\nRunning installing deps with composer failed.\n You should try running './scripts/composer_wrapper.php install' by hand\n";
-        echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+        echo "You can find more info at https://docs.librenms.org/Developing/Validating-Code/\n";
         exit(1);
     }
 
@@ -485,20 +484,22 @@ class CiHelper
         }
 
         // check system
-        $system_path = rtrim(exec("which pylint 2>/dev/null"));
+        $system_path = rtrim(exec('which pylint 2>/dev/null'));
         if (is_executable($system_path)) {
             return $system_path;
         }
 
         echo "Running pip3 install to install developer dependencies.\n";
-        passthru("pip3 install $exec"); // probably wrong in other cases...
+        passthru("pip3 install --user $exec"); // probably wrong in other cases...
 
         if (is_executable($path)) {
             return $path;
         }
 
-        echo "\nRunning installing deps with pip3 failed.\n You should try running 'pip3 install -r requirements.txt' by hand\n";
-        echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+        echo "\nRunning installing deps with pip3 failed.\n You should try running 'pip3 install --user ";
+        echo $exec;
+        echo "' by hand\n";
+        echo "You can find more info at https://docs.librenms.org/Developing/Validating-Code/\n";
         exit(1);
     }
 }

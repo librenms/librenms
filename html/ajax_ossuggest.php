@@ -12,17 +12,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-$init_modules = array('web', 'auth');
+use LibreNMS\Util\Debug;
+
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!Auth::check()) {
-    die('Unauthorized');
+if (! Auth::check()) {
+    exit('Unauthorized');
 }
 
-set_debug($_REQUEST['debug']);
+Debug::set($_REQUEST['debug']);
 
 /**
  * Levenshtein Sort
@@ -32,7 +34,7 @@ set_debug($_REQUEST['debug']);
  */
 function levsortos($base, $obj, $keys)
 {
-    $ret = array();
+    $ret = [];
     foreach ($obj as $elem) {
         $lev = false;
         foreach ($keys as $key) {
@@ -49,21 +51,22 @@ function levsortos($base, $obj, $keys)
     }
 
     ksort($ret);
+
     return $ret;
 }
 
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
     \LibreNMS\Util\OS::loadAllDefinitions(false, true);
-    $_GET['term'] = clean($_GET['term']);
-    $sortos = levsortos($_GET['term'], \LibreNMS\Config::get('os'), ["text", "os"]);
+    $_GET['term'] = strip_tags($_GET['term']);
+    $sortos = levsortos($_GET['term'], \LibreNMS\Config::get('os'), ['text', 'os']);
     $sortos = array_slice($sortos, 0, 20);
     foreach ($sortos as $lev => $os) {
-        $ret[$lev] = array_intersect_key($os, array('os' => true, 'text' => true));
+        $ret[$lev] = array_intersect_key($os, ['os' => true, 'text' => true]);
     }
 }
-if (!isset($ret)) {
-    $ret = array(array('Error: No suggestions found.'));
+if (! isset($ret)) {
+    $ret = [['Error: No suggestions found.']];
 }
 
-die(json_encode($ret));
+exit(json_encode($ret));

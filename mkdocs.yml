@@ -4,26 +4,45 @@ theme:
   name: material
   logo: img/librenms.svg
   language: en
-  palette: null
   font:
     text: 'Roboto'
     code: 'Roboto Mono'
   feature: null
 site_dir: out
-site_url: http://docs.librenms.org
+site_url: https://docs.librenms.org
 markdown_extensions:
+    - admonition
     - pymdownx.tasklist
     - pymdownx.tilde
     - pymdownx.superfences
     - pymdownx.tabbed
+    - pymdownx.details
+    - pymdownx.highlight:
+        extend_pygments_lang:
+          - name: php
+            lang: php
+            options:
+              startinline: true
+plugins:
+  - macros:
+      j2_variable_start_string: '@='
+      j2_variable_end_string: '=@'
+  - search
+  - exclude:
+      glob:
+        - "General/Changelogs/*"
+        - "Dockerfile"
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
 extra_javascript:
-    - librenms-docs.js
+    - js/docs-install-tab.js
+    - js/docs-settings-links.js
 extra:
     article_nav_top: false
     article_nav_bottom: true
+    php:
+        version_min: 7.3
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms/
@@ -59,6 +78,7 @@ nav:
       - Network Map: Extensions/Network-Map.md
       - Syslog: Extensions/Syslog.md
       - Dashboards: Extensions/Dashboards.md
+      - Supermicro: Extensions/Supermicro.md
   - 5. Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
@@ -69,6 +89,7 @@ nav:
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md
       - RRDCached: Extensions/RRDCached.md
+      - Galera Database Cluster: Extensions/Galera-Cluster.md
       - Sub-directory Support: Extensions/Sub-Directory.md
       - Varnish: Extensions/Varnish.md
       - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
@@ -103,6 +124,7 @@ nav:
       - DeviceGroups: API/DeviceGroups.md
       - Ports: API/Ports.md
       - PortGroups: API/PortGroups.md
+      - Port_Groups: API/Port_Groups.md
       - Alerts: API/Alerts.md
       - Routing: API/Routing.md
       - Switching: API/Switching.md

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -37,16 +36,18 @@ class RoutingController implements DeviceTab
     public function __construct()
     {
         $device = DeviceCache::getPrimary();
+        //dd($device);
         $this->tabs = [
-            'ospf' => $device->ospfInstances()->exists(),
-            'bgp' => $device->bgppeers()->exists(),
-            'vrf' => $device->vrfs()->exists(),
-            'cef' => $device->cefSwitching()->exists(),
-            'mpls' => $device->mplsLsps()->exists(),
-            'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->exists(),
-            'loadbalancer_rservers' => $device->rServers()->exists(),
-            'ipsec_tunnels' => $device->ipsecTunnels()->exists(),
-            'routes' => $device->routes()->exists(),
+            'ospf' => $device->ospfInstances()->count(),
+            'isis' => $device->isisAdjacencies()->count(),
+            'bgp' => $device->bgppeers()->count(),
+            'vrf' => $device->vrfs()->count(),
+            'cef' => $device->cefSwitching()->count(),
+            'mpls' => $device->mplsLsps()->count(),
+            'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->count(),
+            'loadbalancer_rservers' => $device->rServers()->count(),
+            'ipsec_tunnels' => $device->ipsecTunnels()->count(),
+            'routes' => $device->routes()->count(),
         ];
     }
 
@@ -73,7 +74,7 @@ class RoutingController implements DeviceTab
     public function data(Device $device): array
     {
         return [
-            'routing_tabs' => array_keys(array_filter($this->tabs))
+            'routing_tabs' => array_filter($this->tabs),
         ];
     }
 }

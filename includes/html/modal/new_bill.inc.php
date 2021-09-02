@@ -18,13 +18,12 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     $port_device_id = -1;
     if (is_numeric($vars['port'])) {
-        $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['port']));
-        $bill_data['bill_name']     = $port['port_descr_descr'];
-        $bill_data['bill_ref']      = $port['port_descr_circuit'];
-        $bill_data['bill_notes']    = $port['port_descr_speed'];
-        $port_device_id             = $port['device_id'];
-    }
-    ?>
+        $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', [$vars['port']]);
+        $bill_data['bill_name'] = $port['port_descr_descr'];
+        $bill_data['bill_ref'] = $port['port_descr_circuit'];
+        $bill_data['bill_notes'] = $port['port_descr_speed'];
+        $port_device_id = $port['device_id'];
+    } ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-bill" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
@@ -54,14 +53,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <?php
                         if (is_array($port)) {
                             // Need to pre-populate port as we've got a port pre-selected
-                            foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', array($port_device_id)) as $interface) {
-                                $interface  = cleanPort($interface);
-                                $string = $interface['label'].' - '.display($interface['ifAlias']);
-                                $selected = $interface['port_id'] === $port['port_id'] ? " selected" : "";
+                            foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', [$port_device_id]) as $interface) {
+                                $interface = cleanPort($interface);
+                                $string = $interface['label'] . ' - ' . \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
+                                $selected = $interface['port_id'] === $port['port_id'] ? ' selected' : '';
                                 echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
                             }
-                        }
-                        ?>
+                        } ?>
                         </select>
                     </div>
                 </div>
@@ -73,10 +71,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         $bill_data['dir_95th'] = 'in';
     }
     $bill_data['bill_type'] = 'cdr';
-    $quota = array('select_gb' => ' selected');
-    $cdr = array('select_mbps' => ' selected');
-    include 'includes/html/pages/bill/addoreditbill.inc.php';
-    ?>
+    $quota = ['select_gb' => ' selected'];
+    $cdr = ['select_mbps' => ' selected'];
+    include 'includes/html/pages/bill/addoreditbill.inc.php'; ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">
                     <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Add Bill</button>

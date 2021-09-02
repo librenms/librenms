@@ -10,8 +10,16 @@ from queue import Queue
 from time import time
 
 from .service import Service, ServiceConfig
-from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, \
-    AlertQueueManager, PollerQueueManager, DiscoveryQueueManager
+from .queuemanager import (
+    QueueManager,
+    TimedQueueManager,
+    BillingQueueManager,
+    PingQueueManager,
+    ServicesQueueManager,
+    AlertQueueManager,
+    PollerQueueManager,
+    DiscoveryQueueManager,
+)
 
 
 def normalize_wait(seconds):
@@ -26,9 +34,9 @@ def call_script(script, args=()):
     :param args: a tuple of arguments to send to the command
     :returns the output of the command
     """
-    if script.endswith('.php'):
+    if script.endswith(".php"):
         # save calling the sh process
-        base = ('/usr/bin/env', 'php')
+        base = ("/usr/bin/env", "php")
     else:
         base = ()
 
@@ -36,7 +44,13 @@ def call_script(script, args=()):
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     debug("Running {}".format(cmd))
     # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
-    return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid).decode()
+    return subprocess.check_call(
+        cmd,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+        preexec_fn=os.setsid,
+        close_fds=True,
+    )
 
 
 class DB:
@@ -54,6 +68,7 @@ class DB:
     def connect(self):
         try:
             import pymysql
+
             pymysql.install_as_MySQLdb()
             info("Using pure python SQL client")
         except ImportError:
@@ -63,19 +78,21 @@ class DB:
             import MySQLdb
         except ImportError:
             critical("ERROR: missing a mysql python module")
-            critical("Install either 'PyMySQL' or 'mysqlclient' from your OS software repository or from PyPI")
+            critical(
+                "Install either 'PyMySQL' or 'mysqlclient' from your OS software repository or from PyPI"
+            )
             raise
 
         try:
             args = {
-                'host': self.config.db_host,
-                'port': self.config.db_port,
-                'user': self.config.db_user,
-                'passwd': self.config.db_pass,
-                'db': self.config.db_name
+                "host": self.config.db_host,
+                "port": self.config.db_port,
+                "user": self.config.db_user,
+                "passwd": self.config.db_pass,
+                "db": self.config.db_name,
             }
             if self.config.db_socket:
-                args['unix_socket'] = self.config.db_socket
+                args["unix_socket"] = self.config.db_socket
 
             conn = MySQLdb.connect(**args)
             conn.autocommit(True)
@@ -164,9 +181,11 @@ class Lock:
         :param expiration: int in seconds
         """
         if (
-            (name not in self._locks) or                                          # lock doesn't exist
-            (allow_owner_relock and self._locks.get(name, [None])[0] == owner) or  # owner has permission
-            time() > self._locks[name][1]                                          # lock has expired
+            (name not in self._locks)
+            or (  # lock doesn't exist
+                allow_owner_relock and self._locks.get(name, [None])[0] == owner
+            )
+            or time() > self._locks[name][1]  # owner has permission  # lock has expired
         ):
             self._locks[name] = (owner, expiration + time())
             return self._locks[name][0] == owner
@@ -229,21 +248,32 @@ class ThreadingLock(Lock):
 
 
 class RedisLock(Lock):
-    def __init__(self, namespace='lock', **redis_kwargs):
+    def __init__(self, namespace="lock", **redis_kwargs):
         import redis
         from redis.sentinel import Sentinel
-        redis_kwargs['decode_responses'] = True
-        if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
-            sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
-            sentinel_service = redis_kwargs.pop('sentinel_service')
-            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db", "socket_timeout"]}
+
+        redis_kwargs["decode_responses"] = True
+        if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
+            sentinels = [
+                tuple(l.split(":")) for l in redis_kwargs.pop("sentinel").split(",")
+            ]
+            sentinel_service = redis_kwargs.pop("sentinel_service")
+            kwargs = {
+                k: v
+                for k, v in redis_kwargs.items()
+                if k in ["decode_responses", "password", "db", "socket_timeout"]
+            }
             self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
-        info("Created redis lock manager with socket_timeout of {}s".format(redis_kwargs['socket_timeout']))
+        info(
+            "Created redis lock manager with socket_timeout of {}s".format(
+                redis_kwargs["socket_timeout"]
+            )
+        )
 
     def __key(self, name):
         return "{}:{}".format(self._namespace, name)
@@ -266,8 +296,13 @@ class RedisLock(Lock):
             non_existing = not (allow_owner_relock and self._redis.get(key) == owner)
             return self._redis.set(key, owner, ex=int(expiration), nx=non_existing)
         except redis.exceptions.ResponseError as e:
-            exception("Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
-                      name, owner, expiration, allow_owner_relock)
+            exception(
+                "Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
+                name,
+                owner,
+                expiration,
+                allow_owner_relock,
+            )
 
     def unlock(self, name, owner):
         """
@@ -285,34 +320,49 @@ class RedisLock(Lock):
         return self._redis.get(self.__key(name)) is not None
 
     def print_locks(self):
-        keys = self._redis.keys(self.__key('*'))
+        keys = self._redis.keys(self.__key("*"))
         for key in keys:
-            print("{} locked by {}, expires in {} seconds".format(key, self._redis.get(key), self._redis.ttl(key)))
+            print(
+                "{} locked by {}, expires in {} seconds".format(
+                    key, self._redis.get(key), self._redis.ttl(key)
+                )
+            )
 
 
 class RedisUniqueQueue(object):
-    def __init__(self, name, namespace='queue', **redis_kwargs):
+    def __init__(self, name, namespace="queue", **redis_kwargs):
         import redis
         from redis.sentinel import Sentinel
-        redis_kwargs['decode_responses'] = True
-        if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
-            sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
-            sentinel_service = redis_kwargs.pop('sentinel_service')
-            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db", "socket_timeout"]}
+
+        redis_kwargs["decode_responses"] = True
+        if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
+            sentinels = [
+                tuple(l.split(":")) for l in redis_kwargs.pop("sentinel").split(",")
+            ]
+            sentinel_service = redis_kwargs.pop("sentinel_service")
+            kwargs = {
+                k: v
+                for k, v in redis_kwargs.items()
+                if k in ["decode_responses", "password", "db", "socket_timeout"]
+            }
             self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)
-        info("Created redis queue with socket_timeout of {}s".format(redis_kwargs['socket_timeout']))
+        info(
+            "Created redis queue with socket_timeout of {}s".format(
+                redis_kwargs["socket_timeout"]
+            )
+        )
 
         # clean up from previous implementations
-        if self._redis.type(self.key) != 'zset':
+        if self._redis.type(self.key) != "zset":
             self._redis.delete(self.key)
 
     def qsize(self):
-        return self._redis.zcount(self.key, '-inf', '+inf')
+        return self._redis.zcount(self.key, "-inf", "+inf")
 
     def empty(self):
         return self.qsize() == 0

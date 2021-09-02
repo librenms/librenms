@@ -36,8 +36,10 @@ the values we expect to see the data in:
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
+| tv_signal                       | dBmV                        |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
+| percent                         | %                           |
 
 #### Simple health discovery
 
@@ -62,7 +64,7 @@ modules:
     sensors:
         airflow:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: airFlowSensorTable
@@ -83,12 +85,13 @@ For `data:` you have the following options:
 The only sensor we have defined here is airflow. The available options
 are as follows:
 
-- `oid` (required): This is the name of the table you want to do the snmp walk on.
+- `oid` (required): This is the name of the table you want to snmp walk for data.
 - `value` (optional): This is the key within the table that contains
-  the value. If not provided willuse `oid`
-- `num_oid` (required): This is the numerical OID that contains
-  `value`. This should always include `{{ $index }}`.  snmptranslate
-  -On can help figure out the number.
+  the value. If not provided will use `oid`
+- `num_oid` (required for PullRequests): If not provided, this parameter should be computed
+  automatically by discovery process. This parameter is still required to
+  submit a pull request. This is the numerical OID that contains
+  `value`. This should usually include `{{ $index }}`.
   In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
@@ -138,6 +141,10 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+When referencing an oid in another table the full index will be used to match the other table.
+If this is undesirable, you may use a single sub index by appending the sub index after a colon to
+the variable name.  Example `{{ $ifName:2 }}`
+
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
 > from the OID, unless a target index is appended to the OID.
@@ -157,13 +164,13 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: 1
 ```
 
-> ``` op ``` can be any of the following operators :
->
+`op` can be any of the following operators :
+
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
 > not_ends, not_contains, not_regex, not_in_array, exists
->
-> Example:
+
+Example:
 
 ```yaml
                     skip_values:
@@ -181,6 +188,21 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: false
 ```
 
+```yaml
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+```
+
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
 
@@ -192,7 +214,7 @@ the discovery code in php.
 The directory structure for sensor information is
 `includes/discovery/sensors/$class/$os.inc.php`. The format of all of
 the sensors follows the same code format which is to collect sensor information
-via SNMP and then call the `discover_sensor()` function; with the exception of state 
+via SNMP and then call the `discover_sensor()` function; with the exception of state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
 well. Sensor information is first collected by
@@ -302,7 +324,7 @@ line walks the cmEntityObject table to get information about the chassis and lin
 this information we extract the model type which will identify which tables in the CM-Facility-Mib
 the ports are populated in. The program then reads the appropriate table into the `$pre_cache`
 array `adva_fsp150_ports`. This array will have OID indexies for each port, which we will use
-later to identify our sensor OIDs. 
+later to identify our sensor OIDs.
 
 ```
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
@@ -456,6 +478,7 @@ Chromatic_dispersion:
 Ber:
 Eer:
 Waterflow:
+Percent:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]

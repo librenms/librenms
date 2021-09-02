@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,11 +33,6 @@ use SplFileInfo;
 
 /**
  * Class MibTest
- * @package LibreNMS\Tests
- *
- * Tests mib files for errors.
- * Will not be run by default, use --group=mibs to test.
- * You may test specific directories or files by specifying them with filter. Example: --filter=@RFC1284-MIB
  */
 class MibTest extends TestCase
 {
@@ -47,11 +41,11 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibDirs
-     * @param $dir
+     * @param string $dir
      */
     public function testMibDirectory($dir)
     {
-        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
+        $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "MIBs in $dir have errors!\n$errors");
@@ -62,9 +56,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param $path
-     * @param $file
-     * @param $mib_name
+     * @param string $path
+     * @param string $file
+     * @param string $mib_name
      */
     public function testDuplicateMibs($path, $file, $mib_name)
     {
@@ -75,7 +69,7 @@ class MibTest extends TestCase
 
         static $existing_mibs;
         if (is_null($existing_mibs)) {
-            $existing_mibs = array();
+            $existing_mibs = [];
         }
 
         if (isset($existing_mibs[$mib_name])) {
@@ -83,7 +77,7 @@ class MibTest extends TestCase
 
             $this->fail("$highligted_mib has duplicates: " . implode(', ', $existing_mibs[$mib_name]));
         } else {
-            $existing_mibs[$mib_name] = array($file_path);
+            $existing_mibs[$mib_name] = [$file_path];
         }
     }
 
@@ -92,9 +86,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param $path
-     * @param $file
-     * @param $mib_name
+     * @param string $path
+     * @param string $file
+     * @param string $mib_name
      */
     public function testMibNameMatches($path, $file, $mib_name)
     {
@@ -105,15 +99,14 @@ class MibTest extends TestCase
         $this->assertEquals($mib_name, $file, "$highlighted_file should be named $mib_name");
     }
 
-
     /**
      * Test each mib file for errors
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param $path
-     * @param $file
-     * @param $mib_name
+     * @param string $path
+     * @param string $file
+     * @param string $mib_name
      */
     public function testMibContents($path, $file, $mib_name)
     {
@@ -121,7 +114,7 @@ class MibTest extends TestCase
         $file_path = "$path/$file";
         $highlighted_file = $console_color->convert("%r$file_path%n");
 
-        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
+        $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
@@ -134,18 +127,18 @@ class MibTest extends TestCase
      */
     public function mibFiles()
     {
-        $file_list = array();
+        $file_list = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
             /** @var SplFileInfo $file */
             if ($file->isDir()) {
                 continue;
             }
             $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathName());
-            $file_list[$mib_path] = array(
+            $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),
-                $this->extractMibName($file->getPathname())
-            );
+                $this->extractMibName($file->getPathname()),
+            ];
         }
 
         return $file_list;
@@ -160,18 +153,19 @@ class MibTest extends TestCase
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));
 
-        $final_list = array();
+        $final_list = [];
         foreach ($dirs as $dir) {
             $relative_dir = str_replace(Config::get('mib_dir') . '/', '', $dir);
-            $final_list[$relative_dir] = array($dir);
+            $final_list[$relative_dir] = [$dir];
         }
+
         return $final_list;
     }
 
     /**
      * Extract the mib name from a file
      *
-     * @param $file
+     * @param string $file
      * @return mixed
      * @throws Exception
      */
@@ -179,7 +173,7 @@ class MibTest extends TestCase
     {
         // extract the mib name (tried regex, but was too complex and I had to read the whole file)
         $mib_name = null;
-        if ($handle = fopen($file, "r")) {
+        if ($handle = fopen($file, 'r')) {
             $header = '';
             while (($line = fgets($handle)) !== false) {
                 $trimmed = trim($line);
@@ -192,6 +186,7 @@ class MibTest extends TestCase
                 if (Str::contains($trimmed, 'DEFINITIONS')) {
                     preg_match('/(\S+)\s+(?=DEFINITIONS)/', $header, $matches);
                     fclose($handle);
+
                     return $matches[1];
                 }
             }

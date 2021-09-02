@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -42,7 +41,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      * @param array $data
      * @return array
      */
-    private function parseLatLng($data)
+    protected function parseLatLng($data)
     {
         return [
             'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,
@@ -74,7 +73,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     protected function buildGeocodingOptions($address)
     {
         $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
+        if (! $api_key) {
             throw new Exception('Google Maps API key missing, set geoloc.api_key');
         }
 
@@ -82,7 +81,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
             'query' => [
                 'key' => $api_key,
                 'address' => $address,
-            ]
+            ],
         ];
     }
 

@@ -1,5 +1,18 @@
 mib: HIK-DEVICE-MIB:HIKVISION-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: HIK-DEVICE-MIB::memSize
+                percent_used: HIK-DEVICE-MIB::memUsed
+                precision: 1048576
+    os:
+        hardware: HIK-DEVICE-MIB::deviceType.0
+        version: HIK-DEVICE-MIB::softwVersion.0
+        features:
+            - HIK-DEVICE-MIB::videoEncode.0
+            - HIK-DEVICE-MIB::videoNetTrans.0
+        features_template: "{{ HIK-DEVICE-MIB::videoEncode.0 }}-{{ HIK-DEVICE-MIB::videoNetTrans.0 }}"
     processors:
         data:
             -

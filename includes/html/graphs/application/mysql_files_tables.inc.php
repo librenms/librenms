@@ -2,21 +2,21 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
-$array = array(
-          'TOC'  => array('descr' => 'Table Cache'),
-          'OFs'  => array('descr' => 'Open Files'),
-          'OTs'  => array('descr' => 'Open Tables'),
-          'OdTs' => array('descr' => 'Opened Tables'),
-         );
+$array = [
+    'TOC'  => ['descr' => 'Table Cache'],
+    'OFs'  => ['descr' => 'Open Files'],
+    'OTs'  => ['descr' => 'Open Tables'],
+    'OdTs' => ['descr' => 'Opened Tables'],
+];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
-        $rrd_list[$i]['filename']  = $rrd_filename;
+        $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];
-        $rrd_list[$i]['ds']    = $ds;
+        $rrd_list[$i]['ds'] = $ds;
         // $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
@@ -24,8 +24,8 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-$colours   = 'mixed';
-$nototal   = 1;
+$colours = 'mixed';
+$nototal = 1;
 $unit_text = '';
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

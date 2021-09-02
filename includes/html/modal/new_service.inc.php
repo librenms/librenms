@@ -18,77 +18,102 @@ if (Auth::user()->hasGlobalAdmin()) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;
         foreach ($files as $file) {
-            if (is_executable($dir.$file) && is_file($dir.$file) && strstr($file, 'check_')) {
-                list(,$check_name) = explode('_', $file, 2);
+            if (is_executable($dir . $file) && is_file($dir . $file) && strstr($file, 'check_')) {
+                [,$check_name] = explode('_', $file, 2);
                 $stype .= "<option value='$check_name'>$check_name</option>";
             }
         }
-    }
-    ?>
+    } ?>
 
 <div class="modal fade bs-example-modal-sm" id="create-service" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Services</h5>
+                <h2 class="modal-title" id="Create">Add / Edit Service</h2>
             </div>
-            <div class="modal-body">
-                <form method="post" role="form" id="service" class="form-horizontal service-form">
-                    <?php echo csrf_field() ?>
-                    <input type="hidden" name="service_id" id="service_id" value="">
-                    <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
-                    <input type="hidden" name="type" id="type" value="create-service">
-                    <div class="form-service">
-                        <div class="col-sm-12">
-                            <span id="ajax_response">&nbsp;</span>
+            <div class='alert alert-info'>Service will modified for the specified Device.</div>
+            <div class='well well-lg'>
+                <div class="modal-body">
+                    <form method="post" role="form" id="service" class="form-horizontal service-form">
+                        <?php echo csrf_field() ?>
+                        <input type="hidden" name="service_id" id="service_id" value="">
+                        <input type="hidden" name="service_template_id" id="service_template_id" value="">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
+                        <input type="hidden" name="type" id="type" value="create-service">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <span id="ajax_response">&nbsp;</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='stype' class='col-sm-3 control-label'>Type: </label>
-                        <div class="col-sm-9">
-                            <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
-                                <?php echo $stype?>
-                            </select>
+                        <div class="form-group row">
+                            <label for='name' class='col-sm-3 control-label'>Name: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='name' name='name' class='form-control input-sm' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
-                    </div>
-                    <div class='form-service row'>
-                        <label for='desc' class='col-sm-3 control-label'>Description: </label>
-                        <div class='col-sm-9'>
-                            <textarea id='desc' name='desc' class='form-control'></textarea>
+                        <div class="form-group row">
+                            <label for='stype' class='col-sm-3 control-label'>Check Type: </label>
+                            <div class="col-sm-9">
+                                <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
+                                    <?php echo $stype?>
+                                </select>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
-                        <div class="col-sm-9">
-                            <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
+                        <div class='form-group row'>
+                            <label for='desc' class='col-sm-3 control-label'>Description: </label>
+                            <div class='col-sm-9'>
+                                <textarea id='desc' name='desc' class='form-control' rows='5'></textarea>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='param' class='col-sm-3 control-label'>Parameters: </label>
-                        <div class="col-sm-9">
-                           <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                        <div class="form-group row">
+                            <label for='ip' class='col-sm-3 control-label'>Remote Host: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='IP Address or Hostname'/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
-                        <div class="col-sm-9">
-                            <input type='checkbox' id='ignore' name='ignore'>
+                        <div class="form-group row">
+                            <label for='param' class='col-sm-3 control-label'>Parameters: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
-                        <div class="col-sm-9">
-                            <input type='checkbox' id='disabled' name='disabled'>
+                        <div class="form-group row">
+                            <div class="col-sm-12 alert alert-info">
+                                <label class='control-label text-left input-sm'>Parameters may be required and will be different depending on the service check.</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <button class="btn btn-success btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button>
+                        <div class="form-group row">
+                            <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
+                            <div class="col-sm-9">
+                                <input type="hidden" name="ignore" id='ignore' value="0">
+                                <input type='checkbox' id='ignore_box' name='ignore_box' onclick="$('#ignore').attr('value', $('#ignore_box').prop('checked')?1:0);">
+                            </div>
                         </div>
-                    </div>
-                    <div class="clearfix"></div>
-                </form>
+                        <div class="form-group row">
+                            <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
+                            <div class="col-sm-9">
+                                <input type='hidden' id='disabled' name='disabled' value="0">
+                                <input type='checkbox' id='disabled_box' name='disabled_box' onclick="$('#disabled').attr('value', $('#disabled_box').prop('checked')?1:0);">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group row">
+                            <center><button class="btn btn-default btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button></center>
+                        </div>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -104,7 +129,12 @@ $('#create-service').on('hide.bs.modal', function (event) {
     $('#desc').val('');
     $('#param').val('');
     $('#ignore').val('');
+    $('#ignore_box').val('');
     $('#disabled').val('');
+    $('#disabled_box').val('');
+    $('#service_template_id').val('');
+    $('#name').val('');
+    $('#service_template_name').val('');
 });
 
 // on-load
@@ -126,19 +156,23 @@ $('#create-service').on('show.bs.modal', function (e) {
             $('#param').val(output['param']);
             $('#ignore').val(output['ignore']);
             $('#disabled').val(output['disabled']);
+            $('#ignore_box').val(output['ignore']);
+            $('#disabled_box').val(output['disabled']);
             if ($('#ignore').attr('value') == 1) {
-                $('#ignore').prop("checked", true);
+                $('#ignore_box').prop("checked", true);
             }
             if ($('#disabled').attr('value') == 1) {
-                $('#disabled').prop("checked", true);
+                $('#disabled_box').prop("checked", true);
             }
+            $('#service_template_id').val(output['service_template_id']);
+            $('#name').val(output['name']);
         }
     });
 
 });
 
 // on-submit
-$('#service-submit').click('', function(e) {
+$('#service-submit').on("click", function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",

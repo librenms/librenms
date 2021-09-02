@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
@@ -29,7 +28,6 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
-
 use LibreNMS\OS;
 
 class Ptp650 extends OS implements
@@ -47,7 +45,8 @@ class Ptp650 extends OS implements
     {
         $transmit = '.1.3.6.1.4.1.17713.7.12.4.0'; //CAMBIUM-PTP650-MIB::transmitPower.0
         $receive = '.1.3.6.1.4.1.17713.7.12.12.0'; //CAMBIUM-PTP650ptp650-MIB::rawReceivePower.0
-        return array(
+
+        return [
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -69,8 +68,8 @@ class Ptp650 extends OS implements
                 null,
                 1,
                 10
-            )
-        );
+            ),
+        ];
     }
 
     /**
@@ -84,9 +83,10 @@ class Ptp650 extends OS implements
         $receive = '.1.3.6.1.4.1.17713.7.20.1.0'; //CAMBIUM-PTP650-MIB::receiveDataRate.0
         $transmit = '.1.3.6.1.4.1.17713.7.20.2.0'; //CAMBIUM-PTP650-MIB::transmitDataRate.0
         $aggregate = '.1.3.6.1.4.1.17713.7.20.3.0'; //CAMBIUM-PTP650-MIB::aggregateDataRate.0
-        $txModulation = ".1.3.6.1.4.1.17713.7.12.15.0";
-        $rxModulation = ".1.3.6.1.4.1.17713.7.12.14.0";
-        return array(
+        $txModulation = '.1.3.6.1.4.1.17713.7.12.15.0';
+        $rxModulation = '.1.3.6.1.4.1.17713.7.12.14.0';
+
+        return [
             new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
@@ -138,7 +138,7 @@ class Ptp650 extends OS implements
                 'PTP650 Receive Modulation Rate',
                 null
             ),
-        );
+        ];
     }
 
     /**
@@ -150,7 +150,8 @@ class Ptp650 extends OS implements
     public function discoverWirelessSsr()
     {
         $ssr = '.1.3.6.1.4.1.17713.7.12.9.0'; // CAMBIUM-PTP650-MIB::signalStrengthRatio.0
-        return array(
+
+        return [
             new WirelessSensor(
                 'ssr',
                 $this->getDeviceId(),
@@ -161,7 +162,7 @@ class Ptp650 extends OS implements
                 null,
                 1,
                 10
-            )
-        );
+            ),
+        ];
     }
 }

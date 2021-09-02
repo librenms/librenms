@@ -10,13 +10,13 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-radioDbm');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-radioDbm');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
-    $rrd_options .= ' DEF:dbm='.$rrdfilename.':dbm:AVERAGE ';
-    $rrd_options .= ' DEF:min='.$rrdfilename.':min:AVERAGE ';
-    $rrd_options .= ' DEF:max='.$rrdfilename.':max:AVERAGE ';
-    $rrd_options .= ' DEF:avg='.$rrdfilename.':avg:AVERAGE ';
+    $rrd_options .= ' DEF:dbm=' . $rrdfilename . ':dbm:AVERAGE ';
+    $rrd_options .= ' DEF:min=' . $rrdfilename . ':min:AVERAGE ';
+    $rrd_options .= ' DEF:max=' . $rrdfilename . ':max:AVERAGE ';
+    $rrd_options .= ' DEF:avg=' . $rrdfilename . ':avg:AVERAGE ';
     $rrd_options .= " LINE2:dbm#00E5EE:'Radio Dbm       ' ";
     $rrd_options .= ' GPRINT:dbm:LAST:%0.2lf%s ';
     $rrd_options .= ' GPRINT:dbm:MIN:%0.2lf%s ';

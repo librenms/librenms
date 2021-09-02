@@ -117,7 +117,7 @@ modules:
 For advanced state discovery:
 
 This example will be based on a Cisco power supply sensor and is all
-it takes to have sensor state support for Cisco power supplys in Cisco
+it takes to have sensor state support for Cisco power supplies in Cisco
 switches. The file should be located in /includes/discovery/sensors/state/cisco.inc.php.
 
 ```php

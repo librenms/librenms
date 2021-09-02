@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -19,15 +19,15 @@ $stacked = generate_stacked_graphs();
 
 $length = '10';
 
-if (!isset($percentile)) {
+if (! isset($percentile)) {
     $length += '2';
 }
 
-if (!isset($out_text)) {
+if (! isset($out_text)) {
     $out_text = 'Out';
 }
 
-if (!isset($in_text)) {
+if (! isset($in_text)) {
     $in_text = 'In';
 }
 
@@ -99,31 +99,31 @@ if ($percentile) {
 
 $rrd_options .= "\\n'";
 $rrd_options .= ' LINE1.25:in#' . $colour_line_in . ":'" . $in_text . "'";
-$rrd_options .= ' GPRINT:in:LAST:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:in:AVERAGE:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:in_max:MAX:%6.'.$float_precision.'lf%s';
+$rrd_options .= ' GPRINT:in:LAST:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:in:AVERAGE:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:in_max:MAX:%6.' . $float_precision . 'lf%s';
 
 if ($percentile) {
-    $rrd_options .= ' GPRINT:percentile_in:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s';
 }
 
-$rrd_options .= " COMMENT:\\n";
+$rrd_options .= ' COMMENT:\\n';
 $rrd_options .= ' AREA:dout#' . $colour_area_out . $stacked['transparency'] . ':';
 $rrd_options .= ' LINE1.25:dout#' . $colour_line_out . ":'" . $out_text . "'";
-$rrd_options .= ' GPRINT:out:LAST:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:out:AVERAGE:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:out_max:MAX:%6.'.$float_precision.'lf%s';
+$rrd_options .= ' GPRINT:out:LAST:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:out:AVERAGE:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:out_max:MAX:%6.' . $float_precision . 'lf%s';
 
 if ($percentile) {
-    $rrd_options .= ' GPRINT:percentile_out:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s';
 }
 
-$rrd_options .= " COMMENT:\\n";
+$rrd_options .= ' COMMENT:\\n';
 
 if ($print_total) {
-    $rrd_options .= " GPRINT:tot:'Total %6.".$float_precision."lf%s'";
-    $rrd_options .= " GPRINT:totin:'(In %6.".$float_precision."lf%s'";
-    $rrd_options .= " GPRINT:totout:'Out %6.".$float_precision."lf%s)\l'";
+    $rrd_options .= " GPRINT:tot:'Total %6." . $float_precision . "lf%s'";
+    $rrd_options .= " GPRINT:totin:'(In %6." . $float_precision . "lf%s'";
+    $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%s)\l'";
 }
 
 if ($percentile) {

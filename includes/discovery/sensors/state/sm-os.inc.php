@@ -21,12 +21,11 @@ $states = [
     ['value' => 12, 'generic' => 0, 'graph' => 1, 'descr' => '4096QAM'],
 ];
 
-
-if (!empty($modulation)) {
+if (! empty($modulation)) {
     create_state_index($state_name, $states);
 }
 
-if (!$os instanceof OS) {
+if (! $os instanceof OS) {
     $os = OS::make($device);
 }
 

@@ -6,9 +6,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @package    LibreNMS
- * @subpackage polling
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
@@ -23,8 +21,8 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      * Build interface RRD with filename in format of:
      * port-id<ifIndex>-cie.rrd
      */
-    $rrd_name = getPortRrdName($port_id, 'cie');
-    $rrdfile = rrd_name($device['hostname'], $rrd_name);
+    $rrd_name = Rrd::portName($port_id, 'cie');
+    $rrdfile = Rrd::name($device['hostname'], $rrd_name);
     $rrd_def = RrdDefinition::make()
         ->addDataset('InRuntsErrs', 'DERIVE', 0)
         ->addDataset('InGiantsErrs', 'DERIVE', 0)
@@ -38,7 +36,7 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
     /*
      * Populate data for RRD
      */
-    $rrd_data = array();
+    $rrd_data = [];
     foreach ($cisco_if_extension_oids as $oid) {
         $ds_name = str_replace('cieIf', '', $oid);
         $rrd_data[$ds_name] = $this_port[$oid];

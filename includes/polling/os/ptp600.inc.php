@@ -15,15 +15,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
-use LibreNMS\RRD\RrdDefinition;
 
 $version = $device['sysDescr'];
-$masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CANOPY-SYS-MIB"));
-$hardware = 'PTP 600 '.$masterSlaveMode;
+$masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', 'CANOPY-SYS-MIB'));
+$hardware = 'PTP 600 ' . $masterSlaveMode;

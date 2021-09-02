@@ -13,5 +13,5 @@
 $data = str_replace('"', '', snmp_get($device, '1.3.6.1.2.1.33.1.1.4.0', '-Ovq'));
 preg_match_all('/^WebPower Pro II Card|v[0-9]+.[0-9]+|(SN [0-9]+)/', $data, $matches);
 $hardware = $matches[0][0];
-$version  = $matches[0][1];
-$serial   = $matches[0][2];
+$version = $matches[0][1];
+$serial = $matches[0][2];

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -79,11 +78,11 @@ class IpTest extends TestCase
 
     public function testHexToIp()
     {
-        $this->assertEquals("192.168.1.254", IP::fromHexString("c0 a8 01 fe"));
-        $this->assertEquals("192.168.1.254", IP::fromHexString("c0a801fe"));
-        $this->assertEquals("192.168.1.254", IP::fromHexString("c0 a8 01 fe "));
-        $this->assertEquals("192.168.1.254", IP::fromHexString("\"c0 a8 01 fe\""));
-        $this->assertEquals("192.168.1.254", IP::fromHexString("192.168.1.254"));
+        $this->assertEquals('192.168.1.254', IP::fromHexString('c0 a8 01 fe'));
+        $this->assertEquals('192.168.1.254', IP::fromHexString('c0a801fe'));
+        $this->assertEquals('192.168.1.254', IP::fromHexString('c0 a8 01 fe '));
+        $this->assertEquals('192.168.1.254', IP::fromHexString('"c0 a8 01 fe"'));
+        $this->assertEquals('192.168.1.254', IP::fromHexString('192.168.1.254'));
 
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('2001:db8::2:1'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 01'));
@@ -95,7 +94,7 @@ class IpTest extends TestCase
         $this->assertEquals('::', IP::fromHexString('00000000000000000000000000000000'));
 
         $this->expectException('LibreNMS\Exceptions\InvalidIpException');
-        IP::fromHexString("c0 a8 01 01 fe");
+        IP::fromHexString('c0 a8 01 01 fe');
 
         $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         IP::fromHexString('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 00 00 01');
@@ -117,7 +116,6 @@ class IpTest extends TestCase
         $this->assertTrue(IP::parse('192.168.1.255')->inNetwork('192.168.1.0/24'));
         $this->assertFalse(IP::parse('192.168.1.1')->inNetwork('192.168.1.0'));
         $this->assertFalse(IP::parse('10.4.3.2')->inNetwork('192.168.1.0/16'));
-
 
         $this->assertTrue(IP::parse('::1')->inNetwork('::/64'));
         $this->assertTrue(IP::parse('2001:db7:85a3::8a2e:370:7334')->inNetwork('::/0'));

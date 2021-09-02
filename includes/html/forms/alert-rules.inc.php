@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -28,8 +27,8 @@ use LibreNMS\Alerting\QueryBuilderParser;
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die(json_encode([
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need to be admin',
     ]));
@@ -38,7 +37,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json   = $vars['builder_json'];
+$builder_json = $vars['builder_json'];
 $override_query = $vars['override_query'];
 
 $options = [
@@ -50,23 +49,23 @@ if ($override_query === 'on') {
 } else {
     $query = QueryBuilderParser::fromJson($builder_json)->toSql();
 }
-$rule_id      = $_POST['rule_id'];
-$count        = mres($_POST['count']);
-$delay        = mres($_POST['delay']);
-$interval     = mres($_POST['interval']);
-$mute         = mres(isset($_POST['mute']) ? $_POST['mute'] : null);
-$invert       = mres(isset($_POST['invert']) ? $_POST['invert'] : null);
-$name         = mres($_POST['name']);
-$proc         = mres($_POST['proc']);
-$recovery     = ($vars['recovery']);
-$invert_map   = mres(isset($_POST['invert_map']) ? $_POST['invert_map'] : null);
-$severity     = mres($_POST['severity']);
+$rule_id = $_POST['rule_id'];
+$count = $_POST['count'];
+$delay = $_POST['delay'];
+$interval = $_POST['interval'];
+$mute = isset($_POST['mute']) ? $_POST['mute'] : null;
+$invert = isset($_POST['invert']) ? $_POST['invert'] : null;
+$name = $_POST['name'];
+$proc = $_POST['proc'];
+$recovery = ($vars['recovery']);
+$invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;
+$severity = $_POST['severity'];
 
-if (!is_numeric($count)) {
+if (! is_numeric($count)) {
     $count = '-1';
 }
 
-$delay_sec    = convert_delay($delay);
+$delay_sec = convert_delay($delay);
 $interval_sec = convert_delay($interval);
 
 if ($mute == 'on') {
@@ -89,7 +88,7 @@ if ($invert_map == 'on') {
     $invert_map = false;
 }
 
-$extra = array(
+$extra = [
     'mute'     => $mute,
     'count'    => $count,
     'delay'    => $delay_sec,
@@ -97,47 +96,46 @@ $extra = array(
     'interval' => $interval_sec,
     'recovery' => $recovery,
     'options'  => $options,
-);
+];
 
 $extra_json = json_encode($extra);
 
-if (!is_array($vars['maps']) && $invert_map) {
-    die(json_encode([
+if (! is_array($vars['maps']) && $invert_map) {
+    exit(json_encode([
         'status' => 'error',
-        'message' => 'Invert map is on but no selection in devices, groups and locations match list<br />'
+        'message' => 'Invert map is on but no selection in devices, groups and locations match list<br />',
     ]));
 }
 
-
 if (is_numeric($rule_id) && $rule_id > 0) {
     if (dbUpdate(
-        array(
+        [
             'severity' => $severity,
             'extra' => $extra_json,
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
             'builder' => $builder_json,
-            'invert_map' => $invert_map
-        ),
+            'invert_map' => $invert_map,
+        ],
         'alert_rules',
         'id=?',
-        array($rule_id)
+        [$rule_id]
     ) >= 0) {
         $message = "Edited Rule: <i>$name</i>";
     } else {
         $message = "Failed to edit Rule <i>$name</i>";
-        $status   = 'error';
+        $status = 'error';
     }
 } else {
     if (empty($name)) {
         $status = 'error';
         $message = 'No rule name provided';
     } elseif (empty($builder_json) || empty($query)) {
-        $status  = 'error';
+        $status = 'error';
         $message = 'No rules provided';
     } else {
-        $rule_id = dbInsert(array(
+        $rule_id = dbInsert([
             'rule' => '',
             'severity' => $severity,
             'extra' => $extra_json,
@@ -146,8 +144,8 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'proc' => $proc,
             'query' => $query,
             'builder' => $builder_json,
-            'invert_map' => $invert_map
-        ), 'alert_rules');
+            'invert_map' => $invert_map,
+        ], 'alert_rules');
 
         if ($rule_id) {
             $message = "Added Rule: <i>$name</i>";
@@ -167,13 +165,13 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     $devices = [];
     $groups = [];
     $locations = [];
-    foreach ((array)$vars['maps'] as $item) {
+    foreach ((array) $vars['maps'] as $item) {
         if (Str::startsWith($item, 'l')) {
-            $locations[] = (int)substr($item, 1);
+            $locations[] = (int) substr($item, 1);
         } elseif (Str::startsWith($item, 'g')) {
-            $groups[] = (int)substr($item, 1);
+            $groups[] = (int) substr($item, 1);
         } else {
-            $devices[] = (int)$item;
+            $devices[] = (int) $item;
         }
     }
 
@@ -184,11 +182,11 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     //Update transport groups and transports - can't use dbSyncRelationship
     $transports = [];
     $groups = [];
-    foreach ((array)$vars['transports'] as $item) {
+    foreach ((array) $vars['transports'] as $item) {
         if (Str::startsWith($item, 'g')) {
-            $groups[] = (int)substr($item, 1);
+            $groups[] = (int) substr($item, 1);
         } else {
-            $transports[] = (int)$item;
+            $transports[] = (int) $item;
         }
     }
 
@@ -207,34 +205,34 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     // Insert any new mappings
     $insert = [];
     foreach ($t_add as $transport_id) {
-        $insert[] = array (
+        $insert[] = [
             'transport_or_group_id' => $transport_id,
             'target_type' => 'single',
-            'rule_id' => $rule_id
-        );
+            'rule_id' => $rule_id,
+        ];
     }
     foreach ($g_add as $group_id) {
-        $insert[] = array(
+        $insert[] = [
             'transport_or_group_id' => $group_id,
             'target_type' => 'group',
-            'rule_id' => $rule_id
-        );
+            'rule_id' => $rule_id,
+        ];
     }
-    if (!empty($insert)) {
+    if (! empty($insert)) {
         $res = dbBulkInsert($insert, 'alert_transport_map');
     }
     // Remove old mappings
-    if (!empty($t_del)) {
+    if (! empty($t_del)) {
         $db_t_values = array_merge([$rule_id], $t_del);
         dbDelete('alert_transport_map', 'target_type="single" AND rule_id=? AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $db_t_values);
     }
-    if (!empty($g_del)) {
+    if (! empty($g_del)) {
         $db_g_values = array_merge([$rule_id], $g_del);
         dbDelete('alert_transport_map', 'target_type="group" AND rule_id=? AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $db_g_values);
     }
 }
 
-die(json_encode([
+exit(json_encode([
     'status'       => $status,
-    'message'      => $message
+    'message'      => $message,
 ]));

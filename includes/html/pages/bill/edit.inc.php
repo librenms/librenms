@@ -4,60 +4,60 @@
 $no_refresh = true;
 
   require 'includes/html/javascript-interfacepicker.inc.php';
-  
+
   // This needs more verification. Is it already added? Does it exist?
   // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
 $base = \LibreNMS\Config::get('billing.base');
-  
+
 if ($bill_data['bill_type'] == 'quota') {
-    $data      = $bill_data['bill_quota'];
+    $data = $bill_data['bill_quota'];
     $tmp['mb'] = ($data / $base / $base);
     $tmp['gb'] = ($data / $base / $base / $base);
     $tmp['tb'] = ($data / $base / $base / $base / $base);
     if ($tmp['tb'] >= 1) {
-        $quota = array(
+        $quota = [
             'type'      => 'tb',
             'select_tb' => ' selected',
             'data'      => $tmp['tb'],
-        );
+        ];
     } elseif (($tmp['gb'] >= 1) and ($tmp['gb'] < $base)) {
-        $quota = array(
+        $quota = [
             'type'      => 'gb',
             'select_gb' => ' selected',
             'data'      => $tmp['gb'],
-        );
+        ];
     } elseif (($tmp['mb'] >= 1) and ($tmp['mb'] < $base)) {
-        $quota = array(
+        $quota = [
             'type'      => 'mb',
             'select_mb' => ' selected',
             'data'      => $tmp['mb'],
-        );
+        ];
     }
 }//end if
-  
+
 if ($bill_data['bill_type'] == 'cdr') {
-    $data        = $bill_data['bill_cdr'];
+    $data = $bill_data['bill_cdr'];
     $tmp['kbps'] = ($data / $base);
     $tmp['mbps'] = ($data / $base / $base);
     $tmp['gbps'] = ($data / $base / $base / $base);
     if ($tmp['gbps'] >= 1) {
-        $cdr = array(
+        $cdr = [
             'type'        => 'gbps',
             'select_gbps' => ' selected',
             'data'        => $tmp['gbps'],
-        );
+        ];
     } elseif (($tmp['mbps'] >= 1) and ($tmp['mbps'] < $base)) {
-        $cdr = array(
+        $cdr = [
             'type'        => 'mbps',
             'select_mbps' => ' selected',
             'data'        => $tmp['mbps'],
-        );
+        ];
     } elseif (($tmp['kbps'] >= 1) and ($tmp['kbps'] < $base)) {
-        $cdr = array(
+        $cdr = [
             'type'        => 'kbps',
             'select_kbps' => ' selected',
             'data'        => $tmp['kbps'],
-        );
+        ];
     }
 }//end if
 ?>
@@ -100,18 +100,16 @@ if ($bill_data['bill_type'] == 'cdr') {
                 'SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
                 WHERE B.bill_id = ? AND P.port_id = B.port_id
                 AND D.device_id = P.device_id ORDER BY D.device_id',
-                array($bill_data['bill_id'])
+                [$bill_data['bill_id']]
             );
-            
+
             if (is_array($ports)) {
                 ?>
             <div class="list-group">
                 <?php   foreach ($ports as $port) {
                     $port = cleanPort($port);
                     $emptyCheck = true;
-                    $portalias  = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
-
-                    ?>
+                    $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . ''); ?>
                 <div class="list-group-item">
                     <form action="" class="form-inline" method="post" name="delete<?php echo $port['port_id'] ?>" style="display: none;">
                         <?php echo csrf_field() ?>
@@ -127,8 +125,9 @@ if ($bill_data['bill_type'] == 'cdr') {
                     <i class="fa fa-random"></i>
                     <?php echo generate_port_link($port, $port['ifName'] . '' . $portalias); ?>
                 </div>
-                <?php   }
-                if (!$emptyCheck) { ?>
+                <?php
+                }
+                if (! $emptyCheck) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
                 <?php                   } ?>
             

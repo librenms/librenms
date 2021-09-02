@@ -8,35 +8,35 @@
  *
  * @package    LibreNMS
  * @subpackage nfs-server
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     SvennD <svennd@svennd.be>
 */
 
 print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>".nicecase($app['app_type']).'</span> &#187; ';
+echo "<span style='font-weight: bold;'>" . \LibreNMS\Util\StringHelpers::niceCase($app['app_type']) . '</span> &#187; ';
 
-$app_sections = array(
+$app_sections = [
     'default'  => 'NFS',
     'proc2'  => 'NFS v2',
     'proc3'  => 'NFS v3',
     'proc4'  => 'NFS v4',
-);
+];
 
 unset($sep);
 
 foreach ($app_sections as $app_section => $app_section_text) {
     // remove entries that have no rrd associated
     // commonly proc2 will be invisible
-    $var_rrd = rrd_name($device['hostname'], 'app-nfs-server-'. $app_section . '-'. $app['app_id']);
-    if (!rrdtool_check_rrd_exists($var_rrd)) {
+    $var_rrd = Rrd::name($device['hostname'], 'app-nfs-server-' . $app_section . '-' . $app['app_id']);
+    if (! Rrd::checkRrdExists($var_rrd)) {
         continue;
     }
-    
+
     echo $sep;
 
-    if (!$vars['app_section']) {
+    if (! $vars['app_section']) {
         $vars['app_section'] = $app_section;
     }
 
@@ -44,7 +44,7 @@ foreach ($app_sections as $app_section => $app_section_text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($app_section_text, $vars, array('app_section' => $app_section));
+    echo generate_link($app_section_text, $vars, ['app_section' => $app_section]);
     if ($vars['app_section'] == $app_section) {
         echo '</span>';
     }
@@ -57,42 +57,42 @@ print_optionbar_end();
 unset($graphs);
 
 // stat => array(text, rrd)
-$graphs['default'] = array(
-    'nfs-server_net' => array('Network stats', 'default'),
-    'nfs-server_rpc' => array('RPC Stats', 'default'),
-    'nfs-server_io' => array('IO', 'default'),
-    'nfs-server_fh' => array('File handler', 'default') ,
-    'nfs-server_rc' => array('Reply cache', 'default'),
-    'nfs-server_ra' => array('Read ahead cache', 'default')
-);
+$graphs['default'] = [
+    'nfs-server_net' => ['Network stats', 'default'],
+    'nfs-server_rpc' => ['RPC Stats', 'default'],
+    'nfs-server_io' => ['IO', 'default'],
+    'nfs-server_fh' => ['File handler', 'default'],
+    'nfs-server_rc' => ['Reply cache', 'default'],
+    'nfs-server_ra' => ['Read ahead cache', 'default'],
+];
 
-$graphs['proc2'] = array(
-    'nfs-server_stats_v2' => array('NFS v2 Statistics', 'proc2')
-);
+$graphs['proc2'] = [
+    'nfs-server_stats_v2' => ['NFS v2 Statistics', 'proc2'],
+];
 
-$graphs['proc3'] = array(
-    'nfs-server_stats_io' => array('NFS v3 Read/Write operations', 'proc3'),
-    'nfs-server_stats_read' => array('NFS v3 other read operations', 'proc3'),
-    'nfs-server_stats_write' => array('NFS v3 other write operations', 'proc3')
-);
+$graphs['proc3'] = [
+    'nfs-server_stats_io' => ['NFS v3 Read/Write operations', 'proc3'],
+    'nfs-server_stats_read' => ['NFS v3 other read operations', 'proc3'],
+    'nfs-server_stats_write' => ['NFS v3 other write operations', 'proc3'],
+];
 
-$graphs['proc4'] = array(
-    'nfs-server_stats_v4' => array('NFS v4 Statistics', 'proc4'),
-    'nfs-server_v4ops' => array('NFS v4ops Statistics', 'proc4ops')
-);
+$graphs['proc4'] = [
+    'nfs-server_stats_v4' => ['NFS v4 Statistics', 'proc4'],
+    'nfs-server_v4ops' => ['NFS v4ops Statistics', 'proc4ops'],
+];
 
 foreach ($graphs[$vars['app_section']] as $key => $info) {
-   // check if they exist
-    if (!rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'app-nfs-server-'. $info[1] . '-'. $app['app_id']))) {
+    // check if they exist
+    if (! Rrd::checkRrdExists(Rrd::name($device['hostname'], 'app-nfs-server-' . $info[1] . '-' . $app['app_id']))) {
         continue;
     }
 
-    $graph_type            = $key;
+    $graph_type = $key;
     $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
+    $graph_array['width'] = '215';
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
+    $graph_array['id'] = $app['app_id'];
+    $graph_array['type'] = 'application_' . $key;
 
     echo '<div class="panel panel-default">
     <div class="panel-heading">

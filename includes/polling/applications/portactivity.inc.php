@@ -1,7 +1,7 @@
 <?php
 
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\RRD\RrdDefinition;
 
 $name = 'portactivity';
 $app_id = $app['app_id'];
@@ -9,14 +9,15 @@ $app_id = $app['app_id'];
 echo $name;
 
 try {
-    $returned=json_app_get($device, 'portactivity', 1);
+    $returned = json_app_get($device, 'portactivity', 1);
 } catch (JsonAppException $e) { // Only doing the generic one as this has no non-JSON return
-    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
-$ports=$returned['data'];
+$ports = $returned['data'];
 
 $ports_rrd_def = RrdDefinition::make()
     ->addDataset('total_conns', 'GAUGE', 0)
@@ -66,11 +67,11 @@ $ports_rrd_def = RrdDefinition::make()
 // update the RRD files for each port
 //
 
-$ports_keys=array_keys($ports);
-$ports_keys_int=0;
+$ports_keys = array_keys($ports);
+$ports_keys_int = 0;
 while (isset($ports[$ports_keys[$ports_keys_int]])) {
-    $rrd_name = array('app', $name, $app_id, $ports_keys[$ports_keys_int]);
-    $fields = array(
+    $rrd_name = ['app', $name, $app_id, $ports_keys[$ports_keys_int]];
+    $fields = [
         'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'],
         'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'],
         'total_from' => $ports[$ports_keys[$ports_keys_int]]['total_from'],
@@ -113,8 +114,8 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
         'fromTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['TIME_WAIT'],
         'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'],
         'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'],
-    );
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name);
+    ];
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $ports_keys_int++;
@@ -123,25 +124,25 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
 //
 // component processing for portsactivity
 //
-$device_id=$device['device_id'];
-$options=array(
-    'filter' => array(
-        'device_id' => array('=', $device_id),
-        'type' => array('=', 'portsactivity'),
-     ),
-);
+$device_id = $device['device_id'];
+$options = [
+    'filter' => [
+        'device_id' => ['=', $device_id],
+        'type' => ['=', 'portsactivity'],
+    ],
+];
 
-$component=new LibreNMS\Component();
-$components=$component->getComponents($device_id, $options);
+$component = new LibreNMS\Component();
+$components = $component->getComponents($device_id, $options);
 
 //delete portsactivity component if nothing is found
 if (empty($ports_keys)) {
     if (isset($components[$device_id])) {
         foreach ($components[$device_id] as $component_id => $_unused) {
-                 $component->deleteComponent($component_id);
+            $component->deleteComponent($component_id);
         }
     }
-//add portsactivity component if found
+    //add portsactivity component if found
 } else {
     if (isset($components[$device_id])) {
         $portsc = $components[$device_id];

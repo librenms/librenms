@@ -1,5 +1,11 @@
 mib: SPAGENT-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>SP\d+)/'
+        hardware:
+            - HHMSAGENT-MIB::hhmsAgentManufName.0
+            - HHMSAGENT-MIB::hhmsAgentHtmlView.0
+        hardware_template: '{{ HHMSAGENT-MIB::hhmsAgentManufName.0 }} {{ HHMSAGENT-MIB::hhmsAgentHtmlView.0 }}'
     sensors:
         state:
             data:

@@ -103,6 +103,100 @@ Output:
 }
 ```
 
+### `availability`
+
+Get calculated availabilities of given device.
+
+Route: `/api/v0/devices/:hostname/availability`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/availability
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "availability": [
+        {
+            "duration": 86400,
+            "availability_perc": "100.000000"
+        },
+        {
+            "duration": 604800,
+            "availability_perc": "100.000000"
+        },
+        {
+            "duration": 2592000,
+            "availability_perc": "99.946000"
+        },
+        {
+            "duration": 31536000,
+            "availability_perc": "99.994000"
+        }
+    ],
+    "count": 4
+}
+```
+
+### `outages`
+
+Get detected outages of given device.
+
+Route: `/api/v0/devices/:hostname/outages`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/outages
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "outages": [
+        {
+            "going_down": 1593194031,
+            "up_again": 1593194388
+        },
+        {
+            "going_down": 1593946507,
+            "up_again": 1593946863
+        },
+        {
+            "going_down": 1594628616,
+            "up_again": 1594628968
+        },
+        {
+            "going_down": 1594628974,
+            "up_again": 1594629339
+        },
+        {
+            "going_down": 1594638668,
+            "up_again": 1594638992
+        }
+    ],
+    "count": 5
+}
+```
+
 ### `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.
@@ -1216,7 +1310,7 @@ search all oxidized device configs for a string.
 Route: `api/v0/oxidized/config/search/:searchstring`
 
   - searchstring is the specific string you would like to search for.
-  
+
 Input:
 
 -
@@ -1251,7 +1345,7 @@ Returns a specific device's config from oxidized.
 Route: `api/v0/oxidized/config/:device_name`
 
   - device_name is the full dns name of the device used when adding the device to librenms.
-  
+
 Input:
 
 -
@@ -1273,11 +1367,11 @@ Output:
 
 Add one or more parents to a host.
 
-Route: `/api/v0/devices/:device_id/parents`
+Route: `/api/v0/devices/:device/parents`
 
 Input (JSON):
 
-- parent_ids: one or more parent ids
+- parent_ids: one or more parent ids or hostnames
 
 Example:
 ```curl
@@ -1296,11 +1390,11 @@ Output:
 
 Deletes some or all the parents from a host.
 
-Route: `/api/v0/devices/:device_id/parents`
+Route: `/api/v0/devices/:device/parents`
 
 Input (JSON):
 
-- parent_ids: One or more parent ids, if not specified deletes all parents from host.
+- parent_ids: One or more parent ids or hostnames, if not specified deletes all parents from host.
 
 Example:
 ```curl

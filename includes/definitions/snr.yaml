@@ -3,8 +3,7 @@ text: 'snr'
 type: network
 icon: snr
 group: snr
-mib_dir:
-    - snr
+mib_dir: snr
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

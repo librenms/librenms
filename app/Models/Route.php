@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class Route extends DeviceRelatedModel
 {
     protected $table = 'route';
@@ -24,7 +26,7 @@ class Route extends DeviceRelatedModel
         'bgp',
         'idpr',
         'ciscoEigrp',
-        'dvmrp'
+        'dvmrp',
     ];
 
     public static $translateType = [
@@ -39,12 +41,7 @@ class Route extends DeviceRelatedModel
     public $timestamps = true;
 
     // ---- Define Relationships ----
-    public function device()
-    {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
-    }
-
-    public function port()
+    public function port(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
     }

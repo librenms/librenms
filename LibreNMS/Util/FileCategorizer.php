@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,7 +37,7 @@ class FileCategorizer extends Categorizer
         if (getenv('CIHELPER_DEBUG')) {
             $this->setSkippable(function ($item) {
                 return in_array($item, [
-                    '.travis.yml',
+                    '.github/workflows/test.yml',
                     'LibreNMS/Util/CiHelper.php',
                     'LibreNMS/Util/FileCategorizer.php',
                     'app/Console/Commands/DevCheckCommand.php',
@@ -66,7 +65,7 @@ class FileCategorizer extends Categorizer
             return Str::startsWith($item, 'resources/') ? $item : false;
         });
         $this->addCategory('full-checks', function ($item) {
-            return in_array($item, ['composer.lock', '.travis.yml']) ? $item : false;
+            return in_array($item, ['composer.lock', '.github/workflows/test.yml']) ? $item : false;
         });
         $this->addCategory('os-files', function ($item) {
             if (($os_name = $this->osFromFile($item)) !== null) {
@@ -127,10 +126,10 @@ class FileCategorizer extends Categorizer
      */
     private function osFromClass($class)
     {
-        preg_match_all("/[A-Z][a-z0-9]*/", $class, $segments);
+        preg_match_all('/[A-Z][a-z0-9]*/', $class, $segments);
         $osname = implode('-', array_map('strtolower', $segments[0]));
         $osname = preg_replace(
-            ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/',],
+            ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/'],
             ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
             $osname
         );
@@ -138,6 +137,7 @@ class FileCategorizer extends Categorizer
         if ($os = $this->validateOs($osname)) {
             return $os;
         }
+
         return $this->validateOs(str_replace('-', '_', $osname));
     }
 }

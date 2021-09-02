@@ -1,29 +1,27 @@
 <?php
 /**
-* junos.inc.php
-*
-* LibreNMS Junos VirtualChassis Ports include
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-* @package    LibreNMS
-* @link       http://librenms.org
-* @copyright  2019 Ruslan Magomedov
-* @author     Ruslan Magomedov <rmagomedov.iam@yahoo.com>
-*/
-
-$junos_vcp_stats = snmpwalk_cache_oid($device, 'jnxVirtualChassisPortTable', array(), 'JUNIPER-VIRTUALCHASSIS-MIB');
+ * junos.inc.php
+ *
+ * LibreNMS Junos VirtualChassis Ports include
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ * @copyright  2019 Ruslan Magomedov
+ * @author     Ruslan Magomedov <rmagomedov.iam@yahoo.com>
+ */
+$junos_vcp_stats = snmpwalk_cache_oid($device, 'jnxVirtualChassisPortTable', [], 'JUNIPER-VIRTUALCHASSIS-MIB');
 
 d_echo($junos_vcp_stats);
 
@@ -45,8 +43,8 @@ foreach ($junos_vcp_stats as $index => $vcp_stats) {
         $nms_index = '100' . $fpc . $pic . $port;
 
         $port_stats[$nms_index]['ifDescr'] = "fpc$index";
-        $port_stats[$nms_index]['ifType']  = "vcp";
-        $port_stats[$nms_index]['ifName']  = "fpc$index";
+        $port_stats[$nms_index]['ifType'] = 'vcp';
+        $port_stats[$nms_index]['ifName'] = "fpc$index";
         $port_stats[$nms_index]['ifHCInOctets'] = $vcp_stats['jnxVirtualChassisPortInOctets'];
         $port_stats[$nms_index]['ifHCOutOctets'] = $vcp_stats['jnxVirtualChassisPortOutOctets'];
         $port_stats[$nms_index]['ifHCInUcastPkts'] = $vcp_stats['jnxVirtualChassisPortInPkts'];
@@ -55,6 +53,6 @@ foreach ($junos_vcp_stats as $index => $vcp_stats) {
         $port_stats[$nms_index]['ifOutMulticastPkts'] = $vcp_stats['jnxVirtualChassisPortOutMcasts'];
         $port_stats[$nms_index]['ifInErrors'] = $vcp_stats['jnxVirtualChassisPortInCRCAlignErrors'];
         $port_stats[$nms_index]['ifAdminStatus'] = $vcp_stats['jnxVirtualChassisPortAdminStatus'];
-        $port_stats[$nms_index]['ifOperStatus']  = $vcp_stats['jnxVirtualChassisPortOperStatus'];
+        $port_stats[$nms_index]['ifOperStatus'] = $vcp_stats['jnxVirtualChassisPortOperStatus'];
     }
 }

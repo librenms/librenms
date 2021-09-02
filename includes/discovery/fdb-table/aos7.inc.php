@@ -15,25 +15,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package   LibreNMS
- * @link      http://librenms.org
+ * @link      https://www.librenms.org
  * @copyright LibreNMS contributors
  * @author    Tony Murray <murraytony@gmail.com>
  * @author    JoseUPV
  */
 
 // Try nokia/aos7/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement first
-$dot1d = snmpwalk_group($device, 'slMacAddressGblManagement', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, array(), 'nokia/aos7');
-if (!empty($dot1d)) {
+$dot1d = snmpwalk_group($device, 'slMacAddressGblManagement', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia/aos7');
+if (! empty($dot1d)) {
     echo 'AOS7+ MAC-ADDRESS-MIB:';
-    $fdbPort_table=array();
+    $fdbPort_table = [];
     foreach ($dot1d['slMacAddressGblManagement'] as $slMacDomain => $data) {
         foreach ($data as $slLocaleType => $data2) {
             foreach ($data2 as $portLocal => $data3) {
                 foreach ($data3 as $vlanLocal => $data4) {
-                    $fdbPort_table[$vlanLocal]=array('dot1qTpFdbPort' => array_combine(array_keys($data4[0]), array_fill(0, count($data4[0]), $portLocal)));
+                    if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
+                        $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
+                    }
+                    foreach ($data4[0] as $macLocal => $one) {
+                        $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
+                    }
                 }
             }
         }

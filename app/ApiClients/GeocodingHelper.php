@@ -14,10 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,8 +45,9 @@ trait GeocodingHelper
      */
     public function getCoordinates($address)
     {
-        if (!Config::get('geoloc.latlng', true)) {
+        if (! Config::get('geoloc.latlng', true)) {
             Log::debug('Geocoding disabled');
+
             return [];
         }
 
@@ -59,10 +59,10 @@ trait GeocodingHelper
             if ($this->checkResponse($response, $response_data)) {
                 return $this->parseLatLng($response_data);
             } else {
-                Log::error("Geocoding failed.", ['response' => $response_data]);
+                Log::error('Geocoding failed.', ['response' => $response_data]);
             }
         } catch (Exception $e) {
-            Log::error("Geocoding failed: " . $e->getMessage());
+            Log::error('Geocoding failed: ' . $e->getMessage());
         }
 
         return [];

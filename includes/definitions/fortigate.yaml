@@ -2,8 +2,7 @@ os: fortigate
 text: 'Fortinet Fortigate'
 type: firewall
 icon: fortinet
-mib_dir:
-    - fortinet
+mib_dir: fortinet
 empty_ifdescr: true
 ifname: true
 over:

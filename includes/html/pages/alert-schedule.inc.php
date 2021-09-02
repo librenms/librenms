@@ -13,12 +13,10 @@
  */
 
 $pagetitle[] = 'Alert Schedule';
-$no_refresh  = true;
+$no_refresh = true;
 if (Auth::user()->hasGlobalAdmin()) {
     include_once 'includes/html/modal/alert_schedule.inc.php';
-    include_once 'includes/html/modal/remove_alert_schedule.inc.php';
-
-    ?>
+    include_once 'includes/html/modal/remove_alert_schedule.inc.php'; ?>
 
 <div class="row">
     <div class="col-sm-12">

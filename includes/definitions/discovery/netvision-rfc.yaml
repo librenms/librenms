@@ -1,0 +1,4 @@
+modules:
+    os:
+        version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        version_regex: '/v(?<version>[\d.]+)/'

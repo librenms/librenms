@@ -10,5 +10,5 @@
  * the source code distribution for details.
  */
 
-$match = explode(" ", $device['sysDescr']);
+$match = explode(' ', $device['sysDescr']);
 $hardware = $match[2];

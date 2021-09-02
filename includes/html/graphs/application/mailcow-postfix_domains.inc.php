@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 LibreNMS
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
@@ -25,18 +25,18 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array = array(
-    'senders' => array('descr' => 'Sender(s)', 'colour' => '11d3f5',),
-    'sendinghostsdomains' => array('descr' => 'Sender domain(s)', 'colour' => '11abf2',),
-    'recipients' => array('descr' => 'Recipient(s)', 'colour' => 'f78f19',),
-    'recipienthostsdomains' => array('descr' => 'Recipient domain(s)', 'colour' => 'e0001a',),
-);
+$array = [
+    'senders' => ['descr' => 'Sender(s)', 'colour' => '11d3f5'],
+    'sendinghostsdomains' => ['descr' => 'Sender domain(s)', 'colour' => '11abf2'],
+    'recipients' => ['descr' => 'Recipient(s)', 'colour' => 'f78f19'],
+    'recipienthostsdomains' => ['descr' => 'Recipient domain(s)', 'colour' => 'e0001a'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

@@ -5,9 +5,8 @@ if (Auth::user()->hasGlobalAdmin()) {
     $new_plugins = scan_new_plugins();
     $removed_plugins = scan_removed_plugins();
 
-
     // Check if we have to toggle enabled / disable a particular module
-    $plugin_id     = $_POST['plugin_id'];
+    $plugin_id = $_POST['plugin_id'];
     $plugin_active = $_POST['plugin_active'];
     if (is_numeric($plugin_id) && is_numeric($plugin_active)) {
         if ($plugin_active == '0') {
@@ -18,7 +17,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $plugin_active = 0;
         }
 
-        if (dbUpdate(array('plugin_active' => $plugin_active), 'plugins', '`plugin_id` = ?', array($plugin_id))) {
+        if (dbUpdate(['plugin_active' => $plugin_active], 'plugins', '`plugin_id` = ?', [$plugin_id])) {
             echo '
 <script type="text/javascript">
 $.ajax({
@@ -31,9 +30,7 @@ $.ajax({
 </script>
 ';
         }
-    }//end if
-
-    ?>
+    }//end if?>
 
 <div class="panel panel-default panel-condensed">
   <div class="panel-heading">
@@ -43,18 +40,17 @@ $.ajax({
     if ($new_plugins > 0) {
         echo '<div class="panel-body">
     <div class="alert alert-warning">
-      We have found '.$new_plugins.' new plugins that need to be configured and enabled
+      We have found ' . $new_plugins . ' new plugins that need to be configured and enabled
     </div>
   </div>';
     }
     if ($removed_plugins > 0) {
         echo '<div class="panel-body">
     <div class="alert alert-warning">
-      We have found '.$removed_plugins.' removed plugins
+      We have found ' . $removed_plugins . ' removed plugins
     </div>
   </div>';
-    }
-    ?>
+    } ?>
   <table class="table table-condensed">
     <tr>
       <th>Name</th>
@@ -66,23 +62,23 @@ $.ajax({
         if ($plugins['plugin_active'] == 1) {
             $plugin_colour = 'bg-success';
             $plugin_button = 'danger';
-            $plugin_label  = 'Disable';
+            $plugin_label = 'Disable';
         } else {
             $plugin_colour = 'bg-danger';
             $plugin_button = 'success';
-            $plugin_label  = 'Enable';
+            $plugin_label = 'Enable';
         }
 
-        echo '<tr class="'.$plugin_colour.'">
+        echo '<tr class="' . $plugin_colour . '">
             <td>
-              '.$plugins['plugin_name'].'
+              ' . $plugins['plugin_name'] . '
             </td>
             <td>
-              <form class="form-inline" role="form" action="" method="post" id="'.$plugins['plugin_id'].'" name=="'.$plugins['plugin_id'].'">
+              <form class="form-inline" role="form" action="" method="post" id="' . $plugins['plugin_id'] . '" name=="' . $plugins['plugin_id'] . '">
                 ' . csrf_field() . '
-                <input type="hidden" name="plugin_id" value="'.$plugins['plugin_id'].'">
-                <input type="hidden" name="plugin_active" value="'.$plugins['plugin_active'].'">
-                <button type="submit" class="btn btn-sm btn-'.$plugin_button.'">'.$plugin_label.'</button>
+                <input type="hidden" name="plugin_id" value="' . $plugins['plugin_id'] . '">
+                <input type="hidden" name="plugin_active" value="' . $plugins['plugin_active'] . '">
+                <button type="submit" class="btn btn-sm btn-' . $plugin_button . '">' . $plugin_label . '</button>
               </form>
             </td>
           </tr>';
@@ -93,5 +89,5 @@ $.ajax({
 
     <?php
 } else {
-    include 'includes/html/error-no-perm.inc.php';
-}//end if
+        include 'includes/html/error-no-perm.inc.php';
+    }//end if

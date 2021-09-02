@@ -12,11 +12,11 @@ if (Config::get('enable_inventory')) {
 
     // Delete any entries that have not been accounted for.
     $sql = 'SELECT * FROM `entPhysical` WHERE `device_id` = ?';
-    foreach (dbFetchRows($sql, array($device['device_id'])) as $test) {
+    foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
         $id = $test['entPhysicalIndex'];
-        if (!$valid[$id]) {
+        if (! $valid[$id]) {
             echo '-';
-            dbDelete('entPhysical', 'entPhysical_id = ?', array ($test['entPhysical_id']));
+            dbDelete('entPhysical', 'entPhysical_id = ?', [$test['entPhysical_id']]);
         }
     }
     unset(

@@ -1,5 +1,9 @@
 mib: AC-ANALOG-MIB:AcGateway:AC-PSTN-MIB:DS1-MIB:AC-PM-PSTN-MIB
 modules:
+    os:
+        hardware: AC-SYSTEM-MIB::acSysIdName.0
+        serial: AC-SYSTEM-MIB::acSysIdSerialNumber.0
+        version: AC-SYSTEM-MIB::acSysVersionSoftware.0
     sensors:
         pre-cache:
             data:

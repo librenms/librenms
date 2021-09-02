@@ -1962,9 +1962,11 @@ label {
 .widget_body {
     padding: 0.8em;
     overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
     height: calc(100% - 38px);
     cursor: auto;
+    text-align: center;
 }
 
 .device-availability, .service-availability {
@@ -2381,4 +2383,23 @@ label {
 
 #manage-device-groups-table > thead > tr > th:last-child {
     min-width: 7%;
+}
+
+.logon-message {
+    white-space: pre-wrap;
+}
+
+.expandable {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.expandable:hover {
+    overflow: visible;
+}
+.expandable:hover span {
+    position: relative;
+    background-color: white;
+    padding: 2px 3px 2px 0;
+    z-index: 5;
 }

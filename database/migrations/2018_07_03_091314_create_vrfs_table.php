@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateVrfsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

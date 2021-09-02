@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -42,7 +42,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 
 <script>
 
-$('#alert-template-removal').click('', function(event) {
+$('#alert-template-removal').on("click", function(event) {
     event.preventDefault();
     var template_id = $("#template_id").val();
     $.ajax({

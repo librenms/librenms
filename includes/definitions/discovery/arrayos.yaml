@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/Hardware: (?<hardware>.*) - Software: ArrayOS Rel\.APV\.(?<version>[\d.]+)/'
+        serial: CA-SNMP-MIB8::serialNumber.0

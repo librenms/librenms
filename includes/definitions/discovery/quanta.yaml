@@ -1,0 +1,10 @@
+modules:
+    mempools:
+        data:
+            -
+                total: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
+                free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
+                precision: 1024
+    os:
+        sysDescr_regex: '/(?<hardware>[^,]+), (?<features>[^,]+), (?<version>[^,]+)/'
+        serial: NETGEAR-SWITCHING-MIB::agentInventorySerialNumber.0

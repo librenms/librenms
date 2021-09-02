@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,12 +35,13 @@ class PollerSettingsController extends Controller
         $this->authorize('update', $poller);
 
         $definition = collect($poller->configDefinition())->keyBy('name');
-        if (!$definition->has($setting)) {
+        if (! $definition->has($setting)) {
             return response()->json(['error' => 'Invalid setting'], 422);
         }
 
         $poller->$setting = $request->get('value');
         $poller->save();
+
         return response()->json(['value' => $poller->$setting]);
     }
 
@@ -51,12 +51,13 @@ class PollerSettingsController extends Controller
         $this->authorize('delete', $poller);
 
         $definition = collect($poller->configDefinition())->keyBy('name');
-        if (!$definition->has($setting)) {
+        if (! $definition->has($setting)) {
             return response()->json(['error' => 'Invalid setting'], 422);
         }
 
         $poller->$setting = $definition->get($setting)['default'];
         $poller->save();
+
         return response()->json(['value' => $poller->$setting]);
     }
 }

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -35,11 +34,11 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     /**
      * Convert the query builder rules to a Laravel Fluent builder
      *
-     * @return Builder
+     * @return Builder|null
      */
     public function toQuery()
     {
-        if (empty($this->builder) || !array_key_exists('condition', $this->builder)) {
+        if (empty($this->builder) || ! array_key_exists('condition', $this->builder)) {
             return null;
         }
 
@@ -60,7 +59,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function parseGroupToQuery($query, $rule, $parent_condition = null)
     {
-        return $query->where(function ($query) use ($rule, $parent_condition) {
+        return $query->where(function ($query) use ($rule) {
             foreach ($rule['rules'] as $group_rule) {
                 if (array_key_exists('condition', $group_rule)) {
                     $this->parseGroupToQuery($query, $group_rule, $rule['condition']);
@@ -79,7 +78,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function parseRuleToQuery($query, $rule, $condition)
     {
-        list($field, $op, $value) = $this->expandRule($rule);
+        [$field, $op, $value] = $this->expandRule($rule);
 
         switch ($op) {
             case 'equal':
@@ -140,7 +139,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
         $op = $rule['operator'];
 
         $value = $rule['value'];
-        if (!is_array($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
+        if (! is_array($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
             $value = DB::raw($this->expandMacro(trim($value, '`')));
         }
 
@@ -153,12 +152,12 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function joinTables($query)
     {
-        if (!isset($this->builder['joins'])) {
+        if (! isset($this->builder['joins'])) {
             $this->generateJoins();
         }
 
         foreach ($this->builder['joins'] as $join) {
-            list($rightTable, $left, $right) = $join;
+            [$rightTable, $left, $right] = $join;
             $query->leftJoin($rightTable, $left, $right);
         }
 
@@ -175,10 +174,10 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     {
         $joins = [];
         foreach ($this->generateGlue() as $glue) {
-            list($left, $right) = explode(' = ', $glue, 2);
+            [$left, $right] = explode(' = ', $glue, 2);
             if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
-                list($leftTable, $leftKey) = explode('.', $left);
-                list($rightTable, $rightKey) = explode('.', $right);
+                [$leftTable, $leftKey] = explode('.', $left);
+                [$rightTable, $rightKey] = explode('.', $right);
                 $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
 
                 $joins[] = [$target_table, $left, $right];

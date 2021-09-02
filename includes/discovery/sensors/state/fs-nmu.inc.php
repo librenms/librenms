@@ -15,17 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
-
-$power1 = snmp_get($device, "power1State.0", "-Ovqe", "OAP-NMU");
-$power2 = snmp_get($device, "power2State.0", "-Ovqe", "OAP-NMU");
-$fan = snmp_get($device, "fanState.0", "-Ovqe", "OAP-NMU");
+$power1 = snmp_get($device, 'power1State.0', '-Ovqe', 'OAP-NMU');
+$power2 = snmp_get($device, 'power2State.0', '-Ovqe', 'OAP-NMU');
+$fan = snmp_get($device, 'fanState.0', '-Ovqe', 'OAP-NMU');
 $oid_power1 = '.1.3.6.1.4.1.40989.10.16.20.11.0';
 $oid_power2 = '.1.3.6.1.4.1.40989.10.16.20.12.0';
 $oid_fan = '.1.3.6.1.4.1.40989.10.16.20.10.0';

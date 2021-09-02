@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateNotificationsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

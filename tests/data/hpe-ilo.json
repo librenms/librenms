@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.232.9.4.10",
                     "sysDescr": "Integrated Lights-Out 4 2.50 Sep 23 2016",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "hpe-ilo",
-                    "type": "appliance",
-                    "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.232.9.4.10",
-                    "sysDescr": "Integrated Lights-Out 4 2.50 Sep 23 2016",
                     "sysContact": "<private>",
                     "version": "2.50",
                     "hardware": "ProLiant ML350 Gen9",
@@ -35,6 +17,54 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hpe-ilo",
+                    "mempool_class": "system",
+                    "mempool_precision": 1048576,
+                    "mempool_descr": "Physical Memory",
+                    "mempool_perc": 98,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 4120903680,
+                    "mempool_used_oid": null,
+                    "mempool_free": 62914560,
+                    "mempool_free_oid": ".1.3.6.1.4.1.232.11.2.13.2.0",
+                    "mempool_total": 4183818240,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hpe-ilo",
+                    "mempool_class": "system",
+                    "mempool_precision": 1048576,
+                    "mempool_descr": "Paging Memory",
+                    "mempool_perc": 1,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 9437184,
+                    "mempool_used_oid": null,
+                    "mempool_free": 964689920,
+                    "mempool_free_oid": ".1.3.6.1.4.1.232.11.2.13.4.0",
+                    "mempool_total": 974127104,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

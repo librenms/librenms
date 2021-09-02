@@ -1,0 +1,19 @@
+os: hpe-mapdu
+text: 'HPE Managed Power Distribution Unit'
+type: power
+icon: hpe
+group: hpe
+mib_dir: hp
+over:
+    - {graph: device_power, text: Power}  
+    - {graph: device_current, text: Current}
+snmp_max_oid: '8'
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.232.165.7
+            - .1.3.6.1.4.1.232.165.11
+    -
+        sysDescr:
+            - P9S18A
+            - Outlet Metered, Outlet Switched

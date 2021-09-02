@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePackagesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,7 @@ class CreatePackagesTable extends Migration
             $table->string('build', 64);
             $table->string('arch', 16);
             $table->bigInteger('size')->nullable();
-            $table->unique(['device_id','name','manager','arch','version','build']);
+            $table->unique(['device_id', 'name', 'manager', 'arch', 'version', 'build']);
         });
     }
 

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,9 +39,9 @@ class Programs extends BaseValidation
     public function validate(Validator $validator)
     {
         // Check programs
-        $bins = array('fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk');
+        $bins = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
         foreach ($bins as $bin) {
-            if (!($cmd = $this->findExecutable($bin))) {
+            if (! ($cmd = $this->findExecutable($bin))) {
                 $validator->fail(
                     "$bin location is incorrect or bin not installed.",
                     "Install $bin or manually set the path to $bin by placing the following in config.php: " .
@@ -58,22 +57,24 @@ class Programs extends BaseValidation
     public function checkFping6(Validator $validator, $fping)
     {
         $fping6 = $this->findExecutable('fping6');
-        $fping6 = (!is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
+        $fping6 = (! is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
 
         $validator->execAsUser("$fping6 ::1 2>&1", $output, $return);
-        $output = implode(" ", $output);
+        $output = implode(' ', $output);
 
-        if ($return === 0 && $output == "::1 is alive") {
+        if ($return === 0 && $output == '::1 is alive') {
             return; // fping is working
         }
 
         if ($output == '::1 address not found') {
-            $validator->warn("fping does not have IPv6 support?!?!");
+            $validator->warn('fping does not have IPv6 support?!?!');
+
             return;
         }
 
         if (Str::contains($output, '::1 is unreachable') || Str::contains($output, 'Address family not supported')) {
-            $validator->warn("IPv6 is disabled on your server, you will not be able to add IPv6 devices.");
+            $validator->warn('IPv6 is disabled on your server, you will not be able to add IPv6 devices.');
+
             return;
         }
 
@@ -85,9 +86,9 @@ class Programs extends BaseValidation
     public function extraFpingChecks(Validator $validator, $cmd)
     {
         $validator->execAsUser("$cmd 127.0.0.1 2>&1", $output, $return);
-        $output = implode(" ", $output);
+        $output = implode(' ', $output);
 
-        if ($return === 0 && $output == "127.0.0.1 is alive") {
+        if ($return === 0 && $output == '127.0.0.1 is alive') {
             return; // fping is working
         }
 
@@ -96,6 +97,7 @@ class Programs extends BaseValidation
 
     private function failFping($validator, $cmd, $output)
     {
+        $validator->info('fping FAILURES can be ignored if running LibreNMS in a jail without ::1. You may want to test it manually: fping ::1');
         $validator->fail(
             "$cmd could not be executed. $cmd must have CAP_NET_RAW capability (getcap) or suid. Selinux exclusions may be required.\n ($output)"
         );
@@ -104,13 +106,13 @@ class Programs extends BaseValidation
             $getcap_out = shell_exec("$getcap $cmd");
             preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
 
-            if (is_null($matches) || !Str::contains($matches[1], 'cap_net_raw+ep')) {
+            if (is_null($matches) || ! Str::contains($matches[1], 'cap_net_raw+ep')) {
                 $validator->fail(
                     "$cmd should have CAP_NET_RAW!",
                     "setcap cap_net_raw+ep $cmd"
                 );
             }
-        } elseif (!(fileperms($cmd) & 2048)) {
+        } elseif (! (fileperms($cmd) & 2048)) {
             $validator->fail("$cmd should be suid!", "chmod u+s $cmd");
         }
     }

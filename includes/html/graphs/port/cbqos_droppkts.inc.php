@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-$cbqos_parameter_name = "droppkts";
-$cbqos_operator = "*";
-$cbqos_operator_param = "1";
-include "includes/html/graphs/port/cbqos_generic.inc.php";
+$cbqos_parameter_name = 'droppkts';
+$cbqos_operator = '*';
+$cbqos_operator_param = '1';
+include 'includes/html/graphs/port/cbqos_generic.inc.php';

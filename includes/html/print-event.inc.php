@@ -10,7 +10,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -20,25 +20,25 @@ $hostname = gethostbyid($entry['device_id']);
 unset($icon);
 
 $severity_colour = eventlog_severity($entry['severity']);
-$icon = '<span class="alert-status '.$severity_colour.'"></span>';
+$icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
 echo '<tr>';
-echo '<td>'.$icon .'</td>';
-echo '<td style="vertical-align: middle;">'.$entry['datetime'].'</td>';
+echo '<td>' . $icon . '</td>';
+echo '<td style="vertical-align: middle;">' . $entry['datetime'] . '</td>';
 
-if (!isset($vars['device'])) {
+if (! isset($vars['device'])) {
     $dev = device_by_id_cache($entry['device_id']);
-    echo '<td style="vertical-align: middle;">'.generate_device_link($dev, shorthost($dev['hostname'])).'</td>';
+    echo '<td style="vertical-align: middle;">' . generate_device_link($dev, shorthost($dev['hostname'])) . '</td>';
 }
 
 if ($entry['type'] == 'interface') {
-    $this_if       = cleanPort(getifbyid($entry['reference']));
-    $entry['link'] = '<b>'.generate_port_link($this_if, makeshortif(strtolower($this_if['label']))).'</b>';
+    $this_if = cleanPort(getifbyid($entry['reference']));
+    $entry['link'] = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
 } else {
     $entry['link'] = 'System';
 }
 
-echo '<td style="vertical-align: middle;">'.$entry['link'].'</td>';
+echo '<td style="vertical-align: middle;">' . $entry['link'] . '</td>';
 
-echo '<td style="vertical-align: middle;">'.htmlspecialchars($entry['message']).'</td>';
+echo '<td style="vertical-align: middle;">' . htmlspecialchars($entry['message']) . '</td>';
 echo '</tr>';

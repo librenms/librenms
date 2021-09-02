@@ -9,7 +9,7 @@
  * the source code distribution for details.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Mike Williams
  * @copyright  2019 PipoCanaja
  * @author     Mike Williams <mike@mgww.net>
@@ -40,7 +40,7 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
             $lowWarnLimit = $oid[$prefix . 'Thresh3'];
             $highLimit = $oid[$prefix . 'Thresh1'];
             $highWarnLimit = $oid[$prefix . 'Thresh2'];
-            if ($oid[$prefix . 'Units'] == "Fahrenheit") {
+            if ($oid[$prefix . 'Units'] == 'Fahrenheit') {
                 $user_function = 'fahrenheit_to_celsius';
                 $value = fahrenheit_to_celsius($value);
                 $lowLimit = fahrenheit_to_celsius($lowLimit);

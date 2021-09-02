@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -25,20 +25,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Pushover API Transport
  * @author neokjames <neokjames@gmail.com>
  * @copyright 2015 neokjames, f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 
 class Pushover extends Transport
 {
@@ -52,19 +51,19 @@ class Pushover extends Transport
 
     public function contactPushover($obj, $api)
     {
-        $data          = array();
+        $data = [];
         $data['token'] = $api['appkey'];
-        $data['user']  = $api['userkey'];
+        $data['user'] = $api['userkey'];
         switch ($obj['severity']) {
-            case "critical":
+            case 'critical':
                 $data['priority'] = 1;
-                if (!empty($api['options']['sound_critical'])) {
+                if (! empty($api['options']['sound_critical'])) {
                     $data['sound'] = $api['options']['sound_critical'];
                 }
                 break;
-            case "warning":
+            case 'warning':
                 $data['priority'] = 1;
-                if (!empty($api['options']['sound_warning'])) {
+                if (! empty($api['options']['sound_warning'])) {
                     $data['sound'] = $api['options']['sound_warning'];
                 }
                 break;
@@ -72,28 +71,30 @@ class Pushover extends Transport
         switch ($obj['state']) {
             case AlertState::RECOVERED:
                 $data['priority'] = 0;
-                if (!empty($api['options']['sound_ok'])) {
+                if (! empty($api['options']['sound_ok'])) {
                     $data['sound'] = $api['options']['sound_ok'];
                 }
                 break;
         }
-        $data['title']   = $obj['title'];
+        $data['title'] = $obj['title'];
         $data['message'] = $obj['msg'];
         if ($api['options']) {
             $data = array_merge($data, $api['options']);
         }
-        $curl            = curl_init();
+        $curl = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("Pushover returned error"); //FIXME: proper debugging
+            var_dump('Pushover returned error'); //FIXME: proper debugging
+
             return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -123,7 +124,7 @@ class Pushover extends Transport
             'validation' => [
                 'appkey' => 'required',
                 'userkey' => 'required',
-            ]
+            ],
         ];
     }
 }

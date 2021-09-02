@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -51,7 +50,7 @@ class RrdCheck extends BaseValidation
         $rrd_total = iterator_count($rrd_iterator);
         $rrd_iterator->rewind(); // Rewind iterator in case iterator_count left iterator in unknown state
 
-        echo "\nScanning " . $rrd_total . " rrd files in " . Config::get('rrd_dir') . "...\n";
+        echo "\nScanning " . $rrd_total . ' rrd files in ' . Config::get('rrd_dir') . "...\n";
 
         // Count loops so we can push status to the user
         $loopcount = 0;
@@ -63,7 +62,7 @@ class RrdCheck extends BaseValidation
             $loopcount++;
             if (($loopcount % 50) == 0) {
                 //This lets us update the previous status update without spamming in most consoles
-                echo "\033[" . $screenpad . "D";
+                echo "\033[" . $screenpad . 'D';
                 $test_status = 'Status: ' . $loopcount . '/' . $rrd_total;
                 echo $test_status;
                 $screenpad = strlen($test_status);
@@ -71,14 +70,14 @@ class RrdCheck extends BaseValidation
 
             // A non zero result means there was some kind of error
             if ($rrd_test_result > 0) {
-                echo "\033[" . $screenpad . "D";
+                echo "\033[" . $screenpad . 'D';
                 $validator->fail('Error parsing "' . $filename . '" RRD ' . trim($error));
                 $screenpad = 0;
             }
         }
 
-        echo "\033[" . $screenpad . "D";
-        echo "Status: " . $loopcount . "/" . $rrd_total . " - Complete\n";
+        echo "\033[" . $screenpad . 'D';
+        echo 'Status: ' . $loopcount . '/' . $rrd_total . " - Complete\n";
     }
 
     /**
@@ -97,15 +96,15 @@ class RrdCheck extends BaseValidation
         $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
         $process = proc_open(
             $command,
-            array (
-                0 => array('pipe', 'r'),
-                1 => array('pipe', 'w'),
-                2 => array('pipe', 'w'),
-            ),
+            [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ],
             $pipes
         );
 
-        if (!is_resource($process)) {
+        if (! is_resource($process)) {
             throw new \RuntimeException('Could not create a valid process');
         }
 
@@ -116,8 +115,9 @@ class RrdCheck extends BaseValidation
         }
 
         $stdOutput = stream_get_contents($pipes[1]);
-        $stdError  = stream_get_contents($pipes[2]);
+        $stdError = stream_get_contents($pipes[2]);
         proc_close($process);
+
         return $status['exitcode'];
     }
 }

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,9 +26,9 @@ namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\OS;
-use const false;
-use const true;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -39,7 +38,7 @@ class OSDiscoveryTest extends TestCase
     {
         parent::setUpBeforeClass();
 
-        $glob = Config::get('install_dir') . "/tests/snmpsim/*.snmprec";
+        $glob = Config::get('install_dir') . '/tests/snmpsim/*.snmprec';
 
         self::$unchecked_files = array_flip(array_map(function ($file) {
             return basename($file, '.snmprec');
@@ -59,9 +58,9 @@ class OSDiscoveryTest extends TestCase
      *
      * @group os
      * @dataProvider osProvider
-     * @param $os_name
+     * @param string $os_name
      */
-    public function testOS($os_name)
+    public function testOSDetection($os_name)
     {
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
@@ -84,13 +83,13 @@ class OSDiscoveryTest extends TestCase
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
      *
-     * @depends testOS
+     * @depends testOSDetection
      */
     public function testAllFilesTested()
     {
         $this->assertEmpty(
             self::$unchecked_files,
-            "Not all snmprec files were checked: " . print_r(array_keys(self::$unchecked_files), true)
+            'Not all snmprec files were checked: ' . print_r(array_keys(self::$unchecked_files), true)
         );
     }
 
@@ -104,11 +103,10 @@ class OSDiscoveryTest extends TestCase
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-        global $debug, $vdebug;
-        $debug = true;
-        $vdebug = true;
+        Debug::set();
+        Debug::setVerbose();
         ob_start();
-        $os = getHostOS($this->genDevice($community));
+        $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();
         ob_end_clean();
 
@@ -147,21 +145,21 @@ class OSDiscoveryTest extends TestCase
     {
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
-        if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
+        if (count($config_os) < count(glob(Config::get('install_dir') . '/includes/definitions/*.yaml'))) {
             OS::loadAllDefinitions(false, true);
             $config_os = array_keys(Config::get('os'));
         }
 
-        $excluded_os = array(
+        $excluded_os = [
             'default',
             'generic',
             'ping',
-        );
+        ];
         $filtered_os = array_diff($config_os, $excluded_os);
 
-        $all_os = array();
+        $all_os = [];
         foreach ($filtered_os as $os) {
-            $all_os[$os] = array($os);
+            $all_os[$os] = [$os];
         }
 
         return $all_os;

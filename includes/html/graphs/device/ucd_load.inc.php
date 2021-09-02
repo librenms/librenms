@@ -4,7 +4,7 @@ $scale_min = '0';
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'ucd_load');
+$rrd_filename = Rrd::name($device['hostname'], 'ucd_load');
 
 $rrd_options .= " DEF:1min=$rrd_filename:1min:AVERAGE";
 $rrd_options .= " DEF:5min=$rrd_filename:5min:AVERAGE";

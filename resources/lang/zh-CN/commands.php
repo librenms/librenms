@@ -13,7 +13,7 @@ return [
             'full-name' => '使用者的全名',
             'role' => '将使用者指派至角色 :roles',
         ],
-        'password-request' => "请输入使用者的密码",
+        'password-request' => '请输入使用者的密码',
         'success' => '已成功新增使用者: :username',
         'wrong-auth' => '警告，您将无法以这个使用者登入，因为您没有使用 MySQL 验证',
     ],

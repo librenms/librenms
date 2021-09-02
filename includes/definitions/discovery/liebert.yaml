@@ -1,4 +1,4 @@
-mib: LIEBERT-GP-AGENT-MIB:LIEBERT-GP-PDU-MIB
+mib: LIEBERT-GP-AGENT-MIB:LIEBERT-GP-PDU-MIB:LIEBERT-GP-ENVIRONMENTAL-MIB:LIEBERT-GP-POWER-MIB
 modules:
     sensors:
         temperature:
@@ -14,6 +14,12 @@ modules:
                     low_warn_limit: lgpPduAuxMeasTempThrshldUndrWarnDegC
                     warn_limit: lgpPduAuxMeasTempThrshldOvrWarnDegC
                     high_limit: lgpPduAuxMeasTempThrshldOvrAlmDegC
+                -
+                    oid: lgpEnvTemperatureTableDegC
+                    value: lgpEnvTemperatureSetPointDegC
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.6.{{ $index }}'
+                    descr: 'Setpoint for {{ $lgpEnvTemperatureDescrDegC }}'
+                    index: 'lgpEnvTemperatureSetPointDegC.{{ $index }}'
         humidity:
             data:
                 -
@@ -27,6 +33,12 @@ modules:
                     low_warn_limit: lgpPduAuxMeasHumThrshldUndrWarn
                     warn_limit: lgpPduAuxMeasHumThrshldOvrWarn
                     high_limit: lgpPduAuxMeasHumThrshldOvrAlm
+                -
+                    oid: lgpEnvHumidityTableRel
+                    value: lgpEnvHumiditySetPoint
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.6.{{ $index }}'
+                    descr: 'Setpoint for {{ $lgpEnvHumidityDescrRel }}'
+                    index: 'lgpEnvHumiditySetPoint.{{ $index }}'
         voltage:
             data:
                 -
@@ -69,6 +81,13 @@ modules:
                     descr: 'Utilization Percent {{ $lgpPduRbEntryUsrLabel }}'
                     index: 'lgpPduRbEntryEcAvailBeforeAlarmHundredths.{{ $index }}'
                     divisor: 10
+                -
+                    oid: lgpEnvOperationalTimeTable
+                    value: lgpEnvOperationTimeValue
+                    group: 'Operating Time'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.5.{{ $index }}'
+                    descr: '{{ $lgpEnvOperationTimePoint }} - ID {{ $lgpEnvOperationTimeSubID }}'
+                    index: ' .1.3.6.1.4.1.476.1.42.3.4.4.32.1.1.{{ $index }}'
         state:
             data:
                 -
@@ -113,3 +132,146 @@ modules:
                         - { value: 16, graph: 0, descr: normalWithAlarm, generic: 2 }
                         - { value: 32, graph: 0, descr: abnormalOperation, generic: 2 }
                         - { value: 64, graph: 0, descr: unknownCommFailure, generic: 2 }
+                -
+                    oid: lgpEnvStateFan
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
+                    descr: 'System Fan Status'
+                    index: 'lgpEnvStateFan.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateSystem
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.1.{{ $index }}'
+                    descr: 'System Status'
+                    index: 'lgpEnvStateSystem.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'off', generic: 1 }
+                        - { value: 3, graph: 2, descr: 'standby', generic: 0 }
+                -
+                    oid: lgpEnvStateCooling
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.2.{{ $index }}'
+                    descr: 'Cooling Subsystem Status'
+                    index: 'lgpEnvStateCooling.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateHumidifying
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.4.{{ $index }}'
+                    descr: 'Humidifier Subsystem Status'
+                    index: 'lgpEnvStateHumidifying.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateDehumidifying
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.5.{{ $index }}'
+                    descr: 'Dehumidifier Subsystem Status'
+                    index: 'lgpEnvStateDehumidifying.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateFan
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
+                    descr: 'System Fan Status'
+                    index: 'lgpEnvStateFan.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateGeneralAlarmOutput
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.8.{{ $index }}'
+                    descr: 'General Alarm Status'
+                    index: 'lgpEnvStateGeneralAlarmOutput.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 2 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 0 }
+                -
+                    oid: lgpEnvStateAudibleAlarm
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.11.{{ $index }}'
+                    descr: 'Audible Alarm Status'
+                    index: 'lgpEnvStateAudibleAlarm.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 2 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 0 }
+                -
+                    oid: lgpEnvStateOperatingReason
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.14.{{ $index }}'
+                    descr: 'Operating State Reason'
+                    index: 'lgpEnvStateOperatingReason.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'none', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'localUser', generic: 0 }
+                        - { value: 3, graph: 2, descr: 'alarm', generic: 0 }
+                        - { value: 4, graph: 3, descr: 'schedule', generic: 0 }
+                        - { value: 5, graph: 4, descr: 'remoteUser', generic: 0 }
+                        - { value: 6, graph: 5, descr: 'externalDevice', generic: 0 }
+                        - { value: 7, graph: 6, descr: 'localDisplay', generic: 0 }
+                -
+                    oid: lgpEnvStateOperatingMode
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.15.{{ $index }}'
+                    descr: 'Operating Mode'
+                    index: 'lgpEnvStateOperatingMode.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'auto', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'manual', generic: 0 }
+                -
+                    oid: lgpEnvStateElectricHeater
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.21.{{ $index }}'
+                    descr: 'Electric Heaters Status'
+                    index: 'lgpEnvStateElectricHeater.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'off', generic: 0 }
+                -
+                    oid: lgpEnvStateHotWater
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.22.{{ $index }}'
+                    descr: 'Hot Water System Status'
+                    index: 'lgpEnvStateHotWater.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'off', generic: 0 }
+        percent:
+            data:
+                -
+                    oid: lgpEnvStateCoolingCapacity
+                    value: lgpEnvStateCoolingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.9.{{ $index }}'
+                    descr: 'Cooling Capacity Usage'
+                    index: 'lgpEnvStateCoolingCapacity.{{ $index }}'
+                -
+                    oid: lgpEnvStateFanCapacity
+                    value: lgpEnvStateFanCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.16.{{ $index }}'
+                    descr: 'Fan Capacity Usage'
+                    index: 'lgpEnvStateFanCapacity.{{ $index }}'
+                -
+                    oid: lgpEnvStateFreeCoolingCapacity
+                    value: lgpEnvStateFreeCoolingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.17.{{ $index }}'
+                    descr: 'Free Cooling Capacity Usage'
+                    index: 'lgpEnvStateFreeCoolingCapacity.{{ $index }}'
+                -
+                    oid: lgpEnvStateDehumidifyingCapacity
+                    value: lgpEnvStateDehumidifyingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.18.{{ $index }}'
+                    descr: 'Dehumidifying Capacity Usage'
+                    index: 'lgpEnvStateDehumidifyingCapacity.{{ $index }}'
+                -
+                    oid: lgpEnvStateHumidifyingCapacity
+                    value: lgpEnvStateHumidifyingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.19.{{ $index }}'
+                    descr: 'Humidifying Capacity Usage'
+                    index: 'lgpEnvStateHumidifyingCapacity.{{ $index }}'
+        power_factor:
+            data:
+                -
+                    oid: lgpPwrLineMeasurementTable
+                    value: lgpPwrLineMeasurementPowerFactor
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.14.{{ $index }}'
+                    descr: '{{ $lgpPwrMeasurementPoint }}.{{ $index }}'
+                    index: 'lgpPwrLineMeasurementPowerFactor.{{ $index }}'

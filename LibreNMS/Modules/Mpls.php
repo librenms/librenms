@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Vitali Kari
  * @copyright  2019 Tony Murray
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -27,12 +26,12 @@
 
 namespace LibreNMS\Modules;
 
+use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\ModuleModelObserver;
 
 class Mpls implements Module
 {
@@ -49,35 +48,35 @@ class Mpls implements Module
         if ($os instanceof MplsDiscovery) {
             echo "\nMPLS LSPs: ";
             ModuleModelObserver::observe('\App\Models\MplsLsp');
-            $lsps = $this->syncModels($os->getDeviceModel(), 'mplsLsps', $os->discoverMplsLsps());
+            $lsps = $this->syncModels($os->getDevice(), 'mplsLsps', $os->discoverMplsLsps());
 
             echo "\nMPLS LSP Paths: ";
             ModuleModelObserver::observe('\App\Models\MplsLspPath');
-            $paths = $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
+            $paths = $this->syncModels($os->getDevice(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
 
             echo "\nMPLS SDPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSdp');
-            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->discoverMplsSdps());
+            $sdps = $this->syncModels($os->getDevice(), 'mplsSdps', $os->discoverMplsSdps());
 
             echo "\nMPLS Services: ";
             ModuleModelObserver::observe('\App\Models\MplsService');
-            $svcs = $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->discoverMplsServices());
+            $svcs = $this->syncModels($os->getDevice(), 'mplsServices', $os->discoverMplsServices());
 
             echo "\nMPLS SAPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSap');
-            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->discoverMplsSaps($svcs));
+            $this->syncModels($os->getDevice(), 'mplsSaps', $os->discoverMplsSaps($svcs));
 
             echo "\nMPLS SDP Bindings: ";
             ModuleModelObserver::observe('\App\Models\MplsSdpBind');
-            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
+            $this->syncModels($os->getDevice(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
 
             echo "\nMPLS Tunnel Active Routing Hops: ";
             ModuleModelObserver::observe('\App\Models\MplsTunnelArHop');
-            $this->syncModels($os->getDeviceModel(), 'mplsTunnelArHops', $os->discoverMplsTunnelArHops($paths));
+            $this->syncModels($os->getDevice(), 'mplsTunnelArHops', $os->discoverMplsTunnelArHops($paths));
 
             echo "\nMPLS Tunnel Constrained Shortest Path First Hops: ";
             ModuleModelObserver::observe('\App\Models\MplsTunnelCHop');
-            $this->syncModels($os->getDeviceModel(), 'mplsTunnelCHops', $os->discoverMplsTunnelCHops($paths));
+            $this->syncModels($os->getDevice(), 'mplsTunnelCHops', $os->discoverMplsTunnelCHops($paths));
 
             echo PHP_EOL;
         }
@@ -93,7 +92,7 @@ class Mpls implements Module
     public function poll(OS $os)
     {
         if ($os instanceof MplsPolling) {
-            $device = $os->getDeviceModel();
+            $device = $os->getDevice();
 
             if ($device->mplsLsps()->exists()) {
                 echo "\nMPLS LSPs: ";
@@ -155,13 +154,13 @@ class Mpls implements Module
      */
     public function cleanup(OS $os)
     {
-        $os->getDeviceModel()->mplsLsps()->delete();
-        $os->getDeviceModel()->mplsLspPaths()->delete();
-        $os->getDeviceModel()->mplsSdps()->delete();
-        $os->getDeviceModel()->mplsServices()->delete();
-        $os->getDeviceModel()->mplsSaps()->delete();
-        $os->getDeviceModel()->mplsSdpBinds()->delete();
-        $os->getDeviceModel()->mplsTunnelArHops()->delete();
-        $os->getDeviceModel()->mplsTunnelCHops()->delete();
+        $os->getDevice()->mplsLsps()->delete();
+        $os->getDevice()->mplsLspPaths()->delete();
+        $os->getDevice()->mplsSdps()->delete();
+        $os->getDevice()->mplsServices()->delete();
+        $os->getDevice()->mplsSaps()->delete();
+        $os->getDevice()->mplsSdpBinds()->delete();
+        $os->getDevice()->mplsTunnelArHops()->delete();
+        $os->getDevice()->mplsTunnelCHops()->delete();
     }
 }

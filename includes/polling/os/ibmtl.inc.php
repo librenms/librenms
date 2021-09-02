@@ -10,6 +10,6 @@
 * the source code distribution for details.
 */
 
-$hardware = trim(snmp_get($device, ".1.3.6.1.4.1.14851.3.1.4.2.0", "-Ovq"), '" ');
-$serial = trim(snmp_get($device, ".1.3.6.1.4.1.14851.3.1.3.2.0", "-Ovq"), '" ');
-$version = trim(snmp_get($device, ".1.3.6.1.4.1.14851.3.1.3.4.0", "-Ovq"), '" ');
+$hardware = trim(snmp_get($device, '.1.3.6.1.4.1.14851.3.1.4.2.0', '-Ovq'), '" ');
+$serial = trim(snmp_get($device, '.1.3.6.1.4.1.14851.3.1.3.2.0', '-Ovq'), '" ');
+$version = trim(snmp_get($device, '.1.3.6.1.4.1.14851.3.1.3.4.0', '-Ovq'), '" ');

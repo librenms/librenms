@@ -134,14 +134,18 @@ UBNT-EdgeMAX-MIB DEFINITIONS ::= BEGIN
        ::= { ubntPsuTable 1 }
 
     UbntPsuEntry ::= SEQUENCE {
-        ubntPsuIndex             Integer32,
-        ubntPsuType              Integer32,
-        ubntPsuStatus            Integer32,
-        ubntPsuOperStatus        Integer32,
-        ubntPsuVoltage           Integer32,
-        ubntPsuTemperature       Integer32,
-        ubntPsuCharging          Integer32,
-        ubntPsuBatteryQuantity   Integer32
+        ubntPsuIndex                    Integer32,
+        ubntPsuType                     INTEGER,
+        ubntPsuStatus                   INTEGER,
+        ubntPsuOperStatus               INTEGER,
+        ubntPsuVoltage                  Integer32,
+        ubntPsuTemperature              Integer32,
+        ubntPsuCharging                 INTEGER,
+        ubntPsuBatteryQuantity          Integer32,
+        ubntPsuBatteryChargeLevel       INTEGER,
+        ubntPsuBatteryTimeRemaining      TimeTicks,
+        ubntPsuBatteryReplaceIndicator  INTEGER,
+        ubntPsuBatteryLastReplaceDate   DisplayString
     }
 
     ubntPsuIndex OBJECT-TYPE
@@ -152,21 +156,21 @@ UBNT-EdgeMAX-MIB DEFINITIONS ::= BEGIN
         ::= { ubntPsuEntry 1 }
 
     ubntPsuType OBJECT-TYPE
-        SYNTAX     INTEGER { unknown(0),ac(1),dc(2),poe(3) }
+        SYNTAX     INTEGER { unknown(0), ac(1), dc(2), poe(3) }
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "PSU Type."
         ::= { ubntPsuEntry 2 }
 
     ubntPsuStatus OBJECT-TYPE
-        SYNTAX     INTEGER { unknown(0),on(1),off(2),standby(3) }
+        SYNTAX     INTEGER { unknown(0), on(1), off(2), standby(3) }
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "PSU Status."
         ::= { ubntPsuEntry 3 }
 
     ubntPsuOperStatus OBJECT-TYPE
-        SYNTAX     INTEGER { down(0),up(1) }
+        SYNTAX     INTEGER { down(0), up(1) }
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "PSU operational status."
@@ -187,7 +191,7 @@ UBNT-EdgeMAX-MIB DEFINITIONS ::= BEGIN
         ::= { ubntPsuEntry 6 }
 
     ubntPsuCharging OBJECT-TYPE
-        SYNTAX     INTEGER { unknown(0),on(1),off(2) }
+        SYNTAX     INTEGER { unknown(0), on(1), off(2) }
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "Shows PSU charging state if it is supported."
@@ -199,6 +203,34 @@ UBNT-EdgeMAX-MIB DEFINITIONS ::= BEGIN
         STATUS     current
         DESCRIPTION "Number of batteries connected to PSU."
         ::= { ubntPsuEntry 8 }
+
+    ubntPsuBatteryChargeLevel OBJECT-TYPE
+        SYNTAX     INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Current battery charge level as a percent (0-100%)."
+        ::= { ubntPsuEntry 9 }
+
+    ubntPsuBatteryTimeRemaining OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The battery run time remaining before battery exhaustion."
+        ::= { ubntPsuEntry 10 }
+
+    ubntPsuBatteryReplaceIndicator OBJECT-TYPE
+        SYNTAX     INTEGER { unknown(0), noBatteryNeedsReplacing(1), batteryNeedsReplacing(2) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Indicates whether the batteries need replacing."
+        ::= { ubntPsuEntry 11 }
+
+    ubntPsuBatteryLastReplaceDate OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Battery installation date (mm/dd/yyyy)."
+        ::= { ubntPsuEntry 12 }
 
     -- --------------------------------------------------------------------------------
     --                             thermometers
@@ -242,7 +274,7 @@ UBNT-EdgeMAX-MIB DEFINITIONS ::= BEGIN
         ::= { ubntThermsEntry 1 }
 
     ubntThermType OBJECT-TYPE
-        SYNTAX     INTEGER { other(0),board(1),cpu(2),power(3) }
+        SYNTAX     INTEGER { other(0), board(1), cpu(2), power(3) }
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "Type of thermometer."
@@ -297,7 +329,7 @@ UBNT-EdgeMAX-MIB DEFINITIONS ::= BEGIN
         ::= { ubntFanEntry 1 }
 
     ubntFanType OBJECT-TYPE
-        SYNTAX     INTEGER { other(0),board(1),cpu(2),power(3) }
+        SYNTAX     INTEGER { other(0), board(1), cpu(2), power(3) }
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "Type of fan."

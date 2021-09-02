@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateOspfAreasTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -27,7 +26,7 @@ class CreateOspfAreasTable extends Migration
             $table->string('ospfAreaSummary', 64);
             $table->string('ospfAreaStatus', 64);
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id','ospfAreaId','context_name']);
+            $table->unique(['device_id', 'ospfAreaId', 'context_name']);
         });
     }
 

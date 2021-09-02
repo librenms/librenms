@@ -1,0 +1,5 @@
+modules:
+    os:
+        hardware: TEL2N-MIB::hipProductName.0
+        serial: TEL2N-MIB::hipSerial.0
+        version: TEL2N-MIB::hipVersion.0

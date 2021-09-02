@@ -1,7 +1,10 @@
 mib: PEPVPN-SPEEDFUSION
 modules:
+    os:
+        hardware: DEVICE::deviceModel.0
+        serial: DEVICE::deviceSerialNumber.0
+        version: DEVICE::deviceFirmwareVersion.0
     sensors:
-        pre-cache:
         pre-cache:
             data:
                 -

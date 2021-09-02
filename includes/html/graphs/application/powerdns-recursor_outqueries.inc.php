@@ -15,52 +15,50 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'powerdns-recursor.inc.php';
 
 $colours = 'mixed';
 $unit_text = 'Queries/sec';
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $rrd_list = array(
-        array(
+if (Rrd::checkRrdExists($rrd_filename)) {
+    $rrd_list = [
+        [
             'filename' => $rrd_filename,
             'ds' => 'all-outqueries',
             'descr' => 'Total',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'ipv6-outqueries',
             'descr' => 'IPv6',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'tcp-outqueries',
             'descr' => 'TCP',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'throttled-out',
             'descr' => 'Throttled',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'outgoing-timeouts',
             'descr' => 'Timeouts',
             'area' => true,
-        )
-    );
+        ],
+    ];
 } else {
     echo "file missing: $rrd_filename";
 }

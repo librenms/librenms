@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -38,38 +37,38 @@ class MapController extends Controller
     protected function nodeDisabledStyle()
     {
         return ['color' => [
-                         'highlight' => [
-                             'background' => Config::get('network_map_legend.di.node'),
-                         ],
-                         'border' => Config::get('network_map_legend.di.border'),
-                         'background' => Config::get('network_map_legend.di.node'),
-                     ],
-               ];
+            'highlight' => [
+                'background' => Config::get('network_map_legend.di.node'),
+            ],
+            'border' => Config::get('network_map_legend.di.border'),
+            'background' => Config::get('network_map_legend.di.node'),
+        ],
+        ];
     }
 
     protected function nodeHighlightStyle()
     {
         return ['color' => [
-                         'highlight' => [
-                             'border' => Config::get('network_map_legend.highlight.border'),
-                         ],
-                         'border' => Config::get('network_map_legend.highlight.border'),
-                     ],
-                'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
-               ];
+            'highlight' => [
+                'border' => Config::get('network_map_legend.highlight.border'),
+            ],
+            'border' => Config::get('network_map_legend.highlight.border'),
+        ],
+            'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+        ];
     }
 
     protected function nodeDownStyle()
     {
         return ['color' => [
-                         'highlight' => [
-                             'background' => Config::get('network_map_legend.dn.node'),
-                             'border' => Config::get('network_map_legend.dn.border'),
-                         ],
-                         'border' => Config::get('network_map_legend.dn.border'),
-                         'background' => Config::get('network_map_legend.dn.node'),
-                     ],
-               ];
+            'highlight' => [
+                'background' => Config::get('network_map_legend.dn.node'),
+                'border' => Config::get('network_map_legend.dn.border'),
+            ],
+            'border' => Config::get('network_map_legend.dn.border'),
+            'background' => Config::get('network_map_legend.dn.node'),
+        ],
+        ];
     }
 
     protected function nodeUpStyle()

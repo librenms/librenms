@@ -7,8 +7,7 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-mib_dir:
-    - dell
+mib_dir: dell
 discovery:
     -
         sysObjectID:

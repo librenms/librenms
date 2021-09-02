@@ -1,5 +1,8 @@
 mib: EDS-MIB
 modules:
+    os:
+        hardware: EDS-MIB::eProductName.0
+        version: EDS-MIB::eFirmwareVersion.0
     sensors:
         pre-cache:
             data:

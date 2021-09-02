@@ -6,28 +6,10 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.3807.1.481005",
                     "sysDescr": "S4800 FiberHome INP (R) Software, Version V210R220,Hw Version N/A,Copyright (c) 2000-2017 by FiberHome Technologies Co., Ltd",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "fiberhome-switch",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3807.1.481005",
-                    "sysDescr": "S4800 FiberHome INP (R) Software, Version V210R220,Hw Version N/A,Copyright (c) 2000-2017 by FiberHome Technologies Co., Ltd",
                     "sysContact": "<private>",
-                    "version": "V210R220\u0000\u0000\u0000\u0000\u0000\u0000\u0000\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
-                    "hardware": "FHN S4800 V N/A\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
-                    "features": null,
+                    "version": "V210R220",
+                    "hardware": "S4800 FiberHome INP",
+                    "features": "N/A",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -97,45 +80,9 @@
                     "processor_descr": "Cpu-1",
                     "processor_precision": 100,
                     "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.",
-                    "processor_index": "",
-                    "processor_type": "fiberhome-switch",
-                    "processor_usage": 0,
-                    "processor_descr": "cpuIndexDescr",
-                    "processor_precision": 100,
-                    "processor_perc_warn": 75
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.1",
-                    "processor_index": "1",
-                    "processor_type": "fiberhome-switch",
-                    "processor_usage": 0,
-                    "processor_descr": "Cpu-1",
-                    "processor_precision": 100,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.",
-                    "processor_index": "",
-                    "processor_type": "fiberhome-switch",
-                    "processor_usage": 0,
-                    "processor_descr": "cpuIndexDescr",
-                    "processor_precision": 100,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

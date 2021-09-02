@@ -6,15 +6,13 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    LibreNMS
- * @subpackage cli
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 
-$init_modules = array();
+$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('Pbg:p:f::');
@@ -69,45 +67,45 @@ if (isset($options['b'])) {
 }
 
 $transports_regex = implode('|', Config::get('snmp.transports'));
-if (!empty($argv[1])) {
-    $host      = strtolower($argv[1]);
+if (! empty($argv[1])) {
+    $host = strtolower($argv[1]);
     $community = $argv[2];
-    $snmpver   = strtolower($argv[3]);
+    $snmpver = strtolower($argv[3]);
 
-    $port      = 161;
+    $port = 161;
     $transport = 'udp';
 
-    $additional = array();
+    $additional = [];
     if (isset($options['b'])) {
-        $additional = array(
+        $additional = [
             'ping_fallback' => 1,
-        );
+        ];
     }
     if (isset($options['P'])) {
         $community = '';
-        $snmpver   = 'v2c';
-        $additional = array(
+        $snmpver = 'v2c';
+        $additional = [
             'snmp_disable' => 1,
-            'os'           => $argv[2] ? mres($argv[2]) : "ping",
-            'hardware'     => $argv[3] ? mres($argv[3]) : '',
-        );
+            'os'           => $argv[2] ? $argv[2] : 'ping',
+            'hardware'     => $argv[3] ? $argv[3] : '',
+        ];
     } elseif ($snmpver === 'v3') {
         $seclevel = $community;
 
         // These values are the same as in defaults.inc.php
-        $v3 = array(
+        $v3 = [
             'authlevel'  => 'noAuthNoPriv',
             'authname'   => 'root',
             'authpass'   => '',
             'authalgo'   => 'MD5',
             'cryptopass' => '',
             'cryptoalgo' => 'AES',
-        );
+        ];
 
         // v3
         if ($seclevel === 'nanp' or $seclevel === 'any' or $seclevel === 'noAuthNoPriv') {
             $v3['authlevel'] = 'noAuthNoPriv';
-            $v3args          = array_slice($argv, 4);
+            $v3args = array_slice($argv, 4);
 
             while ($arg = array_shift($v3args)) {
                 // parse all remaining args
@@ -128,9 +126,9 @@ if (!empty($argv[1])) {
             }
         } elseif ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
             $v3['authlevel'] = 'authNoPriv';
-            $v3args          = array_slice($argv, 4);
-            $v3['authname']  = array_shift($v3args);
-            $v3['authpass']  = array_shift($v3args);
+            $v3args = array_slice($argv, 4);
+            $v3['authname'] = array_shift($v3args);
+            $v3['authpass'] = array_shift($v3args);
 
             while ($arg = array_shift($v3args)) {
                 // parse all remaining args
@@ -141,7 +139,7 @@ if (!empty($argv[1])) {
                 } elseif (preg_match('/^(sha|md5)$/i', $arg)) {
                     $v3['authalgo'] = $arg;
                 } else {
-                    echo 'Invalid argument: '.$arg."\n";
+                    echo 'Invalid argument: ' . $arg . "\n";
                     exit(1);
                 }
             }
@@ -150,10 +148,10 @@ if (!empty($argv[1])) {
             array_unshift($v3_config, $v3);
             Config::set('snmp.v3', $v3_config);
         } elseif ($seclevel === 'ap' or $seclevel === 'authPriv') {
-            $v3['authlevel']  = 'authPriv';
-            $v3args           = array_slice($argv, 4);
-            $v3['authname']   = array_shift($v3args);
-            $v3['authpass']   = array_shift($v3args);
+            $v3['authlevel'] = 'authPriv';
+            $v3args = array_slice($argv, 4);
+            $v3['authname'] = array_shift($v3args);
+            $v3['authpass'] = array_shift($v3args);
             $v3['cryptopass'] = array_shift($v3args);
 
             while ($arg = array_shift($v3args)) {
@@ -167,7 +165,7 @@ if (!empty($argv[1])) {
                 } elseif (preg_match('/^(aes|des)$/i', $arg)) {
                     $v3['cryptoalgo'] = $arg;
                 } else {
-                    echo 'Invalid argument: '.$arg."\n";
+                    echo 'Invalid argument: ' . $arg . "\n";
                     exit(1);
                 }
             }//end while
@@ -215,7 +213,7 @@ if (!empty($argv[1])) {
     }
 } else {
     c_echo(
-        "\n". Config::get('project_name').' Add Host Tool
+        "\n" . Config::get('project_name') . ' Add Host Tool
 
     Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname or IP%n> [community] [v1|v2c] [port] [' . $transports_regex . ']
     Usage (SNMPv3)       :

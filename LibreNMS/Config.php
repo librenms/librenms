@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,6 +30,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Debug;
 use Log;
 
 class Config
@@ -45,7 +45,7 @@ class Config
     public static function load()
     {
         // don't reload the config if it is already loaded, reload() should be used for that
-        if (!is_null(self::$config)) {
+        if (! is_null(self::$config)) {
             return self::$config;
         }
 
@@ -71,6 +71,7 @@ class Config
     public static function reload()
     {
         self::$config = null;
+
         return self::load();
     }
 
@@ -112,7 +113,6 @@ class Config
         @include base_path('config.php');
     }
 
-
     /**
      * Get a config value, if non existent null (or default if set) will be returned
      *
@@ -126,7 +126,7 @@ class Config
             return self::$config[$key];
         }
 
-        if (!Str::contains($key, '.')) {
+        if (! Str::contains($key, '.')) {
             return $default;
         }
 
@@ -204,24 +204,24 @@ class Config
      * @param array $default optional array to return if the setting is not set
      * @return array
      */
-    public static function getCombined($os, $key, $default = array())
+    public static function getCombined($os, $key, $default = [])
     {
-        if (!self::has($key)) {
+        if (! self::has($key)) {
             return self::getOsSetting($os, $key, $default);
         }
 
-        if (!isset(self::$config['os'][$os][$key])) {
-            if (!Str::contains($key, '.')) {
+        if (! isset(self::$config['os'][$os][$key])) {
+            if (! Str::contains($key, '.')) {
                 return self::get($key, $default);
             }
-            if (!self::has("os.$os.$key")) {
+            if (! self::has("os.$os.$key")) {
                 return self::get($key, $default);
             }
         }
 
         return array_unique(array_merge(
-            (array)self::get($key, $default),
-            (array)self::getOsSetting($os, $key, $default)
+            (array) self::get($key, $default),
+            (array) self::getOsSetting($os, $key, $default)
         ));
     }
 
@@ -246,23 +246,24 @@ class Config
     public static function persist($key, $value)
     {
         try {
-                \App\Models\Config::updateOrCreate(['config_name' => $key], [
-                    'config_name' => $key,
-                    'config_value' => $value,
-                ]);
-                Arr::set(self::$config, $key, $value);
+            \App\Models\Config::updateOrCreate(['config_name' => $key], [
+                'config_name' => $key,
+                'config_value' => $value,
+            ]);
+            Arr::set(self::$config, $key, $value);
 
-                // delete any children (there should not be any unless it is legacy)
-                \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+            // delete any children (there should not be any unless it is legacy)
+            \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+
             return true;
         } catch (Exception $e) {
             if (class_exists(Log::class)) {
                 Log::error($e);
             }
-            global $debug;
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 echo $e;
             }
+
             return false;
         }
     }
@@ -296,7 +297,7 @@ class Config
             return true;
         }
 
-        if (!Str::contains($key, '.')) {
+        if (! Str::contains($key, '.')) {
             return false;
         }
 
@@ -328,7 +329,7 @@ class Config
      */
     private static function loadDB()
     {
-        if (!Eloquent::isConnected()) {
+        if (! Eloquent::isConnected()) {
             return;
         }
 
@@ -379,7 +380,7 @@ class Config
         Arr::set(self::$config, 'log_dir', base_path('logs'));
         Arr::set(self::$config, 'distributed_poller_name', php_uname('n'));
 
-         // set base_url from access URL
+        // set base_url from access URL
         if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
             $port = $_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '';
             // handle literal IPv6
@@ -389,28 +390,30 @@ class Config
 
         // graph color copying
         Arr::set(self::$config, 'graph_colours.mega', array_merge(
-            (array)Arr::get(self::$config, 'graph_colours.psychedelic', []),
-            (array)Arr::get(self::$config, 'graph_colours.manycolours', []),
-            (array)Arr::get(self::$config, 'graph_colours.default', []),
-            (array)Arr::get(self::$config, 'graph_colours.mixed', [])
+            (array) Arr::get(self::$config, 'graph_colours.psychedelic', []),
+            (array) Arr::get(self::$config, 'graph_colours.manycolours', []),
+            (array) Arr::get(self::$config, 'graph_colours.default', []),
+            (array) Arr::get(self::$config, 'graph_colours.mixed', [])
         ));
     }
 
     /**
      * Process the config after it has been loaded.
      * Make sure certain variables have been set properly and
-     *
      */
     private static function processConfig()
     {
         // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
+        if (
+            isset($_SERVER['HTTPS']) ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
         self::set('base_url', Str::finish(self::get('base_url'), '/'));
 
-        if (!self::get('email_from')) {
+        if (! self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
         }
 
@@ -432,12 +435,16 @@ class Config
         self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
         self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
+        self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
+        self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
+        self::deprecatedVariable('discovery_modules.cisco-sla', 'discovery_modules.slas');
+        self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
-            if (!is_executable(self::get($bin))) {
+        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6'] as $bin) {
+            if (! is_executable(self::get($bin))) {
                 if ($persist) {
                     self::persist($bin, self::locateBinary($bin));
                 } else {
@@ -461,7 +468,7 @@ class Config
      */
     private static function setDefault($key, $value, $format_values = [])
     {
-        if (!self::has($key)) {
+        if (! self::has($key)) {
             if (is_string($value)) {
                 $format_values = array_map('self::get', $format_values);
                 self::set($key, vsprintf($value, $format_values));
@@ -474,14 +481,13 @@ class Config
     /**
      * Copy data from old variables to new ones.
      *
-     * @param $old
-     * @param $new
+     * @param string $old
+     * @param string $new
      */
     private static function deprecatedVariable($old, $new)
     {
         if (self::has($old)) {
-            global $debug;
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 echo "Copied deprecated config $old to $new\n";
             }
             self::set($new, self::get($old));
@@ -491,12 +497,12 @@ class Config
     /**
      * Locate the actual path of a binary
      *
-     * @param $binary
+     * @param string $binary
      * @return mixed
      */
     public static function locateBinary($binary)
     {
-        if (!Str::contains($binary, '/')) {
+        if (! Str::contains($binary, '/')) {
             $output = `whereis -b $binary`;
             $list = trim(substr($output, strpos($output, ':') + 1));
             $targets = explode(' ', $list);
@@ -506,6 +512,7 @@ class Config
                 }
             }
         }
+
         return $binary;
     }
 

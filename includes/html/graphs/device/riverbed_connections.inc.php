@@ -11,44 +11,44 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 *
 */
 
 require 'includes/html/graphs/common.inc.php';
-$rrd_filename  = rrd_name($device['hostname'], 'riverbed_connections');
+$rrd_filename = Rrd::name($device['hostname'], 'riverbed_connections');
 
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Connections';
-$unitlen       = 11;
-$bigdescrlen   = 15;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Connections';
+$unitlen = 11;
+$bigdescrlen = 15;
 $smalldescrlen = 15;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 80;
-$data_sources  = array(
-    'half_open' => array('descr' => 'Half open','colour' => '66873e',),
-    'half_closed' => array('descr' => 'Half closed','colour' => 'f49842',),
-    'established' => array('descr' => 'Established','colour' => '438099',),
-    'active' => array('descr' => 'Active','colour' => 'af2121',),
-    'total' => array('descr' => 'Total','colour' => '000000',)
-);
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 80;
+$data_sources = [
+    'half_open' => ['descr' => 'Half open', 'colour' => '66873e'],
+    'half_closed' => ['descr' => 'Half closed', 'colour' => 'f49842'],
+    'established' => ['descr' => 'Established', 'colour' => '438099'],
+    'active' => ['descr' => 'Active', 'colour' => 'af2121'],
+    'total' => ['descr' => 'Total', 'colour' => '000000'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($data_sources as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

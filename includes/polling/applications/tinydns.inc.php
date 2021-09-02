@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -28,9 +28,9 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'tinydns';
 $app_id = $app['app_id'];
-if (!empty($agent_data['app'][$name]) && $app_id > 0) {
+if (! empty($agent_data['app'][$name]) && $app_id > 0) {
     echo ' tinydns';
-    $rrd_name = array('app', $name, $app_id);
+    $rrd_name = ['app', $name, $app_id];
     $rrd_def = RrdDefinition::make()
         ->addDataset('a', 'COUNTER', 0, 125000000000)
         ->addDataset('ns', 'COUNTER', 0, 125000000000)
@@ -53,12 +53,12 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
         ->addDataset('badclass', 'COUNTER', 0, 125000000000)
         ->addDataset('noquery', 'COUNTER', 0, 125000000000);
 
-    list(
+    [
         $a, $ns, $cname, $soa, $ptr, $hinfo, $mx, $txt, $rp, $sig, $key, $aaaa, $axfr, $any,
         $total, $other, $notauth, $notimpl, $badclass, $noquery
-        ) = explode(':', $agent_data['app'][$name]);
+        ] = explode(':', $agent_data['app'][$name]);
 
-    $fields = array(
+    $fields = [
         'a'        => $a,
         'ns'       => $ns,
         'cname'    => $cname,
@@ -78,8 +78,8 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
         'notauth'  => $notauth,
         'notimpl'  => $notimpl,
         'badclass' => $badclass,
-        'noquery'  => $noquery
-    );
+        'noquery'  => $noquery,
+    ];
 
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);

@@ -1,5 +1,22 @@
 mib: SMARTNODE-MIB
 modules:
+    mempools:
+        pre-cache:
+            oids:
+                - SMARTNODE-MIB::memDescr
+        data:
+            -
+                used: SMARTNODE-MIB::memAllocatedBytes
+                free: SMARTNODE-MIB::memFreeBytes
+                descr: '{{ SMARTNODE-MIB::memDescr }} Memory'
+    os:
+        hardware:
+            - SMARTNODE-MIB::hwRelease.0
+            - SMARTNODE-MIB::hwVersion.0
+            - SMARTNODE-MIB::productName.0
+        hardware_template: '{{ SMARTNODE-MIB::productName.0 }}, HwRel: {{ SMARTNODE-MIB::hwRelease.0 }}, HwVer: {{ SMARTNODE-MIB::hwVersion.0 }}'
+        serial: SMARTNODE-MIB::serialNumber.0
+        version: SMARTNODE-MIB::swVersion.0
     processors:
         data:
             -

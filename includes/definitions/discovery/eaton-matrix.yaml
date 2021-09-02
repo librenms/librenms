@@ -1,5 +1,9 @@
 mib: TELECOM-MIB
 modules:
+    os:
+        hardware: TELECOM-MIB::matConName.0
+        version: TELECOM-MIB::matAgentSoftwareVerison.0
+        serial: TELECOM-MIB::matConSerialNum.0
     sensors:
         current:
             data:

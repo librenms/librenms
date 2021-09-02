@@ -5,8 +5,7 @@ icon: microsemi
 over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_power, text: Power }
-mib_dir:
-    - microsemi
+mib_dir: microsemi
 discovery:
     -
         sysObjectID:

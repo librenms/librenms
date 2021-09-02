@@ -590,27 +590,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2021.250.10",
                     "sysDescr": "Linux DCH-4000P 2.4.20-uc0 #386 2013... 10... 24... ......... 14:08:33 CST armv3l",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ird",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "pbi.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2021.250.10",
-                    "sysDescr": "Linux DCH-4000P 2.4.20-uc0 #386 2013... 10... 24... ......... 14:08:33 CST armv3l",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": "<PRIVATE>",
+                    "version": "2.4.20-uc0",
+                    "hardware": "Generic ARM",
                     "features": null,
                     "os": "ird",
                     "type": "network",
@@ -619,6 +601,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

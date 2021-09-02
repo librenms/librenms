@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
@@ -19,25 +19,22 @@
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Search
  */
-
 print_optionbar_start(28);
 ?>
 <form method="post" action="" class="form-inline" role="form">
     <?php echo csrf_field() ?>
     <div class="form-group">
         <label for="package">Package</label>
-        <input type="text" name="package" id="package" size=20 value="<?php echo($_POST['package']); ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="package" id="package" size=20 value="<?php echo $_POST['package']; ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <div class="form-group">
         <label for="version">Version</label>
-        <input type="text" name="version" id="version" size=20 value="<?php echo($_POST['version']); ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="version" id="version" size=20 value="<?php echo $_POST['version']; ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <div class="form-group">
         <label for="version">Arch</label>
-        <input type="text" name="arch" id="arch" size=20 value="<?php echo($_POST['arch']); ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="arch" id="arch" size=20 value="<?php echo $_POST['arch']; ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <button type="submit" class="btn btn-default input-sm">Search</button>
 </form>
@@ -58,11 +55,11 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
             <td colspan="3"><strong>Packages</strong></td>
             <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">
                 <?php
-                $result_options = array('10','50','100','250','500','1000','5000');
+                $result_options = ['10', '50', '100', '250', '500', '1000', '5000'];
                 foreach ($result_options as $option) {
                     echo "<option value='$option'";
                     if ($results == $option) {
-                        echo " selected";
+                        echo ' selected';
                     }
                     echo ">$option</option>";
                 }
@@ -71,39 +68,38 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
         </tr>
 <?php
 
-$count_query = "SELECT COUNT(*) FROM ( ";
-$full_query = "";
+$count_query = 'SELECT COUNT(*) FROM ( ';
+$full_query = '';
 $query = 'SELECT packages.name FROM packages,devices ';
-$param = array();
+$param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
-$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";
+$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%" . $_POST['package'] . "%' $sql_where GROUP BY packages.name";
 
 $where = '';
-$ver = "";
-$opt = "";
+$ver = '';
+$opt = '';
 
-if (!empty($_POST['arch'])) {
-    $where  .= ' AND packages.arch = ?';
-    $param[] = mres($_POST['arch']);
+if (! empty($_POST['arch'])) {
+    $where .= ' AND packages.arch = ?';
+    $param[] = $_POST['arch'];
 }
 
 if (is_numeric($_REQUEST['device_id'])) {
-    $where  .= " AND packages.device_id = ?";
+    $where .= ' AND packages.device_id = ?';
     $param[] = $_REQUEST['device_id'];
 }
 
-
-$count_query .= $query." ) sub";
-$query .= $where." ORDER BY packages.name, packages.arch, packages.version";
+$count_query .= $query . ' ) sub';
+$query .= $where . ' ORDER BY packages.name, packages.arch, packages.version';
 $count = dbFetchCell($count_query, $param);
 
-if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
+if (! isset($_POST['page_number']) && $_POST['page_number'] < 1) {
     $page_number = 1;
 } else {
     $page_number = $_POST['page_number'];
@@ -121,35 +117,35 @@ $full_query = $full_query . $query . " LIMIT $start,$results";
         </tr>
 <?php
 
-$ordered = array();
+$ordered = [];
 foreach (dbFetchRows($full_query, $param) as $entry) {
-    $tmp = dbFetchRows("SELECT packages.*,devices.hostname FROM packages,devices WHERE packages.device_id=devices.device_id AND packages.name = ?", array($entry['name']));
+    $tmp = dbFetchRows('SELECT packages.*,devices.hostname FROM packages,devices WHERE packages.device_id=devices.device_id AND packages.name = ?', [$entry['name']]);
     foreach ($tmp as $entry) {
-        if (!is_array($ordered[$entry['name']])) {
-            $ordered[$entry['name']] = array( $entry );
+        if (! is_array($ordered[$entry['name']])) {
+            $ordered[$entry['name']] = [$entry];
         } else {
             $ordered[$entry['name']][] = $entry;
         }
     }
 }
 
-if (!empty($_POST['version'])) {
-    list($opt, $ver) = explode(" ", $_POST['version']);
+if (! empty($_POST['version'])) {
+    [$opt, $ver] = explode(' ', $_POST['version']);
 }
 
 foreach ($ordered as $name => $entry) {
-    $vers = array();
-    $arch = array();
-    $devs = array();
+    $vers = [];
+    $arch = [];
+    $devs = [];
     foreach ($entry as $variation) {
-        $variation['version'] = str_replace(":", ".", $variation['version']);
-        if (!in_array($variation['version'], $vers) && (empty($ver) || version_compare($variation['version'], $ver, $opt))) {
+        $variation['version'] = str_replace(':', '.', $variation['version']);
+        if (! in_array($variation['version'], $vers) && (empty($ver) || version_compare($variation['version'], $ver, $opt))) {
             $vers[] = $variation['version'];
         }
-        if (!in_array($variation['arch'], $arch)) {
+        if (! in_array($variation['arch'], $arch)) {
             $arch[] = $variation['arch'];
         }
-        if (!in_array($variation['hostname'], $devs)) {
+        if (! in_array($variation['hostname'], $devs)) {
             unset($variation['version']);
             $devs[] = generate_device_link($variation);
         }
@@ -157,7 +153,7 @@ foreach ($ordered as $name => $entry) {
     if (sizeof($arch) > 0 && sizeof($vers) > 0) {
         ?>
         <tr>
-            <td><a href="<?php echo(generate_url(array('page'=>'packages','name'=>$name))); ?>"><?php echo $name; ?></a></td>
+            <td><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'packages', 'name' => $name]); ?>"><?php echo $name; ?></a></td>
             <td><?php echo implode('<br/>', $vers); ?></td>
             <td><?php echo implode('<br/>', $arch); ?></td>
             <td><?php echo implode('<br/>', $devs); ?></td>
@@ -185,12 +181,12 @@ if ((int) ($count / $results) > 0 && $count != $results) {
     function updateResults(results) {
        $('#results_amount').val(results.value);
        $('#page_number').val(1);
-       $('#result_form').submit();
+       $('#result_form').trigger( "submit" );
     }
 
     function changePage(page,e) {
         e.preventDefault();
         $('#page_number').val(page);
-        $('#result_form').submit();
+        $('#result_form').trigger( "submit" );
     }
 </script>

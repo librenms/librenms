@@ -83,13 +83,13 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Get group-id of the clicked element
         var group_id = $(e.relatedTarget).data("group_id");
         $("#group_id").val(group_id);
-        
+
         // Reset form
         $(this).find("input[type=text]").val("");
         var $members = $("#members");
         $members.empty();
         $members.val(null).trigger('change');
-        
+
         if (group_id > 0) {
             $.ajax({
                 type: "POST",
@@ -150,7 +150,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }
     });
-    
+
     // Populate group id value
     $("#delete-transport-group").on("show.bs.modal", function (event) {
         group_id = $(event.relatedTarget).data("group_id");
@@ -158,7 +158,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     });
 
     // Delete the transport group
-    $("#remove-transport-group").click('', function (event) {
+    $("#remove-transport-group").on("click", function (event) {
         event.preventDefault();
         var group_id = $("#delete_group_id").val();
         $.ajax({
@@ -177,10 +177,10 @@ if (Auth::user()->hasGlobalAdmin()) {
             },
             error: function() {
                 toastr.error("The alert transport could not be deleted.");
-            } 
+            }
         });
     });
-    
+
     </script>
 
     <?php

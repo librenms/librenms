@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +32,7 @@ class AvailabilityMapController extends Controller
     public function setView(Request $request)
     {
         $this->validate($request, [
-            'map_view' => 'required|numeric|in:0,1,2'
+            'map_view' => 'required|numeric|in:0,1,2',
         ]);
 
         return $this->setSessionValue($request, 'map_view');
@@ -42,7 +41,7 @@ class AvailabilityMapController extends Controller
     public function setGroup(Request $request)
     {
         $this->validate($request, [
-            'group_view' => 'required|numeric'
+            'group_view' => 'required|numeric',
         ]);
 
         return $this->setSessionValue($request, 'group_view');

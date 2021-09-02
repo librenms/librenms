@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +25,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Cache;
 use LibreNMS\Config;
 
 class Rewrite
@@ -56,6 +56,29 @@ class Rewrite
         }
 
         return $type;
+    }
+
+    public static function shortenIfType($type)
+    {
+        return str_ireplace(
+            [
+                'FastEthernet',
+                'TenGigabitEthernet',
+                'GigabitEthernet',
+                'Port-Channel',
+                'Ethernet',
+                'Bundle-Ether',
+            ],
+            [
+                'Fa',
+                'Te',
+                'Gi',
+                'Po',
+                'Eth',
+                'BE',
+            ],
+            $type
+        );
     }
 
     public static function normalizeIfName($name)
@@ -115,12 +138,25 @@ class Rewrite
     /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
-     * @param $mac
+     * @param string $mac
      * @return string
      */
     public static function readableMac($mac)
     {
         return rtrim(chunk_split($mac, 2, ':'), ':');
+    }
+
+    /**
+     * Extract the OUI and match it against cached values
+     *
+     * @param string $mac
+     * @return string
+     */
+    public static function readableOUI($mac)
+    {
+        $key = 'OUIDB-' . (substr($mac, 0, 6));
+
+        return Cache::get($key, '');
     }
 
     /**
@@ -157,8 +193,8 @@ class Rewrite
      */
     public static function macToHex($mac)
     {
-        $mac_array = explode(':', str_replace(['-','.'], ':', $mac));
-        $mac_padding = array_fill(0, count($mac_array), 12/count($mac_array));
+        $mac_array = explode(':', str_replace(['-', '.'], ':', $mac));
+        $mac_padding = array_fill(0, count($mac_array), 12 / count($mac_array));
 
         return implode(array_map('zeropad', $mac_array, $mac_padding));
     }
@@ -172,35 +208,35 @@ class Rewrite
      */
     public static function ciscoHardware(&$device, $short = false)
     {
-        if ($device['os'] == "ios") {
+        if ($device['os'] == 'ios') {
             if ($device['hardware']) {
-                if (preg_match("/^WS-C([A-Za-z0-9]+)/", $device['hardware'], $matches)) {
-                    if (!$short) {
-                        $device['hardware'] = "Catalyst " . $matches[1] . " (" . $device['hardware'] . ")";
+                if (preg_match('/^WS-C([A-Za-z0-9]+)/', $device['hardware'], $matches)) {
+                    if (! $short) {
+                        $device['hardware'] = 'Catalyst ' . $matches[1] . ' (' . $device['hardware'] . ')';
                     } else {
-                        $device['hardware'] = "Catalyst " . $matches[1];
+                        $device['hardware'] = 'Catalyst ' . $matches[1];
                     }
-                } elseif (preg_match("/^CISCO([0-9]+)(.*)/", $device['hardware'], $matches)) {
-                    if (!$short && $matches[2]) {
-                        $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
+                } elseif (preg_match('/^CISCO([0-9]+)(.*)/', $device['hardware'], $matches)) {
+                    if (! $short && $matches[2]) {
+                        $device['hardware'] = 'Cisco ' . $matches[1] . ' (' . $device['hardware'] . ')';
                     } else {
-                        $device['hardware'] = "Cisco " . $matches[1];
+                        $device['hardware'] = 'Cisco ' . $matches[1];
                     }
                 }
-            } elseif (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches)) {
-                $device['hardware'] = "Catalyst " . $matches[1];
-            } elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches)) {
-                $device['hardware'] = "Cisco " . $matches[1];
+            } elseif (preg_match('/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/', $device['sysDescr'], $matches)) {
+                $device['hardware'] = 'Catalyst ' . $matches[1];
+            } elseif (preg_match('/Cisco IOS Software, ([0-9]+) Software.*/', $device['sysDescr'], $matches)) {
+                $device['hardware'] = 'Cisco ' . $matches[1];
             }
         }
 
-        if ($device['os'] == "iosxe") {
+        if ($device['os'] == 'iosxe') {
             if ($device['hardware']) {
-                if (preg_match('/CAT9K/', $device['sysDescr'], $matches) && preg_match("/^C(9[A-Za-z0-9]+)/", $device['hardware'], $matches2)) {
-                    if (!$short) {
-                        $device['hardware'] = "Catalyst " . $matches2[1] . " (" . $device['hardware'] . ")";
+                if (preg_match('/CAT9K/', $device['sysDescr'], $matches) && preg_match('/^C(9[A-Za-z0-9]+)/', $device['hardware'], $matches2)) {
+                    if (! $short) {
+                        $device['hardware'] = 'Catalyst ' . $matches2[1] . ' (' . $device['hardware'] . ')';
                     } else {
-                        $device['hardware'] = "Catalyst " . $matches2[1];
+                        $device['hardware'] = 'Catalyst ' . $matches2[1];
                     }
                 }
             }
@@ -237,7 +273,6 @@ class Rewrite
 
         return $location;
     }
-
 
     public static function vmwareGuest($guest_id)
     {
@@ -411,5 +446,15 @@ class Rewrite
     public static function zeropad($num, $length = 2)
     {
         return str_pad($num, $length, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * If given input is an IPv6 address, wrap it in [] for use in applications that require it
+     * @param string $ip
+     * @return string
+     */
+    public static function addIpv6Brackets($ip): string
+    {
+        return IPv6::isValid($ip) ? "[$ip]" : $ip;
     }
 }

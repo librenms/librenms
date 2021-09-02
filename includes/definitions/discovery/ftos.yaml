@@ -1,0 +1,20 @@
+modules:
+    mempools:
+        data:
+            -
+                total: F10-CHASSIS-MIB::chSysProcessorMemSize
+                percent_used: F10-CHASSIS-MIB::chRpmMemUsageUtil
+            -
+                total: F10-S-SERIES-CHASSIS-MIB::chSysProcessorMemSize
+                percent_used: F10-S-SERIES-CHASSIS-MIB::chStackUnitMemUsageUtil
+            -
+                total: F10-C-SERIES-CHASSIS-MIB::chSysProcessorMemSize
+                percent_used: F10-C-SERIES-CHASSIS-MIB::chSysProcessorMemSize
+            -
+                total: F10-M-SERIES-CHASSIS-MIB::chSysProcessorMemSize
+                percent_used: F10-M-SERIES-CHASSIS-MIB::chSysProcessorMemSize
+            -
+                total: F10-Z-SERIES-CHASSIS-MIB::chSysProcessorMemSize
+                percent_used: F10-Z-SERIES-CHASSIS-MIB::chSysCpuUtilMemUsage
+    os:
+        sysDescr_regex: '/Application Software Version: (?<version>[\d.]+\d)/'

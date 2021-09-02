@@ -10,22 +10,21 @@
  * Twilio API Transport
  * @author Andy Rosen <arosen@arosen.net>
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Twilio extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $twilio_opts['sid']  = $this->config['twilio-sid'];
+        $twilio_opts['sid'] = $this->config['twilio-sid'];
         $twilio_opts['token'] = $this->config['twilio-token'];
         $twilio_opts['sender'] = $this->config['twilio-sender'];
-        $twilio_opts['to']    = $this->config['twilio-to'];
+        $twilio_opts['to'] = $this->config['twilio-to'];
+
         return $this->contacttwilio($obj, $twilio_opts);
     }
 
@@ -39,7 +38,7 @@ class Twilio extends Transport
             'sender' => $opts['sender'],
         ];
 
-        $url    = 'https://api.twilio.com/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
+        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
 
         $data = [
             'From' => $params['sender'],
@@ -48,7 +47,7 @@ class Twilio extends Transport
         ];
         $post = http_build_query($data);
 
-        $curl   = curl_init($url);
+        $curl = curl_init($url);
 
         // set_curl_proxy($curl);
 
@@ -56,7 +55,7 @@ class Twilio extends Transport
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl, CURLOPT_USERPWD, $params["sid"]. ":" . $params["token"]);
+        curl_setopt($curl, CURLOPT_USERPWD, $params['sid'] . ':' . $params['token']);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
 
         curl_exec($curl);
@@ -100,7 +99,7 @@ class Twilio extends Transport
                 'twilio-token'    => 'required|string',
                 'twilio-to' => 'required',
                 'twilio-sender' => 'required',
-            ]
+            ],
         ];
     }
 }

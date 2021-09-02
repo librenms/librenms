@@ -12,11 +12,11 @@
 $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-regCount');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-regCount');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
-    $rrd_options .= ' DEF:regCount='.$rrdfilename.':regCount:AVERAGE ';
-    $rrd_options .= ' DEF:failed='.$rrdfilename.':failed:AVERAGE ';
+    $rrd_options .= ' DEF:regCount=' . $rrdfilename . ':regCount:AVERAGE ';
+    $rrd_options .= ' DEF:failed=' . $rrdfilename . ':failed:AVERAGE ';
     $rrd_options .= " AREA:regCount#FF0000:'Registered Sm       ' ";
     $rrd_options .= ' GPRINT:regCount:LAST:%0.2lf%s ';
     $rrd_options .= ' GPRINT:regCount:MIN:%0.2lf%s ';

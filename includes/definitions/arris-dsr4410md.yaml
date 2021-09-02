@@ -2,8 +2,7 @@ os: arris-dsr4410md
 text: 'Arris Satellite Receiver'
 type: network
 icon: arris
-mib_dir:
-    - arris
+mib_dir: arris
 over:
     - { graph: device_wireless_rssi, text: Sat Signal Level }
     - { graph: device_wireless_quality, text: Sat Signal Quality }

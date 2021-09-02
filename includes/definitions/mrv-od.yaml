@@ -6,8 +6,7 @@ group: mrv
 over:
     - { graph: device_dbm, text: 'dBm' }
     - { graph: device_temperature, text: 'Temperature' }
-mib_dir:
-    - mrv
+mib_dir: mrv
 discovery:
     -
         sysObjectID:

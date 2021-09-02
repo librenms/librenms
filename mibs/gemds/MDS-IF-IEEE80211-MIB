@@ -1,0 +1,478 @@
+MDS-IF-IEEE80211-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex
+        FROM IF-MIB
+    mdsInterfaces
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsIfDot11MIB MODULE-IDENTITY
+    LAST-UPDATED "201805160000Z" -- May 16, 2018
+    ORGANIZATION
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The MIB module to describe the IEEE802.11 interface."
+    REVISION      "201805160000Z"
+    DESCRIPTION
+        "Updated conformance statments based on smilint."
+    REVISION      "201410200000Z"
+    DESCRIPTION
+        "Removed hyphens from enumerations."
+    REVISION      "201304260000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { mdsInterfaces 2 }
+
+mIfDot11MIBObjects OBJECT IDENTIFIER
+    ::= { mdsIfDot11MIB 1 }
+
+mIfDot11Config OBJECT IDENTIFIER
+    ::= { mIfDot11MIBObjects 1 }
+
+mIfDot11Status OBJECT IDENTIFIER
+    ::= { mIfDot11MIBObjects 2 }
+
+-- Textual Conventions
+Byte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:byte"
+    SYNTAX      Integer32 (-128 .. 127)
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+Ssid ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION "IEEE802.11 Service Set Identifier"
+    SYNTAX      OCTET STRING (SIZE (0..32))
+
+MacString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "20a"
+    STATUS      current
+    DESCRIPTION "MAC Identifier String"
+    SYNTAX      OCTET STRING (SIZE (0..20))
+
+-- Dot11 Status Objects
+mIfDot11StatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MIfDot11StatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains status of IEEE802.11 interfaces. This table has
+         a sparse dependent relationship on the ifTable. For each entry in
+         this table, there exists an entry in the ifTable."
+    ::= { mIfDot11Status 1 }
+
+mIfDot11StatusEntry OBJECT-TYPE
+    SYNTAX      MIfDot11StatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry contains status of a cellular interface."
+    INDEX   { ifIndex }
+    ::= { mIfDot11StatusTable 1 }
+
+MIfDot11StatusEntry ::=
+    SEQUENCE {
+        mIfDot11SerialNumber DisplayString,
+        mIfDot11Mode INTEGER,
+        mIfDot11TxPower UnsignedByte,
+        mIfDot11Channel UnsignedByte,
+        mIfDot11StationSsid Ssid,
+        mIfDot11StationBssid MacString,
+        mIfDot11StationRssi Byte,
+        mIfDot11StationAuthenticated TruthValue,
+        mIfDot11StationAuthorized TruthValue,
+        mIfDot11StationInactive Unsigned32,
+        mIfDot11StationRxbytes Unsigned32,
+        mIfDot11StationRxpackets Unsigned32,
+        mIfDot11StationTxbitrate UnsignedShort,
+        mIfDot11StationTxbytes Unsigned32,
+        mIfDot11StationTxpackets Unsigned32,
+        mIfDot11StationTxfailed Unsigned32,
+        mIfDot11StationTxretries Unsigned32,
+        mIfDot11ModemType INTEGER
+    }
+
+mIfDot11SerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IEEE802.11 hardware serial number."
+    ::= { mIfDot11StatusEntry 1 }
+
+mIfDot11Mode OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),station(1),accessPoint(2), accessPointStation(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IEEE802.11 operation mode."
+    ::= { mIfDot11StatusEntry 2 }
+
+mIfDot11TxPower OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IEEE802.11 transmit power (dBm)."
+    ::= { mIfDot11StatusEntry 3 }
+
+mIfDot11Channel OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IEEE802.11 channel"
+    ::= { mIfDot11StatusEntry 4 }
+
+-- Dot11 Station Status objects
+mIfDot11StationSsid OBJECT-TYPE
+    SYNTAX      Ssid
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SSID of access point the unit is connected to"
+    ::= { mIfDot11StatusEntry 5 }
+
+mIfDot11StationBssid OBJECT-TYPE
+    SYNTAX      MacString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "BSSID of access point the unit is connected to"
+    ::= { mIfDot11StatusEntry 6 }
+
+mIfDot11StationRssi OBJECT-TYPE
+    SYNTAX      Byte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received Signal Strength indicator (dBm)."
+    ::= { mIfDot11StatusEntry 7 }
+
+mIfDot11StationAuthenticated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the station has been authenticated by the AP."
+    ::= { mIfDot11StatusEntry 8 }
+
+mIfDot11StationAuthorized OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the station has been authorized by the AP."
+    ::= { mIfDot11StatusEntry 9 }
+
+mIfDot11StationInactive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the station is active."
+    ::= { mIfDot11StatusEntry 10 }
+
+mIfDot11StationRxbytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes received."
+    ::= { mIfDot11StatusEntry 11 }
+
+mIfDot11StationRxpackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets received."
+    ::= { mIfDot11StatusEntry 12 }
+
+mIfDot11StationTxbitrate OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current RF transmission bit rate."
+    ::= { mIfDot11StatusEntry 13 }
+
+mIfDot11StationTxbytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes transmitted."
+    ::= { mIfDot11StatusEntry 14 }
+
+mIfDot11StationTxpackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets transmitted."
+    ::= { mIfDot11StatusEntry 15 }
+
+mIfDot11StationTxfailed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of transmissions that failed."
+    ::= { mIfDot11StatusEntry 16 }
+
+mIfDot11StationTxretries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of transmission retries."
+    ::= { mIfDot11StatusEntry 17 }
+
+mIfDot11ModemType OBJECT-TYPE
+        SYNTAX      INTEGER {unknown(0),w51(1),w52(2)}
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Modem type."
+        ::= { mIfDot11StatusEntry 18 }
+
+-- Dot11 Status Access Point Status objects
+mIfDot11StatusApTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MifDot11StatusApEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The access point table."
+    ::= { mIfDot11Status 2 }
+
+mIfDot11StatusApEntry OBJECT-TYPE
+    SYNTAX      MifDot11StatusApEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The Access Point status entry."
+    INDEX { ifIndex, mIfDot11ApSsid }
+        ::= { mIfDot11StatusApTable 1 }
+
+MifDot11StatusApEntry ::=
+    SEQUENCE {
+        mIfDot11ApSsid Ssid
+    }
+
+mIfDot11ApSsid OBJECT-TYPE
+    SYNTAX      Ssid
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current BSS SSID/Network name"
+    ::= { mIfDot11StatusApEntry 1 }
+
+-- Dot11 Status Access Point Client objects
+mIfDot11StatusApClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MifDot11StatusApClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The access point client entry."
+    ::= { mIfDot11Status 3 }
+
+mIfDot11StatusApClientEntry OBJECT-TYPE
+    SYNTAX      MifDot11StatusApClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The client connected to the AP."
+    INDEX { ifIndex, mIfDot11ApSsid, mIfDot11ApClientMac }
+        ::= { mIfDot11StatusApClientTable 1 }
+
+MifDot11StatusApClientEntry ::=
+    SEQUENCE {
+        mIfDot11ApClientMac MacString,
+        mIfDot11ApClientRssi Byte,
+        mIfDot11ApClientAuthenticated TruthValue,
+        mIfDot11ApClientAuthorized TruthValue,
+        mIfDot11ApClientInactive Unsigned32,
+        mIfDot11ApClientRxbytes Unsigned32,
+        mIfDot11ApClientRxpackets Unsigned32,
+        mIfDot11ApClientTxbitrate UnsignedShort,
+        mIfDot11ApClientTxbytes Unsigned32,
+        mIfDot11ApClientTxpackets Unsigned32,
+        mIfDot11ApClientTxfailed Unsigned32,
+        mIfDot11ApClientTxretries Unsigned32
+    }
+
+mIfDot11ApClientMac OBJECT-TYPE
+    SYNTAX      MacString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The client MAC address."
+    ::= { mIfDot11StatusApClientEntry 1 }
+
+mIfDot11ApClientRssi OBJECT-TYPE
+    SYNTAX      Byte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The client RSSI."
+    ::= { mIfDot11StatusApClientEntry 2 }
+
+mIfDot11ApClientAuthenticated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the client is authenticated."
+    ::= { mIfDot11StatusApClientEntry 3 }
+
+mIfDot11ApClientAuthorized OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the client is authorized."
+    ::= { mIfDot11StatusApClientEntry 4 }
+
+mIfDot11ApClientInactive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the client is inactive."
+    ::= { mIfDot11StatusApClientEntry 5 }
+
+mIfDot11ApClientRxbytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes received from the client."
+    ::= { mIfDot11StatusApClientEntry 6 }
+
+mIfDot11ApClientRxpackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets received from the client."
+    ::= { mIfDot11StatusApClientEntry 7 }
+
+mIfDot11ApClientTxbitrate OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmission bit rate at which the client is connected to AP."
+    ::= { mIfDot11StatusApClientEntry 8 }
+
+mIfDot11ApClientTxbytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes transmitted to the client."
+    ::= { mIfDot11StatusApClientEntry 9 }
+
+mIfDot11ApClientTxpackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets transmitted to the client."
+    ::= { mIfDot11StatusApClientEntry 10 }
+
+mIfDot11ApClientTxfailed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of transmissions to the client that failed."
+    ::= { mIfDot11StatusApClientEntry 11 }
+
+mIfDot11ApClientTxretries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of transmission retries to the client."
+    ::= { mIfDot11StatusApClientEntry 12 }
+
+-- conformance information
+mdsIfDot11MIBConformance   OBJECT IDENTIFIER ::= { mdsIfDot11MIB 3 }
+mdsIfDot11MIBCompliances OBJECT IDENTIFIER ::= { mdsIfDot11MIBConformance 1 }
+mdsIfDot11MIBGroups      OBJECT IDENTIFIER ::= { mdsIfDot11MIBConformance 2 }
+
+-- compliance statements
+mIfDot11Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that
+            implement the MDS-IF-IEEE80211-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mIfDot11StatusCommonGroup,
+            mIfDot11StatusStationGroup,
+            mIfDot11StatusApGroup
+        }
+    ::= { mdsIfDot11MIBCompliances 1 }
+
+-- units of conformance
+mIfDot11StatusCommonGroup OBJECT-GROUP
+    OBJECTS {
+        mIfDot11SerialNumber,
+        mIfDot11Mode,
+        mIfDot11TxPower,
+        mIfDot11Channel,
+        mIfDot11ModemType
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        common IEEE802.11 interface status."
+    ::= { mdsIfDot11MIBGroups 1 }
+
+mIfDot11StatusStationGroup OBJECT-GROUP
+    OBJECTS {
+        mIfDot11StationSsid,
+        mIfDot11StationRssi,
+        mIfDot11StationBssid,
+        mIfDot11StationAuthenticated,
+        mIfDot11StationAuthorized,
+        mIfDot11StationInactive,
+        mIfDot11StationRxbytes,
+        mIfDot11StationRxpackets,
+        mIfDot11StationTxbitrate,
+        mIfDot11StationTxbytes,
+        mIfDot11StationTxpackets,
+        mIfDot11StationTxfailed,
+        mIfDot11StationTxretries
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        IEEE802.11 interface status in station mode."
+    ::= { mdsIfDot11MIBGroups 2 }
+
+mIfDot11StatusApGroup OBJECT-GROUP
+    OBJECTS {
+        mIfDot11ApSsid,
+        mIfDot11ApClientMac,
+        mIfDot11ApClientRssi,
+        mIfDot11ApClientAuthenticated,
+        mIfDot11ApClientAuthorized,
+        mIfDot11ApClientInactive,
+        mIfDot11ApClientRxbytes,
+        mIfDot11ApClientRxpackets,
+        mIfDot11ApClientTxbitrate,
+        mIfDot11ApClientTxbytes,
+        mIfDot11ApClientTxpackets,
+        mIfDot11ApClientTxfailed,
+        mIfDot11ApClientTxretries
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        IEEE802.11 interface status in Access Point mode."
+    ::= { mdsIfDot11MIBGroups 3 }
+
+END

@@ -1,8 +1,127 @@
-mib: BDCOM-PROCESS-MIB
+mib: NMS-CHASSIS:NMS-FAN-TRAP:NMS-POWER-MIB:NMS-GPON-MIB:NMS-EPON-OLT-PON
 modules:
+    mempools:
+        data:
+            -
+                percent_used: NMS-CHASSIS::nmscardMEMUtilization
+                descr: 'Memory Usage'
+    os:
+        hardware:
+            - NMS-CHASSIS::nmscardDescr.0
+            - NMS-CHASSIS::nmscardDescr.1
+        version:
+            - NMS-CHASSIS::nmscardSwVersion.0
+            - NMS-CHASSIS::nmscardSwVersion.1
+        serial:
+            - NMS-CHASSIS::nmscardSerial.0
+            - NMS-CHASSIS::nmscardSerial.1
+    pre-cache:
+        data:
+            -
+                oid:
+                 - gponOltPonPortPortIndex
+                 - ponIfIndex
+                 - gponOltPonPortPortActiveOnuNum
+                 - gponOltPonPortPortInactiveOnuNum
     processors:
         data:
             -
-                oid: bdpmCPUTotal5min
-                num_oid: '.1.3.6.1.4.1.3320.9.109.1.1.1.1.5.{{ $index }}'
-                index: 0
+                oid: nmscardCPUUtilization
+                num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.11.{{ $index }}'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: nmscardTemperature
+                    num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.13.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: nmscardVoltage
+                    num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.14.{{ $index }}'
+                    descr: 'Voltage {{ $index }}'
+        humidity:
+            data:        
+                -
+                    oid: nmsHumidity
+                    num_oid: '.1.3.6.1.4.1.3320.3.6.17.{{ $index }}'
+                    descr: 'Humidity {{ $index }}'
+        state:
+            data:
+                -
+                    oid: nmsSysErrorNum
+                    num_oid: '.1.3.6.1.4.1.3320.3.6.18.{{ $index }}'
+                    descr: 'Sys Errors'
+                    states:
+                        - { descr: sys_ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: TLB_modification_exception, graph: 0, value: 1, generic: 1 }
+                        - { descr: load_or_instruction_fetch_TLB_miss_exception, graph: 0, value: 2, generic: 2 }
+                        - { descr: store_TLB_miss_exception, graph: 0, value: 3, generic: 2 }
+                        - { descr: load_instruction_fetch_address_error_exception, graph: 0, value: 4, generic: 2 }
+                        - { descr: store_address_error_exception, graph: 0, value: 5, generic: 2 }
+                        - { descr: for_instruction_fetch_bus_error, graph: 0, value: 6, generic: 2 }
+                        - { descr: data_load_or_store_bus_error, graph: 0, value: 7, generic: 2 }
+                        - { descr: arithmetic_overflow_exception, graph: 0, value: 12, generic: 2 }
+                        - { descr: trap_exception, graph: 0, value: 13, generic: 2 }
+                        - { descr: deadlock_software_exception, graph: 0, value: 16, generic: 2 }
+                -
+                    oid: FanStatus
+                    num_oid: '.1.3.6.1.4.1.3320.9.187.4.1.2.{{ $index }}'
+                    descr: 'Fan {{ $index }} status'
+                    states:
+                        - { descr: Normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: Stop, graph: 1, value: 2, generic: 2 }
+                        - { descr: Unused, graph: 1, value: 3, generic: 1 }
+                -
+                    oid: powerStatus
+                    num_oid: '.1.3.6.1.4.1.3320.9.189.1.{{ $index }}'
+                    descr: 'Power status'
+                    states:
+                        - { descr: power-A-normal, graph: 1, value: 1, generic: 1 }
+                        - { descr: power-B-normal, graph: 1, value: 2, generic: 1 }
+                        - { descr: power-A-B-normal, graph: 1, value: 3, generic: 0 }
+                        - { descr: other, graph: 1, value: 4, generic: 3 }
+        count:
+            data:
+                -
+                    oid: gponOltPonPortConfigTable
+                    value: gponOltPonPortPortActiveOnuNum
+                    num_oid: '.1.3.6.1.4.1.3320.10.2.1.1.4.{{ $index }}'
+                    group: "GPON Active Onu Num"
+                    descr: "{{ $gponOltPonPortPortIndex }}"
+                    index: "gponOltPonPortPortActiveOnuNum.{{ $index }}"
+                    low_limit: 0
+                    warn_limit: 120
+                    high_limit: 128
+                -
+                    oid: gponOltPonPortConfigTable
+                    value: gponOltPonPortPortInactiveOnuNum
+                    num_oid: '.1.3.6.1.4.1.3320.10.2.1.1.5.{{ $index }}'
+                    group: "GPON Inactive Onu Num"
+                    descr: "{{ $gponOltPonPortPortIndex }}"
+                    index: "gponOltPonPortPortInactiveOnuNum.{{ $index }}"
+                -
+                    oid: nmseponoltponTable
+                    value: activeOnuNum
+                    num_oid: '.1.3.6.1.4.1.3320.101.6.1.1.21.{{ $index }}'
+                    group: "EPON Active Onu Num"
+                    descr: "{{ $ponIfIndex }}"
+                    index: "activeOnuNum.{{ $index }}"
+                    low_limit: 0
+                    warn_limit: 60
+                    high_limit: 64
+                -
+                    oid: nmseponoltponTable
+                    value: inactiveOnuNum
+                    num_oid: '.1.3.6.1.4.1.3320.101.6.1.1.22.{{ $index }}'
+                    group: "EPON Inactive Onu Num"
+                    descr: "{{ $ponIfIndex }}"
+                    index: "inactiveOnuNum.{{ $index }}"
+                    
+        fanspeed:
+            data:
+                -
+                    oid: FanSpeed
+                    num_oid: '.1.3.6.1.4.1.3320.9.187.4.1.3.{{ $index }}'
+                    descr: 'Fan {{ $index }} speed'

@@ -1,5 +1,7 @@
 mib: POSEIDON-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>Poseidon [0-9]+) .* v(?<version>[\d.]+)/'
     sensors:
         temperature:
             data:

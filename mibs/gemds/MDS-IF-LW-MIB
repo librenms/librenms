@@ -1,0 +1,837 @@
+MDS-IF-LW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue,
+		MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex
+        FROM IF-MIB
+    mdsInterfaces
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsIfLwMIB MODULE-IDENTITY
+    LAST-UPDATED "201809130000Z" -- September 13, 2018
+    ORGANIZATION 
+      "GE MDS LLC
+      http://www.gemds.com"
+    CONTACT-INFO
+      "T 1-800-474-0694 (Toll Free in North America)
+       T 585-242-9600
+       F 585-242-9620
+
+       175 Science Parkway
+       Rochester, New York 14620
+       USA"
+    DESCRIPTION
+      "The MIB module to describe the licenced narrowband interface."
+	REVISION      "201809130000Z"
+    DESCRIPTION
+      "Initial version."
+    ::= { mdsInterfaces 6 }
+
+mIfLwMIBObjects OBJECT IDENTIFIER
+    ::= { mdsIfLwMIB 1 }
+
+mIfLwConfig OBJECT IDENTIFIER
+    ::= { mIfLwMIBObjects 1 }
+
+mIfLwStatus OBJECT IDENTIFIER
+    ::= { mIfLwMIBObjects 2 }
+
+-- Textual Conventions
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+LinkStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Link state"
+    SYNTAX      INTEGER {initializing(0),scanning(1),negotiating(2),authenticating(3),associated(4),disassociated(5)}
+
+InitStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "State of the NIC Initialization."
+    SYNTAX      INTEGER {off(0),initializing(1),discovering(2),reprogramming(3),configuring(4),complete(5),error(6)}
+
+DeviceModeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Device Mode"
+    SYNTAX      INTEGER {remote(0),accessPoint(1),storeAndForward(2),test(3)}
+
+ModulationModeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "modulation"
+    SYNTAX      INTEGER {qpsk25(2),qpsk50(3),qpsk75(4),qam16r50(5),qam16r75(6)}
+
+AlarmFlags ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Alarms"
+    SYNTAX      BITS {notCalibrated(23), temperature(0)}
+
+FirmwareRevision ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION "Firmware revision"
+    SYNTAX      OCTET STRING 
+
+InetIpAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "IP Address"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+FrequencyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Frequency"
+    SYNTAX      OCTET STRING (SIZE (0..16))
+
+ChannelType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Channel"
+    SYNTAX      OCTET STRING (SIZE (0..32))
+
+FecType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Forward error corection"
+    SYNTAX      INTEGER {disabled(0),adaptiveGain(1),lowGain(2)}
+
+RateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Rate"
+    SYNTAX      OCTET STRING (SIZE (0..16))
+
+-- Lw Status Objects
+mIfLwStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MIfLwStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains status of LW interfaces. This table has 
+         a sparse dependent relationship on the ifTable. For each entry in 
+         this table, there exists an entry in the ifTable."
+    ::= { mIfLwStatus 1 }
+
+mIfLwStatusEntry OBJECT-TYPE
+    SYNTAX      MIfLwStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry contains status of a cellular interface."
+    INDEX   { ifIndex }
+    ::= { mIfLwStatusTable 1 }
+
+MIfLwStatusEntry ::=
+    SEQUENCE {
+        mIfLwLinkStatus LinkStatus,
+        mIfLwInitStatus InitStatus,
+        mIfLwCurrentDeviceMode DeviceModeType,
+        mIfLwAlarms AlarmFlags,
+        mIfLwSerialNumber Unsigned32,
+        mIfLwFirmwareRevision FirmwareRevision,
+        mIfLwHardwareId UnsignedByte,
+        mIfLwHardwareRevision UnsignedByte,
+        mIfLwTemperature Integer32,
+        mIfLwApInfoApAddress MacAddress,
+        mIfLwApInfoIpAddress InetIpAddress,
+        mIfLwApInfoConnectedTime Integer32,
+        mIfLwApInfoRssi Integer32,
+        mIfLwApInfoSnr Unsigned32,
+        mIfLwApInfoMod ModulationModeType,
+        mIfLwMacStatsTxSuccess Unsigned32,
+        mIfLwMacStatsTxQueueFull Unsigned32,
+        mIfLwMacStatsTxError Unsigned32,
+        mIfLwMacStatsTxRetry Unsigned32,
+        mIfLwMacStatsRxSuccess Unsigned32,
+        mIfLwMacStatsRxError Unsigned32,
+        mIfLwModemStatsTxSuccess Unsigned32,
+        mIfLwModemStatsTxError Unsigned32,
+        mIfLwModemStatsRxSuccess Unsigned32,
+        mIfLwModemStatsRxError Unsigned32,	
+        mIfLwLastRssi Integer32,
+        mIfLwLastSnr Unsigned32,
+        mIfLwLastMod ModulationModeType,
+        mIfLwLastRate RateType,
+        mIfLwActiveNic TruthValue
+    }
+
+mIfLwLinkStatus OBJECT-TYPE
+    SYNTAX      LinkStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link State."
+    ::= { mIfLwStatusEntry 1 }
+
+mIfLwInitStatus OBJECT-TYPE
+    SYNTAX      InitStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State of the NIC Initialization."
+    ::= { mIfLwStatusEntry 2 }
+
+mIfLwCurrentDeviceMode OBJECT-TYPE
+    SYNTAX      DeviceModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current device mode."
+    ::= { mIfLwStatusEntry 3 }
+
+mIfLwAlarms OBJECT-TYPE
+    SYNTAX      AlarmFlags
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current NIC alarms."
+    ::= { mIfLwStatusEntry 4 }
+
+mIfLwSerialNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Serial Number."
+    ::= { mIfLwStatusEntry 5 }
+
+mIfLwFirmwareRevision OBJECT-TYPE
+    SYNTAX      FirmwareRevision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NIC Firmware Revision."
+    ::= { mIfLwStatusEntry 6 }
+
+mIfLwHardwareId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Hardware ID."
+    ::= { mIfLwStatusEntry 7 }
+
+mIfLwHardwareRevision OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Hardware Revision."
+    ::= { mIfLwStatusEntry 8 }
+
+mIfLwTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The transceiver temperature."
+    ::= { mIfLwStatusEntry 9 }
+
+mIfLwApInfoApAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of access point this device is linked to."
+    ::= { mIfLwStatusEntry 10 }
+
+mIfLwApInfoIpAddress OBJECT-TYPE
+    SYNTAX      InetIpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address of access point this device is linked to."
+    ::= { mIfLwStatusEntry 11 }
+
+mIfLwApInfoConnectedTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time elapsed since link established."
+    ::= { mIfLwStatusEntry 12 }
+
+mIfLwApInfoRssi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average received signal strength index."
+    ::= { mIfLwStatusEntry 13 }
+
+mIfLwApInfoSnr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average error vector magnitude."
+    ::= { mIfLwStatusEntry 14 }
+
+mIfLwApInfoMod OBJECT-TYPE
+    SYNTAX      ModulationModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last modulation"
+    ::= { mIfLwStatusEntry 15 }
+
+mIfLwMacStatsTxSuccess OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Successful transmissions."
+    ::= { mIfLwStatusEntry 16 }
+
+mIfLwMacStatsTxQueueFull OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Failed transmissions, MAC queue full."
+    ::= { mIfLwStatusEntry 17 }
+
+mIfLwMacStatsTxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packets dropped for other reasons. Currently unused."
+    ::= { mIfLwStatusEntry 18 }
+
+mIfLwMacStatsTxRetry OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Re-transmission count due to to previously unsuccessful transmission."
+    ::= { mIfLwStatusEntry 19 }
+
+mIfLwMacStatsRxSuccess OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Valid packet received."
+    ::= { mIfLwStatusEntry 20 }
+
+mIfLwMacStatsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Valid packet received."
+    ::= { mIfLwStatusEntry 21 }
+
+mIfLwModemStatsTxSuccess OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem successfully transmitted a packet"
+    ::= { mIfLwStatusEntry 22 }
+
+mIfLwModemStatsTxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem failed to transmit a packet"
+    ::= { mIfLwStatusEntry 23 }
+
+mIfLwModemStatsRxSuccess OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem successfully received a packet"
+    ::= { mIfLwStatusEntry 24 }
+
+mIfLwModemStatsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem failed to receive a packet"
+    ::= { mIfLwStatusEntry 25 }
+
+mIfLwLastRssi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Lasr received signal strength index."
+    ::= { mIfLwStatusEntry 26 }
+
+mIfLwLastSnr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last error vector magnitude."
+    ::= { mIfLwStatusEntry 27 }
+
+mIfLwLastMod OBJECT-TYPE
+    SYNTAX      ModulationModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last modulation"
+    ::= { mIfLwStatusEntry 28 }
+
+mIfLwLastRate OBJECT-TYPE
+    SYNTAX      RateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last rate in kbps"
+    ::= { mIfLwStatusEntry 29 }
+
+mIfLwActiveNic OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If nic is active"
+    ::= { mIfLwStatusEntry 30 }
+
+-- Lw Status Connected Remotes Status objects
+mIfLwStatusConnRemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MifLwStatusConnRemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The list of connected remotes."
+    ::= { mIfLwStatus 2 }
+
+mIfLwStatusConnRemEntry OBJECT-TYPE
+    SYNTAX      MifLwStatusConnRemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The connected remote status entry."
+    INDEX { ifIndex, mIfLwStatusConnRemAddress }
+        ::= { mIfLwStatusConnRemTable 1 }
+
+MifLwStatusConnRemEntry ::=
+    SEQUENCE {
+        mIfLwStatusConnRemAddress MacAddress,
+        mIfLwStatusConnRemIpAddress InetIpAddress,
+        mIfLwStatusConnRemTimeToLive Unsigned32,
+        mIfLwStatusConnRemLinkStatus LinkStatus,
+        mIfLwStatusConnRemNicId UnsignedShort,
+        mIfLwStatusConnRemRssi Integer32,
+        mIfLwStatusConnRemSnr Unsigned32,
+        mIfLwStatusConnRemMod ModulationModeType,
+        mIfLwStatusConnRemStatsTxPackets Unsigned32,
+        mIfLwStatusConnRemStatsTxBytes Unsigned32,
+        mIfLwStatusConnRemStatsRxPackets Unsigned32,
+        mIfLwStatusConnRemStatsRxBytes Unsigned32,
+        mIfLwStatusConnRemStatsTxError Unsigned32,
+        mIfLwStatusConnRemStatsRxError Unsigned32,
+        mIfLwStatusConnRemStatsTxDrop Unsigned32,
+        mIfLwStatusConnRemStatsRxDrop Unsigned32,
+		mIfLwStatusConnRemStatsGateway MacAddress,
+        mIfLwStatusConnRemStatsAllIp OCTET STRING,
+        mIfLwStatusConnRemStatsName OCTET STRING,
+        mIfLwStatusConnRemStatsAlarmed TruthValue,
+        mIfLwStatusConnRemStatsVersion OCTET STRING,
+        mIfLwStatusConnRemStatsTemp Integer32 (-32768 .. 32767),
+        mIfLwStatusConnRemStatsDwnRssi Integer32,
+        mIfLwStatusConnRemStatsDwnSnr Unsigned32,
+        mIfLwStatusConnRemStatsDwnMod ModulationModeType
+    }
+
+mIfLwStatusConnRemAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address of connected remote."
+    ::= { mIfLwStatusConnRemEntry 1 }
+
+mIfLwStatusConnRemIpAddress OBJECT-TYPE
+    SYNTAX      InetIpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ip address of connected remote."
+    ::= { mIfLwStatusConnRemEntry 2 }
+
+mIfLwStatusConnRemTimeToLive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time left until this entry is aged out."
+    ::= { mIfLwStatusConnRemEntry 3 }
+
+mIfLwStatusConnRemLinkStatus OBJECT-TYPE
+    SYNTAX      LinkStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status of the connection to a remote device."
+    ::= { mIfLwStatusConnRemEntry 4 }
+
+mIfLwStatusConnRemNicId OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The RF connection identifier for the connected remote device."
+    ::= { mIfLwStatusConnRemEntry 5 }
+
+mIfLwStatusConnRemRssi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "received signal strength index."
+    ::= { mIfLwStatusConnRemEntry 6 }
+
+mIfLwStatusConnRemSnr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "link quality index."
+    ::= { mIfLwStatusConnRemEntry 7 }
+
+mIfLwStatusConnRemMod OBJECT-TYPE
+    SYNTAX      ModulationModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last modulation"
+    ::= { mIfLwStatusConnRemEntry 8 }
+
+mIfLwStatusConnRemStatsTxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx packets"
+    ::= { mIfLwStatusConnRemEntry 9 }
+
+mIfLwStatusConnRemStatsTxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx bytes"
+    ::= { mIfLwStatusConnRemEntry 10 }
+
+mIfLwStatusConnRemStatsRxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx packets"
+    ::= { mIfLwStatusConnRemEntry 11 }
+
+mIfLwStatusConnRemStatsRxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx bytes"
+    ::= { mIfLwStatusConnRemEntry 12 }
+
+mIfLwStatusConnRemStatsTxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx error"
+    ::= { mIfLwStatusConnRemEntry 13 }
+
+mIfLwStatusConnRemStatsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx error"
+    ::= { mIfLwStatusConnRemEntry 14 }
+
+mIfLwStatusConnRemStatsTxDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx drop"
+    ::= { mIfLwStatusConnRemEntry 15 }
+
+mIfLwStatusConnRemStatsRxDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx drop"
+    ::= { mIfLwStatusConnRemEntry 16 }
+
+mIfLwStatusConnRemStatsGateway OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The mac address of the next hop"
+    ::= { mIfLwStatusConnRemEntry 17 }
+
+mIfLwStatusConnRemStatsAllIp OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "String version of all IP addresses"
+    ::= { mIfLwStatusConnRemEntry 18 }
+
+mIfLwStatusConnRemStatsName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "System name"
+    ::= { mIfLwStatusConnRemEntry 19 }
+
+mIfLwStatusConnRemStatsAlarmed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Is alarmed"
+    ::= { mIfLwStatusConnRemEntry 20 }
+
+mIfLwStatusConnRemStatsVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Host firmware version"
+    ::= { mIfLwStatusConnRemEntry 21 }
+
+mIfLwStatusConnRemStatsTemp OBJECT-TYPE
+    SYNTAX      Integer32 (-32768 .. 32767)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "System temprature in celsius"
+    ::= { mIfLwStatusConnRemEntry 22 }
+
+mIfLwStatusConnRemStatsDwnRssi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Downstream RSSI"
+    ::= { mIfLwStatusConnRemEntry 23 }
+
+mIfLwStatusConnRemStatsDwnSnr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Downstream SNR"
+    ::= { mIfLwStatusConnRemEntry 24 }
+
+mIfLwStatusConnRemStatsDwnMod OBJECT-TYPE
+    SYNTAX      ModulationModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Downstream Modulation"
+    ::= { mIfLwStatusConnRemEntry 25 }
+
+-- Lw Status Endpoints Status objects
+mIfLwStatusEndpointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MifLwStatusEndpointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The list of endpoints."
+    ::= { mIfLwStatus 3 }
+
+mIfLwStatusEndpointEntry OBJECT-TYPE
+    SYNTAX      MifLwStatusEndpointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The endpoint status entry."
+    INDEX { ifIndex, mIfLwStatusEndpointAddress }
+        ::= { mIfLwStatusEndpointTable 1 }
+
+MifLwStatusEndpointEntry ::=
+    SEQUENCE {
+        mIfLwStatusEndpointAddress MacAddress,
+        mIfLwStatusEndpointIpAddress InetIpAddress,
+        mIfLwStatusEndpointTimeToLive Unsigned32,
+        mIfLwStatusEndpointRemAddress MacAddress,
+        mIfLwStatusEndpointStatsTxPackets Unsigned32,
+        mIfLwStatusEndpointStatsTxBytes Unsigned32,
+        mIfLwStatusEndpointStatsRxPackets Unsigned32,
+        mIfLwStatusEndpointStatsRxBytes Unsigned32,
+        mIfLwStatusEndpointStatsTxError Unsigned32,
+        mIfLwStatusEndpointStatsRxError Unsigned32,
+        mIfLwStatusEndpointStatsTxDrop Unsigned32,
+        mIfLwStatusEndpointStatsRxDrop Unsigned32
+    }
+
+mIfLwStatusEndpointAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address of endpoint."
+    ::= { mIfLwStatusEndpointEntry 1 }
+
+mIfLwStatusEndpointIpAddress OBJECT-TYPE
+    SYNTAX      InetIpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ip address of endpoint."
+    ::= { mIfLwStatusEndpointEntry 2 }
+
+mIfLwStatusEndpointTimeToLive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time left until this entry is aged out."
+    ::= { mIfLwStatusEndpointEntry 3 }
+
+mIfLwStatusEndpointRemAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The MAC address of the remote device servicing this endpoint."
+    ::= { mIfLwStatusEndpointEntry 4 }
+
+mIfLwStatusEndpointStatsTxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx packets"
+    ::= { mIfLwStatusEndpointEntry 5 }
+
+mIfLwStatusEndpointStatsTxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx bytes"
+    ::= { mIfLwStatusEndpointEntry 6 }
+
+mIfLwStatusEndpointStatsRxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx packets"
+    ::= { mIfLwStatusEndpointEntry 7 }
+
+mIfLwStatusEndpointStatsRxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx bytes"
+    ::= { mIfLwStatusEndpointEntry 8 }
+
+mIfLwStatusEndpointStatsTxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx error"
+    ::= { mIfLwStatusEndpointEntry 9 }
+
+mIfLwStatusEndpointStatsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx error"
+    ::= { mIfLwStatusEndpointEntry 10 }
+
+mIfLwStatusEndpointStatsTxDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "tx drop"
+    ::= { mIfLwStatusEndpointEntry 11 }
+
+mIfLwStatusEndpointStatsRxDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rx drop"
+    ::= { mIfLwStatusEndpointEntry 12 }
+
+
+
+-- conformance information
+mdsIfLwMIBConformance   OBJECT IDENTIFIER ::= { mdsIfLwMIB 3 }
+mdsIfLwMIBCompliances OBJECT IDENTIFIER ::= { mdsIfLwMIBConformance 1 }
+mdsIfLwMIBGroups      OBJECT IDENTIFIER ::= { mdsIfLwMIBConformance 2 }
+
+-- compliance statements
+mIfLwCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that 
+            implement the MDS-IF-LW-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mIfLwStatusGroup,
+            mIfLwStatusConnRemGroup,
+            mIfLwStatusEndpointGroup
+        }
+    ::= { mdsIfLwMIBCompliances 1 }
+
+-- units of conformance
+mIfLwStatusGroup OBJECT-GROUP
+    OBJECTS {
+      mIfLwLinkStatus,
+      mIfLwInitStatus,
+      mIfLwCurrentDeviceMode,
+      mIfLwAlarms,
+      mIfLwSerialNumber,
+      mIfLwFirmwareRevision,
+      mIfLwHardwareId,
+      mIfLwHardwareRevision,
+      mIfLwTemperature,
+      mIfLwApInfoApAddress,
+      mIfLwApInfoIpAddress,
+      mIfLwApInfoConnectedTime,
+      mIfLwApInfoRssi,
+      mIfLwApInfoSnr,
+      mIfLwApInfoMod,
+      mIfLwMacStatsTxSuccess,
+      mIfLwMacStatsTxQueueFull,
+      mIfLwMacStatsTxError,
+      mIfLwMacStatsTxRetry,
+      mIfLwMacStatsRxSuccess,
+      mIfLwMacStatsRxError,
+      mIfLwModemStatsTxSuccess,
+      mIfLwModemStatsTxError,
+      mIfLwModemStatsRxSuccess,
+      mIfLwModemStatsRxError, 
+	  mIfLwLastRssi,
+	  mIfLwLastSnr,
+	  mIfLwLastMod,
+	  mIfLwLastRate,
+	  mIfLwActiveNic
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        common LW interface status."
+    ::= { mdsIfLwMIBGroups 1 }
+
+mIfLwStatusConnRemGroup OBJECT-GROUP
+    OBJECTS {
+      mIfLwStatusConnRemAddress,
+      mIfLwStatusConnRemIpAddress,
+      mIfLwStatusConnRemTimeToLive,
+      mIfLwStatusConnRemLinkStatus,
+      mIfLwStatusConnRemNicId,
+      mIfLwStatusConnRemRssi,
+      mIfLwStatusConnRemSnr,
+      mIfLwStatusConnRemMod,
+      mIfLwStatusConnRemStatsTxPackets,
+      mIfLwStatusConnRemStatsTxBytes,
+      mIfLwStatusConnRemStatsRxPackets,
+      mIfLwStatusConnRemStatsRxBytes,
+      mIfLwStatusConnRemStatsTxError,
+      mIfLwStatusConnRemStatsRxError,
+      mIfLwStatusConnRemStatsTxDrop,
+      mIfLwStatusConnRemStatsRxDrop,
+	  mIfLwStatusConnRemStatsGateway,
+	  mIfLwStatusConnRemStatsAllIp,
+	  mIfLwStatusConnRemStatsName,
+	  mIfLwStatusConnRemStatsAlarmed,
+	  mIfLwStatusConnRemStatsVersion,
+	  mIfLwStatusConnRemStatsTemp,
+	  mIfLwStatusConnRemStatsDwnRssi,
+	  mIfLwStatusConnRemStatsDwnSnr,
+	  mIfLwStatusConnRemStatsDwnMod
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        connected remotes status."
+    ::= { mdsIfLwMIBGroups 2 }
+
+mIfLwStatusEndpointGroup OBJECT-GROUP
+    OBJECTS {
+      mIfLwStatusEndpointAddress,
+      mIfLwStatusEndpointIpAddress,
+      mIfLwStatusEndpointTimeToLive,
+      mIfLwStatusEndpointRemAddress,
+      mIfLwStatusEndpointStatsTxPackets,
+      mIfLwStatusEndpointStatsTxBytes,
+      mIfLwStatusEndpointStatsRxPackets,
+      mIfLwStatusEndpointStatsRxBytes,
+      mIfLwStatusEndpointStatsTxError,
+      mIfLwStatusEndpointStatsRxError,
+      mIfLwStatusEndpointStatsTxDrop,
+      mIfLwStatusEndpointStatsRxDrop
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        endpoints status."
+    ::= { mdsIfLwMIBGroups 3 }
+
+END

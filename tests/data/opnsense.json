@@ -7,34 +7,17 @@
                     "sysObjectID": ".1.3.6.1.4.1.12325.1.1.2.1.1",
                     "sysDescr": "OPNsense OPNsense.7p.lan 18.1.1-a5575d7bd OPNsense FreeBSD 11.1-RELEASE-p6 amd64",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "opnsense",
-                    "type": "firewall",
-                    "serial": null,
-                    "icon": "opnsense.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.12325.1.1.2.1.1",
-                    "sysDescr": "OPNsense OPNsense.7p.lan 18.1.1-a5575d7bd OPNsense FreeBSD 11.1-RELEASE-p6 amd64",
-                    "sysContact": null,
                     "version": "18.1.1-a5575d7bd",
                     "hardware": "amd64",
                     "features": null,
                     "os": "opnsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "opnsense.png",
+                    "icon": "opnsense.svg",
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

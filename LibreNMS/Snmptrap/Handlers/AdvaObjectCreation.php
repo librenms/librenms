@@ -15,13 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Traps when Adva objects are created. This includes Remote User Login object,
  * Flow Creation object, and LAG Creation object.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart#kanren.net> & Neil Kahle <nkahle@kanren.net>
  */
@@ -45,7 +44,6 @@ class AdvaObjectCreation implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-
         if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
             $UserName = $trap->getOidData($trap_oid);
             Log::event("User object $UserName created", $device->device_id, 'trap', 2);

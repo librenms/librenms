@@ -2,8 +2,7 @@ os: logmaster
 text: LogMaster
 type: power
 icon: logmaster
-mib_dir:
-    - logmaster
+mib_dir: logmaster
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.935

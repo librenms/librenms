@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: The mib is used for VAP.
 -- Reference: 
--- Version: V1.10
+-- Version: V1.22
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.17
 		hwWlanVap MODULE-IDENTITY
-			LAST-UPDATED "201607071030Z"		                      -- July 7, 2016 at 10:30 GMT
+			LAST-UPDATED "202007081651Z"		                      -- Jul 08, 2020 at 16:51 GMT			
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -29,8 +29,66 @@
 				   Shenzhen 518129
 				   People's Republic of China
 				   Website: http://www.huawei.com
-				   Email: support@huawei.com
-				  "
+				   Email: support@huawei.com"
+			DESCRIPTION
+				"V1.22, Modify the nodes of  hwWlanVapAuthType and hwWlanNaviVapAuthType."
+				
+			REVISION "202007081651Z"		                      -- Jul 08, 2020 at 16:51 GMT 
+			DESCRIPTION 
+				"V1.21, Modify the nodes of  hwVapCreateFailReason and hwVapMaxNum about description."
+
+                                                          REVISION "202006161038Z"		                      -- Jun 16, 2020 at 10:38 GMT															 
+			DESCRIPTION 
+				"V1.21, Modify the nodes of  hwVapCreateFailReason and hwVapMaxNum about description."
+
+			REVISION "202006121000Z"		                      -- Jun 12, 2020 at 10:00 GMT															 
+			DESCRIPTION 
+				"V1.20, Modify the nodes of  hwVapIGMPSnoopingBandwidthExceedTrap, hwVapCreateFailTrapRestore and hwVapIGMPSnoopingUserExceedTrap about description."
+
+			REVISION "202006101054Z"		                      -- Jun 10, 2020 at 10:54 GMT															 
+			DESCRIPTION 
+				"V1.19, Modify the nodes of  hwVapNumExceedSpecTrap and hwVapCreateFailTrap about description."
+
+			REVISION "201909201530Z"		                      -- Sep 20, 2019 at 15:30 GMT																 
+			DESCRIPTION 
+				"V1.18, Add the nodes of  hwVapNumExceedCardSpecTrap and hwVapNumExceedCardSpecTrapRestore."
+
+			REVISION "201909201530Z"		                      -- Sep 20, 2019 at 15:30 GMT																 
+			DESCRIPTION 
+				"V1.17, Modify the nodes of  hwWlanVapAuthType and hwWlanNaviVapAuthType."
+
+			REVISION "201901081135Z"		                      -- Jan 8, 2019 at 11:35 GMT
+
+			DESCRIPTION 
+				"V1.16, Add node hwVapCreateFailReason, hwVapCreateFailTrap and hwVapCreateFailTrapRestore."
+			REVISION "201812102135Z"		                      -- Dec 10, 2018 at 21:35 GMT
+			
+			DESCRIPTION 
+				"
+				V1.15, Modify the nodes of  hwWlanNaviVapState
+				"				
+			REVISION "201812041005Z"		                      -- Dec 04, 2018 at 10:05 GMT	
+		                   DESCRIPTION 
+				"
+				V1.14, Modify the nodes of  hwWlanVapAuthType and hwWlanNaviVapAuthType.
+				"				
+			REVISION "201810232205Z"		                      -- Oct 23, 2018 at 22:05 GMT		
+
+	                                      DESCRIPTION 
+				"
+				V1.13, Modify the nodes of  hwWlanNaviVapACID and hwWlanNaviVapWlanId.
+				"				
+			REVISION "201809061030Z"		                      -- Sep 06, 2018 at 10:30 GMT	
+                                                          DESCRIPTION 
+				"
+				V1.12, Add the tables hwWlanNaviAcVapInfoTable and hwWlanNaviVapCreateFailTable.
+				"				
+			REVISION "201809011530Z"		                      -- Sep 01, 2018 at 15:30 GMT
+			DESCRIPTION 
+				"
+				V1.11, Modify node hwWlanVapAuthType.
+				"				
+			REVISION "201712101730Z"		                      -- Dec 10, 2017 at 17:30 GMT
 			DESCRIPTION 
 				"The MIB module defines the VAP operation."
 			REVISION "201607071030Z"		                      -- July 7, 2016 at 10:30 GMT
@@ -227,7 +285,41 @@
 				wpaWpa2PskMac(20),
 				wpaWpa2PskPortal(21),
 				wpaWpa2Dot1x(22),
-				wapiPskPortal(23)
+				wapiPskPortal(23),
+				wepOpenSystem8021XMac(24),
+				wepShareKey8021XMac(25),
+				wpa8021XMac(26),
+				wpa2Dot1xMac(27),
+				wpaWpa2Dot1xMac(28),
+				wepOpenSystemPortalMac(29),
+				wepShareKeyPortalMac(30),
+				wpaPskPortalMac(31),
+				wpa2PskPortalMac(32),
+				wpaWpa2PskPortalMac(33),
+				wapiPskPortalMac(34),
+			   	wpaPpsk(35),
+			   	wpaPpskMac(36),
+			   	wpaPpskPortal(37),
+			   	wpaPpskPortalMac(38),
+			    	wpa2Ppsk(39),
+			    	wpa2PpskMac(40),
+			    	wpa2PpskPortal(41),
+			   	wpa2PpskPortalMac(42),
+			    	wpaWpa2Ppsk(43),
+			    	wpaWpa2PpskMac(44),
+			    	wpaWpa2PpskPortal(45),
+			    	wpaWpa2PpskPortalMac(46),
+				wep8021X(47),
+				wpa3Dot1x(48),
+				wpa3Dot1xMac(49),
+				wpa3Sae(50),
+				wpa3SaePortal(51),
+				wpa3SaeMac(52),
+				wpa3SaePortalMac(53),
+				wpa2PskWpa3Sae(54),
+				wpa2PskWpa3SaePortal(55),
+				wpa2PskWpa3SaePortalMac(56),
+				wpa2PskWpa3SaeMac(57)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -944,6 +1036,334 @@
 				"This object indicates the VAP IGMP snooping max user number."
 			::= { hwWlanVapIGMPSnoopingCacInfoEntry 8 }
 
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6
+		hwWlanNaviAcVapInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanNaviAcVapInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to query VAP information of Navigation AC."
+			::= { hwWlanVapObjects 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1
+		hwWlanNaviAcVapInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanNaviAcVapInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanNaviVapACID, hwWlanNaviVapWlanId"
+			INDEX { hwWlanNaviVapACID, hwWlanNaviVapWlanId }
+			::= { hwWlanNaviAcVapInfoTable 1 }
+
+		
+		HwWlanNaviAcVapInfoEntry ::=
+			SEQUENCE { 
+				hwWlanNaviVapACID
+					Unsigned32,
+				hwWlanNaviVapACIPv4
+					IpAddress,
+				hwWlanNaviVapACIPv6
+					OCTET STRING,
+				hwWlanNaviVapACMac
+					MacAddress,
+				hwWlanNaviVapWlanId
+					Unsigned32,
+				hwWlanNaviVapState
+					INTEGER,
+				hwWlanNaviVapAuthType
+					INTEGER,
+				hwWlanNaviVapStaNum
+					Unsigned32,
+				hwWlanNaviVapSSID
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.1
+		hwWlanNaviVapACID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AC index"
+			::= { hwWlanNaviAcVapInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.2
+		hwWlanNaviVapACIPv4 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates theIPv4 address of local AC"
+			::= { hwWlanNaviAcVapInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.3
+		hwWlanNaviVapACIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IPv6 address of local AC"
+			::= { hwWlanNaviAcVapInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.4
+		hwWlanNaviVapACMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of local AC"
+			::= { hwWlanNaviAcVapInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.5
+		hwWlanNaviVapWlanId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Wlan index"
+			::= { hwWlanNaviAcVapInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.6
+		hwWlanNaviVapState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP state"
+			::= { hwWlanNaviAcVapInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.7
+		hwWlanNaviVapAuthType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				wepOpenSystem(1),
+				wepOpenSystemMac(2),
+				wepOpenSystem8021X(3),
+				wepOpenSystemPortal(4),
+				wepShareKey(5),
+				wepShareKeyMac(6),
+				wepShareKey8021X(7),
+				wepShareKeyPortal(8),
+				wpa8021X(9),
+				wpaPreShareKey(10),
+				wpaPskMac(11),
+				wpaPskPortal(12),
+				wpa2Dot1x(13),
+				wpa2PreShareKey(14),
+				wpa2PskMac(15),
+				wpa2PskPortal(16),
+				wapiCertification(17),
+				wapiPreShareKey(18),
+				wpaWpa2PreShareKey(19),
+				wpaWpa2PskMac(20),
+				wpaWpa2PskPortal(21),
+				wpaWpa2Dot1x(22),
+				wapiPskPortal(23),
+				wepOpenSystem8021XMac(24),
+				wepShareKey8021XMac(25),
+				wpa8021XMac(26),
+				wpa2Dot1xMac(27),
+				wpaWpa2Dot1xMac(28),
+				wepOpenSystemPortalMac(29),
+				wepShareKeyPortalMac(30),
+				wpaPskPortalMac(31),
+				wpa2PskPortalMac(32),
+				wpaWpa2PskPortalMac(33),
+				wapiPskPortalMac(34),
+			   	wpaPpsk(35),
+			   	wpaPpskMac(36),
+			   	wpaPpskPortal(37),
+			   	wpaPpskPortalMac(38),
+			    	wpa2Ppsk(39),
+			    	wpa2PpskMac(40),
+			    	wpa2PpskPortal(41),
+			   	wpa2PpskPortalMac(42),
+			    	wpaWpa2Ppsk(43),
+			    	wpaWpa2PpskMac(44),
+			    	wpaWpa2PpskPortal(45),
+			    	wpaWpa2PpskPortalMac(46),
+				wep8021X(47),
+				wpa3Dot1x(48),
+				wpa3Dot1xMac(49),
+				wpa3Sae(50),
+				wpa3SaePortal(51),
+				wpa3SaeMac(52),
+				wpa3SaePortalMac(53),
+				wpa2PskWpa3Sae(54),
+				wpa2PskWpa3SaePortal(55),
+				wpa2PskWpa3SaePortalMac(56),
+				wpa2PskWpa3SaeMac(57)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP authentication type"
+			::= { hwWlanNaviAcVapInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.8
+		hwWlanNaviVapStaNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP station number"
+			::= { hwWlanNaviAcVapInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.6.1.9
+		hwWlanNaviVapSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP  SSID name"
+			::= { hwWlanNaviAcVapInfoEntry 9 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7
+		hwWlanNaviVapCreateFailTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanNaviVapCreateFailEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to query VAP create fail information of Navigation AC."
+			::= { hwWlanVapObjects 7 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1
+		hwWlanNaviVapCreateFailEntry OBJECT-TYPE
+			SYNTAX HwWlanNaviVapCreateFailEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanNaviVapCreateFailACID, hwWlanNaviVapCreateFailWlanId"
+			INDEX { hwWlanNaviVapCreateFailACID, hwWlanNaviVapCreateFailWlanId }
+			::= { hwWlanNaviVapCreateFailTable 1 }
+
+		
+		HwWlanNaviVapCreateFailEntry ::=
+			SEQUENCE { 
+				hwWlanNaviVapCreateFailACID
+					Unsigned32,
+				hwWlanNaviVapCreateFailIPv4
+					IpAddress,
+				hwWlanNaviVapCreateFailIPv6
+					OCTET STRING,
+				hwWlanNaviVapCreateFailACMac
+					MacAddress,
+				hwWlanNaviVapCreateFailWlanId
+					Unsigned32,
+				hwWlanNaviVapCreateFailVapProfile
+					OCTET STRING,
+				hwWlanNaviVapCreateFailTime
+					OCTET STRING,
+				hwWlanNaviVapCreateFailReason
+					OCTET STRING
+			 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.1
+		hwWlanNaviVapCreateFailACID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AC index"
+			::= { hwWlanNaviVapCreateFailEntry 1 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.2
+		hwWlanNaviVapCreateFailIPv4 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IPv4 address of local AC"
+			::= { hwWlanNaviVapCreateFailEntry 2 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.3
+		hwWlanNaviVapCreateFailIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IPv6 address of local AC"
+			::= { hwWlanNaviVapCreateFailEntry 3 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.4
+		hwWlanNaviVapCreateFailACMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of local AC"
+			::= { hwWlanNaviVapCreateFailEntry 4 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.5
+		hwWlanNaviVapCreateFailWlanId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the wlan index"
+			::= { hwWlanNaviVapCreateFailEntry 5 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.6
+		hwWlanNaviVapCreateFailVapProfile OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP profile name"
+			::= { hwWlanNaviVapCreateFailEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.7
+		hwWlanNaviVapCreateFailTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last time which the failed be created"
+			::= { hwWlanNaviVapCreateFailEntry 7 }
+
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.7.1.8
+		hwWlanNaviVapCreateFailReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the failed reason"
+			::= { hwWlanNaviVapCreateFailEntry 8 }
+			
+
+
 		-- 1.3.6.1.4.1.2011.6.139.17.2
 		hwWlanVapTrapInfo OBJECT IDENTIFIER ::= { hwWlanVap 2 }
 		
@@ -955,7 +1375,7 @@
 			OBJECTS { hwVapMaxNum }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The number of VAP instances exceeds the maximum specifications of the system."
 			::= { hwWlanVapTrap 1 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.17.2.1.2
@@ -964,7 +1384,7 @@
 				hwWlanVapApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The multicast bandwidth of a VAP exceeds the threshold."
 			::= { hwWlanVapTrap 2 }
 
 		-- 1.3.6.1.4.1.2011.6.139.17.2.1.3
@@ -973,8 +1393,40 @@
 				hwWlanVapApId }
 			STATUS current
 			DESCRIPTION 
-				"Description."
+				"The number of multicast group memberships on a VAP exceeds the threshold."
 			::= { hwWlanVapTrap 3 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.4
+		hwVapCreateFailTrap NOTIFICATION-TYPE
+			OBJECTS { hwVapCreateFailReason }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a VAP fails to be created."
+			::= { hwWlanVapTrap 4 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.5
+		hwVapCreateFailTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwVapCreateFailReason }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the VAP creation failure alarm is cleared."
+			::= { hwWlanVapTrap 5 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.6
+		hwVapNumExceedCardSpecTrap NOTIFICATION-TYPE
+			OBJECTS { hwVapSlot, hwVapMaxNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of VAP on the card reaches the maximum specifications."
+			::= { hwWlanVapTrap 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.7
+		hwVapNumExceedCardSpecTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwVapSlot, hwVapMaxNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of VAP on the card is less than the maximum specifications."
+			::= { hwWlanVapTrap 7 }
 
 		-- 1.3.6.1.4.1.2011.6.139.17.2.2
 		hwWlanVapTrapObjects OBJECT IDENTIFIER ::= { hwWlanVapTrapInfo 2 }
@@ -985,7 +1437,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Maximum number of VAPs allowed."
 			::= { hwWlanVapTrapObjects 1 }
 
 		-- 1.3.6.1.4.1.2011.6.139.17.2.2.2
@@ -1005,6 +1457,24 @@
 			DESCRIPTION
 				"Description."
 			::= { hwWlanVapTrapObjects 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2.4
+		hwVapCreateFailReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the reason for a VAP creation failure."
+			::= { hwWlanVapTrapObjects 4 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2.5
+		hwVapSlot OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot"
+			::= { hwWlanVapTrapObjects 5 }
 
 		-- 1.3.6.1.4.1.2011.6.139.17.3
 		hwWlanVapConformance OBJECT IDENTIFIER ::= { hwWlanVap 3 }
@@ -1064,3 +1534,10 @@
 --
 -- HUAWEI-WLAN-VAP-MIB.mib
 --
+
+
+
+
+
+
+

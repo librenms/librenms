@@ -15,20 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $no_refresh = true;
-$pagetitle[] = "Capture";
+$pagetitle[] = 'Capture';
 
-
-if (!Auth::user()->hasGlobalAdmin()) {
-    print_error("Insufficient Privileges");
+if (! Auth::user()->hasGlobalAdmin()) {
+    print_error('Insufficient Privileges');
 } else {
     ?>
     <h2>Capture Debug Information</h2>
@@ -40,16 +37,16 @@ if (!Auth::user()->hasGlobalAdmin()) {
     </ul>
     <div class="tab-content">
     <?php
-    $tabs = array(
-        'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname='.$device['hostname'],
-        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname='.$device['hostname'],
-        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname='.$device['hostname'],
-        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname='.$device['hostname'],
-    );
+    $tabs = [
+        'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname=' . $device['hostname'],
+        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname=' . $device['hostname'],
+        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname=' . $device['hostname'],
+        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname=' . $device['hostname'],
+    ];
 
     foreach ($tabs as $tab => $url) {
         ?>
-        <div id="<?php echo $tab ?>" class="tab-pane fade <?php echo ($tab == 'discovery' ? ' in active' : '') ?>">
+        <div id="<?php echo $tab ?>" class="tab-pane fade <?php echo $tab == 'discovery' ? ' in active' : '' ?>">
         <div class="row"><div class="col-md-12">
         <div class="btn-toolbar" role="toolbar" style="margin:5px 0 5px 0">
         <button type="button" class="btn btn-success" id="run-<?php echo $tab ?>"><i class="fa fa-play fa-lg"></i> Run</button>

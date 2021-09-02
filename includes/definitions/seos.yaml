@@ -2,8 +2,7 @@ os: seos
 text: 'Redback Networks SmartEdge'
 type: network
 icon: ericsson
-mib_dir:
-    - ericsson
+mib_dir: ericsson
 discovery:
     -
         sysObjectID:

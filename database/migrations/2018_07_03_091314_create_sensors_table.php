@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateSensorsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -32,7 +31,7 @@ class CreateSensorsTable extends Migration
             $table->double('sensor_limit_low')->nullable();
             $table->double('sensor_limit_low_warn')->nullable();
             $table->boolean('sensor_alert')->default(1);
-            $table->enum('sensor_custom', array('No','Yes'))->default('No');
+            $table->enum('sensor_custom', ['No', 'Yes'])->default('No');
             $table->string('entPhysicalIndex', 16)->nullable();
             $table->string('entPhysicalIndex_measured', 16)->nullable();
             if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {

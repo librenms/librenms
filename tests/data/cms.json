@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.41036",
                     "sysDescr": "Corero CMS SNMP agent",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "cms",
-                    "type": "appliance",
-                    "serial": null,
-                    "icon": "corero.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.41036",
-                    "sysDescr": "Corero CMS SNMP agent",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

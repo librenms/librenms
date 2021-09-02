@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -48,13 +47,15 @@ trait ActiveDirectoryCommon
         }
         $revLevel = hexdec(substr($sidHex, 0, 2));
         $authIdent = hexdec(substr($sidHex, 4, 12));
-        return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
+
+        return 'S-' . $revLevel . '-' . $authIdent . '-' . implode('-', $subAuths);
     }
 
     protected function getCn($dn)
     {
         $dn = str_replace('\\,', '~C0mmA~', $dn);
         preg_match('/[^,]*/', $dn, $matches, PREG_OFFSET_CAPTURE, 3);
+
         return str_replace('~C0mmA~', ',', $matches[0][0]);
     }
 
@@ -124,7 +125,7 @@ trait ActiveDirectoryCommon
 
     public function getGroupList()
     {
-        $ldap_groups   = array();
+        $ldap_groups = [];
 
         // show all Active Directory Users by default
         $default_group = 'Users';
@@ -135,7 +136,7 @@ trait ActiveDirectoryCommon
             }
         }
 
-        if (!Config::has('auth_ad_groups') && !Config::has('auth_ad_group')) {
+        if (! Config::has('auth_ad_groups') && ! Config::has('auth_ad_group')) {
             $ldap_groups[] = $this->getDn($default_group);
         }
 
@@ -150,15 +151,15 @@ trait ActiveDirectoryCommon
     {
         $connection = $this->getConnection();
 
-        $userlist = array();
+        $userlist = [];
         $ldap_groups = $this->getGroupList();
 
         foreach ($ldap_groups as $ldap_group) {
             $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
             if (Config::get('auth_ad_user_filter')) {
-                $search_filter = "(&" . Config::get('auth_ad_user_filter') . $search_filter .")";
+                $search_filter = '(&' . Config::get('auth_ad_user_filter') . $search_filter . ')';
             }
-            $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
+            $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
             $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
             $results = ldap_get_entries($connection, $search);
 
@@ -177,12 +178,12 @@ trait ActiveDirectoryCommon
      * Must have the attributes: objectsid, samaccountname, displayname, mail
      * @internal
      *
-     * @param $entry
+     * @param array $entry
      * @return array
      */
     protected function userFromAd($entry)
     {
-        return array(
+        return [
             'user_id' => $this->getUseridFromSid($this->sidFromLdap($entry['objectsid'][0])),
             'username' => $entry['samaccountname'][0],
             'realname' => $entry['displayname'][0],
@@ -190,7 +191,7 @@ trait ActiveDirectoryCommon
             'descr' => '',
             'level' => $this->getUserlevel($entry['samaccountname'][0]),
             'can_modify_passwd' => 0,
-        );
+        ];
     }
 
     public function getUser($user_id)
@@ -199,7 +200,7 @@ trait ActiveDirectoryCommon
         $domain_sid = $this->getDomainSid();
 
         $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
-        $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
+        $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
         $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
         $entry = ldap_get_entries($connection, $search);
 
@@ -207,7 +208,7 @@ trait ActiveDirectoryCommon
             return $this->userFromAd($entry[0]);
         }
 
-        return array();
+        return [];
     }
 
     protected function getDomainSid()
@@ -221,9 +222,10 @@ trait ActiveDirectoryCommon
             $connection,
             $dn_candidate,
             '(objectClass=*)',
-            array('objectsid')
+            ['objectsid']
         );
         $entry = ldap_get_entries($connection, $search);
+
         return substr($this->sidFromLdap($entry[0]['objectsid'][0]), 0, 41);
     }
 

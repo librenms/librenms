@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePortsVlansTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,7 @@ class CreatePortsVlansTable extends Migration
             $table->string('state', 16);
             $table->integer('cost');
             $table->boolean('untagged')->default(0);
-            $table->unique(['device_id','port_id','vlan']);
+            $table->unique(['device_id', 'port_id', 'vlan']);
         });
     }
 

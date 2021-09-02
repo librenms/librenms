@@ -11,6 +11,7 @@ class PollerGroupController extends Controller
     {
         if ($request->user()->isAdmin()) {
             $pollergroup->delete();
+
             return response()->json(['status' => 'success']);
         } else {
             return response()->json(['status' => 'failure']);

@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Location;
-use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Time;
 
@@ -14,7 +14,7 @@ echo "<div class='row'>
 
 if (Config::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
-    echo Config::get('overview_show_sysDescr', true) ? $device['sysDescr'] : 'System';
+    echo Config::get('overview_show_sysDescr', true) ? Clean::html($device['sysDescr'], []) : 'System';
     echo '</strong>';
 }
 
@@ -24,24 +24,24 @@ echo '<script src="js/leaflet.js"></script>';
 echo '<script src="js/L.Control.Locate.min.js"></script>';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    formatCiscoHardware($device);
+    \LibreNMS\Util\Rewrite::ciscoHardware($device, false);
 }
 
 if ($device['features']) {
-    $device['features'] = '('.$device['features'].')';
+    $device['features'] = '(' . $device['features'] . ')';
 }
 
 $device['os_text'] = Config::getOsSetting($device['os'], 'text');
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
-        <div class="col-sm-8">'.$device['sysName'].' </div>
+        <div class="col-sm-8">' . Clean::html($device['sysName'], []) . ' </div>
       </div>';
 
-if (!empty($device['overwrite_ip'])) {
-     echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>{$device['overwrite_ip']}</div></div>";
-} elseif (!empty($device['ip'])) {
-     echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
+if (! empty($device['overwrite_ip'])) {
+    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>{$device['overwrite_ip']}</div></div>";
+} elseif (! empty($device['ip'])) {
+    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
 } elseif (Config::get('force_ip_to_sysname') === true) {
     try {
         $ip = IP::parse($device['hostname']);
@@ -54,33 +54,33 @@ if (!empty($device['overwrite_ip'])) {
 if ($device['purpose']) {
     echo '<div class="row">
         <div class="col-sm-4">Description</div>
-        <div class="col-sm-8">'.display($device['purpose']).'</div>
+        <div class="col-sm-8">' . Clean::html($device['purpose'], []) . '</div>
       </div>';
 }
 
 if ($device['hardware']) {
     echo '<div class="row">
         <div class="col-sm-4">Hardware</div>
-        <div class="col-sm-8">'.$device['hardware'].'</div>
+        <div class="col-sm-8">' . Clean::html($device['hardware'], []) . '</div>
       </div>';
 }
 
 echo '<div class="row">
         <div class="col-sm-4 text-nowrap">Operating System</div>
-        <div class="col-sm-8">'.$device['os_text'].' '.$device['version'].' '.$device['features'].' </div>
+        <div class="col-sm-8">' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </div>
       </div>';
 
 if ($device['serial']) {
     echo '<div class="row">
         <div class="col-sm-4">Serial</div>
-        <div class="col-sm-8">'.$device['serial'].'</div>
+        <div class="col-sm-8">' . Clean::html($device['serial'], []) . '</div>
       </div>';
 }
 
 if ($device['sysObjectID']) {
     echo '<div class="row">
         <div class="col-sm-4">Object ID</div>
-        <div class="col-sm-8">'.$device['sysObjectID'].'</div>
+        <div class="col-sm-8">' . Clean::html($device['sysObjectID'], []) . '</div>
       </div>';
 }
 
@@ -89,26 +89,26 @@ if ($device['sysContact']) {
         <div class="col-sm-4">Contact</div>';
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '
-        <div class="col-sm-8">'.htmlspecialchars(get_dev_attrib($device, 'override_sysContact_string')).'</div>
+        <div class="col-sm-8">' . Clean::html(get_dev_attrib($device, 'override_sysContact_string')) . '</div>
       </div>
       <div class="row">
         <div class="col-sm-4">SNMP Contact</div>';
     }
 
     echo '
-        <div class="col-sm-8">'.htmlspecialchars($device['sysContact']).'</div>
+        <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
       </div>';
 }
 
-if (!empty($device['inserted']) && preg_match("/^0/", $device['inserted']) == 0) {
-    $inserted_text = "Device Added";
-    $inserted = (Time::formatInterval(time() - strtotime($device['inserted'])) . " ago");
+if (! empty($device['inserted']) && preg_match('/^0/', $device['inserted']) == 0) {
+    $inserted_text = 'Device Added';
+    $inserted = (Time::formatInterval(time() - strtotime($device['inserted'])) . ' ago');
     echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
 }
 
-if (!empty($device['last_discovered'])) {
-    $last_discovered_text = "Last Discovered";
-    $last_discovered = (empty($device['last_discovered']) ? "Never" : Time::formatInterval(time() - strtotime($device['last_discovered'])) . " ago");
+if (! empty($device['last_discovered'])) {
+    $last_discovered_text = 'Last Discovered';
+    $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(time() - strtotime($device['last_discovered'])) . ' ago');
     echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
 }
 
@@ -130,7 +130,7 @@ if ($device['location_id']) {
     echo '
     <div class="row">
         <div class="col-sm-4">Location</div>
-        <div class="col-sm-8">' . $location->location . '</div>
+        <div class="col-sm-8">' . Clean::html($location->display(), []) . '</div>
     </div>
     <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
         <div class="col-sm-4">Lat / Lng</div>
@@ -148,8 +148,8 @@ if ($device['location_id']) {
         var device_marker, device_location, device_map;
         $("#toggle-map").on("shown.bs.collapse", function () {
             if (device_marker == null) {
-                device_location = new L.LatLng(' . (float)$location->lat . ', ' . (float)$location->lng . ');
-                config = {"tile_url": "'.Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org').'"};
+                device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
+                config = {"tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '"};
                 device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
                 device_marker = init_map_marker(device_map, device_location);
                 device_map.setZoom(18);

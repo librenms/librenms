@@ -15,13 +15,13 @@
 $enabled = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'");
 if ($enabled == 1) {
     if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") == '') {
-        dbInsert(array('name' => 'uuid', 'value' => guidv4(openssl_random_pseudo_bytes(16))), 'callback');
+        dbInsert(['name' => 'uuid', 'value' => guidv4(openssl_random_pseudo_bytes(16))], 'callback');
     }
 
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
     $version = version_info();
-    $queries = array(
+    $queries = [
         'alert_rules'     => 'SELECT COUNT(*) AS `total`,`severity` FROM `alert_rules` WHERE `disabled`=0 GROUP BY `severity`',
         'alert_templates' => 'SELECT COUNT(*) AS `total` FROM `alert_templates`',
         'api_tokens'      => 'SELECT COUNT(*) AS `total` FROM `api_tokens` WHERE `disabled`=0',
@@ -55,25 +55,25 @@ if ($enabled == 1) {
         'processors'      => 'SELECT COUNT(*) AS `total`,`processor_type` FROM `processors` GROUP BY `processor_type`',
         'pseudowires'     => 'SELECT COUNT(*) AS `total` FROM `pseudowires`',
         'sensors'         => 'SELECT COUNT(*) AS `total`,`sensor_class` FROM `sensors` GROUP BY `sensor_class`',
+        'sla'             => 'SELECT COUNT(*) AS `total`,`rtt_type` FROM `slas` GROUP BY `rtt_type`',
         'wireless'        => 'SELECT COUNT(*) AS `total`,`sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`',
         'storage'         => 'SELECT COUNT(*) AS `total`,`storage_type` FROM `storage` GROUP BY `storage_type`',
-        'toner'           => 'SELECT COUNT(*) AS `total`,`toner_type` FROM `toner` GROUP BY `toner_type`',
+        'toner'           => 'SELECT COUNT(*) AS `total`,`supply_type` FROM `printer_supplies` GROUP BY `supply_type`',
         'vlans'           => 'SELECT COUNT(*) AS `total`,`vlan_type` FROM `vlans` GROUP BY `vlan_type`',
         'vminfo'          => 'SELECT COUNT(*) AS `total`,`vm_type` FROM `vminfo` GROUP BY `vm_type`',
         'vmware'          => 'SELECT COUNT(*) AS `total` FROM `vminfo`',
         'vrfs'            => 'SELECT COUNT(*) AS `total` FROM `vrfs`',
         'mysql_version'   => 'SELECT 1 AS `total`, @@version AS `version`',
-    );
-
+    ];
 
     foreach ($queries as $name => $query) {
-        $data            = dbFetchRows($query);
+        $data = dbFetchRows($query);
         $response[$name] = $data;
     }
-    $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
-    $response['python_version'][]      = ['total' => 1, 'version' => $version['python_ver']];
-    $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
-    $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
+    $response['php_version'][] = ['total' => 1, 'version' => $version['php_ver']];
+    $response['python_version'][] = ['total' => 1, 'version' => $version['python_ver']];
+    $response['rrdtool_version'][] = ['total' => 1, 'version' => $version['rrdtool_ver']];
+    $response['netsnmp_version'][] = ['total' => 1, 'version' => $version['netsnmp_ver']];
 
     // collect sysDescr and sysObjectID for submission
     $device_info = dbFetchRows('SELECT COUNT(*) AS `count`,`os`, `sysDescr`, `sysObjectID` FROM `devices`
@@ -83,12 +83,12 @@ if ($enabled == 1) {
     $device_info = array_map(function ($entry) {
         // remove hostnames from linux, macosx, and SunOS
         $entry['sysDescr'] = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function ($matches) {
-            return $matches[1] . 'hostname ' .$matches[2];
+            return $matches[1] . 'hostname ' . $matches[2];
         }, $entry['sysDescr']);
 
         // wipe serial numbers, preserve the format
-        $sn_patterns = array('/[A-Z]/', '/[a-z]/', '/[0-9]/');
-        $sn_replacements = array('A', 'a', '0');
+        $sn_patterns = ['/[A-Z]/', '/[a-z]/', '/[0-9]/'];
+        $sn_replacements = ['A', 'a', '0'];
         $entry['sysDescr'] = preg_replace_callback(
             '/((s\/?n|serial num(ber)?)[:=]? ?)([a-z0-9.\-]{4,16})/i',
             function ($matches) use ($sn_patterns, $sn_replacements) {
@@ -100,17 +100,17 @@ if ($enabled == 1) {
         return $entry;
     }, $device_info);
 
-    $output = array(
+    $output = [
         'uuid' => $uuid,
         'data' => $response,
         'info' => $device_info,
-    );
-    $data   = json_encode($output);
-    $submit = array('data' => $data);
+    ];
+    $data = json_encode($output);
+    $submit = ['data' => $data];
 
     $fields = '';
     foreach ($submit as $key => $value) {
-        $fields .= $key.'='.$value.'&';
+        $fields .= $key . '=' . $value . '&';
     }
 
     rtrim($fields, '&');
@@ -123,7 +123,7 @@ if ($enabled == 1) {
     curl_setopt($post, CURLOPT_RETURNTRANSFER, 1);
     $result = curl_exec($post);
 } elseif ($enabled == 2) {
-    $uuid   = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
+    $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
     $fields = "uuid=$uuid";
 
     $clear = curl_init();
@@ -133,6 +133,6 @@ if ($enabled == 1) {
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($clear, CURLOPT_RETURNTRANSFER, 1);
     $result = curl_exec($clear);
-    dbDelete('callback', '`name`="uuid"', array());
-    dbUpdate(array('value' => '0'), 'callback', '`name` = "enabled"', array());
+    dbDelete('callback', '`name`="uuid"', []);
+    dbUpdate(['value' => '0'], 'callback', '`name` = "enabled"', []);
 }

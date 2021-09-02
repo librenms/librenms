@@ -17,7 +17,7 @@ $pagetitle[] = 'Oxidized';
         <ul class="nav nav-tabs">
             <li class="active"><a href="#list" data-toggle="tab">Node List</a></li>
             <li><a href="#search" data-toggle="tab">Config Search</a></li>
-            <li><a href="<?php echo generate_url(array('page' => 'tools', 'tool' => 'oxidized-cfg-check')); ?>">Oxidized config validation</a></li>
+            <li><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'tools', 'tool' => 'oxidized-cfg-check']); ?>">Oxidized config validation</a></li>
         </ul>
     </div>
     <div class="panel with-nav-tabs panel-default">
@@ -30,7 +30,7 @@ $pagetitle[] = 'Oxidized';
                             <tr>
                                 <th data-column-id="id" data-visible="false">ID</th>
                                 <th data-column-id="hostname" data-formatter="hostname" data-order="asc">Hostname</th>
-                                <th data-column-id="sysname" data-visible=" <?php echo (!Config::get('force_ip_to_sysname')  ? 'true' : 'false') ?>">SysName</th>
+                                <th data-column-id="sysname" data-visible=" <?php echo ! Config::get('force_ip_to_sysname') ? 'true' : 'false' ?>">SysName</th>
                                 <th data-column-id="last_status" data-formatter="status">Last Status</th>
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
@@ -39,7 +39,7 @@ $pagetitle[] = 'Oxidized';
                             </tr>
                             </thead>
                             <tbody>
-                            <?php get_oxidized_nodes_list();?>
+                            <?php get_oxidized_nodes_list(); ?>
                             </tbody>
                         </table>
                     </div>
@@ -78,21 +78,21 @@ $pagetitle[] = 'Oxidized';
                         <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div>\
                     </div></div>'
             },
-        rowCount: [50, 100, 250, -1],                
+        rowCount: [50, 100, 250, -1],
         formatters: {
             "hostname": function(column, row) {
                 if (row.id) {
-                    return '<a href="/device/device=' + row.id + '">' + row.hostname + '</a>';
+                    return '<a href="<?= url('device') ?>/' + row.id + '">' + row.hostname + '</a>';
                 } else {
                     return row.hostname;
                 }
             },
             "actions": function(column, row) {
                 if (row.id) {
-                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id + 
+                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id +
                             '" id="btn-refresh-node-devId' + row.id + '" onclick="refresh_oxidized_node(\'' + row.hostname + '\');" title="Refetch config">' +
                             '<i class="fa fa-refresh"></i></button> ' +
-                            '<a href="device/device=' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
+                            '<a href="<?= url('device') ?>/' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
                 }
             },
             "status": function(column, row) {
@@ -101,7 +101,7 @@ $pagetitle[] = 'Oxidized';
             }
         }
     });
-    
+
     $("[name='btn-search']").on('click', function (event) {
         event.preventDefault();
         var $this = $(this);
@@ -121,7 +121,7 @@ $pagetitle[] = 'Oxidized';
                     $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
                         if (value['dev_id']) {
-                            $('#search-output').append('<p><a href="device/device=' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
+                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
                         } else {
                             $('#search-output').append('<p>' + value['full_name'] + '</p>');
                         }

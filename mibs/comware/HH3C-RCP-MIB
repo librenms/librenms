@@ -1,0 +1,377 @@
+-- =================================================================
+-- Copyright (C) 2006 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Private MIB for RCP information
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2006-09-20, Created by ChaiYongfu
+-- =================================================================
+HH3C-RCP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cRCP
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB;
+
+hh3cRCPMIB MODULE-IDENTITY
+    LAST-UPDATED "200609200000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The MIB module is used for managing RCP protocol server."
+    REVISION "200609200000Z"
+    DESCRIPTION
+        "The Initial Version of hh3cRCPMIB."
+    ::= { hh3cRCP 1 }
+
+hh3cRCPLeaf OBJECT IDENTIFIER ::= { hh3cRCPMIB 1 }
+
+hh3cRCPServerEnableStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute controls the system wide operation of RCP server.
+        The value TRUE means that the RCP server is enabled.
+        The value FALSE means that the RCP server is disabled."
+    ::= { hh3cRCPLeaf 1 }
+
+hh3cRCPConnTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum time in seconds that a RCP client connection
+        is idle."
+    ::= { hh3cRCPLeaf 2 }
+
+hh3cRCPRuleTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the time in seconds before a RCP rule is aged out.
+        If its value is 0, it indicates RCP rule will not be aged out."
+    ::= { hh3cRCPLeaf 3 }
+
+hh3cRCPServerMaxConn OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum number of clients that permitted to connect with
+        RCP server at the same time."
+    ::= { hh3cRCPLeaf 4 }
+
+hh3cRCPServerCurConn OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current actual number of clients that connecting with RCP server."
+    ::= { hh3cRCPLeaf 5 }
+
+hh3cRCPConnTimeoutMaxValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum value of hh3cRCPConnTimeout."
+    ::= { hh3cRCPLeaf 6 }
+
+hh3cRCPRuleTimeoutMaxValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum value of hh3cRCPRuleTimeout."
+    ::= { hh3cRCPLeaf 7 }
+
+hh3cRCPServerMaxConnMaxValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum value of hh3cRCPServerMaxConn."
+    ::= { hh3cRCPLeaf 8 }
+
+hh3cRCPBalanceGroupIdMinValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum value of balance group identity."
+    ::= { hh3cRCPLeaf 9 }
+
+hh3cRCPBalanceGroupIdMaxValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum value of balance group identity."
+    ::= { hh3cRCPLeaf 10 }
+
+hh3cRCPTotalUsers OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the total number of RCP user."
+    ::= { hh3cRCPLeaf 11 }
+
+hh3cRCPTotalClientIPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the total number of RCP client IP."
+    ::= { hh3cRCPLeaf 12 }
+
+hh3cRCPTable OBJECT IDENTIFIER ::= { hh3cRCPMIB 2 }
+
+hh3cRCPUserTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRCPUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "RCP User Info Table."
+    ::= { hh3cRCPTable 1 }
+
+hh3cRCPUserEntry OBJECT-TYPE
+    SYNTAX      Hh3cRCPUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cRCPUserTable."
+    INDEX
+        {
+            hh3cRCPUserName
+        }
+    ::= { hh3cRCPUserTable 1 }
+
+Hh3cRCPUserEntry ::= SEQUENCE
+    {
+        hh3cRCPUserName                    DisplayString,
+        hh3cRCPUserPassword                DisplayString,
+        hh3cRCPUserRedirectInterface       InterfaceIndexOrZero,
+        hh3cRCPUserRedirectBalanceGroup    Integer32,
+        hh3cRCPUserRowStatus               RowStatus
+    }
+
+hh3cRCPUserName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of RCP user."
+    ::= { hh3cRCPUserEntry 1 }
+
+hh3cRCPUserPassword OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " The password of RCP user.
+        It is invisible to users and displayed as '***'."
+    ::= { hh3cRCPUserEntry 2 }
+
+hh3cRCPUserRedirectInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The redirect interface index of RCP user.
+        The RCP rule assigned by the user can be associated with the redirect
+        interface.
+        If the redirect interface is invalid, its value is set to be 0."
+    ::= { hh3cRCPUserEntry 3 }
+
+hh3cRCPUserRedirectBalanceGroup OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The redirect balance group identity of RCP user.
+        The RCP rule assigned by the user can be associated with the redirect
+        balance group.
+        If the balance group is invalid, its value is set to be 0."
+    ::= { hh3cRCPUserEntry 4 }
+
+hh3cRCPUserRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This manages the creation and deletion of rows, and shows
+        the current status of the indexed user name. This object has the
+        following values.
+
+        active(1)        The indexed user name is configured on the device.
+        notInService(2)  Not Supported.
+        notReady(3)      Not Supported.
+        createAndGo(4)   Create a new user.
+        createAndWait(5) Not Supported.
+        destroy(6)       Delete this entry.
+
+        The associated entry can be modified when the value of
+        hh3cRCPUserRowStatus is active(1).
+        When deleting an inexistence entry, return noError."
+    ::= { hh3cRCPUserEntry 5 }
+
+hh3cRCPClientIPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRCPClientIPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "RCP Client IP Table."
+    ::= { hh3cRCPTable 2 }
+
+hh3cRCPClientIPEntry OBJECT-TYPE
+    SYNTAX      Hh3cRCPClientIPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cRCPClientIPTable."
+    INDEX
+        {
+            hh3cRCPClientIPType,
+            hh3cRCPClientIP
+        }
+    ::= { hh3cRCPClientIPTable 1 }
+
+Hh3cRCPClientIPEntry ::= SEQUENCE
+    {
+        hh3cRCPClientIPType         InetAddressType,
+        hh3cRCPClientIP             InetAddress,
+        hh3cRCPClientIPRowStatus    RowStatus
+    }
+
+hh3cRCPClientIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address type (IPv4 or IPv6) of RCP client."
+    ::= { hh3cRCPClientIPEntry 1 }
+
+hh3cRCPClientIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of RCP client."
+    ::= { hh3cRCPClientIPEntry 2 }
+
+hh3cRCPClientIPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This manages the creation and deletion or rows, and shows
+        the current status of the indexed client IP address.  This object has
+        the following values.
+
+        active(1)        The indexed client IP is configured on the device.
+        notInService(2)  Not Supported.
+        notReady(3)      Not Supported.
+        createAndGo(4)   Create a new client IP.
+        createAndWait(5) Not Supported.
+        destroy(6)       Delete this entry.
+
+        The associated entry can be modified when the value of
+        hh3cRCPClientIPRowStatus is active(1).
+        When deleting an inexistence entry, return noError."
+    ::= { hh3cRCPClientIPEntry 3 }
+
+hh3cRCPSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRCPSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "RCP session Table."
+    ::= { hh3cRCPTable 3 }
+
+hh3cRCPSessionEntry OBJECT-TYPE
+    SYNTAX      Hh3cRCPSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cRCPSessionTable."
+    INDEX
+        {
+            hh3cRCPSessionId
+        }
+    ::= { hh3cRCPSessionTable 1 }
+
+Hh3cRCPSessionEntry ::= SEQUENCE
+    {
+        hh3cRCPSessionId               Integer32,
+        hh3cRCPSessionClientIPType     InetAddressType,
+        hh3cRCPSessionClientIP         InetAddress,
+        hh3cRCPSessionRunningStatus    INTEGER,
+        hh3cRCPSessionUserName         DisplayString
+    }
+
+hh3cRCPSessionId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "RCP session identity."
+    ::= { hh3cRCPSessionEntry 1 }
+
+hh3cRCPSessionClientIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address type (IPv4 or IPv6) of RCP client."
+    ::= { hh3cRCPSessionEntry 2 }
+
+hh3cRCPSessionClientIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RCP client IP address."
+    ::= { hh3cRCPSessionEntry 3 }
+
+hh3cRCPSessionRunningStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            connected(1),
+            operational(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RCP server running status.
+         It is one of the following status:
+         connected: The connection is established and the RCP client is waiting
+                    for authentication.
+         operational: The RCP client is authenticated and the server is ready
+                      for rule configuration request."
+    ::= { hh3cRCPSessionEntry 4 }
+
+hh3cRCPSessionUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RCP user name."
+    ::= { hh3cRCPSessionEntry 5 }
+
+END

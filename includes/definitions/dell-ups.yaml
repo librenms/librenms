@@ -6,8 +6,7 @@ icon: dell
 over:
     - { graph: device_current, text: Current }
     - { graph: sensor_runtime, text: Runtime }
-mib_dir:
-    - dell
+mib_dir: dell
 discovery:
     -
         sysObjectID:

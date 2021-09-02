@@ -4,7 +4,7 @@
 --
 -- May 2006, chenyu
 --
--- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -21,16 +21,16 @@ IMPORTS
     MODULE-COMPLIANCE,
     NOTIFICATION-GROUP,
     OBJECT-GROUP                        FROM SNMPv2-CONF
-    ifIndex                             FROM IF-MIB   
+    ifIndex                             FROM IF-MIB
     EnableVar        					FROM SWITCH-TC
     raisecomAgent                       FROM RAISECOM-BASE-MIB;
 
 raisecomOpticalMonitorMIB MODULE-IDENTITY
     LAST-UPDATED   "200606060000Z"
     ORGANIZATION   "Raisecom, Inc."
-    CONTACT-INFO  
+    CONTACT-INFO
                 "       Raise Systems
-                        
+
                 Postal: Beijing,
                         China
 
@@ -54,17 +54,17 @@ OpticalParameterType ::= TEXTUAL-CONVENTION
         "This value indicates the optical parameter that is
         being monitored. Valid values are -
 
-        temperature(1)        
-        supplyVoltage(2)           
-        biasCurrent(3)               
-        txOutputPower(4)       
+        temperature(1)
+        supplyVoltage(2)
+        biasCurrent(3)
+        txOutputPower(4)
         receivedPower(5)               "
     SYNTAX    INTEGER {
- 			       		temperature(1),         
-    			    	supplyVoltage(2),    
-      				  	biasCurrent(3),      
-        				txOutputPower(4),         
-        				receivedPower(5)       
+ 			       		temperature(1),
+    			    	supplyVoltage(2),
+      				  	biasCurrent(3),
+        				txOutputPower(4),
+        				receivedPower(5)
               }
 
 
@@ -89,15 +89,15 @@ OpticalParameterValue ::= TEXTUAL-CONVENTION
         5.5 V.
 
         When the optical parameter being monitored is 'biasCurrent',
-        the supported range is from 0 to 65535, in units of 1/500 
+        the supported range is from 0 to 65535, in units of 1/500
         microamperes.
         Example: A value of 500 represents a bias current reading of
         1 microamperes.
 
         When the optical parameter being monitored is 'txOutputPower',
         the supported range is from 0 to 65535, in units of 1/10000 mW ..and express in units of dBm¡£
-        Example: A value of 60000 represents a txOutputPower reading of 7.78 dBm.    
-        
+        Example: A value of 60000 represents a txOutputPower reading of 7.78 dBm.
+
         When the optical parameter being monitored is 'receivedPower',
         the supported range is from 0 to 65535, in units of 1/10000 mW ..and express in units of dBm¡£
         Example: A value of 60000 represents a receivedPower reading of 7.78 dBm.        "
@@ -164,7 +164,7 @@ raisecomTranceiverType OBJECT-TYPE
 		DESCRIPTION
 			"Type of the interface, such as 1000_BASE_SX_SFP"
 		::= { raisecomTranceiverInfoEntry 1 }
-		
+
 raisecomTranceiverConnectorType OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
@@ -172,7 +172,7 @@ raisecomTranceiverConnectorType OBJECT-TYPE
 		DESCRIPTION
 			"ConnectorType of the interface, such as SC/LC"
 		::= { raisecomTranceiverInfoEntry 2 }
-		
+
 raisecomTranceiverWavelength OBJECT-TYPE
 		SYNTAX	Integer32
 		ACCESS	read-only
@@ -180,7 +180,7 @@ raisecomTranceiverWavelength OBJECT-TYPE
 		DESCRIPTION
 			"Wavelength of the interface, measured in nm."
 		::= { raisecomTranceiverInfoEntry 3 }
-		
+
 raisecomTranceiverVendorName OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
@@ -188,7 +188,7 @@ raisecomTranceiverVendorName OBJECT-TYPE
 		DESCRIPTION
 			"Vendor name of the interface."
 		::= { raisecomTranceiverInfoEntry 4 }
-		
+
 raisecomTranceiverVendorPN OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
@@ -196,7 +196,7 @@ raisecomTranceiverVendorPN OBJECT-TYPE
 		DESCRIPTION
 			"Vendor part number of the interface."
 		::= { raisecomTranceiverInfoEntry 5 }
-		
+
 raisecomTranceiverVendorSN OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
@@ -204,21 +204,21 @@ raisecomTranceiverVendorSN OBJECT-TYPE
 		DESCRIPTION
 			"Vendor serial number of the interface."
 		::= { raisecomTranceiverInfoEntry 6 }
-		
+
 raisecomTransceiverFiberType OBJECT-TYPE
 		SYNTAX INTEGER
        {
-          single_mode(1),
-          multi_mode(2),
-          none(3)                 
+          single-mode(1),
+          multi-mode(2),
+          none(3)
         }
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"Types of the fiber, 
+			"Types of the fiber,
             single_mode, multi_mode, none."
 		::= { raisecomTranceiverInfoEntry 7 }
-		
+
 raisecomTransceiverTransferDistance OBJECT-TYPE
 		SYNTAX	Integer32
 		ACCESS	read-only
@@ -227,7 +227,7 @@ raisecomTransceiverTransferDistance OBJECT-TYPE
 			"The max distance which the interface could transmit,
             measured in meter."
 		::= { raisecomTranceiverInfoEntry 8 }
-		
+
 
 
 
@@ -266,7 +266,7 @@ RaisecomOpticalMonEntry ::= SEQUENCE {
     raisecomOpticalParamAlarmLastChange        TimeTicks,
     raisecomOpticalMon15MinValidIntervals      Unsigned32,
     raisecomOpticalMon24HrValidIntervals       Unsigned32,
-    raisecomOpticalMonValidStatus        INTEGER 
+    raisecomOpticalMonValidStatus        INTEGER
 }
 
 raisecomOpticalMonParameterType OBJECT-TYPE
@@ -297,10 +297,10 @@ raisecomOpticalParamHighAlarmThresh OBJECT-TYPE
         optical parameter being monitored.
 
         An alarm condition will be raised if the value given by
-        raisecomOpticalParameterValue goes from below the value of 
+        raisecomOpticalParameterValue goes from below the value of
         this object to above the value of this object, or if
         the initial value of raisecomOpticalParameterValue exceeds the value
-        of this object. This alarm will be indicated in the 
+        of this object. This alarm will be indicated in the
         raisecomOpticalParamAlarmStatus object."
     ::={ raisecomOpticalMonEntry 3 }
 
@@ -316,7 +316,7 @@ raisecomOpticalParamHighWarningThresh OBJECT-TYPE
         given by raisecomOpticalParameterValue goes from below the value
         of this object to above the value of this
         object, or if the initial value of raisecomOpticalParameterValue
-        exceeds the value of this object. This alarm will be indicated in the 
+        exceeds the value of this object. This alarm will be indicated in the
         raisecomOpticalParamAlarmStatus object.
         "
     ::={ raisecomOpticalMonEntry 4 }
@@ -371,8 +371,8 @@ raisecomOpticalParamAlarmStatus OBJECT-TYPE
         the thresholds for the monitored optical parameter
         on the interface.
 
-           If a threshold is currently being exceeded on the   
-           interface, the object  will be set. Otherwise, 
+           If a threshold is currently being exceeded on the
+           interface, the object  will be set. Otherwise,
            the object will be set to 0."
     ::={ raisecomOpticalMonEntry 7 }
 
@@ -427,7 +427,7 @@ raisecomOpticalMon24HrValidIntervals OBJECT-TYPE
         The value of this object will be 0 if the measurement
         was (re-)started within the last 24 hours, or 1 otherwise."
     ::={ raisecomOpticalMonEntry 11 }
-       
+
 raisecomOpticalMonValidStatus OBJECT-TYPE
     SYNTAX      INTEGER {
                     valid(1),
@@ -482,7 +482,7 @@ raisecomOpticalPMCurrentEntry OBJECT-TYPE
         parameter at an interface, collected over the current 15
         minute or the current 24 hour interval.
         "
-    INDEX       { ifIndex,                  
+    INDEX       { ifIndex,
                   raisecomOpticalPMCurrentPeriod,
 				  raisecomOpticalPMCurrentParamType }
     ::={ raisecomOpticalPMCurrentTable 1 }
@@ -576,7 +576,7 @@ raisecomOpticalPMIntervalEntry OBJECT-TYPE
         "
     INDEX      { ifIndex,
     			raisecomOpticalPMIntervalPeriod,
-                 raisecomOpticalPMIntervalNumber,                 
+                 raisecomOpticalPMIntervalNumber,
                  raisecomOpticalPMIntervalParamType }
     ::={ raisecomOpticalPMIntervalTable 1 }
 
@@ -727,7 +727,7 @@ raisecomOpticalMonitorMIBCompliance MODULE-COMPLIANCE
     DESCRIPTION
         "Write access is not required."
 
-    OBJECT     cOpticalParamLowWarningThresh
+    OBJECT     raisecomOpticalParamLowWarningThresh
     MIN-ACCESS read-only
     DESCRIPTION
         "Write access is not required."
@@ -737,7 +737,7 @@ raisecomOpticalMonitorMIBCompliance MODULE-COMPLIANCE
     DESCRIPTION
         "Write access is not required."
 
-    OBJECT     cOpticalParamHighWarningSev
+    OBJECT     raisecomOpticalParamHighWarningSev
     MIN-ACCESS read-only
     DESCRIPTION
         "Write access is not required."

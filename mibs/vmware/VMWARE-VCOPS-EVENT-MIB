@@ -54,7 +54,7 @@ vmwVcopsMIB MODULE-IDENTITY
 
 -- Group 0: Alerts sent as traps
 vmwareAlertTrap OBJECT-IDENTITY
-        STATUS  current
+        STATUS  obsolete
         DESCRIPTION
          "This group is actually the prefix one uses when creating
           enterprise-specific trap OID's for an SNMPv2 trap.  It is
@@ -67,7 +67,7 @@ vmwareAlertTrap OBJECT-IDENTITY
 -- Generic data, in var-binds, that is associated with EVERY Alert
 --
 vmwareGenericAlertData OBJECT-IDENTITY
-        STATUS  current
+        STATUS  obsolete
         DESCRIPTION
          "This members of this group are the OIDs for VarBinds
       that contain data for ALL Alerts."
@@ -76,7 +76,7 @@ vmwareGenericAlertData OBJECT-IDENTITY
 vmwareAlertAliveServerName OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "The name of the vRealize Operations server that generated this alert."
     ::= { vmwareGenericAlertData 1 }
@@ -84,7 +84,7 @@ vmwareAlertAliveServerName OBJECT-TYPE
 vmwareAlertEntityName OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "The Entity name about which this alert was generated."
     ::= { vmwareGenericAlertData 2 }
@@ -92,7 +92,7 @@ vmwareAlertEntityName OBJECT-TYPE
 vmwareAlertEntityType OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "The Entity type about which this alert was generated."
     ::= { vmwareGenericAlertData 3 }
@@ -100,7 +100,7 @@ vmwareAlertEntityType OBJECT-TYPE
 vmwareAlertTimestamp OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "The timestamp of the alert in UTC format."
     ::= { vmwareGenericAlertData 4 }
@@ -108,7 +108,7 @@ vmwareAlertTimestamp OBJECT-TYPE
 vmwareAlertCriticality OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "A text string describing the alert criticality level."
     ::= { vmwareGenericAlertData 5 }
@@ -116,7 +116,7 @@ vmwareAlertCriticality OBJECT-TYPE
 vmwareAlertRootCause OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "A text string describing the root-cause of the alert that was generated."
     ::= { vmwareGenericAlertData 6 }
@@ -124,7 +124,7 @@ vmwareAlertRootCause OBJECT-TYPE
 vmwareAlertURL OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "The URL of the 'Alert Summary' page of the alert that was generated."
     ::= { vmwareGenericAlertData 7 }
@@ -132,7 +132,7 @@ vmwareAlertURL OBJECT-TYPE
 vmwareAlertID OBJECT-TYPE
     SYNTAX OCTET STRING
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "The unique vRealize Operations identifier of the alert that was generated."
     ::= { vmwareGenericAlertData 8 }
@@ -140,7 +140,7 @@ vmwareAlertID OBJECT-TYPE
 vmwareAlertMessage OBJECT-TYPE
    SYNTAX OCTET STRING
    MAX-ACCESS accessible-for-notify
-   STATUS   current
+   STATUS   obsolete
    DESCRIPTION
    "The info message of the alert that was generated."
    ::= { vmwareGenericAlertData 9 }
@@ -148,7 +148,7 @@ vmwareAlertMessage OBJECT-TYPE
 vmwareAlertType OBJECT-TYPE
    SYNTAX OCTET STRING
    MAX-ACCESS accessible-for-notify
-   STATUS   current
+   STATUS   obsolete
    DESCRIPTION
    "The textual type description of the alert that was generated."
    ::= { vmwareGenericAlertData 10 }
@@ -157,7 +157,7 @@ vmwareAlertType OBJECT-TYPE
 vmwareAlertSubtype OBJECT-TYPE
    SYNTAX OCTET STRING
    MAX-ACCESS accessible-for-notify
-   STATUS   current
+   STATUS   obsolete
    DESCRIPTION
    "The textual subtype description of the alert that was generated."
    ::= { vmwareGenericAlertData 11 }
@@ -165,7 +165,7 @@ vmwareAlertSubtype OBJECT-TYPE
 vmwareAlertHealth OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "Health badge state."
     ::= { vmwareGenericAlertData 12 }
@@ -173,7 +173,7 @@ vmwareAlertHealth OBJECT-TYPE
 vmwareAlertRisk OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "Risk badge state."
     ::= { vmwareGenericAlertData 13 }
@@ -181,7 +181,7 @@ vmwareAlertRisk OBJECT-TYPE
 vmwareAlertEfficiency OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "Efficiency badge state."
     ::= { vmwareGenericAlertData 14 }
@@ -189,7 +189,7 @@ vmwareAlertEfficiency OBJECT-TYPE
 vmwareAlertMetricName OBJECT-TYPE
    SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS   current
+    STATUS   obsolete
     DESCRIPTION
     "The textual metric name of the alert that was generated."
     ::= { vmwareGenericAlertData 15 }
@@ -197,7 +197,7 @@ vmwareAlertMetricName OBJECT-TYPE
 vmwareAlertResourceKind OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS   current
+    STATUS   obsolete
     DESCRIPTION
     "The textual object type of the alert that was generated."
     ::= { vmwareGenericAlertData 16 }
@@ -205,7 +205,7 @@ vmwareAlertResourceKind OBJECT-TYPE
 vmwareAlertDefinitionName OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "Alert Definition Name."
     ::= { vmwareGenericAlertData 17 }
@@ -213,7 +213,7 @@ vmwareAlertDefinitionName OBJECT-TYPE
 vmwareAlertDefinitionDesc OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "Alert Definition Description."
     ::= { vmwareGenericAlertData 18 }
@@ -221,7 +221,7 @@ vmwareAlertDefinitionDesc OBJECT-TYPE
 vmwareAlertImpact OBJECT-TYPE
     SYNTAX SnmpAdminString
     MAX-ACCESS accessible-for-notify
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
     "Alert Impact"
     ::= { vmwareGenericAlertData 19 }
@@ -266,7 +266,7 @@ vmwareTrapKPIBreachActive NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that indicates a KPI Breach condition
      became active."
@@ -288,7 +288,7 @@ vmwareTrapKPIBreachClear NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that indicates a KPI Breach condition
      became inactive."
@@ -310,7 +310,7 @@ vmwareTrapKPIBreachChange NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that indicates a KPI Breach condition
      has changed one of its parameters' value."
@@ -332,7 +332,7 @@ vmwareTrapKPIPredictionActive NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that predicts a KPI Breach condition
      (also know as 'Fingerprint') became active."
@@ -354,7 +354,7 @@ vmwareTrapKPIPredictionClear NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that predicts a KPI Breach condition
      (also know as 'Fingerprint') became inactive."
@@ -376,7 +376,7 @@ vmwareTrapKPIPredictionChange NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that predicts a KPI Breach condition
      (also know as 'Fingerprint') that experiences a change in one or more
@@ -402,7 +402,7 @@ vmwareTrapAggregateAnomalyActive NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that indicates an Aggregate Anomaly condition
      became active."
@@ -424,7 +424,7 @@ vmwareTrapAggregateAnomalyClear NOTIFICATION-TYPE
         vmwareAlertMetricName,
         vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Smart Alert that indicates an Aggregate Anomaly condition
      became inactive."
@@ -446,7 +446,7 @@ vmwareTrapKPIHTBreachActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Classic Alert that indicates a KPI HT Breach condition
     became active."
@@ -468,7 +468,7 @@ vmwareTrapKPIHTBreachClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Classic Alert that indicates a KPI HT Breach condition
     became inactive."
@@ -490,7 +490,7 @@ vmwareTrapKPIHTBreachChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
  }
- STATUS current
+ STATUS obsolete
  DESCRIPTION
  "A trap describing a Classic Alert that indicates a KPI HT Breach condition
   has changed one of its parameters' value."
@@ -512,7 +512,7 @@ vmwareTrapNotificationActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Classic Alert that indicates a Notification condition
     became active."
@@ -534,7 +534,7 @@ vmwareTrapNotificationClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Classic Alert that indicates a Notification condition
     became inactive."
@@ -556,7 +556,7 @@ vmwareTrapNotificationChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
  }
- STATUS current
+ STATUS obsolete
  DESCRIPTION
  "A trap describing a Classic Alert that indicates a Notification condition
   has changed one of its parameters' value."
@@ -578,7 +578,7 @@ vmwareTrapAbnormalityActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Classic Alert that indicates a Abnormality condition
     became active."
@@ -601,7 +601,7 @@ vmwareTrapAbnormalityClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Classic Alert that indicates a Abnormality condition
     became inactive."
@@ -623,7 +623,7 @@ vmwareTrapAbnormalityChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
  }
- STATUS current
+ STATUS obsolete
  DESCRIPTION
  "A trap describing a Classic Alert that indicates a Abnormality condition
   has changed one of its parameters' value."
@@ -645,7 +645,7 @@ vmwareTrapWorkloadActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Health Alert that indicates a Workload condition
     became active."
@@ -667,7 +667,7 @@ vmwareTrapWorkloadClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Health Alert that indicates a Workload condition
     became inactive."
@@ -689,7 +689,7 @@ vmwareTrapWorkloadChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Health Alert that indicates a Workload condition
      has changed one of its parameters' value."
@@ -711,7 +711,7 @@ vmwareTrapAnomalyActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Health Alert that indicates an Anomaly condition
     became active."
@@ -733,7 +733,7 @@ vmwareTrapAnomalyClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Health Alert that indicates an Anomaly condition
     became inactive."
@@ -755,7 +755,7 @@ vmwareTrapAnomalyChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Health Alert that indicates an Anomaly condition
      has changed one of its parameters' value."
@@ -777,7 +777,7 @@ vmwareTrapFaultActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Health Alert that indicates a Fault condition
     became active."
@@ -799,7 +799,7 @@ vmwareTrapFaultClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Health Alert that indicates a Fault condition
     became inactive."
@@ -821,7 +821,7 @@ vmwareTrapFaultChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Health Alert that indicates a Fault condition
      has changed one of its parameters' value."
@@ -843,7 +843,7 @@ vmwareTrapTimeRemainingActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Time Remaining condition
     became active."
@@ -865,7 +865,7 @@ vmwareTrapTimeRemainingClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Time Remaining condition
     became inactive."
@@ -887,7 +887,7 @@ vmwareTrapTimeRemainingChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Risk Alert that indicates a Time Remaining condition
      has changed one of its parameters' value."
@@ -909,7 +909,7 @@ vmwareTrapCapacityRemainingActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Capacity Remaining condition
     became active."
@@ -931,7 +931,7 @@ vmwareTrapCapacityRemainingClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Capacity Remaining condition
     became inactive."
@@ -953,7 +953,7 @@ vmwareTrapCapacityRemainingChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Risk Alert that indicates a Capacity Remaining condition
      has changed one of its parameters' value."
@@ -975,7 +975,7 @@ vmwareTrapStressActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Stress condition
     became active."
@@ -997,7 +997,7 @@ vmwareTrapStressClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Stress condition
     became inactive."
@@ -1019,7 +1019,7 @@ vmwareTrapStressChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Risk Alert that indicates a Stress condition
      has changed one of its parameters' value."
@@ -1041,7 +1041,7 @@ vmwareTrapWasteActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Efficiency Alert that indicates a Waste condition
     became active."
@@ -1063,7 +1063,7 @@ vmwareTrapWasteClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Efficiency Alert that indicates a Waste condition
     became inactive."
@@ -1085,7 +1085,7 @@ vmwareTrapWasteChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Efficiency Alert that indicates a Waste condition
      has changed one of its parameters' value."
@@ -1107,7 +1107,7 @@ vmwareTrapDensityActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Efficiency Alert that indicates a Density condition
     became active."
@@ -1129,7 +1129,7 @@ vmwareTrapDensityClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Efficiency Alert that indicates a Density condition
     became inactive."
@@ -1151,7 +1151,7 @@ vmwareTrapDensityChange NOTIFICATION-TYPE
     vmwareAlertMetricName,
     vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Efficiency Alert that indicates a Density condition
      has changed one of its parameters' value."
@@ -1173,7 +1173,7 @@ vmwareTrapDensityChange NOTIFICATION-TYPE
        vmwareAlertMetricName,
        vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Risk Alert that indicates a Compliance condition
      became active."
@@ -1195,7 +1195,7 @@ vmwareTrapDensityChange NOTIFICATION-TYPE
        vmwareAlertMetricName,
        vmwareAlertResourceKind
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
     "A trap describing a Risk Alert that indicates a Compliance condition
      became inactive."
@@ -1217,7 +1217,7 @@ vmwareTrapComplianceChange NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Risk Alert that indicates a Compliance condition
     has changed one of its parameters' value."
@@ -1245,7 +1245,7 @@ vmwareTrapProblemActive NOTIFICATION-TYPE
       vmwareAlertDefinitionDesc,
       vmwareAlertImpact
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Problem Alert that indicates a Abnormality condition
     became active."
@@ -1273,7 +1273,7 @@ vmwareTrapProblemClear NOTIFICATION-TYPE
       vmwareAlertDefinitionDesc,
       vmwareAlertImpact
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Problem Alert that indicates a Abnormality condition
     became inactive."
@@ -1301,7 +1301,7 @@ vmwareTrapProblemChange NOTIFICATION-TYPE
     vmwareAlertDefinitionDesc,
     vmwareAlertImpact
  }
- STATUS current
+ STATUS obsolete
  DESCRIPTION
  "A trap describing a Problem Alert that indicates a Abnormality condition
   has changed one of its parameters' value."
@@ -1331,7 +1331,7 @@ vmwareTrapAliveComponentFailureActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing an Administrative Alert that indicates an vRealize Operations Component failure
     became active."
@@ -1353,7 +1353,7 @@ vmwareTrapAliveComponentFailureClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing an Administrative Alert that indicates an vRealize Operations Component failure
     became inactive."
@@ -1375,7 +1375,7 @@ vmwareTrapResourceDisconnectedActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing an Administrative Alert that indicates a resource has disconnected
     from vRealize Operations."
@@ -1397,7 +1397,7 @@ vmwareTrapResourceDisconnectedClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing an Administrative Alert that indicates that a disconnected
     resource has re-connected to vRealize Operations."
@@ -1421,7 +1421,7 @@ vmwareTrapConsolidatedAlertActive NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Consolidated Alert that aggregates similar alerts
     has become active"
@@ -1443,7 +1443,7 @@ vmwareTrapConsolidatedAlertClear NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Consolidated Alert that aggregates similar alerts
     has become inactive"
@@ -1465,7 +1465,7 @@ vmwareTrapConsolidatedAlertChange NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "A trap describing a Consolidated Alert that aggregates similar alerts
     has changed one of its parameters"
@@ -1491,7 +1491,7 @@ vmwareTrapTest NOTIFICATION-TYPE
       vmwareAlertMetricName,
       vmwareAlertResourceKind
    }
-   STATUS current
+   STATUS obsolete
    DESCRIPTION
    "Trap for testing purposes."
    ::= { vmwareAlertTrap 200 }
@@ -1503,7 +1503,7 @@ vmwVCOPSMIBGroups OBJECT IDENTIFIER ::= { vmwVCOPSMIBConformance 2 }
 
 -- compliance statements
 vmwVCOPSMIBBasicCompliance MODULE-COMPLIANCE
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
         "The compliance statement for entities which implement VMWARE-VCOPS-EVENT-MIB."
     MODULE -- this module
@@ -1526,7 +1526,7 @@ vmwVCOPSNotificationInfoGroup1 OBJECT-GROUP
        vmwareAlertMetricName,
        vmwareAlertResourceKind
     }
-    STATUS deprecated
+    STATUS obsolete
     DESCRIPTION
         "These objects provide details in vRealize Operations notifications."
     ::= { vmwVCOPSMIBGroups 2 }
@@ -1586,13 +1586,13 @@ vmwVCOPSNotificationGroup1 NOTIFICATION-GROUP
        vmwareTrapResourceDisconnectedActive,
        vmwareTrapResourceDisconnectedClear
        }
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Group of objects describing notifications (traps, informs)."
        ::= { vmwVCOPSMIBGroups 3 }
 
 vmwVCOPSMIBBasicCompliance2016 MODULE-COMPLIANCE
-    STATUS    current
+    STATUS    obsolete
     DESCRIPTION
         "Define which events apply to agents implementing VMWARE-VCOPS-EVENT-MIB."
     MODULE -- this module
@@ -1622,7 +1622,7 @@ vmwVCOPSNotificationInfoGroup2 OBJECT-GROUP
        vmwareAlertDefinitionDesc,
        vmwareAlertImpact
     }
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
         "These objects provide details in vRealize Operations notifications."
     ::= { vmwVCOPSMIBGroups 4 }
@@ -1686,7 +1686,7 @@ vmwVCOPSNotificationGroup2 NOTIFICATION-GROUP
        vmwareTrapProblemClear,
        vmwareTrapProblemChange
        }
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Group of objects describing notifications (traps, informs) supported for this
            version of this mib modules."

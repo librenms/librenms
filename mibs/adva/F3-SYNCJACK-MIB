@@ -25,27 +25,41 @@ IMPORTS
              FROM  CM-COMMON-MIB;
 
 f3SyncJMIB MODULE-IDENTITY
-    LAST-UPDATED    "201205100000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "201908190000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Sync Jack MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
+             Copyright (C) ADVA."
     REVISION        "201205100000Z"
     DESCRIPTION
-         "
+         "                
+         Notes from release 201908190000Z
+            (i)   New table: f3UserDefinedMTIEMaskTable
+            (ii)  Add user-defined enum to MTIEMaskType
+                                          
+         Notes from release 201712240000Z
+            (i)   New tables: f3SyncJClockProbeStatsTable, f3SyncJClockProbeHistoryTable, f3SyncJClockProbeThresholdTable,
+                              f3SyncJPTPClockProbeStatsTable, f3SyncJPTPClockProbeHistoryTable, f3SyncJPTPClockProbeThresholdTable
+            (ii)  New notifications: f3SyncJClockProbeThresholdCrossingAlert , f3SyncJPTPClockProbeThresholdCrossingAlert   
+            (iii) Added f3SyncJClockProbeMTIERestart to f3SyncJClockProbeTable 
+            (iv)  Added f3SyncJPTPClockProbeMTIERestart to f3SyncJPTPClockProbeTable 
+
           Notes from release 201205100000Z
             (i) Initial Version of the MIBs
           ." 
     ::= {fsp150cm 22}    
-
+                          
 -- 
 -- OID definitions
 -- 
@@ -94,7 +108,8 @@ MTIEMaskType ::= TEXTUAL-CONVENTION
                g8262-eec-opt1-tolerrance(17),
                g8263-var-temp(18),
                g8273-2(19),
-               g8271-1(20)
+               g8271-1(20),
+               user-defined(21)
 
              }
 
@@ -229,7 +244,8 @@ F3SyncJClockProbeEntry ::= SEQUENCE {
     f3SyncJClockProbeMaxTEMeasurementTime        Unsigned32,
 
     f3SyncJClockProbeMaxTEThreshold              Integer32,
-    f3SyncJClockProbeMaxTEClrThreshold           Integer32
+    f3SyncJClockProbeMaxTEClrThreshold           Integer32,
+    f3SyncJClockProbeMTIERestart                 TruthValue
 
 
 
@@ -602,6 +618,14 @@ f3SyncJClockProbeMaxTEClrThreshold OBJECT-TYPE
     DESCRIPTION
             "The TE Max clear threshold configured for this entry."
     ::= { f3SyncJClockProbeEntry 43 }
+
+f3SyncJClockProbeMTIERestart OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The MTIE Restart configured for this entry."
+    ::= { f3SyncJClockProbeEntry 44 }
 
 
 
@@ -1241,7 +1265,8 @@ F3SyncJPTPClockProbeEntry ::= SEQUENCE {
 
 
     f3SyncJPTPClockProbeMaxTEThreshold              Integer32,
-    f3SyncJPTPClockProbeMaxTEClrThreshold           Integer32
+    f3SyncJPTPClockProbeMaxTEClrThreshold           Integer32,
+    f3SyncJPTPClockProbeMTIERestart                 TruthValue
 
 
 
@@ -1729,7 +1754,13 @@ f3SyncJPTPClockProbeMaxTEClrThreshold OBJECT-TYPE
             "The TE Max clear threshold configured for this entry."
     ::= { f3SyncJPTPClockProbeEntry 56 }
 
-
+f3SyncJPTPClockProbeMTIERestart  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The MTIE Restart configured for this entry."
+    ::= { f3SyncJPTPClockProbeEntry 57 }
 
 
 --
@@ -2869,7 +2900,103 @@ f3SyncJScheduleGroupRowStatus OBJECT-TYPE
             The f3SyncJScheduleGroupRowStatus object may be modified if
             the associated instance of this object is equal to active(1)."
     ::= { f3SyncJScheduleGroupEntry 9 }
+     
+--
+-- F3 User Defined MTIE Mask Table
+--   
+  
+f3UserDefinedMTIEMaskTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3UserDefinedMTIEMaskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries that enable the user to define a new (only one) MTIE mask for Clock Probe and for PTP clock Probe. ."
+    ::= { f3SyncJConfigObjects 11 }
 
+f3UserDefinedMTIEMaskEntry  OBJECT-TYPE
+    SYNTAX      F3UserDefinedMTIEMaskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A row in f3UserDefinedMTIEMaskTable. Entries are created
+          in this table by management application action."
+    INDEX { neIndex, f3UserDefinedMTIEMaskIndex }
+    ::= { f3UserDefinedMTIEMaskTable 1 }
+
+
+F3UserDefinedMTIEMaskEntry ::= SEQUENCE {
+    f3UserDefinedMTIEMaskIndex                Integer32,    
+    f3UserDefinedMTIEMaskName                 DisplayString,
+    f3UserDefinedMTIEMaskDisplayPoints        DisplayString,
+    f3UserDefinedMTIEMaskMeasurmentPoints     DisplayString,
+    f3UserDefinedMTIEMaskStorageType          StorageType,  
+    f3UserDefinedMTIEMaskRowStatus            RowStatus
+}
+
+f3UserDefinedMTIEMaskIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "A unique index to distinguish the User Defined MTIE Mask."
+    ::= { f3UserDefinedMTIEMaskEntry 1 }
+
+f3UserDefinedMTIEMaskName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object allows SNMP management entities to provide a 
+                        name to the User Defined MTIE Mask entity."
+    ::= { f3UserDefinedMTIEMaskEntry 2 }
+
+f3UserDefinedMTIEMaskDisplayPoints OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..1024))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify the coordinates point in form of x,y pairs separated by semicolon. 
+                        X values are in seconds, y values are in nanoseconds."
+     ::= { f3UserDefinedMTIEMaskEntry 3 }
+
+f3UserDefinedMTIEMaskMeasurmentPoints OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..256))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the measurement intervals y-points in nanoseconds."
+     ::= { f3UserDefinedMTIEMaskEntry 4 }
+                    
+f3UserDefinedMTIEMaskStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+          "The type of storage configured for this entry."
+    ::= { f3UserDefinedMTIEMaskEntry 5 }
+                    
+f3UserDefinedMTIEMaskRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3UserDefinedMTIEMaskRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3UserDefinedMTIEMaskRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The f3UserDefinedMTIEMaskRowStatus object may be modified if
+          f3UserDefinedMTIEMaskEntry of this object is equal to active(1)."
+    ::= { f3UserDefinedMTIEMaskEntry 6 }
+    
+    
 --
 -- PERFORMANCE 
 --
@@ -3754,6 +3881,718 @@ f3SyncJPTPNetworkProbeThresholdMonValue OBJECT-TYPE
         "Monitored value corresponding to f3SyncJPTPNetworkProbeThresholdVariable."
     ::= { f3SyncJPTPNetworkProbeThresholdEntry 6 }
 
+--
+-- SyncJack Clock Probe Current Statistics Table
+--
+f3SyncJClockProbeStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SyncJClockProbeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of SyncJack Clock Probe statistics.  
+             These reflect the current data."
+    ::= { f3SyncJPerformanceObjects 4 }
+
+f3SyncJClockProbeStatsEntry OBJECT-TYPE
+    SYNTAX      F3SyncJClockProbeStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SyncJClockProbeStatsTable.
+             Entries exist in this table for each Clock Probe."
+    INDEX { neIndex, f3SyncJClockProbeIndex, f3SyncJClockProbeStatsIndex}
+    ::= { f3SyncJClockProbeStatsTable 1 }
+
+F3SyncJClockProbeStatsEntry ::= SEQUENCE {
+    f3SyncJClockProbeStatsIndex                  Integer32,
+    f3SyncJClockProbeStatsIntervalType           CmPmIntervalType,
+    f3SyncJClockProbeStatsValid                  TruthValue,
+    f3SyncJClockProbeStatsAction                 CmPmBinAction,
+    f3SyncJClockProbeStatsMTIE1s                 Unsigned32,
+    f3SyncJClockProbeStatsMTIE10s                Unsigned32,
+    f3SyncJClockProbeStatsMTIE100s               Unsigned32,
+    f3SyncJClockProbeStatsMTIE1000s              Unsigned32,
+    f3SyncJClockProbeStatsMTIE10000s             Unsigned32,
+    f3SyncJClockProbeStatsMTIE50000s             Unsigned32,
+    f3SyncJClockProbeStatsMaxTE                  Integer32,
+    f3SyncJClockProbeStatsMaxConstTE             Integer32
+    
+}
+
+f3SyncJClockProbeStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this PTPNetworkProbe statistics entry. 
+            Index 1 corresponds to 15minute, index 2 to 1 day and index
+            3 corresponds to rollover."
+    ::= { f3SyncJClockProbeStatsEntry 1 }
+
+f3SyncJClockProbeStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day or rollover."
+    ::= { f3SyncJClockProbeStatsEntry 2 }
+
+f3SyncJClockProbeStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3SyncJClockProbeStatsEntry 3 }
+
+f3SyncJClockProbeStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3SyncJClockProbeStatsEntry 4 }
+
+f3SyncJClockProbeStatsMTIE1s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1s observation window."
+    ::= { f3SyncJClockProbeStatsEntry 5 }
+
+f3SyncJClockProbeStatsMTIE10s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10s observation window."
+    ::= { f3SyncJClockProbeStatsEntry 6 }
+
+f3SyncJClockProbeStatsMTIE100s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 100s observation window."
+    ::= { f3SyncJClockProbeStatsEntry 7 }
+
+f3SyncJClockProbeStatsMTIE1000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1000s observation window."
+    ::= { f3SyncJClockProbeStatsEntry 8 }
+
+f3SyncJClockProbeStatsMTIE10000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10000s observation window."
+    ::= { f3SyncJClockProbeStatsEntry 9 }
+
+f3SyncJClockProbeStatsMTIE50000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 50000s observation window."
+    ::= { f3SyncJClockProbeStatsEntry 10 }
+
+f3SyncJClockProbeStatsMaxTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum TE value in ns observed over PM interval."
+    ::= { f3SyncJClockProbeStatsEntry 11 }
+
+f3SyncJClockProbeStatsMaxConstTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum constant TE value in ns observed over PM interval."
+    ::= { f3SyncJClockProbeStatsEntry 12 }
+
+
+--
+-- SyncJack Clock Probe History Table
+--
+f3SyncJClockProbeHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SyncJClockProbeHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of SyncJack Clock Probe statistics.  
+             These reflect the history data."
+    ::= { f3SyncJPerformanceObjects 5 }
+
+f3SyncJClockProbeHistoryEntry OBJECT-TYPE
+    SYNTAX      F3SyncJClockProbeHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SyncJClockProbeHistoryTable.
+             Entries exist in this table for each Clock Probe."
+    INDEX { neIndex, f3SyncJClockProbeIndex, f3SyncJClockProbeStatsIndex,
+            f3SyncJClockProbeHistoryIndex}
+    ::= { f3SyncJClockProbeHistoryTable 1 }
+
+F3SyncJClockProbeHistoryEntry ::= SEQUENCE {
+    f3SyncJClockProbeHistoryIndex                  Integer32,
+    f3SyncJClockProbeHistoryTime                   DateAndTime,
+    f3SyncJClockProbeHistoryValid                  TruthValue,
+    f3SyncJClockProbeHistoryAction                 CmPmBinAction,
+    f3SyncJClockProbeHistoryMTIE1s                 Unsigned32,
+    f3SyncJClockProbeHistoryMTIE10s                Unsigned32,
+    f3SyncJClockProbeHistoryMTIE100s               Unsigned32,
+    f3SyncJClockProbeHistoryMTIE1000s              Unsigned32,
+    f3SyncJClockProbeHistoryMTIE10000s             Unsigned32,
+    f3SyncJClockProbeHistoryMTIE50000s             Unsigned32,
+    f3SyncJClockProbeHistoryMaxTE                  Integer32,
+    f3SyncJClockProbeHistoryMaxConstTE             Integer32
+}
+
+f3SyncJClockProbeHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this SyncJack Clock Probe PM history entry."
+    ::= { f3SyncJClockProbeHistoryEntry 1 }
+
+f3SyncJClockProbeHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3SyncJClockProbeHistoryEntry 2 }
+
+f3SyncJClockProbeHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3SyncJClockProbeHistoryEntry 3 }
+
+f3SyncJClockProbeHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3SyncJClockProbeHistoryEntry 4 }
+
+f3SyncJClockProbeHistoryMTIE1s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1s observation window."
+    ::= { f3SyncJClockProbeHistoryEntry 5 }
+
+f3SyncJClockProbeHistoryMTIE10s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10s observation window."
+    ::= { f3SyncJClockProbeHistoryEntry 6 }
+
+f3SyncJClockProbeHistoryMTIE100s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 100s observation window."
+    ::= { f3SyncJClockProbeHistoryEntry 7 }
+
+f3SyncJClockProbeHistoryMTIE1000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1000s observation window."
+    ::= { f3SyncJClockProbeHistoryEntry 8 }
+
+f3SyncJClockProbeHistoryMTIE10000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10000s observation window."
+    ::= { f3SyncJClockProbeHistoryEntry 9 }
+
+f3SyncJClockProbeHistoryMTIE50000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 50000s observation window."
+    ::= { f3SyncJClockProbeHistoryEntry 10 }
+
+f3SyncJClockProbeHistoryMaxTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum TE value in ns observed over PM interval."
+    ::= { f3SyncJClockProbeHistoryEntry 11 }
+
+f3SyncJClockProbeHistoryMaxConstTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum constant TE value in ns observed over PM interval."
+    ::= { f3SyncJClockProbeHistoryEntry 12 }
+
+--
+-- Clock Probe Threshold Table
+--
+f3SyncJClockProbeThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SyncJClockProbeThresholdEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow support the Clock Probe 
+             Thresholds."
+    ::= { f3SyncJPerformanceObjects 6 }
+
+f3SyncJClockProbeThresholdEntry OBJECT-TYPE
+    SYNTAX      F3SyncJClockProbeThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SyncJClockProbeThresholdTable."
+    INDEX { neIndex, f3SyncJClockProbeIndex, f3SyncJClockProbeStatsIndex,
+            f3SyncJClockProbeThresholdIndex}
+    ::= { f3SyncJClockProbeThresholdTable 1 }
+
+F3SyncJClockProbeThresholdEntry ::= SEQUENCE {
+    f3SyncJClockProbeThresholdIndex       Integer32,
+    f3SyncJClockProbeThresholdInterval    CmPmIntervalType,
+    f3SyncJClockProbeThresholdVariable    VariablePointer,
+    f3SyncJClockProbeThresholdValueLo     Unsigned32,
+    f3SyncJClockProbeThresholdValueHi     Unsigned32,
+    f3SyncJClockProbeThresholdMonValue    PerfCounter64
+}
+
+f3SyncJClockProbeThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3SyncJClockProbeThresholdTable."
+    ::= { f3SyncJClockProbeThresholdEntry 1 }
+
+f3SyncJClockProbeThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3SyncJClockProbeThresholdEntry 2 }
+
+f3SyncJClockProbeThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3SyncJClockProbeThresholdEntry 3 }
+
+f3SyncJClockProbeThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3SyncJClockProbeThresholdEntry 4 }
+
+f3SyncJClockProbeThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3SyncJClockProbeThresholdEntry 5 }
+
+f3SyncJClockProbeThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3SyncJClockProbeThresholdVariable."
+    ::= { f3SyncJClockProbeThresholdEntry 6 }
+
+--
+-- SyncJack PTP Clock Probe Current Statistics Table
+--
+f3SyncJPTPClockProbeStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SyncJPTPClockProbeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of SyncJack PTP Clock Probe statistics.  
+             These reflect the current data."
+    ::= { f3SyncJPerformanceObjects 7 }
+
+f3SyncJPTPClockProbeStatsEntry OBJECT-TYPE
+    SYNTAX      F3SyncJPTPClockProbeStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SyncJPTPClockProbeStatsTable.
+             Entries exist in this table for each PTP Clock Probe."
+    INDEX { neIndex, f3SyncJPTPClockProbeIndex, f3SyncJPTPClockProbeStatsIndex}
+    ::= { f3SyncJPTPClockProbeStatsTable 1 }
+
+F3SyncJPTPClockProbeStatsEntry ::= SEQUENCE {
+    f3SyncJPTPClockProbeStatsIndex                  Integer32,
+    f3SyncJPTPClockProbeStatsIntervalType           CmPmIntervalType,
+    f3SyncJPTPClockProbeStatsValid                  TruthValue,
+    f3SyncJPTPClockProbeStatsAction                 CmPmBinAction,
+    f3SyncJPTPClockProbeStatsMTIE1s                 Unsigned32,
+    f3SyncJPTPClockProbeStatsMTIE10s                Unsigned32,
+    f3SyncJPTPClockProbeStatsMTIE100s               Unsigned32,
+    f3SyncJPTPClockProbeStatsMTIE1000s              Unsigned32,
+    f3SyncJPTPClockProbeStatsMTIE10000s             Unsigned32,
+    f3SyncJPTPClockProbeStatsMTIE50000s             Unsigned32,
+    f3SyncJPTPClockProbeStatsMaxTE                  Integer32,
+    f3SyncJPTPClockProbeStatsMaxConstTE             Integer32
+    
+}
+
+f3SyncJPTPClockProbeStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this PTPNetworkProbe statistics entry. 
+            Index 1 corresponds to 15minute, index 2 to 1 day and index
+            3 corresponds to rollover."
+    ::= { f3SyncJPTPClockProbeStatsEntry 1 }
+
+f3SyncJPTPClockProbeStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day or rollover."
+    ::= { f3SyncJPTPClockProbeStatsEntry 2 }
+
+f3SyncJPTPClockProbeStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3SyncJPTPClockProbeStatsEntry 3 }
+
+f3SyncJPTPClockProbeStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3SyncJPTPClockProbeStatsEntry 4 }
+
+f3SyncJPTPClockProbeStatsMTIE1s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1s observation window."
+    ::= { f3SyncJPTPClockProbeStatsEntry 5 }
+
+f3SyncJPTPClockProbeStatsMTIE10s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10s observation window."
+    ::= { f3SyncJPTPClockProbeStatsEntry 6 }
+
+f3SyncJPTPClockProbeStatsMTIE100s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 100s observation window."
+    ::= { f3SyncJPTPClockProbeStatsEntry 7 }
+
+f3SyncJPTPClockProbeStatsMTIE1000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1000s observation window."
+    ::= { f3SyncJPTPClockProbeStatsEntry 8 }
+
+f3SyncJPTPClockProbeStatsMTIE10000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10000s observation window."
+    ::= { f3SyncJPTPClockProbeStatsEntry 9 }
+
+f3SyncJPTPClockProbeStatsMTIE50000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 50000s observation window."
+    ::= { f3SyncJPTPClockProbeStatsEntry 10 }
+
+f3SyncJPTPClockProbeStatsMaxTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum TE value in ns observed over PM interval."
+    ::= { f3SyncJPTPClockProbeStatsEntry 11 }
+
+f3SyncJPTPClockProbeStatsMaxConstTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum constant TE value in ns observed over PM interval."
+    ::= { f3SyncJPTPClockProbeStatsEntry 12 }
+
+
+--
+-- SyncJack PTP Clock Probe History Table
+--
+f3SyncJPTPClockProbeHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SyncJPTPClockProbeHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of SyncJack PTP Clock Probe statistics.  
+             These reflect the history data."
+    ::= { f3SyncJPerformanceObjects 8 }
+
+f3SyncJPTPClockProbeHistoryEntry OBJECT-TYPE
+    SYNTAX      F3SyncJPTPClockProbeHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SyncJPTPClockProbeHistoryTable.
+             Entries exist in this table for each PTP Clock Probe."
+    INDEX { neIndex, f3SyncJPTPClockProbeIndex, f3SyncJPTPClockProbeStatsIndex,
+            f3SyncJPTPClockProbeHistoryIndex}
+    ::= { f3SyncJPTPClockProbeHistoryTable 1 }
+
+F3SyncJPTPClockProbeHistoryEntry ::= SEQUENCE {
+    f3SyncJPTPClockProbeHistoryIndex                  Integer32,
+    f3SyncJPTPClockProbeHistoryTime                   DateAndTime,
+    f3SyncJPTPClockProbeHistoryValid                  TruthValue,
+    f3SyncJPTPClockProbeHistoryAction                 CmPmBinAction,
+    f3SyncJPTPClockProbeHistoryMTIE1s                 Unsigned32,
+    f3SyncJPTPClockProbeHistoryMTIE10s                Unsigned32,
+    f3SyncJPTPClockProbeHistoryMTIE100s               Unsigned32,
+    f3SyncJPTPClockProbeHistoryMTIE1000s              Unsigned32,
+    f3SyncJPTPClockProbeHistoryMTIE10000s             Unsigned32,
+    f3SyncJPTPClockProbeHistoryMTIE50000s             Unsigned32,
+    f3SyncJPTPClockProbeHistoryMaxTE                  Integer32,
+    f3SyncJPTPClockProbeHistoryMaxConstTE             Integer32
+}
+
+f3SyncJPTPClockProbeHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this SyncJack PTP Clock Probe PM history entry."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 1 }
+
+f3SyncJPTPClockProbeHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3SyncJPTPClockProbeHistoryEntry 2 }
+
+f3SyncJPTPClockProbeHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 3 }
+
+f3SyncJPTPClockProbeHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 4 }
+
+f3SyncJPTPClockProbeHistoryMTIE1s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1s observation window."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 5 }
+
+f3SyncJPTPClockProbeHistoryMTIE10s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10s observation window."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 6 }
+
+f3SyncJPTPClockProbeHistoryMTIE100s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 100s observation window."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 7 }
+
+f3SyncJPTPClockProbeHistoryMTIE1000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 1000s observation window."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 8 }
+
+f3SyncJPTPClockProbeHistoryMTIE10000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 10000s observation window."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 9 }
+
+f3SyncJPTPClockProbeHistoryMTIE50000s OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates MTIE value in ns for 50000s observation window."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 10 }
+
+f3SyncJPTPClockProbeHistoryMaxTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum TE value in ns observed over PM interval."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 11 }
+
+f3SyncJPTPClockProbeHistoryMaxConstTE OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This attribute indicates maximum constant TE value in ns observed over PM interval."
+    ::= { f3SyncJPTPClockProbeHistoryEntry 12 }
+
+--
+-- PTP Clock Probe Threshold Table
+--
+f3SyncJPTPClockProbeThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SyncJPTPClockProbeThresholdEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow support the PTP Clock Probe 
+             Thresholds."
+    ::= { f3SyncJPerformanceObjects 9 }
+
+f3SyncJPTPClockProbeThresholdEntry OBJECT-TYPE
+    SYNTAX      F3SyncJPTPClockProbeThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SyncJPTPClockProbeThresholdTable."
+    INDEX { neIndex, f3SyncJPTPClockProbeIndex, f3SyncJPTPClockProbeStatsIndex,
+            f3SyncJPTPClockProbeThresholdIndex}
+    ::= { f3SyncJPTPClockProbeThresholdTable 1 }
+
+F3SyncJPTPClockProbeThresholdEntry ::= SEQUENCE {
+    f3SyncJPTPClockProbeThresholdIndex       Integer32,
+    f3SyncJPTPClockProbeThresholdInterval    CmPmIntervalType,
+    f3SyncJPTPClockProbeThresholdVariable    VariablePointer,
+    f3SyncJPTPClockProbeThresholdValueLo     Unsigned32,
+    f3SyncJPTPClockProbeThresholdValueHi     Unsigned32,
+    f3SyncJPTPClockProbeThresholdMonValue    PerfCounter64
+}
+
+f3SyncJPTPClockProbeThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3SyncJPTPClockProbeThresholdTable."
+    ::= { f3SyncJPTPClockProbeThresholdEntry 1 }
+
+f3SyncJPTPClockProbeThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3SyncJPTPClockProbeThresholdEntry 2 }
+
+f3SyncJPTPClockProbeThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3SyncJPTPClockProbeThresholdEntry 3 }
+
+f3SyncJPTPClockProbeThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3SyncJPTPClockProbeThresholdEntry 4 }
+
+f3SyncJPTPClockProbeThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3SyncJPTPClockProbeThresholdEntry 5 }
+
+f3SyncJPTPClockProbeThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3SyncJPTPClockProbeThresholdVariable."
+    ::= { f3SyncJPTPClockProbeThresholdEntry 6 }
+
 ---
 ---Notifications
 ---
@@ -3819,6 +4658,36 @@ f3SyncJPTPNetworkProbeStatusChangeTrap NOTIFICATION-TYPE
              on a SyncJack PTP Network Probe."
   ::= { f3SyncJNotifications 4 }
 
+f3SyncJClockProbeThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3SyncJClockProbeThresholdIndex,       
+                f3SyncJClockProbeThresholdInterval,
+                f3SyncJClockProbeThresholdVariable,
+                f3SyncJClockProbeThresholdValueLo,
+                f3SyncJClockProbeThresholdValueHi,
+                f3SyncJClockProbeThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an Clock Probe is crossed."
+  ::= { f3SyncJNotifications 5 }
+
+f3SyncJPTPClockProbeThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3SyncJPTPClockProbeThresholdIndex,       
+                f3SyncJPTPClockProbeThresholdInterval,
+                f3SyncJPTPClockProbeThresholdVariable,
+                f3SyncJPTPClockProbeThresholdValueLo,
+                f3SyncJPTPClockProbeThresholdValueHi,
+                f3SyncJPTPClockProbeThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an PTP Clock Probe is crossed."
+  ::= { f3SyncJNotifications 6 }
+
 --
 -- CONFORMANCE
 --
@@ -3876,6 +4745,7 @@ f3SyncJObjectGroup OBJECT-GROUP
 
         f3SyncJClockProbeMaxTEThreshold,
         f3SyncJClockProbeMaxTEClrThreshold,
+        f3SyncJClockProbeMTIERestart,
 
 
         f3SyncJClockProbeResHistoryIndex, 
@@ -3984,6 +4854,7 @@ f3SyncJObjectGroup OBJECT-GROUP
 
         f3SyncJPTPClockProbeSlavePortIdentity,
         f3SyncJPTPClockProbeMasterPortIdentity,
+        f3SyncJPTPClockProbeMTIERestart,
 
         f3SyncJPTPClockProbeResHistoryIndex, f3SyncJPTPClockProbeResHistoryAlias,
         f3SyncJPTPClockProbeResHistoryMeasurementDirection,
@@ -4077,7 +4948,11 @@ f3SyncJObjectGroup OBJECT-GROUP
         f3SyncJScheduleGroupEntityList, f3SyncJScheduleGroupType,
         f3SyncJScheduleGroupStartTime, f3SyncJScheduleGroupDuration,
         f3SyncJScheduleGroupStatus, f3SyncJScheduleGroupStorageType,
-        f3SyncJScheduleGroupRowStatus
+        f3SyncJScheduleGroupRowStatus,
+        
+        f3UserDefinedMTIEMaskIndex, f3UserDefinedMTIEMaskName,                 
+        f3UserDefinedMTIEMaskDisplayPoints, f3UserDefinedMTIEMaskMeasurmentPoints,   
+        f3UserDefinedMTIEMaskStorageType, f3UserDefinedMTIEMaskRowStatus                
     }
     STATUS  current
     DESCRIPTION
@@ -4171,7 +5046,65 @@ f3SyncJPerfObjectGroup OBJECT-GROUP
       f3SyncJPTPNetworkProbeThresholdVariable,
       f3SyncJPTPNetworkProbeThresholdValueLo,
       f3SyncJPTPNetworkProbeThresholdValueHi,
-      f3SyncJPTPNetworkProbeThresholdMonValue
+      f3SyncJPTPNetworkProbeThresholdMonValue,
+
+      f3SyncJClockProbeStatsIndex, f3SyncJClockProbeStatsIntervalType,
+      f3SyncJClockProbeStatsValid, f3SyncJClockProbeStatsAction,
+      f3SyncJClockProbeStatsMTIE1s,
+      f3SyncJClockProbeStatsMTIE10s,
+      f3SyncJClockProbeStatsMTIE100s,
+      f3SyncJClockProbeStatsMTIE1000s,
+      f3SyncJClockProbeStatsMTIE10000s,
+      f3SyncJClockProbeStatsMTIE50000s,
+      f3SyncJClockProbeStatsMaxTE,
+      f3SyncJClockProbeStatsMaxConstTE,
+
+      f3SyncJClockProbeHistoryIndex, f3SyncJClockProbeHistoryTime,
+      f3SyncJClockProbeHistoryValid, f3SyncJClockProbeHistoryAction,
+      f3SyncJClockProbeHistoryMTIE1s,
+      f3SyncJClockProbeHistoryMTIE10s,
+      f3SyncJClockProbeHistoryMTIE100s,
+      f3SyncJClockProbeHistoryMTIE1000s,
+      f3SyncJClockProbeHistoryMTIE10000s,
+      f3SyncJClockProbeHistoryMTIE50000s,
+      f3SyncJClockProbeHistoryMaxTE,
+      f3SyncJClockProbeHistoryMaxConstTE,
+
+      f3SyncJClockProbeThresholdIndex,
+      f3SyncJClockProbeThresholdInterval,
+      f3SyncJClockProbeThresholdVariable,
+      f3SyncJClockProbeThresholdValueLo,
+      f3SyncJClockProbeThresholdValueHi,
+      f3SyncJClockProbeThresholdMonValue,
+
+      f3SyncJPTPClockProbeStatsIndex, f3SyncJPTPClockProbeStatsIntervalType,
+      f3SyncJPTPClockProbeStatsValid, f3SyncJPTPClockProbeStatsAction,
+      f3SyncJPTPClockProbeStatsMTIE1s,
+      f3SyncJPTPClockProbeStatsMTIE10s,
+      f3SyncJPTPClockProbeStatsMTIE100s,
+      f3SyncJPTPClockProbeStatsMTIE1000s,
+      f3SyncJPTPClockProbeStatsMTIE10000s,
+      f3SyncJPTPClockProbeStatsMTIE50000s,
+      f3SyncJPTPClockProbeStatsMaxTE,
+      f3SyncJPTPClockProbeStatsMaxConstTE,
+
+      f3SyncJPTPClockProbeHistoryIndex, f3SyncJPTPClockProbeHistoryTime,
+      f3SyncJPTPClockProbeHistoryValid, f3SyncJPTPClockProbeHistoryAction,
+      f3SyncJPTPClockProbeHistoryMTIE1s,
+      f3SyncJPTPClockProbeHistoryMTIE10s,
+      f3SyncJPTPClockProbeHistoryMTIE100s,
+      f3SyncJPTPClockProbeHistoryMTIE1000s,
+      f3SyncJPTPClockProbeHistoryMTIE10000s,
+      f3SyncJPTPClockProbeHistoryMTIE50000s,
+      f3SyncJPTPClockProbeHistoryMaxTE,
+      f3SyncJPTPClockProbeHistoryMaxConstTE,
+
+      f3SyncJPTPClockProbeThresholdIndex,
+      f3SyncJPTPClockProbeThresholdInterval,
+      f3SyncJPTPClockProbeThresholdVariable,
+      f3SyncJPTPClockProbeThresholdValueLo,
+      f3SyncJPTPClockProbeThresholdValueHi,
+      f3SyncJPTPClockProbeThresholdMonValue
     }
     STATUS  current
     DESCRIPTION
@@ -4182,6 +5115,8 @@ f3SyncJPerfObjectGroup OBJECT-GROUP
 f3SyncJNotifGroup NOTIFICATION-GROUP
     NOTIFICATIONS {
         f3SyncJPTPNetworkProbeThresholdCrossingAlert,
+        f3SyncJClockProbeThresholdCrossingAlert,
+        f3SyncJPTPClockProbeThresholdCrossingAlert,
         f3SyncJClockProbeStatusChangeTrap,
         f3SyncJPTPClockProbeStatusChangeTrap,
         f3SyncJPTPNetworkProbeStatusChangeTrap 

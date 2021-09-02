@@ -3,8 +3,7 @@ text: 'Blue Coat SSL Visibility'
 type: network
 ifname: true
 icon: bluecoat
-mib_dir:
-    - bluecoat
+mib_dir: bluecoat
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

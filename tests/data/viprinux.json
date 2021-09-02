@@ -36,23 +36,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": "Viprinet VPN Router",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "VPN Router ",
-                    "features": null,
-                    "os": "viprinux",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "viprinux.png",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

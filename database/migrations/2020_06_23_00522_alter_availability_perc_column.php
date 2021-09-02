@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AlterAvailabilityPercColumn extends Migration
 {
@@ -17,6 +17,7 @@ class AlterAvailabilityPercColumn extends Migration
             $table->decimal('availability_perc', 9, 6)->default(0)->change();
         });
     }
+
     /**
      * Reverse the migrations.
      *

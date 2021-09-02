@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2016 Karl Shea, LibreNMS
 * @author     Karl Shea <karl@karlshea.com>
 *
@@ -30,8 +30,8 @@ $colour_area_max = 'FFCCCC';
 $graph_max = 0;
 $unit_text = 'Mode';
 
-$gpsd  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
-if (rrdtool_check_rrd_exists($gpsd)) {
+$gpsd = Rrd::name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
+if (Rrd::checkRrdExists($gpsd)) {
     $rrd_filename = $gpsd;
 } else {
     echo "file missing: $rrd_filename";

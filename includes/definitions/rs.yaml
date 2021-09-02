@@ -1,0 +1,10 @@
+os: rs
+text: Rohde & Schwarz
+over:
+    - { graph: device_power, text: Output Power }
+type: network
+mib_dir: rs
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.2566.127.1.2.

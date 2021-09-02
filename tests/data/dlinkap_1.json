@@ -26,7 +26,7 @@
                     "sysDescr": "D-Link DAP-2660",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "D-Link DAP-2660",
                     "features": null,
                     "os": "dlinkap",
                     "type": "wireless",
@@ -36,23 +36,33 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
                 {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.171.10.37.52",
-                    "sysDescr": "D-Link DAP-2660",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "D-Link DAP-2660 ",
-                    "features": null,
-                    "os": "dlinkap",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "dlink.svg",
-                    "location": null
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "dlinkap",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Memory",
+                    "mempool_perc": 76,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.171.10.37.52.5.1.4.0",
+                    "mempool_used": 76,
+                    "mempool_used_oid": null,
+                    "mempool_free": 24,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

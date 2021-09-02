@@ -16,13 +16,12 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
             return "<span title='$message' class='$color'>$type</span>";
         })->implode(', ');
 
-    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
-    ?>
+    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']); ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                    <?php echo '<a href="device/device='.$device['device_id'].'/tab=services">'?><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong><?php echo '</a>'?>
+                    <?php echo '<a href="device/device=' . $device['device_id'] . '/tab=services">'?><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong><?php echo '</a>'?>
                     </div>
                     <table class="table table-hover table-condensed table-striped">
                         <tr>

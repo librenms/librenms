@@ -1,17 +1,18 @@
 MIKROTIK-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+InetAddressType, InetAddress, InetPortNumber FROM INET-ADDRESS-MIB
 MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, IpAddress,
 Counter64, enterprises, NOTIFICATION-TYPE, TimeTicks FROM SNMPv2-SMI
 TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
 OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "201807310000Z"
+  LAST-UPDATED "202010080000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "201807310000Z"
+  REVISION "202010080000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -39,6 +40,7 @@ mtxrLTEModem OBJECT IDENTIFIER ::= { mtXRouterOs 16 }
 mtxrPartition OBJECT IDENTIFIER ::= { mtXRouterOs 17 }
 mtxrScriptRun OBJECT IDENTIFIER ::= { mtXRouterOs 18 }
 mtxrOptical OBJECT IDENTIFIER ::= { mtXRouterOs 19 }
+mtxrIPSec OBJECT IDENTIFIER ::= { mtXRouterOs 20 }
 
 ObjectIndex ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "x"
@@ -104,6 +106,12 @@ BoolValue ::= TEXTUAL-CONVENTION
     "Boolean value."
     SYNTAX       INTEGER { false(0), true(1) }
 
+IsakmpCookie ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "16a"
+    STATUS          current
+    DESCRIPTION "ISAKMP cookie string"
+    SYNTAX  OCTET STRING (SIZE (16))
+
 -- WIRELESS ********************************************************************
 
 mtxrWlStatTable OBJECT-TYPE
@@ -129,7 +137,9 @@ MtxrWlStatEntry ::= SEQUENCE {
     mtxrWlStatSsid DisplayString,
     mtxrWlStatBssid MacAddress,
     mtxrWlStatFreq Integer32,
-    mtxrWlStatBand DisplayString
+    mtxrWlStatBand DisplayString,
+    mtxrWlStatTxCCQ Counter32,
+    mtxrWlStatRxCCQ Counter32
 }
 
 mtxrWlStatIndex OBJECT-TYPE
@@ -188,6 +198,21 @@ mtxrWlStatBand OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrWlStatEntry 8 }
 
+mtxrWlStatTxCCQ OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlStatEntry 9 }
+
+mtxrWlStatRxCCQ OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlStatEntry 10 }
+
+-- WlRtabTable
 mtxrWlRtabTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrWlRtabEntry
     MAX-ACCESS not-accessible
@@ -223,7 +248,8 @@ MtxrWlRtabEntry ::= SEQUENCE {
     mtxrWlRtabRxStrengthCh1 Integer32,
     mtxrWlRtabTxStrengthCh2 Integer32,
     mtxrWlRtabRxStrengthCh2 Integer32,
-    mtxrWlRtabTxStrength Integer32
+    mtxrWlRtabTxStrength Integer32,
+    mtxrWlRtabRadioName DisplayString
 }
 
 mtxrWlRtabAddr OBJECT-TYPE
@@ -358,6 +384,13 @@ mtxrWlRtabTxStrength OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrWlRtabEntry 19 }
+
+mtxrWlRtabRadioName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlRtabEntry 20 }
 
 mtxrWlRtabEntryCount OBJECT-TYPE
     SYNTAX Gauge32
@@ -500,7 +533,8 @@ MtxrWlCMRtabEntry ::= SEQUENCE {
     mtxrWlCMRtabRxRate Gauge32,
     mtxrWlCMRtabTxStrength Integer32,
     mtxrWlCMRtabRxStrength Integer32,
-    mtxrWlCMRtabSsid DisplayString
+    mtxrWlCMRtabSsid DisplayString,
+    mtxrWlCMRtabEapIdent DisplayString
 }
 
 mtxrWlCMRtabAddr OBJECT-TYPE
@@ -587,6 +621,13 @@ mtxrWlCMRtabSsid OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrWlCMRtabEntry 12 }
+
+mtxrWlCMRtabEapIdent OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlCMRtabEntry 13 }
 
 mtxrWlCMRtabEntryCount OBJECT-TYPE
     SYNTAX Gauge32
@@ -745,9 +786,9 @@ MtxrWl60GEntry ::= SEQUENCE {
     mtxrWl60GMcs Integer32,
     mtxrWl60GSignal Integer32,
     mtxrWl60GTxSector Integer32,
-    mtxrWl60GRxSector Integer32,
     mtxrWl60GTxSectorInfo DisplayString,
-    mtxrWl60GRssi Integer32
+    mtxrWl60GRssi Integer32,
+    mtxrWl60GPhyRate Gauge32
 }
 
 mtxrWl60GIndex OBJECT-TYPE
@@ -818,13 +859,6 @@ mtxrWl60GTxSector OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrWl60GEntry 9 }
 
-mtxrWl60GRxSector OBJECT-TYPE
-    SYNTAX Integer32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtxrWl60GEntry 10 }
-
 mtxrWl60GTxSectorInfo OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
@@ -838,6 +872,13 @@ mtxrWl60GRssi OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrWl60GEntry 12 }
+
+mtxrWl60GPhyRate OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 13 }
 
 -- W60GSta
 mtxrWl60GStaTable OBJECT-TYPE
@@ -862,7 +903,6 @@ MtxrWl60GStaEntry ::= SEQUENCE {
     mtxrWl60GStaMcs Integer32,
     mtxrWl60GStaSignal Integer32,
     mtxrWl60GStaTxSector Integer32,
-    mtxrWl60GStaRxSector Integer32,
     mtxrWl60GStaPhyRate Gauge32,
     mtxrWl60GStaRssi Integer32,
     mtxrWl60GStaDistance Integer32
@@ -910,13 +950,6 @@ mtxrWl60GStaTxSector OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrWl60GStaEntry 6 }
 
-mtxrWl60GStaRxSector OBJECT-TYPE
-    SYNTAX Integer32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtxrWl60GStaEntry 7 }
-
 mtxrWl60GStaPhyRate OBJECT-TYPE
     SYNTAX Gauge32
     MAX-ACCESS read-only
@@ -947,6 +980,8 @@ mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWlStatBssid,
 	mtxrWlStatFreq,
 	mtxrWlStatBand,
+        mtxrWlStatTxCCQ,
+        mtxrWlStatRxCCQ,
 	mtxrWlRtabStrength,
 	mtxrWlRtabTxBytes,
         mtxrWlRtabRxBytes,
@@ -965,6 +1000,7 @@ mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWlRtabTxStrengthCh2,
         mtxrWlRtabRxStrengthCh2,
         mtxrWlRtabTxStrength,
+        mtxrWlRtabRadioName,
         mtxrWlApTxRate,
 	mtxrWlApRxRate,
 	mtxrWlApSsid,
@@ -998,15 +1034,14 @@ mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWl60GMcs,
         mtxrWl60GSignal,
         mtxrWl60GTxSector,
-        mtxrWl60GRxSector,
         mtxrWl60GTxSectorInfo,
         mtxrWl60GRssi,
+        mtxrWl60GPhyRate,
         mtxrWl60GStaConnected,
         mtxrWl60GStaRemote,
         mtxrWl60GStaMcs,
         mtxrWl60GStaSignal,
-        mtxrWl60GStaTxSector,
-        mtxrWl60GStaRxSector
+        mtxrWl60GStaTxSector
     }
     STATUS current
     DESCRIPTION ""
@@ -1376,28 +1411,86 @@ mtxrHlBackupPowerSupplyState OBJECT-TYPE
     ::= { mtxrHealth 16 }
 
 mtxrHlFanSpeed1 OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX Gauge32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "rpm"
     ::= { mtxrHealth 17 }
 
 mtxrHlFanSpeed2 OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX Gauge32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "rpm"
     ::= { mtxrHealth 18 }
 
+mtxrGaugeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrGaugeTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrHealth 100 }
+
+mtxrGaugeTableEntry OBJECT-TYPE
+    SYNTAX MtxrGaugeTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrGaugeIndex }
+    ::= { mtxrGaugeTable 1 }
+
+MtxrGaugeTableEntry ::= SEQUENCE {
+    mtxrGaugeIndex ObjectIndex,
+    mtxrGaugeName DisplayString,
+    mtxrGaugeValue Gauge32,
+    mtxrGaugeUnit INTEGER
+}
+
+mtxrGaugeIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrGaugeTableEntry 1 }
+
+mtxrGaugeName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrGaugeTableEntry 2 }
+
+mtxrGaugeValue OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrGaugeTableEntry 3 }
+
+mtxrGaugeUnit OBJECT-TYPE
+    SYNTAX INTEGER {
+        celsius(1),
+        rpm(2),
+        dV(3),
+        dA(4),
+        dW(5),
+        status(6)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "units"
+    ::= { mtxrGaugeTableEntry 4 }
+
 mtxrHealthGroup OBJECT-GROUP OBJECTS {
         mtxrHlCoreVoltage, mtxrHlThreeDotThreeVoltage, mtxrHlFiveVoltage,
         mtxrHlTwelveVoltage, mtxrHlSensorTemperature, mtxrHlCpuTemperature,
-        mtxrHlBoardTemperature, mtxrHlVoltage, mtxrHlActiveFan,
+        mtxrHlBoardTemperature, mtxrHlVoltage, mtxrHlActiveFan, 
 	mtxrHlTemperature, mtxrHlProcessorTemperature,
         mtxrHlCurrent, mtxrHlPower,
         mtxrHlProcessorFrequency,
         mtxrHlPowerSupplyState, mtxrHlBackupPowerSupplyState,
-        mtxrHlFanSpeed1, mtxrHlFanSpeed2
+        mtxrHlFanSpeed1, mtxrHlFanSpeed2,
+        mtxrGaugeName, mtxrGaugeValue, mtxrGaugeUnit
     }
     STATUS current
     DESCRIPTION ""
@@ -1858,7 +1951,7 @@ MtxrDnStatEntry ::= SEQUENCE {
     mtxrDnStatTxStrength Integer32,
     mtxrDnStatRxStrength Integer32,
     mtxrDnConnected Integer32
-}
+}	
 
 mtxrDnStatIndex OBJECT-TYPE
     SYNTAX ObjectIndex
@@ -2185,7 +2278,8 @@ MtxrInterfaceStatsEntry ::= SEQUENCE {
     mtxrInterfaceStatsTxJabber Counter64,
     mtxrInterfaceStatsTxFCSError Counter64,
     mtxrInterfaceStatsTxControl Counter64,
-    mtxrInterfaceStatsTxFragment Counter64
+    mtxrInterfaceStatsTxFragment Counter64,
+    mtxrInterfaceStatsLinkDowns Counter32
 }
 
 mtxrInterfaceStatsIndex OBJECT-TYPE
@@ -2285,7 +2379,7 @@ mtxrInterfaceStatsRxBytes OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrInterfaceStatsEntry 31 }
-
+ 
 mtxrInterfaceStatsRxPackets OBJECT-TYPE
     SYNTAX Counter64
     MAX-ACCESS read-only
@@ -2657,6 +2751,13 @@ mtxrInterfaceStatsTxFragment OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrInterfaceStatsEntry 89 }
 
+mtxrInterfaceStatsLinkDowns OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrInterfaceStatsEntry 90 }
+
 mtxrInterfaceStatsGroup OBJECT-GROUP OBJECTS {
         mtxrInterfaceStatsName,
         mtxrInterfaceStatsDriverRxBytes,
@@ -2726,7 +2827,8 @@ mtxrInterfaceStatsGroup OBJECT-GROUP OBJECTS {
         mtxrInterfaceStatsTxJabber,
         mtxrInterfaceStatsTxFCSError,
         mtxrInterfaceStatsTxControl,
-        mtxrInterfaceStatsTxFragment
+        mtxrInterfaceStatsTxFragment,
+        mtxrInterfaceStatsLinkDowns
     }
     STATUS current
     DESCRIPTION ""
@@ -2840,7 +2942,14 @@ MtxrLTEModemEntry ::= SEQUENCE {
     mtxrLTEModemSignalRSRP Integer32,
     mtxrLTEModemCellId HexInt,
     mtxrLTEModemAccessTechnology INTEGER,
-    mtxrLTEModemSignalSINR Integer32
+    mtxrLTEModemSignalSINR Integer32,
+    mtxrLTEModemEnbId Integer32,
+    mtxrLTEModemSectorId Integer32,
+    mtxrLTEModemLac Integer32,
+    mtxrLTEModemIMEI DisplayString,
+    mtxrLTEModemIMSI DisplayString,
+    mtxrLTEModemUICC DisplayString,
+    mtxrLTEModemRAT DisplayString
 }
 
 mtxrLTEModemInterfaceIndex OBJECT-TYPE
@@ -2902,13 +3011,69 @@ mtxrLTEModemSignalSINR OBJECT-TYPE
     DESCRIPTION "dB"
     ::= { mtxrLTEModemEntry 7 }
 
+mtxrLTEModemEnbId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 8 }
+
+mtxrLTEModemSectorId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 9 }
+
+mtxrLTEModemLac OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 10 }
+
+mtxrLTEModemIMEI OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 11 }
+
+mtxrLTEModemIMSI OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 12 }
+
+mtxrLTEModemUICC OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 13 }
+
+mtxrLTEModemRAT OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 14 }
+
 mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
         mtxrLTEModemSignalRSSI,
         mtxrLTEModemSignalRSRQ,
         mtxrLTEModemSignalRSRP,
         mtxrLTEModemCellId,
         mtxrLTEModemAccessTechnology,
-        mtxrLTEModemSignalSINR
+        mtxrLTEModemSignalSINR,
+        mtxrLTEModemEnbId,
+        mtxrLTEModemSectorId,
+        mtxrLTEModemLac,
+        mtxrLTEModemIMEI,
+        mtxrLTEModemIMSI,
+        mtxrLTEModemUICC,
+        mtxrLTEModemRAT
     }
     STATUS current
     DESCRIPTION ""
@@ -3114,6 +3279,253 @@ mtxrOpticalRxPower OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrOpticalTableEntry 10 }
 
+-- IPSec *****************************************************************
+
+mtxrIkeSACount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "IKE SA count"
+    ::= { mtxrIPSec 1 }
+
+mtxrIkeSATable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrIkeSATableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "IKE SA table"
+    ::= { mtxrIPSec 2 }
+
+mtxrIkeSATableEntry OBJECT-TYPE
+    SYNTAX MtxrIkeSATableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {
+        mtxrIkeSAIndex
+    }
+    ::= { mtxrIkeSATable 1 }
+
+MtxrIkeSATableEntry ::= SEQUENCE {
+        mtxrIkeSAIndex ObjectIndex,
+        mtxrIkeSAInitiatorCookie IsakmpCookie,
+        mtxrIkeSAResponderCookie IsakmpCookie,
+        mtxrIkeSAResponder BoolValue,
+        mtxrIkeSANatt BoolValue,
+        mtxrIkeSAVersion Gauge32,
+        mtxrIkeSAState INTEGER,
+        mtxrIkeSAUptime TimeTicks,
+        mtxrIkeSASeen TimeTicks,
+        mtxrIkeSAIdentity DisplayString,
+        mtxrIkeSAPh2Count Gauge32,
+        mtxrIkeSALocalAddressType InetAddressType,
+        mtxrIkeSALocalAddress InetAddress,
+        mtxrIkeSALocalPort InetPortNumber,
+        mtxrIkeSAPeerAddressType InetAddressType,
+        mtxrIkeSAPeerAddress InetAddress,
+        mtxrIkeSAPeerPort InetPortNumber,
+        mtxrIkeSADynamicAddressType InetAddressType,
+        mtxrIkeSADynamicAddress InetAddress,
+        mtxrIkeSATxBytes Counter64,
+        mtxrIkeSARxBytes Counter64,
+        mtxrIkeSATxPackets Counter64,
+        mtxrIkeSARxPackets Counter64
+}
+
+mtxrIkeSAGroup OBJECT-GROUP OBJECTS {
+        mtxrIkeSACount,
+        mtxrIkeSAInitiatorCookie,
+        mtxrIkeSAResponderCookie,
+        mtxrIkeSAResponder,
+        mtxrIkeSANatt,
+        mtxrIkeSAVersion,
+        mtxrIkeSAState,
+        mtxrIkeSAUptime,
+        mtxrIkeSASeen,
+        mtxrIkeSAIdentity,
+        mtxrIkeSAPh2Count,
+        mtxrIkeSALocalAddressType,
+        mtxrIkeSALocalAddress,
+        mtxrIkeSALocalPort,
+        mtxrIkeSAPeerAddressType,
+        mtxrIkeSAPeerAddress,
+        mtxrIkeSAPeerPort,
+        mtxrIkeSADynamicAddressType,
+        mtxrIkeSADynamicAddress,
+        mtxrIkeSATxBytes,
+        mtxrIkeSARxBytes,
+        mtxrIkeSATxPackets,
+        mtxrIkeSARxPackets
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 7 }
+
+mtxrIkeSAIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 1 }
+
+mtxrIkeSAInitiatorCookie OBJECT-TYPE
+    SYNTAX IsakmpCookie
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "initiator SPI"
+    ::= { mtxrIkeSATableEntry 2 }
+
+mtxrIkeSAResponderCookie OBJECT-TYPE
+    SYNTAX IsakmpCookie
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "responder SPI"
+    ::= { mtxrIkeSATableEntry 3 }
+
+mtxrIkeSAResponder OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "IKE side"
+    ::= { mtxrIkeSATableEntry 4 }
+
+mtxrIkeSANatt OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "NAT is detected"
+    ::= { mtxrIkeSATableEntry 5 }
+
+mtxrIkeSAVersion OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "protocol version"
+    ::= { mtxrIkeSATableEntry 6 }
+
+mtxrIkeSAState OBJECT-TYPE
+    SYNTAX INTEGER {
+        exchange(1),
+        established(2),
+        expired(3),
+        eap(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 7 }
+
+mtxrIkeSAUptime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 8 }
+
+mtxrIkeSASeen OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "time elapsed since last valid IKE packet"
+    ::= { mtxrIkeSATableEntry 9 }
+
+mtxrIkeSAIdentity OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "peer identity"
+    ::= { mtxrIkeSATableEntry 10 }
+
+mtxrIkeSAPh2Count OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "total ph2 SA pairs"
+    ::= { mtxrIkeSATableEntry 11 }
+
+mtxrIkeSALocalAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 12 }
+
+mtxrIkeSALocalAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 13 }
+
+mtxrIkeSALocalPort OBJECT-TYPE
+    SYNTAX InetPortNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 14 }
+
+mtxrIkeSAPeerAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 15 }
+
+mtxrIkeSAPeerAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 16 }
+
+mtxrIkeSAPeerPort OBJECT-TYPE
+    SYNTAX InetPortNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 17 }
+
+mtxrIkeSADynamicAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrIkeSATableEntry 18 }
+
+mtxrIkeSADynamicAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dynamic address allocated by mode config"
+    ::= { mtxrIkeSATableEntry 19 }
+
+mtxrIkeSATxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "ph2 SA tx bytes"
+    ::= { mtxrIkeSATableEntry 20 }
+
+mtxrIkeSARxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "ph2 SA rx bytes"
+    ::= { mtxrIkeSATableEntry 21 }
+
+mtxrIkeSATxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "ph2 SA tx packets"
+    ::= { mtxrIkeSATableEntry 22 }
+
+mtxrIkeSARxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "ph2 SA rx packets"
+    ::= { mtxrIkeSATableEntry 23 }
+
 -- TRAPS **********************************************************************
 
 mtxrNotifications OBJECT IDENTIFIER ::= { mtxrTraps 0 }
@@ -3139,3 +3551,4 @@ mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
 -- ***************************************************************************
 
 END
+

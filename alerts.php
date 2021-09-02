@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Alerts Cronjob
  * @author f0o <f0o@devilcode.org>
@@ -27,33 +27,32 @@
  * @author: Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Util\FileLock;
 use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Util\Debug;
 
-$init_modules = ['alerts','laravel'];
+$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
 
-$alerts_lock = FileLock::lockOrDie('alerts');
-
-$alerts = new RunAlerts();
-
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-if (!defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
-    echo 'Start: '.date('r')."\r\n";
-    echo "ClearStaleAlerts():" . PHP_EOL;
-    $alerts->clearStaleAlerts();
-    echo "RunFollowUp():\r\n";
-    $alerts->runFollowUp();
-    echo "RunAlerts():\r\n";
-    $alerts->runAlerts();
-    echo "RunAcks():\r\n";
-    $alerts->runAcks();
-    echo 'End  : '.date('r')."\r\n";
+$alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
+if ($alerts_lock->get()) {
+    $alerts = new RunAlerts();
+    if (! defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
+        echo 'Start: ' . date('r') . "\r\n";
+        echo 'ClearStaleAlerts():' . PHP_EOL;
+        $alerts->clearStaleAlerts();
+        echo "RunFollowUp():\r\n";
+        $alerts->runFollowUp();
+        echo "RunAlerts():\r\n";
+        $alerts->runAlerts();
+        echo "RunAcks():\r\n";
+        $alerts->runAcks();
+        echo 'End  : ' . date('r') . "\r\n";
+    }
+    $alerts_lock->release();
 }
-
-$alerts_lock->release();

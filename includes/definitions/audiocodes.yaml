@@ -5,8 +5,7 @@ type: network
 icon: audiocodes
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-mib_dir:
-    - audiocodes
+mib_dir: audiocodes
 discovery:
     -
         sysObjectID:

@@ -11,41 +11,41 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 *
 */
 
 require 'includes/html/graphs/common.inc.php';
-$rrd_filename  = rrd_name($device['hostname'], 'riverbed_optimization');
+$rrd_filename = Rrd::name($device['hostname'], 'riverbed_optimization');
 
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Optimized connections';
-$unitlen       = 21;
-$bigdescrlen   = 15;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Optimized connections';
+$unitlen = 21;
+$bigdescrlen = 15;
 $smalldescrlen = 15;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 80;
-$data_sources  = array(
-    'conn_optimized' => array('descr' => 'Optimized','colour' => '438099',),
-    'conn_passthrough' => array('descr' => 'Passthrough','colour' => 'af2121',)
-);
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 80;
+$data_sources = [
+    'conn_optimized' => ['descr' => 'Optimized', 'colour' => '438099'],
+    'conn_passthrough' => ['descr' => 'Passthrough', 'colour' => 'af2121'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($data_sources as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

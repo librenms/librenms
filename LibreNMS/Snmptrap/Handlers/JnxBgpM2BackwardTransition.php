@@ -15,14 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * The BGPBackwardTransition Event is generated
  * when the BGP FSM moves from a higher numbered
  * state to a lower numbered state.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -52,8 +51,9 @@ class JnxBgpM2BackwardTransition implements SnmptrapHandler
 
         $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $peerAddr)->first();
 
-        if (!$bgpPeer) {
+        if (! $bgpPeer) {
             Log::error('Unknown bgp peer handling bgpEstablished trap: ' . $peerAddr);
+
             return;
         }
 

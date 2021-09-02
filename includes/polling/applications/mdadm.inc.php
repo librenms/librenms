@@ -1,6 +1,7 @@
 <?php
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
+
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'mdadm';
@@ -12,12 +13,13 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $mdadm_data = $e->getParsedJson();
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('level', 'GAUGE', 0)
     ->addDataset('size', 'GAUGE', 0)
@@ -27,7 +29,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('sync_speed', 'GAUGE', 0)
     ->addDataset('sync_completed', 'GAUGE', 0);
 
-$metrics = array();
+$metrics = [];
 foreach ($mdadm_data as $data) {
     $array_name = $data['name'];
     $level = $data['level'];
@@ -40,22 +42,22 @@ foreach ($mdadm_data as $data) {
     $sync_speed = $data['sync_speed'];
     $sync_completed = $data['sync_completed'];
 
-    $rrd_name = array('app', $name, $app_id, $array_name);
+    $rrd_name = ['app', $name, $app_id, $array_name];
 
     $array_level = str_replace('raid', '', $level);
 
-    $fields = array(
+    $fields = [
         'level'          => $array_level,
         'size'           => $size,
         'disc_count'     => $disc_count,
         'hotspare_count' => $hotspare_count,
         'degraded'       => $degraded,
         'sync_speed'     => $sync_speed,
-        'sync_completed' => $sync_completed
-    );
+        'sync_completed' => $sync_completed,
+    ];
 
     $metrics[$array_name] = $fields;
-    $tags = array('name' => $array_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $array_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 update_application($app, $output, $metrics);

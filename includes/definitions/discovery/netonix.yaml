@@ -1,5 +1,9 @@
 mib: NETONIX-SWITCH-MIB
 modules:
+    os:
+        sysDescr_regex: '/Netonix (?<hardware>.*)/'
+        version: NETONIX-SWITCH-MIB::firmwareVersion.0
+        version_regex: '/(?<version>.*\d)/' # version display bug in 1.3.9
     sensors:
         state:
             data:

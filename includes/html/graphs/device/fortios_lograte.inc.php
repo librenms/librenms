@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'fortios_lograte');
+$rrd_filename = Rrd::name($device['hostname'], 'fortios_lograte');
 
 require 'includes/html/graphs/common.inc.php';
 

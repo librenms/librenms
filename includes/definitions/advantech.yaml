@@ -3,8 +3,7 @@ text: 'Advantech'
 type: network
 icon: advantech
 group: advantech
-mib_dir:
-    - advantech
+mib_dir: advantech
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

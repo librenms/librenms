@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -29,7 +29,7 @@ $unit_text = 'Bits/sec';
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "    Current      Average     Maximum      '";
-    if (!$nototal) {
+    if (! $nototal) {
         $rrd_options .= " COMMENT:'Total      '";
     }
 
@@ -38,12 +38,12 @@ if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "     Now         Ave          Max\l'";
 }
 
-if (!isset($multiplier)) {
+if (! isset($multiplier)) {
     $multiplier = '8';
 }
 
 foreach ($rrd_list as $rrd) {
-    if (!\LibreNMS\Config::get("graph_colours.$colours_in.$iter") || !\LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours_in.$iter") || ! \LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
@@ -51,12 +51,12 @@ foreach ($rrd_list as $rrd) {
     $colour_out = \LibreNMS\Config::get("graph_colours.$colours_out.$iter");
 
     if (isset($rrd['descr_in'])) {
-        $descr = rrdtool_escape($rrd['descr_in'], $descr_len) . '  In';
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'], $descr_len) . '  In';
     } else {
-        $descr = rrdtool_escape($rrd['descr'], $descr_len) . '  In';
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len) . '  In';
     }
 
-    $descr_out = rrdtool_escape($rrd['descr_out'], $descr_len) . ' Out';
+    $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'], $descr_len) . ' Out';
 
     $rrd_options .= ' DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE ';
     $rrd_options .= ' DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE ';
@@ -65,7 +65,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
-    if (!$args['nototal']) {
+    if (! $args['nototal']) {
         $in_thing .= $seperator . $in . $i . ',UN,0,' . $in . $i . ',IF';
         $out_thing .= $seperator . $out . $i . ',UN,0,' . $out . $i . ',IF';
         $pluses .= $plus;
@@ -82,22 +82,22 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":'" . $descr . "'$stack";
-    $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.".$float_precision."lf%s$units";
-    $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
-    $rrd_options .= ' GPRINT:inB' . $i . ":MAX:%6.".$float_precision."lf%s$units\l";
+    $rrd_options .= ' GPRINT:inB' . $i . ':LAST:%6.' . $float_precision . "lf%s$units";
+    $rrd_options .= ' GPRINT:inB' . $i . ':AVERAGE:%6.' . $float_precision . "lf%s$units";
+    $rrd_options .= ' GPRINT:inB' . $i . ':MAX:%6.' . $float_precision . "lf%s$units\l";
 
-    if (!$nototal) {
-        $rrd_options .= ' GPRINT:totin' . $i . ":%6.".$float_precision."lf%s$total_units";
+    if (! $nototal) {
+        $rrd_options .= ' GPRINT:totin' . $i . ':%6.' . $float_precision . "lf%s$total_units";
     }
 
     $rrd_options .= " 'HRULE:0#" . $colour_out . ':' . $descr_out . "'";
     $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack'";
-    $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.".$float_precision."lf%s$units";
-    $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
-    $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.".$float_precision."lf%s$units\l";
+    $rrd_options .= ' GPRINT:outB' . $i . ':LAST:%6.' . $float_precision . "lf%s$units";
+    $rrd_options .= ' GPRINT:outB' . $i . ':AVERAGE:%6.' . $float_precision . "lf%s$units";
+    $rrd_options .= ' GPRINT:outB' . $i . ':MAX:%6.' . $float_precision . "lf%s$units\l";
 
-    if (!$nototal) {
-        $rrd_options .= ' GPRINT:totout' . $i . ":%6.".$float_precision."lf%s$total_units";
+    if (! $nototal) {
+        $rrd_options .= ' GPRINT:totout' . $i . ':%6.' . $float_precision . "lf%s$total_units";
     }
 
     $rrd_options .= " 'COMMENT:\l'";
@@ -109,7 +109,7 @@ if ($custom_graph) {
     $rrd_options .= $custom_graph;
 }
 
-if (!$nototal) {
+if (! $nototal) {
     $rrd_options .= ' CDEF:' . $in . 'octets=' . $in_thing . $pluses;
     $rrd_options .= ' CDEF:' . $out . 'octets=' . $out_thing . $pluses;
     $rrd_options .= ' CDEF:octets=inoctets,outoctets,+';

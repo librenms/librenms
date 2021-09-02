@@ -1,5 +1,9 @@
 mib: SW-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: .1.3.6.1.4.1.1588.2.1.1.1.26.6.0
     processors:
         data:
             -

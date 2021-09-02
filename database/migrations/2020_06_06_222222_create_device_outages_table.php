@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDeviceOutagesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,7 +24,7 @@ class CreateDeviceOutagesTable extends Migration
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('duration');
             $table->float('availability_perc', 6, 6)->default(0.000000);
-            $table->unique(['device_id','duration']);
+            $table->unique(['device_id', 'duration']);
         });
     }
 

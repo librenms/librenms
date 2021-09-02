@@ -7,8 +7,8 @@
                     "sysObjectID": ".1.3.6.1.4.1.171.10.153.10.1",
                     "sysDescr": "WS6-DGS-1210-52MP/F1 6.10.007",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "6.10.007",
+                    "hardware": "WS6-DGS-1210-52MP/F1",
                     "features": null,
                     "os": "dlink",
                     "type": "network",
@@ -18,23 +18,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.171.10.153.10.1",
-                    "sysDescr": "WS6-DGS-1210-52MP/F1 6.10.007",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "WS6-DGS-1210-52MP/F1 Rev. ",
-                    "features": null,
-                    "os": "dlink",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "dlink.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

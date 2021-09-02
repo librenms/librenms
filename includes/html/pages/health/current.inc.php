@@ -10,13 +10,13 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 $graph_type = 'sensor_current';
-$class      = 'current';
-$unit       = 'A';
+$class = 'current';
+$unit = 'A';
 
 require 'includes/html/pages/health/sensors.inc.php';

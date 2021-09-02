@@ -25,9 +25,7 @@ $default_recovery_alerts = Config::get('alert_rule.recovery_alerts');
 $default_invert_map = Config::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
-    $filters = json_encode(new QueryBuilderFilter('alert'));
-
-    ?>
+    $filters = json_encode(new QueryBuilderFilter('alert')); ?>
 
     <div class="modal fade" id="create-alert" tabindex="-1" role="dialog"
          aria-labelledby="Create" aria-hidden="true">

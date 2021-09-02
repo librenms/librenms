@@ -1,5 +1,11 @@
 mib: BENU-HOST-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: BENU-HOST-MIB::bSysTotalMem
+                used: BENU-HOST-MIB::bSysMemUsed
+                precision: 1024
     processors:
         data:
             -

@@ -2,8 +2,7 @@ os: ciscosat
 text: 'Cisco Satellite Receiver'
 type: network
 icon: cisco
-mib_dir:
-    - cisco
+mib_dir: cisco
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_wireless_rssi, text: Sat Signal Level }

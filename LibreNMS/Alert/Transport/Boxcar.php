@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -25,22 +25,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Boxcar API Transport
  * @author trick77 <jan@trick77.com>
  * @copyright 2015 trick77, neokjames, f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Boxcar extends Transport
 {
@@ -54,47 +52,54 @@ class Boxcar extends Transport
 
     public static function contactBoxcar($obj, $api)
     {
-        $data                              = [];
-        $data['user_credentials']          = $api['access_token'];
+        $data = [];
+        $data['user_credentials'] = $api['access_token'];
         $data['notification[source_name]'] = Config::get('project_id', 'librenms');
         switch ($obj['severity']) {
-            case "critical":
-                $severity = "Critical";
-                if (!empty($api['sound_critical'])) {
+            case 'critical':
+                $severity = 'Critical';
+                if (! empty($api['sound_critical'])) {
                     $data['notification[sound]'] = $api['sound_critical'];
                 }
                 break;
-            case "warning":
-                $severity = "Warning";
-                if (!empty($api['sound_warning'])) {
+            case 'warning':
+                $severity = 'Warning';
+                if (! empty($api['sound_warning'])) {
                     $data['notification[sound]'] = $api['sound_warning'];
                 }
+                break;
+            default:
+                $severity = 'Unknown';
                 break;
         }
         switch ($obj['state']) {
             case AlertState::RECOVERED:
-                $title_text = "OK";
-                if (!empty($api['sound_ok'])) {
+                $title_text = 'OK';
+                if (! empty($api['sound_ok'])) {
                     $data['notification[sound]'] = $api['sound_ok'];
                 }
                 break;
-            case AlertState::Active:
+            case AlertState::ACTIVE:
                 $title_text = $severity;
                 break;
             case AlertState::ACKNOWLEDGED:
-                $title_text = "Acknowledged";
+                $title_text = 'Acknowledged';
                 break;
+            default:
+                $title_text = $severity;
+                break;
+
         }
-        $data['notification[title]'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
-        $message_text                = "Timestamp: " . $obj['timestamp'];
-        if (!empty($obj['faults'])) {
+        $data['notification[title]'] = $title_text . ' - ' . $obj['hostname'] . ' - ' . $obj['name'];
+        $message_text = 'Timestamp: ' . $obj['timestamp'];
+        if (! empty($obj['faults'])) {
             $message_text .= "\n\nFaults:\n";
             foreach ($obj['faults'] as $k => $faults) {
-                $message_text .= "#" . $k . " " . $faults['string'] . "\n";
+                $message_text .= '#' . $k . ' ' . $faults['string'] . "\n";
             }
         }
         $data['notification[long_message]'] = $message_text;
-        $curl                               = curl_init();
+        $curl = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://new.boxcar.io/api/notifications');
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
@@ -103,7 +108,8 @@ class Boxcar extends Transport
         curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 201) {
-            var_dump("Boxcar returned error"); //FIXME: proper debugging
+            var_dump('Boxcar returned error'); //FIXME: proper debugging
+
             return false;
         }
 
@@ -125,11 +131,11 @@ class Boxcar extends Transport
                     'name' => 'boxcar-options',
                     'descr' => 'Boxcar Options',
                     'type' => 'textarea',
-                ]
+                ],
             ],
             'validation' => [
                 'boxcar-token' => 'required',
-            ]
+            ],
         ];
     }
 }

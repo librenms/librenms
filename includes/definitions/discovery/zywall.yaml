@@ -1,5 +1,19 @@
 mib: ZYXEL-ZYWALL-ZLD-COMMON-MIB
 modules:
+    os:
+        hardware:
+            - ZYXEL-ES-COMMON::sysProductModel.0
+        serial: ZYXEL-ES-COMMON::sysProductSerialNumber.0
+        version: ZYXEL-ES-COMMON::sysSwVersionString.0
+    mempools:
+        data:
+            -
+                percent_used: ZYXEL-ZYWALL-ZLD-COMMON-MIB::sysRAMUsage
+                index: 0
+            -
+                percent_used: ZYXEL-ES-COMMON::sysMgmtFlashUsage
+                descr: Flash
+                index: 1
     processors:
         data:
             -

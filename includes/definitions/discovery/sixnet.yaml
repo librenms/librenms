@@ -1,5 +1,8 @@
 mib: SIXNET-MIB
 modules:
+    os:
+        serial: SIXNET-MIB::serialNumber.0
+        version: SIXNET-MIB::firmwareRevision.0
     sensors:
         state:
             data:

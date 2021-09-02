@@ -5,8 +5,7 @@ ifname: true
 over:
     - { graph: device_bits, text: Traffic }
 type: network
-mib_dir:
-    - ciena
+mib_dir: ciena
 discovery:
     -
         sysObjectID:

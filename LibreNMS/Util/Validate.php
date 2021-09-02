@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,7 +29,7 @@ class Validate
     /**
      * Checks if the give string is a valid hostname
      * @param string $hostname
-     * @return boolean
+     * @return bool
      */
     public static function hostname($hostname)
     {
@@ -45,10 +44,16 @@ class Validate
         // such as the underscore character (_), other DNS names may contain the underscore
         // maximum length is 253 characters, maximum segment size is 63
 
-        return (
+        return
             preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname) //valid chars check
-            && preg_match("/^.{1,253}$/", $hostname) //overall length check
-            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname)
-        );
+            && preg_match('/^.{1,253}$/', $hostname) //overall length check
+            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname);
+    }
+
+    public static function ascDesc($direction, $default = 'ASC')
+    {
+        return in_array(strtolower($direction), ['asc', 'desc'], true)
+            ? $direction
+            : $default;
     }
 }

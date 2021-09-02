@@ -3,8 +3,7 @@ text: 'Check Point GAiA'
 type: firewall
 icon: checkpoint
 ifname: true
-mib_dir:
-    - checkpoint
+mib_dir: checkpoint
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

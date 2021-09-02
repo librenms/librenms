@@ -1,5 +1,8 @@
 mib: ICT-SINE-WAVE-INVERTER-MIB
 modules:
+    os:
+        hardware: ICT-SINE-WAVE-INVERTER-MIB::deviceHardware.0
+        version: ICT-SINE-WAVE-INVERTER-MIB::deviceFirmware.0
     sensors:
         voltage:
             data:

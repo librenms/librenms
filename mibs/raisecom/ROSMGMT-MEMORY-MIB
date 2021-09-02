@@ -1,0 +1,142 @@
+--MibName=rosMgmtMemory
+-- =======================================================================
+-- Version info
+--
+-- Version 0.1 Created 2003.12.17 by GONGGUIDONG
+-- This version of MIB is created just for the use of Network Management Systems
+-- display the  memory and cpu.
+--
+-- Copyright(c) 2002-2005 by RAISECOM TECH, Ltd.
+--
+-- =======================================================================
+
+ROSMGMT-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Integer32
+                    FROM SNMPv2-SMI
+        EnableVar
+                    FROM SWITCH-TC
+        rosMgmtSystem
+                    FROM ROSMGMT-SYSTEM-MIB;
+
+    rosMgmtMemory MODULE-IDENTITY
+                LAST-UPDATED     "202004120000Z"
+                ORGANIZATION     "RAISECOM TECH, Ltd."
+                CONTACT-INFO     "www.raisecom.com"
+                DESCRIPTION
+					"raisecom System objects: memory objects."
+				REVISION        "202004120000Z"
+				DESCRIPTION     "MIB file check and modification"
+		::= { rosMgmtSystem 3 }
+
+
+    rosMgmtMemoryNotifications    OBJECT IDENTIFIER ::= { rosMgmtMemory 0 }
+    rosMgmtMemoryObjects          OBJECT IDENTIFIER ::= { rosMgmtMemory 1 }
+    rosMgmtMemoryConformance      OBJECT IDENTIFIER ::= { rosMgmtMemory 2 }
+
+        -- 1.3.6.1.4.1.8886.60.1.3.0.1
+        rosMgmtMemoryTrap NOTIFICATION-TYPE
+            OBJECTS { rosMgmtMemoryTotal, rosMgmtMemoryUtil, rosMgmtMemoryThrshd }
+            STATUS current
+            DESCRIPTION
+                "Trap transfer when memory utilization upon threshold."
+            ::= { rosMgmtMemoryNotifications 1 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.0.2
+        rosMgmtMemoryTrapRecover NOTIFICATION-TYPE
+            OBJECTS { rosMgmtMemoryTotal, rosMgmtMemoryUtil,rosMgmtMemoryThrshdRecover }
+            STATUS current
+            DESCRIPTION
+                "Trap transfer when memory utilization upon thresholdrecover."
+            ::= { rosMgmtMemoryNotifications 2 }
+
+
+--
+-- rosMgmtMemoryScalarGroup
+--
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1
+        rosMgmtMemoryScalarGroup OBJECT IDENTIFIER ::= { rosMgmtMemoryObjects 1 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.1
+        rosMgmtMemoryTotal OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "KB"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total memory of the system for this duration."
+            ::= { rosMgmtMemoryScalarGroup 1 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.2
+        rosMgmtMemoryAvailable OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "KB"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The available memory of the system for this duration."
+            ::= { rosMgmtMemoryScalarGroup 2 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.3
+        rosMgmtMemoryUtil OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..8))
+            UNITS "percent"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current value of memory utilization for this duration."
+            ::= { rosMgmtMemoryScalarGroup 3 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.4
+        rosMgmtMemoryTrapEnable OBJECT-TYPE
+            SYNTAX EnableVar
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "The switch of memory trap."
+            ::= { rosMgmtMemoryScalarGroup 4 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.5
+        rosMgmtMemoryThrshd OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The threshold of memory monitor."
+            ::= { rosMgmtMemoryScalarGroup 5 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.6
+        rosMgmtMemoryThrshdRecover OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "percent"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The recover threshold of memory monitor."
+            ::= { rosMgmtMemoryScalarGroup 6 }
+
+
+        -- 1.3.6.1.4.1.8886.60.1.3.1.1.7
+        rosMgmtMemoryMonInterval OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "second"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The timer interval of memory monitor."
+            ::= { rosMgmtMemoryScalarGroup 7 }
+
+
+END

@@ -10,16 +10,19 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.9.1.1902 # { ciscoProducts 1902 } -- Cisco FirePOWER Virtual Appliance
-            - .1.3.6.1.4.1.9.1.2319
             - .1.3.6.1.4.1.9.1.2313 # { ciscoProducts 2413 } -- Cisco FirePOWER 4110 Security module
-            - .1.3.6.1.4.1.9.1.2409
-            - .1.3.6.1.4.1.9.1.2407 # { ciscoProducts 2407 } -- Cisco FirePOWER 2140 Security Appliance, 1U with embedded security
-            - .1.3.6.1.4.1.9.1.2406 # { ciscoProducts 2406 } -- Cisco FirePOWER 2130 Security Appliance, 1U with embedded security
-            - .1.3.6.1.4.1.9.1.2405 # { ciscoProducts 2405 } -- Cisco FirePOWER 2120 Security Appliance, 1U with embedded security
-            - .1.3.6.1.4.1.9.1.2404 # { ciscoProducts 2404 } -- Cisco FirePOWER 2110 Security Appliance, 1U with embedded security
-            - .1.3.6.1.4.1.9.1.2663 # { ciscoProducts 2663 } -- Cisco FirePOWER 1120 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2315 # { ciscoProducts 2315 } -- Cisco FirePOWER 4140 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2319
+            - .1.3.6.1.4.1.9.1.2404 # { ciscoProducts 2404 } -- Cisco FirePOWER 2110 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2405 # { ciscoProducts 2405 } -- Cisco FirePOWER 2120 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2406 # { ciscoProducts 2406 } -- Cisco FirePOWER 2130 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2407 # { ciscoProducts 2407 } -- Cisco FirePOWER 2140 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2409 # { ciscoProducts 2409 } -- Cisco FirePOWER 9000 Security Appliance
             - .1.3.6.1.4.1.9.1.2483 # { ciscoProducts 2483 } -- Cisco FirePOWER 1010 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2662 # { ciscoProducts 2662 } -- Cisco FirePOWER 1140 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2663 # { ciscoProducts 2663 } -- Cisco FirePOWER 1120 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2774 # { ciscoProducts 2774 } -- Cisco FirePOWER 4115 Security Module 24
+            - .1.3.6.1.4.1.9.1.2775 # { ciscoProducts 2775 } -- Cisco FirePOWER 4125 Security Appliance
 discovery_modules:
     entity-physical: false
     cisco-vrf-lite: false

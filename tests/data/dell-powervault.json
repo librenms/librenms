@@ -6,7 +6,7 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.674.10893.2.31",
                     "sysDescr": "DELL     MD38xxi          0123",
-                    "sysContact": null,
+                    "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
                     "features": null,
@@ -14,7 +14,7 @@
                     "type": "storage",
                     "serial": null,
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

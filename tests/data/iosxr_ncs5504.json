@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.2413",
                     "sysDescr": "Cisco IOS XR Software (NCS-5500), Version 6.6.3  Copyright (c) 2013-2019 by Cisco Systems, Inc.",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "iosxr",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.2413",
-                    "sysDescr": "Cisco IOS XR Software (NCS-5500), Version 6.6.3  Copyright (c) 2013-2019 by Cisco Systems, Inc.",
                     "sysContact": "<private>",
                     "version": "6.6.3",
                     "hardware": "NCS-5504",
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

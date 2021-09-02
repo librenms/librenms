@@ -1,5 +1,9 @@
 mib: CHECKPOINT-MIB
 modules:
+    os:
+        hardware: CHECKPOINT-MIB::svnApplianceProductName.0
+        serial: CHECKPOINT-MIB::svnApplianceSerialNumber.0
+        version: CHECKPOINT-MIB::svnVersion.0
     processors:
         data:
             -

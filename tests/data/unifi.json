@@ -580,24 +580,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.10002.1",
                     "sysDescr": "Linux 3.3.8 #1 Wed Jan 18 09:26:53 PST 2017 mips",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "unifi",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.10002.1",
-                    "sysDescr": "Linux 3.3.8 #1 Wed Jan 18 09:26:53 PST 2017 mips",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -609,7 +591,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {
@@ -617,14 +600,18 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "unifi",
-                    "mempool_precision": 1,
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
                     "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 38,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 24264704,
+                    "mempool_used_oid": null,
+                    "mempool_free": 39616512,
+                    "mempool_free_oid": ".1.3.6.1.4.1.10002.1.1.1.1.2.0",
+                    "mempool_total": 63881216,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -632,25 +619,6 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "unifi",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 38,
-                    "mempool_used": 24264704,
-                    "mempool_free": 39616512,
-                    "mempool_total": 63881216,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

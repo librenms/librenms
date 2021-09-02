@@ -8,22 +8,22 @@ $name = 'shoutcast';
 $app_id = $app['app_id'];
 
 $options = '-Oqv';
-$oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.115.104.111.117.116.99.97.115.116';
+$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.115.104.111.117.116.99.97.115.116';
 $shoutcast = snmp_get($device, $oid, $options);
 
 echo ' shoutcast';
 
 $servers = explode("\n", $shoutcast);
 
-$metrics = array();
+$metrics = [];
 foreach ($servers as $item => $server) {
     $server = trim($server);
 
-    if (!empty($server)) {
+    if (! empty($server)) {
         $data = explode(';', $server);
-        list($host, $port) = explode(':', $data['0'], 2);
+        [$host, $port] = explode(':', $data['0'], 2);
 
-        $rrd_name = array('app', $name, $app_id, $host . '_' . $port);
+        $rrd_name = ['app', $name, $app_id, $host . '_' . $port];
         $rrd_def = RrdDefinition::make()
             ->addDataset('bitrate', 'GAUGE', 0, 125000000000)
             ->addDataset('traf_in', 'GAUGE', 0, 125000000000)
@@ -34,7 +34,7 @@ foreach ($servers as $item => $server) {
             ->addDataset('max', 'GAUGE', 0, 125000000000)
             ->addDataset('unique', 'GAUGE', 0, 125000000000);
 
-        $fields = array(
+        $fields = [
             'bitrate'  => $data['1'],
             'traf_in'  => $data['2'],
             'traf_out' => $data['3'],
@@ -43,7 +43,7 @@ foreach ($servers as $item => $server) {
             'peak'     => $data['6'],
             'max'      => $data['7'],
             'unique'   => $data['8'],
-        );
+        ];
         $metrics[$server] = $fields;
 
         $tags = compact('name', 'app_id', 'host', 'port', 'rrd_name', 'rrd_def');

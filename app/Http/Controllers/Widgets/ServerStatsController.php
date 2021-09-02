@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -47,7 +46,6 @@ class ServerStatsController extends WidgetController
             return $settings['title'];
         }
 
-        /** @var Device $device */
         $device = Device::hasAccess($request->user())->find($settings['device']);
         if ($device) {
             return $device->displayName() . ' Stats';
@@ -64,7 +62,6 @@ class ServerStatsController extends WidgetController
             return $this->getSettingsView($request);
         }
 
-        /** @var Device $device */
         $device = Device::hasAccess($request->user())->find($data['device']);
         if ($device) {
             $data['cpu'] = $device->processors()->avg('processor_usage');

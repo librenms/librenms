@@ -15,14 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Used covert alarm ID in the JnxDomLaneAlarm traps from Hex to a
  * descriptive string.
-
- * @package    LibreNMS
- * @link       http://librenms.org
+ *
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -34,8 +33,8 @@ class JnxDomLaneAlarmId
     public static function getLaneAlarms($currentAlarm)
     {
         $alarmBin = preg_split(
-            "//",
-            sprintf("%024s", decbin(hexdec(str_replace(" ", "", $currentAlarm)))),
+            '//',
+            sprintf('%024s', decbin(hexdec(str_replace(' ', '', $currentAlarm)))),
             -1,
             PREG_SPLIT_NO_EMPTY
         );
@@ -54,12 +53,13 @@ class JnxDomLaneAlarmId
         $descr = [];
         $index = 0;
         foreach ($alarmBin as $syntax) {
-            if ($syntax == "1") {
+            if ($syntax == '1') {
                 $descr[$index] = $alarmDescr[$index];
             }
             $index++;
         }
         $message = implode(', ', $descr);
+
         return $message;
     }
 }

@@ -8,38 +8,38 @@
  *
  * @package    LibreNMS
  * @subpackage nfs-server
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     SvennD <svennd@svennd.be>
 */
 
 require 'includes/html/graphs/common.inc.php';
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Operations';
-$unitlen       = 10;
-$bigdescrlen   = 15;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Operations';
+$unitlen = 10;
+$bigdescrlen = 15;
 $smalldescrlen = 15;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
 
-$rrd_filename  = rrd_name($device['hostname'], array('app', 'nfs-server-default', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
 
-$array = array(
-    'io_read' => array('descr' => 'read','colour' => '2B9220',),
-    'io_write' => array('descr' => 'write','colour' => 'B0262D',),
-);
+$array = [
+    'io_read' => ['descr' => 'read', 'colour' => '2B9220'],
+    'io_write' => ['descr' => 'write', 'colour' => 'B0262D'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {
@@ -47,7 +47,6 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
 }
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';
-
 
 /*
 This would create a graph with reads above and write belows;

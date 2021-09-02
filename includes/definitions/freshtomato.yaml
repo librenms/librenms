@@ -1,0 +1,15 @@
+os: freshtomato
+text: FreshTomato
+type: network
+icon: tomato
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.8072.1.3.2.2.1.3.7.118.101.114.115.105.111.110
+            op: starts
+            value: FreshTomato

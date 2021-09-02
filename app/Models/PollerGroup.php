@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -26,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PollerGroup extends Model
 {
@@ -52,7 +52,7 @@ class PollerGroup extends Model
         return self::query()->pluck('group_name', 'id')->prepend(__('General'), 0);
     }
 
-    public function devices()
+    public function devices(): HasMany
     {
         return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
     }

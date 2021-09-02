@@ -1,5 +1,9 @@
 mib: UBNT-AirFIBER-MIB
 modules:
+    os:
+        hardware: IEEE802dot11-MIB::dot11manufacturerProductName.5
+        hardware_template: 'Ubiquiti AF {{ IEEE802dot11-MIB::dot11manufacturerProductName.5 }}'
+        version: UBNT-AirFIBER-MIB::fwVersion.1
     processors:
         data:
             -

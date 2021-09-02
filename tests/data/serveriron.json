@@ -37,5 +37,32 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "serveriron",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Dynamic Memory",
+                    "mempool_perc": 94,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 502635550,
+                    "mempool_used_oid": null,
+                    "mempool_free": 34235362,
+                    "mempool_free_oid": ".1.3.6.1.4.1.1991.1.1.2.1.55.0",
+                    "mempool_total": 536870912,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

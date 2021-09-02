@@ -2,8 +2,7 @@ os: hwg-poseidon
 text: 'HWg Poseidon'
 type: environment
 icon: hwg-poseidon
-mib_dir:
-    - hwg
+mib_dir: hwg
 over:
     - { graph: device_bits, text: Traffic }
 discovery:

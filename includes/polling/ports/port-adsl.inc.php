@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 // Example snmpwalk with units
 // "Interval" oids have been filtered out
@@ -42,7 +43,7 @@ use LibreNMS\RRD\RrdDefinition;
 // adslAturPerfValidIntervals.1 = 0
 // adslAturPerfInvalidIntervals.1 = 0
 if (isset($this_port['adslLineCoding'])) {
-    $rrd_name = getPortRrdName($port_id, 'adsl');
+    $rrd_name = Rrd::portName($port_id, 'adsl');
     $rrd_def = RrdDefinition::make()->disableNameChecking()
         ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
         ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
@@ -68,7 +69,7 @@ if (isset($this_port['adslLineCoding'])) {
         ->addDataset('AturChanCorrectedBl', 'COUNTER', null, 100000000000)
         ->addDataset('AturChanUncorrectBl', 'COUNTER', null, 100000000000);
 
-    $adsl_oids = array(
+    $adsl_oids = [
         'AtucCurrSnrMgn',
         'AtucCurrAtn',
         'AtucCurrOutputPwr',
@@ -92,9 +93,9 @@ if (isset($this_port['adslLineCoding'])) {
         'AtucChanUncorrectBlks',
         'AturChanCorrectedBlks',
         'AturChanUncorrectBlks',
-    );
+    ];
 
-    $adsl_db_oids = array(
+    $adsl_db_oids = [
         'adslLineCoding',
         'adslLineType',
         'adslAtucInvVendorID',
@@ -112,33 +113,33 @@ if (isset($this_port['adslLineCoding'])) {
         'adslAturCurrAtn',
         'adslAturCurrOutputPwr',
         'adslAturCurrAttainableRate',
-    );
+    ];
 
-    $adsl_tenth_oids = array(
+    $adsl_tenth_oids = [
         'adslAtucCurrSnrMgn',
         'adslAtucCurrAtn',
         'adslAtucCurrOutputPwr',
         'adslAturCurrSnrMgn',
         'adslAturCurrAtn',
         'adslAturCurrOutputPwr',
-    );
+    ];
 
     foreach ($adsl_tenth_oids as $oid) {
         $this_port[$oid] = ($this_port[$oid] / 10);
     }
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?', array($port_id)) == '0') {
-        dbInsert(array('port_id' => $port_id), 'ports_adsl');
+    if (dbFetchCell('SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?', [$port_id]) == '0') {
+        dbInsert(['port_id' => $port_id], 'ports_adsl');
     }
 
-    $port['adsl_update'] = array('port_adsl_updated' => array('NOW()'));
+    $port['adsl_update'] = ['port_adsl_updated' => ['NOW()']];
     foreach ($adsl_db_oids as $oid) {
         $data = str_replace('"', '', $this_port[$oid]);
         // FIXME - do we need this?
         $port['adsl_update'][$oid] = $data;
     }
 
-    dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', array($port_id));
+    dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', [$port_id]);
 
     if ($this_port['adslAtucCurrSnrMgn'] > '1280') {
         $this_port['adslAtucCurrSnrMgn'] = 'U';
@@ -148,12 +149,12 @@ if (isset($this_port['adslLineCoding'])) {
         $this_port['adslAturCurrSnrMgn'] = 'U';
     }
 
-    $fields = array();
+    $fields = [];
     foreach ($adsl_oids as $oid) {
-        $oid  = 'adsl'.$oid;
+        $oid = 'adsl' . $oid;
         $data = str_replace('"', '', $this_port[$oid]);
         // Set data to be "unknown" if it's garbled, unexistant or zero
-        if (!is_numeric($data)) {
+        if (! is_numeric($data)) {
             $data = 'U';
         }
         $fields[$oid] = $data;
@@ -162,5 +163,5 @@ if (isset($this_port['adslLineCoding'])) {
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
     data_update($device, 'adsl', $tags, $fields);
 
-    echo 'ADSL ('.$this_port['adslLineCoding'].'/'.formatRates($this_port['adslAtucChanCurrTxRate']).'/'.formatRates($this_port['adslAturChanCurrTxRate']).')';
+    echo 'ADSL (' . $this_port['adslLineCoding'] . '/' . Number::formatSi($this_port['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . Number::formatSi($this_port['adslAturChanCurrTxRate'], 2, 3, 'bps') . ')';
 }//end if

@@ -1,5 +1,11 @@
 mib: A3COM-HUAWEI-LswDEVM-MIB
 modules:
+    mempools:
+        data:
+            -
+                free: A3COM-HUAWEI-LswDEVM-MIB::hwMemFree
+                total: A3COM-HUAWEI-LswDEVM-MIB::hwMemSize
+                index: 0
     processors:
         data:
             -

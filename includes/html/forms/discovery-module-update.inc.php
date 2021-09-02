@@ -4,14 +4,14 @@ header('Content-type: text/plain');
 
 // FUA
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 $device['device_id'] = $_POST['device_id'];
-$module              = 'discover_'.$_POST['discovery_module'];
+$module = 'discover_' . $_POST['discovery_module'];
 
-if (!isset($module) && validate_device_id($device['device_id']) === false) {
+if (! isset($module) && validate_device_id($device['device_id']) === false) {
     echo 'error with data';
     exit;
 } else {

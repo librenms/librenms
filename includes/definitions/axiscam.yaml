@@ -2,8 +2,7 @@ os: axiscam
 text: 'AXIS Network Camera'
 type: appliance
 icon: axis
-mib_dir:
-    - axis
+mib_dir: axis
 discovery:
     -
         sysDescr_regex: '/AXIS .* (Network Camera|Video Server|Network Video Encoder)/'

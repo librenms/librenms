@@ -36,12 +36,15 @@ path: blob/master/doc/
 - [Why does modifying 'Default Alert Template' fail?](#faq31)
 - [Why would alert un-mute itself](#faq32)
 - [How do I change the Device Type?](#faq33)
+- [Editing large device groups gives error messages](#faq34)
 - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
 - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
 - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
 - [My alert templates stopped working](#my-alert-templates-stopped-working)
 - [How do I use trend prediction in graphs](#how-do-i-use-trend-prediction-in-graphs)
 - [How do I move only the DB to another server](#move-db-to-another-server)
+- [What are the "optional requirements message" when I add SNMPv3 devices](#optional-requirements-for-snmpv3-sha2-auth)
+- [How do I clean up alerts from my switches and routers about ports being down or changing speed](#network-config-permanent-change)
 
 # Developing
 
@@ -54,7 +57,7 @@ path: blob/master/doc/
 
 This is currently well documented within the doc folder of the installation files.
 
-Please see the following [doc](http://docs.librenms.org/Installation/Installing-LibreNMS/)
+Please see the following [doc](../Installation/Installing-LibreNMS.md)
 
 ## <a name="faq2"> How do I add a device?</a>
 
@@ -64,7 +67,7 @@ You have two options for adding a new device into LibreNMS.
    to the directory of your LibreNMS install and typing (be sure to
    put the correct details).
 
-```ssh
+```bash
 ./addhost.php [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
 ```
 
@@ -139,14 +142,12 @@ bottom of every page that will show you detailed debug information.
 
 ## <a name="faq11"> How do I debug the discovery process?</a>
 
-Please see the [Discovery
-Support](http://docs.librenms.org/Support/Discovery Support/) document
+Please see the [Discovery Support](Discovery%20Support.md) document
 for further details.
 
 ## <a name="faq12"> How do I debug the poller process?</a>
 
-Please see the [Poller
-Support](http://docs.librenms.org/Support/Poller Support/) document
+Please see the [Poller Support](Poller%20Support.md) document
 for further details.
 
 ## <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
@@ -184,7 +185,7 @@ ifIn/OutOctets value and record that. Now, it appears as though all of
 the traffic since it stopped getting values have occurred in the last
 5 minute interval.
 
-So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittant network connectivity, broken poller, and more.
+So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittent network connectivity, broken poller, and more.
 
 ## <a name="faq17"> Why do I see gaps in my graphs?</a>
 
@@ -198,7 +199,7 @@ Modules Performance. Take a look at what modules are taking the
 longest and disabled un used modules.
 
 If you poll a large number of devices / ports then it's recommended to
-run a local recurisve dns server such as pdns-recursor.
+run a local recursive dns server such as pdns-recursor.
 
 Running RRDCached is also highly advised in larger installs but has
 benefits no matter the size.
@@ -268,7 +269,7 @@ do so by setting `$config['uptime_warning'] = '84600';` in
 ## <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
 
 By default numerous interface types and interface descriptions are
-excluded from this graph. The excluded defailts are:
+excluded from this graph. The excluded defaults are:
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -318,7 +319,7 @@ architecture then the following steps should be all that's needed:
 - and import it into your new server (`mysql -u root -p librenms < librenms.sql`).
 - Copy the `rrd/` folder to the new server.
 - Copy the `.env` and `config.php` files to the new server.
-- Check for modified files (eg specific os, ...) with `git status` and 
+- Check for modified files (eg specific os, ...) with `git status` and
   migrate them.
 - Ensure ownership of the copied files and folders (substitute your
   user if necessary) - `chown -R librenms:librenms /opt/librenms`
@@ -369,9 +370,27 @@ adding to /etc/snmp/snmpd.conf :
 ## <a name="faq28"> What does mean \"ignore alert tag\" on device, component, service and port?</a>
 
 Tag device, component, service and port to ignore alerts. Alert checks will still run.
-However, ignore tag can be read in alert rules. For example on device, if `devices.ignore = 0` 
+However, ignore tag can be read in alert rules. For example on device, if `devices.ignore = 0`
 or `macros.device = 1` condition is is set and ignore alert tag is on,
 the alert rule won't match. The alert rule is ignored.
+
+## <a name="network-config-permanent-change"> How do I clean up alerts from my switches and routers about ports being down or changing speed</a>
+
+Some properties used for alerting (ending in `_prev`) are only updated when a
+change is detected, and not every time the poller runs. This means that if you
+make a permanant change to your network such as removing a device, performing a
+major firmware upgrade, or downgrading a WAN connection, you may be stuck with
+some unresolvable alerts.
+
+If a port will be permantly down, it's best practice to configure it to be
+administratively down on the device to prevent malicious access. You can then
+only run alerts on ports with `ifAdminStatus = up`. Otherwise, you'll need to
+reset the device port state history.
+
+On the device generating alerts, use the cog button to go to the edit device
+page. At the top of the _device settings_ pane is a button labelled `Reset Port
+State` - this will clear the historic state for all ports on that device,
+allowing any active alerts to clear.
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
@@ -441,7 +460,7 @@ LibreNMS improve.
   own time.
 - Documentation. Documentation can always be improved and every little
   bit helps. Not all features are currently documented or documented
-  well, there's speeling mistakes etc. It's very easy to submit
+  well, there's spelling mistakes etc. It's very easy to submit
   updates [through the GitHub
   website](https://help.github.com/articles/editing-files-in-another-user-s-repository/),
   no git experience needed.
@@ -526,6 +545,12 @@ define custom types, we suggest using [Device
 Groups](/Extensions/Device-Groups/). They will be listed in the
 menu similarly to device types.
 
+## <a name="faq34"> Editing large device groups gives error messages</a>
+
+If the device group contains large amount of devices, editing it from the UI might cause errors on the form even when all the data seems correct. This is caused by PHP's `max_input_vars`-variable. You should be able to confirm that this is the case by inspecting the PHP's error logs.
+
+With the basic installation on Ubuntu 20.04 LTS with Nginx and PHP 7.4 FPM this value can be tuned by editing the file `/etc/php/7.4/fpm/php.ini` and adjusting the value of `max_input_vars` to be at least the size of the large group. In larger installations a value such as `10000` should suffice.
+
 ## <a name="faq-where-do-i-update-my-database-credentials">Where do I update my database credentials?</a>
 
 If you've changed your database credentials then you will need to
@@ -564,8 +589,7 @@ MySQL/MariaDB.
 ## <a name='my-alert-templates-stopped-working'>My alert templates stopped working</a>
 
 You should probably have a look in the documentation concerning the
-new template syntax:
-<https://docs.librenms.org/Alerting/Templates/>. Since version 1.42,
+new [template syntax](../Alerting/Templates.md). Since version 1.42,
 syntax changed, and you basically need to convert your templates to
 this new syntax (including the titles).
 
@@ -584,17 +608,17 @@ To view a prediction:
 You should now see a linear prediction line on the graph.
 ## <a name='move-db-to-another-server'>How do I move only the DB to another server?</a>
 
-There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a seperate database install. 
+There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a separate database install.
 *Note: This section assumes you have a MySQL/MariaDB instance
 
 - Stop the apache and mysql service in you LibreNMS installation.
-- Edit out all the cron entries in `/etc/cron.d/librenms`. 
+- Edit out all the cron entries in `/etc/cron.d/librenms`.
 - Dump your `librenms`database on your current install by issuing `mysqldump librenms -u root -p > librenms.sql`.
 - Stop and disable the MySQL server on your current install.
 - On your new server make sure you create a new database with the standard install command, no need to add a user for localhost though.
 - Copy this over to your new database server and import it with `mysql -u root -p librenms < librenms.sql`.
 - Enter to mysql and add permissions with the following two commands:
-```
+```sql
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'IP_OF_YOUR_LNMS_SERVER' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'FQDN_OF_YOUR_LNMS_SERVER' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
@@ -602,5 +626,8 @@ exit;
 ```
 - Enable and restart MySQL server.
 - Edit your `config.php` file to point the install to the new database server location.
-- **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` paramater to point to your new server location. 
+- **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` paramater to point to your new server location.
 - After all this is done, enable all the cron entries again and start apache.
+## <a name='optional-requirements-for-snmpv3-sha2-auth'>What are the "optional requirements message" when I add SNMPv3 devices?</a>
+When you add a device via the WebUI you may see a little message stating "Optional requirements are not met so some options are disabled". Do not panic. This simply means your system does not contain **openssl >= 1.1** and **net-snmp >= 5.8**, which are the minimum specifications needed to be able to use SHA-224|256|384|512 as auth algorithms.
+For crypto algorithms AES-192, AES-256 you need **net-snmp** compiled with `--enable-blumenthal-aes`.

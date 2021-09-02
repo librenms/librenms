@@ -1,0 +1,11 @@
+os: zyxelac
+text: 'ZyXEL AC'
+group: zyxel
+type: network
+icon: zyxel
+discovery:
+    -
+        sysDescr_regex:
+            - '/^AC/'
+        sysObjectID:
+            - '.1.3.6.1.4.1.890'

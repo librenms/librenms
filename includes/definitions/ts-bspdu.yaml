@@ -1,9 +1,8 @@
-os: bladeshelterpdu
+os: ts-bspdu
 text: 'BladeShelter PDU by PowerTek'
 type: power
 icon: bladeshelterpdu
-mib_dir:
-    - bladeshelter
+mib_dir: bladeshelter
 over:
     - { graph: device_power, text: Power }
     - { graph: device_current, text: Current }

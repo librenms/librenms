@@ -1,0 +1,305 @@
+-- ==================================================================
+-- Copyright (C) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: DHCP Snooping MIB
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0 The initial version, created by FuJiajia, 2004.12.29
+-- V1.1 2006-03-08 updated by HeHangjun
+--      Added hh3cDhcpSnoopVlanTable
+-- V1.2 2007-06-18 updated by qizhenglin
+--      Added hh3cDhcpSnoopSpoofServerDetected
+--            hh3cDhcpSnoopSpoofServerMac
+--            hh3cDhcpSnoopSpoofServerIP
+-- V1.3 2013-10-16 updated by xuyufei
+--      Added hh3cDhcpSnoopNewBinding
+--            hh3cDhcpSnoopBindingIP
+--            hh3cDhcpSnoopBindingMac
+-- ==================================================================
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-DHCPSNOOP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MacAddress
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY,OBJECT-TYPE,NOTIFICATION-TYPE,IpAddress,Integer32
+        FROM SNMPv2-SMI
+
+    ifIndex
+        FROM IF-MIB
+
+    hh3cdot1qVlanIndex
+        FROM HH3C-LswVLAN-MIB
+
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+
+    hh3cCommon
+        FROM HH3C-OID-MIB
+
+    TruthValue
+        FROM SNMPv2-TC;
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+hh3cDhcpSnoop MODULE-IDENTITY
+        LAST-UPDATED "200501140000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "The private MIB file includes the DHCP Snooping profile."
+        ::= { hh3cCommon  36 }
+
+    hh3cDhcpSnoopMibObject OBJECT IDENTIFIER ::= {  hh3cDhcpSnoop 1  }
+
+    hh3cDhcpSnoopEnable OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "DHCP Snooping status (enable or disable)."
+        DEFVAL { disable }
+        ::= { hh3cDhcpSnoopMibObject 1 }
+
+    hh3cDhcpSnoopTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDhcpSnoopEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "The table containing information of DHCP clients listened by
+                    DHCP snooping and it's enabled or disabled by setting
+                    hh3cDhcpSnoopEnable node."
+        ::= { hh3cDhcpSnoopMibObject 2 }
+
+
+    hh3cDhcpSnoopEntry OBJECT-TYPE
+        SYNTAX  Hh3cDhcpSnoopEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "An entry containing information of DHCP clients."
+        INDEX   { hh3cDhcpSnoopClientIpAddressType, hh3cDhcpSnoopClientIpAddress }
+        ::= { hh3cDhcpSnoopTable 1 }
+
+    Hh3cDhcpSnoopEntry   ::=
+    SEQUENCE {
+        hh3cDhcpSnoopClientIpAddressType InetAddressType,
+        hh3cDhcpSnoopClientIpAddress   InetAddress,
+        hh3cDhcpSnoopClientMacAddress  MacAddress,
+        hh3cDhcpSnoopClientProperty    INTEGER ,
+        hh3cDhcpSnoopClientUnitNum     Integer32
+        }
+
+    hh3cDhcpSnoopClientIpAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "DHCP clients' IP addresses type (IPv4 or IPv6)."
+        DEFVAL { ipv4 }
+        ::= { hh3cDhcpSnoopEntry 1 }
+
+    hh3cDhcpSnoopClientIpAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "DHCP clients' IP addresses collected by DHCP snooping."
+        ::= { hh3cDhcpSnoopEntry 2 }
+
+    hh3cDhcpSnoopClientMacAddress OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "DHCP clients' MAC addresses collected by DHCP snooping."
+        ::= { hh3cDhcpSnoopEntry 3 }
+
+    hh3cDhcpSnoopClientProperty OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            static(1),
+            dynamic(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Method of getting IP addresses collected by DHCP snooping."
+        ::= { hh3cDhcpSnoopEntry 4 }
+
+    hh3cDhcpSnoopClientUnitNum OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "IRF (Intelligent Resilient Fabric) unit number via whom the clients
+                    get their IP addresses. The value 0 means this device does not support IRF."
+        ::= { hh3cDhcpSnoopEntry 5 }
+
+    hh3cDhcpSnoopTrustTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDhcpSnoopTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "A table is used to configure and monitor port trusted status."
+        ::= { hh3cDhcpSnoopMibObject 3 }
+
+    hh3cDhcpSnoopTrustEntry OBJECT-TYPE
+        SYNTAX  Hh3cDhcpSnoopTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "An entry containing information about trusted status of ports."
+        INDEX   { ifIndex }
+        ::= { hh3cDhcpSnoopTrustTable 1 }
+
+    Hh3cDhcpSnoopTrustEntry  ::=
+    SEQUENCE {
+        hh3cDhcpSnoopTrustStatus     INTEGER
+        }
+
+    hh3cDhcpSnoopTrustStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            untrusted(0),
+            trusted(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Trusted status of current port which supports both get and
+                    set operation."
+        DEFVAL { untrusted }
+        ::= { hh3cDhcpSnoopTrustEntry 1 }
+
+    hh3cDhcpSnoopVlanTable   OBJECT-TYPE
+         SYNTAX          SEQUENCE OF Hh3cDhcpSnoopVlanEntry
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION     "A table is used to configure and monitor DHCP Snooping
+                         status of VLANs."
+         ::= { hh3cDhcpSnoopMibObject 4 }
+
+    hh3cDhcpSnoopVlanEntry  OBJECT-TYPE
+         SYNTAX          Hh3cDhcpSnoopVlanEntry
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION     "The entry information about hh3cDhcpSnoopVlanTable."
+         INDEX
+         {
+                hh3cDhcpSnoopVlanIndex
+         }
+         ::= { hh3cDhcpSnoopVlanTable 1 }
+
+    Hh3cDhcpSnoopVlanEntry ::=
+         SEQUENCE
+         {
+                hh3cDhcpSnoopVlanIndex     Integer32,
+                hh3cDhcpSnoopVlanEnable    TruthValue
+         }
+
+    hh3cDhcpSnoopVlanIndex        OBJECT-TYPE
+         SYNTAX          Integer32(0..2147483647)
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION     "Current VLAN index."
+         ::= { hh3cDhcpSnoopVlanEntry 1 }
+
+    hh3cDhcpSnoopVlanEnable        OBJECT-TYPE
+         SYNTAX          TruthValue
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION     "DHCP Snooping status of current VLAN."
+         DEFVAL          { false }
+         ::= { hh3cDhcpSnoopVlanEntry 2 }
+
+-- ==================================================================
+--
+-- ======================= trap definition begin ====================
+--
+-- ==================================================================
+    hh3cDhcpSnoopTraps OBJECT IDENTIFIER ::= {  hh3cDhcpSnoop 2  }
+    hh3cDhcpSnoopTrapsPrefix OBJECT IDENTIFIER ::= {  hh3cDhcpSnoopTraps 0  }
+    hh3cDhcpSnoopTrapsObject OBJECT IDENTIFIER ::= {  hh3cDhcpSnoopTraps 1  }
+
+    hh3cDhcpSnoopSpoofServerMac OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "MAC address of the spoofing server and it is derived from
+          link-layer header of offer packet. If the offer packet is relayed
+          by dhcp relay entity, it may be the MAC address of relay entity.
+          "
+      ::= { hh3cDhcpSnoopTrapsObject 1 }
+
+    hh3cDhcpSnoopSpoofServerIP OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "IP address of the spoofing server and it is derived from
+          IP header of offer packet. A tricksy host may send offer packet use
+          other host's address, so this address can not always be  trust.
+          "
+      ::= { hh3cDhcpSnoopTrapsObject 2 }
+
+    hh3cDhcpSnoopBindingIP OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "IP address of a new binding. "
+      ::= { hh3cDhcpSnoopTrapsObject 3 }
+
+
+    hh3cDhcpSnoopBindingMac OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "MAC address of a new binding. "
+      ::= { hh3cDhcpSnoopTrapsObject 4 }
+
+
+    hh3cDhcpSnoopSpoofServerDetected NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ifIndex,            -- The interface from which an
+                                -- illegal dhcp server accessed
+            hh3cdot1qVlanIndex,   -- The vlan from which an illegal
+                                -- dhcp server accessed
+            hh3cDhcpSnoopSpoofServerMac,
+            hh3cDhcpSnoopSpoofServerIP
+        }
+        STATUS         current
+        DESCRIPTION
+           "To detect unauthorized DHCP servers on a network, the DHCP snooping
+           device sends DHCP-DISCOVER messages through its downstream port
+           (which is connected to the DHCP clients).
+           If any response (DHCP-OFFER message) is received from the downstream port,
+           an unauthorized DHCP server is considered present, and then the device
+           sends a trap.
+           With unauthorized DHCP server detection enabled, the interface sends a
+           DHCP-DISCOVER message to detect unauthorized DHCP servers on the network.
+           If this interface receives a DHCP-OFFER  message,  the DHCP server which
+           sent it is considered unauthorized. "
+    ::= { hh3cDhcpSnoopTrapsPrefix 1 }
+
+    hh3cDhcpSnoopNewBinding NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cDhcpSnoopBindingIP,
+            hh3cDhcpSnoopBindingMac
+        }
+        STATUS current
+        DESCRIPTION
+           "The device sends a trap when adding a new binding."
+    ::= { hh3cDhcpSnoopTrapsPrefix 2 }
+
+END

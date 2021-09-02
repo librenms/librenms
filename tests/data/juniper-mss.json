@@ -25,24 +25,6 @@
                     "sysObjectID": ".1.3.6.1.4.1.14525.3.3.1",
                     "sysDescr": "Juniper Networks, Inc WLC880R 7.7.4.4 REL",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "juniper-mss",
-                    "type": "appliance",
-                    "serial": null,
-                    "icon": "junos.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.14525.3.3.1",
-                    "sysDescr": "Juniper Networks, Inc WLC880R 7.7.4.4 REL",
-                    "sysContact": null,
                     "version": "7.7.4.4",
                     "hardware": "WLC880R",
                     "features": null,
@@ -53,6 +35,34 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "juniper-mss",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory",
+                    "mempool_perc": 52,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 556498944,
+                    "mempool_used_oid": ".1.3.6.1.4.1.14525.4.8.1.1.12.1.0",
+                    "mempool_free": 517242880,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1073741824,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

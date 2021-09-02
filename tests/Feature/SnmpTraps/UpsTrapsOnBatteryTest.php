@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @author     TheGreatDoc
  */
 
@@ -26,7 +25,6 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Sensor;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
@@ -34,10 +32,10 @@ class UpsTrapsOnBatteryTest extends SnmpTrapTestCase
 {
     public function testOnBattery()
     {
-        $device = factory(Device::class)->create();
-        $state = factory(Sensor::class)->make(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']);
-        $time = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']);
-        $remaining = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $state = Sensor::factory()->make(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']); /** @var Sensor $state */
+        $time = Sensor::factory()->make(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']); /** @var Sensor $time */
+        $remaining = Sensor::factory()->make(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']); /** @var Sensor $remaining */
         $device->sensors()->save($state);
         $device->sensors()->save($time);
         $device->sensors()->save($remaining);
@@ -54,7 +52,7 @@ UPS-MIB::upsConfigLowBattTime.0 1 minutes";
         \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
         \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
 
-        $message = "UPS running on battery for 120 seconds. Estimated 100 minutes remaining";
+        $message = 'UPS running on battery for 120 seconds. Estimated 100 minutes remaining';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $trap = new Trap($trapText);

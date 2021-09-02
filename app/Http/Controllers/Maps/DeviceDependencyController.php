@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -26,12 +25,12 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
 {
-
     protected $isolatedDeviceId = -1;
 
     protected $deviceIdAll = [];
@@ -55,8 +54,9 @@ class DeviceDependencyController extends MapController
                 },
                 'children' => function ($query) use ($request) {
                     $query->hasAccess($request->user());
-                }])
+                }, ])
             ->get();
+
         return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
     }
 
@@ -134,7 +134,7 @@ class DeviceDependencyController extends MapController
                     'to'    => $parent->device_id,
                     'width' => 2,
                 ];
-            };
+            }
         }
 
         // highlight isolated Devices
@@ -154,7 +154,13 @@ class DeviceDependencyController extends MapController
             $devices_by_id = $this->highlightDevices($devices_by_id, $this->parentDeviceIds);
         }
 
-        array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
+        $device_list_labels = array_column($device_list, 'label');
+        array_multisort($device_list_labels, SORT_ASC, $device_list);
+
+        $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
+        if (! empty($group_name)) {
+            $group_name = $group_name->name;
+        }
 
         $data = [
             'showparentdevicepath' => $show_device_path,
@@ -166,6 +172,7 @@ class DeviceDependencyController extends MapController
             'options' => $this->visOptions(),
             'nodes' => json_encode(array_values($devices_by_id)),
             'edges' => json_encode($dependencies),
+            'group_name' => $group_name,
         ];
 
         return view('map.device-dependency', $data);

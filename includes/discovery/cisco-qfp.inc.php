@@ -8,44 +8,41 @@
  *
  * LibreNMS module to capture Cisco QFP Statistics
  *
- * @package    LibreNMS
- * @subpackage discovery
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
-
 if ($device['os_group'] == 'cisco') {
     $module = 'cisco-qfp';
 
     /*
      * CISCO-ENTITY-QFP-MIB::ceqfpSystemState values
      */
-    $system_states = array(
+    $system_states = [
         1 => 'unknown',
         2 => 'reset',
         3 => 'init',
         4 => 'active',
         5 => 'activeSolo',
         6 => 'standby',
-        7 => 'hotStandby'
-    );
+        7 => 'hotStandby',
+    ];
 
     /*
      * CISCO-ENTITY-QFP-MIB::ceqfpSystemTrafficDirection values
      */
-    $system_traffic_direction = array (
+    $system_traffic_direction = [
         1 => 'none',
         2 => 'ingress',
         3 => 'egress',
-        4 => 'both'
-    );
+        4 => 'both',
+    ];
 
     /*
      * Get module's components for a device
      */
     $component = new LibreNMS\Component();
-    $components = $component->getComponents($device['device_id'], array('type'=>$module));
+    $components = $component->getComponents($device['device_id'], ['type'=>$module]);
     $components = $components[$device['device_id']];
 
     /*
@@ -67,15 +64,15 @@ if ($device['os_group'] == 'cisco') {
             /*
              * Component data array for `component_prefs`
              */
-            $component_data = array(
+            $component_data = [
                 'label' => 'qfp_' . $qfp_index,
                 'entPhysicalIndex' => $qfp_index,
                 'name' => $qfp_name,
                 'traffic_direction' => $system_traffic_direction[$data['ceqfpSystemTrafficDirection']],
                 'system_state' => $system_states[$data['ceqfpSystemState']],
                 'system_loads' => $data['ceqfpNumberSystemLoads'],
-                'system_last_load' => $data['ceqfpSystemLastLoadTime']
-            );
+                'system_last_load' => $data['ceqfpSystemLastLoadTime'],
+            ];
 
             /*
              * Find existing component ID if QFP is already known
@@ -91,7 +88,7 @@ if ($device['os_group'] == 'cisco') {
              * If $component_id is false QFP Component doesn't exist
              * Create new component and add it to $components array
              */
-            if (!$component_id) {
+            if (! $component_id) {
                 $new_component = $component->createComponent($device['device_id'], $module);
                 $component_id = key($new_component);
                 $components[$component_id] = array_merge($new_component[$component_id], $component_data);
@@ -108,7 +105,7 @@ if ($device['os_group'] == 'cisco') {
      */
     foreach ($components as $tmp_component_id => $tmp_component) {
         $found = in_array($tmp_component['entPhysicalIndex'], array_keys($qfp_general_data));
-        if (!$found) {
+        if (! $found) {
             $component->deleteComponent($tmp_component_id);
             echo '-';
         }

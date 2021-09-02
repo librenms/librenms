@@ -3,8 +3,7 @@ text: 'iBoot PDU'
 type: power
 icon: dataprobe
 rfc1628_compat: true
-mib_dir:
-    - dataprobe
+mib_dir: dataprobe
 over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_current, text: Current }

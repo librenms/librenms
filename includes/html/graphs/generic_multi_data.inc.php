@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -106,18 +106,18 @@ if ($i) {
     } else {
         $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . \LibreNMS\Config::get('percentile_value') . "th %\\n'";
         $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':In ';
-        $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:in' . $format . ':MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:percentile_in:%6.".$float_precision."lf%s\\n";
+        $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:in' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\n';
         $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':Out';
-        $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:out' . $format . ':MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:percentile_out:%6.".$float_precision."lf%s\\n";
-        $rrd_options .= " GPRINT:tot:'Total %6.".$float_precision."lf%sB'";
-        $rrd_options .= " GPRINT:totin:'(In %6.".$float_precision."lf%sB'";
-        $rrd_options .= " GPRINT:totout:'Out %6.".$float_precision."lf%sB)\\l'";
+        $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:out' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
+        $rrd_options .= " GPRINT:tot:'Total %6." . $float_precision . "lf%sB'";
+        $rrd_options .= " GPRINT:totin:'(In %6." . $float_precision . "lf%sB'";
+        $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%sB)\\l'";
     }
 
     $rrd_options .= ' LINE1:percentile_in#aa0000';

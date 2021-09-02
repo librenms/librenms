@@ -8,7 +8,7 @@
 
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 PipoCanaja <pipocanaja@gmail.com>
  * @author     PipoCanaja <pipocanaja@gmail.com>
  */
@@ -21,4 +21,3 @@ $no_refresh = true;
 <hr>
 <?php
 echo \LibreNMS\Plugins::call('port_container', [$device, $port]);
-

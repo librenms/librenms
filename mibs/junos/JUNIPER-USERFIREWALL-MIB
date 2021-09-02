@@ -1,0 +1,446 @@
+--
+-- Enterprise Specific MIB: UserFirewalls MIB
+--
+-- Copyright (c) 2019, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-USERFIREWALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, IpAddress
+FROM SNMPv2-SMI
+DisplayString
+FROM SNMPv2-TC
+jnxUserFirewallsRoot
+FROM JUNIPER-SMI;
+
+jnxUserFirewalls MODULE-IDENTITY
+LAST-UPDATED "201909261553Z" -- Wed Jan 23 15:53:50 2019 UTC
+ORGANIZATION "Juniper Networks, Inc."
+CONTACT-INFO
+" Juniper Technical Assistance Center
+Juniper Networks, Inc.
+1133 Innovation Way
+Sunnyvale, CA 94089
+E-mail: support@juniper.net"
+
+DESCRIPTION
+"This is Juniper Networks' implementation of enterprise
+specific MIB for user firewalls' counters."
+
+REVISION "201909261553Z" -- Wed Jan 23 15:53:50 2019 UTC
+DESCRIPTION "MIB support for user firewall counters."
+::= { jnxUserFirewallsRoot 1}
+
+jnxUserFwTable OBJECT IDENTIFIER ::= { jnxUserFirewalls 1 }
+jnxUserFwJIMSServerScalar OBJECT IDENTIFIER ::= { jnxUserFirewalls 2 }
+
+jnxUserFwDomainAuthTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF JnxUserFwDomainAuthEntry
+MAX-ACCESS      not-accessible
+STATUS          current
+DESCRIPTION
+"A list of authentication table entries.
+ Data showed should be consistent with CLI:
+ show services user-identification authentication-table counter.
+ There no distinction between primary and secondary for the time being."
+::= { jnxUserFwTable 1 }
+
+jnxUserFwDomainAuthEntry OBJECT-TYPE
+SYNTAX JnxUserFwDomainAuthEntry
+MAX-ACCESS      not-accessible
+STATUS current
+DESCRIPTION
+"Internal counters by domain of an authentication table entry."
+INDEX { jnxUserFwDomain }
+::= { jnxUserFwDomainAuthTable 1 }
+
+JnxUserFwDomainAuthEntry ::= SEQUENCE
+{
+    jnxUserFwDomain                 DisplayString,
+    jnxUserFwAuthCPCounter          Unsigned32,
+    jnxUserFwAuthJIMSCounter        Unsigned32,
+    jnxUserFwAuthValidCounter       Unsigned32,
+    jnxUserFwAuthPendingCounter     Unsigned32,
+    jnxUserFwAuthInvalidCounter     Unsigned32,
+    jnxUserFwAuthTotalCounter       Unsigned32,
+    jnxUserFwAuthADCounter          Unsigned32
+}
+
+jnxUserFwDomain OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The user firewall domain name."
+::= { jnxUserFwDomainAuthEntry 1 }
+
+jnxUserFwAuthCPCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of cp authentication entries."
+::= { jnxUserFwDomainAuthEntry 2 }
+
+jnxUserFwAuthJIMSCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of JIMS(Juniper Identity Management Service) authentication entries."
+::= { jnxUserFwDomainAuthEntry 3 }
+
+jnxUserFwAuthValidCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of valid authentication entries."
+::= { jnxUserFwDomainAuthEntry 4 }
+
+jnxUserFwAuthPendingCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of pending authentication entries."
+::= { jnxUserFwDomainAuthEntry 5 }
+
+jnxUserFwAuthInvalidCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of invalid authentication entries."
+::= { jnxUserFwDomainAuthEntry 6 }
+
+jnxUserFwAuthTotalCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of total authentication entries."
+::= { jnxUserFwDomainAuthEntry 7 }
+
+jnxUserFwAuthADCounter  OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The counter of AD(Active Directory) authentication entries."
+::= { jnxUserFwDomainAuthEntry 8 }
+
+jnxUserFwADDomCtlrTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF JnxUserFwADDomCtlrEntry
+MAX-ACCESS      not-accessible
+STATUS          current
+DESCRIPTION
+"Table to check status information for the Active Directory domain controllers
+ configured for the integrated user firewall feature.
+ This table also defines OID for numbers of total queries and failed queries
+ to the event log on the domain controller for address-to-user mappings."
+::= { jnxUserFwTable 2 }
+
+jnxUserFwADDomCtlrEntry OBJECT-TYPE
+SYNTAX JnxUserFwADDomCtlrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Entry of current status of Active Directory domain controller."
+INDEX   {jnxUserFwADDomain, jnxUserFwADDomCtrlerAddr}
+::= { jnxUserFwADDomCtlrTable 1 }
+
+JnxUserFwADDomCtlrEntry ::= SEQUENCE
+{
+    jnxUserFwADDomain                  DisplayString,
+    jnxUserFwADDomCtrlerAddr            DisplayString,
+    jnxUserFwADDomCtrlerName            DisplayString,
+    jnxUserFwADDomCtrlerConnStatus      DisplayString,
+    jnxUserFwADDomTotalLogQuery         Unsigned32,
+    jnxUserFwADDomFailedLogQuery        Unsigned32,
+    jnxUserFwADDomRecordsFetched        Unsigned32
+}
+
+jnxUserFwADDomain OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Domain name."
+::= { jnxUserFwADDomCtlrEntry 1 }
+
+jnxUserFwADDomCtrlerAddr OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The ip address of doamin controller."
+::= { jnxUserFwADDomCtlrEntry 2 }
+
+jnxUserFwADDomCtrlerName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Domain controller name."
+::= { jnxUserFwADDomCtlrEntry 3 }
+
+jnxUserFwADDomCtrlerConnStatus  OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Domain controller connection status."
+::= { jnxUserFwADDomCtlrEntry 4 }
+
+jnxUserFwADDomTotalLogQuery OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Total log query times."
+::= { jnxUserFwADDomCtlrEntry 5 }
+
+jnxUserFwADDomFailedLogQuery OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Failed log query times."
+::= { jnxUserFwADDomCtlrEntry 6 }
+
+jnxUserFwADDomRecordsFetched OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of records fetched."
+::= { jnxUserFwADDomCtlrEntry 7 }
+
+jnxUserFwLDAPTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF JnxUserFwLDAPEntry
+MAX-ACCESS      not-accessible
+STATUS          current
+DESCRIPTION
+"LDAP or user-group-mapping query statistics for each configured LDAP server."
+::= { jnxUserFwTable 3 }
+
+jnxUserFwLDAPEntry OBJECT-TYPE
+SYNTAX JnxUserFwLDAPEntry
+MAX-ACCESS      not-accessible
+STATUS current
+DESCRIPTION
+"Entry of LDAP or user-group-mapping query statistics for each configured LDAP server by domain."
+INDEX { jnxUserFwLDAPDomain, jnxUserFwLDAPHost}
+::= { jnxUserFwLDAPTable 1 }
+
+JnxUserFwLDAPEntry ::= SEQUENCE
+{
+    jnxUserFwLDAPDomain         DisplayString,
+    jnxUserFwLDAPHost           DisplayString,
+    jnxUserFwLDAPTotalQuery     Unsigned32,
+    jnxUserFwLDAPFailedQuery    Unsigned32
+}
+
+jnxUserFwLDAPDomain  OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"LDAP domain name."
+::= { jnxUserFwLDAPEntry 1 }
+
+jnxUserFwLDAPHost OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"LDAP Host."
+::= { jnxUserFwLDAPEntry 2 }
+jnxUserFwLDAPTotalQuery OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Total LDAP query number."
+::= { jnxUserFwLDAPEntry 3 }
+
+jnxUserFwLDAPFailedQuery OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"LDAP failed query number."
+::= { jnxUserFwLDAPEntry 4 }
+
+
+jnxUserFwProbeTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF JnxUserFwProbeEntry
+MAX-ACCESS      not-accessible
+STATUS          current
+DESCRIPTION
+"PC Probe statistics."
+::= { jnxUserFwTable 4 }
+
+jnxUserFwProbeEntry OBJECT-TYPE
+SYNTAX  JnxUserFwProbeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry of PC Probe statistics."
+INDEX { jnxUserFwDomainName }
+::= { jnxUserFwProbeTable 1 }
+
+JnxUserFwProbeEntry ::= SEQUENCE
+{
+    jnxUserFwDomainName             DisplayString,
+    jnxUserFwTotalUserProbeNum      Unsigned32,
+    jnxUserFwFailedUserProbeNum     Unsigned32
+}
+
+jnxUserFwDomainName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Domain name."
+::= { jnxUserFwProbeEntry 1 }
+
+jnxUserFwTotalUserProbeNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Total user probe number."
+::= { jnxUserFwProbeEntry 2 }
+
+jnxUserFwFailedUserProbeNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Failed user probe number."
+::= { jnxUserFwProbeEntry 3 }
+
+---
+---Scalar Objects
+---
+
+jnxUserFwPriServAddress  OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The primary server address."
+::= { jnxUserFwJIMSServerScalar 1 }
+
+jnxUserFwPriServQuerySentNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Batch query sent number to primary server."
+::= { jnxUserFwJIMSServerScalar 2 }
+
+jnxUserFwPriServQueryRespNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Batch query total response number to primary server."
+::= { jnxUserFwJIMSServerScalar 3}
+
+jnxUserFwPriServQueryErrNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Batch query error response number to primary server."
+::= { jnxUserFwJIMSServerScalar 4 }
+
+jnxUserFwPriServIPQuerySentNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"IP query sent number to primary server."
+::= { jnxUserFwJIMSServerScalar 5 }
+
+jnxUserFwPriServIPQueryRespNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"IP query total response number to primary server."
+::= { jnxUserFwJIMSServerScalar 6 }
+
+jnxUserFwPriServIPQueryErrNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"IP query error response number to primary server."
+::= { jnxUserFwJIMSServerScalar 7 }
+
+jnxUserFwSecServAddress  OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The secondary server address."
+::= { jnxUserFwJIMSServerScalar 8 }
+
+jnxUserFwSecServQuerySentNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Batch query sent number to secondary server."
+::= { jnxUserFwJIMSServerScalar 9 }
+
+jnxUserFwSecServQueryRespNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Batch query total response number to secondary server."
+::= { jnxUserFwJIMSServerScalar 10 }
+
+jnxUserFwSecServQueryErrNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Batch query error response number to secondary server."
+::= { jnxUserFwJIMSServerScalar 11 }
+
+jnxUserFwSecServIPQuerySentNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"IP query sent number to secondary server."
+::= { jnxUserFwJIMSServerScalar 12 }
+
+jnxUserFwSecServIPQueryRespNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"IP query total response number to secondary server."
+::= { jnxUserFwJIMSServerScalar 13 }
+
+jnxUserFwSecServIPQueryErrNum OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"IP query error response number to secondary server."
+::= { jnxUserFwJIMSServerScalar 14 }
+
+END
+

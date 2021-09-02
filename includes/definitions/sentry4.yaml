@@ -4,8 +4,7 @@ type: power
 over:
     - { graph: device_current, text: Current }
 icon: servertech
-mib_dir:
-    - sentry
+mib_dir: sentry
 discovery:
 discovery:
     -

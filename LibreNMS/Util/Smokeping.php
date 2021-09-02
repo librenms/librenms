@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -71,6 +70,7 @@ class Smokeping
     public function findFiles()
     {
         $this->files = null;
+
         return $this->getFiles();
     }
 
@@ -101,7 +101,7 @@ class Smokeping
                         'type' => 'smokeping_' . $direction,
                         'device' => $this->device->device_id,
                         $remote => $device->device_id,
-                    ]
+                    ],
                 ];
             }
         }
@@ -116,12 +116,12 @@ class Smokeping
 
     public function hasInGraph()
     {
-        return !empty($this->getFiles()['in'][$this->device->hostname]);
+        return ! empty($this->getFiles()['in'][$this->device->hostname]);
     }
 
     public function hasOutGraph()
     {
-        return !empty($this->getFiles()['out'][$this->device->hostname]);
+        return ! empty($this->getFiles()['out'][$this->device->hostname]);
     }
 
     private function filenameToHostname($name)
@@ -129,6 +129,7 @@ class Smokeping
         if (Config::get('smokeping.integration') === true) {
             $name = str_replace('_', '.', $name);
         }
+
         return str_replace('.rrd', '', $name);
     }
 }

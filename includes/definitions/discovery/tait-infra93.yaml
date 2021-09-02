@@ -1,0 +1,1130 @@
+mib: TAIT-INFRA93SERIES-MIB
+modules:
+    os:
+        sysDescr_regex: '/Tait Communications, (?<hardware>[^,]+),/'
+        version: TAIT-INFRA93SERIES-MIB::rctInfoFirmwareVersion.0
+        serial: TAIT-INFRA93SERIES-MIB::rctInfoSerialNumber.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: infoGroup
+                    value: infoTransmitterStatus
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.1.1.{{ $index }}'
+                    descr: 'Transmitter Status'
+                    group: Transmitter
+                    index: 'infoTransmitterStatus.{{ $index }}'
+                    state_name: infoTransmitterStatus
+                    states:
+                        - { descr: unknown, graph: 1, value: 0, generic: 3 }
+                        - { descr: unconfigured, graph: 1, value: 1, generic: 3 }
+                        - { descr: untuned, graph: 1, value: 2, generic: 1 }
+                        - { descr: idle, graph: 1, value: 3, generic: 3 }
+                        - { descr: transmitting, graph: 1, value: 4, generic: 0 }
+                        - { descr: calibrating, graph: 1, value: 5, generic: 3 }
+                        - { descr: fault, graph: 1, value: 6, generic: 2 }
+                -
+                    oid: health
+                    value: healthRunMode
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.2.2.{{ $index }}'
+                    descr: 'DMR BS Health Status'
+                    group: DMRHealth
+                    index: 'healthRunMode.{{ $index }}'
+                    state_name: healthRunMode
+                    states:
+                        - { descr: offline, graph: 1, value: 0, generic: 3 }
+                        - { descr: online, graph: 1, value: 1, generic: 0 }
+                        - { descr: unknown, graph: 1, value: 2, generic: 1 }
+                -
+                    oid: health
+                    value: healthNetworkConnLogChan1State
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.2.3.{{ $index }}'
+                    descr: 'State of Logical Ch 1'
+                    group: DMRHealth
+                    index: 'healthNetworkConnLogChan1State.{{ $index }}'
+                    state_name: healthNetworkConnLogChan1State
+                    states:
+                        - { descr: inactive, graph: 1, value: 0, generic: 1 }
+                        - { descr: idle, graph: 1, value: 1, generic: 3 }
+                        - { descr: traffic, graph: 1, value: 2, generic: 0 }
+                        - { descr: control, graph: 1, value: 3, generic: 0 }
+                        - { descr: test, graph: 1, value: 4, generic: 3 }
+                        - { descr: poll, graph: 1, value: 5, generic: 3 }
+                        - { descr: invalid, graph: 1, value: 255, generic: 2 }
+                -
+                    oid: health
+                    value: healthNetworkConnLogChan2State
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.2.4.{{ $index }}'
+                    descr: 'State of Logical Ch 2'
+                    group: DMRHealth
+                    index: 'healthNetworkConnLogChan2State.{{ $index }}'
+                    state_name: healthNetworkConnLogChan2State
+                    states:
+                        - { descr: inactive, graph: 1, value: 0, generic: 1 }
+                        - { descr: idle, graph: 1, value: 1, generic: 3 }
+                        - { descr: traffic, graph: 1, value: 2, generic: 0 }
+                        - { descr: control, graph: 1, value: 3, generic: 0 }
+                        - { descr: test, graph: 1, value: 4, generic: 3 }
+                        - { descr: poll, graph: 1, value: 5, generic: 3 }
+                        - { descr: invalid, graph: 1, value: 255, generic: 2 }
+                -
+                    oid: pmuState
+                    value: pmuStateMainsInState
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.1.{{ $index }}'
+                    descr: 'PMU AC power input state'
+                    group: PMUState
+                    index: 'pmuStateMainsInState.{{ $index }}'
+                    state_name: pmuStateMainsInState
+                    states:
+                        - { descr: bad, graph: 1, value: 0, generic: 1 }
+                        - { descr: good, graph: 1, value: 1, generic: 0 }
+                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: pmuState
+                    value: pmuStateOutStatus
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.6.{{ $index }}'
+                    descr: 'PMU power supply to the PA state'
+                    group: PMUState
+                    index: 'pmuStateOutStatus.{{ $index }}'
+                    state_name: pmuStateOutStatus
+                    states:
+                        - { descr: bad, graph: 1, value: 0, generic: 1 }
+                        - { descr: good, graph: 1, value: 1, generic: 0 }
+                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: pmuState
+                    value: pmuStateAuxOutState
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.7.{{ $index }}'
+                    descr: 'Auxiliary power output state'
+                    group: PMUState
+                    index: 'pmuStateAuxOutState.{{ $index }}'
+                    state_name: pmuStateAuxOutState
+                    states:
+                        - { descr: bad, graph: 1, value: 0, generic: 1 }
+                        - { descr: good, graph: 1, value: 1, generic: 0 }
+                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: pmuState
+                    value: pmuStateBatteryInState
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.2.{{ $index }}'
+                    descr: 'PMU DC power input state'
+                    group: PMUState
+                    index: 'pmuStateBatteryInState.{{ $index }}'
+                    state_name: pmuStateBatteryInState
+                    states:
+                        - { descr: bad, graph: 1, value: 0, generic: 1 }
+                        - { descr: good, graph: 1, value: 1, generic: 0 }
+                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: pmuState
+                    value: pmuStateBusConnect
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.9.{{ $index }}'
+                    descr: 'DC supply to the PMU state'
+                    group: PMUState
+                    index: 'pmuStateBusConnect.{{ $index }}'
+                    state_name: pmuStateBusConnect
+                    states:
+                        - { descr: connected, graph: 1, value: 1, generic: 0 }
+                        - { descr: not connected, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: linkInfo
+                    value: linkInfoCtrlProtocolStatus
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.4.1.1.1.{{ $index }}'
+                    descr: 'Status of the BS'
+                    group: LinkInfo
+                    index: 'linkInfoCtrlProtocolStatus.{{ $index }}'
+                    state_name: linkInfoCtrlProtocolStatus
+                    states:
+                        - { descr: unconnected, graph: 1, value: 0, generic: 1 }
+                        - { descr: deprecatedUnconnected, graph: 1, value: 1, generic: 1 }
+                        - { descr: standby, graph: 1, value: 2, generic: 1 }
+                        - { descr: dmr-aligned, graph: 1, value: 3, generic: 0 }
+                        - { descr: dmr-offset, graph: 1, value: 4, generic: 3 }
+                        - { descr: dmr-two-slot-data, graph: 1, value: 5, generic: 0 }
+                        - { descr: dmr-hibernate, graph: 1, value: 6, generic: 1 }
+                        - { descr: analogue, graph: 1, value: 7, generic: 3 }
+                        - { descr: test-mode, graph: 1, value: 8, generic: 3 }
+                        - { descr: dmr-tier2-aligned, graph: 1, value: 9, generic: 0 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryBaseStation
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.1.{{ $index }}'
+                    descr: 'BS Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryBaseStation.{{ $index }}'
+                    state_name: alarmSummaryBaseStation
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryReciter
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.2.{{ $index }}'
+                    descr: 'Reciter Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryReciter.{{ $index }}'
+                    state_name: alarmSummaryReciter
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryPowerAmplifier
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.3.{{ $index }}'
+                    descr: 'Power Amplifier (PA) Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryPowerAmplifier.{{ $index }}'
+                    state_name: alarmSummaryPowerAmplifier
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryPowerManagementUnit
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.4.{{ $index }}'
+                    descr: 'Power Management Unit (PMU) Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryPowerManagementUnit.{{ $index }}'
+                    state_name: alarmSummaryPowerManagementUnit
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryCustomAlarms
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.5.{{ $index }}'
+                    descr: 'Custom Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryCustomAlarms.{{ $index }}'
+                    state_name: alarmSummaryCustomAlarms
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryFrontPanel
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.6.{{ $index }}'
+                    descr: 'Front Pannel Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryFrontPanel.{{ $index }}'
+                    state_name: alarmSummaryFrontPanel
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummarySystem
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.7.{{ $index }}'
+                    descr: 'System Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummarySystem.{{ $index }}'
+                    state_name: alarmSummarySystem
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryMinor
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.8.{{ $index }}'
+                    descr: 'Minor Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryMinor.{{ $index }}'
+                    state_name: alarmSummaryMinor
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: alarmSummary
+                    value: alarmSummaryMajor
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.9.{{ $index }}'
+                    descr: 'Major Summary Alarm'
+                    group: AlarmSummary
+                    index: 'alarmSummaryMajor.{{ $index }}'
+                    state_name: alarmSummaryMajor
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmRxSynthOutOfLock
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.2.{{ $index }}'
+                    descr: 'Receiver synthesizer alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmRxSynthOutOfLock.{{ $index }}'
+                    state_name: rctAlarmRxSynthOutOfLock
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmInvalidChannelSelected
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.3.{{ $index }}'
+                    descr: 'Channel invalid alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmInvalidChannelSelected.{{ $index }}'
+                    state_name: rctAlarmInvalidChannelSelected
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmOverTemperature
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.10.{{ $index }}'
+                    descr: 'Temperature high alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmOverTemperature.{{ $index }}'
+                    state_name: rctAlarmOverTemperature
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmTxCalibrationInvalid
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.13.{{ $index }}'
+                    descr: 'Transmitter calibration invalid alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmTxCalibrationInvalid.{{ $index }}'
+                    state_name: rctAlarmTxCalibrationInvalid
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmRxCalibrationInvalid
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.14.{{ $index }}'
+                    descr: 'Reciter receiver calibration invalid alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmRxCalibrationInvalid.{{ $index }}'
+                    state_name: rctAlarmRxCalibrationInvalid
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmInvalidConfiguration
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.15.{{ $index }}'
+                    descr: 'Reciter hardware configuration invalid alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmInvalidConfiguration.{{ $index }}'
+                    state_name: rctAlarmInvalidConfiguration
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarm25MHzSynthOutOfLock
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.16.{{ $index }}'
+                    descr: 'Synthesizer 25 MHz out of lock alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarm25MHzSynthOutOfLock.{{ $index }}'
+                    state_name: rctAlarm25MHzSynthOutOfLock
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarm6144MHzSynthOutOfLock
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.17.{{ $index }}'
+                    descr: 'Synthesizer 61.44 MHz out of lock alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarm6144MHzSynthOutOfLock.{{ $index }}'
+                    state_name: rctAlarm6144MHzSynthOutOfLock
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmTxFSynthOutOfLock
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.18.{{ $index }}'
+                    descr: 'TxF synthesizer unable to lock to freq conf'
+                    group: ReciterAlarms
+                    index: 'rctAlarmTxFSynthOutOfLock.{{ $index }}'
+                    state_name: rctAlarmTxFSynthOutOfLock
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmSimulcastSynch
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.19.{{ $index }}'
+                    descr: 'Synch to common time ref for simulcast'
+                    group: ReciterAlarms
+                    index: 'rctAlarmSimulcastSynch.{{ $index }}'
+                    state_name: rctAlarmSimulcastSynch
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmReceiverSynch
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.20.{{ $index }}'
+                    descr: 'Receiver unsynchronized alarm'
+                    group: ReciterAlarms
+                    index: 'rctAlarmReceiverSynch.{{ $index }}'
+                    state_name: rctAlarmReceiverSynch
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: reciterAlarms
+                    value: rctAlarmTxRSynthOutOfLock
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.21.{{ $index }}'
+                    descr: 'TxR synthesizer unable to lock on to the freq'
+                    group: ReciterAlarms
+                    index: 'rctAlarmTxRSynthOutOfLock.{{ $index }}'
+                    state_name: rctAlarmTxRSynthOutOfLock
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmNoPADetected
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.1.{{ $index }}'
+                    descr: 'PA not detected by Reciter'
+                    group: PAAlarms
+                    index: 'paAlarmNoPADetected.{{ $index }}'
+                    state_name: paAlarmNoPADetected
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmInvalidFirmware
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.2.{{ $index }}'
+                    descr: 'PA firmware invalid alarm'
+                    group: PAAlarms
+                    index: 'paAlarmInvalidFirmware.{{ $index }}'
+                    state_name: paAlarmInvalidFirmware
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmInvalidCalibration
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.3.{{ $index }}'
+                    descr: 'Invalid PA calibration alarm'
+                    group: PAAlarms
+                    index: 'paAlarmInvalidCalibration.{{ $index }}'
+                    state_name: paAlarmInvalidCalibration
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmForwardPowerLow
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.5.{{ $index }}'
+                    descr: 'PA Forward power low alarm'
+                    group: PAAlarms
+                    index: 'paAlarmForwardPowerLow.{{ $index }}'
+                    state_name: paAlarmForwardPowerLow
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmPowerFoldback
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.7.{{ $index }}'
+                    descr: 'PA Power foldback alarm'
+                    group: PAAlarms
+                    index: 'paAlarmPowerFoldback.{{ $index }}'
+                    state_name: paAlarmPowerFoldback
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmReversePowerHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.8.{{ $index }}'
+                    descr: 'PA Reverse power high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmReversePowerHigh.{{ $index }}'
+                    state_name: paAlarmReversePowerHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmShutdownImminent
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.9.{{ $index }}'
+                    descr: 'PA Shutdown alarm'
+                    group: PAAlarms
+                    index: 'paAlarmShutdownImminent.{{ $index }}'
+                    state_name: paAlarmShutdownImminent
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmVSWRFault
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.10.{{ $index }}'
+                    descr: 'PA VSWR alarm'
+                    group: PAAlarms
+                    index: 'paAlarmVSWRFault.{{ $index }}'
+                    state_name: paAlarmVSWRFault
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmDriverCurrentHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.11.{{ $index }}'
+                    descr: 'PA Driver current high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmDriverCurrentHigh.{{ $index }}'
+                    state_name: paAlarmDriverCurrentHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmFinal1CurrentHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.12.{{ $index }}'
+                    descr: 'PA Final 1 current high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmFinal1CurrentHigh.{{ $index }}'
+                    state_name: paAlarmFinal1CurrentHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmFinal2CurrentHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.13.{{ $index }}'
+                    descr: 'PA Final 2 current high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmFinal2CurrentHigh.{{ $index }}'
+                    state_name: paAlarmFinal2CurrentHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmCurrentImbalance
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.14.{{ $index }}'
+                    descr: 'PA Current imbalance alarm'
+                    group: PAAlarms
+                    index: 'paAlarmCurrentImbalance.{{ $index }}'
+                    state_name: paAlarmCurrentImbalance
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmSupplyVoltageLow
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.15.{{ $index }}'
+                    descr: 'PA Supply voltage low alarm'
+                    group: PAAlarms
+                    index: 'paAlarmSupplyVoltageLow.{{ $index }}'
+                    state_name: paAlarmSupplyVoltageLow
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmSupplyVoltageHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.16.{{ $index }}'
+                    descr: 'PA Supply voltage low alarm'
+                    group: PAAlarms
+                    index: 'paAlarmSupplyVoltageHigh.{{ $index }}'
+                    state_name: paAlarmSupplyVoltageHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmDriverTemperatureHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.17.{{ $index }}'
+                    descr: 'PA Driver temp high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmDriverTemperatureHigh.{{ $index }}'
+                    state_name: paAlarmDriverTemperatureHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmFinal1TemperatureHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.18.{{ $index }}'
+                    descr: 'PA Final1 Temp high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmFinal1TemperatureHigh.{{ $index }}'
+                    state_name: paAlarmFinal1TemperatureHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: paAlarms
+                    value: paAlarmFinal2TemperatureHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.19.{{ $index }}'
+                    descr: 'PA Final2 Temp high alarm'
+                    group: PAAlarms
+                    index: 'paAlarmFinal2TemperatureHigh.{{ $index }}'
+                    state_name: paAlarmFinal2TemperatureHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmNoPMUDetected
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.1.{{ $index }}'
+                    descr: 'PMU not detected alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmNoPMUDetected.{{ $index }}'
+                    state_name: pmuAlarmNoPMUDetected
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmInvalidFirmware
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.2.{{ $index }}'
+                    descr: 'PMU firmware invalid alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmInvalidFirmware.{{ $index }}'
+                    state_name: pmuAlarmInvalidFirmware
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmMainsFailure
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.4.{{ $index }}'
+                    descr: 'PMU Mains supply alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmMainsFailure.{{ $index }}'
+                    state_name: pmuAlarmMainsFailure
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmMainsFailure
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.4.{{ $index }}'
+                    descr: 'PMU Mains supply alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmMainsFailure.{{ $index }}'
+                    state_name: pmuAlarmMainsFailure
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmSelfTestFailure
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.5.{{ $index }}'
+                    descr: 'PMU Mains supply alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmSelfTestFailure.{{ $index }}'
+                    state_name: pmuAlarmSelfTestFailure
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmShutdownImminent
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.6.{{ $index }}'
+                    descr: 'PMU shutdown imminent alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmShutdownImminent.{{ $index }}'
+                    state_name: pmuAlarmShutdownImminent
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmTemperatureHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.7.{{ $index }}'
+                    descr: 'PMU high temp alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmTemperatureHigh.{{ $index }}'
+                    state_name: pmuAlarmTemperatureHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmBatteryProtect
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.8.{{ $index }}'
+                    descr: 'PMU battery protect alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmBatteryProtect.{{ $index }}'
+                    state_name: pmuAlarmBatteryProtect
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmBatteryVoltageLow
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.9.{{ $index }}'
+                    descr: 'PMU Low Battery voltage alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmBatteryVoltageLow.{{ $index }}'
+                    state_name: pmuAlarmBatteryVoltageLow
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmBatteryVoltageHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.10.{{ $index }}'
+                    descr: 'PMU High Battery voltage alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmBatteryVoltageHigh.{{ $index }}'
+                    state_name: pmuAlarmBatteryVoltageHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmCurrentOutHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.11.{{ $index }}'
+                    descr: 'PMU high current alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmCurrentOutHigh.{{ $index }}'
+                    state_name: pmuAlarmCurrentOutHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmVoltageOutLow
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.12.{{ $index }}'
+                    descr: 'PMU Output voltage low alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmVoltageOutLow.{{ $index }}'
+                    state_name: pmuAlarmVoltageOutLow
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: pmuAlarms
+                    value: pmuAlarmVoltageOutHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.13.{{ $index }}'
+                    descr: 'PMU Output high voltage alarm'
+                    group: PMUAlarms
+                    index: 'pmuAlarmVoltageOutHigh.{{ $index }}'
+                    state_name: pmuAlarmVoltageOutHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmAmbientTempLow
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.1.{{ $index }}'
+                    descr: 'Ambient temperature low alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmAmbientTempLow.{{ $index }}'
+                    state_name: systemAlarmAmbientTempLow
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmAmbientTempHigh
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.2.{{ $index }}'
+                    descr: 'Ambient temperature high alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmAmbientTempHigh.{{ $index }}'
+                    state_name: systemAlarmAmbientTempHigh
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmExternalRefAbsent
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.3.{{ $index }}'
+                    descr: 'External freq ref absent alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmExternalRefAbsent.{{ $index }}'
+                    state_name: systemAlarmExternalRefAbsent
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmQoSJitter
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.4.{{ $index }}'
+                    descr: 'QoS jitter alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmQoSJitter.{{ $index }}'
+                    state_name: systemAlarmQoSJitter
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmQoSLostPackets
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.5.{{ $index }}'
+                    descr: 'QoS lost packets alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmQoSLostPackets.{{ $index }}'
+                    state_name: systemAlarmQoSLostPackets
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmFallbackControlled
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.6.{{ $index }}'
+                    descr: 'BS controlled by Embedded Node fallback mode'
+                    group: SystemAlarms
+                    index: 'systemAlarmFallbackControlled.{{ $index }}'
+                    state_name: systemAlarmFallbackControlled
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmDuplicateNodePriority
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.7.{{ $index }}'
+                    descr: 'BS Duplicate node priority'
+                    group: SystemAlarms
+                    index: 'systemAlarmDuplicateNodePriority.{{ $index }}'
+                    state_name: systemAlarmDuplicateNodePriority
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmNTPSynchronisation
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.8.{{ $index }}'
+                    descr: 'BS NTP unsynchronized'
+                    group: SystemAlarms
+                    index: 'systemAlarmNTPSynchronisation.{{ $index }}'
+                    state_name: systemAlarmNTPSynchronisation
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarm1PPSAbsent
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.9.{{ $index }}'
+                    descr: 'PPS Absent'
+                    group: SystemAlarms
+                    index: 'systemAlarm1PPSAbsent.{{ $index }}'
+                    state_name: systemAlarm1PPSAbsent
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmQoSTransmitBuffer
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.10.{{ $index }}'
+                    descr: 'QoS Transmit Buffer alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmQoSTransmitBuffer.{{ $index }}'
+                    state_name: systemAlarmQoSTransmitBuffer
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 1 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmCartesianLoopUnstable
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.11.{{ $index }}'
+                    descr: 'PA cartesiaon loop alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmCartesianLoopUnstable.{{ $index }}'
+                    state_name: systemAlarmCartesianLoopUnstable
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: systemAlarms
+                    value: systemAlarmTxRCableAbsent
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.12.{{ $index }}'
+                    descr: 'PA feedback cable to reciter TxR alarm'
+                    group: SystemAlarms
+                    index: 'systemAlarmTxRCableAbsent.{{ $index }}'
+                    state_name: systemAlarmTxRCableAbsent
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: fpAlarms
+                    value: fpAlarmFan1
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.1.{{ $index }}'
+                    descr: 'Fan1 alarm'
+                    group: FrontPanelAlarms
+                    index: 'fpAlarmFan1.{{ $index }}'
+                    state_name: fpAlarmFan1
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: fpAlarms
+                    value: fpAlarmFan2
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.2.{{ $index }}'
+                    descr: 'Fan2 alarm'
+                    group: FrontPanelAlarms
+                    index: 'fpAlarmFan2.{{ $index }}'
+                    state_name: fpAlarmFan2
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: fpAlarms
+                    value: fpAlarmFan3
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.3.{{ $index }}'
+                    descr: 'Fan3 alarm'
+                    group: FrontPanelAlarms
+                    index: 'fpAlarmFan3.{{ $index }}'
+                    state_name: fpAlarmFan3
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: fpAlarms
+                    value: fpAlarmNoFPDetected
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.4.{{ $index }}'
+                    descr: 'No FrontPanel Detected alarm'
+                    group: FrontPanelAlarms
+                    index: 'fpAlarmNoFPDetected.{{ $index }}'
+                    state_name: fpAlarmNoFPDetected
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: fpAlarms
+                    value: fpAlarmInvalidFirmware
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.5.{{ $index }}'
+                    descr: 'FP Invalid Firmware'
+                    group: FrontPanelAlarms
+                    index: 'fpAlarmInvalidFirmware.{{ $index }}'
+                    state_name: fpAlarmInvalidFirmware
+                    states:
+                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
+                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
+                        - { descr: raised, graph: 1, value: 2, generic: 2 }
+                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+        frequency:
+            data:
+                -
+                    oid: rctSelectedChannel
+                    value: rctSelectedChannelTxFreq
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.2.6.{{ $index }}'
+                    descr: 'Transmit Frequency (Hz)'
+                    index: 'rctSelectedChannelTxFreq.{{ $index }}'
+                    group: Transmitter
+                -
+                    oid: rctSelectedChannel
+                    value: rctSelectedChannelRxFreq
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.2.7.{{ $index }}'
+                    descr: 'Receive Frequency (Hz)'
+                    index: 'rctSelectedChannelRxFreq.{{ $index }}'
+                    group: Receiver
+        dbm:
+            data:
+                -
+                    oid: rctRfReceiver
+                    value: rctRfReceiverRSSI
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.4.1.{{ $index }}'
+                    descr: 'RSSI (dBm)'
+                    index: 'rctRfReceiverRSSI.{{ $index }}'
+                    divisor: 100
+                    group: Receiver
+                -
+                    oid: rctRfReceiver
+                    value: rctRfReceiverLC1RSSI
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.4.2.{{ $index }}'
+                    descr: 'RSSI logical ch 1 (dBm)'
+                    index: 'rctRfReceiverLC1RSSI.{{ $index }}'
+                    divisor: 100
+                    group: Receiver
+                -
+                    oid: rctRfReceiver
+                    value: rctRfReceiverLC2RSSI
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.4.3.{{ $index }}'
+                    descr: 'RSSI logical ch 2 (dBm)'
+                    index: 'rctRfReceiverLC2RSSI.{{ $index }}'
+                    divisor: 100
+                    group: Receiver
+        power:
+            data:
+                -
+                    oid: paTxOutput
+                    value: paTxOutputForwardPower
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.3.2.1.{{ $index }}'
+                    descr: 'PA output (W)'
+                    entPhysicalIndex: '130{{ $index }}'
+                    index: 'paTxOutputForwardPower.{{ $index }}'
+                    group: Power Amplifier
+        count:
+            data:
+                -
+                    oid: paTxOutput
+                    value: paTxOutputVSWR
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.3.2.2.{{ $index }}'
+                    descr: 'PA Tx Voltage Standing Wave Ratio (VSWR)'
+                    index: 'paTxOutputVSWR.{{ $index }}'
+                    divisor: 10
+                    group: Power Amplifier
+        current:
+            data:
+                -
+                    oid: pmuState
+                    value: pmuStateOutCurrent
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.4.{{ $index }}'
+                    descr: 'Output current that  PMU is supplying to the subrack'
+                    index: 'pmuStateOutCurrent.{{ $index }}'
+                    divisor: 1000
+                    group: PMUState
+        voltage:
+            data:
+                -
+                    oid: pmuState
+                    value: pmuStateOutVoltage
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.5.{{ $index }}'
+                    descr: 'Current voltage of the PMU output(s) to subrack (nominal 28V)'
+                    index: 'pmuStateOutVoltage.{{ $index }}'
+                    divisor: 100
+                    group: PMUState
+                -
+                    oid: pmuState
+                    value: pmuStateBatteryInVoltage
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.3.{{ $index }}'
+                    descr: 'Voltage of the DC (battery) PS to the PMU'
+                    index: 'pmuStateBatteryInVoltage.{{ $index }}'
+                    group: PMUState
+        temperature:
+            data:
+                -
+                    oid: rctTemperature
+                    value: rctTemperatureBoard
+                    num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.6.1.{{ $index }}'
+                    descr: 'Reciter Temperature (C)'
+                    entPhysicalIndex: '120{{ $index }}'
+                    index: 'rctTemperatureBoard.{{ $index }}'
+                    group: Reciter

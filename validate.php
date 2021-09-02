@@ -44,18 +44,23 @@ if (isset($options['h'])) {
           - poller: check that the poller and discovery are running properly
           - programs: check that external programs exist and are executable
           - python: check that various Python modules and functions exist
+          - system: checks system related items
           - updates: checks the status of git and updates
           - user: check that the LibreNMS user is set properly
 
         Example: ./validate.php -g mail.
 
-        "
-    ;
+        ";
     exit;
 }
 
+if (function_exists('posix_getuid') && posix_getuid() === 0) {
+    echo 'Do not run validate.php as root' . PHP_EOL;
+    exit(1);
+}
+
 // Check autoload
-if (!file_exists('vendor/autoload.php')) {
+if (! file_exists('vendor/autoload.php')) {
     print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
     exit;
 }
@@ -63,8 +68,6 @@ if (!file_exists('vendor/autoload.php')) {
 require_once 'vendor/autoload.php';
 require_once 'includes/common.php';
 require_once 'includes/functions.php';
-require_once 'includes/dbFacile.php';
-
 
 // Buffer output
 ob_start();
@@ -72,7 +75,7 @@ $precheck_complete = false;
 register_shutdown_function(function () {
     global $precheck_complete;
 
-    if (!$precheck_complete) {
+    if (! $precheck_complete) {
         // use this in case composer autoloader isn't available
         spl_autoload_register(function ($class) {
             @include str_replace('\\', '/', $class) . '.php';
@@ -93,19 +96,19 @@ if (file_exists('config.php')) {
     }
 
     $first_line = rtrim(`head -n1 config.php`);
-    if (!strpos($first_line, '<?php') === 0) {
+    if (! strpos($first_line, '<?php') === 0) {
         print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
         $pre_checks_failed = true;
     }
     if (strpos(`tail config.php`, '?>') !== false) {
-        print_fail("Remove the ?> at the end of config.php");
+        print_fail('Remove the ?> at the end of config.php');
         $pre_checks_failed = true;
     }
 }
 
 // Composer check
 $validator = new Validator();
-$validator->validate(array('dependencies'));
+$validator->validate(['dependencies']);
 if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {
     $pre_checks_failed = true;
 }
@@ -118,7 +121,7 @@ $init_modules = [];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
-if (!file_exists(Config::get('install_dir').'/.env')) {
+if (! file_exists(Config::get('install_dir') . '/.env')) {
     $suggested = realpath(__DIR__);
     print_fail('\'install_dir\' config setting is not set correctly.', "It should probably be set to: $suggested");
     exit;
@@ -138,12 +141,11 @@ if (isset($options['g'])) {
 } elseif (isset($options['m'])) {
     $modules = explode(',', $options['m']); // backwards compat
 } else {
-    $modules = array(); // all modules
+    $modules = []; // all modules
 }
 
 // run checks
-$validator->validate($modules, isset($options['s'])||!empty($modules));
-
+$validator->validate($modules, isset($options['s']) || ! empty($modules));
 
 function print_header($versions)
 {
@@ -172,10 +174,10 @@ function print_fail($msg, $fix = null)
 {
     c_echo("[%RFAIL%n]  $msg");
     if ($fix && strlen($msg) > 72) {
-        echo PHP_EOL . "       ";
+        echo PHP_EOL . '       ';
     }
 
-    if (!empty($fix)) {
+    if (! empty($fix)) {
         c_echo(" [%BFIX%n] %B$fix%n");
     }
     echo PHP_EOL;

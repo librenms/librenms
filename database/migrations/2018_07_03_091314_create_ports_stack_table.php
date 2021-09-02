@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePortsStackTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,7 @@ class CreatePortsStackTable extends Migration
             $table->unsignedInteger('port_id_high');
             $table->unsignedInteger('port_id_low');
             $table->string('ifStackStatus', 32);
-            $table->unique(['device_id','port_id_high','port_id_low']);
+            $table->unique(['device_id', 'port_id_high', 'port_id_low']);
         });
     }
 

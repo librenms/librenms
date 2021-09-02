@@ -2,8 +2,7 @@ os: webmon
 text: 'Dantel Webmon'
 type: environment
 icon: dantel
-mib_dir:
-    - dantel
+mib_dir: dantel
 over:
     - { graph: device_temperature, text: Temperature }
     - { graph: device_humidity, text: Humidity }

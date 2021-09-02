@@ -1,5 +1,22 @@
 mib: CYBEROAM-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: CYBEROAM-MIB::memoryCapacity
+                percent_used: CYBEROAM-MIB::memoryPercentUsage
+                precision: 1048576
+                index: 0
+            -
+                total: CYBEROAM-MIB::swapCapacity
+                percent_used: CYBEROAM-MIB::swapPercentUsage
+                precision: 1048576
+                descr: Swap
+                index: 1
+    os:
+        hardware: CYBEROAM-MIB::applianceModel.0
+        version: CYBEROAM-MIB::cyberoamVersion.0
+        serial: CYBEROAM-MIB::applianceKey.0
     processors:
         data:
             -

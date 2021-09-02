@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,7 +25,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 
-$snmpMockCache = array();
+$snmpMockCache = [];
 
 /**
  * Cache the data from an snmprec file
@@ -40,21 +39,30 @@ function cache_snmprec($file)
     if (isset($snmpMockCache[$file])) {
         return;
     }
-    $snmpMockCache[$file] = array();
+    $snmpMockCache[$file] = [];
 
     $data = file_get_contents(Config::get('install_dir') . "/tests/snmpsim/$file.snmprec");
     $line = strtok($data, "\r\n");
     while ($line !== false) {
-        list($oid, $type, $data) = explode('|', $line, 3);
+        [$oid, $type, $data] = explode('|', $line, 3);
         if ($type == '4') {
             $data = trim($data);
         } elseif ($type == '6') {
             $data = trim($data, '.');
         } elseif ($type == '4x') {
-            $data = hex2str($data);
+            // MacAddress type is stored as hex string, but we don't understand mibs
+            if (Str::startsWith($oid, [
+                '1.3.6.1.2.1.2.2.1.6', // IF-MIB::ifPhysAddress
+                '1.3.6.1.2.1.17.1.1.0', // BRIDGE-MIB::dot1dBaseBridgeAddress.0
+                '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20', // IES5206-MIB::slotModuleMacAddress
+            ])) {
+                $data = \LibreNMS\Util\Rewrite::readableMac($data);
+            } else {
+                $data = hex2str($data);
+            }
         }
 
-        $snmpMockCache[$file][$oid] = array($type, $data);
+        $snmpMockCache[$file][$oid] = [$type, $data];
         $line = strtok("\r\n");
     }
 }
@@ -140,7 +148,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
     }
 
     $cmd = "snmptranslate -IR -On '$oid'";
-    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ":" . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
+    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ':' . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }
@@ -157,7 +165,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
 function snmp_translate_type($oid, $mib = null, $mibdir = null)
 {
     $cmd = "snmptranslate -IR -Td $oid";
-    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ":" . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
+    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ':' . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }
@@ -222,18 +230,18 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
         return $result;
     } catch (Exception $e) {
         d_echo("[SNMP] snmpget $community $oid ($num_oid): no data\n");
+
         return false;
     }
 }
 
-
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
-    if (!is_array($oids)) {
+    if (! is_array($oids)) {
         $oids = explode(' ', $oids);
     }
 
-    $data = array();
+    $data = [];
     foreach ($oids as $index => $oid) {
         if (Str::contains($options, 'n')) {
             $oid_name = '.' . snmp_translate_number($oid, $mib, $mibdir);
@@ -279,6 +287,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
         return false;
     } else {
         d_echo($output);
+
         return $output;
     }
 }

@@ -1,5 +1,20 @@
 mib: RAPID-CITY
 modules:
+    mempools:
+        data:
+            -
+                used: RAPID-CITY::rcKhiSlotMemUsed
+                free: RAPID-CITY::rcKhiSlotMemFree
+#                percent_used: RAPID-CITY::rcKhiSlotMemUtil
+                type: avaya-vsp
+                descr: 'VOSS Memory'
+                precision: 1024
+                index: 0
+    os:
+        sysDescr_regex: '/(?<hardware>\S+) \((?<version>[^)]+)\)/'
+        version: RAPID-CITY::rcSysVersion.0
+        version_regex: '/(?<version>\d+\.\d+\S+)/'
+        serial: RAPID-CITY::rcChasSerialNumber.0
     processors:
         data:
             -

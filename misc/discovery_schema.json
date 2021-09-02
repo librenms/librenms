@@ -8,6 +8,122 @@
         "modules": {
             "type": "object",
             "properties": {
+                "mempools": {
+                    "type": "object",
+                    "properties": {
+                        "pre-cache": {"$ref": "#/definitions/pre-cache"},
+                        "data": {
+                            "type": "array",
+                            "items": {
+                                "properties": {
+                                    "descr": {
+                                        "type": "string"
+                                    },
+                                    "free": {
+                                        "type": "string"
+                                    },
+                                    "index": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "oid": {"$ref": "#/definitions/oid"},
+                                    "percent_used": {
+                                        "type": "string"
+                                    },
+                                    "precision": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "skip_values": {
+                                        "$ref": "#/definitions/skip_values"
+                                    },
+                                    "snmp_flags": {
+                                        "type": "string"
+                                    },
+                                    "total": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "class": {
+                                        "type": "string"
+                                    },
+                                    "used": {
+                                        "type": "string"
+                                    },
+                                    "warn_percent": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "data"
+                    ]
+                },
+                "os": {
+                    "type": "object",
+                    "properties": {
+                        "version": {"$ref": "#/definitions/oids"},
+                        "hardware": {"$ref": "#/definitions/oids"},
+                        "features": {"$ref": "#/definitions/oids"},
+                        "serial": {"$ref": "#/definitions/oids"},
+                        "lat": {"$ref": "#/definitions/oid"},
+                        "location": {"$ref": "#/definitions/oids"},
+                        "long": {"$ref": "#/definitions/oid"},
+                        "sysDescr_regex": {
+                            "type": ["string", "array"]
+                        },
+                        "version_regex": {
+                            "type": "string"
+                        },
+                        "hardware_mib": {
+                            "type": "string"
+                        },
+                        "hardware_regex": {
+                            "type": "string"
+                        },
+                        "features_regex": {
+                            "type": "string"
+                        },
+                        "serial_regex": {
+                            "type": "string"
+                        },
+                        "location_regex": {
+                            "type": "string"
+                        },
+                        "version_template": {
+                            "type": "string"
+                        },
+                        "hardware_template": {
+                            "type": "string"
+                        },
+                        "features_template": {
+                            "type": "string"
+                        },
+                        "serial_template": {
+                            "type": "string"
+                        },
+                        "location_template": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "processors": {
                     "type": "object",
                     "properties": {
@@ -16,9 +132,7 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "oid": {
-                                        "type": "string"
-                                    },
+                                    "oid": {"$ref": "#/definitions/oid"},
                                     "num_oid": {
                                         "type": "string"
                                     },
@@ -34,51 +148,12 @@
                                     "precision": {
                                         "type": "integer"
                                     },
-                                    "value": {
-                                        "type": "string"
-                                    },
+                                    "value": {"$ref": "#/definitions/oid"},
                                     "type": {
                                         "type": "string"
                                     },
                                     "skip_values": {
-                                        "anyOf": [
-                                            {
-                                                "type": "integer"
-                                            },
-                                            {
-                                                "type": "array",
-                                                "items": {
-                                                    "anyOf": [
-                                                        {
-                                                            "type": "integer"
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "oid": {
-                                                                    "type": "string"
-                                                                },
-                                                                "op": {
-                                                                    "$ref": "#/definitions/comparison"
-                                                                },
-                                                                "value": {
-                                                                    "type": ["boolean", "integer", "string", "array"],
-                                                                    "items": {
-                                                                        "type": ["integer", "string"]
-                                                                    }
-                                                                }
-                                                            },
-                                                            "additionalProperties": false,
-                                                            "required": [
-                                                                "oid",
-                                                                "op",
-                                                                "value"
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        ]
+                                        "$ref": "#/definitions/skip_values"
                                     },
                                     "entPhysicalIndex": {
                                         "type": "string"
@@ -95,8 +170,8 @@
                                 },
                                 "additionalProperties": false,
                                 "required": [
-                                    "num_oid",
-                                    "oid"
+                                    "oid",
+                                    "num_oid"
                                 ]
                             }
                         }
@@ -117,9 +192,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
+                                            "oid": {"$ref": "#/definitions/oid"},
                                             "value": {
                                                 "type": "string"
                                             },
@@ -188,42 +261,16 @@
                                                 "type": "string"
                                             },
                                             "skip_values": {
-                                                "anyOf": [
-                                                    {
-                                                        "type": "integer"
-                                                    },
-                                                    {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "oid": {
-                                                                    "type": "string"
-                                                                },
-                                                                "op": {
-                                                                    "$ref": "#/definitions/comparison"
-                                                                },
-                                                                "value": {
-                                                                    "type": ["boolean", "integer", "string", "array"],
-                                                                    "items": {
-                                                                        "type": ["integer", "string"]
-                                                                    }
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "oid",
-                                                                "op",
-                                                                "value"
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
+                                                "$ref": "#/definitions/skip_values"
                                             },
                                             "snmp_flags": {
                                                 "type": [
                                                     "string",
                                                     "array"
                                                 ]
+                                            },
+                                            "snmp_bulk": {
+                                                "type": "boolean"
                                             },
                                             "entPhysicalIndex": {
                                                 "type": ["integer", "string"]
@@ -258,12 +305,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            },
+                                            "oid": {"$ref": "#/definitions/oids"},
                                             "snmp_flags": {
                                                 "type": [
                                                     "string",
@@ -310,11 +352,110 @@
         "modules"
     ],
     "definitions": {
+        "oid": {
+            "type": "string"
+        },
+        "oids": {
+            "type": ["string", "array"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "pre-cache": {
+            "type": "object",
+            "properties": {
+                "oids": {"$ref": "#/definitions/oids"},
+                "snmp_flags": {
+                    "type": [
+                        "string",
+                        "array"
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "oids"
+            ]
+        },
         "sensor": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/data"
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "oid": {
+                                "type": "string"
+                            },
+                            "num_oid": {
+                                "type": "string",
+                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
+                            },
+                            "index": {
+                                "type": ["integer", "string"]
+                            },
+                            "descr": {
+                                "type": "string"
+                            },
+                            "divisor": {
+                                "type": "integer"
+                            },
+                            "multiplier": {
+                                "type": "integer"
+                            },
+                            "value": {
+                                "type": "string"
+                            },
+                            "group": {
+                                "type": "string"
+                            },
+                            "low_limit": {
+                                "type": ["number", "string"]
+                            },
+                            "low_warn_limit": {
+                                "type": ["number", "string"]
+                            },
+                            "warn_limit": {
+                                "type": ["number", "string"]
+                            },
+                            "high_limit": {
+                                "type": ["number", "string"]
+                            },
+                            "skip_value_lt": {
+                                "type": "number"
+                            },
+                            "skip_value_gt": {
+                                "type": "number"
+                            },
+                            "skip_values": {
+                                "$ref": "#/definitions/skip_values"                            },
+                            "snmp_flags": {
+                                "type": [
+                                    "string",
+                                    "array"
+                                ]
+                            },
+                            "snmp_bulk": {
+                                "type": "boolean"
+                            },
+                            "entPhysicalIndex": {
+                                "type": ["integer", "string"]
+                            },
+                            "entPhysicalIndex_measured": {
+                                "type": "string"
+                            },
+                            "user_func": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                            "descr",
+                            "num_oid",
+                            "oid"
+                        ]
+                    }
                 },
                 "options": {
                     "$ref": "#/definitions/options"
@@ -325,103 +466,45 @@
                 "data"
             ]
         },
-        "data": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "oid": {
-                        "type": "string"
-                    },
-                    "num_oid": {
-                        "type": "string",
-                        "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
-                    },
-                    "index": {
-                        "type": ["integer", "string"]
-                    },
-                    "descr": {
-                        "type": "string"
-                    },
-                    "divisor": {
-                        "type": "integer"
-                    },
-                    "multiplier": {
-                        "type": "integer"
-                    },
-                    "value": {
-                        "type": "string"
-                    },
-                    "group": {
-                        "type": "string"
-                    },
-                    "low_limit": {
-                        "type": ["number", "string"]
-                    },
-                    "low_warn_limit": {
-                        "type": ["number", "string"]
-                    },
-                    "warn_limit": {
-                        "type": ["number", "string"]
-                    },
-                    "high_limit": {
-                        "type": ["number", "string"]
-                    },
-                    "skip_value_lt": {
-                        "type": "number"
-                    },
-                    "skip_value_gt": {
-                        "type": "number"
-                    },
-                    "skip_values": {
-                        "type": ["number", "array"],
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "oid": {
-                                    "type": "string"
-                                },
-                                "op": {
-                                    "$ref": "#/definitions/comparison"
-                                },
-                                "value": {
-                                    "type": ["boolean", "integer", "string", "array"],
-                                    "items": {
-                                        "type": ["integer", "string"]
-                                    }
-                                }
-                            },
-                            "additionalProperties": false,
-                            "required": [
-                                "oid",
-                                "op",
-                                "value"
-                            ]
-                        }
-                    },
-                    "snmp_flags": {
-                        "type": [
-                            "string",
-                            "array"
-                        ]
-                    },
-                    "entPhysicalIndex": {
-                        "type": ["integer", "string"]
-                    },
-                    "entPhysicalIndex_measured": {
-                        "type": "string"
-                    },
-                    "user_func": {
-                        "type": "string"
-                    }
+        "skip_values": {
+            "anyOf": [
+                {
+                    "type": "number"
                 },
-                "additionalProperties": false,
-                "required": [
-                    "descr",
-                    "num_oid",
-                    "oid"
-                ]
-            }
+                {
+                    "type": "array",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "oid": {
+                                        "type": "string"
+                                    },
+                                    "op": {
+                                        "$ref": "#/definitions/comparison"
+                                    },
+                                    "value": {
+                                        "type": ["boolean", "number", "string", "array"],
+                                        "items": {
+                                            "type": ["number", "string"]
+                                        }
+                                    }
+                                },
+                                "additionalProperties": false,
+                                "required": [
+                                    "oid",
+                                    "op",
+                                    "value"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
         },
         "options": {
             "type": "object",
@@ -430,19 +513,12 @@
                     "type": "integer"
                 },
                 "skip_values": {
-                    "anyOf": [
-                        {
-                            "type": "integer"
-                        },
-                        {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    ]
+                    "$ref": "#/definitions/skip_values"
                 },
-                "skip_values_lt": {
+                "skip_value_gt": {
+                    "type": "integer"
+                },
+                "skip_value_lt": {
                     "type": "integer"
                 }
             },

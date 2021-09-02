@@ -2,34 +2,34 @@
 
 switch ($device['sysObjectID']) {
     /**
-        * Dell Powerconnect 5548
-        * Operating Temperature: 0º C to 45º C
-        */
+     * Dell Powerconnect 5548
+     * Operating Temperature: 0º C to 45º C
+     */
     case '.1.3.6.1.4.1.674.10895.3031':
         $temperature = trim(snmp_get($device, '.1.3.6.1.4.1.89.53.15.1.9.1', '-Ovq'));
         discover_sensor($valid['sensor'], 'temperature', $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         break;
     /**
-        * Dell Powerconnect 3548
-        * Operating Temperature: 0º C to 45º C
-        */
+     * Dell Powerconnect 3548
+     * Operating Temperature: 0º C to 45º C
+     */
     case '.1.3.6.1.4.1.674.10895.3017':
-        $temperature = trim(snmp_get($device, ".1.3.6.1.4.1.89.53.15.1.9.1", "-Ovq"));
+        $temperature = trim(snmp_get($device, '.1.3.6.1.4.1.89.53.15.1.9.1', '-Ovq'));
         discover_sensor($valid['sensor'], 'temperature', $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         break;
     /**
-        * Dell Powerconnect 3548P
-        * Operating Temperature: 0º C to 45º C
-        */
+     * Dell Powerconnect 3548P
+     * Operating Temperature: 0º C to 45º C
+     */
     case '.1.3.6.1.4.1.674.10895.3019':
-        $temperature = trim(snmp_get($device, ".1.3.6.1.4.1.89.53.15.1.9.1", "-Ovq"));
+        $temperature = trim(snmp_get($device, '.1.3.6.1.4.1.89.53.15.1.9.1', '-Ovq'));
         discover_sensor($valid['sensor'], 'temperature', $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         break;
     default:
         /**
-        * Default Temperature Discovery
-        * Operating Temperature: 0º C to 45º C
-        */
+         * Default Temperature Discovery
+         * Operating Temperature: 0º C to 45º C
+         */
         $temperature = snmp_get($device, 'boxServicesTempSensorTemperature.0', '-Ovq', 'FASTPATH-BOXSERVICES-PRIVATE-MIB');
         if (is_numeric($temperature)) {
             discover_sensor($valid['sensor'], 'temperature', $device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.0', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
@@ -63,8 +63,8 @@ $oids = snmpwalk_cache_oid($device, 'chStackUnitSysType', $oids, 'F10-S-SERIES-C
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        $descr   = 'Unit '.$index.' '.$entry['chStackUnitSysType'];
-        $oid     = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.'.$index;
+        $descr = 'Unit ' . $index . ' ' . $entry['chStackUnitSysType'];
+        $oid = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.' . $index;
         $current = $entry['chStackUnitTemp'];
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
     }

@@ -8,14 +8,14 @@
  * the source code distribution for details.
  */
 
-if (!is_array($aix_cache['aixFileSystem'])) {
-    $aix_cache['aixFileSystem'] = snmpwalk_cache_oid($device, 'aixFsTableEntry', array(), 'IBM-AIX-MIB');
+if (! is_array($aix_cache['aixFileSystem'])) {
+    $aix_cache['aixFileSystem'] = snmpwalk_cache_oid($device, 'aixFsTableEntry', [], 'IBM-AIX-MIB');
     d_echo($aix_cache);
 }
 
 $entry = $aix_cache['aixFileSystem'][$storage['storage_index']];
 
-$storage['units']       = 1024*1024;
-$storage['size']        = ($entry['aixFsSize'] * $storage['units']);
-$storage['free']        = ($entry['aixFsFree'] * $storage['units']);
-$storage['used']        = ($storage['size'] - $storage['free']);
+$storage['units'] = 1024 * 1024;
+$storage['size'] = ($entry['aixFsSize'] * $storage['units']);
+$storage['free'] = ($entry['aixFsFree'] * $storage['units']);
+$storage['used'] = ($storage['size'] - $storage['free']);

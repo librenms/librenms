@@ -8,14 +8,15 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 $no_refresh = true;
-$device_id= '';
+$device_id = '';
 $vars['fromdevice'] = false;
+require_once 'includes/html/modal/alert_details.php';
 require_once 'includes/html/common/alert-log.inc.php';
 echo implode('', $common_output);
 unset($device_id);

@@ -25,25 +25,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.27",
                     "sysDescr": "ES-2024PWR",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "zynos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "zyxel.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.27",
-                    "sysDescr": "ES-2024PWR",
-                    "sysContact": null,
-                    "version": null,
+                    "version": "",
                     "hardware": "ES-2024PWR",
                     "features": null,
                     "os": "zynos",
@@ -53,6 +35,7 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

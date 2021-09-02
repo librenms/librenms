@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12148.10",
                     "sysDescr": "ELTEK Power System",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "enexus",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "eltek.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12148.10",
-                    "sysDescr": "ELTEK Power System",
                     "sysContact": "<private>",
                     "version": "2.5.3",
                     "hardware": "Smartpack S",
@@ -35,7 +17,8 @@
                     "location": "Site"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSdp extends Model implements Keyable
@@ -30,7 +31,7 @@ class MplsSdp extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
-     * @return string
+     * @return int
      */
     public function getCompositeKey()
     {
@@ -39,7 +40,7 @@ class MplsSdp extends Model implements Keyable
 
     // ---- Define Relationships ----
 
-    public function binds()
+    public function binds(): HasMany
     {
         return $this->hasMany(\App\Models\MplsSdpBind::class, 'sdp_id');
     }

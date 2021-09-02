@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,9 +26,9 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
-use Auth;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -48,23 +47,23 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
-        if (is_null($device)) {
+        if (! $device instanceof Device || ! $device->hostname) {
             return '';
         }
 
-        if (!$device->canAccess(Auth::user())) {
+        if (! $device->canAccess(Auth::user())) {
             return $device->displayName();
         }
 
-        if (!$start) {
+        if (! $start) {
             $start = Carbon::now()->subDay()->timestamp;
         }
 
-        if (!$end) {
+        if (! $end) {
             $end = Carbon::now()->timestamp;
         }
 
-        if (!$text) {
+        if (! $text) {
             $text = $device->displayName();
         }
 
@@ -100,7 +99,7 @@ class Url
 
         $contents .= '</div>';
 
-        foreach ((array)$graphs as $entry) {
+        foreach ((array) $graphs as $entry) {
             $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
             $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
             $contents .= '<div class="overlib-box">';
@@ -124,20 +123,25 @@ class Url
      * @param Port $port
      * @param string $text
      * @param string $type
-     * @param boolean $overlib
-     * @param boolean $single_graph
+     * @param bool $overlib
+     * @param bool $single_graph
      * @return mixed|string
      */
     public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
     {
+        if ($port === null) {
+            return $text;
+        }
 
         $label = Rewrite::normalizeIfName($port->getLabel());
-        if (!$text) {
+        if (! $text) {
             $text = $label;
         }
 
         $content = '<div class=list-large>' . addslashes(htmlentities($port->device->displayName() . ' - ' . $label)) . '</div>';
-        if ($port->ifAlias) {
+        if ($port['port_descr_descr']) {
+            $content .= addslashes(\LibreNMS\Util\Clean::html($port['port_descr_descr'], [])) . '<br />';
+        } elseif ($port['ifAlias']) {
             $content .= addslashes(htmlentities($port->ifAlias)) . '<br />';
         }
 
@@ -153,7 +157,7 @@ class Url
         ];
 
         $content .= self::graphTag($graph_array);
-        if (!$single_graph) {
+        if (! $single_graph) {
             $graph_array['from'] = Carbon::now()->subWeek()->timestamp;
             $content .= self::graphTag($graph_array);
             $graph_array['from'] = Carbon::now()->subMonth()->timestamp;
@@ -164,7 +168,7 @@ class Url
 
         $content .= '</div>';
 
-        if (!$overlib) {
+        if (! $overlib) {
             return $content;
         } elseif ($port->canAccess(Auth::user())) {
             return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
@@ -174,18 +178,17 @@ class Url
     }
 
     /**
-     * @param Sensor $sensor
+     * @param \App\Models\Sensor $sensor
      * @param string $text
      * @param string $type
-     * @param boolean $overlib
-     * @param boolean $single_graph
+     * @param bool $overlib
+     * @param bool $single_graph
      * @return mixed|string
      */
     public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
     {
-
         $label = $sensor->sensor_descr;
-        if (!$text) {
+        if (! $text) {
             $text = $label;
         }
 
@@ -203,7 +206,7 @@ class Url
         ];
 
         $content .= self::graphTag($graph_array);
-        if (!$single_graph) {
+        if (! $single_graph) {
             $graph_array['from'] = Carbon::now()->subWeek()->timestamp;
             $content .= self::graphTag($graph_array);
             $graph_array['from'] = Carbon::now()->subMonth()->timestamp;
@@ -214,9 +217,10 @@ class Url
 
         $content .= '</div>';
 
-        if (!$overlib) {
+        if (! $overlib) {
             return $content;
         }
+
         return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
     }
 
@@ -227,7 +231,7 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [is_int($device) ? $device : $device->device_id];
+        $routeParams = [is_numeric($device) ? $device : $device->device_id];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
@@ -243,7 +247,7 @@ class Url
 
     public static function sensorUrl($sensor, $vars = [])
     {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health' , 'metric' => $sensor->sensor_class], $vars);
+        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
 
     /**
@@ -255,6 +259,24 @@ class Url
         $graph_array = [
             'port_id' => $port->port_id,
             'graph_type' => 'port_bits',
+            'from' => Carbon::now()->subDay()->timestamp,
+            'to' => Carbon::now()->timestamp,
+            'width' => 150,
+            'height' => 21,
+        ];
+
+        return self::portImage($graph_array);
+    }
+
+    /**
+     * @param Port $port
+     * @return string
+     */
+    public static function portErrorsThumbnail($port)
+    {
+        $graph_array = [
+            'port_id' => $port->port_id,
+            'graph_type' => 'port_errors',
             'from' => Carbon::now()->subDay()->timestamp,
             'to' => Carbon::now()->timestamp,
             'width' => 150,
@@ -295,8 +317,8 @@ class Url
     {
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
-            if ($value == '0' || $value != '' && !Str::contains($var, 'opt') && !is_numeric($var)) {
-                $url .= $var . '=' . urlencode($value) . '/';
+            if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
+                $url .= urlencode($var) . '=' . urlencode($value) . '/';
             }
         }
 
@@ -317,33 +339,33 @@ class Url
         return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
-    public static function graphPopup($args)
+    public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
         $original_from = $args['from'];
         $now = CarbonImmutable::now();
 
-        $graph = self::graphTag($args);
-        $content = '<div class=list-large>' . $args['popup_title'] . '</div>';
-        $content .= '<div style="width: 850px">';
+        $graph = $content ?: self::graphTag($args);
+        $popup = '<div class=list-large>' . $args['popup_title'] . '</div>';
+        $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
         $args['legend'] = 'yes';
         $args['from'] = $now->subDay()->timestamp;
-        $content .= self::graphTag($args);
+        $popup .= self::graphTag($args);
         $args['from'] = $now->subWeek()->timestamp;
-        $content .= self::graphTag($args);
+        $popup .= self::graphTag($args);
         $args['from'] = $now->subMonth()->timestamp;
-        $content .= self::graphTag($args);
+        $popup .= self::graphTag($args);
         $args['from'] = $now->subYear()->timestamp;
-        $content .= self::graphTag($args);
-        $content .= '</div>';
+        $popup .= self::graphTag($args);
+        $popup .= '</div>';
 
         $args['from'] = $original_from;
 
-        $args['link'] = self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
+        $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
 
-        return self::overlibLink($args['link'], $graph, $content, null);
+        return self::overlibLink($args['link'], $graph, $popup, null);
     }
 
     public static function lazyGraphTag($args)
@@ -351,15 +373,16 @@ class Url
         $urlargs = [];
 
         foreach ($args as $key => $arg) {
-            $urlargs[] = $key . "=" . urlencode($arg);
+            $urlargs[] = $key . '=' . urlencode($arg);
         }
 
+        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
         if (Config::get('enable_lazy_load', true)) {
-            return '<img class="lazy img-responsive" data-original="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+            return $tag . ' loading="lazy" />';
         }
 
-        return '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return $tag . ' />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
@@ -418,6 +441,7 @@ class Url
     public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
+
         return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
     }
 
@@ -446,15 +470,15 @@ class Url
      */
     public static function portLinkDisplayClass($port)
     {
-        if ($port->ifAdminStatus == "down") {
-            return "interface-admindown";
+        if ($port->ifAdminStatus == 'down') {
+            return 'interface-admindown';
         }
 
-        if ($port->ifAdminStatus == "up" && $port->ifOperStatus != "up") {
-            return "interface-updown";
+        if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+            return 'interface-updown';
         }
 
-        return "interface-upup";
+        return 'interface-upup';
     }
 
     /**
@@ -466,11 +490,11 @@ class Url
     public static function sensorLinkDisplayClass($sensor)
     {
         if ($sensor->sensor_current > $sensor->sensor_limit) {
-            return "sensor-high";
+            return 'sensor-high';
         }
 
         if ($sensor->sensor_current < $sensor->sensor_limit_low) {
-            return "sensor-low";
+            return 'sensor-low';
         }
 
         return 'sensor-ok';
@@ -488,7 +512,7 @@ class Url
         $possibilities = [$icon];
 
         if ($os) {
-            if ($os == "linux") {
+            if ($os == 'linux') {
                 // first, prefer the first word of $feature
                 $distro = Str::before(strtolower(trim($feature)), ' ');
                 $possibilities[] = "$distro.svg";
@@ -496,7 +520,7 @@ class Url
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
                 if (strpos($feature, ' ') !== false) {
-                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";
                     $possibilities[] = "$distro.png";

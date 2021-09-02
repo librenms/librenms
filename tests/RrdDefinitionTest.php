@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,8 +31,7 @@ class RrdDefinitionTest extends TestCase
 {
     public function testEmpty()
     {
-
-        $this->assertEmpty((string)new RrdDefinition());
+        $this->assertEmpty((string) new RrdDefinition());
     }
 
     public function testWrongType()
@@ -52,7 +50,7 @@ class RrdDefinitionTest extends TestCase
         $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100 ';
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
-        $this->assertEquals($expected, (string)$def);
+        $this->assertEquals($expected, (string) $def);
     }
 
     public function testCreation()

@@ -15,11 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Original file
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  * 3 Phase support extension
@@ -28,7 +27,7 @@
  */
 
 // Detect type of UPS (Signle-Phase/3 Phase)
-    # Number of input lines
+    // Number of input lines
     $upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
     $in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
 
@@ -38,16 +37,16 @@ if ($in_phaseNum == '1') {
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.4.0';
     $in_frequency = snmp_get($device, $in_frequency_oid, '-Oqv');
 
-    if (!empty($in_frequency) || $in_frequency == 0) {
-        $type             = 'netagent2';
-        $index            = 0;
-        $limit            = 60;
-        $warnlimit        = 51;
-        $lowlimit         = 0;
-        $lowwarnlimit     = 49;
-        $divisor          = 10;
-        $frequency        = $in_frequency / $divisor;
-        $descr            = 'Input frequency';
+    if (! empty($in_frequency) || $in_frequency == 0) {
+        $type = 'netagent2';
+        $index = 0;
+        $limit = 60;
+        $warnlimit = 51;
+        $lowlimit = 0;
+        $lowwarnlimit = 49;
+        $divisor = 10;
+        $frequency = $in_frequency / $divisor;
+        $descr = 'Input frequency';
 
         discover_sensor(
             $valid['sensor'],
@@ -70,16 +69,16 @@ if ($in_phaseNum == '1') {
     $out_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.2.0';
     $out_frequency = snmp_get($device, $frequency_oid, '-Oqv');
 
-    if (!empty($out_frequency) || $out_frequency == 0) {
-        $type             = 'netagent2';
-        $index            = 1;
-        $limit            = 60;
-        $warnlimit        = 51;
-        $lowlimit         = 0;
-        $lowwarnlimit     = 49;
-        $divisor          = 10;
-        $frequency        = $out_frequency / $divisor;
-        $descr            = 'Output frequency';
+    if (! empty($out_frequency) || $out_frequency == 0) {
+        $type = 'netagent2';
+        $index = 1;
+        $limit = 60;
+        $warnlimit = 51;
+        $lowlimit = 0;
+        $lowwarnlimit = 49;
+        $divisor = 10;
+        $frequency = $out_frequency / $divisor;
+        $descr = 'Output frequency';
 
         discover_sensor(
             $valid['sensor'],
@@ -106,16 +105,16 @@ if ($in_phaseNum == '3') {
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.8.2.1.0';
     $in_frequency = snmp_get($device, $in_frequency_oid, '-Oqv');
 
-    if (!empty($in_frequency) || $in_frequency == 0) {
-        $type             = 'netagent2';
-        $index            = 0;
-        $limit            = 60;
-        $warnlimit        = 51;
-        $lowlimit         = 0;
-        $lowwarnlimit     = 49;
-        $divisor          = 10;
-        $frequency        = $in_frequency / $divisor;
-        $descr            = 'Input frequency';
+    if (! empty($in_frequency) || $in_frequency == 0) {
+        $type = 'netagent2';
+        $index = 0;
+        $limit = 60;
+        $warnlimit = 51;
+        $lowlimit = 0;
+        $lowwarnlimit = 49;
+        $divisor = 10;
+        $frequency = $in_frequency / $divisor;
+        $descr = 'Input frequency';
 
         discover_sensor(
             $valid['sensor'],
@@ -138,16 +137,16 @@ if ($in_phaseNum == '3') {
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.8.3.1.0';
     $in_frequency = snmp_get($device, $in_frequency_oid, '-Oqv');
 
-    if (!empty($in_frequency) || $in_frequency == 0) {
-        $type             = 'netagent2';
-        $index            = 1;
-        $limit            = 60;
-        $warnlimit        = 51;
-        $lowlimit         = 0;
-        $lowwarnlimit     = 49;
-        $divisor          = 10;
-        $frequency        = $in_frequency / $divisor;
-        $descr            = 'Output frequency';
+    if (! empty($in_frequency) || $in_frequency == 0) {
+        $type = 'netagent2';
+        $index = 1;
+        $limit = 60;
+        $warnlimit = 51;
+        $lowlimit = 0;
+        $lowwarnlimit = 49;
+        $divisor = 10;
+        $frequency = $in_frequency / $divisor;
+        $descr = 'Output frequency';
 
         discover_sensor(
             $valid['sensor'],
@@ -170,16 +169,16 @@ if ($in_phaseNum == '3') {
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.8.4.1.0';
     $in_frequency = snmp_get($device, $in_frequency_oid, '-Oqv');
 
-    if (!empty($in_frequency) || $in_frequency == 0) {
-        $type             = 'netagent2';
-        $index            = 2;
-        $limit            = 60;
-        $warnlimit        = 51;
-        $lowlimit         = 0;
-        $lowwarnlimit     = 49;
-        $divisor          = 10;
-        $frequency        = $in_frequency / $divisor;
-        $descr            = 'Bypass frequency';
+    if (! empty($in_frequency) || $in_frequency == 0) {
+        $type = 'netagent2';
+        $index = 2;
+        $limit = 60;
+        $warnlimit = 51;
+        $lowlimit = 0;
+        $lowwarnlimit = 49;
+        $divisor = 10;
+        $frequency = $in_frequency / $divisor;
+        $descr = 'Bypass frequency';
 
         discover_sensor(
             $valid['sensor'],

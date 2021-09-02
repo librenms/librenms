@@ -11,10 +11,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 *
@@ -23,14 +23,14 @@
 require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
-$ds        = 'time_remaining';
-$colour_area     = 'EEEEEE';
-$colour_line     = '36393D';
+$ds = 'time_remaining';
+$colour_area = 'EEEEEE';
+$colour_line = '36393D';
 $colour_area_max = 'FFEE99';
-$graph_max       = 0;
-$unit_text       = 'Minutes';
-$ups_nut  = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
-if (rrdtool_check_rrd_exists($ups_nut)) {
+$graph_max = 0;
+$unit_text = 'Minutes';
+$ups_nut = Rrd::name($device['hostname'], ['app', 'ups-nut', $app['app_id']]);
+if (Rrd::checkRrdExists($ups_nut)) {
     $rrd_filename = $ups_nut;
 } else {
     echo "file missing: $rrd_filename";

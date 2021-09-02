@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -24,24 +24,24 @@
  * @subpackage Apps
  */
 
-$graphs = array(
+$graphs = [
     'tinydns_queries' => 'Queries',
     'tinydns_errors'  => 'Errors',
     'tinydns_dnssec'  => 'DNSSec',
     'tinydns_other'   => 'Other',
-);
+];
 
 foreach ($graphs as $key => $text) {
-    $graph_type            = $key;
+    $graph_type = $key;
     $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
+    $graph_array['width'] = '215';
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
-    
+    $graph_array['id'] = $app['app_id'];
+    $graph_array['type'] = 'application_' . $key;
+
     echo '<div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">'.$text.'</h3>
+        <h3 class="panel-title">' . $text . '</h3>
     </div>
     <div class="panel-body">
     <div class="row">';

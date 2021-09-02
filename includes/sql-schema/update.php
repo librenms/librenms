@@ -15,22 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Config;
-use LibreNMS\Exceptions\LockException;
-use LibreNMS\Util\FileLock;
-use LibreNMS\Util\MemcacheLock;
+use Database\Seeders\DefaultWidgetSeeder;
 
-if (!isset($init_modules) && php_sapi_name() == 'cli') {
+if (! isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = [];
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
@@ -38,16 +34,14 @@ if (!isset($init_modules) && php_sapi_name() == 'cli') {
 
 $return = 0;
 
-try {
-    if (isset($skip_schema_lock) && !$skip_schema_lock) {
-        if (Config::get('distributed_poller')) {
-            $schemaLock = MemcacheLock::lock('schema', 30, 86000);
-        } else {
-            $schemaLock = FileLock::lock('schema', 30);
-        }
-    }
+// make sure the cache_locks table exists before attempting to use a db lock
+if (config('cache.default') == 'database' && ! \Schema::hasTable('cache_locks')) {
+    $skip_schema_lock = true;
+}
 
-    $db_rev = get_db_schema();
+$schemaLock = Cache::lock('schema', 86000);
+if (! empty($skip_schema_lock) || $schemaLock->get()) {
+    $db_rev = \LibreNMS\DB\Schema::getLegacySchema();
 
     $migrate_opts = ['--force' => true, '--ansi' => true];
 
@@ -74,7 +68,7 @@ try {
                             d_echo("$line \n");
 
                             if ($line[0] != '#') {
-                                if (!dbQuery($line)) {
+                                if (! dbQuery($line)) {
                                     $return = 2;
                                     $err++;
                                 }
@@ -99,7 +93,7 @@ try {
 
         echo "-- Done\n";
         // end legacy update
-        $db_rev = get_db_schema();
+        $db_rev = \LibreNMS\DB\Schema::getLegacySchema();
     }
 
     if ($db_rev == 1000) {
@@ -108,10 +102,5 @@ try {
         echo Artisan::output();
     }
 
-    if (isset($schemaLock)) {
-        $schemaLock->release();
-    }
-} catch (LockException $e) {
-    echo $e->getMessage() . PHP_EOL;
-    $return = 1;
+    $schemaLock->release();
 }

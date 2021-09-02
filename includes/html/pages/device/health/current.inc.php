@@ -1,7 +1,7 @@
 <?php
 
-$class = "current";
-$unit  = "A";
-$graph_type = "sensor_current";
+$class = 'current';
+$unit = 'A';
+$graph_type = 'sensor_current';
 
 require 'sensors.inc.php';

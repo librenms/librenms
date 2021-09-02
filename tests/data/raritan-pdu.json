@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.13742.4",
                     "sysDescr": "Raritan Dominion PX - Firmware Version 010507-11172",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "raritan-pdu",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "raritan.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.13742.4",
-                    "sysDescr": "Raritan Dominion PX - Firmware Version 010507-11172",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -47,7 +30,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.1",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -407,7 +390,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.5",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -820,7 +803,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.1",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -1180,7 +1163,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.5",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,

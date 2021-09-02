@@ -5,26 +5,24 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    librenms
- * @subpackage map
  * @copyright  (C) 2006 - 2012 Adam Armstrong
- *
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $links = 1;
 
-$init_modules = array('web', 'auth');
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!Auth::check()) {
-    die('Unauthorized');
+if (! Auth::check()) {
+    exit('Unauthorized');
 }
 
 $options = getopt('d::');
 
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']), false)) {
     echo "DEBUG!\n";
 }
 
@@ -44,7 +42,7 @@ if (isset($_GET['device']) && is_numeric($_GET['device'])) {
 }
 // FIXME this shit probably needs tidied up.
 
-if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
+if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
     $map = '
             digraph G { bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=LR;
             node [ fontname="helvetica", fontstyle=bold, style=filled, color=white, fillcolor=lightgrey, overlap=false];
@@ -52,25 +50,25 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             graph [bgcolor=transparent];
 ';
 
-    if (!Auth::check()) {
+    if (! Auth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
         $locations = getlocations();
         $loc_count = 1;
-        foreach (dbFetch("SELECT *, locations.location FROM devices LEFT JOIN locations ON devices.location_id = locations.id WHERE 1 ".$where, $param) as $device) {
+        foreach (dbFetch('SELECT *, locations.location FROM devices LEFT JOIN locations ON devices.location_id = locations.id WHERE 1 ' . $where, $param) as $device) {
             if ($device) {
-                $links = dbFetch("SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_port_id = I.port_id ORDER BY L.remote_hostname", array($device['device_id']));
+                $links = dbFetch('SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_port_id = I.port_id ORDER BY L.remote_hostname', [$device['device_id']]);
                 if (count($links)) {
                     if ($anon) {
                         $device['hostname'] = md5($device['hostname']);
                     }
-                    if (!isset($locations[$device['location']])) {
+                    if (! isset($locations[$device['location']])) {
                         $locations[$device['location']] = $loc_count;
                         $loc_count++;
                     }
                     $loc_id = $locations[$device['location']];
 
-                    $map .= "\"" . $device['hostname'] . "\" [fontsize=20, fillcolor=\"lightblue\", group=" . $loc_id . " URL=\"" . Config::get('base_url') . "/device/device=" . $device['device_id'] . "/tab=neighbours/selection=map/\" shape=box3d]\n";
+                    $map .= '"' . $device['hostname'] . '" [fontsize=20, fillcolor="lightblue", group=' . $loc_id . ' URL="' . Config::get('base_url') . '/device/device=' . $device['device_id'] . "/tab=neighbours/selection=map/\" shape=box3d]\n";
                 }
 
                 foreach ($links as $link) {
@@ -83,21 +81,21 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                         $done = 1;
                     }
 
-                    if (!$done) {
+                    if (! $done) {
                         $linkdone[$local_port_id][$remote_port_id] = true;
 
                         $links++;
 
-                        if ($link['ifSpeed'] >= "10000000000") {
-                            $info = "color=red3 style=\"setlinewidth(6)\"";
-                        } elseif ($link['ifSpeed'] >= "1000000000") {
-                            $info = "color=lightblue style=\"setlinewidth(4)\"";
-                        } elseif ($link['ifSpeed'] >= "100000000") {
-                            $info = "color=lightgrey style=\"setlinewidth(2)\"";
-                        } elseif ($link['ifSpeed'] >= "10000000") {
-                            $info = "style=\"setlinewidth(1)\"";
+                        if ($link['ifSpeed'] >= '10000000000') {
+                            $info = 'color=red3 style="setlinewidth(6)"';
+                        } elseif ($link['ifSpeed'] >= '1000000000') {
+                            $info = 'color=lightblue style="setlinewidth(4)"';
+                        } elseif ($link['ifSpeed'] >= '100000000') {
+                            $info = 'color=lightgrey style="setlinewidth(2)"';
+                        } elseif ($link['ifSpeed'] >= '10000000') {
+                            $info = 'style="setlinewidth(1)"';
                         } else {
-                            $info = "style=\"setlinewidth(1)\"";
+                            $info = 'style="setlinewidth(1)"';
                         }
 
                         $src = $device['hostname'];
@@ -105,8 +103,8 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                             $src = md5($src);
                         }
                         if ($remote_port_id) {
-                            $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.port_id = ? AND D.device_id = I.device_id", array($remote_port_id));
-                            $dst_host = dbFetchCell("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.port_id = ?  AND D.device_id = I.device_id", array($remote_port_id));
+                            $dst = dbFetchCell('SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.port_id = ? AND D.device_id = I.device_id', [$remote_port_id]);
+                            $dst_host = dbFetchCell('SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.port_id = ?  AND D.device_id = I.device_id', [$remote_port_id]);
                         } else {
                             unset($dst_host);
                             $dst = $link['remote_hostname'];
@@ -117,22 +115,22 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                             $src = md5($src);
                         }
 
-                        $sif = cleanPort(dbFetchRow("SELECT * FROM ports WHERE `port_id` = ?", array($link['local_port_id'])), $device);
+                        $sif = cleanPort(dbFetchRow('SELECT * FROM ports WHERE `port_id` = ?', [$link['local_port_id']]), $device);
                         if ($remote_port_id) {
-                            $dif = cleanPort(dbFetchRow("SELECT * FROM ports WHERE `port_id` = ?", array($link['remote_port_id'])));
+                            $dif = cleanPort(dbFetchRow('SELECT * FROM ports WHERE `port_id` = ?', [$link['remote_port_id']]));
                         } else {
                             $dif['label'] = $link['remote_port'];
                             $dif['port_id'] = $link['remote_hostname'] . '/' . $link['remote_port'];
                         }
 
-                        if ($where == "") {
-                            if (!$ifdone[$dst][$dif['port_id']] && !$ifdone[$src][$sif['port_id']]) {
+                        if ($where == '') {
+                            if (! $ifdone[$dst][$dif['port_id']] && ! $ifdone[$src][$sif['port_id']]) {
                                 $map .= "\"$src\" -> \"" . $dst . "\" [weight=500000, arrowsize=0, len=0];\n";
                             }
                             $ifdone[$src][$sif['port_id']] = 1;
                         } else {
-                            $map .= "\"" . $sif['port_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"" . Config::get('base_url') . "/device/device=" . $device['device_id'] . "/tab=port/port=$local_port_id/\"]\n";
-                            if (!$ifdone[$src][$sif['port_id']]) {
+                            $map .= '"' . $sif['port_id'] . '" [label="' . $sif['label'] . '", fontsize=12, fillcolor=lightblue, URL="' . Config::get('base_url') . '/device/device=' . $device['device_id'] . "/tab=port/port=$local_port_id/\"]\n";
+                            if (! $ifdone[$src][$sif['port_id']]) {
                                 $map .= "\"$src\" -> \"" . $sif['port_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
                                 $ifdone[$src][$sif['port_id']] = 1;
                             }
@@ -144,20 +142,20 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                             }
 
                             if ($dst_host == $device['device_id'] || $where == '') {
-                                $map .= "\"" . $dif['port_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"" . Config::get('base_url') . "/device/device=$dst_host/tab=port/port=$remote_port_id/\"]\n";
+                                $map .= '"' . $dif['port_id'] . '" [label="' . $dif['label'] . '", fontsize=12, fillcolor=lightblue, URL="' . Config::get('base_url') . "/device/device=$dst_host/tab=port/port=$remote_port_id/\"]\n";
                             } else {
-                                $map .= "\"" . $dif['port_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray";
+                                $map .= '"' . $dif['port_id'] . '" [label="' . $dif['label'] . ' ", fontsize=12, fillcolor=lightgray';
                                 if ($dst_host) {
-                                    $map .= ", URL=\"" . Config::get('base_url') . "/device/device=$dst_host/tab=port/port=$remote_port_id/\"";
+                                    $map .= ', URL="' . Config::get('base_url') . "/device/device=$dst_host/tab=port/port=$remote_port_id/\"";
                                 }
                                 $map .= "]\n";
                             }
 
-                            if (!$ifdone[$dst][$dif['port_id']]) {
-                                $map .= "\"" . $dif['port_id'] . "\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
+                            if (! $ifdone[$dst][$dif['port_id']]) {
+                                $map .= '"' . $dif['port_id'] . "\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
                                 $ifdone[$dst][$dif['port_id']] = 1;
                             }
-                            $map .= "\"" . $sif['port_id'] . "\" -> \"" . $dif['port_id'] . "\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
+                            $map .= '"' . $sif['port_id'] . '" -> "' . $dif['port_id'] . "\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
                         }
                     }
                 }
@@ -180,7 +178,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             $_GET['format'] = 'png:gd';
             break;
         case 'dot':
-            echo($map);
+            echo $map;
             exit();
         default:
             $_GET['format'] = 'png:gd';
@@ -198,11 +196,11 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
         $maptool = Config::get('dot');
     }
 
-    $descriptorspec = array(0 => array("pipe", "r"),1 => array("pipe", "w") );
+    $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w']];
 
-    $mapfile = Config::get('temp_dir') . "/" . strgen() . ".png";
+    $mapfile = Config::get('temp_dir') . '/' . strgen() . '.png';
 
-    $process = proc_open($maptool.' -T'.$_GET['format'], $descriptorspec, $pipes);
+    $process = proc_open($maptool . ' -T' . $_GET['format'], $descriptorspec, $pipes);
 
     if (is_resource($process)) {
         fwrite($pipes[0], "$map");
@@ -214,11 +212,11 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
         $return_value = proc_close($process);
     }
 
-    if ($_GET['format'] == "png:gd") {
-        header("Content-type: image/png");
-    } elseif ($_GET['format'] == "svg") {
-        header("Content-type: image/svg+xml");
-        $img = str_replace("<a ", '<a target="_parent" ', $img);
+    if ($_GET['format'] == 'png:gd') {
+        header('Content-type: image/png');
+    } elseif ($_GET['format'] == 'svg') {
+        header('Content-type: image/svg+xml');
+        $img = str_replace('<a ', '<a target="_parent" ', $img);
     }
     echo $img;
 } else {

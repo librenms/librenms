@@ -1,0 +1,8 @@
+modules:
+    mempools:
+        data:
+            -
+                total: NMS-MEMORY-POOL-MIB::nmsMemoryPoolTotalMemorySize
+                percent_used: NMS-MEMORY-POOL-MIB::nmsMemoryPoolUtilization
+                type: pbn-mem
+                descr: 'Main Memory'

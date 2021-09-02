@@ -2,8 +2,7 @@ os: papouch-quido
 text: 'Papouch QUIDO'
 type: environment
 icon: papouch-tme
-mib_dir:
-    - papouch
+mib_dir: papouch
 over:
     - { graph: device_temperature, text: temperature }
 discovery:

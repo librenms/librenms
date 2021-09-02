@@ -1,5 +1,10 @@
-mib: BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB:WWP-PRODUCTS-MIB:WWP-LEOS-PORT-XCVR-MIB:WWP-LEOS-SYSTEM-CONFIG-MIB
+mib: BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB:WWP-PRODUCTS-MIB:WWP-LEOS-PORT-XCVR-MIB:WWP-LEOS-SYSTEM-CONFIG-MIB:CIENA-CES-RAPS-MIB
 modules:
+    os:
+        features: CIENA-CES-MODULE-MIB::cienaCesModuleDescription.1.1
+        hardware: CIENA-CES-CHASSIS-MIB::cienaCesChassisPartNumber.0
+        serial: CIENA-CES-CHASSIS-MIB::cienaCesChassisSerialNumber.0
+        version: CIENA-CES-MODULE-MIB::cienaCesModuleSwRunningRelease.1.1.31
     processors:
         data:
             -
@@ -40,19 +45,6 @@ modules:
                     - dot1dBasePortIfIndex
                     - cienaCesLogicalPortConfigPortName
                     - cienaCesChassisPowerSupplySlotName
-                    - cienaCesPortXcvrLowTempAlarmThreshold
-                    - cienaCesPortXcvrHighTempAlarmThreshold
-                    - cienaCesPortXcvrLowVccAlarmThreshold
-                    - cienaCesPortXcvrHighVccAlarmThreshold
-                    - cienaCesPortXcvrLowBiasAlarmThreshold
-                    - cienaCesPortXcvrHighBiasAlarmThreshold
-                    - cienaCesPortXcvrLowRxPwAlarmThreshold
-                    - cienaCesPortXcvrHighRxPwAlarmThreshold
-                    - cienaCesPortXcvrLowTxPwAlarmThreshold
-                    - cienaCesPortXcvrHighTxPwAlarmThreshold
-                    - cienaCesPortXcvrOperState
-                    - cienaCesPortXcvrTxState
-                    - wwpLeosPortXcvrTable
         dbm:
             data:
                 -
@@ -121,7 +113,7 @@ modules:
                     snmp_flags: '-OQUsbe'
                     group: 'Modules'
                 -
-                    oid: cienaCesPortXcvrTemperature
+                    oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrTemperature
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.3.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver'
@@ -177,7 +169,7 @@ modules:
                     index: 'psu-v-{{ $index }}'
                     snmp_flags: '-OQUsbe'
                 -
-                    oid: cienaCesPortXcvrVcc
+                    oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrVcc
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.4.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Vcc'
@@ -197,13 +189,13 @@ modules:
         current:
             data:
                 -
-                    oid: cienaCesPortXcvrBias
+                    oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrBias
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.5.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Bias Current'
                     entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
                     entPhysicalIndex_measured: 'ports'
-                    low_limit: cienaCesPortXcvrLowBiasAlarmThreshold
+                    low_limit: 0
                     high_limit: cienaCesPortXcvrHighBiasAlarmThreshold
                     divisor: 1000
                     snmp_flags: '-OQUsbe'
@@ -217,7 +209,8 @@ modules:
         power:
             data:
                 -
-                    oid: cienaCesPortXcvrRxPower
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrRxPower
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.6.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Rx Power'
                     entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
@@ -234,7 +227,8 @@ modules:
                             op: 'in_array'
                             value: [1,4]
                 -
-                    oid: cienaCesPortXcvrRxPower
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrRxPower
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.6.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Rx Power'
                     entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
@@ -251,7 +245,8 @@ modules:
                             op: 'not_in_array'
                             value: [1]
                 -
-                    oid: cienaCesPortXcvrTxOutputPower
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrTxOutputPower
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.35.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Tx Power'
                     entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
@@ -324,7 +319,7 @@ modules:
                     snmp_flags: '-OQUsbe'
                     group: 'CPU'
                 -
-                    oid: cienaCesPortXcvrFecMode
+                    oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrFecMode
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.36.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver FEC Mode'
@@ -347,7 +342,7 @@ modules:
                     snmp_flags: '-OQUsbe'
                     group: 'Transceiver FEC Mode'
                 -
-                    oid: cienaCesPortXcvrTxState
+                    oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrTxState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.32.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Tx State'
@@ -369,7 +364,7 @@ modules:
                     snmp_flags: '-OQUsbe'
                     group: 'Transceiver Tx State'
                 -
-                    oid: cienaCesPortXcvrTxFaultStatus
+                    oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrTxFaultStatus
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.33.{{ $index }}'
                     descr: 'Port {{ $cienaCesLogicalPortConfigPortName }} Transceiver Tx Fault'
@@ -487,6 +482,7 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: dc }
                         - { value: 3, generic: 1, graph: 0, descr: unequipped }
                         - { value: 99, generic: 3, graph: 0, descr: unknown }
+                    skip_values: 99
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                 -
@@ -593,7 +589,7 @@ modules:
                         - { value:  4, generic: 0, graph: 0, descr: protected }
                     group: 'Module Standby Status'
                 -
-                    oid: cienaCesChassisDiskHealthTable.1.3.1
+                    oid: cienaCesChassisDiskHealthTable
                     value: cienaCesChassisDiskHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.12.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Disk Health - Flash0'
@@ -606,8 +602,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Disk'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisDiskHealthSubCategory
+                            op: '!='
+                            value: 1
                 -
-                    oid: cienaCesChassisDiskHealthTable.1.3.2
+                    oid: cienaCesChassisDiskHealthTable
                     value: cienaCesChassisDiskHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.12.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Disk Health - RAM'
@@ -620,8 +621,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Disk'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisDiskHealthSubCategory
+                            op: '!='
+                            value: 2
                 -
-                    oid: cienaCesChassisDiskHealthTable.1.3.3
+                    oid: cienaCesChassisDiskHealthTable
                     value: cienaCesChassisDiskHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.12.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Disk Health - USB'
@@ -634,8 +640,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Disk'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisDiskHealthSubCategory
+                            op: '!='
+                            value: 3
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.1
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} Load Fuse'
@@ -648,8 +659,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 1
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.2
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} Internal Fuse'
@@ -662,8 +678,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 2
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.3
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} Voltage Regulator'
@@ -676,8 +697,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 3
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.4
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} Temperature'
@@ -690,8 +716,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 4
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.5
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} AC Input'
@@ -704,8 +735,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 5
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.6
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} Overload Protection'
@@ -718,8 +754,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 6
                 -
-                    oid: cienaCesChassisPowerParamsHealthTable.1.3.7
+                    oid: cienaCesChassisPowerParamsHealthTable
                     value: cienaCesChassisPowerParamsHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
                     descr: 'PS {{ $subindex1 }} Fan'
@@ -732,6 +773,11 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 7
                 -
                     oid: cienaCesChassisSMFabricHealthTable
                     value: cienaCesChassisSMFabricHealthState
@@ -761,7 +807,7 @@ modules:
                     snmp_flags: '-OQUsbe'
                     group: 'Switch Modules'
                 -
-                    oid: cienaCesChassisMemoryHealthTable.1.3.1
+                    oid: cienaCesChassisMemoryHealthTable
                     value: cienaCesChassisMemoryHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Global Heap'
@@ -774,8 +820,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisMemoryHealthSubCategory
+                            op: '!='
+                            value: 1
                 -
-                    oid: cienaCesChassisMemoryHealthTable.1.3.2
+                    oid: cienaCesChassisMemoryHealthTable
                     value: cienaCesChassisMemoryHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Heap1'
@@ -788,12 +839,17 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisMemoryHealthSubCategory
+                            op: '=='
+                            value: 1
                 -
-                    oid: cienaCesChassisMemoryHealthTable.1.3.3
+                    oid: cienaCesChassisMemoryHealthTable
                     value: cienaCesChassisMemoryHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Heap2'
-                    state_name: cienaCesChassisMemoryHealthStateHeap2
+                    state_name: cienaCesChassisMemoryHealthSubCategory
                     states:
                         - { value: 1, generic: 3, graph: 0, descr: unknown }
                         - { value: 2, generic: 0, graph: 0, descr: normal }
@@ -802,8 +858,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisMemoryHealthSubCategory
+                            op: '!='
+                            value: 3
                 -
-                    oid: cienaCesChassisMemoryHealthTable.1.3.4
+                    oid: cienaCesChassisMemoryHealthTable
                     value: cienaCesChassisMemoryHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Pool1'
@@ -816,8 +877,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisMemoryHealthOriginIndex
+                            op: '!='
+                            value: 4
                 -
-                    oid: cienaCesChassisMemoryHealthTable.1.3.5
+                    oid: cienaCesChassisMemoryHealthTable
                     value: cienaCesChassisMemoryHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Pool2'
@@ -830,8 +896,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisMemoryHealthOriginIndex
+                            op: '!='
+                            value: 5
                 -
-                    oid: cienaCesChassisMemoryHealthTable.1.3.6
+                    oid: cienaCesChassisMemoryHealthTable
                     value: cienaCesChassisMemoryHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} Heap'
@@ -844,8 +915,13 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cienaCesChassisMemoryHealthOriginIndex
+                            op: '!='
+                            value: 6
                 -
-                    oid: cienaCesChassisCPUHealthEntry.3.1
+                    oid: cienaCesChassisCPUHealthTable
                     value: cienaCesChassisCPUHealthState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.5.1.3.{{ $index }}'
                     descr: 'Slot {{ $subindex1 }} CPU Status'
@@ -858,3 +934,89 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
                     snmp_flags: '-OQUsbe'
                     group: 'CPU'
+                -
+                    oid: cienaCesRapsVirtualRingTable
+                    value: cienaCesRapsVirtualRingState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.7.{{ $index }}'
+                    descr: 'Virtual Ring {{ $cienaCesRapsVirtualRingName }} State'
+                    state_name: cienaCesRapsVirtualRingState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: adminDisabled }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 2, graph: 0, descr: protecting }
+                        - { value: 4, generic: 1, graph: 0, descr: recovering }
+                        - { value: 5, generic: 1, graph: 0, descr: init }
+                        - { value: 6, generic: 3, graph: 0, descr: none }
+                    snmp_flags: '-OQUsbe'
+                    group: 'G.8032'
+                -
+                    oid: cienaCesRapsVirtualRingTable
+                    value: cienaCesRapsVirtualRingStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.8.{{ $index }}'
+                    descr: 'Virtual Ring {{ $cienaCesRapsVirtualRingName }} Status'
+                    state_name: cienaCesRapsVirtualRingStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: clear }
+                        - { value: 2, generic: 1, graph: 0, descr: localSignalFail }
+                        - { value: 3, generic: 1, graph: 0, descr: localForceSwitch }
+                        - { value: 4, generic: 1, graph: 0, descr: remoteOrOtherPortSignalFail }
+                        - { value: 5, generic: 1, graph: 0, descr: remoteOrOtherPortForceSwitch }
+                        - { value: 6, generic: 1, graph: 0, descr: provisioningMismatch }
+                        - { value: 7, generic: 1, graph: 0, descr: noRapsPduReceived }
+                        - { value: 8, generic: 1, graph: 0, descr: noRplOwnerDetected }
+                    snmp_flags: '-OQUsbe'
+                    group: 'G.8032'
+                -
+                    oid: cienaCesRapsVirtualRingTable
+                    value: cienaCesRapsVirtualRingWestPortState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.14.{{ $index }}'
+                    descr: 'Virtual Ring {{ $cienaCesRapsVirtualRingName }} Port State - West'
+                    state_name: cienaCesRapsVirtualRingWestPortState
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: forwarding }
+                        - { value: 3, generic: 0, graph: 0, descr: blocked }
+                    snmp_flags: '-OQUsbe'
+                    group: 'G.8032'
+                -
+                    oid: cienaCesRapsVirtualRingTable
+                    value: cienaCesRapsVirtualRingEastPortState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.25.{{ $index }}'
+                    descr: 'Virtual Ring {{ $cienaCesRapsVirtualRingName }} Port State - East'
+                    state_name: cienaCesRapsVirtualRingEastPortState
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: forwarding }
+                        - { value: 3, generic: 0, graph: 0, descr: blocked }
+                    snmp_flags: '-OQUsbe'
+                    group: 'G.8032'
+                -
+                    oid: cienaCesRapsVirtualRingTable
+                    value: cienaCesRapsVirtualRingWestPortStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.15.{{ $index }}'
+                    descr: 'Virtual Ring {{ $cienaCesRapsVirtualRingName }} Port Status - West'
+                    state_name: cienaCesRapsVirtualRingWestPortStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 2, graph: 0, descr: down }
+                        - { value: 3, generic: 1, graph: 0, descr: ccmFailure }
+                        - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
+                        - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
+                        - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
+                    snmp_flags: '-OQUsbe'
+                    group: 'G.8032'
+                -
+                    oid: cienaCesRapsVirtualRingTable
+                    value: cienaCesRapsVirtualRingEastPortStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.26.{{ $index }}'
+                    descr: 'Virtual Ring {{ $cienaCesRapsVirtualRingName }} Port Status - East'
+                    state_name: cienaCesRapsVirtualRingEastPortStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 2, graph: 0, descr: down }
+                        - { value: 3, generic: 1, graph: 0, descr: ccmFailure }
+                        - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
+                        - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
+                        - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
+                    snmp_flags: '-OQUsbe'
+                    group: 'G.8032'

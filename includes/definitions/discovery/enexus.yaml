@@ -1,5 +1,12 @@
 mib: SP2-MIB
 modules:
+    os:
+        hardware: SP2-MIB::powerSystemModel.0
+        version:
+            - SP2-MIB::controlUnitSwVersion.1
+            - SP2-MIB::controlUnitSwVersion.2
+        serial: SP2-MIB::powerSystemSerialNumber.0
+        location: SP2-MIB::powerSystemSite.0
     sensors:
         state:
             data:

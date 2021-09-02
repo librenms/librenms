@@ -1,0 +1,21 @@
+os: powerwalker-vfi
+text: 'PowerWalker VFI'
+type: power
+icon: powerwalker
+mib_dir: powerwalker-vfi
+discovery:
+        - 
+                sysObjectID: .1.3.6.1.4.1.3808.1.1.1
+                sysDescr: 'Power Management Card'
+        -    
+                sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+                sysDescr: 'Linux SNMP-System'
+                snmpget:
+                        oid: .1.3.6.1.2.1.33.1.1.3.0
+                        op: '!='
+                        value: false
+over:
+        - { graph: device_current, text: Current }
+        - { graph: device_voltage, text: Voltage }
+        - { graph: device_load, text: Load }
+        - { graph: device_power, text: Power }

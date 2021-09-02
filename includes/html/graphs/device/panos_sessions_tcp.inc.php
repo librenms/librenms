@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'panos-sessions-tcp');
+$rrd_filename = Rrd::name($device['hostname'], 'panos-sessions-tcp');
 
 $ds = 'sessions_tcp';
 

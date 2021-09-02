@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,8 +39,8 @@ class Dnos extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
-        $processors = array();
+        $device = $this->getDeviceArray();
+        $processors = [];
 
         if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.3')) {
             d_echo('Dell S Series Chassis');
@@ -100,7 +99,7 @@ class Dnos extends OS implements ProcessorDiscovery
      * @param string $mib MIB
      * @param string $num_oid Numerical OID
      * @param string $name Name prefix to display to user
-     * @param string custom type (if there are multiple in one chassis)
+     * @param string $type custom type (if there are multiple in one chassis)
      */
     private function findProcessors(&$processors, $oid, $mib, $num_oid, $name, $type = null)
     {

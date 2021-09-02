@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +30,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    const VERSION = '1.66';
+    const VERSION = '21.8.0';
 
     protected $is_git_install = false;
 
@@ -59,6 +58,7 @@ class Version
         if (Eloquent::isConnected()) {
             try {
                 $query = Eloquent::DB()->table('migrations');
+
                 return [
                     'last' => $query->orderBy('id', 'desc')->value('migration'),
                     'total' => $query->count(),

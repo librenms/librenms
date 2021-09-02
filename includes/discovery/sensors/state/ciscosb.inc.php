@@ -25,7 +25,7 @@ if (is_array($temp)) {
     create_state_index($state_name, $states);
 
     foreach ($temp as $index => $entry) {
-        $port_data = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
+        $port_data = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
         $descr = $port_data['ifDescr'] . ' Suspended Status';
         if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
             //Discover Sensors

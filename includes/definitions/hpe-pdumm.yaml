@@ -5,8 +5,7 @@ icon: hpe
 over:
     - {graph: device_load, text: Load}
     - {graph: device_current, text: Current}
-mib_dir:
-    - hp
+mib_dir: hp
 discovery:
     -
         sysDescr:

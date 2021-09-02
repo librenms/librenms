@@ -2,9 +2,8 @@ os: chatsworth-pdu
 text: 'Chatsworth PDU'
 type: power
 icon: chatsworth
-nobulk: true
-mib_dir:
-    - chatsworth
+snmp_bulk: false
+mib_dir: chatsworth
 discovery:
     -
         sysObjectID:

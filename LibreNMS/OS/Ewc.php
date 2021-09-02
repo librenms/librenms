@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 James Andrewartha
  * @author     James Andrewartha <trs80@ucc.asn.au>
  */
@@ -54,14 +53,15 @@ class Ewc extends OS implements
      */
     public function discoverWirelessApCount()
     {
-        $oids = array(
+        $oids = [
             'HIPATH-WIRELESS-HWC-MIB::apCount.0',
             'HIPATH-WIRELESS-HWC-MIB::licenseLocalAP.0',
-            'HIPATH-WIRELESS-HWC-MIB::licenseForeignAP.0'
-        );
-        $data = snmp_get_multi($this->getDevice(), $oids);
+            'HIPATH-WIRELESS-HWC-MIB::licenseForeignAP.0',
+        ];
+        $data = snmp_get_multi($this->getDeviceArray(), $oids);
         $licCount = $data[0]['licenseLocalAP'] + $data[0]['licenseForeignAP'];
-        return array(
+
+        return [
             new WirelessSensor(
                 'ap-count',
                 $this->getDeviceId(),
@@ -83,8 +83,8 @@ class Ewc extends OS implements
                 'sum',
                 null,
                 $licCount
-            )
-        );
+            ),
+        ];
     }
 
     /**
@@ -94,7 +94,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessClients()
     {
-        $sensors = array(
+        $sensors = [
             new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
@@ -102,10 +102,10 @@ class Ewc extends OS implements
                 'ewc',
                 0,
                 'Connected Clients'
-            )
-        );
+            ),
+        ];
 
-        $apstats = snmpwalk_cache_oid($this->getDevice(), 'apStatsMuCounts', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $apstats = snmpwalk_cache_oid($this->getDeviceArray(), 'apStatsMuCounts', [], 'HIPATH-WIRELESS-HWC-MIB');
         $apnames = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
         foreach ($apstats as $index => $entry) {
@@ -122,7 +122,7 @@ class Ewc extends OS implements
             );
         }
 
-        $wlanstats = snmpwalk_cache_oid($this->getDevice(), 'wlanStatsAssociatedClients', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $wlanstats = snmpwalk_cache_oid($this->getDeviceArray(), 'wlanStatsAssociatedClients', [], 'HIPATH-WIRELESS-HWC-MIB');
         $wlannames = $this->getCacheByIndex('wlanName', 'HIPATH-WIRELESS-HWC-MIB');
 
         foreach ($wlanstats as $index => $entry) {
@@ -136,6 +136,7 @@ class Ewc extends OS implements
                 "SSID: $name"
             );
         }
+
         return $sensors;
     }
 
@@ -147,10 +148,10 @@ class Ewc extends OS implements
      */
     public function discoverWirelessErrors()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioPktRetx', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioPktRetx', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
             $sensors[] = new WirelessSensor(
@@ -159,9 +160,10 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
                 'ewc',
                 $index . 'Retx',
-                "Retransmits ($name radio " . explode('.', $index)[1]. ")"
+                "Retransmits ($name radio " . explode('.', $index)[1] . ')'
             );
         }
+
         return $sensors;
     }
 
@@ -173,10 +175,10 @@ class Ewc extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apRadioStatusChannel', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apRadioStatusChannel', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
             $sensors[] = new WirelessSensor(
@@ -188,6 +190,7 @@ class Ewc extends OS implements
                 "Frequency ($name)"
             );
         }
+
         return $sensors;
     }
 
@@ -199,10 +202,10 @@ class Ewc extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'dot11ExtRadioMaxNfCount', array(), 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'dot11ExtRadioMaxNfCount', [], 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
         $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
             $noisefloor = $entry['dot11ExtRadioMaxNfCount'];
@@ -221,6 +224,7 @@ class Ewc extends OS implements
                 -75
             );
         }
+
         return $sensors;
     }
 
@@ -232,10 +236,10 @@ class Ewc extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentRSS', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentRSS', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
             $sensors[] = new WirelessSensor(
@@ -244,9 +248,10 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
                 'ewc',
                 $index,
-                "RSS ($name radio " . explode('.', $index)[1]. ")"
+                "RSS ($name radio " . explode('.', $index)[1] . ')'
             );
         }
+
         return $sensors;
     }
 
@@ -258,10 +263,10 @@ class Ewc extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentSNR', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentSNR', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
             $sensors[] = new WirelessSensor(
@@ -270,9 +275,10 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
                 'ewc',
                 $index,
-                "SNR ($name radio " . explode('.', $index)[1]. ")"
+                "SNR ($name radio " . explode('.', $index)[1] . ')'
             );
         }
+
         return $sensors;
     }
 
@@ -284,10 +290,10 @@ class Ewc extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentChannelUtilization', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentChannelUtilization', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
             $sensors[] = new WirelessSensor(
@@ -296,9 +302,10 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
                 'ewc',
                 $index,
-                "Utilization ($name radio " . explode('.', $index)[1]. ")"
+                "Utilization ($name radio " . explode('.', $index)[1] . ')'
             );
         }
+
         return $sensors;
     }
 }

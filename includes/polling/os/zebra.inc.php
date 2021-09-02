@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,11 +28,11 @@
 use Illuminate\Support\Str;
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.683')) {
-    $oids = array(
+    $oids = [
         'hardware' => '.1.3.6.1.4.1.683.1.4.0',
         'serial' => '.1.3.6.1.4.1.683.1.5.0',
         'version' => '.1.3.6.1.4.1.683.1.9.0',
-    );
+    ];
     $os_data = snmp_get_multi_oid($device, $oids);
     foreach ($oids as $var => $oid) {
         $$var = trim($os_data[$oid], '"');

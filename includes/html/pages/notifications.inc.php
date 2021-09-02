@@ -11,15 +11,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Notification Page
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
- * @package LibreNMS
- * @subpackage Notifications
  */
 
 use App\Models\User;
@@ -39,7 +37,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
 }
 
-if ($notifications['count'] > 0 && !isset($vars['archive'])) {
+if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     echo '<button class="btn btn-success pull-right fa fa-eye read-all-notif" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>';
 }
 ?>
@@ -74,12 +72,12 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
     </div>
   </div>
 </div>
-<?php if (!isset($vars['archive'])) { ?>
+<?php if (! isset($vars['archive'])) { ?>
 <div class="container">
     <?php
     foreach ($notifications['sticky'] as $notif) {
         if (is_numeric($notif['source'])) {
-            $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
+            $notif['source'] = dbFetchCell('select username from users where user_id =?', [$notif['source']]);
         }
         echo '<div class="well"><div class="row"> <div class="col-md-12">';
 
@@ -95,20 +93,20 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
             echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
         }
 
-        echo '</span></h4>';
-        ?>
+        echo '</span></h4>'; ?>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
         <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo $notif['body']; ?></p>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
   </div>
-    <?php        } ?>
+    <?php
+    } ?>
     <?php    if ($notifications['sticky_count'] != 0) { ?>
 <hr/>
     <?php    } ?>
@@ -122,7 +120,7 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
         d_echo($notif);
         $class = 'text-success';
         if ($notif['severity'] == 1) {
-            $class='text-warning';
+            $class = 'text-warning';
         } elseif ($notif['severity'] == 2) {
             $class = 'text-danger';
         }
@@ -130,8 +128,7 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
 
         if (Auth::user()->hasGlobalAdmin()) {
             echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
-        }
-        ?>
+        } ?>
 
 <button class="btn btn-primary fa fa-eye read-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Read" style="margin-top:-10px;"></button>
 </span>
@@ -141,13 +138,14 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
     <div class="row">
       <div class="col-md-12">
           <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo preg_replace('/\\\n/', '<br />', $notif['body']); ?></p>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
   </div>
-    <?php        } ?>
+    <?php
+    } ?>
   <div class="row">
     <div class="col-md-12">
       <h3><a class="btn btn-default" href="notifications/archive/">Show Archive</a></h3>
@@ -173,21 +171,21 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
 
         if (Auth::user()->isAdmin()) {
             echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
-        }
-        ?>
+        } ?>
         </h4>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
           <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo preg_replace('/\\\n/', '<br />', $notif['body']); ?></p>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
   </div>
-    <?php    } ?>
+    <?php
+    } ?>
 </div>
 <?php } ?>
 <script>

@@ -4,9 +4,9 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$agent_rrd = rrd_name($device['hostname'], 'agent');
+$agent_rrd = Rrd::name($device['hostname'], 'agent');
 
-if (rrdtool_check_rrd_exists($agent_rrd)) {
+if (Rrd::checkRrdExists($agent_rrd)) {
     $rrd_filename = $agent_rrd;
 }
 
@@ -17,8 +17,8 @@ $colour_line = '36393D';
 
 $colour_area_max = 'FFEE99';
 
-$graph_max         = 1;
-$multiplier        = 1000;
+$graph_max = 1;
+$multiplier = 1000;
 $multiplier_action = '/';
 
 $unit_text = 'Seconds';

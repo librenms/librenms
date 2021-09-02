@@ -1,5 +1,12 @@
 mib: CISCOSB-rndMng
 modules:
+    os:
+        sysDescr_regex: 
+            - '/(?<hardware>S.+-\d+) \d/'
+            - '/(?<hardware>CBS[^\s]+) /'
+        hardware: CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1
+        serial: CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamSerialNum.1
+        features: CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamServiceTag.1
     processors:
         data:
             -

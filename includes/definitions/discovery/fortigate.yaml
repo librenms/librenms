@@ -1,11 +1,28 @@
 mib: FORTINET-FORTIGATE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTIGATE-MIB::fgSysMemCapacity
+                percent_used: FORTINET-FORTIGATE-MIB::fgSysMemUsage
+                precision: 1024
+                descr: 'Main Memory'
+    os:
+        version: FORTINET-FORTIGATE-MIB::fgSysVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        hardware: ENTITY-MIB::entPhysicalModelName.1
     processors:
         data:
             -
                 oid: fgSysCpuUsage
                 num_oid: '.1.3.6.1.4.1.12356.101.4.1.3.{{ $index }}'
+                descr: System Cpu Usage
                 type: fortigate-fixed
+            -
+                oid: fgProcessorUsage
+                num_oid: '.1.3.6.1.4.1.12356.101.4.4.2.1.2.{{ $index }}'
+                descr: 'CPU Core {{ $index }}'
+                type: fortigate-core
     sensors:
         pre-cache:
             data:

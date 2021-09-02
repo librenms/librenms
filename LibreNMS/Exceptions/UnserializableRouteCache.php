@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +32,7 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     protected $cli_php_version;
     protected $web_php_version;
 
-    public function __construct($message = "", $code = 0, Throwable $previous = null, $cli_php_version = null, $web_php_version = null)
+    public function __construct($message = '', $code = 0, Throwable $previous = null, $cli_php_version = null, $web_php_version = null)
     {
         $this->cli_php_version = $cli_php_version;
         $this->web_php_version = $web_php_version;
@@ -44,7 +43,7 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
      * Try to convert the given Exception to this exception
      *
      * @param \Exception $exception
-     * @return static
+     * @return static|null
      */
     public static function upgrade($exception)
     {
@@ -62,7 +61,6 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)

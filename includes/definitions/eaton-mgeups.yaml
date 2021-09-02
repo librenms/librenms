@@ -1,11 +1,10 @@
 os: eaton-mgeups
-text: 'Eaton MGE UPS'
+text: 'Eaton UPS'
 group: ups
 type: power
 icon: eaton
 rfc1628_compat: true
-mib_dir:
-    - mge
+mib_dir: eaton
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

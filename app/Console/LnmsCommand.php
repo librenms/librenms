@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -48,6 +47,7 @@ abstract class LnmsCommand extends Command
     public function isHidden()
     {
         $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
+
         return $this->hidden || ($this->developer && $env !== 'production');
     }
 
@@ -105,16 +105,19 @@ abstract class LnmsCommand extends Command
     /**
      * Validate the input of this command.  Uses Laravel input validation
      * merging the arguments and options together to check.
-     *
-     * @param array $rules
-     * @param array $messages
      */
-    protected function validate($rules, $messages = [])
+    protected function validate(array $rules, array $messages = []): array
     {
-        $validator = Validator::make($this->arguments() + $this->options(), $rules, $messages);
+        $validator = Validator::make(
+            $this->arguments() + $this->options(),
+            $rules,
+            array_merge(trans('commands.' . $this->getName() . '.validation-errors'), $messages)
+        );
 
         try {
             $validator->validate();
+
+            return $validator->validated();
         } catch (ValidationException $e) {
             collect($validator->getMessageBag()->all())->each(function ($message) {
                 $this->error($message);

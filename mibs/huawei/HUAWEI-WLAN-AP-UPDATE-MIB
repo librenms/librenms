@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for update the ap's program version.
 -- Reference: HUAWEI-WLAN-MIB
--- Version: V1.10
+-- Version: V1.21
 -- ============================================================================
 -- Module definition
 
@@ -30,7 +30,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.14
 		hwWlanApUpdate MODULE-IDENTITY
-			LAST-UPDATED "201611071451Z"		-- Nov 7, 2016 at 14:51 GMT
+			LAST-UPDATED "202007082018Z"		-- July 8, 2020 at 20:18 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -41,10 +41,56 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				  "
+                                                         DESCRIPTION 
+				"V1.21, add insufficientMemoryAsNgeEnable for hwWlanApUpdateProgressStatus"				
+                    REVISION "202007082018Z"                -- July 8, 2020 at 20:18 GMT
+                                                        DESCRIPTION 
+				"V1.20, hwWlanApUpdateProgressStatus"				
+                    REVISION "202004091508Z"                -- Apr 9, 2020 at 15:09 GMT
+			DESCRIPTION 
+				"The MIB module defines the AP update operation."  
+                    REVISION "202001062230Z"		-- Jan 6, 2020 at 22:30 GMT
+			DESCRIPTION 
+				"V1.19, hwWlanApUpdateResetPartitionId, hwWlanApUpdateResetPrimaryAccessIPv4, hwWlanApUpdateResetPrimaryAccessIPv6, hwWlanApUpdateApPartitionId, hwWlanApUpdateApChannel"				
+                    REVISION "201911041150Z"                -- November 4, 2019 at 11:50 GMT
+			DESCRIPTION 
+				"V1.18, hwWlanApUpdateProgressStatus, hwWlanApUpdateResult, hwWlanApUpdateResultStatus "				
+                    REVISION "201902181120Z"		-- February 18, 2019 at 11:20 GMT
+			DESCRIPTION 
+				"V1.17, Add the hwWlanApUpdateFTPIPv6Username, hwWlanApUpdateFTPIPv6Password, hwWlanApUpdateSFTPIPv6Username,  hwWlanApUpdateSFTPIPv6Password, 
+				hwWlanApUpdateFTPIPv6MaxConnectNum and hwWlanApUpdateSFTPIPv6MaxConnectNum "
+ 
+ 		    REVISION "201901141040Z"		-- Jan 14, 2019 at 10:40 GMT
+			DESCRIPTION 
+				"V1.16, Modify the hwWlanApTypeGroupUpdatePatchFilename "	
+ 
+ 		    REVISION "201803051540Z"		-- March 5, 2018 at 15:40 GMT
+			DESCRIPTION 
+				"V1.15, Modify the hwWlanApUpdateProgressStatus "	
+
+		    REVISION "201712101555Z"		-- Dec 10, 2017 at 15:55 GMT
+			DESCRIPTION 
+				"V1.14, Add the hwWlanApUpdateApGroup in the hwWlanApUpdateProgressTable."	
+				
+		    REVISION "201711290955Z"		-- Nov 29, 2017 at 09:55 GMT
+			DESCRIPTION
+				"V1.14, Modify the hwWlanApUpdateEndTime in the hwWlanApUpdateProgressTable."
+			REVISION "201710261555Z"		-- Oct 26, 2017 at 15:55 GMT
+			DESCRIPTION 
+				"V1.14, Add the hwWlanApUpdateFileVersion and hwWlanApUpdateEndTime in the hwWlanApUpdateProgressTable."
+
+			REVISION "201706071911Z"		-- June 19, 2017 at 09:11 GMT
+			DESCRIPTION 
+				"V1.13, Modify the hwWlanApUpdateProgressStatus."
 			
-                                                                DESCRIPTION 
-				"The MIB module defines the AP update operation."
-				     
+			REVISION "201706011633Z"		-- June 1, 2017 at 16:33 GMT
+			DESCRIPTION 
+				"V1.12, Modify the hwWlanApUpdateProgressStatus."
+	     
+			REVISION "201704181525Z"		-- April 18, 2017 at 15:25 GMT
+			DESCRIPTION 
+				"V1.11, Modify the hwWlanApUpdateProgressStatus."
+
 			REVISION "201611071451Z"		-- Nov 7, 2016 at 14:51 GMT
 			DESCRIPTION 
 				"V1.10, Modify the hwWlanApUpdateProgressStatus."
@@ -142,7 +188,8 @@
 				failureFileContentError(8) ,
 				failureWriteFlashFailure(9) ,
 				failureTimeoutForUpgrade(10) ,
-				failureCommunicationFaultApAndAc(11)
+				failureCommunicationFaultApAndAc(11) ,
+				failureInsufficientStorageSpace(65)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -202,7 +249,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the IP address of the FTP server used in FTP upgrade mode."
+				"This object indicates the IPv4 address of the FTP server used in FTP upgrade mode."
 			::= { hwWlanApUpdateConfig 1 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.2
@@ -211,7 +258,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the user name of the FTP client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPAddress or hwWlanApUpdateFTPIPv6Address."
+				"This object indicates the user name of the FTP IPv4 client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPAddress."
 			::= { hwWlanApUpdateConfig 2 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.3
@@ -220,7 +267,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the password of the FTP client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPAddress or hwWlanApUpdateFTPIPv6Address."
+				"This object indicates the password of the FTP IPv4 client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPAddress."
 			::= { hwWlanApUpdateConfig 3 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.4
@@ -243,7 +290,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the IP address of the SFTP server used in SFTP upgrade mode."
+				"This object indicates the IPv4 address of the SFTP server used in SFTP upgrade mode."
 			::= { hwWlanApUpdateConfig 5 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.6
@@ -252,7 +299,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the user name of the SFTP client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPAddress or hwWlanApUpdateSFTPIPv6Address."
+				"This object indicates the user name of the SFTP IPv4 client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPAddress."
 			::= { hwWlanApUpdateConfig 6 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.7
@@ -261,7 +308,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the password of the SFTP client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPAddress or hwWlanApUpdateSFTPIPv6Address."
+				"This object indicates the password of the SFTP IPv4 client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPAddress."
 			::= { hwWlanApUpdateConfig 7 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.8
@@ -270,7 +317,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the maximum number of FTP connections."
+				"This object indicates the maximum number of FTP IPv4 connections."
 			::= { hwWlanApUpdateConfig 8 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.9
@@ -279,7 +326,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the maximum number of SFTP connections."
+				"This object indicates the maximum number of SFTP IPv4 connections."
 			::= { hwWlanApUpdateConfig 9 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.1.10
@@ -299,8 +346,62 @@
 			DESCRIPTION 
 				"This object indicates the IPv6 address of the SFTP server."
 			::= { hwWlanApUpdateConfig 11 }
-
-		--1.3.6.1.4.1.2011.6.139.14.3.2
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.12
+		hwWlanApUpdateFTPIPv6Username OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the user name of the FTP IPv6 client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.13
+		hwWlanApUpdateFTPIPv6Password OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the password of the FTP IPv6 client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 13 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.14
+		hwWlanApUpdateSFTPIPv6Username OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the user name of the SFTP IPv6 client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 14 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.15
+		hwWlanApUpdateSFTPIPv6Password OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the password of the SFTP IPv6 client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 15 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.16
+		hwWlanApUpdateFTPIPv6MaxConnectNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum number of FTP IPv6 connections."
+			::= { hwWlanApUpdateConfig 16 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.17
+		hwWlanApUpdateSFTPIPv6MaxConnectNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum number of SFTP IPv6 connections."
+			::= { hwWlanApUpdateConfig 17 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.2
 		hwWlanApUpdateTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApUpdateEntry 
 			MAX-ACCESS not-accessible
@@ -329,7 +430,15 @@
 				hwWlanApUpdatePercent
 					Integer32,
 				hwWlanApUpdateRowStatus
-					RowStatus 
+					RowStatus,
+                                hwWlanApUpdatePatchFilename
+					OCTET STRING,
+                                hwWlanApUpdateResetPartitionId
+				    Integer32,
+                                hwWlanApUpdateResetPrimaryAccessIPv4
+                                    IpAddress,
+                                hwWlanApUpdateResetPrimaryAccessIPv6
+                                    OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.1
@@ -373,6 +482,42 @@
 				"This object indicates the row status of this table."
 			::= { hwWlanApUpdateEntry 4 }
 
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.5
+		hwWlanApUpdatePatchFilename OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the upgrade patch file matching the type of the APs to be upgraded."
+			::= { hwWlanApUpdateEntry 5 }
+	    
+		--1.3.6.1.4.1.2011.6.139.14.3.2.1.6
+		hwWlanApUpdateResetPartitionId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the partition id for reset partition."
+			::= { hwWlanApUpdateEntry 6 }
+			
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.7
+		hwWlanApUpdateResetPrimaryAccessIPv4 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ipv4 address for reset partition."
+			::= { hwWlanApUpdateEntry 7 }
+        
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.8
+		hwWlanApUpdateResetPrimaryAccessIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ipv6 address for reset partition."
+			::= { hwWlanApUpdateEntry 8 }
+        		
 		--1.3.6.1.4.1.2011.6.139.14.3.3
 		hwWlanApUpdateProgressTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApUpdateProgressEntry 
@@ -404,7 +549,18 @@
 				hwWlanApUpdateType
 					INTEGER,
 				hwWlanApUpdateFileType
-					INTEGER 
+					INTEGER,
+				hwWlanApUpdateFileVersion
+					OCTET STRING,
+				hwWlanApUpdateLastEndTime
+					OCTET STRING,
+				hwWlanApUpdateApGroup
+					OCTET STRING,
+                                hwWlanApUpdateApPartitionId
+				        Integer32,
+		                hwWlanApUpdateApChannel
+				        Integer32
+				
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.3.1.1
@@ -457,7 +613,28 @@
 				isUpdatingNow(44),
 				succeedNeedModeSwitch(45),		
 				updateFsmStateCheckFailed(46),  
-				fileChanged(47),
+				fileChanged(47), 
+				serverPasswordIsTooLong(48), 
+				configChanged(49),
+				succeedResetting(50),
+				flashNotSupportupgrade(51),
+				updateFailForBackupSoftware(52),
+				incompatibleHardwareBOMVersion(53),
+				continueSendingImagePieceTimeout(54),
+				backingUpTheSystemSoftware(55),
+				patchChecksumError(56),
+				patchFileError(57),
+				patchActiveFailed(58),
+				vrpPatchProcessActiveFailed(59),
+				vfpPatchActiveFailed(60),
+				kernelPatchActived(61),
+				patchInnerProcError(62),
+				wifiTargetChipPatchActiveFailed(63),
+				notSupportPatchUpdate(64),
+				insufficientStorageSpace(65),			
+				insufficientMemorySpaceInAc(66),			
+				patchVersionMismatch(67),
+				insufficientMemoryAsNgeEnable(68),
 				noUpdateProgressStatus(255)
 				}
 			MAX-ACCESS read-only
@@ -503,14 +680,60 @@
 				{
 				fit(1) ,
 				fat(2) ,
-				fatCloud(3) 			
+				fatCloud(3) ,
+				patch(4) 			
 				}
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
 				"This object indicates the AP upgrade file type."
-			::= { hwWlanApUpdateProgressEntry 5 }
-
+			::= { hwWlanApUpdateProgressEntry 5 }    
+	    
+		--1.3.6.1.4.1.2011.6.139.14.3.3.1.6
+		hwWlanApUpdateFileVersion OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the version of the upgrade file matching the type of the APs upgraded."
+			::= { hwWlanApUpdateProgressEntry 6 }   
+		
+		--1.3.6.1.4.1.2011.6.139.14.3.3.1.7
+		hwWlanApUpdateLastEndTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the end-time of the upgrading."
+			::= { hwWlanApUpdateProgressEntry 7 }
+		
+                --1.3.6.1.4.1.2011.6.139.14.3.3.1.8
+		hwWlanApUpdateApGroup OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ap group of the APs upgraded."
+			::= { hwWlanApUpdateProgressEntry  8}  
+			
+		--1.3.6.1.4.1.2011.6.139.14.3.3.1.9
+		hwWlanApUpdateApPartitionId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ap partition id of the APs upgraded."
+			::= { hwWlanApUpdateProgressEntry  9} 
+			
+	    	--1.3.6.1.4.1.2011.6.139.14.3.3.1.10
+		hwWlanApUpdateApChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ap channel of the APs upgraded."
+			::= { hwWlanApUpdateProgressEntry  10} 
+			
 		--1.3.6.1.4.1.2011.6.139.14.3.4
 		hwWlanSingleApUpdateTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanSingleApUpdateEntry 
@@ -538,7 +761,11 @@
 				hwWlanSingleApUpdatePercent
 					Integer32,
 				hwWlanSingleApUpdateFilename
-					OCTET STRING 
+					OCTET STRING,
+                                hwWlanSingleApUpdatePrimaryAccessIPv4
+                                        IpAddress,
+				hwWlanSingleApUpdatePrimaryAccessIPv6
+                                        OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.4.1.1
@@ -547,7 +774,9 @@
 				{
 				start(1) ,
 				reset(2) ,
-				cancel(3)
+				cancel(3),
+				patchupgrate(4),
+				patchdelete(5)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -572,8 +801,26 @@
 			DESCRIPTION 
 				"This object indicates the name of the upgrade file matching the type of the AP to be upgraded."
 			::= { hwWlanSingleApUpdateEntry 3 }
-
-		--1.3.6.1.4.1.2011.6.139.14.3.5
+			
+		 --1.3.6.1.4.1.2011.6.139.14.3.4.1.4
+		hwWlanSingleApUpdatePrimaryAccessIPv4 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ipv4 address of the upgrade reset partition."
+			::= { hwWlanSingleApUpdateEntry 4 }
+			
+	        --1.3.6.1.4.1.2011.6.139.14.3.4.1.5
+		hwWlanSingleApUpdatePrimaryAccessIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ipv6 address of the upgrade reset partition."
+			::= { hwWlanSingleApUpdateEntry 5}
+			
+		 --1.3.6.1.4.1.2011.6.139.14.3.5
 		hwWlanApTypeGroupUpdateTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApTypeGroupUpdateEntry 
 			MAX-ACCESS not-accessible
@@ -602,7 +849,9 @@
 				hwWlanApTypeGroupUpdatePercent
 					Integer32,
 				hwWlanApTypeGroupUpdateRowStatus
-					RowStatus 
+					RowStatus,
+				hwWlanApTypeGroupUpdatePatchFilename
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.5.1.1
@@ -620,7 +869,9 @@
 				{
 				start(1) ,
 				reset(2) ,
-				cancel(3)
+				cancel(3),
+				patchupgrate(4),
+				patchdelete(5)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -645,7 +896,16 @@
 			DESCRIPTION 
 				"This object indicates the row status of this table."
 			::= { hwWlanApTypeGroupUpdateEntry 4 } 
-		
+        
+                --1.3.6.1.4.1.2011.6.139.14.3.5.1.5
+		hwWlanApTypeGroupUpdatePatchFilename OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the patch upgrade file matching the type of the APs to be upgraded."
+			::= { hwWlanApTypeGroupUpdateEntry 5 }
+					
 		--1.3.6.1.4.1.2011.6.139.14.3.6
 		hwWlanApUpdateScheduleTaskTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApUpdateScheduleTaskEntry 
@@ -837,9 +1097,12 @@
 		hwWlanApUpdateObjectsGroup OBJECT-GROUP
 			OBJECTS { hwWlanApUpdateFTPIPAddress, hwWlanApUpdateFTPUsername, hwWlanApUpdateFTPPassword, hwWlanApUpdateMode, hwWlanApUpdateSFTPIPAddress, 
 			hwWlanApUpdateSFTPUsername, hwWlanApUpdateSFTPPassword, hwWlanApUpdateFTPMaxConnectNum, hwWlanApUpdateSFTPMaxConnectNum, hwWlanApUpdateFTPIPv6Address, 
-			hwWlanApUpdateSFTPIPv6Address, hwWlanApUpdateFilename, hwWlanApUpdateAdminOper, hwWlanApUpdatePercent, hwWlanApUpdateRowStatus, 
-			hwWlanApUpdateProgressStatus, hwWlanApUpdateProgress, hwWlanApFlashProgress, hwWlanApUpdateType, hwWlanApUpdateFileType, hwWlanSingleApUpdateAdminOper, hwWlanSingleApUpdatePercent, 
-			hwWlanSingleApUpdateFilename, hwWlanApTypeGroupUpdateFilename, hwWlanApTypeGroupUpdateAdminOper, hwWlanApTypeGroupUpdatePercent, hwWlanApTypeGroupUpdateRowStatus,
+			hwWlanApUpdateSFTPIPv6Address, hwWlanApUpdateFilename, hwWlanApUpdateAdminOper, hwWlanApUpdatePercent, hwWlanApUpdateRowStatus, hwWlanApUpdatePatchFilename,
+			hwWlanApUpdateResetPartitionId,hwWlanApUpdateResetPrimaryAccessIPv4,hwWlanApUpdateResetPrimaryAccessIPv6,
+			hwWlanApUpdateProgressStatus, hwWlanApUpdateProgress, hwWlanApFlashProgress, hwWlanApUpdateType, hwWlanApUpdateFileType, hwWlanApUpdateFileVersion, 
+			hwWlanApUpdateLastEndTime, hwWlanApUpdateApGroup, hwWlanApUpdateApPartitionId,hwWlanApUpdateApChannel,hwWlanSingleApUpdateAdminOper, hwWlanSingleApUpdatePercent, 
+			hwWlanSingleApUpdateFilename, hwWlanSingleApUpdatePrimaryAccessIPv4, hwWlanSingleApUpdatePrimaryAccessIPv6,hwWlanApTypeGroupUpdateFilename, hwWlanApTypeGroupUpdateAdminOper,
+			hwWlanApTypeGroupUpdatePercent, hwWlanApTypeGroupUpdateRowStatus,hwWlanApTypeGroupUpdatePatchFilename,
 			hwWlanApUpdateScheduleTaskStartTime, hwWlanApUpdateScheduleTaskStopTime, hwWlanApUpdateScheduleTaskApType, 
 			hwWlanApUpdateScheduleTaskApGroup, hwWlanApUpdateScheduleTaskState, hwWlanApUpdateScheduleTaskRowStatus, hwWlanApUpdateOperAdminOper, hwWlanApUpdateOperApType,
 			hwWlanApUpdateOperApGroup, hwWlanApUpdateOperPercent }
@@ -853,3 +1116,4 @@
 --
 -- HUAWEI-WLAN-AP-UPDATE-MIB.mib
 --
+

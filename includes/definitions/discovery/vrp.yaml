@@ -1,5 +1,16 @@
-mib: HUAWEI-WAN-MIB:HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
+mib: HUAWEI-WLAN-CONFIGURATION-MIB:HUAWEI-WAN-MIB:HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
 modules:
+    os:
+        sysDescr_regex: '/\((?<hardware>[^)]+) (?<version>V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/'
+        hardware:
+            - HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0
+            - HUAWEI-DEVICE-EXT-MIB::hwProductName.0
+            - HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1
+            - HUAWEI-MIB::mlsr.20.1.1.1.3.0
+            - HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9
+        serial:
+            - HUAWEI-DEVICE-EXT-MIB::hwDeviceEsn.0
+            - ENTITY-MIB::entPhysicalSerialNum.9
     processors:
         data:
             -
@@ -42,13 +53,25 @@ modules:
                             oid: hwEntityOpticalTemperature
                             op: '<'
                             value: '-50'
+                        -
+                            oid: hwEntityOpticalTemperature
+                            op: '>='
+                            value: '2147483646'
                 -
                     oid: hwEntityStateTable
                     value: hwEntityTemperature
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: hwEntityTemperature
+                            op: '='
+                            value: '0'
+                        -
+                            oid: hwEntityTemperature
+                            op: '>='
+                            value: '2147483646'
         count:
             data:
                 -
@@ -57,14 +80,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.47.{{ $index }}'
                     descr: 'Bit Error Rate'
                     index: '3GBER-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -73,14 +96,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.30.{{ $index }}'
                     descr: 'Upstream Bandwidth'
                     index: '3gup-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -89,14 +112,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.31.{{ $index }}'
                     descr: 'Downstream Bandwidth'
                     index: '3gdown-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -105,14 +128,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.28.{{ $index }}'
                     descr: 'Upstream Cur. Speed (bytes/s)'
                     index: '3gupr-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -121,14 +144,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.29.{{ $index }}'
                     descr: 'Downstream Cur. Speed (bytes/s)'
                     index: '3gdownr-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
         runtime:
@@ -140,14 +163,14 @@ modules:
                     descr: 'Uptime'
                     divisor: 6000
                     index: '3guptime-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
         dbm:
@@ -158,14 +181,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.35.{{ $index }}'
                     descr: 'RSSI'
                     index: 'rssi-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -174,14 +197,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.38.{{ $index }}'
                     descr: 'LTE RSRP'
                     index: 'rsrp-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -190,14 +213,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.40.{{ $index }}'
                     descr: 'LTE RSRQ'
                     index: 'rsrq-{{ $index }}'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -387,6 +410,42 @@ modules:
         state:
             data:
                 -
+                    oid: hwWlanClusterSynConfig
+                    value: hwWlanClusterSynConfigScheduleEnable
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.5.4.{{ $index }}'
+                    descr: 'Configuration Sync'
+                    group: Redundancy
+                    state_name: hwWlanClusterSynConfigScheduleEnable
+                    states:
+                        - { descr: disable, graph: 1, value: 1, generic: 3 }
+                        - { descr: enable, graph: 1, value: 2, generic: 0 }
+                -
+                    oid: hwWlanClusterACListInfoTable
+                    value: hwWlanClusterACStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.7.{{ $index }}'
+                    descr: 'Current Redundancy Status'
+                    group: Redundancy
+                    state_name: hwWlanClusterACStatus
+                    states:
+                        - { descr: down, graph: 1, value: 1, generic: 2 }
+                        - { descr: up, graph: 1, value: 2, generic: 0 }
+                        - { descr: pskmismatch, graph: 1, value: 3, generic: 2 }
+                        - { descr: vermismatch, graph: 1, value: 4, generic: 2 }
+                        - { descr: cfgmismatch, graph: 1, value: 5, generic: 2 }
+                        - { descr: devmismatch, graph: 1, value: 6, generic: 2 }
+                        - { descr: initial, graph: 1, value: 7, generic: 3 }
+                -
+                    oid: hwWlanClusterACListInfoTable
+                    value: hwWlanClusterACRole
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.4.{{ $index }}'
+                    descr: 'Peer Redundancy Role'
+                    group: Redundancy
+                    state_name: hwWlanClusterACRole
+                    states:
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 2, generic: 0 }
+                        - { descr: Backup, graph: 1, value: 3, generic: 0 }
+                -
                     oid: hwFanStatusTable
                     value: hwEntityFanState
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
@@ -412,7 +471,7 @@ modules:
                     value: hw3GModemStatus
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.11.{{ $index }}'
                     descr: 'Current Modem Status'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     state_name: hw3GModemStatus
                     states:
                         - { descr: onLine, graph: 1, value: 1, generic: 0 }
@@ -423,7 +482,7 @@ modules:
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -432,7 +491,7 @@ modules:
                     index: 'netConn-{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.34.{{ $index }}'
                     descr: 'Current Network'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     state_name: hw3GCurrentNetworkConnection
                     states:
                         - { descr: '3G', graph: 1, value: 2, generic: 0 }
@@ -444,7 +503,7 @@ modules:
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''
                 -
@@ -453,7 +512,7 @@ modules:
                     index: 'netConnStatus-{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.53.{{ $index }}'
                     descr: 'Current Network Status'
-                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GIMEI }}'
                     state_name: hw3GConnectionStatus
                     states:
                         - { descr: 'noService', graph: 1, value: 0, generic: 2 }
@@ -468,6 +527,6 @@ modules:
                             op: '='
                             value: ''
                         -
-                            oid: hw3GDeviceSerialNumber
+                            oid: hw3GIMEI
                             op: '='
                             value: ''

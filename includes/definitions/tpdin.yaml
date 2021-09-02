@@ -6,8 +6,7 @@ over:
     - { graph: sensor_voltage, text: 'Device Voltage' }
     - { graph: sensor_current, text: 'Device Current' }
     - { graph: sensor_temperature, text: 'Device Temperature' }
-mib_dir:
-    - tycon
+mib_dir: tycon
 discovery:
     -
         sysObjectID:

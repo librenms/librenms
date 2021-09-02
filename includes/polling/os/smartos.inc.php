@@ -15,17 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
 //SmartOptics, M-Series M-1601-D1000C1 R2A, SmartOS v2.4.14 (Compiled on Thu Jun  2 14:21:33 CEST 2016)
 
-list(, $hardware, $version) = explode(',', $device['sysDescr']);
+[, $hardware, $version] = explode(',', $device['sysDescr']);
 
 $hardware = str_replace('M-Series ', '', $hardware);
-list(,,$version,)  = explode(' ', $version);
+[,,$version,] = explode(' ', $version);

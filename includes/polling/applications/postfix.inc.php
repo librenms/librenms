@@ -1,22 +1,23 @@
 <?php
+
 $name = 'postfix';
 $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
-$options      = '-Oqv';
-$queueOID     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.97.105.108.113';
-$detailOID    = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.15.112.111.115.116.102.105.120.100.101.116.97.105.108.101.100';
+$options = '-Oqv';
+$queueOID = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.97.105.108.113';
+$detailOID = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.15.112.111.115.116.102.105.120.100.101.116.97.105.108.101.100';
 $mailq = snmp_walk($device, $queueOID, $options);
-$detail= snmp_walk($device, $detailOID, $options);
+$detail = snmp_walk($device, $detailOID, $options);
 
-list($incomingq, $activeq, $deferredq, $holdq) = explode("\n", $mailq);
+[$incomingq, $activeq, $deferredq, $holdq] = explode("\n", $mailq);
 
-list($received, $delivered, $forwarded, $deferred, $bounced, $rejected, $rejectw, $held, $discarded, $bytesr,
+[$received, $delivered, $forwarded, $deferred, $bounced, $rejected, $rejectw, $held, $discarded, $bytesr,
      $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
-     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr) = explode("\n", $detail);
+     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr] = explode("\n", $detail);
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('incomingq', 'GAUGE', 0)
     ->addDataset('activeq', 'GAUGE', 0)
@@ -54,7 +55,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('scp', 'GAUGE', 0)
     ->addDataset('urr', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'incomingq' => $incomingq,
     'activeq' => $activeq,
     'deferredq' => $deferredq,
@@ -89,9 +90,9 @@ $fields = array(
     'iuscp' => $iuscp,
     'sce' => $sce,
     'scp' => $scp,
-    'urr' => $urr
-);
+    'urr' => $urr,
+];
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $mailq, $fields);

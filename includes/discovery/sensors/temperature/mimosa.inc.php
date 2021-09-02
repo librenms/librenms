@@ -11,7 +11,7 @@
  */
 
 d_echo('Mimosa');
-$oid = ".1.3.6.1.4.1.43356.2.1.2.1.8.0";
+$oid = '.1.3.6.1.4.1.43356.2.1.2.1.8.0';
 $index = 0;
 $sensor_type = 'mimosaInternalTemp';
 $descr = 'Internal Temp';

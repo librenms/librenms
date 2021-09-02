@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,34 +37,39 @@ class Colors
         if ($percentage > $perc_warn) {
             return [
                 'left' => 'c4323f',
-                'right' => 'c96a73'
+                'right' => 'c96a73',
+                'middle' => 'c75862',
             ];
         }
 
         if ($percentage > 75) {
             return [
                 'left' => 'bf5d5b',
-                'right' => 'd39392'
+                'right' => 'd39392',
+                'middle' => 'c97e7d',
             ];
         }
 
         if ($percentage > 50) {
             return [
                 'left' => 'bf875b',
-                'right' => 'd3ae92'
+                'right' => 'd3ae92',
+                'middle' => 'cca07e',
             ];
         }
 
         if ($percentage > 25) {
             return [
                 'left' => '5b93bf',
-                'right' => '92b7d3'
+                'right' => '92b7d3',
+                'middle' => '7da8c9',
             ];
         }
 
         return [
             'left' => '9abf5b',
-            'right' => 'bbd392'
+            'right' => 'bbd392',
+            'middle' => 'afcc7c',
         ];
     }
 }

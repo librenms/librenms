@@ -10,12 +10,12 @@
  * the source code distribution for details.
  */
 
-$state = snmp_get($device, "DELL-SHADOW-MIB::shadowStatusGlobalStatus.0", '-Oqne');
-list($oid, $value) = explode(' ', $state);
+$state = snmp_get($device, 'DELL-SHADOW-MIB::shadowStatusGlobalStatus.0', '-Oqne');
+[$oid, $value] = explode(' ', $state);
 
 if (is_numeric($value)) {
-    $descr = "Global Status";
-    $state_name = "shadowStatusGlobalStatus";
+    $descr = 'Global Status';
+    $state_name = 'shadowStatusGlobalStatus';
     $states = [
         ['value' => 1, 'generic' => 0, 'graph' => 2, 'descr' => 'other'],
         ['value' => 2, 'generic' => 0, 'graph' => 3, 'descr' => 'unknown'],

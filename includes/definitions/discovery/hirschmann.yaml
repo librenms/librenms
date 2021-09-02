@@ -1,5 +1,16 @@
 mib: HMPRIV-MGMT-SNMP-MIB
 modules:
+    mempools:
+        data:
+            -
+                used: HMPRIV-MGMT-SNMP-MIB::hmMemoryAllocated
+                free: HMPRIV-MGMT-SNMP-MIB::hmMemoryFree
+                descr: 'Main Memory'
+                precision: 1024
+    os:
+        hardware: HMPRIV-MGMT-SNMP-MIB::hmPNIOOrderID.0
+        version: HMPRIV-MGMT-SNMP-MIB::hmPNIOSoftwareRelease.0
+        serial: HMPRIV-MGMT-SNMP-MIB::hmSysGroupSerialNum.1
     processors:
         data:
             -

@@ -11,6 +11,6 @@
 
 $cnpilot_data = snmp_get_multi_oid($device, ['serialNumber.0', 'productName.0', 'hardwareVersion.0'], '-OUQs', 'CAMBIUM-MIB');
 
-$version  = $cnpilot_data['hardwareVersion.0'];
+$version = $cnpilot_data['hardwareVersion.0'];
 $hardware = $cnpilot_data['productName.0'];
-$serial   = $cnpilot_data['serialNumber.0'];
+$serial = $cnpilot_data['serialNumber.0'];

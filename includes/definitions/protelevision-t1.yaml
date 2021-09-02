@@ -3,8 +3,7 @@ text: 'DVB-T Transmitter'
 type: network
 icon: protelevision
 group: protelevision
-mib_dir:
-    - protelevision
+mib_dir: protelevision
 over:
     - { graph: device_dbm, text: 'dBm' }
     - { graph: device_wireless_rate, text: 'On Air TS Bitrate' }

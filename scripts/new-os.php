@@ -2,8 +2,10 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 
-$init_modules = array('');
+$init_modules = [''];
 require __DIR__ . '/../includes/init.php';
 
 $options = getopt('h:o:t:v:d::');
@@ -11,7 +13,7 @@ $options = getopt('h:o:t:v:d::');
 if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $type = $options['t'];
     $vendor = $options['v'];
-    set_debug(isset($options['d']));
+    Debug::set(isset($options['d']));
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $device = device_by_id_cache($device_id);
@@ -33,13 +35,13 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = getHostOS($device);
+        $os = Core::detectOS($device);
         $continue = 'n';
         if ($os != 'generic') {
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
         }
 
-        if (!str_i_contains($continue, 'y')) {
+        if (! str_i_contains($continue, 'y')) {
             $descr = get_user_input('Enter the description for this OS, i.e Cisco IOS:');
             $icon = get_user_input('Enter the logo to use, this can be the name of an existing one (i.e: cisco) or the url to retrieve one:');
 
@@ -79,11 +81,11 @@ discovery:
         }
 
         if ($os === 'generic') {
-            c_echo("Base discovery file created,");
+            c_echo('Base discovery file created,');
         }
     }
 
-    $mib_name = get_user_input("ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:");
+    $mib_name = get_user_input('ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:');
 
     if (filter_var($mib_name, FILTER_VALIDATE_URL)) {
         $mib_data = file_get_contents($mib_name);
@@ -94,7 +96,7 @@ discovery:
             exit(1);
         }
         preg_match('/(.* DEFINITIONS ::)/', $mib_data, $matches);
-        list($mib_name,) = explode(' ', $matches[0], 2);
+        [$mib_name,] = explode(' ', $matches[0], 2);
         if (file_exists(Config::get('install_dir') . "/mibs/$vendor/") == false) {
             mkdir(Config::get('install_dir') . "/mibs/$vendor/");
         }
@@ -163,7 +165,7 @@ modules:
         c_echo($discovery_data);
     }
 } else {
-    c_echo("
+    c_echo('
 Info:
     You can use to build the yaml files for a new OS.
 Usage:
@@ -171,18 +173,19 @@ Usage:
     -o This is the OS name, i.e ios, nxos, eos
     -t This is the OS type, i.e network, power, etc
     -v The vendor name in lower case, i.e cisco, arista
-    
+
 Example:
 ./scripts/new-os.php -h 44 -o new-eos
 
-");
+');
     exit(1);
 }
 
 function get_user_input($msg)
 {
     c_echo($msg . ' ');
-    $handle = fopen("php://stdin", "r");
+    $handle = fopen('php://stdin', 'r');
     $line = fgets($handle);
+
     return trim($line);
 }

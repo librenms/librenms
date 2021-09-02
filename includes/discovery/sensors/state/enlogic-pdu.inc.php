@@ -15,14 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['enlogic_pdu_status'] as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.38446.1.2.4.1.3.' . $index;
@@ -54,7 +52,7 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
         $state_name = 'pduInputPhaseStatusCurrentState';
         $current = $data['pduInputPhaseStatusCurrentState'];
         $descr = "Current state #$index";
-        if (!is_numeric($current)) {
+        if (! is_numeric($current)) {
             $states = [
                 ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],
                 ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'],
@@ -75,7 +73,7 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
         $state_name = 'pduInputPhaseStatusVoltageState';
         $current = $data['pduInputPhaseStatusVoltageState'];
         $descr = "Voltage state #$index";
-        if (!is_numeric($current)) {
+        if (! is_numeric($current)) {
             $states = [
                 ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],
                 ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'],
@@ -99,7 +97,7 @@ foreach ($pre_cache['enlogic_pdu_circuit'] as $index => $data) {
         $state_name = 'pduCircuitBreakerStatusLoadState';
         $current = $data['pduCircuitBreakerStatusLoadState'];
 
-        if (!is_numeric($current)) {
+        if (! is_numeric($current)) {
             //Create State Translation
             $states = [
                 ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],

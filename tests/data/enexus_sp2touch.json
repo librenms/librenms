@@ -7,24 +7,6 @@
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "enexus",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "eltek.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": null,
-                    "sysContact": null,
                     "version": "1.5",
                     "hardware": "SmartPack2 Touch",
                     "features": null,
@@ -35,7 +17,8 @@
                     "location": "<location>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -413,8 +396,8 @@
                     "sensor_multiplier": 1,
                     "sensor_current": 54.5,
                     "sensor_limit": 57,
-                    "sensor_limit_warn": 56.799999999999997,
-                    "sensor_limit_low": 46.299999999999997,
+                    "sensor_limit_warn": 56.8,
+                    "sensor_limit_low": 46.3,
                     "sensor_limit_low_warn": 48,
                     "sensor_alert": 1,
                     "sensor_custom": "No",

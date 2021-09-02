@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -64,7 +63,7 @@ class GlobeController extends WidgetController
         $query = Location::hasAccess($request->user())
             ->with($eager_load)
             ->when($data['device_group'], function ($query) use ($data) {
-                $query->inDeviceGroup($data['device_group']);
+                return $query->inDeviceGroup($data['device_group']);
             });
 
         /** @var Location $location */
@@ -75,8 +74,8 @@ class GlobeController extends WidgetController
 
             if ($data['markers'] == 'devices') {
                 $count = $location->devices->count();
-                list($devices_down, $devices_up) = $location->devices->partition(function ($device) {
-                    return $device->disable = 0 && $device->ignore = 0 && $device->status = 0;
+                [$devices_down, $devices_up] = $location->devices->partition(function ($device) {
+                    return $device->disabled == 0 && $device->ignore == 0 && $device->status == 0;
                 });
                 $up = $devices_up->count();
                 $down_items = $devices_down->map(function ($device) {
@@ -84,7 +83,7 @@ class GlobeController extends WidgetController
                 });
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
-                    list($ports_down, $ports_up) = $device->ports->partition(function ($port) {
+                    [$ports_down, $ports_up] = $device->ports->partition(function ($port) {
                         return $port->ifOperStatus != 'up' && $port->ifAdminStatus == 'up';
                     });
                     $count += $device->ports->count();
@@ -96,14 +95,14 @@ class GlobeController extends WidgetController
             }
 
             // indicate the number of up items before the itemized down
-            $down_items->prepend($up .  '&nbsp;' . ucfirst($data['markers']) . '&nbsp;OK');
+            $down_items->prepend($up . '&nbsp;' . ucfirst($data['markers']) . '&nbsp;OK');
 
             if ($count > 0) {
                 $locations->push([
                     $location->lat,
                     $location->lng,
                     $location->location,
-                    $count ? (1 - $up / $count) * 100 : 0, // percent down
+                    (1 - $up / $count) * 100, // percent down
                     $count,
                     $down_items->implode(',<br/> '),
                 ]);

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,8 +37,7 @@ class ComponentTest extends DBTestCase
 
     public function testDeleteComponent()
     {
-        $target = factory(\App\Models\Component::class)->create();
-
+        $target = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $target */
         $this->assertTrue(\App\Models\Component::where('id', $target->id)->exists(), 'Failed to create component, this shouldn\'t happen');
 
         $component = new Component();
@@ -55,7 +53,7 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsType()
     {
-        $target = factory(\App\Models\Component::class)->create();
+        $target = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $target */
         $component = new Component();
 
         $actual = $component->getComponents($target->device_id, ['type' => $target->type]);
@@ -67,8 +65,8 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsFilterNotIgnore()
     {
-        factory(\App\Models\Component::class)->create(['device_id' => 1, 'ignore' => 1]);
-        $target = factory(\App\Models\Component::class)->times(2)->create(['device_id' => 1, 'ignore' => 0]);
+        \App\Models\Component::factory()->create(['device_id' => 1, 'ignore' => 1]);
+        $target = \App\Models\Component::factory()->times(2)->create(['device_id' => 1, 'ignore' => 0]); /** @var \Illuminate\Support\Collection $target */
         $component = new Component();
 
         $actual = $component->getComponents(1, ['filter' => ['ignore' => ['=', 0]]]);
@@ -78,10 +76,10 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsComplex()
     {
-        factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
-        factory(\App\Models\Component::class)->times(2)->create(['label' => 'Something Else']);
-        $target = factory(\App\Models\Component::class)->times(2)->create(['label' => 'Search Phrase']);
-        factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
+        \App\Models\Component::factory()->create(['label' => 'Search Phrase']);
+        \App\Models\Component::factory()->times(2)->create(['label' => 'Something Else']);
+        $target = \App\Models\Component::factory()->times(2)->create(['label' => 'Search Phrase']); /** @var \Illuminate\Support\Collection $target */
+        \App\Models\Component::factory()->create(['label' => 'Search Phrase']);
         $component = new Component();
 
         $options = [
@@ -107,9 +105,9 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentCount()
     {
-        factory(\App\Models\Component::class)->times(2)->create(['device_id' => 1, 'type' => 'three']);
-        factory(\App\Models\Component::class)->create(['device_id' => 2, 'type' => 'three']);
-        factory(\App\Models\Component::class)->create(['device_id' => 2, 'type' => 'one']);
+        \App\Models\Component::factory()->times(2)->create(['device_id' => 1, 'type' => 'three']);
+        \App\Models\Component::factory()->create(['device_id' => 2, 'type' => 'three']);
+        \App\Models\Component::factory()->create(['device_id' => 2, 'type' => 'one']);
 
         $component = new Component();
         $this->assertEquals(['three' => 3, 'one' => 1], $component->getComponentCount());
@@ -120,7 +118,7 @@ class ComponentTest extends DBTestCase
     public function testSetComponentPrefs()
     {
         // Nightmare function, no where near exhaustive
-        $base = factory(\App\Models\Component::class)->create();
+        $base = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $base */
         $component = new Component();
 
         \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was added with value: ", $base->device_id, 'component', 3, $base->id]);
@@ -183,7 +181,7 @@ class ComponentTest extends DBTestCase
         $this->assertEquals(0, $component->createStatusLogEntry(434242, 0, 'failed'), 'incorrectly added log');
 
         $message = Str::random(8);
-        $model = factory(\App\Models\Component::class)->create();
+        $model = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $model */
         $log_id = $component->createStatusLogEntry($model->id, 1, $message);
         $this->assertNotEquals(0, $log_id, ' failed to create log');
 
@@ -195,6 +193,7 @@ class ComponentTest extends DBTestCase
     private function buildExpected($target)
     {
         $collection = $target instanceof \App\Models\Component ? collect([$target]) : $target;
+
         return $collection->groupBy('device_id')->map(function ($group) {
             return $group->keyBy('id')->map(function ($model) {
                 $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];

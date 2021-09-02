@@ -10,11 +10,11 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 raid MODULE-IDENTITY
-	LAST-UPDATED "201212131322Z"
+	LAST-UPDATED "201909121500Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for PacketLogic2 RAID devices"
-	REVISION "201212131322Z"
+	REVISION "201909121500Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={hw 1}
@@ -58,6 +58,7 @@ ldEntryIndex	OBJECT-TYPE
 DiskEntry ::= SEQUENCE {
 	diskId DisplayString,
 	diskState DisplayString,
+	diskLabel DisplayString,
 	diskEntryIndex Integer32
 }
 
@@ -82,6 +83,7 @@ diskEntryIndex	OBJECT-TYPE
 	STATUS current
 	DESCRIPTION "Unique Row Index for Conceptual Table"
 	::={diskEntry 999}
+
 
 
 
@@ -141,6 +143,14 @@ diskState	OBJECT-TYPE
 	DESCRIPTION "Disk State"
 
 	::={diskEntry 2}
+
+diskLabel	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Disk Label"
+
+	::={diskEntry 3}
 
 
 

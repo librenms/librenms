@@ -1,0 +1,61 @@
+mib: NE843-MIB
+modules:
+    sensors:
+       state:
+            data:
+                -
+                    oid: ne843Dc1Rss
+                    num_oid: '.1.3.6.1.4.1.10520.2.1.3.1.13.{{ $index }}'
+                    descr: 'System Status'
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: critical, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: ne843RecTable
+                    value: ne843RecEntryRfa1
+                    num_oid: '.1.3.6.1.4.1.10520.2.1.3.7.1.44.{{ $index }}'
+                    index: 'ne843RecEntryRfa1.{{ $index }}'
+                    descr: '{{ $ne843RecEntryDes }}'
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: critical, graph: 1, value: 1, generic: 0 }
+       voltage:
+            data:
+                - 
+                   oid: ne843Dc1Vdc
+                   num_oid: '.1.3.6.1.4.1.10520.2.1.3.1.4.{{ $index }}'
+                   descr: 'System DC Voltage'
+                   divisor: 1000
+                -
+                   oid: ne843RecTable
+                   value: ne843RecEntryVac
+                   num_oid: '.1.3.6.1.4.1.10520.2.1.3.7.1.10.{{ $index }}'
+                   index: 'ne843RecEntryVac.{{ $index }}'
+                   descr: 'AC Voltage - {{ $ne843RecEntryDes }}'
+       current:
+            data:
+                -
+                   oid: ne843Dc1Adc
+                   num_oid: '.1.3.6.1.4.1.10520.2.1.3.1.5.{{ $index }}'
+                   descr: 'System Current'
+                -
+                   oid: ne843RecTable
+                   value: ne843RecEntryAdc
+                   num_oid: '.1.3.6.1.4.1.10520.2.1.3.7.1.6.{{ $index }}'
+                   descr: 'DC Current - {{ $ne843RecEntryDes }}'
+                   index: 'ne843RecEntryAdc.{{ $index }}'
+                -
+                   oid: ne843RecTable
+                   value: ne843RecEntryAac
+                   num_oid: '.1.3.6.1.4.1.10520.2.1.3.7.1.11.{{ $index }}'
+                   index: 'ne843RecEntryAac.{{ $index }}'
+                   descr: 'AC Current - {{ $ne843RecEntryDes }}'
+                   divisor: 1000
+       temperature:
+            data:
+                -
+                   oid: ne843RecTable
+                   num_oid: '.1.3.6.1.4.1.10520.2.1.3.7.1.12.{{ $index }}'
+                   value: ne843RecEntryTmp
+                   index: 'ne843RecEntryTmp.{{ $index }}'
+                   descr: '{{ $ne843RecEntryDes }}'

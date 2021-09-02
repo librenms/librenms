@@ -24,36 +24,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.25506.11.1.120",
                     "sysDescr": "HPE Comware Platform Software, Software Version 7.1.045, Release 2422P01\nHPE 5900AF-48G-4XG-2QSFP+ Switch\r\nCopyright (c) 2010-2015 Hewlett Packard Enterprise Development LP",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "comware",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.25506.11.1.120",
-                    "sysDescr": "HPE Comware Platform Software, Software Version 7.1.045, Release 2422P01\nHPE 5900AF-48G-4XG-2QSFP+ Switch\r\nCopyright (c) 2010-2015 Hewlett Packard Enterprise Development LP",
                     "sysContact": "<private>",
                     "version": "7.1.045",
-                    "hardware": "5900AF-48G-4XG-2QSFP+ Switch\r",
+                    "hardware": "5900AF-48G-4XG-2QSFP+ Switch",
                     "features": "2422P01",
                     "os": "comware",
                     "type": "network",
-                    "serial": null,
+                    "serial": "",
                     "icon": "hpe.svg",
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -235,6 +218,33 @@
                     "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "192",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "comware",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Board",
+                    "mempool_perc": 32,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.192",
+                    "mempool_used": 669713695,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1423141601,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2092855296,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
                 }
             ]
         },

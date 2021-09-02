@@ -1,13 +1,21 @@
 mib: CHECKPOINT-MIB
 modules:
+    os:
+        hardware: CHECKPOINT-MIB::svnApplianceProductName.0
+        serial: CHECKPOINT-MIB::svnApplianceSerialNumber.0
+        version: CHECKPOINT-MIB::svnVersion.0
     sensors:
         pre-cache:
             data:
                 -
                     oid:
+                        - tunnelPeerIpAddr
+                        - tunnelPeerObjName
                         - tempertureSensorName
                         - fanSpeedSensorName
                         - voltageSensorName
+                        - fwLSConnName
+                        - mglsGWIP
         state:
             data:
                 -
@@ -40,6 +48,275 @@ modules:
                         - { value: 0, descr: 'false', graph: 1, generic: 0 }
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
+                -
+                    oid: haStarted
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.5.{{ $index }}'
+                    index: 'haStarted.{{ $index }}'
+                    descr: 'Cluster mechanism started'
+                    group: HA
+                    value: haStarted
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 0 }
+                        - { value: 0, descr: no, graph: 0, generic: 2 }
+                -
+                    oid: haState
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.6.{{ $index }}'
+                    index: 'haState.{{ $index }}'
+                    descr: 'Cluster member state'
+                    group: HA
+                    value: haState
+                    states:
+                        - { value: 1, descr: active , graph: 3, generic: 0 }
+                        - { value: 2, descr: standby, graph: 2, generic: 0 }
+                        - { value: 3, descr: 'Active Attention', graph: 1, generic: 1 }
+                        - { value: 0, descr: down, graph: 0, generic: 2 }
+                -
+                    oid: haStatCode
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
+                    index: 'haStatCode.{{ $index }}'
+                    descr: 'Cluster member status code'
+                    group: HA
+                    value: haStatCode
+                    states:
+                        - { value: 0, descr: Up , graph: 2, generic: 0 }
+                        - { value: 1, descr: Attention, graph: 1, generic: 3 }
+                        - { value: 2, descr: Down, graph: 0, generic: 1 }
+                -
+                    oid: tunnelState
+                    num_oid: '.1.3.6.1.4.1.2620.500.9002.1.3.{{ $index }}'
+                    index: 'tunnelStateIndex.{{ $index }}'
+                    descr: "{{ $tunnelPeerObjName }} ({{ $tunnelPeerIpAddr }})"
+                    group: IPSEC VPN
+                    value: tunnelState
+                    states:
+                        - { value: 0, descr: Unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: Up, graph: 1, generic: 0 }
+                        - { value: 4, descr: Destroyed, graph: 1, generic: 3 }
+                        - { value: 129, descr: Idle, graph: 1, generic: 3 }
+                        - { value: 130, descr: Phase1, graph: 1, generic: 1 }
+                        - { value: 131, descr: Down, graph: 1, generic: 2 }
+                        - { value: 132, descr: Init, graph: 1, generic: 1 }                        
+                -                
+                    oid: mglsGWState
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.14.4.1.3.{{ $index }}'
+                    index: 'mglsGWState.{{ $index }}'
+                    descr: '{{ $mglsGWIP }}'
+                    group: 'Management Connected Gateways'
+                    value: mglsGWState
+                    states:
+                        - { value: 1, descr: Connected, graph: 1, generic: 0 }
+                        - { value: 0, descr: Disconnected, graph: 0, generic: 2 }
+                -
+                    oid: fwSXLStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.36.1.1.{{ $index }}'
+                    index: 'fwSXLStatus.{{ $index }}'
+                    descr: 'SecureXL current status'
+                    group: HA
+                    value: fwSXLStatus
+                    states:
+                        - { value: 1, descr: Enabled , graph: 0, generic: 0 }
+                        - { value: 0, descr: Disabled, graph: 1, generic: 1 }
+                -
+                    oid: raidVolumeState
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.6.{{ $index }}'
+                    index: 'raidVolumeState.{{ $index }}'
+                    descr: 'RAID Status'
+                    group: RAID
+                    value: raidVolumeState
+                    states:
+                        - { value: 0, descr: OPTIMAL, graph: 3, generic: 0 }
+                        - { value: 1, descr: DEGRADED, graph: 2, generic: 1 }
+                        - { value: 2, descr: FAILED, graph: 1, generic: 2}
+                        - { value: -1, descr: 'Unknown', graph: 0, generic: 3}
+                -
+                    oid: raidVolumeType
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.3.{{ $index }}'
+                    index: 'raidVolumeType.{{ $index }}'
+                    descr: 'RAID Type'
+                    group: RAID
+                    value: raidVolumeType
+                    states:
+                        - { value: 0, descr: 'RAID-0', graph: 8, generic: 0 }
+                        - { value: 1, descr: 'RAID-1E', graph: 7, generic: 0 }
+                        - { value: 2, descr: 'RAID-1', graph: 6, generic: 0 }
+                        - { value: 3, descr: 'RAID-10', graph: 5, generic: 0 }
+                        - { value: 4, descr: 'RAID-4', graph: 4, generic: 0 }
+                        - { value: 5, descr: 'RAID-5', graph: 3, generic: 0 }
+                        - { value: 6, descr: 'RAID-6', graph: 2, generic: 0 }
+                        - { value: 7, descr: 'RAID-60', graph: 1, generic: 0 }
+                        - { value: 8, descr: 'RAID-50', graph: 0, generic: 0 }
+                -
+                    oid: fwLSConnOverall
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.1.{{ $index }}'
+                    index: 'fwLSConnOverall.{{ $index }}'
+                    descr: 'Log Server Connectivity'
+                    group: Logging
+                    value: fwLSConnOverall
+                    states:
+                        - {value: 0, descr: 'Ok', graph: 2, generic: 0}
+                        - {value: 1, descr: 'Warning', graph: 1, generic: 1}
+                        - {value: 2, descr: 'Error', graph: 0, generic: 2}
+                -
+                    oid: fwLSConnState
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.3.1.3.{{ $index }}'
+                    index: 'fwLSConnState.{{ $index }}'
+                    descr: '{{ $fwLSConnName }}, Log Server Connectivity'
+                    group: Logging
+                    value: fwLSConnState
+                    states:
+                        - {value: 0, descr: 'Ok', graph: 2, generic: 0}
+                        - {value: 1, descr: 'Error', graph: 1, generic: 2}
+                        - {value: 2, descr: 'Not Active', graph: 0, generic: 2}
+                -
+                    oid: fwLocalLoggingStat
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.5.{{ $index }}'
+                    index: 'fwLocalLoggingStat.{{ $index }}'
+                    descr: 'Local Log Server Status'
+                    group: Logging
+                    value: fwLocalLoggingStat
+                    states:
+                        - {value: 0, descr: 'To log servers', graph: 3, generic: 0}
+                        - {value: 1, descr: 'Local configured', graph: 2, generic: 0}
+                        - {value: 2, descr: 'Local due to connectivity', graph: 1, generic: 2}
+                        - {value: 3, descr: 'Local due to high rate', graph: 0, generic: 2}
+                -
+                    oid: mgStatCode
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.101.{{ $index }}'
+                    index: 'mgStatCode.{{ $index }}'
+                    descr: 'Management Sync Status'
+                    group: HA
+                    states:
+                        - { value: 0, descr: 'OK', graph: 0, generic: 0 }
+                        - { value: 1, descr: 'Attention', graph: 1, generic: 1 }
+                        - { value: 2, descr: 'Problem', graph: 2, generic: 2}
+                -
+                    oid: mgActiveStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.5.{{ $index }}'
+                    index: 'mgActiveStatus.{{ $index }}'
+                    descr: 'SMS Status'
+                    group: HA
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'active' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'standby' }
+                -
+                    oid: mgFwmIsAlive
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.6.{{ $index }}'
+                    index: 'mgFwmIsAlive.{{ $index }}'
+                    descr: 'FWM Daemon Status'
+                    group: HA
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: 'Down' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Up' }
+#Update Status
+                -
+                    oid: advancedUrlFilteringUpdateStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.43.2.1.{{ $index }}'
+                    index: 'advancedUrlFilteringUpdateStatus.{{ $index }}'
+                    descr: 'URL Filtering Update'
+                    group: Update
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: applicationControlUpdateStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.39.2.1.{{ $index }}'
+                    index: 'applicationControlUpdateStatus.{{ $index }}'
+                    descr: 'Application Control Update'
+                    group: Update
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: amwAVUpdateStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.46.5.1.{{ $index }}'
+                    index: 'amwAVUpdateStatus.{{ $index }}'
+                    descr: 'Anti Virus Update'
+                    group: Update
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: amwABUpdateStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.46.1.1.{{ $index }}'
+                    index: 'amwABUpdateStatus.{{ $index }}'
+                    descr: 'Anti Malware Update'
+                    group: Update
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+#Subscriptions
+                -
+                    oid: advancedUrlFilteringSubscriptionStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.43.1.1.{{ $index }}'
+                    index: 'advancedUrlFilteringSubscriptionStatus.{{ $index }}'
+                    descr: 'URL Filtering Subscription'
+                    group: Licenses
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: applicationControlSubscriptionStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.39.1.1.{{ $index }}'
+                    index: 'applicationControlSubscriptionStatus.{{ $index }}'
+                    descr: 'Application Control Subscription'
+                    group: Licenses
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: antiVirusSubscriptionStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.46.3.1.{{ $index }}'
+                    index: 'antiVirusSubscriptionStatus.{{ $index }}'
+                    descr: 'Anti Virus Subscription'
+                    group: Licenses
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: antiBotSubscriptionStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.46.2.1.{{ $index }}'
+                    index: 'antiBotSubscriptionStatus.{{ $index }}'
+                    descr: 'Anti Bot Subscription'
+                    group: Licenses
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
+                -
+                    oid: antiSpamSubscriptionStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.46.4.1.{{ $index }}'
+                    index: 'antiSpamSubscriptionStatus.{{ $index }}'
+                    descr: 'Anti Spam Subscription'
+                    group: Licenses
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
         temperature:
             data:
                 -
@@ -65,3 +342,74 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.3.{{ $index }}'
                     descr: voltageSensorName
                     index: 'voltageSensorValue.{{ $index }}'
+        count:
+            data:
+#Connections
+                -
+                    oid: fwNumConn
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.25.3.{{ $index }}'
+                    index: 'fwNumConn.{{ $index }}'
+                    descr: 'Number of concurrent connections'
+                    group: Connections
+                -
+                    oid: fwPeakNumConn
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.25.4.{{ $index }}'
+                    index: 'fwPeakNumConn.{{ $index }}'
+                    descr: 'Peak number of concurrent connections'
+                    group: Connections
+                -
+                    oid: fwConnTableLimit
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.25.10.{{ $index }}'
+                    index: 'fwConnTableLimit.{{ $index }}'
+                    descr: 'Limit of Connections table'
+                    group: Connections
+                -
+                    oid: fwConnectionsStatConnectionRate
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.26.11.6.{{ $index }}'
+                    index: 'fwConnectionsStatConnectionRate.{{ $index }}'
+                    descr: 'Connections rate'
+                    group: Connections
+                -
+                    oid: fwSXLConnsExisting
+                    num_oid: '.1.3.6.1.4.1.2620.1.36.1.2.{{ $index }}'
+                    index: 'fwSXLConnsExisting.{{ $index }}'
+                    descr: 'Number of connections handled by SecureXL'
+                    group: Connections
+#VPN
+                -
+                    oid: cpvIKECurrSAs
+                    num_oid: '.1.3.6.1.4.1.2620.1.2.9.1.1.{{ $index }}'
+                    index: 'cpvIKECurrSAs.{{ $index }}'
+                    descr: 'Number of IKE current SAs'
+                    group: VPN
+                -
+                    oid: cpvCurrEspSAsIn
+                    num_oid: '.1.3.6.1.4.1.2620.1.2.5.2.1.{{ $index }}'
+                    index: 'cpvCurrEspSAsIn.{{ $index }}'
+                    descr: 'Number of IPsec current Inbound ESP SAs'
+                    group: VPN
+                -
+                    oid: cpvCurrEspSAsOut
+                    num_oid: '.1.3.6.1.4.1.2620.1.2.5.2.3.{{ $index }}'
+                    index: 'cpvCurrEspSAsOut.{{ $index }}'
+                    descr: 'Number of IPsec current Outbound ESP SAs'
+                    group: VPN
+#Logging
+                -
+                    oid: mgLSLogReceiveRate
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.14.1.{{ $index }}'
+                    index: 'mgLSLogReceiveRate.{{ $index }}'
+                    descr: 'Log Receive Rate'
+                    group: Logging
+                -
+                    oid: mgLSLogReceiveRatePeak
+                    num_oid: '.1.3.6.1.4.1.2620.1.7.14.2.{{ $index }}'
+                    index: 'mgLSLogReceiveRatePeak.{{ $index }}'
+                    descr: 'Log Receive Rate Peak'
+                    group: Logging
+                -
+                    oid: fwLoggingHandlingRate
+                    num_oid: '.1.3.6.1.4.1.2620.1.1.30.7.{{ $index }}'
+                    index: 'fwLoggingHandlingRate.{{ $index }}'
+                    descr: 'Log Rate'
+                    group: Logging

@@ -25,25 +25,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.6027.1.3.4",
                     "sysDescr": "Force10 Networks Real Time Operating System Software.Force10 Operating System Version: 1.0.Force10 Application Software Version: 8.4.2.5.Copyright (c) 1999-2010 by Force10 Networks, Inc.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ftos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "force10.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.6027.1.3.4",
-                    "sysDescr": "Force10 Networks Real Time Operating System Software.Force10 Operating System Version: 1.0.Force10 Application Software Version: 8.4.2.5.Copyright (c) 1999-2010 by Force10 Networks, Inc.",
-                    "sysContact": null,
-                    "version": null,
+                    "version": "8.4.2.5",
                     "hardware": "S25P-AC",
                     "features": null,
                     "os": "ftos",
@@ -53,6 +35,7 @@
                     "location": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-$data=[];
+$data = [];
 $descr = '';
 
 $temperature = snmp_get($device, '.1.3.6.1.4.1.89.53.15.1.9.1', '-Oqv');

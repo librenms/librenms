@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
                     "sysDescr": "AIX testhost 1 7 <private>",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "aix",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "aix.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
-                    "sysDescr": "AIX testhost 1 7 <private>",
                     "sysContact": "<private>",
                     "version": "7.1",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {
@@ -94,30 +77,38 @@
                 {
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 4096,
                     "mempool_descr": "Physical memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 28,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 2370166784,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "mempool_free": 6219767808,
+                    "mempool_free_oid": null,
+                    "mempool_total": 8589934592,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 99
                 },
                 {
                     "mempool_index": "2",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 4096,
                     "mempool_descr": "Real memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 28,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 2370166784,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.2",
+                    "mempool_free": 6219767808,
+                    "mempool_free_oid": null,
+                    "mempool_total": 8589934592,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -126,105 +117,46 @@
                 {
                     "mempool_index": "3",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Virtual memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 28,
-                    "mempool_used": 2370166784,
-                    "mempool_free": 6219767808,
-                    "mempool_total": 8589934592,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "2",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Real memory",
-                    "mempool_perc": 28,
-                    "mempool_used": 2370166784,
-                    "mempool_free": 6219767808,
-                    "mempool_total": 8589934592,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
+                    "mempool_class": "virtual",
                     "mempool_precision": 4096,
                     "mempool_descr": "Virtual memory",
                     "mempool_perc": 11,
+                    "mempool_perc_oid": null,
                     "mempool_used": 2381922304,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
                     "mempool_free": 19092914176,
+                    "mempool_free_oid": null,
                     "mempool_total": 21474836480,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 95
                 },
                 {
                     "mempool_index": "10",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "swap",
                     "mempool_precision": 4096,
                     "mempool_descr": "Swap space",
                     "mempool_perc": 0,
+                    "mempool_perc_oid": null,
                     "mempool_used": 11755520,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.10",
                     "mempool_free": 12873146368,
+                    "mempool_free_oid": null,
                     "mempool_total": 12884901888,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 10
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "storage": {
         "discovery": {

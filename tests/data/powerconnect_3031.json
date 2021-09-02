@@ -26,7 +26,7 @@
                     "sysDescr": "48G Ethernet Switch",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "48G",
                     "features": null,
                     "os": "powerconnect",
                     "type": "network",
@@ -36,24 +36,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.674.10895.3031",
-                    "sysDescr": "48G Ethernet Switch",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "Dell ",
-                    "features": null,
-                    "os": "powerconnect",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "dell.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

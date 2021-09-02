@@ -6,12 +6,17 @@
         <thead>
             <tr>
                 <th data-column-id="device">Device</th>
-                <th data-column-id="mac_address" data-width="150px">MAC Address</th>
-                <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
+                <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
+<?php
+if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+    echo '                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
+}
+?>
+                <th data-column-id="ipv4_address" data-sortable="false" data-formatter="tooltip">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan" data-width="60px">Vlan</th>
-                <th data-column-id="description">Description</th>
-                <th data-column-id="dnsname" data-sortable="false" data-visible="false">DNS Name</th>
+                <th data-column-id="description" data-formatter="tooltip">Description</th>
+                <th data-column-id="dnsname" data-sortable="false" data-visible="false" data-formatter="tooltip">DNS Name</th>
                 <th data-column-id="first_seen" data-width="165px">First seen</th>
                 <th data-column-id="last_seen" data-width="165px">Last seen</th>
             </tr>
@@ -36,22 +41,22 @@ var grid = $("#fdb-search").bootgrid({
 
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
-$param = array();
+$param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $vars['device_id']) {
         echo '" selected "+';
     }
 
-    echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
+    echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
 }
 ?>
                 "</select>"+
@@ -103,7 +108,7 @@ if ($vars['searchby'] == 'vlan') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"'.$vars['searchPhrase'].'"+';
+echo '"' . $vars['searchPhrase'] . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Value\" />"+
@@ -118,10 +123,20 @@ echo '"'.$vars['searchPhrase'].'"+';
             device_id: '<?php echo $vars['device_id']; ?>',
             searchby: '<?php echo $vars['searchby']; ?>',
             searchPhrase: '<?php echo $vars['searchPhrase']; ?>',
-            dns: $("#fdb-search").bootgrid("getColumnSettings")[6].visible
+            dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
         };
     },
-    url: "<?php echo url('/ajax/table/fdb-tables'); ?>"
+    url: "<?php echo url('/ajax/table/fdb-tables'); ?>",
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'mac_address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
 });
 
 </script>

@@ -15,16 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Util;
 
+use App;
 use LibreNMS\Config;
 use LibreNMS\Proc;
 
@@ -34,7 +34,7 @@ class Snmpsim
     private $ip;
     private $port;
     private $log;
-    /** @var Proc $proc */
+    /** @var Proc */
     private $proc;
 
     public function __construct($ip = '127.1.6.1', $port = 1161, $log = '/tmp/snmpsimd.log')
@@ -42,7 +42,7 @@ class Snmpsim
         $this->ip = $ip;
         $this->port = $port;
         $this->log = $log;
-        $this->snmprec_dir = Config::get('install_dir') . "/tests/snmpsim/";
+        $this->snmprec_dir = Config::get('install_dir') . '/tests/snmpsim/';
     }
 
     /**
@@ -55,12 +55,13 @@ class Snmpsim
     {
         if ($this->isRunning()) {
             echo "Snmpsim is already running!\n";
+
             return;
         }
 
         $cmd = $this->getCmd();
 
-        if (isCli()) {
+        if (App::runningInConsole()) {
             echo "Starting snmpsim listening on {$this->ip}:{$this->port}... \n";
             d_echo($cmd);
         }
@@ -71,16 +72,16 @@ class Snmpsim
             sleep($wait);
         }
 
-        if (isCli() && !$this->proc->isRunning()) {
+        if (App::runningInConsole() && ! $this->proc->isRunning()) {
             // if starting failed, run snmpsim again and output to the console and validate the data
             passthru($this->getCmd(false) . ' --validate-data');
 
-            if (!is_executable($this->findSnmpsimd())) {
+            if (! is_executable($this->findSnmpsimd())) {
                 echo "\nCould not find snmpsim, you can install it with 'pip install snmpsim'.  If it is already installed, make sure snmpsimd or snmpsimd.py is in PATH\n";
             } else {
                 echo "\nFailed to start Snmpsim. Scroll up for error.\n";
             }
-            exit;
+            exit(1);
         }
     }
 
@@ -106,7 +107,6 @@ class Snmpsim
     /**
      * Run snmpsimd but keep it in the foreground
      * Outputs to stdout
-     *
      */
     public function run()
     {
@@ -160,7 +160,7 @@ class Snmpsim
         $cmd .= " --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
         if (is_null($this->log)) {
-            $cmd .= " --logging-method=null";
+            $cmd .= ' --logging-method=null';
         } elseif ($with_log) {
             $cmd .= " --logging-method=file:{$this->log}";
         }
@@ -174,12 +174,13 @@ class Snmpsim
         unset($this->proc);
     }
 
-    private function findSnmpsimd()
+    public function findSnmpsimd()
     {
         $cmd = Config::locateBinary('snmpsimd');
-        if (!is_executable($cmd)) {
+        if (! is_executable($cmd)) {
             $cmd = Config::locateBinary('snmpsimd.py');
         }
+
         return $cmd;
     }
 }

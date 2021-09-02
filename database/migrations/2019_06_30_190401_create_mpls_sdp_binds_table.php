@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMplsSdpBindsTable extends Migration
 {
@@ -20,13 +20,13 @@ class CreateMplsSdpBindsTable extends Migration
             $table->unsignedInteger('sdp_oid');
             $table->unsignedInteger('svc_oid');
             $table->unsignedInteger('device_id')->index();
-            $table->enum('sdpBindRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'))->nullable();
-            $table->enum('sdpBindAdminStatus', array('up','down'))->nullable();
-            $table->enum('sdpBindOperStatus', array('up','down'))->nullable();
+            $table->enum('sdpBindRowStatus', ['active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy'])->nullable();
+            $table->enum('sdpBindAdminStatus', ['up', 'down'])->nullable();
+            $table->enum('sdpBindOperStatus', ['up', 'down'])->nullable();
             $table->bigInteger('sdpBindLastMgmtChange')->nullable();
             $table->bigInteger('sdpBindLastStatusChange')->nullable();
-            $table->enum('sdpBindType', array('spoke','mesh'))->nullable();
-            $table->enum('sdpBindVcType', array('undef','ether','vlan','mirrior','atmSdu'.'atmCell','atmVcc','atmVpc','frDlci','ipipe','satopE1','satopT1','satopE3','satopT3','cesopsn','cesopsnCas'))->nullable();
+            $table->enum('sdpBindType', ['spoke', 'mesh'])->nullable();
+            $table->enum('sdpBindVcType', ['undef', 'ether', 'vlan', 'mirrior', 'atmSdu' . 'atmCell', 'atmVcc', 'atmVpc', 'frDlci', 'ipipe', 'satopE1', 'satopT1', 'satopE3', 'satopT3', 'cesopsn', 'cesopsnCas'])->nullable();
             $table->bigInteger('sdpBindBaseStatsIngFwdPackets')->nullable();
             $table->bigInteger('sdpBindBaseStatsIngFwdOctets')->nullable();
             $table->bigInteger('sdpBindBaseStatsEgrFwdPackets')->nullable();

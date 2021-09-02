@@ -4,10 +4,16 @@ text: 'Huawei SmartAX'
 type: network
 icon: huawei
 ifname: true
+mib_dir: huawei
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
 discovery:
-    -
-        sysDescr:
-            - 'Huawei Integrated Access Software'
+    - sysDescr:
+        - 'Huawei Integrated Access Software'
+    - sysObjectID:
+        - .1.3.6.1.4.1.2011.2.80.8
+        - .1.3.6.1.4.1.2011.2.115
+        - .1.3.6.1.4.1.2011.2.123
+        - .1.3.6.1.4.1.2011.2.133
+        - .1.3.6.1.4.1.2011.2.248

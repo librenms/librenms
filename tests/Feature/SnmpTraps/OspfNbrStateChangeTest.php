@@ -19,10 +19,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -33,16 +32,14 @@ use App\Models\Device;
 use App\Models\OspfNbr;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class OspfNbrStateChangeTest extends SnmpTrapTestCase
 {
     //Test OSPF neighbor state down trap
     public function testOspfNbrDown()
     {
-        $device = factory(Device::class)->create();
-
-        $ospfNbr = factory(OspfNbr::class)->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
@@ -72,9 +69,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     //Test OSPF neighbor state full trap
     public function testOspfNbrFull()
     {
-        $device = factory(Device::class)->create();
-
-        $ospfNbr = factory(OspfNbr::class)->make(['device_id' => $device->device_id, 'ospfNbrState' => 'down']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'down']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
@@ -104,9 +100,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     //Test OSPF neighbor state trap any other state
     public function testOspfNbrOther()
     {
-        $device = factory(Device::class)->create();
-
-        $ospfNbr = factory(OspfNbr::class)->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 

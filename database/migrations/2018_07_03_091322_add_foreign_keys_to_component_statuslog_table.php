@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class AddForeignKeysToComponentStatuslogTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,7 +16,6 @@ class AddForeignKeysToComponentStatuslogTable extends Migration
             $table->foreign('component_id', 'component_statuslog_ibfk_1')->references('id')->on('component')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

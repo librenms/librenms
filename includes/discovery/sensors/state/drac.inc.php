@@ -11,20 +11,20 @@
  */
 
 $tables = [
-    ['virtualDiskTable','.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.','virtualDiskState','virtualDiskName'],
-    ['processorDeviceTable','.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.','processorDeviceStatus','processorDeviceBrandName'],
-    ['memoryDeviceTable','.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.','memoryDeviceStatus','memoryDeviceLocationName'],
-    ['voltageProbeTable','.1.3.6.1.4.1.674.10892.5.4.600.20.1.5.','voltageProbeStatus','voltageProbeLocationName'],
-    ['amperageProbeTable','.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.','amperageProbeStatus','amperageProbeLocationName'],
-    ['systemBatteryTable','.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.','systemBatteryStatus','systemBatteryLocationName']
+    ['virtualDiskTable', '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.', 'virtualDiskState', 'virtualDiskName'],
+    ['processorDeviceTable', '.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.', 'processorDeviceStatus', 'processorDeviceBrandName'],
+    ['memoryDeviceTable', '.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.', 'memoryDeviceStatus', 'memoryDeviceLocationName'],
+    ['voltageProbeTable', '.1.3.6.1.4.1.674.10892.5.4.600.20.1.5.', 'voltageProbeStatus', 'voltageProbeLocationName'],
+    ['amperageProbeTable', '.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.', 'amperageProbeStatus', 'amperageProbeLocationName'],
+    ['systemBatteryTable', '.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.', 'systemBatteryStatus', 'systemBatteryLocationName'],
 ];
 
 foreach ($tables as $tablevalue) {
-    list($table_oid, $num_oid, $value_oid, $descr_oid) = $tablevalue;
+    [$table_oid, $num_oid, $value_oid, $descr_oid] = $tablevalue;
     $temp = snmpwalk_cache_multi_oid($device, $table_oid, [], 'IDRAC-MIB-SMIv2', null, '-OQUse');
     // '-OQUsetX'
 
-    if (!empty($temp)) {
+    if (! empty($temp)) {
         // Find the right states
         if ($value_oid == 'virtualDiskState') {
             $states = [
@@ -62,7 +62,7 @@ foreach ($tables as $tablevalue) {
 
         foreach ($temp as $index => $entry) {
             if ($value_oid == 'memoryDeviceStatus') {
-                $descr = $entry[$descr_oid] . ', ' . $entry['memoryDeviceSize']/1024 . ' MB';
+                $descr = $entry[$descr_oid] . ', ' . $entry['memoryDeviceSize'] / 1024 . ' MB';
             } else {
                 $descr = $entry[$descr_oid];
             }

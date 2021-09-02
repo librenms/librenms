@@ -3,8 +3,7 @@ text: ApsoluteOS
 type: network
 icon: radware
 group: radware
-mib_dir:
-    - radware
+mib_dir: radware
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

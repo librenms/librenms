@@ -1,0 +1,3855 @@
+LUM-OA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DisplayString, DateAndTime, TruthValue
+        FROM SNMPv2-TC
+    lumModules, lumOaMIB
+        FROM LUM-REG
+    FaultStatus, MgmtNameString, SubrackNumber, SlotNumber, PortNumber,
+    LambdaFrequency, BoardOrInterfaceOperStatus, BoardOrInterfaceAdminStatus,
+    CommandString, ObjectProperty
+        FROM LUM-TC;
+
+lumOaMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201906280000Z" -- June 28th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The optical amplifier interface MIB.
+
+        - General
+
+        - Amplifier interfaces
+
+"
+    REVISION
+        "201906280000Z" -- June 28th 2019
+    DESCRIPTION
+        "Changes for release r33.0:
+         - laserForcedOn set to be persistent"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+         - Changes for Finisar ROADM: new alarms moduleWarmingUp and
+           moduleFailure added (moduleFailure previously in roadmAddDropIf).
+        -  VCOM threshold is exceeded alarm removed."
+    REVISION
+        "201605300000Z" -- May 30th 2016
+    DESCRIPTION
+        "Changes made for release r27:
+         - Output power failed alarm added.
+	 - Default value of operStatus set to notPresent."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+         - VCOM threshold is exceeded alarm added.
+         - Firmware upgrade available alarm added.
+         - Interface supports fetching monitor insertion loss added.
+         "
+    REVISION
+        "201211010000Z" --  November 20th 2012
+    DESCRIPTION
+        "Changes made for release r20:
+         "
+    REVISION
+        "201203300000Z" --  March 30th 2012
+    DESCRIPTION
+        "Changes made for release r19:
+         - Voa SFP attributes added."
+    REVISION
+        "201112200000Z" --  December 20th 2011
+    DESCRIPTION
+        "Changes made for release r18:
+         - MDU16 features included."
+    REVISION
+        "201104270000Z" --  April 27th 2011
+    DESCRIPTION
+        "Added new amplifiers."
+    REVISION
+        "200501270000Z" --  January 27th 2006
+    DESCRIPTION
+        "Added TS-1100 specific alarms."
+    REVISION
+        "200209020000Z" --  September 2nd 2002
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 20 }
+
+
+-- ----------------------------------------------------
+-- Conformance area, containing groups and complicance
+-- specifications.
+-- ----------------------------------------------------
+
+lumOaConfs OBJECT IDENTIFIER ::= { lumOaMIB 1 }
+lumOaGroups OBJECT IDENTIFIER ::= { lumOaConfs 1 }
+lumOaCompl OBJECT IDENTIFIER ::= { lumOaConfs 2 }
+lumOaMinimalGroups OBJECT IDENTIFIER ::= { lumOaConfs 3 }
+lumOaMinimalCompl OBJECT IDENTIFIER ::= { lumOaConfs 4 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the oa MIB
+-- ----------------------------------------------------
+
+lumOaMIBObjects OBJECT IDENTIFIER ::= { lumOaMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+oaGeneral OBJECT IDENTIFIER ::= { lumOaMIBObjects 1 }
+oaIfList OBJECT IDENTIFIER ::= { lumOaMIBObjects 2 }
+lumentisOaNotifications  OBJECT IDENTIFIER ::= { lumOaMIBObjects 3 }
+oaVoaIfList OBJECT IDENTIFIER ::= { lumOaMIBObjects 4 }
+oaVoaClientIfList OBJECT IDENTIFIER ::= { lumOaMIBObjects 5 }
+oaVoaLineIfList OBJECT IDENTIFIER ::= { lumOaMIBObjects 6 }
+oaModuleList OBJECT IDENTIFIER ::= { lumOaMIBObjects 7 }
+
+
+-- ----------------------------------------------------
+-- Textual Conventions
+-- ----------------------------------------------------
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+oaGeneralLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB
+        was last changed.
+
+"
+    ::= { oaGeneral 1 }
+
+oaGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state of the MIB was last
+        changed.
+
+"
+    ::= { oaGeneral 2 }
+
+oaGeneralOaIfTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { oaGeneral 3 }
+
+oaGeneralVoaIfTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { oaGeneral 4 }
+
+oaGeneralVoaClientIfTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { oaGeneral 5 }
+
+oaGeneralVoaLineIfTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { oaGeneral 6 }
+
+oaGeneralOaModuleTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { oaGeneral 7 }
+
+
+-- ----------------------------------------------------
+-- Optical amplifier interfaces
+-- ----------------------------------------------------
+
+oaIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface list."
+    ::= { oaIfList 1 }
+
+oaIfEntry OBJECT-TYPE
+    SYNTAX      OaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the interface list.
+
+"
+    INDEX { oaIfIndex }
+    ::= { oaIfTable 1 }
+
+OaIfEntry ::=
+    SEQUENCE {
+        oaIfIndex                       Unsigned32,
+        oaIfName                        MgmtNameString,
+        oaIfDescr                       DisplayString,
+        oaIfSubrack                     SubrackNumber,
+        oaIfSlot                        SlotNumber,
+        oaIfTxPort                      PortNumber,
+        oaIfRxPort                      PortNumber,
+        oaIfInvPhysIndexOrZero          Unsigned32,
+        oaIfAdminStatus                 BoardOrInterfaceAdminStatus,
+        oaIfOperStatus                  BoardOrInterfaceOperStatus,
+        oaIfLaserStatus                 INTEGER,
+        oaIfAmplifierType               INTEGER,
+        oaIfWantedAbsolutePowerLevel    Integer32,
+        oaIfWantedRelativePowerLevel    Integer32,
+        oaIfWantedGain                  Integer32,
+        oaIfFrequencyMin                LambdaFrequency,
+        oaIfFrequencyMax                LambdaFrequency,
+        oaIfNominalTxPower              Integer32,
+        oaIfTxPowerLevel                Integer32,
+        oaIfRxPowerLevel                Integer32,
+        oaIfRxPowerLevelLowThreshold    Integer32,
+        oaIfLaserBias                   Unsigned32,
+        oaIfNominalLaserTemp            Unsigned32,
+        oaIfRelativeLaserTemp           Integer32,
+        oaIfLossOfSignalThreshold       Integer32,
+        oaIfLossOfSignal                FaultStatus,
+        oaIfPumpLaserTempHigh           FaultStatus,
+        oaIfRegulationProblemRxPowerHigh FaultStatus,
+        oaIfRegulationProblemTxPowerHigh FaultStatus,
+        oaIfRegulationProblemTxPowerLow FaultStatus,
+        oaIfReceivedPowerLow            FaultStatus,
+        oaIfLaserBiasHigh               FaultStatus,
+        oaIfLaserTempControlFault       FaultStatus,
+        oaIfHwMissing                   FaultStatus,
+        oaIfConfigurationCommand        CommandString,
+        oaIfPumpLaserTempLow            FaultStatus,
+        oaIfLaserTempLowRelativeThreshold Integer32,
+        oaIfLaserTempHighRelativeThreshold Integer32,
+        oaIfAmpTypeNotSupportedByHw      FaultStatus,
+        oaIfWantedSignalPowerLevel      Integer32,
+        oaIfObjectProperty              ObjectProperty,
+        oaIfLaserForcedOn               INTEGER,
+        oaIfActualLaserTemp             Integer32,
+        oaIfAutomaticPowerShutdown      INTEGER,
+        oaIfDisabled                    FaultStatus,
+        oaIfWantedPowerLimit            Integer32,
+        oaIfModuleInfo                  DisplayString,
+        oaIfMonitorInsertionLoss        DisplayString,
+        oaIfNumMonitorInsertionLoss     Unsigned32,
+        oaIfFunctionalType              INTEGER,
+        oaIfActualGain                  Integer32,
+        oaIfSaturationFault             FaultStatus,
+        oaIfWantedGainTilt              Integer32,
+        oaIfTxPowerLevelLowThreshold    Integer32,
+        oaIfLaserPumpBias               Unsigned32,
+        oaIfCaseTempOutOfrange          FaultStatus,
+        oaIfLaserTempOutOfRange         FaultStatus,
+        oaIfSupportsReadMonitorInsertionLoss TruthValue,
+        oaIfTxSignalStatus              INTEGER,
+        oaIfRxSignalStatus              INTEGER,
+        oaIfOutputPowerFail             FaultStatus
+        }
+
+oaIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { oaIfEntry 1 }
+
+oaIfName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for
+        example 'oa:1:2:1-2', where the first number
+        indicates sub-rack, the second slot number and
+        the third is the port number.
+        Examples:
+
+        oa:s:s:p - Optical amplifier interface
+
+"
+    ::= { oaIfEntry 2 }
+
+oaIfDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { oaIfEntry 3 }
+
+oaIfSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the interface
+        is located.
+
+"
+    ::= { oaIfEntry 4 }
+
+oaIfSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the interface is
+        located.
+
+"
+    ::= { oaIfEntry 5 }
+
+oaIfTxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the TX-side of the
+        interface is located.
+
+"
+    ::= { oaIfEntry 6 }
+
+oaIfRxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the RX-side of
+        the interface is located.
+
+"
+    ::= { oaIfEntry 7 }
+
+oaIfInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this interface.
+        Set to 0 if not known.
+
+"
+    ::= { oaIfEntry 8 }
+
+
+oaIfAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state for the interface.
+
+        down - The interface should be inactive.
+
+        service - The interface is activated but alarms
+        are suppressed. Intended for use during service
+        or re-configuration. When service is concluded
+        adminStatus should be set to 'up' again.
+
+        up - The interface should be activated when
+        it becomes available. Alarms are not suppressed.
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { up }
+    ::= { oaIfEntry 9 }
+
+oaIfOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The physical resources are not
+        available.
+
+        down - The interface is de-activated or the are
+        faults preventing it from going to the 'up'-state.
+
+        up - The interface is operational.
+
+"
+    DEFVAL { notPresent }
+    ::= { oaIfEntry 10 }
+
+oaIfLaserStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    on (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the laser.
+
+        off - The laser is turned off.
+
+        on - The laser is turned on.
+
+"
+    ::= { oaIfEntry 11 }
+
+oaIfAmplifierType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pre25ad (1),
+                    pre25tm (2),
+                    pow10 (3),
+                    pre10ad (4),
+                    pre10tm (5),
+                    constantGain (6),
+                    constantSignalPower (7),
+                    constantPower (8),
+                    constantGainLI (9),
+                    constantGainHI (10) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of amplifier for this interface.
+
+        preAmp25GAd - pre-amplifier for 2.5 G,
+        add-drop
+
+        preAmp25GTm - pre-amplifier for 2.5 G,
+        terminal multiplexor
+
+        powAmp10G  - power amplifier for 10 G
+
+        preAmp10GAd - pre-amplifier for 10 G,
+        add-drop
+
+        preAmp10GTm - pre-amplifier for 10 G,
+        terminal multiplexor
+
+        constantGain - used for pre-amps and other
+                  point-to-point links. Uses ASE compensation.
+                  => specify wantedGain
+
+        constantGainLI - Default value. Works as constantGain
+                  but uses low input power mode. Please,
+                  refer to OA commissioning manual to decideoaIfRxSignalStatus
+                  which gain mode that should be used.
+
+        constantGainHI - Works as constantGain but uses high
+                  input power mode. Please, refer to OA
+                  commissioning manual to decide which gain
+                  mode that should be used.
+
+        constantSignalPower - used in combination
+                  with 2 channel add-drop filters.
+                  Uses ASE compensation.
+                  => specify wantedSignalPower
+
+        constantPower - For test purposes
+                  No ASE compensation.
+                  => specify wantedAbsolutePower
+
+"
+    ::= { oaIfEntry 12 }
+
+oaIfWantedAbsolutePowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (0..195)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For powAmp10G and constantPower, the
+         user can give the wanted absolute power level
+         in units of 0.1 dBm.
+
+         For OA10 and OA17 in constantGain and
+         constantSignalPower, this parameter shows the
+         derived absolute power level. The value is
+         calculated from the other given parameters.
+
+"
+    DEFVAL { 90 }
+    ::= { oaIfEntry 13 }
+
+oaIfWantedRelativePowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-60..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Wanted offset from production setting in units
+        of 0.1 dBm.
+        Applicable for preAmp25GAd and preAmp10GAd.
+
+        Note that the output power level is dependent on
+        the power of the input signal, so you might not
+        always get the power that you want.
+
+"
+    DEFVAL { 0 }
+    ::= { oaIfEntry 14 }
+
+oaIfWantedGain OBJECT-TYPE
+    SYNTAX      Integer32 (130..330)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Signal gain setting in units of 0.1 dB.
+         Applicable for preAmp25GTm, preAmp10GTm
+         and constantGain/LI/HI.
+
+         This attribute can be written via SNMP.
+"
+    DEFVAL { 200 }
+    ::= { oaIfEntry 15 }
+
+oaIfFrequencyMin OBJECT-TYPE
+    SYNTAX      LambdaFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lowest amplified freqency in hundreds of
+        GHz (0.01 GHz).
+
+        Supported range 19210 ... 19590 (c921 .. c959)
+
+"
+    DEFVAL { ch921 }
+    ::= { oaIfEntry 16 }
+
+oaIfFrequencyMax OBJECT-TYPE
+    SYNTAX      LambdaFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Highest amplified freqency in hundreds of
+        GHz (0.01 GHz).
+
+        Supported range 19210 ... 19590 (c921 .. c959)
+
+"
+    DEFVAL { ch959 }
+    ::= { oaIfEntry 17 }
+
+oaIfNominalTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The production setting for output power in
+        units of 0.1 dBm.
+
+"
+    ::= { oaIfEntry 18 }
+
+oaIfTxPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted power level in units of 0.1 dBm.
+
+"
+    ::= { oaIfEntry 19 }
+
+oaIfRxPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The received power level in units of 0.1 dBm.
+
+"
+    ::= { oaIfEntry 20 }
+
+oaIfRxPowerLevelLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-50..80)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lower threshold for received power level
+        relative to the loss of signal threshold,
+        in units of 0.1 dB.
+
+"
+    DEFVAL { 30 }
+    ::= { oaIfEntry 21 }
+
+oaIfLaserBias OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measures laser bias current value in tenths of
+        mA (0.1 mA).
+
+"
+    ::= { oaIfEntry 22 }
+
+oaIfNominalLaserTemp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The pre-set laser temperature (0.1 deg C)
+
+"
+    ::= { oaIfEntry 23 }
+
+oaIfRelativeLaserTemp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current offset from the pre-set temperature
+        in units of 0.1 degrees centigrade.
+
+"
+    ::= { oaIfEntry 24 }
+
+oaIfLossOfSignalThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-560..80)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for loss of signal.
+
+        Note: Depending on the type of optical amplifier
+        the value range may vary.
+
+"
+    DEFVAL { -560 }
+    ::= { oaIfEntry 25 }
+
+
+oaIfLossOfSignal OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loss of signal.
+        Applicable for all signal formats.
+
+        A(ctivation): Active loss of signal HW
+        indication.
+
+        D(e-activation): Inactive loss of signal HW
+        indication.
+
+"
+    ::= { oaIfEntry 26 }
+
+oaIfPumpLaserTempHigh OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pump laser temperature too high.
+
+        A(ctivation): Temperature exceedes threshold.
+
+        D(e-activation): Temperature below threshold
+        again.
+
+"
+    ::= { oaIfEntry 27 }
+
+oaIfRegulationProblemRxPowerHigh OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The input power is above meassuring range.
+
+        A: The received power level exceeds the
+        associated threshold.
+
+        D: The received power level is 0.5 dBm below
+        the threshold.
+
+"
+    ::= { oaIfEntry 28 }
+
+oaIfRegulationProblemTxPowerHigh OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The output power is above meassuring range.
+
+        A: The received power level exceeds the
+        associated threshold.
+
+        D: The received power level is 0.5 dBm below
+        the threshold.
+
+"
+    ::= { oaIfEntry 29 }
+
+oaIfRegulationProblemTxPowerLow OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The output power is below meassuring range.
+
+        A: The transmitted power level below the associated
+        threshold.
+
+        D: The transmitted power level is 0.5 dBm above the
+        threshold.
+
+"
+    ::= { oaIfEntry 30 }
+
+oaIfReceivedPowerLow OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received power level low threshold exceeded.
+
+        A: The received power level is below the
+        associated threshold.
+
+        D: The received power level is 0.5 dBm above the
+        threshold.
+
+"
+    ::= { oaIfEntry 31 }
+
+oaIfLaserBiasHigh OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Laser bias high threshold exceeded.
+
+        A: The laser bias current exceeds the associated
+        threshold.
+
+        D: The laser bias current is 0.5 mA below the
+        associated threshold.
+
+"
+    ::= { oaIfEntry 32 }
+
+oaIfLaserTempControlFault OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The pump laser temperature exceeds the
+        associated threshold.
+
+        A: The temperature exceeds the value.
+
+        D: The temperature is below the value.
+
+"
+    ::= { oaIfEntry 33 }
+
+oaIfHwMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The HW for this i/f is not present
+
+        A: Wrong HW is inserted in subrack.
+
+        D: Correct HW is inserted in subrack.
+
+"
+    ::= { oaIfEntry 34 }
+
+oaIfConfigurationCommand OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select which amplifier type to use. All modes are not applicable
+        for all type of amplifier boards.
+
+        constantGain:        Amplifier will set output power according to
+                             the input power and the given gain
+        constantSignalPower: Amplifier will set a constant output power
+                             with noise-compensation
+        constantPower:       Amplifier will set a constant output power
+                             independent of input power
+        constantGainLI:      Amplifier will work with constant gain in the low
+                             input power region (-35 to -5 dBm)
+        constantGainHI:      Amplifier will work with constant gain in the
+                             high input power region (-25 to +8 dBm)
+        pow10:               Power amplifier for 10G
+        pre10ad:             Pre-amplifier for 10G in add/drop config.
+        pre25ad:             Pre-amplifier for 2.5G in add/drop config.
+        pre10tm:             Pre-amplifier for 10G in TM configuration
+        pre25tm:             Pre-amplifier for 2.5G in TM configuration
+
+"
+    ::= { oaIfEntry 35 }
+
+oaIfPumpLaserTempLow OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pump laser temperature too low.
+
+        A(ctivation): Temperature exceedes threshold.
+
+        D(e-activation): Temperature above threshold
+        again.
+
+"
+    ::= { oaIfEntry 36 }
+
+oaIfLaserTempLowRelativeThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-100..150)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold for the Laser Temp Low alarm, expressed
+         as an offset from a pre-set nominal temperature,
+         in units of 0.1 degrees centigrade.
+
+"
+    DEFVAL { -30 }
+    ::= { oaIfEntry 37 }
+
+oaIfLaserTempHighRelativeThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-250..450)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold for the Laser Temp High alarm, expressed
+         as an offset from a pre-set nominal temperature,
+         in units of 0.1 degrees centigrade.
+
+"
+    DEFVAL { 30 }
+    ::= { oaIfEntry 38 }
+
+oaIfAmpTypeNotSupportedByHw OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The HW revision does not support
+         the selected amplifier type.
+
+"
+    ::= { oaIfEntry 39 }
+
+oaIfWantedSignalPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-150..-50)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Wanted offset from production setting in units
+        of 0.1 dBm.
+        Applicable for preAmp25GAd and preAmp10GAd.
+
+        Note that the output power level is dependent on
+        the power of the input signal, so you might not
+        always get the power that you want.
+
+"
+    DEFVAL { -100 }
+    ::= { oaIfEntry 40 }
+
+oaIfObjectProperty  OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { oaIfEntry 41 }
+
+oaIfLaserForcedOn OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, the laser control is on regardless of
+         whether there is an input signal present or not.
+
+        disabled - the laser control is activated first
+                   after input signal is detected
+
+        enabled  - the laser control is always on
+
+"
+    DEFVAL { disabled }
+    ::= { oaIfEntry 42 }
+
+oaIfActualLaserTemp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current laser temperature
+        in units of 0.1 degrees centigrade.
+
+"
+    ::= { oaIfEntry 43 }
+
+oaIfAutomaticPowerShutdown OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, the laser is turned off if
+         the input signal to the other gain block
+         is lost.
+
+        disabled - the laser is NOT affected by
+                   the other gain block.
+
+        enabled  - the laser is turned off if
+                   the input to the other gain block
+                   is lost.
+
+"
+    DEFVAL { disabled }
+    ::= { oaIfEntry 44 }
+
+oaIfDisabled OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface is disabled.
+
+        A: Interface disabled.
+
+        D: Interface enabled.
+
+"
+    ::= { oaIfEntry 45 }
+
+oaIfWantedPowerLimit OBJECT-TYPE
+    SYNTAX      Integer32 (-70..195)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Applicable for constantGainLI/HI.
+
+        Sets the maximum allowed output power.
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { 167 }
+    ::= { oaIfEntry 46 }
+
+oaIfModuleInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information (for example firmware and serial number) about
+        the module.
+
+"
+    ::= { oaIfEntry 47 }
+
+oaIfMonitorInsertionLoss OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The insertion loss for the monitor port.
+         When the real insertion loss is not possible
+         to read from unit (older HW revsions), 20
+         (default) dB will be shown which is the
+         normal value.
+
+"
+    ::= { oaIfEntry 48 }
+
+oaIfNumMonitorInsertionLoss OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the same parameter as Monitor Port
+         Insertion Loss. The difference is that you
+         will not see if the value can be read from
+         the port or not (if not 20 dB will be shown).
+
+"
+    ::= { oaIfEntry 49 }
+
+
+oaIfFunctionalType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  undefined (1),
+                  preAmp (2),
+                  offLinePreAmp (3),
+                  lineAmp (4),
+                  booster (5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The functional type of amplifier. This attribute is ONLY used
+        by TNM and the traffic is not affected if changed.
+
+        undefined     - default
+
+        preAmp        - pre-amplifier. Receiving amplifier on a
+                        terminal node.
+
+        offLinePreAmp - offline pre-amplifier. Receiving amplifier
+                        in a non-terminal node. Offline pre-amplifier
+                        amplifies dropped traffic, NOT line traffic.
+
+        lineAmp       - line amplifier. Amplifier situated between
+                        the terminal nodes, which amplifies passing
+                        line traffic and (if applicable) added
+                        traffic.
+
+        booster       - booster. The transmitting amplifier from a
+                        terminal node.
+
+"
+    DEFVAL { undefined }
+    ::= { oaIfEntry 50 }
+
+oaIfActualGain OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual measured gain in units of 0.1 dB.
+
+"
+    ::= { oaIfEntry 51 }
+
+oaIfSaturationFault OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Saturation alarm threshold is passed. Actual Gain < (Wanted
+         Gain -1 dB). The alarm can be cleared be cleared by reducing
+         the wanted gain attribute.
+
+"
+    ::= { oaIfEntry 52 }
+
+oaIfWantedGainTilt OBJECT-TYPE
+    SYNTAX      Integer32 (-20..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Settable gain tilt for variable gain OA in units of 0.1 dB.
+        Positive gain tilt is defined as gain increasing wavelength.
+        Negative gain tilt is defined as gain decreasing wavelength.
+
+"
+    DEFVAL { 0 }
+    ::= { oaIfEntry 53 }
+
+oaIfTxPowerLevelLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..207)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lower threshold for transmitted power level
+        transmits to the loss of signal threshold,
+        in units of 0.1 dB.
+
+"
+    DEFVAL { 5 }
+    ::= { oaIfEntry 54 }
+
+oaIfLaserPumpBias OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measures laser pump bias current in
+        per cent (%) of max value.
+
+"
+    ::= { oaIfEntry 55 }
+
+oaIfCaseTempOutOfrange OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module has shutdown automatically because of
+        too high case temp (>85 degC) or too low case
+        temp (-40 degC).
+
+        A(ctivation): Case temperature exceedes pre-set
+        temp range.
+
+        D(e-activation): Case temperature within pre-set
+        temp range again.
+
+"
+    ::= { oaIfEntry 56 }
+
+oaIfLaserTempOutOfRange OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the module has shutdown automatically because of
+        pump laser temp out of range (15-35 degC).
+
+        A(ctivation): Laser temperature exceedes pre-set value.
+
+        D(e-activation): Laser temperature below pre-set value
+        again.
+
+"
+    ::= { oaIfEntry 57 }
+
+oaIfSupportsReadMonitorInsertionLoss OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value tells whether a OA interface has the ability
+        to read the insertion loss value for the monitor port on
+        an interface.
+
+        true: Insertion loss can be read for this interface
+        false: Insertion loss cannot be read for this interface
+
+"
+
+    ::= { oaIfEntry 58 }
+
+oaIfTxSignalStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        down (1),
+                        degraded (2),
+                        up (3),
+                        notApplicable (2147483647) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for outgoing (TX) signal
+        of the interface.
+
+        down - A fault that would lead to a protection
+        switch has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+        notApplicable (2147483647) - Attribute is not used on board.
+"
+    ::= { oaIfEntry 59 }
+
+oaIfRxSignalStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        down (1),
+                        degraded (2),
+                        up (3),
+                        notApplicable (2147483647) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+        notApplicable (2147483647) - Attribute is not used on board
+"
+    ::= { oaIfEntry 60 }
+
+oaIfOutputPowerFail OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Output power failed alarm threshold is passed. Actual Gain < (Wanted
+         Gain -1 dB) and Output Power < (Power Limit -1 dB).
+
+"
+    ::= { oaIfEntry 61 }
+
+-- ----------------------------------------------------
+-- Variable Optical Attenuator interfaces
+-- ----------------------------------------------------
+
+oaVoaIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OaVoaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface list."
+    ::= { oaVoaIfList 1 }
+
+oaVoaIfEntry OBJECT-TYPE
+    SYNTAX      OaVoaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the interface list.
+
+"
+    INDEX { oaVoaIfIndex }
+    ::= { oaVoaIfTable 1 }
+
+OaVoaIfEntry ::=
+    SEQUENCE {
+        oaVoaIfIndex                      Unsigned32,
+        oaVoaIfName                       MgmtNameString,
+        oaVoaIfDescr                      DisplayString,
+        oaVoaIfSubrack                    SubrackNumber,
+        oaVoaIfSlot                       SlotNumber,
+        oaVoaIfTxPort                     PortNumber,
+        oaVoaIfRxPort                     PortNumber,
+        oaVoaIfInvPhysIndexOrZero         Unsigned32,
+        oaVoaIfAdminStatus                BoardOrInterfaceAdminStatus,
+        oaVoaIfOperStatus                 BoardOrInterfaceOperStatus,
+        oaVoaIfObjectProperty             ObjectProperty,
+        oaVoaIfControlMode                INTEGER,
+        oaVoaIfWantedOutputPower          Integer32,
+        oaVoaIfCurrentOutputPower         Integer32,
+        oaVoaIfRegulationRange            Unsigned32,
+        oaVoaIfWantedAttenuation          Unsigned32,
+        oaVoaIfCurrentAttenuation         Unsigned32,
+        oaVoaIfSamplePeriod               Unsigned32,
+        oaVoaIfOuputPowerControlFailure   FaultStatus,
+        oaVoaIfCurrentPowerOutOfRange     FaultStatus,
+        oaVoaIfConfigurationCommand       CommandString,
+        oaVoaIfInInstallationMode         FaultStatus }
+
+oaVoaIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { oaVoaIfEntry 1 }
+
+oaVoaIfName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface,
+        for example 'voa:1:2:1'.
+
+"
+    ::= { oaVoaIfEntry 2 }
+
+oaVoaIfDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { oaVoaIfEntry 3 }
+
+oaVoaIfSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the interface
+        is located.
+
+"
+    ::= { oaVoaIfEntry 4 }
+
+oaVoaIfSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the interface is
+        located.
+
+"
+    ::= { oaVoaIfEntry 5 }
+
+oaVoaIfTxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the TX part of
+         the interface is located.
+
+"
+    ::= { oaVoaIfEntry 6 }
+
+oaVoaIfRxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the RX part of
+         the interface is located.
+
+"
+    ::= { oaVoaIfEntry 7 }
+
+oaVoaIfInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this interface.
+        Set to 0 if not known.
+
+"
+    ::= { oaVoaIfEntry 8 }
+
+oaVoaIfAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state for the interface.
+
+        down - The interface should be inactive.
+
+        service - The interface is activated but alarms
+        are suppressed. Intended for use during service
+        or re-configuration. When service is concluded
+        adminStatus should be set to 'up' again.
+        Note that there is no difference between 'up'
+        and 'service', if no alarms can be rasied from
+        this object.
+
+        up - The interface should be activated when
+        it becomes available. Alarms are not suppressed.
+
+        This attribute can be written via SNMP.
+"
+    ::= { oaVoaIfEntry 9 }
+
+oaVoaIfOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The interface is not available.
+
+        down - The interface is not used.
+
+        up - The interface is active.
+
+"
+    DEFVAL { notPresent }
+    ::= { oaVoaIfEntry 10 }
+
+oaVoaIfObjectProperty OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { oaVoaIfEntry 11 }
+
+oaVoaIfControlMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    constPower (1),
+                    constAttenuation (2),
+                    constPowerAtInstallation (3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The control mode of the VOA channel.
+
+        constPower - regulate slowly towards a given
+                     output power.
+
+        constAttenuation - set a fix attenuation
+
+        constPowerAtInstallation -
+            like constPower but allow faster changes
+            (this mode is not released)
+
+"
+    DEFVAL { constPower }
+    ::= { oaVoaIfEntry 12 }
+
+oaVoaIfWantedOutputPower OBJECT-TYPE
+    SYNTAX      Integer32 (-300..170)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wanted output power.
+
+         Applicable for constPower.
+
+"
+    DEFVAL { 0 }
+    ::= { oaVoaIfEntry 13 }
+
+oaVoaIfCurrentOutputPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual output power.
+
+"
+    ::= { oaVoaIfEntry 14 }
+
+oaVoaIfRegulationRange OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An offset below the wanted output power
+         at which the 'Current Power Out Of Range'
+         alarm shall be raised.
+
+         When the current output power is so
+         far below the wanted output power,
+         the regulation stops and the alarm
+         is raised.
+
+         Applicable for constPower.
+
+"
+    DEFVAL { 40 }
+    ::= { oaVoaIfEntry 15 }
+
+oaVoaIfWantedAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wanted attenuation.
+
+         voa8ch: applicable for constAttenuation
+         voa2ch: always applicable
+
+         This attribute can be written via SNMP.
+
+"
+    DEFVAL { 200 }
+    ::= { oaVoaIfEntry 16 }
+
+oaVoaIfCurrentAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current attenuation.
+
+         Applicable for constPower.
+
+"
+    ::= { oaVoaIfEntry 17 }
+
+oaVoaIfSamplePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The approximate period between 2
+         consecutive measurements of the output
+         power
+
+"
+    ::= { oaVoaIfEntry 18 }
+
+
+oaVoaIfOuputPowerControlFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Alarm raised when the wanted output power
+         can not be obtained. That is, even if the
+         attenuation is reduced to zero, the wanted
+         power can not be obtained.
+
+"
+    ::= { oaVoaIfEntry 19 }
+
+oaVoaIfCurrentPowerOutOfRange OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Alarm raised when the current output power
+         is outside the 'regulation range'.
+
+        The regulation range is defined by
+
+        Wanted Output Power +/- Regulation Range
+
+        At this point, no regulation will be performed.
+        The operator must change the wantedOutputPower.
+
+"
+    ::= { oaVoaIfEntry 20 }
+
+oaVoaIfConfigurationCommand OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select which control mode to use:
+
+           constPower
+           constAttenuation
+
+"
+    ::= { oaVoaIfEntry 21 }
+
+oaVoaIfInInstallationMode OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Alarm raised when the VOA is put in the
+         mode constPowerAtInstallation.
+
+"
+    ::= { oaVoaIfEntry 22 }
+
+-- ----------------------------------------------------
+-- Variable Optical Attenuator Client interfaces
+-- ----------------------------------------------------
+
+oaVoaClientIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OaVoaClientIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface list."
+    ::= { oaVoaClientIfList 1 }
+
+oaVoaClientIfEntry OBJECT-TYPE
+    SYNTAX      OaVoaClientIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the interface list.
+
+"
+    INDEX { oaVoaClientIfIndex }
+    ::= { oaVoaClientIfTable 1 }
+
+OaVoaClientIfEntry ::=
+    SEQUENCE {
+        oaVoaClientIfIndex                      Unsigned32,
+        oaVoaClientIfName                       MgmtNameString,
+        oaVoaClientIfDescr                      DisplayString,
+        oaVoaClientIfSubrack                    SubrackNumber,
+        oaVoaClientIfSlot                       SlotNumber,
+        oaVoaClientIfTxPort                     PortNumber,
+        oaVoaClientIfRxPort                     PortNumber,
+        oaVoaClientIfInvPhysIndexOrZero         Unsigned32,
+        oaVoaClientIfAdminStatus                BoardOrInterfaceAdminStatus,
+        oaVoaClientIfOperStatus                 BoardOrInterfaceOperStatus,
+        oaVoaClientIfObjectProperty             ObjectProperty,
+        oaVoaClientIfControlMode                INTEGER,
+        oaVoaClientIfWantedAttenuation          Unsigned32,
+        oaVoaClientIfCurrentAttenuation         Unsigned32,
+        oaVoaClientIfLambda                     LambdaFrequency,
+        oaVoaClientIfAbsoluteAttenuation        Unsigned32,
+        oaVoaClientIfVoa2CurrentAttenuation     Unsigned32,
+        oaVoaClientIfDecreaseAttenuation        Unsigned32,
+        oaVoaClientIfIncreaseAttenuation        Unsigned32,
+        oaVoaClientIfInsertionLoss              Unsigned32,
+        oaVoaClientIfExpectedFrequency          LambdaFrequency,
+        oaVoaClientIfSfpMissing                 FaultStatus,
+        oaVoaClientIfSfpClass                   DisplayString,
+        oaVoaClientIfSfpTransmitterFailed       FaultStatus,
+        oaVoaClientIfSfpMediaMismatch           FaultStatus,
+        oaVoaClientIfLossOfSignal               FaultStatus,
+        oaVoaClientIfSfpCodeMismatch            FaultStatus,
+        oaVoaClientIfAttenuationConfigMismatch  FaultStatus }
+
+oaVoaClientIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { oaVoaClientIfEntry 1 }
+
+oaVoaClientIfName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface,
+        for example 'voaClient:1:2:1' which
+        indicates subrack 1, board 2 and port 1.
+
+"
+    ::= { oaVoaClientIfEntry 2 }
+
+oaVoaClientIfDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { oaVoaClientIfEntry 3 }
+
+oaVoaClientIfSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the interface
+        is located.
+
+"
+    ::= { oaVoaClientIfEntry 4 }
+
+oaVoaClientIfSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the interface is
+        located.
+
+"
+    ::= { oaVoaClientIfEntry 5 }
+
+oaVoaClientIfTxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the Tx part of
+         the interface is located.
+
+"
+    ::= { oaVoaClientIfEntry 6 }
+
+oaVoaClientIfRxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the Rx part of
+         the interface is located.
+
+"
+    ::= { oaVoaClientIfEntry 7 }
+
+oaVoaClientIfInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this interface.
+        Set to 0 if not known.
+
+"
+    ::= { oaVoaClientIfEntry 8 }
+
+oaVoaClientIfAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state for the interface.
+
+        down - The interface should be inactive.
+
+        service - The interface is activated but alarms
+        are suppressed. Intended for use during service
+        or re-configuration. When service is concluded
+        adminStatus should be set to 'up' again.
+
+        up - The interface should be activated when
+        it becomes available. Alarms are not suppressed.
+
+"
+    DEFVAL { up }
+    ::= { oaVoaClientIfEntry 9 }
+
+oaVoaClientIfOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The interface is not available.
+
+        down - The interface is not used.
+
+        up - The interface is active.
+
+"
+    DEFVAL { notPresent }
+    ::= { oaVoaClientIfEntry 10 }
+
+oaVoaClientIfObjectProperty OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { oaVoaClientIfEntry 11 }
+
+oaVoaClientIfControlMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    constAttenuation (1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The control mode of the VOA channel.
+
+        constAttenuation - set a fix attenuation
+
+"
+    DEFVAL { constAttenuation }
+    ::= { oaVoaClientIfEntry 12 }
+
+oaVoaClientIfWantedAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..200|2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wanted attenuation.
+
+        Applicable for constAttenuation
+
+        This attribute can be written via SNMP if not set to 2147483647.
+
+"
+    DEFVAL { 200 }
+    ::= { oaVoaClientIfEntry 13 }
+
+oaVoaClientIfCurrentAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current attenuation.
+
+         Applicable in case of MDU40 boards.
+
+"
+    ::= { oaVoaClientIfEntry 14 }
+
+oaVoaClientIfLambda OBJECT-TYPE
+    SYNTAX      LambdaFrequency
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The frequency given in hundreds of GHz
+        (0.01 GHz). Set to 0 for transparent ports.
+
+"
+    ::= { oaVoaClientIfEntry 15 }
+
+oaVoaClientIfAbsoluteAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wanted absolute attenuation including
+        the insertion loss. This value can never be
+        set below the upper limit of the insertion loss.
+
+        VOA8CHSFP: The range is dependent on the
+        inserted VOA SFP.
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { 200 }
+    ::= { oaVoaClientIfEntry 16 }
+
+oaVoaClientIfVoa2CurrentAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value shows the current set absolute  attenua-
+         tion on VOA8ch-II and voa8chsfp. This value is
+         usually the same value as the absolute attenuation
+         except when a decrase or increase of attenuation is
+         ongoing or when administrative status is set to down.
+
+"
+    DEFVAL { 200 }
+    ::= { oaVoaClientIfEntry 17 }
+
+oaVoaClientIfDecreaseAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wanted decrease of the current attenuation.
+
+         This attribute can be written via SNMP.
+"
+    DEFVAL { 0 }
+    ::= { oaVoaClientIfEntry 18 }
+
+oaVoaClientIfIncreaseAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wanted increase of the current attenuation.
+
+         This attribute can be written via SNMP.
+"
+    DEFVAL { 0 }
+    ::= { oaVoaClientIfEntry 19 }
+
+oaVoaClientIfInsertionLoss OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The insertion loss for the port. The attenuation
+        can never be set to a value below this value.
+
+"
+    DEFVAL { 25 }
+    ::= { oaVoaClientIfEntry 20 }
+
+oaVoaClientIfExpectedFrequency OBJECT-TYPE
+    SYNTAX      LambdaFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The frequency given in hundreds of GHz
+        (0.01 GHz). This value is only used for
+        presentation purposes in name of port.
+
+"
+    DEFVAL { 0 }
+    ::= { oaVoaClientIfEntry 21 }
+
+oaVoaClientIfSfpMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An expected VOA SFP is missing.
+
+        A(ctivation): An expected SFP is missing.
+
+        D(e-activation): The missing SFP is inserted.
+
+"
+    ::= { oaVoaClientIfEntry 22 }
+
+oaVoaClientIfSfpClass OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "String that contains general information about
+         the SFP.
+
+"
+    DEFVAL { "" }
+    ::= { oaVoaClientIfEntry 23 }
+
+oaVoaClientIfSfpTransmitterFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SFP has detected a failure
+         in the transmitter part.
+
+        A(ctivation): The transmitter has failed
+
+        D(e-activation): The transmitter is OK again
+
+"
+    ::= { oaVoaClientIfEntry 24 }
+
+oaVoaClientIfSfpMediaMismatch OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the inserted SFP is not the expected one.
+
+        A(ctivation): Invalid or mismatching SFP media is
+           detected.
+
+        D(e-activation): The correct SFP is used.
+
+"
+    ::= { oaVoaClientIfEntry 25 }
+
+oaVoaClientIfLossOfSignal OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loss of signal.
+
+        A(ctivation): Active loss of signal HW
+        indication.
+
+        D(e-activation): Inactive loss of signal HW
+        indication.
+
+"
+    ::= { oaVoaClientIfEntry 26 }
+
+oaVoaClientIfSfpCodeMismatch OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inserted SFP does not have a legal
+         manufacturer code.
+
+        A(ctivation): A SFP with illegal code is inserted.
+
+        D(e-activation): The SFP with illegal code is removed.
+
+"
+    ::= { oaVoaClientIfEntry 27 }
+
+oaVoaClientIfAttenuationConfigMismatch OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The wanted attenuation is not supported by the
+        inserted SFP.
+
+"
+    ::= { oaVoaClientIfEntry 28 }
+
+-- ----------------------------------------------------
+-- Variable Optical Attenuator Line interfaces
+-- ----------------------------------------------------
+
+oaVoaLineIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OaVoaLineIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface list."
+    ::= { oaVoaLineIfList 1 }
+
+oaVoaLineIfEntry OBJECT-TYPE
+    SYNTAX      OaVoaLineIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the interface list.
+
+"
+    INDEX { oaVoaLineIfIndex }
+    ::= { oaVoaLineIfTable 1 }
+
+OaVoaLineIfEntry ::=
+    SEQUENCE {
+        oaVoaLineIfIndex                       Unsigned32,
+        oaVoaLineIfName                        MgmtNameString,
+        oaVoaLineIfDescr                       DisplayString,
+        oaVoaLineIfSubrack                     SubrackNumber,
+        oaVoaLineIfSlot                        SlotNumber,
+        oaVoaLineIfTxPort                      PortNumber,
+        oaVoaLineIfRxPort                      PortNumber,
+        oaVoaLineIfInvPhysIndexOrZero          Unsigned32,
+        oaVoaLineIfAdminStatus                 BoardOrInterfaceAdminStatus,
+        oaVoaLineIfOperStatus                  BoardOrInterfaceOperStatus,
+        oaVoaLineIfModuleFailure               FaultStatus,
+        oaVoaLineIfObjectProperty              ObjectProperty }
+
+oaVoaLineIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { oaVoaLineIfEntry 1 }
+
+oaVoaLineIfName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for
+        example 'VoaLine:1:2:1-2', where the first number
+        indicates sub-rack, the second slot number and
+        the third is the port number.
+        Examples:
+
+        oaVoaLine:s:s:p - line interface
+
+"
+    ::= { oaVoaLineIfEntry 2 }
+
+oaVoaLineIfDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { "" }
+    ::= { oaVoaLineIfEntry 3 }
+
+oaVoaLineIfSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the interface
+        is located.
+
+"
+    ::= { oaVoaLineIfEntry 4 }
+
+oaVoaLineIfSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the interface is
+        located.
+
+"
+    ::= { oaVoaLineIfEntry 5 }
+
+oaVoaLineIfTxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the TX-side of the
+        interface is located.
+
+"
+    ::= { oaVoaLineIfEntry 6 }
+
+oaVoaLineIfRxPort OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the port where the RX-side of
+        the interface is located.
+
+"
+    ::= { oaVoaLineIfEntry 7 }
+
+oaVoaLineIfInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this interface.
+        Set to 0 if not known.
+
+"
+    ::= { oaVoaLineIfEntry 8 }
+
+oaVoaLineIfAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state for the interface.
+
+        down - The interface should be inactive.
+
+        service - The interface is activated but alarms
+        are suppressed. Intended for use during service
+        or re-configuration. When service is concluded
+        adminStatus should be set to 'up' again.
+
+        up - The interface should be activated when
+        it becomes available. Alarms are not suppressed.
+
+"
+    DEFVAL { up }
+    ::= { oaVoaLineIfEntry 9 }
+
+oaVoaLineIfOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The interface is not available.
+
+        down - The interface is not used.
+
+        up - The interface is active.
+
+"
+    DEFVAL { notPresent }
+    ::= { oaVoaLineIfEntry 10 }
+
+oaVoaLineIfModuleFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module HW has detected a failure.
+
+        A: The module has failed
+
+        D: The module is OK again
+
+"
+    ::= { oaVoaLineIfEntry 11 }
+
+oaVoaLineIfObjectProperty  OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { oaVoaLineIfEntry 12 }
+
+-- ----------------------------------------------------
+-- Optical Module information
+-- ----------------------------------------------------
+
+oaModuleTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OaModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The module list."
+    ::= { oaModuleList 1 }
+
+oaModuleEntry OBJECT-TYPE
+    SYNTAX      OaModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the module list.
+
+"
+    INDEX { oaModuleIndex }
+    ::= { oaModuleTable 1 }
+
+OaModuleEntry ::=
+    SEQUENCE {
+        oaModuleIndex                      Unsigned32,
+        oaModuleName                       MgmtNameString,
+        oaModuleDescr                      DisplayString,
+        oaModuleSubrack                    SubrackNumber,
+        oaModuleSlot                       SlotNumber,
+        oaModuleNumber                     PortNumber,
+        oaModuleInvPhysIndexOrZero         Unsigned32,
+        oaModuleAdminStatus                BoardOrInterfaceAdminStatus,
+        oaModuleOperStatus                 BoardOrInterfaceOperStatus,
+        oaModuleObjectProperty             ObjectProperty,
+        oaModuleNominalTemp                Integer32,
+        oaModuleRelativeTemp               Integer32,
+        oaModuleTempFailure                FaultStatus,
+        oaModuleTemperature                Integer32,
+        oaModuleCommunicationFailure       FaultStatus,
+        oaModuleModuleInfo                 DisplayString,
+        oaModuleVcomThresholdExceeded      FaultStatus,
+        oaModuleFirmwareUpgradeAvailable   FaultStatus,
+        oaModuleWarmingUp                  FaultStatus,
+        oaModuleFailure                    FaultStatus}
+
+oaModuleIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { oaModuleEntry 1 }
+
+oaModuleName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface,
+        for example 'module:1:2:1'.
+
+"
+    ::= { oaModuleEntry 2 }
+
+oaModuleDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { oaModuleEntry 3 }
+
+oaModuleSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the module
+        is located.
+
+"
+    ::= { oaModuleEntry 4 }
+
+oaModuleSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the module is
+        located.
+
+"
+    ::= { oaModuleEntry 5 }
+
+oaModuleNumber OBJECT-TYPE
+    SYNTAX      PortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the module on the board.
+
+"
+    ::= { oaModuleEntry 6 }
+
+oaModuleInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this interface.
+        Set to 0 if not known.
+
+"
+    ::= { oaModuleEntry 7 }
+
+oaModuleAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state for the module.
+
+        up - Alarms are not suppressed.
+
+        service - Alarms from the module are suppressed.
+        The module is still activated.
+
+        down - Currently not used.
+
+"
+    DEFVAL { up }
+    ::= { oaModuleEntry 8 }
+
+oaModuleOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the module.
+
+        notPresent - The module is not available.
+
+        down - The module is not used.
+
+        up - The module is active.
+
+"
+    DEFVAL { notPresent }
+    ::= { oaModuleEntry 9 }
+
+oaModuleObjectProperty OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { oaModuleEntry 10 }
+
+oaModuleNominalTemp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set temperature in units of 0.1 degrees centigrade.
+
+"
+    ::= { oaModuleEntry 11 }
+
+oaModuleRelativeTemp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The relative temperature in units of 0.1 degrees centigrade.
+
+"
+    ::= { oaModuleEntry 12 }
+
+oaModuleTempFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module temperature is above/below expected one.
+
+        A: The temperature is not correct.
+
+        D: The temperature becomes correct.
+
+"
+    ::= { oaModuleEntry 13 }
+
+oaModuleTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature of the module in 0.1 degrees
+        centigrade
+
+"
+    ::= { oaModuleEntry 14 }
+
+oaModuleCommunicationFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The communication with the module failed.
+
+        A(ctivation): Failed to talk to the module
+
+        D(e-activation): Could talk to the module again
+
+"
+    ::= { oaModuleEntry 15 }
+
+oaModuleModuleInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information (for example firmware and serial number) about the module.
+
+"
+    ::= { oaModuleEntry 16 }
+
+oaModuleVcomThresholdExceeded OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The common voltage supply in the ROADM module has exceeded
+         recommended threshold. Firmware upgrade is recommended to resolve this alarm.
+
+        A(ctivation): The VCOM threshold is exceeded
+
+        D(e-activation): The VCOM threshold is OK again
+
+"
+    ::= { oaModuleEntry 17 }
+
+oaModuleFirmwareUpgradeAvailable OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An upgrade is available for the ROADM module. See release
+         notes for details on how to obtain and install the upgrade
+
+
+"
+    ::= { oaModuleEntry 18 }
+
+oaModuleWarmingUp OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ROADM module is warming up, the optics has not reached a stable
+         temperature, all channels are blocked.
+
+        A(ctivation): cold start of ROADM board
+
+        D(e-activation): the warning is cleared as soon as the module
+        has reached a stable temperature, this takes 3-8 minutes
+
+"
+    ::= { oaModuleEntry 19 }
+
+oaModuleFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module HW has detected a failure.
+
+        A(ctivation): The module has failed
+
+        D(e-activation): The module is OK again
+
+"
+    ::= { oaModuleEntry 20 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+-- n/a
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+oaGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        oaGeneralLastChangeTime,
+        oaGeneralStateLastChangeTime}
+    STATUS      deprecated
+    DESCRIPTION
+        "The general objects."
+    ::= { lumOaGroups 1 }
+
+oaIfGroup OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfHwMissing }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects."
+    ::= { lumOaGroups 2 }
+
+oaIfGroupV2 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects."
+    ::= { lumOaGroups 3 }
+
+oaIfGroupV3 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects."
+    ::= { lumOaGroups 4 }
+
+oaGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        oaGeneralLastChangeTime,
+        oaGeneralStateLastChangeTime,
+        oaGeneralOaIfTableSize }
+    STATUS      current
+    DESCRIPTION
+        "The general objects. (3.1)"
+    ::= { lumOaGroups 5 }
+
+oaIfGroupV4 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (3.2)"
+    ::= { lumOaGroups 6 }
+
+oaIfGroupV5 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown }
+    STATUS      current
+    DESCRIPTION
+        "The oa interface objects. (4.0)"
+    ::= { lumOaGroups 7 }
+
+oaIfGroupV6 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (5.0)"
+    ::= { lumOaGroups 8 }
+
+oaVoaIfGroupV1 OBJECT-GROUP
+    OBJECTS {
+        oaVoaIfIndex,
+        oaVoaIfName,
+        oaVoaIfDescr,
+        oaVoaIfSubrack,
+        oaVoaIfSlot,
+        oaVoaIfTxPort,
+        oaVoaIfRxPort,
+        oaVoaIfInvPhysIndexOrZero,
+        oaVoaIfAdminStatus,
+        oaVoaIfOperStatus,
+        oaVoaIfObjectProperty,
+        oaVoaIfControlMode,
+        oaVoaIfWantedOutputPower,
+        oaVoaIfCurrentOutputPower,
+        oaVoaIfRegulationRange,
+        oaVoaIfWantedAttenuation,
+        oaVoaIfCurrentAttenuation,
+        oaVoaIfSamplePeriod,
+        oaVoaIfOuputPowerControlFailure,
+        oaVoaIfCurrentPowerOutOfRange,
+        oaVoaIfConfigurationCommand,
+        oaVoaIfInInstallationMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The voa interface objects. (5.0)"
+    ::= { lumOaGroups 9 }
+
+oaIfGroupV7 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (6.0)"
+    ::= { lumOaGroups 10 }
+
+oaIfGroupV8 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (10.0)"
+    ::= { lumOaGroups 11 }
+
+oaVoaClientIfGroupV1 OBJECT-GROUP
+    OBJECTS {
+        oaVoaClientIfIndex,
+        oaVoaClientIfName,
+        oaVoaClientIfDescr,
+        oaVoaClientIfSubrack,
+        oaVoaClientIfSlot,
+        oaVoaClientIfTxPort,
+        oaVoaClientIfRxPort,
+        oaVoaClientIfInvPhysIndexOrZero,
+        oaVoaClientIfAdminStatus,
+        oaVoaClientIfOperStatus,
+        oaVoaClientIfObjectProperty,
+        oaVoaClientIfControlMode,
+        oaVoaClientIfWantedAttenuation,
+        oaVoaClientIfCurrentAttenuation,
+        oaVoaClientIfLambda
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The voa client interface objects. (10.0)"
+    ::= { lumOaGroups 12 }
+
+oaVoaLineIfGroupV1 OBJECT-GROUP
+    OBJECTS {
+        oaVoaLineIfIndex,
+        oaVoaLineIfName,
+        oaVoaLineIfDescr,
+        oaVoaLineIfSubrack,
+        oaVoaLineIfSlot,
+        oaVoaLineIfTxPort,
+        oaVoaLineIfRxPort,
+        oaVoaLineIfInvPhysIndexOrZero,
+        oaVoaLineIfAdminStatus,
+        oaVoaLineIfOperStatus,
+        oaVoaLineIfModuleFailure,
+        oaVoaLineIfObjectProperty
+    }
+    STATUS      current
+    DESCRIPTION
+        "The voa line interface objects. (10.0)"
+    ::= { lumOaGroups 13 }
+
+oaGeneralGroupV3 OBJECT-GROUP
+    OBJECTS {
+        oaGeneralLastChangeTime,
+        oaGeneralStateLastChangeTime,
+        oaGeneralOaIfTableSize,
+        oaGeneralVoaIfTableSize,
+        oaGeneralVoaClientIfTableSize,
+        oaGeneralVoaLineIfTableSize }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general objects. (10.0)"
+    ::= { lumOaGroups 14 }
+
+oaVoaClientIfGroupV2 OBJECT-GROUP
+    OBJECTS {
+        oaVoaClientIfIndex,
+        oaVoaClientIfName,
+        oaVoaClientIfDescr,
+        oaVoaClientIfSubrack,
+        oaVoaClientIfSlot,
+        oaVoaClientIfTxPort,
+        oaVoaClientIfRxPort,
+        oaVoaClientIfInvPhysIndexOrZero,
+        oaVoaClientIfAdminStatus,
+        oaVoaClientIfOperStatus,
+        oaVoaClientIfObjectProperty,
+        oaVoaClientIfControlMode,
+        oaVoaClientIfWantedAttenuation,
+        oaVoaClientIfCurrentAttenuation,
+        oaVoaClientIfLambda,
+        oaVoaClientIfAbsoluteAttenuation,
+        oaVoaClientIfVoa2CurrentAttenuation,
+        oaVoaClientIfDecreaseAttenuation,
+        oaVoaClientIfIncreaseAttenuation,
+        oaVoaClientIfInsertionLoss,
+        oaVoaClientIfExpectedFrequency
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The voa client interface objects. (11.0)"
+    ::= { lumOaGroups 15 }
+
+oaModuleGroupV1 OBJECT-GROUP
+    OBJECTS {
+        oaModuleIndex,
+        oaModuleName,
+        oaModuleDescr,
+        oaModuleSubrack,
+        oaModuleSlot,
+        oaModuleNumber,
+        oaModuleInvPhysIndexOrZero,
+        oaModuleAdminStatus,
+        oaModuleOperStatus,
+        oaModuleObjectProperty,
+        oaModuleNominalTemp,
+        oaModuleRelativeTemp,
+        oaModuleTempFailure
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The module objects. (11.0)"
+    ::= { lumOaGroups 16 }
+
+oaGeneralGroupV4 OBJECT-GROUP
+    OBJECTS {
+        oaGeneralLastChangeTime,
+        oaGeneralStateLastChangeTime,
+        oaGeneralOaIfTableSize,
+        oaGeneralVoaIfTableSize,
+        oaGeneralVoaClientIfTableSize,
+        oaGeneralVoaLineIfTableSize,
+        oaGeneralOaModuleTableSize
+    }
+    STATUS      current
+    DESCRIPTION
+        "The general objects. (11.0)"
+    ::= { lumOaGroups 17 }
+
+oaIfGroupV9 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (11.0)"
+    ::= { lumOaGroups 18 }
+
+oaModuleGroupV2 OBJECT-GROUP
+    OBJECTS {
+        oaModuleIndex,
+        oaModuleName,
+        oaModuleDescr,
+        oaModuleSubrack,
+        oaModuleSlot,
+        oaModuleNumber,
+        oaModuleInvPhysIndexOrZero,
+        oaModuleAdminStatus,
+        oaModuleOperStatus,
+        oaModuleObjectProperty,
+        oaModuleNominalTemp,
+        oaModuleRelativeTemp,
+        oaModuleTempFailure,
+        oaModuleTemperature,
+        oaModuleCommunicationFailure,
+        oaModuleModuleInfo
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The module objects. (12.0)"
+    ::= { lumOaGroups 19 }
+
+oaModuleGroupV3 OBJECT-GROUP
+    OBJECTS {
+        oaModuleIndex,
+        oaModuleName,
+        oaModuleDescr,
+        oaModuleSubrack,
+        oaModuleSlot,
+        oaModuleNumber,
+        oaModuleInvPhysIndexOrZero,
+        oaModuleAdminStatus,
+        oaModuleOperStatus,
+        oaModuleObjectProperty,
+        oaModuleNominalTemp,
+        oaModuleRelativeTemp,
+        oaModuleTempFailure,
+        oaModuleTemperature,
+        oaModuleCommunicationFailure,
+        oaModuleModuleInfo,
+        oaModuleVcomThresholdExceeded,
+        oaModuleFirmwareUpgradeAvailable
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The module objects. (23.0)"
+    ::= { lumOaGroups 24 }
+
+oaIfGroupV10 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType,
+        oaIfActualGain,
+        oaIfSaturationFault }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (15.0)"
+    ::= { lumOaGroups 20 }
+
+oaIfGroupV11 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType,
+        oaIfActualGain,
+        oaIfSaturationFault,
+        oaIfWantedGainTilt
+        }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (17.0)"
+    ::= { lumOaGroups 21 }
+
+oaVoaClientIfGroupV3 OBJECT-GROUP
+    OBJECTS {
+        oaVoaClientIfIndex,
+        oaVoaClientIfName,
+        oaVoaClientIfDescr,
+        oaVoaClientIfSubrack,
+        oaVoaClientIfSlot,
+        oaVoaClientIfTxPort,
+        oaVoaClientIfRxPort,
+        oaVoaClientIfInvPhysIndexOrZero,
+        oaVoaClientIfAdminStatus,
+        oaVoaClientIfOperStatus,
+        oaVoaClientIfObjectProperty,
+        oaVoaClientIfControlMode,
+        oaVoaClientIfWantedAttenuation,
+        oaVoaClientIfCurrentAttenuation,
+        oaVoaClientIfLambda,
+        oaVoaClientIfAbsoluteAttenuation,
+        oaVoaClientIfVoa2CurrentAttenuation,
+        oaVoaClientIfDecreaseAttenuation,
+        oaVoaClientIfIncreaseAttenuation,
+        oaVoaClientIfInsertionLoss,
+        oaVoaClientIfExpectedFrequency,
+        oaVoaClientIfSfpMissing,
+        oaVoaClientIfSfpClass,
+        oaVoaClientIfSfpTransmitterFailed,
+        oaVoaClientIfSfpMediaMismatch,
+        oaVoaClientIfLossOfSignal,
+        oaVoaClientIfSfpCodeMismatch,
+        oaVoaClientIfAttenuationConfigMismatch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The voa client interface objects. (19.0)"
+    ::= { lumOaGroups 22 }
+
+oaIfGroupV12 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType,
+        oaIfActualGain,
+        oaIfSaturationFault,
+        oaIfWantedGainTilt,
+        oaIfTxPowerLevelLowThreshold,
+        oaIfLaserPumpBias,
+        oaIfCaseTempOutOfrange,
+        oaIfLaserTempOutOfRange
+        }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (20.0)"
+    ::= { lumOaGroups 23 }
+
+oaIfGroupV13 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType,
+        oaIfActualGain,
+        oaIfSaturationFault,
+        oaIfWantedGainTilt,
+        oaIfTxPowerLevelLowThreshold,
+        oaIfLaserPumpBias,
+        oaIfCaseTempOutOfrange,
+        oaIfLaserTempOutOfRange,
+        oaIfSupportsReadMonitorInsertionLoss
+        }
+    STATUS      deprecated
+    DESCRIPTION
+        "The oa interface objects. (23.0)"
+    ::= { lumOaGroups 25 }
+
+oaIfGroupV14 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType,
+        oaIfActualGain,
+        oaIfSaturationFault,
+        oaIfWantedGainTilt,
+        oaIfTxPowerLevelLowThreshold,
+        oaIfLaserPumpBias,
+        oaIfCaseTempOutOfrange,
+        oaIfLaserTempOutOfRange,
+        oaIfSupportsReadMonitorInsertionLoss,
+        oaIfTxSignalStatus,
+        oaIfRxSignalStatus
+        }
+    STATUS      current
+    DESCRIPTION
+        "The oa interface objects. (24.0)"
+    ::= { lumOaGroups 26 }
+
+oaIfGroupV15 OBJECT-GROUP
+    OBJECTS {
+        oaIfIndex,
+        oaIfName,
+        oaIfDescr,
+        oaIfSubrack,
+        oaIfSlot,
+        oaIfTxPort,
+        oaIfRxPort,
+        oaIfInvPhysIndexOrZero,
+        oaIfAdminStatus,
+        oaIfOperStatus,
+        oaIfLaserStatus,
+        oaIfAmplifierType,
+        oaIfWantedAbsolutePowerLevel,
+        oaIfWantedRelativePowerLevel,
+        oaIfWantedGain,
+        oaIfFrequencyMin,
+        oaIfFrequencyMax,
+        oaIfNominalTxPower,
+        oaIfTxPowerLevel,
+        oaIfRxPowerLevel,
+        oaIfRxPowerLevelLowThreshold,
+        oaIfLaserBias,
+        oaIfNominalLaserTemp,
+        oaIfRelativeLaserTemp,
+        oaIfLossOfSignalThreshold,
+        oaIfLossOfSignal,
+        oaIfPumpLaserTempHigh,
+        oaIfRegulationProblemRxPowerHigh,
+        oaIfRegulationProblemTxPowerHigh,
+        oaIfRegulationProblemTxPowerLow,
+        oaIfReceivedPowerLow,
+        oaIfLaserBiasHigh,
+        oaIfLaserTempControlFault,
+        oaIfConfigurationCommand,
+        oaIfPumpLaserTempLow,
+        oaIfLaserTempLowRelativeThreshold,
+        oaIfLaserTempHighRelativeThreshold,
+        oaIfAmpTypeNotSupportedByHw,
+        oaIfWantedSignalPowerLevel,
+        oaIfObjectProperty,
+        oaIfLaserForcedOn,
+        oaIfActualLaserTemp,
+        oaIfAutomaticPowerShutdown,
+        oaIfDisabled,
+        oaIfWantedPowerLimit,
+        oaIfModuleInfo,
+        oaIfMonitorInsertionLoss,
+        oaIfNumMonitorInsertionLoss,
+        oaIfFunctionalType,
+        oaIfActualGain,
+        oaIfSaturationFault,
+        oaIfWantedGainTilt,
+        oaIfTxPowerLevelLowThreshold,
+        oaIfLaserPumpBias,
+        oaIfCaseTempOutOfrange,
+        oaIfLaserTempOutOfRange,
+        oaIfSupportsReadMonitorInsertionLoss,
+        oaIfTxSignalStatus,
+        oaIfRxSignalStatus,
+	oaIfOutputPowerFail
+        }
+    STATUS      current
+    DESCRIPTION
+        "The oa interface objects. (27.0)"
+    ::= { lumOaGroups 27 }
+
+oaModuleGroupV4 OBJECT-GROUP
+    OBJECTS {
+        oaModuleIndex,
+        oaModuleName,
+        oaModuleDescr,
+        oaModuleSubrack,
+        oaModuleSlot,
+        oaModuleNumber,
+        oaModuleInvPhysIndexOrZero,
+        oaModuleAdminStatus,
+        oaModuleOperStatus,
+        oaModuleObjectProperty,
+        oaModuleNominalTemp,
+        oaModuleRelativeTemp,
+        oaModuleTempFailure,
+        oaModuleTemperature,
+        oaModuleCommunicationFailure,
+        oaModuleModuleInfo,
+        oaModuleFirmwareUpgradeAvailable,
+        oaModuleWarmingUp,
+        oaModuleFailure
+    }
+    STATUS      current
+    DESCRIPTION
+        "The module objects. (28.0)"
+    ::= { lumOaGroups 28 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumOaBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroup,
+            oaIfGroup}
+    ::= { lumOaCompl 1 }
+
+lumOaBasicComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V2."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroup,
+            oaIfGroupV2 }
+    ::= { lumOaCompl 2 }
+
+lumOaBasicComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroup,
+            oaIfGroupV3 }
+    ::= { lumOaCompl 3 }
+
+lumOaBasicComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V4 (3.1)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV2,
+            oaIfGroupV3 }
+    ::= { lumOaCompl 4 }
+
+lumOaBasicComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V5 (3.2)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV2,
+            oaIfGroupV4 }
+    ::= { lumOaCompl 5 }
+
+lumOaBasicComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V6 (4.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV2,
+            oaIfGroupV5 }
+    ::= { lumOaCompl 6 }
+
+lumOaBasicComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V7 (5.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV2,
+            oaIfGroupV6,
+            oaVoaIfGroupV1 }
+    ::= { lumOaCompl 7 }
+
+lumOaBasicComplV8 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V8 (6.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV2,
+            oaIfGroupV7,
+            oaVoaIfGroupV1 }
+    ::= { lumOaCompl 8 }
+
+lumOaBasicComplV9 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V9 (10.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV3,
+            oaIfGroupV8,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV1,
+            oaVoaLineIfGroupV1 }
+    ::= { lumOaCompl 9 }
+
+lumOaBasicComplV10 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V10 (11.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV9,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV2,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV1 }
+    ::= { lumOaCompl 10 }
+
+lumOaBasicComplV11 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V11 (12.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV9,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV2,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV2 }
+    ::= { lumOaCompl 11 }
+
+lumOaBasicComplV12 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V12 (15.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV10,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV2,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV2 }
+    ::= { lumOaCompl 12 }
+
+lumOaBasicComplV13 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V13 (17.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV11,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV2,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV2 }
+    ::= { lumOaCompl 13 }
+
+lumOaBasicComplV14 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V14 (19.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV11,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV3,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV2 }
+    ::= { lumOaCompl 14 }
+
+lumOaBasicComplV15 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V14 (20.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV12,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV3,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV2 }
+    ::= { lumOaCompl 15 }
+
+lumOaBasicComplV16 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V16 (23.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV13,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV3,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV3 }
+    ::= { lumOaCompl 16 }
+
+lumOaBasicComplV17 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V16 (24.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV14,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV3,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV3 }
+    ::= { lumOaCompl 17 }
+
+
+lumOaBasicComplV18 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V16 (27.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV15,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV3,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV3 }
+    ::= { lumOaCompl 18 }
+
+
+lumOaBasicComplV19 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the OA MIB V17 (28.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV4,
+            oaIfGroupV15,
+            oaVoaIfGroupV1,
+            oaVoaClientIfGroupV3,
+            oaVoaLineIfGroupV1,
+            oaModuleGroupV4 }
+    ::= { lumOaCompl 19 }
+-- ----------------------------------------------------
+-- Minimal Compliance
+-- ----------------------------------------------------
+
+lumOaMinimalComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the OA MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            oaGeneralGroupV2,
+            oaIfGroupV5 }
+    ::= { lumOaMinimalCompl 1 }
+
+END
+
+

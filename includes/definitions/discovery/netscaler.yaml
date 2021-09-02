@@ -1,5 +1,16 @@
 mib: NS-ROOT-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NS-ROOT-MIB::memSizeMB
+                percent_used: NS-ROOT-MIB::resMemUsage
+                precision: 1048576
+    os:
+        hardware: NS-ROOT-MIB::sysHardwareVersionDesc.0
+        serial: NS-ROOT-MIB::sysHardwareSerialNumber.0
+        version: NS-ROOT-MIB::sysBuildVersion.0
+        version_regex: '/NetScaler (?<version>[^:]+): (?<features>[^,]+),/'
     processors:
         data:
             -

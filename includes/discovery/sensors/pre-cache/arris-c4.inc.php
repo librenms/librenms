@@ -15,15 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  * Based on Neil Lathwood Cisco EPC files
  */
-
 echo 'ifName ';
 $pre_cache['ar-c4_ifName'] = snmpwalk_cache_oid($device, 'ifName', [], 'DOCS-IF-MIB');
 

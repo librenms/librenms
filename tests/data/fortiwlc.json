@@ -6,27 +6,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.15983.1.1.7.18",
                     "sysDescr": "controller",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "fortiwlc",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "fortinet.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.15983.1.1.7.18",
-                    "sysDescr": "controller",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": null,
+                    "version": "8.2-7MR-1",
+                    "hardware": "MC1550",
                     "features": null,
                     "os": "fortiwlc",
                     "type": "network",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -54,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -165,8 +146,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",

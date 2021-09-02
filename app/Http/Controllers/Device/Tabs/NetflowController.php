@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,7 +33,7 @@ class NetflowController implements DeviceTab
     public function visible(Device $device): bool
     {
         if (Config::get('nfsen_enable')) {
-            foreach ((array)Config::get('nfsen_rrds', []) as $nfsenrrds) {
+            foreach ((array) Config::get('nfsen_rrds', []) as $nfsenrrds) {
                 if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
                     $nfsenrrds .= '/';
                 }
@@ -47,8 +46,8 @@ class NetflowController implements DeviceTab
                     $basefilename_underscored = $device->hostname;
                 }
 
-                $nfsen_filename = preg_replace('/'.$nfsensuffix.'/', '', $basefilename_underscored);
-                if (is_file($nfsenrrds.$nfsen_filename.'.rrd')) {
+                $nfsen_filename = preg_replace('/' . $nfsensuffix . '/', '', $basefilename_underscored);
+                if (is_file($nfsenrrds . $nfsen_filename . '.rrd')) {
                     return true;
                 }
             }

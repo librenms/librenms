@@ -15,20 +15,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Bill extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
 
@@ -40,13 +43,13 @@ class Bill extends Model
             return $query;
         }
 
-        return $query->join('bill_perms', 'bill_perms.bill_id', "bills.bill_id")
+        return $query->join('bill_perms', 'bill_perms.bill_id', 'bills.bill_id')
             ->where('bill_perms.user_id', $user->user_id);
     }
 
     // ---- Define Relationships ----
 
-    public function ports()
+    public function ports(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Port::class, 'bill_ports', 'bill_id', 'bill_id');
     }

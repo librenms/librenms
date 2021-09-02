@@ -1,0 +1,20 @@
+modules:
+    os:
+        hardware:
+            - E5-121-IESCOMMON-MIB::iesSlotModuleDescr.0.0
+            - E5-120-IESCOMMON-MIB::iesSlotModuleDescr.0.0
+            - E5-111-IESCOMMON-MIB::iesSlotModuleDescr.0.0
+            - E5-110-IESCOMMON-MIB::iesSlotModuleDescr.0.0
+            - AE-ALARM-TABLE-MIB::aeOntModelNum.0
+        serial:
+            - E5-121-IESCOMMON-MIB::iesChassisSerialNumber.0
+            - E5-120-IESCOMMON-MIB::iesChassisSerialNumber.0
+            - E5-111-IESCOMMON-MIB::iesChassisSerialNumber.0
+            - E5-110-IESCOMMON-MIB::iesChassisSerialNumber.0
+            - AE-ALARM-TABLE-MIB::aeOntFsanSerNum.0
+        version:
+            - E5-121-IESCOMMON-MIB::iesSlotModuleFWVersion.0.0
+            - E5-120-IESCOMMON-MIB::iesSlotModuleFWVersion.0.0
+            - E5-111-IESCOMMON-MIB::iesSlotModuleFWVersion.0.0
+            - E5-110-IESCOMMON-MIB::iesSlotModuleFWVersion.0.0
+            - AE-ALARM-TABLE-MIB::aeOntFirmwareVersion.0

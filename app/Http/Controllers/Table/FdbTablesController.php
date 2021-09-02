@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -148,6 +147,9 @@ class FdbTablesController extends TableController
         return $query;
     }
 
+    /**
+     * @param PortsFdb $fdb_entry
+     */
     public function formatItem($fdb_entry)
     {
         $ip_info = $this->findIps($fdb_entry->mac_address);
@@ -155,13 +157,14 @@ class FdbTablesController extends TableController
         $item = [
             'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
             'mac_address' => Rewrite::readableMac($fdb_entry->mac_address),
+            'mac_oui' => Rewrite::readableOUI($fdb_entry->mac_address),
             'ipv4_address' => $ip_info['ips']->implode(', '),
             'interface' => '',
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
             'description' => '',
             'dnsname' => $ip_info['dns'],
             'first_seen' => 'unknown',
-            'last_seen' => 'unknown'
+            'last_seen' => 'unknown',
         ];
 
         // diffForHumans and doDateTimeString are not safe
@@ -198,10 +201,10 @@ class FdbTablesController extends TableController
 
         return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->where('port_id', $port_id);
+                return $query->where('port_id', $port_id);
             })
             ->pluck('mac_address');
     }
@@ -217,10 +220,10 @@ class FdbTablesController extends TableController
 
         return Vlan::where('vlan_vlan', $vlan)
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->whereIn('device_id', function ($query) use ($port_id) {
+                return $query->whereIn('device_id', function ($query) use ($port_id) {
                     $query->select('device_id')->from('ports')->where('port_id', $port_id);
                 });
             })
@@ -238,10 +241,10 @@ class FdbTablesController extends TableController
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->where('port_id', $port_id);
+                return $query->where('port_id', $port_id);
             })
             ->pluck('port_id');
     }
@@ -252,7 +255,7 @@ class FdbTablesController extends TableController
      */
     protected function findIps($mac_address)
     {
-        if (!isset($this->ipCache[$mac_address])) {
+        if (! isset($this->ipCache[$mac_address])) {
             $ips = Ipv4Mac::where('mac_address', $mac_address)
                 ->groupBy('ipv4_address')
                 ->pluck('ipv4_address');
@@ -264,7 +267,7 @@ class FdbTablesController extends TableController
                 // don't try too many dns queries, this is the slowest part
                 foreach ($ips->take(3) as $ip) {
                     $hostname = gethostbyaddr($ip);
-                    if (!IP::isValid($hostname)) {
+                    if (! IP::isValid($hostname)) {
                         $dns = $hostname;
                         break;
                     }
@@ -286,7 +289,7 @@ class FdbTablesController extends TableController
      */
     protected function getMacCount($port)
     {
-        if (!isset($this->macCountCache[$port->port_id])) {
+        if (! isset($this->macCountCache[$port->port_id])) {
             $this->macCountCache[$port->port_id] = $port->fdbEntries()->count();
         }
 

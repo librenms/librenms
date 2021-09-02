@@ -4,8 +4,7 @@ path: blob/master/doc/
 ## Versioning
 
 Versioning an API is a minefield which saw us looking at numerous
-options on how to do this. Paul wrote an excellent blog post which
-touches on this: <https://blog.librenms.org/2014/09/restful-apis/>
+options on how to do this.
 
 We have currently settled on using versioning within the API end point
 itself `/api/v0`. As the API itself is new and still in active
@@ -75,6 +74,7 @@ Output from the API currently is via two output types:
 - [Devices](Devices.md)
 - [DeviceGroups](DeviceGroups.md)
 - [Ports](Ports.md)
+- [Port_Groups](Port_Groups.md)
 - [PortGroups](PortGroups.md)
 - [Alerts](Alerts.md)
 - [Routing](Routing.md)

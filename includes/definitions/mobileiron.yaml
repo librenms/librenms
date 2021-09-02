@@ -4,11 +4,16 @@ group: unix
 text: MobileIron
 ifXmcbc: true
 ifname: true
-mib_dir:
-    - supermicro
-    - dell
 over:
     - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
 processor_stacked: true
+discovery:
+    -
+        sysDescr: Linux
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpwalk:
+            oid: HOST-RESOURCES-MIB::hrSWInstalledName
+            op: 'contains'
+            value: mobileiron

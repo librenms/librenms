@@ -15,20 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 foreach ($pre_cache['ciscoepc_docsIfSignalQualityTable'] as $index => $data) {
     if (is_numeric($data['docsIfSigQSignalNoise'])) {
-        $descr   = "Channel {$pre_cache['ciscoepc_docsIfDownstreamChannelTable'][$index]['docsIfDownChannelId']}";
-        $oid     = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
+        $descr = "Channel {$pre_cache['ciscoepc_docsIfDownstreamChannelTable'][$index]['docsIfDownChannelId']}";
+        $oid = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
         $divisor = 10;
-        $value   = $data['docsIfSigQSignalNoise'];
-        discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.'.$index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
+        $value = $data['docsIfSigQSignalNoise'];
+        discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.' . $index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
     }
 }

@@ -38,13 +38,29 @@ APP_DEBUG=true
 ### Automated testing
 
 LibreNMS uses continuous integration to test code changes to help
-reduce bugs.  This also helps guarantee the changes you  contribute
+reduce bugs.  This also helps guarantee the changes you contribute
 won't be broken in the future. You can find out more in our [Validating Code Documentation](Validating-Code.md)
+
+The default database connection for automated testing is `testing`.
+
+To override the database parameters for unit tests, configure your
+`.env` file accordingly. The defaults (from `config/database.php`)
+are:
+
+```dotenv
+DB_TEST_DRIVER="mysql"   # PDO driver
+DB_TEST_HOST="localhost" # hostname or IP address
+DB_TEST_PORT=""          # port
+DB_TEST_DATABASE="librenms_phpunit_78hunjuybybh" # database
+DB_TEST_USERNAME="root"  # username
+DB_TEST_PASSWORD=""      # password
+DB_TEST_SOCKET=""        # unix socket path
+```
 
 ### Polling debug output
 
 You can see detailed info by running your polling code in debug
-mode. If you are looking at a specific
+mode by adding a `-d` flag.
 
 ```bash
 ./discovery.php -d -h HOSTNAME

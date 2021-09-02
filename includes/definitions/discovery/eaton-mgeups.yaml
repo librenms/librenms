@@ -1,38 +1,14 @@
 mib: MG-SNMP-UPS-MIB:EATON-OIDS:EATON-EMP-MIB
 modules:
+    os:
+        hardware:
+            - MG-SNMP-UPS-MIB::upsmgIdentFamilyName.0
+            - MG-SNMP-UPS-MIB::upsmgIdentModelName.0
+        hardware_template: '{{ MG-SNMP-UPS-MIB::upsmgIdentFamilyName.0 }} {{ MG-SNMP-UPS-MIB::upsmgIdentModelName.0 }}'
+        serial: MG-SNMP-UPS-MIB::upsmgIdentSerialNumber.0
+        version: MG-SNMP-UPS-MIB::upsmgIdentFirmwareVersion.0
+        features: UPS-MIB::upsIdentAgentSoftwareVersion.0
     sensors:
-        power:
-            data:
-                -
-                    oid: upsmgOutputPhaseTable
-                    value: mgoutputLoadPerPhase
-                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.4.{{ $index }}'
-                    multiplier: 1000
-                    descr: 'Output (VA) Phase {{ $subindex0 }}'
-                    index: 'kva.mgoutputLoadPerPhase.{{ $index }}'
-        current:
-            data:
-                -
-                    oid: upsmgInputPhaseTable
-                    value: mginputCurrent
-                    num_oid: '.1.3.6.1.4.1.705.1.6.2.1.6.{{ $index }}'
-                    divisor: 10
-                    descr: 'Input Current Phase {{ $subindex0 }}'
-                    index: 'mginputCurrent.{{ $index }}'
-                -
-                    oid: upsmgOutputPhaseTable
-                    value: mgoutputCurrent
-                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.5.{{ $index }}'
-                    divisor: 10
-                    descr: 'Output Current Phase {{ $subindex0 }}'
-                    index: 'mgoutputCurrent.{{ $index }}'
-                -
-                    oid: upsmgBattery
-                    value: upsmgBatteryCurrent
-                    num_oid: '.1.3.6.1.4.1.705.1.5.6.{{ $index }}'
-                    divisor: 10
-                    descr: 'Battery'
-                    index: 'upsmgBatteryCurrent.{{ $index }}'
         temperature:
             data:
                 -
@@ -55,22 +31,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.534.1.6.6.{{ $index }}'
                     descr: 'Environment'
                     index: 'xupsEnvRemoteHumidity.{{ $index }}'
-        frequency:
-            data:
-                -
-                    oid: upsmgInputPhaseTable
-                    value: mginputFrequency
-                    num_oid: '.1.3.6.1.4.1.705.1.6.2.1.3.{{ $index }}'
-                    divisor: 10
-                    descr: 'Input Frequency Phase {{ $subindex0 }}'
-                    index: 'mginputFrequency.{{ $index }}'
-                -
-                    oid: upsmgOutputPhaseTable
-                    value: mgoutputFrequency
-                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.3.{{ $index }}'
-                    divisor: 10
-                    descr: 'Output Frequency Phase {{ $subindex0 }}'
-                    index: 'mgoutputFrequency.{{ $index }}'
         delay:
             data:
                 -
@@ -79,38 +39,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.705.1.5.1.{{ $index }}'
                     descr: 'Remaining time'
                     index: 'upsmgBatteryRemainingTime.{{ $index }}'
-        charge:
-            data:
-                -
-                    oid: upsmgBattery
-                    value: upsmgBatteryLevel
-                    num_oid: '.1.3.6.1.4.1.705.1.5.2.{{ $index }}'
-                    descr: 'Remaining battery capacity'
-                    index: 'upsmgBatteryLevel.{{ $index }}'
-        voltage:
-            data:
-                -
-                    oid: upsmgInputPhaseTable
-                    value: mginputVoltage
-                    num_oid: '.1.3.6.1.4.1.705.1.6.2.1.2.{{ $index }}'
-                    divisor: 10
-                    descr: 'Input Phase/Phase {{ $subindex0 }}'
-                    index: 'mginputVoltage.{{ $index }}'
-                -
-                    oid: upsmgOutputPhaseTable
-                    value: mgoutputVoltage
-                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.2.{{ $index }}'
-                    divisor: 10
-                    descr: 'Output Phase/Phase {{ $subindex0 }}'
-                    index: 'mgoutputVoltage.{{ $index }}'
-                -
-                    oid: upsmgBattery
-                    value: upsmgBatteryVoltage
-                    num_oid: '.1.3.6.1.4.1.705.1.5.5.{{ $index }}'
-                    divisor: 10
-                    descr: 'Battery'
-                    index: 'upsmgBatteryVoltage.{{ $index }}'
-
         state:
             data:
                 -

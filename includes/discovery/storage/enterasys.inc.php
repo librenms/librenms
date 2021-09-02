@@ -8,9 +8,9 @@
  * the source code distribution for details.
  */
 if ($device['os'] == 'enterasys') {
-    $fstype = "Flash";
-    $descr  = "Internal Flash Storage";
-    $units  = 1024;
+    $fstype = 'Flash';
+    $descr = 'Internal Flash Storage';
+    $units = 1024;
     $index = 0;
     $free = snmp_get($device, 'etsysResourceStorageAvailable.3.flash.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
     $total = snmp_get($device, 'etsysResourceStorageSize.3.flash.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');

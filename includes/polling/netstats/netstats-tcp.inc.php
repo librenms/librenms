@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!Str::startsWith($device['os'], ['Snom', 'asa'])) {
+if (! Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' TCP';
     $oids = [
         'tcpActiveOpens',
@@ -35,8 +35,8 @@ if (!Str::startsWith($device['os'], ['Snom', 'asa'])) {
         }
 
         // Replace Segs with HC Segs if we have them.
-        $fields['tcpInSegs'] = !empty($hc_data['tcpHCInSegs']) ? $hc_data['tcpHCInSegs'] : $fields['tcpInSegs'];
-        $fields['tcpOutSegs'] = !empty($hc_data['tcpHCOutSegs']) ? $hc_data['tcpHCOutSegs'] : $fields['tcpOutSegs'];
+        $fields['tcpInSegs'] = ! empty($hc_data['tcpHCInSegs']) ? $hc_data['tcpHCInSegs'] : $fields['tcpInSegs'];
+        $fields['tcpOutSegs'] = ! empty($hc_data['tcpHCOutSegs']) ? $hc_data['tcpHCOutSegs'] : $fields['tcpOutSegs'];
 
         $tags = compact('rrd_def');
         data_update($device, 'netstats-tcp', $tags, $fields);

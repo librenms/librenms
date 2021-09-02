@@ -1,5 +1,10 @@
 mib: RAY3-MIB
 modules:
+    os:
+        features: RAY3-MIB::unitType.0
+        hardware: RAY3-MIB::productName.0
+        serial: RAY3-MIB::serialNumber.0
+        version: RAY3-MIB::swVer.0
     processors:
         data:
             -

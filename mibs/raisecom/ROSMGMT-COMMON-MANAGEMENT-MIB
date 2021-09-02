@@ -1,0 +1,141 @@
+--MibName=raisecomCommonManagement
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2002.5.24 by GONGGUIDONG
+-- This version of MIB is created just for management of base and user.   
+-- Added raisecomClockGroup.raisecomClockMode sub-node by XueChaomin 20081220
+-- remove UserManage and OnlineUpgrade group by guoxiaodan 20070716
+-- removed keepalve group by LIAOBIN 20070709
+-- raisecomEnableLogMethod add localradius radiuslocal  by yjg 20070112
+-- modify RaisecomUserEntry by cjy 20060616
+-- add raisecomEnableLogPassword¡¢raisecomEnableLogOldPassword by cjy 20060616
+-- add rcNotificationGroup   by gongguidong 20041208
+-- add raisecomUserStatus    by gongguidong 20040205
+-- add online Upgrade group   by gongguidong 20040205
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- =======================================================================
+
+-- ===========================================================================
+
+--
+-- RAISECOM base management objects
+--            
+
+ROSMGMT-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE ,
+        Integer32
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC    
+        EnableVar
+            FROM SWITCH-TC       
+        rosMgmt
+            FROM RAISECOM-BASE-MIB;
+    
+    rosMgmtCommonManagement    MODULE-IDENTITY
+        LAST-UPDATED     "202004120000Z"
+        ORGANIZATION     "RAISECOM TECH, Ltd."
+        CONTACT-INFO     "www.raisecom.com"
+        DESCRIPTION      
+            "The MIB module defining objects for common management"
+        REVISION    	"202004120000Z" 
+        DESCRIPTION 	"MIB file check and modification"
+        ::= { rosMgmt  2}
+
+    rosMgmtCommonFunctionGroup    OBJECT IDENTIFIER ::= {rosMgmtCommonManagement 1}
+
+		rosMgmtCommonNotifications    OBJECT IDENTIFIER ::= { rosMgmtCommonFunctionGroup 0 }
+		rosMgmtCommonObjects          OBJECT IDENTIFIER ::= { rosMgmtCommonFunctionGroup 1 }
+		rosMgmtCommonConformance      OBJECT IDENTIFIER ::= { rosMgmtCommonFunctionGroup 2 }
+	
+			rosMgmtLoadcfg       			OBJECT IDENTIFIER ::= { rosMgmtCommonObjects 1 }
+			rosMgmtAutoWrite        		OBJECT IDENTIFIER ::= { rosMgmtCommonObjects 2 }
+
+			
+	rosMgmtLoadcfgScalar    OBJECT IDENTIFIER ::= { rosMgmtLoadcfg 1 }
+	
+    rosMgmtConfigLoadOperation    OBJECT-TYPE
+        SYNTAX	INTEGER{
+                    ready(1),
+                    saving(2),
+                    erasing(3),
+                    reboot(4),
+                    restore(5),
+                    reload(6),
+                    backupsaving(7),
+                    cpoyStaConf2BackConf(8),
+                    cpoyBackConf2StaConf(9),
+                    switStaConfBackConf(10),
+                    backuperasing(11),
+                    eraseStartupconfig(12),
+                    eraseStartupconfigAll(13),
+                    savingall(14)}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Syetem Load Configuration .Includes to erase the start-up config,
+						or to save the running config."
+		::= { rosMgmtLoadcfgScalar 1 }
+    
+    rosMgmtConfigLoadNotificationOnCompletion OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Specifies whether or not a  raisecomConfigLoadOnCompletion
+			notification should be issued on completion of some 
+			operation . If such a notification is desired, it is the
+			responsibility of the management entity to ensure that the
+			SNMP administrative model is configured in such a way as to
+			allow the notification to be delivered."
+		DEFVAL { false }
+		::= {  rosMgmtLoadcfgScalar 2 }
+    
+	rosMgmtConfigLoadState OBJECT-TYPE
+		SYNTAX  INTEGER {
+						ready(1),
+						running(2),
+						successful(3),
+						failed(4)
+						}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Specifies the state of this load configuration."
+		::= {  rosMgmtLoadcfgScalar 3 } 
+
+
+		
+    rosMgmtAutoWritecfgEnable OBJECT-TYPE           
+        SYNTAX       EnableVar
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "Set/get auto writing configuration status."
+        DEFVAL      { enable }
+		::= { rosMgmtAutoWrite 1 }   
+        
+	rosMgmtAutoWritecfgInterval OBJECT-TYPE
+		SYNTAX  Integer32 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			" Interval time of auto save  module."
+		::= {  rosMgmtAutoWrite 2 }
+            
+	rosMgmtConfigLoadCompletion NOTIFICATION-TYPE 
+		OBJECTS {
+				rosMgmtConfigLoadOperation,
+				rosMgmtConfigLoadState }
+		STATUS	current
+		DESCRIPTION
+			"A raisecomConfigLoadeCompletion trap is sent when saving 
+			or erasing the configuration file. "
+		::=  { rosMgmtCommonNotifications 1}
+
+END
+
+

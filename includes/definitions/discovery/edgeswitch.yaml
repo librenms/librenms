@@ -1,5 +1,14 @@
 mib: EdgeSwitch-BOXSERVICES-PRIVATE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: EdgeSwitch-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
+                free: EdgeSwitch-SWITCHING-MIB::agentSwitchCpuProcessMemFree
+                precision: 1024
+    os:
+        sysDescr_regex: '/^(?<hardware>EdgeSwitch .*|EdgePoint Switch .*|USW-.*), (?<version>.*), Linux .*$/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     sensors:
         state:
             data:

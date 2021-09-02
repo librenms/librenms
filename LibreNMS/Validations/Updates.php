@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,17 +39,20 @@ class Updates extends BaseValidation
     {
         if (EnvHelper::librenmsDocker()) {
             $validator->warn('Updates are managed through the official Docker image');
+
             return;
         }
 
-        if (!Git::repoPresent()) {
+        if (! Git::repoPresent()) {
             $validator->warn('Non-git install, updates are manual or from package');
+
             return;
         }
 
         // if git is not available, we cannot do the other tests
-        if (!Git::binaryExists()) {
+        if (! Git::binaryExists()) {
             $validator->warn('Unable to locate git. This should probably be installed.');
+
             return;
         }
 
@@ -63,7 +65,7 @@ class Updates extends BaseValidation
                     $commit_date = new DateTime('@' . $versions['local_date'], new DateTimeZone(date_default_timezone_get()));
                     if ($commit_date->diff(new DateTime())->days > 0) {
                         $validator->warn(
-                            "Your install is over 24 hours out of date, last update: " . $commit_date->format('r'),
+                            'Your install is over 24 hours out of date, last update: ' . $commit_date->format('r'),
                             'Make sure your daily.sh cron is running and run ./daily.sh by hand to see if there are any errors.'
                         );
                     }
@@ -75,18 +77,18 @@ class Updates extends BaseValidation
             if ($versions['local_branch'] != 'master') {
                 if ($versions['local_branch'] == 'php53') {
                     $validator->warn(
-                        "You are on the PHP 5.3 support branch, this will prevent automatic updates.",
-                        "Update to PHP 5.6.4 or newer (PHP " . Php::PHP_RECOMMENDED_VERSION . " recommended) to continue to receive updates."
+                        'You are on the PHP 5.3 support branch, this will prevent automatic updates.',
+                        'Update to PHP 5.6.4 or newer (PHP ' . Php::PHP_RECOMMENDED_VERSION . ' recommended) to continue to receive updates.'
                     );
                 } elseif ($versions['local_branch'] == 'php56') {
                     $validator->warn(
-                        "You are on the PHP 5.6/7.0 support branch, this will prevent automatic updates.",
-                        "Update to PHP " . Php::PHP_MIN_VERSION . " or newer (PHP " . Php::PHP_RECOMMENDED_VERSION . " recommended) to continue to receive updates."
+                        'You are on the PHP 5.6/7.0 support branch, this will prevent automatic updates.',
+                        'Update to PHP ' . Php::PHP_MIN_VERSION . ' or newer (PHP ' . Php::PHP_RECOMMENDED_VERSION . ' recommended) to continue to receive updates.'
                     );
                 } else {
                     $validator->warn(
-                        "Your local git branch is not master, this will prevent automatic updates.",
-                        "You can switch back to master with git checkout master"
+                        'Your local git branch is not master, this will prevent automatic updates.',
+                        'You can switch back to master with git checkout master'
                     );
                 }
             }
@@ -97,10 +99,10 @@ class Updates extends BaseValidation
         // check for modified files
         $modifiedcmd = 'git diff --name-only --exit-code';
         $validator->execAsUser($modifiedcmd, $cmdoutput, $code);
-        if ($code !== 0 && !empty($cmdoutput)) {
+        if ($code !== 0 && ! empty($cmdoutput)) {
             $result = ValidationResult::warn(
-                "Your local git contains modified files, this could prevent automatic updates.",
-                "You can fix this with ./scripts/github-remove"
+                'Your local git contains modified files, this could prevent automatic updates.',
+                'You can fix this with ./scripts/github-remove'
             );
             $result->setList('Modified Files', $cmdoutput);
             $validator->result($result);

@@ -21,7 +21,7 @@ IMPORTS
     FROM VMWARE-TC-MIB;
 
     vmwEnvironmentalMIB MODULE-IDENTITY
-    LAST-UPDATED "201705300000Z"
+    LAST-UPDATED "201706050000Z"
     ORGANIZATION "VMware, Inc"
     CONTACT-INFO
     "VMware, Inc
@@ -38,11 +38,13 @@ DESCRIPTION
       which provides a definition for IPMI System Event Log (SEL).
      "
 
-REVISION   "201705300000Z"
+REVISION   "201706050000Z"
 DESCRIPTION
     "This revision deprecates the previous CIM based implementation. The vmwEnvTable now maps
      directly to an IPMI System Event Log allowing for simpler identification and management.
-     vmwEnvSource.0 will now report ipmi(4) on agents implementing this mib module version."
+     vmwEnvSource.0 will now report ipmi(4) on agents implementing this mib module version.
+     The first implementation of vmwEnvTable adds vmwEnvHrDeviceIndex and
+     changes vmwEnvHardwareTime syntax from TimeTicks to DateAndTime"
 
 REVISION   "201005120000Z"
 DESCRIPTION

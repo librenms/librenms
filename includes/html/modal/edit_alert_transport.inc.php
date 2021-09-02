@@ -42,8 +42,8 @@ if (Auth::user()->hasGlobalAdmin()) {
     <?php
 
 // Create list of transport
-    $transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
-    $transports_list = array();
+    $transport_dir = Config::get('install_dir') . '/LibreNMS/Alert/Transport';
+    $transports_list = [];
     foreach (scandir($transport_dir) as $transport) {
         $transport = strstr($transport, '.', true);
         if (empty($transport)) {
@@ -52,9 +52,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         $transports_list[] = $transport;
     }
     foreach ($transports_list as $transport) {
-        echo '<option value="'.strtolower($transport).'-form">'.$transport.'</option>';
-    }
-    ?>
+        echo '<option value="' . strtolower($transport) . '-form">' . $transport . '</option>';
+    } ?>
                                 </select>
                             </div>
                         </div>
@@ -69,19 +68,19 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     $switches = []; // store names of bootstrap switches
     foreach ($transports_list as $transport) {
-        $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
+        $class = 'LibreNMS\\Alert\\Transport\\' . $transport;
 
-        if (!method_exists($class, 'configTemplate')) {
+        if (! method_exists($class, 'configTemplate')) {
             // Skip since support has not been added
             continue;
         }
-    
-        echo '<form method="post" role="form" id="'.strtolower($transport).'-form" class="form-horizontal transport">';
+
+        echo '<form method="post" role="form" id="' . strtolower($transport) . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" id="transport-type" value="'.strtolower($transport).'">';
-   
-        $tmp = call_user_func($class.'::configTemplate');
-    
+        echo '<input type="hidden" name="transport-type" id="transport-type" value="' . strtolower($transport) . '">';
+
+        $tmp = call_user_func($class . '::configTemplate');
+
         foreach ($tmp['config'] as $item) {
             if ($item['type'] !== 'hidden') {
                 echo '<div class="form-group" title="' . $item['descr'] . '">';
@@ -137,8 +136,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo '</div>';
         echo '</div>';
         echo '</form>';
-    }
-    ?>
+    } ?>
                 </div>
             </div>
         </div>
@@ -174,11 +172,11 @@ if (Auth::user()->hasGlobalAdmin()) {
     <script>
         // Scripts related to editing/updating alert transports
 
-        // Display different form on selection 
-        $("#transport-choice").change(function (){
+        // Display different form on selection
+        $("#transport-choice").on("change", function (){
             $(".transport").hide();
             $("#" + $(this).val()).show().find("input:text").val("");
-         
+
         });
 
         $("#edit-alert-transport").on("show.bs.modal", function(e) {
@@ -197,7 +195,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         toastr.error("Failed to process alert transport");
                     }
                 });
-            
+
             } else {
             // Resetting to default
                 $("#name").val("");
@@ -205,9 +203,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $(".transport").hide();
                 $("#" + $("#transport-choice").val()).show().find("input:text").val("");
                 $("#is_default").bootstrapSwitch('state', false);
-                
+
                 // Turn on all switches in form
-                var switches = <?php echo json_encode($switches);?>;
+                var switches = <?php echo json_encode($switches); ?>;
                 $.each(switches, function(name, state) {
                     $("input[name="+name+"]").bootstrapSwitch('state', state);
                 });
@@ -223,7 +221,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#is_default").bootstrapSwitch('state', transport.is_default);
             $(".transport").hide();
             transport_form.show().find("input:text").val("");
-             
+
             // Populate the field values
             transport.details.forEach(function(config) {
                 var $field = transport_form.find("#" + config.name);
@@ -235,7 +233,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             });
         }
 
-        $(".btn-oauth").click(function (e) {
+        $(".btn-oauth").on("click", function (e) {
             this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
         });
 
@@ -246,7 +244,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             //Combine form data (general and transport specific)
             data = $("form.transports-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
-            
+
             if (data !== null) {
                 //post data to ajax form
                 $.ajax({
@@ -281,7 +279,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
         // Delete the alert transport
-        $("#remove-alert-transport").click('', function(event) {
+        $("#remove-alert-transport").on("click", function(event) {
             event.preventDefault();
             var transport_id = $("#delete_transport_id").val();
             $.ajax({

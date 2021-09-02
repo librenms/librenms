@@ -15,12 +15,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Test Juniper configuration change trap jnxCmCfgChange
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -30,15 +29,12 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
     public function testConfigChangeTrap()
     {
-
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -50,7 +46,7 @@ JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventUser.54 TestUser
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX2200";
 
         $trap = new Trap($trapText);
-        $message = "Config modified by TestUser from cli at 2018-11-21,7:34:39.0,-6:0";
+        $message = 'Config modified by TestUser from cli at 2018-11-21,7:34:39.0,-6:0';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxCmCfgChange trap');
@@ -58,8 +54,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX22
 
     public function testConfigRollbackTrap()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -71,7 +66,7 @@ JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventUser.54 root
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX2200";
 
         $trap = new Trap($trapText);
-        $message = "Config rolled back at 2017-12-21,7:34:39.0,-6:0";
+        $message = 'Config rolled back at 2017-12-21,7:34:39.0,-6:0';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxCmCfgChange config rolled back');

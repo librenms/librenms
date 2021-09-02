@@ -4,8 +4,7 @@ type: appliance
 icon: 2n
 over:
     - { graph: device_uptime, text: 'Device Uptime' }
-mib_dir:
-    - 2n
+mib_dir: 2n
 discovery:
     -
         sysObjectID:

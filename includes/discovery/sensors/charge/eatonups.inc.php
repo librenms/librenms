@@ -14,7 +14,7 @@
 $charge_oid = '.1.3.6.1.4.1.534.1.2.4.0';
 $charge = snmp_get($device, $charge_oid, '-Osqnv');
 
-if (!empty($charge)) {
+if (! empty($charge)) {
     $type = 'eatonups';
     $index = 0;
     $limit = 100;

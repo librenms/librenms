@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.135",
                     "sysDescr": "Juniper Networks, Inc. srx340 internet router, kernel JUNOS 15.1X49-D120.3, Build date: 2017-11-04 21:55:34 UTC Copyright (c) 1996-2017 Juniper Networks, Inc.",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "junos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "junos.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.135",
-                    "sysDescr": "Juniper Networks, Inc. srx340 internet router, kernel JUNOS 15.1X49-D120.3, Build date: 2017-11-04 21:55:34 UTC Copyright (c) 1996-2017 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "15.1X49-D120.3",
                     "hardware": "Juniper SRX340",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

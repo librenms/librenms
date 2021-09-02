@@ -15,18 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 require 'rrdcached.inc.php';
 require 'includes/html/graphs/common.inc.php';
 
-$ds  = 'queue_length';
+$ds = 'queue_length';
 
 $colour_area = 'F37900';
 $colour_line = 'FFA700';

@@ -3,8 +3,7 @@ text: 'Gude Expert Transfer Switch'
 type: power
 icon: gude
 group: gude
-mib_dir:
-    - gude
+mib_dir: gude
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_state, text: States }

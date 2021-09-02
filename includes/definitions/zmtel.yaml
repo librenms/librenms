@@ -2,8 +2,7 @@ os: zmtel
 text: 'Zmtel Greenpacket'
 icon: greenpacket
 type: network
-mib_dir:
-    - zmtel
+mib_dir: zmtel
 discovery:
     -
         sysObjectID:

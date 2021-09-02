@@ -1,5 +1,7 @@
 mib: QTECH-MIB
 modules:
+    os:
+        sysDescr_regex: '/^(?<hardware>\S+).*SoftWare Version.*?(?<version>\d+\.[\d.]+(\(R[\d.]+\))?).*?((Serial No\.:|Device serial number )(?<serial>\d*))?\s+Copyright/s'
     processors:
         data:
             -

@@ -12,6 +12,14 @@ Using the command line via ssh you can add a new device by changing to
 the directory of your LibreNMS install and typing (be sure to put the
 correct details).
 
+Preferred method:
+```bash
+./lnms device:add [--v1|--v2c] [-c yourSNMPcommunity] yourhostname
+```
+
+You can use `./lnms device:add --help` for a list of available options and defaults.
+
+Alternative:
 ```bash
 ./addhost.php yourhostname [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
 ```
@@ -20,6 +28,12 @@ As an example, if your device with the name `mydevice.example.com` is
 configured to use the community `my_company` using snmp `v2c` then you
 would enter:
 
+Preferred method:
+```bash
+./lnms device:add --v2c -c my_company mydevice.example.com
+```
+
+Alternative:
 ```bash
 ./addhost.php mydevice.example.com my_company v2c
 ```
@@ -36,14 +50,14 @@ community `my_company` using snmp `v2c` then you would enter: SNMP
 Port defaults to 161.
 
 By default Hostname will be used for polling data. If you want
-to get polling Device data via a specific IP-Addresse (e.g. Management IP)
-fill out the optional field `Overwrite IP` with it's IP-Addresse.
+to get polling Device data via a specific IP-Address (e.g. Management IP)
+fill out the optional field `Overwrite IP` with it's IP-Address.
 
 ![Add device](/img/webui_add_device.png)
 
-### Ping Only Device
+## Ping Only Device
 
-You can add ping only devices into LibreNMS through the WebUI. When
+You can add ping only devices into LibreNMS through the WebUI or CLI. When
 adding the device switch the SNMP button to "off". Device will be
 added into LibreNMS as Ping Only Device and will show ICMP Response Graph.
 
@@ -51,13 +65,17 @@ added into LibreNMS as Ping Only Device and will show ICMP Response Graph.
 - Hardware: Optional you can type in whatever you like.
 - OS: Optional this will add the Device's OS Icon.
 
-[How to add ping only devices](https://youtu.be/cjuByubg-uk)
+Via CLI this is done with `./lnms device:add [-P|--ping-only] yourhostname`
 
 ![Ping Only](/img/add-ping-only.png)
+
+A How-to video can be found here: [How to add ping only devices](https://youtu.be/cjuByubg-uk)
+
+## Automatic Discovery and API
 
 If you would like to add devices automatically then you will probably
 want to read the [Auto-discovery
 Setup](../Extensions/Auto-Discovery.md) guide.
 
-You may also want to add devices programatically, if so, take a look
+You may also want to add devices programmatically, if so, take a look
 at our [API documentation](../API/index.md)

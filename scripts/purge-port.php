@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
@@ -21,9 +21,6 @@
  * @author Maximilian Wilhelm <max@sdn.clinic>
  * @copyright 2016-2017 LibreNMS, Barbarossa
  * @license GPL
- * @package LibreNMS
- * @subpackage ?
- *
  */
 
 use App\Models\Port;
@@ -31,7 +28,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 chdir(dirname($argv[0]));
 
-$init_modules = array();
+$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $opt = getopt('p:f:');
@@ -45,11 +42,11 @@ if ($opt['p']) {
 // File with port-ids given on cmdline?
 $port_id_file = null;
 if ($opt['f']) {
-     $port_id_file = $opt['f'];
+    $port_id_file = $opt['f'];
 }
 
 if (! $port_id && ! $port_id_file || ($port_id && $port_id_file)) {
-    print $console_color->convert(\LibreNMS\Config::get('project_name').' Port purge tool
+    echo $console_color->convert(\LibreNMS\Config::get('project_name') . ' Port purge tool
     -p <port_id>  Purge single port by it\'s port-id
     -f <file>     Purge a list of ports, read port-ids from <file>, one on each line.
                   A filename of - means reading from STDIN.
@@ -71,9 +68,9 @@ if ($port_id_file) {
     if ($port_id_file == '-') {
         $fh = STDIN;
     } else {
-        $fh = fopen($port_id_file, "r");
+        $fh = fopen($port_id_file, 'r');
         if (! $fh) {
-            echo "Failed to open port-id list \"" . $port_id_file . "\": \n";
+            echo 'Failed to open port-id list "' . $port_id_file . "\": \n";
             exit(1);
         }
     }

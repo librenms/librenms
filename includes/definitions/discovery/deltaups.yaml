@@ -1,0 +1,7 @@
+modules:
+    os:
+        hardware:
+            - DeltaUPS-MIB::dupsIdentManufacturer.0
+            - DeltaUPS-MIB::dupsIdentModel.0
+        hardware_template: '{{ DeltaUPS-MIB::dupsIdentManufacturer.0 }} {{ DeltaUPS-MIB::dupsIdentModel.0 }}'
+        version: DeltaUPS-MIB::dupsIdentUPSSoftwareVersion.0

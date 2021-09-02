@@ -2,8 +2,7 @@ os: mbg-ltos6
 text: 'LANTIME v6'
 type: timing
 icon: meinberg
-mib_dir:
-    - meinberg
+mib_dir: meinberg
 discovery:
     -
         sysObjectID:

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
  */
@@ -26,14 +25,14 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Rewrite;
 
@@ -50,14 +49,16 @@ class Lcos extends OS implements
     /**
      * Convert String to decimal encoded string notation
      *
-     * @param string
+     * @param string $index
      * @return string decimal encoded OID string
      */
     private function strToDecOid($index)
     {
+        $dec_index = [];
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index[$i]);
+            $dec_index[] = ord($index[$i]);
         }
+
         return implode('.', $dec_index);
     }
 
@@ -69,7 +70,7 @@ class Lcos extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanRadiosEntryRadioChannel', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanRadiosEntryRadioChannel', [], 'LCOS-MIB');
         $radios = $this->getCacheByIndex('lcsStatusWlanRadiosEntryIfc', 'LCOS-MIB');
 
         $sensors = [];
@@ -88,6 +89,7 @@ class Lcos extends OS implements
                 WirelessSensor::channelToFrequency($entry['lcsStatusWlanRadiosEntryRadioChannel'])
             );
         }
+
         return $sensors;
     }
 
@@ -111,7 +113,7 @@ class Lcos extends OS implements
      */
     public function discoverWirelessCapacity()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanRadiosEntryModemLoad', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanRadiosEntryModemLoad', [], 'LCOS-MIB');
         $radios = $this->getCacheByIndex('lcsStatusWlanRadiosEntryIfc', 'LCOS-MIB');
 
         $sensors = [];
@@ -130,6 +132,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryModemLoad']
             );
         }
+
         return $sensors;
     }
 
@@ -141,7 +144,7 @@ class Lcos extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanRadiosEntryNoiseLevel', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanRadiosEntryNoiseLevel', [], 'LCOS-MIB');
         $radios = $this->getCacheByIndex('lcsStatusWlanRadiosEntryIfc', 'LCOS-MIB');
 
         $sensors = [];
@@ -160,6 +163,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryNoiseLevel']
             );
         }
+
         return $sensors;
     }
 
@@ -171,7 +175,7 @@ class Lcos extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanRadiosEntryTransmitPower', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanRadiosEntryTransmitPower', [], 'LCOS-MIB');
         $radios = $this->getCacheByIndex('lcsStatusWlanRadiosEntryIfc', 'LCOS-MIB');
 
         $sensors = [];
@@ -191,6 +195,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryTransmitPower']
             );
         }
+
         return $sensors;
     }
 
@@ -202,8 +207,8 @@ class Lcos extends OS implements
      */
     public function discoverWirelessCcq()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanCompetingNetworksEntryPhySignal', [], 'LCOS-MIB');
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanCompetingNetworksEntryPhySignal', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-MIB');
         $bssids = $this->getCacheByIndex('lcsStatusWlanCompetingNetworksEntryBssid', 'LCOS-MIB');
 
         $sensors = [];
@@ -219,10 +224,11 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
-                "CCQ " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'CCQ ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
             );
         }
+
         return $sensors;
     }
 
@@ -234,8 +240,8 @@ class Lcos extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanCompetingNetworksEntryEffRate', [], 'LCOS-MIB');
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanCompetingNetworksEntryEffRate', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-MIB');
         $bssids = $this->getCacheByIndex('lcsStatusWlanCompetingNetworksEntryBssid', 'LCOS-MIB');
 
         $sensors = [];
@@ -251,11 +257,12 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos-tx',
                 $bssid,
-                "TX Rate " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'TX Rate ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryEffRate'],
                 1000000
             );
         }
+
         return $sensors;
     }
 
@@ -267,8 +274,8 @@ class Lcos extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanCompetingNetworksEntrySignalLevel', [], 'LCOS-MIB');
-        $data = snmpwalk_cache_oid($this->getDevice(), 'lcsStatusWlanCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanCompetingNetworksEntrySignalLevel', [], 'LCOS-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcsStatusWlanCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-MIB');
         $bssids = $this->getCacheByIndex('lcsStatusWlanCompetingNetworksEntryBssid', 'LCOS-MIB');
 
         $sensors = [];
@@ -285,10 +292,11 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
-                "RSSI " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'RSSI ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntrySignalLevel']
             );
         }
+
         return $sensors;
     }
 }

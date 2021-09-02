@@ -17,11 +17,11 @@ poller_modules:
     cisco-mac-accounting: false
     cisco-otv: false
     cisco-remote-access-monitor: false
-    cisco-sla: false
+    slas: false
     cisco-voice: false
     ipmi: false
     ospf: false
-    toner: false
+    printer-supplies:   false
     ucd-diskio: false
     ucd-mib: false
 discovery_modules:
@@ -30,13 +30,13 @@ discovery_modules:
     cisco-mac-accounting: false
     cisco-otv: false
     cisco-pw: false
-    cisco-sla: false
+    slas: false
     cisco-vrf-lite: false
     vrf: false
     libvirt-vminfo: false
     ntp: false
     stp: false
-    toner: false
+    printer-supplies:   false
     ucd-diskio: false
     vlans: false
 discovery:

@@ -11,6 +11,6 @@ discovery:
             - .1.3.6.1.4.1.253.8.62.1.
             - .1.3.6.1.4.1.297.1.11.93.1.
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

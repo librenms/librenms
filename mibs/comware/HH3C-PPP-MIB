@@ -1,0 +1,110 @@
+-- =================================================================
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB file is used for inquiring for PPP access user
+--              authentication information.
+-- Reference:
+-- Version:     V1.0
+-- History:
+--   V1.0 Initial version by hkf6733
+-- =================================================================
+HH3C-PPP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    DisplayString
+        FROM SNMPv2-TC;
+
+
+
+hh3cPPP MODULE-IDENTITY
+    LAST-UPDATED "201802010000Z"            -- Feb 01th, 2018 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "PPP management information base for managing devices that support PPP
+        protocol."
+    REVISION    "201802010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { hh3cCommon 175 }
+
+--
+-- Node definitions
+--
+
+hh3cPPPAuthObjects OBJECT IDENTIFIER ::= { hh3cPPP  1 }
+
+hh3cPPPAuthTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPPPAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describes the authentication information for PPP access
+        users.  The index of this table is the interface and authentication
+        type."
+    ::= { hh3cPPPAuthObjects 1 }
+
+hh3cPPPAuthEntry OBJECT-TYPE
+    SYNTAX Hh3cPPPAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the authentication  information of
+        a PPP access user.  The available information includes: The index of
+        the interface on which the PPP authentication information are
+        configured, authentication type and username on the interface."
+    INDEX { hh3cPPPIfIndex, hh3cPPPAuthType }
+        ::= { hh3cPPPAuthTable 1 }
+
+Hh3cPPPAuthEntry ::=
+    SEQUENCE {
+        hh3cPPPIfIndex
+            InterfaceIndex,
+        hh3cPPPAuthType
+            INTEGER,
+        hh3cPPPUserName
+            DisplayString
+        }
+
+hh3cPPPIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of the interface on the PPP authentication information are
+        configured."
+        ::= { hh3cPPPAuthEntry 1 }
+
+hh3cPPPAuthType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            unknown(1),
+            pap(2),
+            chap(3)
+        }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type of authentication for for the peer."
+    ::= { hh3cPPPAuthEntry 2 }
+
+hh3cPPPUserName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..80))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The username for access user."
+        ::= { hh3cPPPAuthEntry 3 }
+
+END

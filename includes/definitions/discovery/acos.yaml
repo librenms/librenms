@@ -1,5 +1,16 @@
 mib: A10-AX-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: A10-AX-MIB::axSysMemoryTotal
+                used: A10-AX-MIB::axSysMemoryUsage
+                precision: 1024
+                descr: 'System Memory'
+    os:
+        sysDescr_regex: '/(?<hardware>\S+( TPS)?), ACOS (?<version>[^,]+)/'
+        serial: A10-AX-MIB::axSysSerialNumber.0
+        version: A10-AX-MIB::axSysFirmwareVersion.0
     processors:
         data:
             -

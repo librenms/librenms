@@ -1,5 +1,5 @@
 <?php
-  
+
 /**
  * timos.inc.php
  *
@@ -16,25 +16,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 LibreNMS Contributors
  * @author     LibreNMS Contributors
  */
 
 use LibreNMS\Config;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {
     if ($device['os'] == 'timos') {
-        $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
+        $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
         foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
+            $oid = explode('.', $key);
             $vrfInstance = $oid[0];
-            $address = str_replace($oid[0].".".$oid[1].".", '', $key);
+            $address = str_replace($oid[0] . '.' . $oid[1] . '.', '', $key);
             if (strlen($address) > 15) {
                 $address = IP::fromHexString($address)->compressed();
             }

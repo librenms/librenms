@@ -1,3 +1,3 @@
 <?php
 
-list($features, $version) = explode('-', trim(str_replace('Vyatta', '', $device['sysDescr'])), 2);
+[$features, $version] = explode('-', trim(str_replace('Vyatta', '', $device['sysDescr'])), 2);

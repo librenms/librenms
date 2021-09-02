@@ -6,26 +6,8 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.20",
                     "sysDescr": "GS-4012F",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "zynos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "zyxel.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.20",
-                    "sysDescr": "GS-4012F",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "",
                     "hardware": "GS-4012F",
                     "features": null,
                     "os": "zynos",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

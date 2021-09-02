@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -75,7 +74,7 @@ class LoadBalancerController implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return !empty($this->tabs);
+        return ! empty($this->tabs);
     }
 
     public function slug(): string

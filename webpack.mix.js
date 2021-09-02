@@ -13,6 +13,7 @@ const mix = require('laravel-mix');
 
 mix.setPublicPath('html/')
     .js('resources/js/app.js', 'js')
+    .vue()
     .sass('resources/sass/app.scss', 'css')
     .extract()
     .version('html/js/lang/*.js');

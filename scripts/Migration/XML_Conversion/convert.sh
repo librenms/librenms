@@ -18,7 +18,7 @@
 ###################################################################
 
 ############################# CREDITS #############################
-# LibreNMS work is done by a great group - http://librenms.org    #
+# LibreNMS work is done by a great group - https://www.librenms.org    #
 # Script Written by - Dan Brown - http://vlan50.com               #
 ###################################################################
 

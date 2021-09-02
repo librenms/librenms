@@ -41,7 +41,8 @@
                     "sysDescr_regex": {"$ref": "#/definitions/regex_group"},
                     "sysDescr_regex_except": {"$ref": "#/definitions/regex_group"},
                     "snmpget": {"$ref": "#/definitions/snmpget"},
-                    "snmpget_except": {"$ref": "#/definitions/snmpget"}
+                    "snmpget_except": {"$ref": "#/definitions/snmpget"},
+                    "snmpwalk": {"$ref": "#/definitions/snmpget"}
                 },
                 "minProperties": 1,
                 "additionalProperties": false
@@ -77,7 +78,7 @@
                 "cisco-remote-access-monitor": {
                     "type": "boolean"
                 },
-                "cisco-sla": {
+                "slas": {
                     "type": "boolean"
                 },
                 "cisco-ipsec-flow-monitor": {
@@ -93,6 +94,9 @@
                     "type": "boolean"
                 },
                 "cisco-ace-loadbalancer": {
+                    "type": "boolean"
+                },
+                "entity-state": {
                     "type": "boolean"
                 },
                 "wifi": {
@@ -167,7 +171,7 @@
                 "mib": {
                     "type": "boolean"
                 },
-                "toner": {
+                "printer-supplies": {
                     "type": "boolean"
                 },
                 "cisco-vpdn": {
@@ -218,7 +222,7 @@
                 "cisco-cef": {
                     "type": "boolean"
                 },
-                "cisco-sla": {
+                "slas": {
                     "type": "boolean"
                 },
                 "cisco-mac-accounting": {
@@ -228,6 +232,9 @@
                     "type": "boolean"
                 },
                 "cisco-pw": {
+                    "type": "boolean"
+                },
+                "entity-state": {
                     "type": "boolean"
                 },
                 "vrf": {
@@ -287,7 +294,7 @@
                 "arp-table": {
                     "type": "boolean"
                 },
-                "toner": {
+                "printer-supplies": {
                     "type": "boolean"
                 },
                 "ipv4-addresses": {
@@ -347,14 +354,16 @@
         "ifname": {
             "type": "boolean"
         },
-        "mib_dir": {"$ref": "#/definitions/string_group"},
+        "mib_dir": {
+            "type":  "string"
+        },
         "good_if": {
             "type": "array",
             "items": {
                 "type": "string"
             }
         },
-        "nobulk": {
+        "snmp_bulk": {
             "type": "boolean"
         },
         "snmp_max_oid": {
@@ -369,6 +378,7 @@
         "empty_ifdescr": {
             "type": "boolean"
         },
+        "bad_entity_sensor_regex": {"$ref": "#/definitions/regex_group"},
         "bad_if": {
             "type": "array",
             "items": {
@@ -396,6 +406,13 @@
         "processor_stacked": {
             "type": "boolean"
         },
+        "disabled_sensors": {
+            "type": "object",
+            "patternProperties": {
+                ".": {"type": "boolean"}
+            }
+        },
+        "disabled_sensors_regex": {"$ref": "#/definitions/regex_group"},
         "bad_ifname_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_if_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_snmpEngineTime": {
@@ -424,7 +441,8 @@
     "required": [
         "os",
         "text",
-        "type"
+        "type",
+        "discovery"
     ],
     "definitions": {
         "string_group": {

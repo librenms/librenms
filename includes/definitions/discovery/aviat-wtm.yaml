@@ -1,5 +1,9 @@
 mib: AVIAT-MODEM-MIB
 modules:
+    os:
+        hardware: ENTITY-MIB::entPhysicalModelName.2
+        serial: ENTITY-MIB::entPhysicalSerialNum.2
+        version: ENTITY-MIB::entPhysicalSoftwareRev.2
     sensors:
         state:
             data:

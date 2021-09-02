@@ -1,5 +1,11 @@
 mib: OG-STATUSv2-MIB
 modules:
+    os:
+        hardware_mib: OG-PRODUCTS-MIB
+        hardware_regex: '/og(?<hardware>\S+)/'
+        version: OG-STATUSv2-MIB::ogFirmwareVersion
+        version_regex: '/(?<version>\S+)/'
+        serial: OG-STATUSv2-MIB::ogSerialNumber
     sensors:
         pre-cache:
             data:

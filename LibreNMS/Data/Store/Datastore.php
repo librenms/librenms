@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,7 +35,7 @@ class Datastore
      * Initialize and create the Datastore(s)
      *
      * @param array $options
-     * @return DatastoreContract
+     * @return Datastore
      */
     public static function init($options = [])
     {
@@ -107,7 +106,7 @@ class Datastore
         // data_update($device, 'mymeasurement', $tags, 1234);
         //     AND
         // data_update($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
-        if (!is_array($fields)) {
+        if (! is_array($fields)) {
             $fields = [$measurement => $fields];
         }
 
@@ -136,6 +135,7 @@ class Datastore
             }
             $result[$k] = $v;
         }
+
         return $result;
     }
 
@@ -153,6 +153,7 @@ class Datastore
     {
         return array_reduce($this->stores, function ($result, DatastoreContract $store) {
             $result[$store->getName()] = $store->getStats();
+
             return $result;
         }, []);
     }

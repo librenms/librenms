@@ -3,8 +3,7 @@ text: 'cdata'
 type: network
 icon: cdata
 group: cdata
-mib_dir:
-    - cdata
+mib_dir: cdata
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

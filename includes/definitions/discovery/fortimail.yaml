@@ -1,5 +1,14 @@
 mib: FORTINET-FORTIMAIL-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: FORTINET-FORTIMAIL-MIB::fmlSysMemUsage
+                descr: 'Physical Memory'
+    os:
+        hardware: FORTINET-FORTIMAIL-MIB::fmlSysModel.0
+        version: FORTINET-FORTIMAIL-MIB::fmlSysVersion.0
+        serial: FORTINET-FORTIMAIL-MIB::fmlSysSerial.0
     processors:
         data:
             -

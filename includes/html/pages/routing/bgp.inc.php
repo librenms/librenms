@@ -3,19 +3,19 @@
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
-    $link_array = array(
+    $link_array = [
         'page'     => 'routing',
         'protocol' => 'bgp',
-    );
+    ];
 
     print_optionbar_start('', '');
 
     echo '<span style="font-weight: bold;">BGP</span> &#187; ';
 
-    if (!$vars['type']) {
+    if (! $vars['type']) {
         $vars['type'] = 'all';
     }
 
@@ -23,7 +23,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('All', $vars, array('type' => 'all'));
+    echo generate_link('All', $vars, ['type' => 'all']);
     if ($vars['type'] == 'all') {
         echo '</span>';
     }
@@ -34,7 +34,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('iBGP', $vars, array('type' => 'internal'));
+    echo generate_link('iBGP', $vars, ['type' => 'internal']);
     if ($vars['type'] == 'internal') {
         echo '</span>';
     }
@@ -45,7 +45,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('eBGP', $vars, array('type' => 'external'));
+    echo generate_link('eBGP', $vars, ['type' => 'external']);
     if ($vars['type'] == 'external') {
         echo '</span>';
     }
@@ -54,34 +54,34 @@ if (!Auth::user()->hasGlobalRead()) {
 
     if ($vars['adminstatus'] == 'stop') {
         echo "<span class='pagemenu-selected'>";
-        echo generate_link('Shutdown', $vars, array('adminstatus' => null));
+        echo generate_link('Shutdown', $vars, ['adminstatus' => null]);
         echo '</span>';
     } else {
-        echo generate_link('Shutdown', $vars, array('adminstatus' => 'stop'));
+        echo generate_link('Shutdown', $vars, ['adminstatus' => 'stop']);
     }
 
     echo ' | ';
 
     if ($vars['adminstatus'] == 'start') {
         echo "<span class='pagemenu-selected'>";
-        echo generate_link('Enabled', $vars, array('adminstatus' => null));
+        echo generate_link('Enabled', $vars, ['adminstatus' => null]);
         echo '</span>';
     } else {
-        echo generate_link('Enabled', $vars, array('adminstatus' => 'start'));
+        echo generate_link('Enabled', $vars, ['adminstatus' => 'start']);
     }
 
     echo ' | ';
 
     if ($vars['state'] == 'down') {
         echo "<span class='pagemenu-selected'>";
-        echo generate_link('Down', $vars, array('state' => null));
+        echo generate_link('Down', $vars, ['state' => null]);
         echo '</span>';
     } else {
-        echo generate_link('Down', $vars, array('state' => 'down'));
+        echo generate_link('Down', $vars, ['state' => 'down']);
     }
 
     // End BGP Menu
-    if (!isset($vars['view'])) {
+    if (! isset($vars['view'])) {
         $vars['view'] = 'details';
     }
 
@@ -91,7 +91,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('No Graphs', $vars, array('view' => 'details', 'graph' => 'NULL'));
+    echo generate_link('No Graphs', $vars, ['view' => 'details', 'graph' => 'NULL']);
     if ($vars['view'] == 'details') {
         echo '</span>';
     }
@@ -102,7 +102,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('Updates', $vars, array('view' => 'graphs', 'graph' => 'updates'));
+    echo generate_link('Updates', $vars, ['view' => 'graphs', 'graph' => 'updates']);
     if ($vars['graph'] == 'updates') {
         echo '</span>';
     }
@@ -113,7 +113,7 @@ if (!Auth::user()->hasGlobalRead()) {
         $extra_sql = " AND `bgpPeerIdentifier` NOT LIKE '%:%'";
     }
 
-    echo generate_link('IPv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4unicast'));
+    echo generate_link('IPv4', $vars, ['view' => 'graphs', 'graph' => 'prefixes_ipv4unicast']);
     if ($vars['graph'] == 'prefixes_ipv4unicast') {
         echo '</span>';
     }
@@ -125,7 +125,7 @@ if (!Auth::user()->hasGlobalRead()) {
         $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
     }
 
-    echo generate_link('IPv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6unicast'));
+    echo generate_link('IPv6', $vars, ['view' => 'graphs', 'graph' => 'prefixes_ipv6unicast']);
     if ($vars['graph'] == 'prefixes_ipv6unicast') {
         echo '</span>';
     }
@@ -136,7 +136,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('VPNv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4vpn'));
+    echo generate_link('VPNv4', $vars, ['view' => 'graphs', 'graph' => 'prefixes_ipv4vpn']);
     if ($vars['graph'] == 'prefixes_ipv4vpn') {
         echo '</span>';
     }
@@ -147,7 +147,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('VPNv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6vpn'));
+    echo generate_link('VPNv6', $vars, ['view' => 'graphs', 'graph' => 'prefixes_ipv6vpn']);
     if ($vars['graph'] == 'prefixes_ipv6vpn') {
         echo '</span>';
     }
@@ -159,7 +159,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('IPv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4multicast'));
+    echo generate_link('IPv4', $vars, ['view' => 'graphs', 'graph' => 'prefixes_ipv4multicast']);
     if ($vars['graph'] == 'prefixes_ipv4multicast') {
         echo '</span>';
     }
@@ -170,7 +170,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('IPv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6multicast'));
+    echo generate_link('IPv6', $vars, ['view' => 'graphs', 'graph' => 'prefixes_ipv6multicast']);
     if ($vars['graph'] == 'prefixes_ipv6multicast') {
         echo '</span>';
     }
@@ -182,7 +182,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('Bits', $vars, array('view' => 'graphs', 'graph' => 'macaccounting_bits'));
+    echo generate_link('Bits', $vars, ['view' => 'graphs', 'graph' => 'macaccounting_bits']);
     if ($vars['graph'] == 'macaccounting_bits') {
         echo '</span>';
     }
@@ -193,7 +193,7 @@ if (!Auth::user()->hasGlobalRead()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link('Packets', $vars, array('view' => 'graphs', 'graph' => 'macaccounting_pkts'));
+    echo generate_link('Packets', $vars, ['view' => 'graphs', 'graph' => 'macaccounting_pkts']);
     if ($vars['graph'] == 'macaccounting_pkts') {
         echo '</span>';
     }
@@ -230,7 +230,7 @@ if (!Auth::user()->hasGlobalRead()) {
         if ($peer['bgpPeerState'] == 'established') {
             $col = 'green';
         } else {
-            $col           = 'red';
+            $col = 'red';
             $peer['alert'] = 1;
         }
 
@@ -241,7 +241,7 @@ if (!Auth::user()->hasGlobalRead()) {
         }
 
         if ($peer['bgpPeerAdminStatus'] == 'stop') {
-            $peer['alert']    = 0;
+            $peer['alert'] = 0;
             $peer['disabled'] = 1;
         }
 
@@ -267,44 +267,44 @@ if (!Auth::user()->hasGlobalRead()) {
         }
 
         // display overlib graphs
-        $graph_array                = array();
-        $graph_array['type']        = 'bgp_updates';
-        $graph_array['id']          = $peer['bgpPeer_id'];
+        $graph_array = [];
+        $graph_array['type'] = 'bgp_updates';
+        $graph_array['id'] = $peer['bgpPeer_id'];
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
-        $graph_array['height']      = '110';
-        $graph_array['width']       = $width;
+        $graph_array['height'] = '110';
+        $graph_array['width'] = $width;
 
         // Peer Address
-        $graph_array_zoom           = $graph_array;
+        $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
-        $graph_array_zoom['width']  = '500';
-        $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
-        $peeraddresslink = "<span class=list-large>".overlib_link($overlib_link, $peer_ident, generate_graph_tag($graph_array_zoom), null)."</span>";
+        $graph_array_zoom['width'] = '500';
+        $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
+        $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $peer_ident, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
         // Local Address
-        $graph_array['afi']         = 'ipv4';
-        $graph_array['safi']        = 'unicast';
-        $graph_array_zoom['afi']    = 'ipv4';
-        $graph_array_zoom['safi']    = 'unicast';
-        $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
-        $localaddresslink = "<span class=list-large>".overlib_link($overlib_link, $peer_ip, generate_graph_tag($graph_array_zoom), null)."</span>";
+        $graph_array['afi'] = 'ipv4';
+        $graph_array['safi'] = 'unicast';
+        $graph_array_zoom['afi'] = 'ipv4';
+        $graph_array_zoom['safi'] = 'unicast';
+        $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
+        $localaddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $peer_ip, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
             $last_error = $peer['bgpPeerLastErrorText'];
         } else {
-            $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])."<br/>".$peer['bgpPeerLastErrorText'];
+            $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . '<br/>' . $peer['bgpPeerLastErrorText'];
         }
 
-        echo '<tr class="bgp"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>';
+        echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';
 
         unset($sep);
-        foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($peer['device_id'], $peer['bgpPeerIdentifier'])) as $afisafi) {
-            $afi          = $afisafi['afi'];
-            $safi         = $afisafi['safi'];
-            $this_afisafi = $afi.$safi;
-            $peer['afi'] .= $sep.$afi.'.'.$safi;
-            $sep          = '<br />';
+        foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
+            $afi = $afisafi['afi'];
+            $safi = $afisafi['safi'];
+            $this_afisafi = $afi . $safi;
+            $peer['afi'] .= $sep . $afi . '.' . $safi;
+            $sep = '<br />';
             $peer['afisafi'][$this_afisafi] = 1;
             // Build a list of valid AFI/SAFI for this peer
         }
@@ -312,18 +312,18 @@ if (!Auth::user()->hasGlobalRead()) {
         unset($sep);
 
         echo '  <td></td>
-            <td width=150>'.$localaddresslink.'<br />'.generate_device_link($peer, shorthost($peer['hostname']), array('tab' => 'routing', 'proto' => 'bgp')).'</td>
+            <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
-            <td width=150>'.$peeraddresslink."</td>
+            <td width=150>' . $peeraddresslink . "</td>
             <td width=50><b>$peer_type</b></td>
-            <td width=50>".$peer['afi'].'</td>
-            <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
-            <td>".$peer['bgpPeerDescr']."</td>
-            <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState']."</span></strong></td>
-            <td>".$last_error."</td>
-            <td>".formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
-            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerInUpdates'])."
-            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerOutUpdates']).'</td></tr>';
+            <td width=50>" . $peer['afi'] . '</td>
+            <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
+            <td>' . $peer['bgpPeerDescr'] . "</td>
+            <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
+            <td>' . $last_error . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
+            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi($peer['bgpPeerInUpdates'], 2, 3, '') . "
+            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi($peer['bgpPeerOutUpdates'], 2, 3, '') . '</td></tr>';
 
         unset($invalid);
         switch ($vars['graph']) {
@@ -332,24 +332,24 @@ if (!Auth::user()->hasGlobalRead()) {
             case 'prefixes_ipv4vpn':
             case 'prefixes_ipv6unicast':
             case 'prefixes_ipv6multicast':
-                list(,$afisafi) = explode('_', $vars['graph']);
+                [,$afisafi] = explode('_', $vars['graph']);
                 if (isset($peer['afisafi'][$afisafi])) {
                     $peer['graph'] = 1;
                 }
                 // fall-through
             case 'updates':
-                $graph_array['type'] = 'bgp_'.$vars['graph'];
-                $graph_array['id']   = $peer['bgpPeer_id'];
+                $graph_array['type'] = 'bgp_' . $vars['graph'];
+                $graph_array['id'] = $peer['bgpPeer_id'];
         }
 
         switch ($vars['graph']) {
             case 'macaccounting_bits':
             case 'macaccounting_pkts':
-                $acc      = dbFetchRow('SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id', array($peer['bgpPeerIdentifier']));
-                $database = rrd_name($device['hostname'], array('cip', $acc['ifIndex'], $acc['mac']));
+                $acc = dbFetchRow('SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id', [$peer['bgpPeerIdentifier']]);
+                $database = Rrd::name($device['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
                 if (is_array($acc) && is_file($database)) {
-                    $peer['graph']       = 1;
-                    $graph_array['id']   = $acc['ma_id'];
+                    $peer['graph'] = 1;
+                    $graph_array['id'] = $acc['ma_id'];
                     $graph_array['type'] = $vars['graph'];
                 }
         }
@@ -360,9 +360,9 @@ if (!Auth::user()->hasGlobalRead()) {
 
         if ($peer['graph']) {
             $graph_array['height'] = '100';
-            $graph_array['width']  = '218';
+            $graph_array['width'] = '218';
             $graph_array['to'] = \LibreNMS\Config::get('time.now');
-            echo '<tr></tr><tr class="bgp"'.($bg_image ? ' background="'.$bg_image.'"' : '').'"><td colspan="9">';
+            echo '<tr></tr><tr class="bgp"' . ($bg_image ? ' background="' . $bg_image . '"' : '') . '"><td colspan="9">';
 
             include 'includes/html/print-graphrow.inc.php';
 

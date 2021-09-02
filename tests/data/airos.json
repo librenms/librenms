@@ -707,27 +707,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.10002.1",
                     "sysDescr": "Linux 2.6.32.68 #1 Fri Dec 16 15:44:21 EET 2016 mips",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "airos",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.10002.1",
-                    "sysDescr": "Linux 2.6.32.68 #1 Fri Dec 16 15:44:21 EET 2016 mips",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": "Ubiquiti Linux 2.6.32.68 #1 Fri Dec 16 15:44:21 EET 2016 mips",
+                    "version": "8.5.1.37185.180307.0931",
+                    "hardware": "Rocket Prism 5AC Gen2",
                     "features": null,
                     "os": "airos",
                     "type": "wireless",
@@ -736,6 +718,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

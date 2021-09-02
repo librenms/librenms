@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja <pipocanaja@gmail.com>
  */
@@ -42,19 +41,20 @@ class FsGbn extends OS implements ProcessorDiscovery
         $processors = [];
 
         // Test first pair of OIDs from GBNPlatformOAM-MIB
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.13464.1.2.1.1.2.11.'.$index, //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
+                '.1.3.6.1.4.1.13464.1.2.1.1.2.11.' . $index, //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
                 $index,
                 $entry['cpuDescription'],
                 -1,
                 100 - $entry['cpuIdle']
             );
         }
+
         return $processors;
     }
 }

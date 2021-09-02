@@ -6,27 +6,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.94.48.1",
                     "sysDescr": "SG350X-48 48-Port Gigabit Stackable Managed Switch",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ciscosb",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.6.1.94.48.1",
-                    "sysDescr": "SG350X-48 48-Port Gigabit Stackable Managed Switch",
                     "sysContact": "<private>",
-                    "version": "Software ",
-                    "hardware": null,
+                    "version": "",
+                    "hardware": "SG350X-48",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

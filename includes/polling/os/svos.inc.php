@@ -1,6 +1,6 @@
 <?php
 
-$data = snmpwalk_cache_oid($device, 'raidExMibRaidListTable', array(), 'HM800MIB');
+$data = snmpwalk_cache_oid($device, 'raidExMibRaidListTable', [], 'HM800MIB');
 d_echo($data);
 
 foreach ($data as $serialnum => $oid) {

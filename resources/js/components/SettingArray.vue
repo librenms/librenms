@@ -14,10 +14,10 @@
   - GNU General Public License for more details.
   -
   - You should have received a copy of the GNU General Public License
-  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -
   - @package    LibreNMS
-  - @link       http://librenms.org
+  - @link       https://www.librenms.org
   - @copyright  2019 Tony Murray
   - @author     Tony Murray <murraytony@gmail.com>
   -->
@@ -68,19 +68,23 @@
         },
         methods: {
             addItem() {
+                if (this.disabled) return;
                 this.localList.push(this.newItem);
                 this.$emit('input', this.localList);
                 this.newItem = "";
             },
             removeItem(index) {
+                if (this.disabled) return;
                 this.localList.splice(index, 1);
                 this.$emit('input', this.localList);
             },
             updateItem(index, value) {
+                if (this.disabled || this.localList[index] === value) return;
                 this.localList[index] = value;
                 this.$emit('input', this.localList);
             },
             dragged() {
+                if (this.disabled) return;
                 this.$emit('input', this.localList);
             }
         },

@@ -6,27 +6,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2011.2.239.1",
                     "sysDescr": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE12800 V200R002C50SPC800) \r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd. \r\nHUAWEICE12804",
-                    "sysContact": null,
-                    "version": "8.150 (V200R002C50SPC800) [CE12804,CE12804-AC,CE12804 AC Assembly Chassis(with CMUs and Fans)]",
-                    "hardware": "Huawei CE12800",
-                    "features": null,
-                    "os": "vrp",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "huawei.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2011.2.239.1",
-                    "sysDescr": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE12800 V200R002C50SPC800) \r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd. \r\nHUAWEICE12804",
                     "sysContact": "<private>",
                     "version": "8.150 (V200R002C50SPC800) [CE12804,CE12804-AC,CE12804 AC Assembly Chassis(with CMUs and Fans)]",
-                    "hardware": "Huawei CE12800",
+                    "hardware": "CE12800",
                     "features": null,
                     "os": "vrp",
                     "type": "network",
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

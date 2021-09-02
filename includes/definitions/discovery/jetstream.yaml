@@ -1,9 +1,187 @@
-mib: TPLINK-SYSMONITOR-MIB
+---
+mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB:TPLINK-DDMSTATUS-MIB:TPLINK-DDMBIASCURTHRESHOLD-MIB:TPLINK-DDMRXPOWTHRESHOLD-MIB:TPLINK-DDMTXPOWTHRESHOLD-MIB:TPLINK-DDMTEMPTHRESHOLD-MIB:TPLINK-DDMVOLTHRESHOLD-MIB:TPLINK-POWER-OVER-ETHERNET-MIB
 modules:
+    os:
+        hardware: TPLINK-SYSINFO-MIB::tpSysInfoHwVersion.0
+        serial: TPLINK-SYSINFO-MIB::tpSysInfoSerialNum.0
+        version: TPLINK-SYSINFO-MIB::tpSysInfoSwVersion.0
+    mempools:
+        data:
+            -
+                percent_used: TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryUtilization
+                descr: 'Memory #{{ $index }}'
     processors:
         data:
             -
                 oid: tpSysMonitorCpu5Seconds
                 num_oid: '.1.3.6.1.4.1.11863.6.4.1.1.1.1.2.{{ $index }}'
-                index:  '{{ $index }}'
+                index: '{{ $index }}'
                 descr: 'Proc #{{ $index }}'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ddmBiasCurThresholdLowAlarm
+                        - ddmBiasCurThresholdLowWarn
+                        - ddmBiasCurThresholdHighAlarm
+                        - ddmBiasCurThresholdHighWarn
+                        - ddmTempThresholdLowAlarm
+                        - ddmTempThresholdLowWarn
+                        - ddmTempThresholdHighAlarm
+                        - ddmTempThresholdHighWarn
+                        - ddmVolThresholdLowAlarm
+                        - ddmVolThresholdLowWarn
+                        - ddmVolThresholdHighAlarm
+                        - ddmVolThresholdHighWarn
+                        - ddmRxPowThresholdLowAlarm
+                        - ddmRxPowThresholdLowWarn
+                        - ddmRxPowThresholdHighAlarm
+                        - ddmRxPowThresholdHighWarn
+                        - ddmTxPowThresholdLowAlarm
+                        - ddmTxPowThresholdLowWarn
+                        - ddmTxPowThresholdHighAlarm
+                        - ddmTxPowThresholdHighWarn
+        current:
+            data:
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.4.{{ $index }}'
+                    value: ddmStatusBiasCurrent
+                    descr: 'DDM Bias Current {{ $ddmStatusPort }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusBiasCurrent.{{ $index }}'
+                    low_limit: ddmBiasCurThresholdLowAlarm
+                    low_warn_limit: ddmBiasCurThresholdLowWarn
+                    high_limit: ddmBiasCurThresholdHighAlarm
+                    warn_limit: ddmBiasCurThresholdHighWarn
+        dbm:
+            data:
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.5.{{ $index }}'
+                    value: ddmStatusTxPow
+                    descr: 'DDM TX Power {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusTxPow.{{ $index }}'
+                    user_func: mw_to_dbm
+                    low_limit: ddmTxPowThresholdLowAlarm
+                    low_warn_limit: ddmTxPowThresholdLowWarn
+                    high_limit: ddmTxPowThresholdHighAlarm
+                    warn_limit: ddmTxPowThresholdHighWarn
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.6.{{ $index }}'
+                    value: ddmStatusRxPow
+                    descr: 'DDM RX Power {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusRxPow.{{ $index }}'
+                    user_func: mw_to_dbm
+                    low_limit: ddmRxPowThresholdLowAlarm
+                    low_warn_limit: ddmRxPowThresholdLowWarn
+                    high_limit: ddmRxPowThresholdHighAlarm
+                    warn_limit: ddmRxPowThresholdHighWarn
+        power:
+            data:
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.{{ $index }}'
+                    value: tpSystemPowerConsumption
+                    descr: 'Power Consumption'
+                    divisor: 10
+                    index: tpSystemPowerConsumption
+                    group: PoE
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.{{ $index }}'
+                    value: tpSystemPowerRemain
+                    descr: 'Power Remaining'
+                    divisor: 10
+                    index: tpSystemPowerRemain
+                    group: PoE
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.{{ $index }}'
+                    value: tpSystemPowerLimit
+                    descr: 'Power Limit'
+                    divisor: 10
+                    index: tpSystemPowerLimit
+                    group: PoE
+        state:
+            data:
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.7.{{ $index }}'
+                    value: ddmStatusDataReady
+                    descr: 'DDM Data Ready {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: '{{ $index }}'
+                    skip_values: 2
+                    states: &ddm_states
+                        - {value: 0, generic: 0, graph: 0, descr: 'False'}
+                        - {value: 1, generic: 2, graph: 1, descr: 'True'}
+                        - {value: 2, generic: 2, graph: 2, descr: N/A}
+                    state_name: ddmStatusDataReady
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.8.{{ $index }}'
+                    value: ddmStatusLossSignal
+                    descr: 'DDM Loss of Signal {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: '{{ $index }}'
+                    skip_values: 2
+                    states: *ddm_states
+                    state_name: ddmStatusLossSignal
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.9.{{ $index }}'
+                    value: ddmStatusTxFault
+                    descr: 'DDM TX Fault {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: '{{ $index }}'
+                    skip_values: 2
+                    states: *ddm_states
+                    state_name: ddmStatusTxFault
+        temperature:
+            data:
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.2.{{ $index }}'
+                    value: ddmStatusTemperature
+                    descr: 'DDM Temperature {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusTemperature.{{ $index }}'
+                    low_limit: ddmTempThresholdLowAlarm
+                    low_warn_limit: ddmTempThresholdLowWarn
+                    high_limit: ddmTempThresholdHighAlarm
+                    warn_limit: ddmTempThresholdHighWarn
+        voltage:
+            data:
+                -
+                    oid: ddmStatusEntry
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.3.{{ $index }}'
+                    value: ddmStatusVoltage
+                    descr: 'DDM Voltage {{ $ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusVoltage.{{ $index }}'
+                    low_limit: ddmVolThresholdLowAlarm
+                    low_warn_limit: ddmVolThresholdLowWarn
+                    high_limit: ddmVolThresholdHighAlarm
+                    warn_limit: ddmVolThresholdHighWarn

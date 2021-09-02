@@ -212,15 +212,12 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
 
                     $("#recurring").bootstrapSwitch('state', true);
                     $('#recurring').val(1);
-                    var recdayupd = output['recurring_day'];
-                    if (recdayupd){
-                        var arrayrecdayupd = recdayupd.split(',');
-                        $.each(arrayrecdayupd, function(indexcheckedday, checkedday){
-                            $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
-                        });
-                    }else{
-                        $("input[name='recurring_day[]']").prop('checked', false);
-                    }
+                    var daysofweek = {"Mo": 1, "Tu": 2, "We": 3, "Th": 4, "Fr": 5, "Sa": 6, "Su": 7};
+                    var arrayrecdayupd = output['recurring_day'];
+                    $("input[name='recurring_day[]']").prop('checked', false);
+                    $.each(arrayrecdayupd, function(indexdayup, recdayupd){
+                        $("input[name='recurring_day[]'][value="+daysofweek[recdayupd]+"]").prop('checked', true);
+                    });
 
                     $('#norecurringgroup').hide();
                     $('#recurringgroup').show();
@@ -257,7 +254,7 @@ function recurring_switch() {
     }
 }
 
-$('#sched-submit').click('', function(e) {
+$('#sched-submit').on("click", function(e) {
     e.preventDefault();
     // parse start/end to ISO8601
     var formData = $('form.schedule-maintenance-form').serializeArray();

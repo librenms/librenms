@@ -10,8 +10,7 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
 type: network
-mib_dir:
-    - ciena
+mib_dir: ciena
 discovery:
     -
         sysObjectID:

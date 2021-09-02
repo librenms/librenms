@@ -33,8 +33,7 @@ To include users that have `Global-Read`, `Administrator` or
 
 ## Using a AMQP based Transport
 
-You need to install an additional php module : `bcmath` (eg `php72w-bcmath` for
-Centos 7)
+You need to install an additional php module : `bcmath`
 
 ## Alerta
 
@@ -63,9 +62,12 @@ of alerts of similar content for an array of hosts, whereas
 Alertmanager can group them by alert meta, ideally producing one
 single notice in case an issue occurs.
 
-It is possible to configure as much label values as required in
-Alertmanager Options section. Every label and it's value should be
+It is possible to configure as many label values as required in
+Alertmanager Options section. Every label and its value should be
 entered as a new line.
+
+Multiple Alertmanager URLs (comma separated) are supported. Each
+URL will be tried and the search will stop at the first success.
 
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
@@ -73,7 +75,7 @@ entered as a new line.
 
 | Config | Example |
 | ------ | ------- |
-| Alertmanager URL      | http://alertmanager.example.com |
+| Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
 | Alertmanager Options: | source=librenms <br/> customlabel=value |
 
 ## API
@@ -259,11 +261,11 @@ The index pattern uses strftime() formatting.
 | Port | 9200 |
 | Index Patter | librenms-%Y.%m.%d |
 
-## Gitlab
+## GitLab
 
 LibreNMS will create issues for warning and critical level alerts
 however only title and description are set. Uses Personal access
-tokens to authenticate with Gitlab and will store the token in cleartext.
+tokens to authenticate with GitLab and will store the token in cleartext.
 
 **Example:**
 
@@ -354,11 +356,29 @@ As a small reminder, here is it's configuration directives including defaults:
 | ------ | ------- |
 | Email | me@example.com |
 
+## Matrix
+
+For using the Matrix transports, you have to create a room on the Matrix-server.
+The provided Auth_token belongs to an user, which is member of this room.
+The Message, sent to the matrix-room can be built from the variables defined in
+[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
+See API-Transport. The variable ``` $msg ``` is contains the result of the Alert template.
+The Matrix-Server URL is cutted before the beginning of the ``_matrix/client/r0/...`` API-part.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Matrix-Server URL | <https://matrix.example.com/> |
+| Room | !ajPbbPalmVbNuQoBDK:example.com |
+| Auth_token: | MDAyYmxvY2F0aW9uI...z1DCn6lz_uOhtW3XRICg |
+| Message: | Alert: {{ $msg }} https://librenms.example.com |
+
 ## Microsoft Teams
 
-LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are 
-then posted to a specific channel. Microsoft recommends using 
-[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards. 
+LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are
+then posted to a specific channel. Microsoft recommends using
+[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards.
 Administrators can opt to [compose](https://messagecardplayground.azurewebsites.net/)
 the [MessageCard](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference)
 themselves using JSON to get the full functionality.
@@ -638,7 +658,10 @@ You need a token you can find on your personnal space.
 LibreNMS can send alerts to a Splunk instance and provide all device
 and alert details.
 
-Example output: `Feb 21 15:21:52 nms  hostname="localhost", sysName="localhost", 
+Example output:
+
+```
+Feb 21 15:21:52 nms  hostname="localhost", sysName="localhost", 
 sysDescr="", sysContact="", os="fortigate", type="firewall", ip="localhost", 
 hardware="FGT_50E", version="v5.6.9", serial="", features="", location="", 
 uptime="387", uptime_short=" 6m 27s", uptime_long=" 6 minutes 27 seconds", 
@@ -756,6 +779,19 @@ located at: [https://www.twilio.com/docs/api?filter-product=sms](https://www.twi
 | Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
 | Twilio SMS Number | 8888778660 |
 
+## UKFast PSS
+
+UKFast PSS tickets can be raised from alerts using the UKFastPSS transport. This required an [API key](https://my.ukfast.co.uk/applications) with PSS `write` permissions
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Key | ABCDefgfg12 |
+| Author | 5423 |
+| Priority | Critical |
+| Secure | true |
+
 ## VictorOps
 
 VictorOps provide a webHook url to make integration extremely
@@ -805,6 +841,20 @@ connect to servicedesk
 | Kayako API Key | 8cc02f38-7465-4a0c-8730-bb3af122167b |
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako Department | 1 |
+
+## Signal CLI
+
+Use the Signal Mesenger for Alerts. Run the Signal CLI with the D-Bus option.
+
+[GitHub Project](https://github.com/AsamK/signal-cli)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Path | /opt/signal-cli/bin/signal-cli |
+| Recipient type | Group |
+| Recipient | dfgjsdkgljior4345== |
 
 ## SMSFeedback
 

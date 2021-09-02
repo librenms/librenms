@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateLoadbalancerRserversTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

@@ -1,30 +1,29 @@
 <?php
 /**
-* timos.inc.php
-*
-* LibreNMS include timos (nokia) virtual router ports
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-* @package    LibreNMS
-* @link       http://librenms.org
-* @copyright  2018 Vitali Kari
-* @author     Vitali Kari <vitali.kari@gmail.com>
-*/
+ * timos.inc.php
+ *
+ * LibreNMS include timos (nokia) virtual router ports
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ * @copyright  2018 Vitali Kari
+ * @author     Vitali Kari <vitali.kari@gmail.com>
+ */
 
 // get all virtual router ports and statistics
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', array(), 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', [], 'TIMETRA-VRTR-MIB');
 $timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfAlias', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
 $timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfDescription', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
 $timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfSpeed', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
@@ -54,7 +53,7 @@ $translate = [
     'ifHCInOctets'      => 'vRtrIfRxBytes',
     'ifHCOutOctets'     => 'vRtrIfTxBytes',
     'ifHCInUcastPkts'   => 'vRtrIfRxPkts',
-    'ifHCOutUcastPkts'  => 'vRtrIfTxPkts'
+    'ifHCOutUcastPkts'  => 'vRtrIfTxPkts',
 ];
 
 $timos_ports = [];

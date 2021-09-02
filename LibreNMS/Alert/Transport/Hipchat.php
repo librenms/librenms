@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /*
  * API Transport
@@ -21,9 +21,9 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Hipchat extends Transport
@@ -41,50 +41,48 @@ class Hipchat extends Transport
     public function contactHipchat($obj, $option)
     {
         $version = 1;
-        if (stripos($option['url'], "v2")) {
+        if (stripos($option['url'], 'v2')) {
             $version = 2;
         }
 
         // Generate our URL from the base URL + room_id and the auth token if the version is 2.
         $url = $option['url'];
         if ($version == 2) {
-            $url .= "/" . urlencode($option["room_id"]) . "/notification?auth_token=" . urlencode($option["auth_token"]);
+            $url .= '/' . urlencode($option['room_id']) . '/notification?auth_token=' . urlencode($option['auth_token']);
         }
-        foreach ($obj as $key => $value) {
-            $api = str_replace("%" . $key, $method == "get" ? urlencode($value) : $value, $api);
-        }
+
         $curl = curl_init();
 
-        if (empty($obj["msg"])) {
-            return "Empty Message";
+        if (empty($obj['msg'])) {
+            return 'Empty Message';
         }
 
-        if (empty($option["message_format"])) {
-            $option["message_format"] = 'text';
+        if (empty($option['message_format'])) {
+            $option['message_format'] = 'text';
         }
 
         // Sane default of making the message color green if the message indicates
         // that the alert recovered.   If it rebooted, make it yellow.
-        if (stripos($obj["msg"], "recovered")) {
-            $color = "green";
-        } elseif (stripos($obj["msg"], "rebooted")) {
-            $color = "yellow";
+        if (stripos($obj['msg'], 'recovered')) {
+            $color = 'green';
+        } elseif (stripos($obj['msg'], 'rebooted')) {
+            $color = 'yellow';
         } else {
-            if (empty($option["color"]) || $option["color"] == 'u') {
+            if (empty($option['color']) || $option['color'] == 'u') {
                 $color = 'red';
             } else {
-                $color = $option["color"];
+                $color = $option['color'];
             }
         }
 
-        $data[] = "message=" . urlencode($obj["msg"]);
+        $data[] = 'message=' . urlencode($obj['msg']);
         if ($version == 1) {
-            $data[] = "room_id=" . urlencode($option["room_id"]);
+            $data[] = 'room_id=' . urlencode($option['room_id']);
         }
-        $data[] = "from=" . urlencode($option["from"]);
-        $data[] = "color=" . urlencode($color);
-        $data[] = "notify=" . urlencode($option["notify"]);
-        $data[] = "message_format=" . urlencode($option["message_format"]);
+        $data[] = 'from=' . urlencode($option['from']);
+        $data[] = 'color=' . urlencode($color);
+        $data[] = 'notify=' . urlencode($option['notify']);
+        $data[] = 'message_format=' . urlencode($option['message_format']);
 
         $data = implode('&', $data);
         set_curl_proxy($curl);
@@ -92,16 +90,17 @@ class Hipchat extends Transport
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-Type: application/x-www-form-urlencoded',
-        ));
+        ]);
         $ret = curl_exec($curl);
 
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200 && $code != 204) {
             var_dump("API '$url' returned Error");
-            var_dump("Params: " . $message);
-            var_dump("Return: " . $ret);
+            //var_dump('Params: ' . $message);
+            var_dump('Return: ' . $ret);
+
             return 'HTTP Status code ' . $code;
         }
 
@@ -140,7 +139,7 @@ class Hipchat extends Transport
             'validation' => [
                 'hipchat-url' => 'required|url',
                 'hipchat-room-id' => 'required|numeric',
-            ]
+            ],
         ];
     }
 }

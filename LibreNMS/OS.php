@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,19 +30,27 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
+use LibreNMS\OS\Traits\YamlOSDiscovery;
 
-class OS implements ProcessorDiscovery
+class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
+        HostResources::discoverMempools as discoverHrMempools;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
+        UcdResources::discoverMempools as discoverUcdMempools;
     }
+    use YamlOSDiscovery;
+    use YamlMempoolsDiscovery;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
@@ -52,6 +59,7 @@ class OS implements ProcessorDiscovery
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
+     *
      * @param array $device
      */
     private function __construct(&$device)
@@ -65,7 +73,7 @@ class OS implements ProcessorDiscovery
      *
      * @return array
      */
-    public function &getDevice()
+    public function &getDeviceArray()
     {
         return $this->device;
     }
@@ -77,7 +85,7 @@ class OS implements ProcessorDiscovery
      */
     public function getDeviceId()
     {
-        return (int)$this->device['device_id'];
+        return (int) $this->device['device_id'];
     }
 
     /**
@@ -85,7 +93,7 @@ class OS implements ProcessorDiscovery
      *
      * @return Device
      */
-    public function getDeviceModel()
+    public function getDevice()
     {
         return DeviceCache::get($this->getDeviceId());
     }
@@ -102,7 +110,7 @@ class OS implements ProcessorDiscovery
 
     public function persistGraphs()
     {
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
         $graphs = collect(array_keys($this->graphs));
 
         // delete extra graphs
@@ -130,17 +138,18 @@ class OS implements ProcessorDiscovery
      * @param string $oid textual oid
      * @param string $mib mib for this oid
      * @param string $snmpflags snmpflags for this oid
-     * @return array array indexed by the snmp index with the value as the data returned by snmp
+     * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
         if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
+
             return null;
         }
 
-        if (!isset($this->cache['cache_oid'][$oid])) {
-            $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib, null, $snmpflags);
+        if (! isset($this->cache['cache_oid'][$oid])) {
+            $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
             $this->cache['cache_oid'][$oid] = array_map('current', $data);
         }
 
@@ -154,18 +163,19 @@ class OS implements ProcessorDiscovery
      *
      * @param string $oid textual oid
      * @param string $mib mib for this oid (optional)
-     * @param string $depth depth for snmpwalk_group (optional)
-     * @return array array indexed by the snmp index with the value as the data returned by snmp
+     * @param int $depth depth for snmpwalk_group (optional)
+     * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
         if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
+
             return null;
         }
 
-        if (!isset($this->cache['group'][$depth][$oid])) {
-            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDevice(), $oid, $mib, $depth);
+        if (! isset($this->cache['group'][$depth][$oid])) {
+            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
         }
 
         return $this->cache['group'][$depth][$oid];
@@ -174,7 +184,7 @@ class OS implements ProcessorDiscovery
     /**
      * Check if an OID has been cached
      *
-     * @param $oid
+     * @param string $oid
      * @return bool
      */
     public function isCached($oid)
@@ -196,6 +206,7 @@ class OS implements ProcessorDiscovery
         d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
         if (class_exists($class)) {
             d_echo("OS initialized: $class\n");
+
             return new $class($device);
         }
 
@@ -205,11 +216,13 @@ class OS implements ProcessorDiscovery
             d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
             if (class_exists($class)) {
                 d_echo("OS initialized: $class\n");
+
                 return new $class($device);
             }
         }
 
         d_echo("OS initialized as Generic\n");
+
         return new Generic($device);
     }
 
@@ -221,7 +234,7 @@ class OS implements ProcessorDiscovery
 
         $rf = new \ReflectionClass($this);
         $name = $rf->getShortName();
-        preg_match_all("/[A-Z][a-z]*/", $name, $segments);
+        preg_match_all('/[A-Z][a-z]*/', $name, $segments);
 
         return implode('-', array_map('strtolower', $segments[0]));
     }
@@ -236,17 +249,17 @@ class OS implements ProcessorDiscovery
     protected function pollWirelessChannelAsFrequency($sensors, $callback = null)
     {
         if (empty($sensors)) {
-            return array();
+            return [];
         }
 
-        $oids = array();
+        $oids = [];
         foreach ($sensors as $sensor) {
             $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
         }
 
-        $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
+        $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
-        $data = array();
+        $data = [];
         foreach ($oids as $id => $oid) {
             if (isset($callback)) {
                 $channel = call_user_func($callback, $snmp_data[$oid]);
@@ -275,5 +288,40 @@ class OS implements ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    public function discoverMempools()
+    {
+        if ($this->hasYamlDiscovery('mempools')) {
+            return $this->discoverYamlMempools();
+        }
+
+        $mempools = $this->discoverHrMempools();
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        return $this->discoverUcdMempools();
+    }
+
+    public function getDiscovery($module = null)
+    {
+        if (! array_key_exists('dynamic_discovery', $this->device)) {
+            $file = base_path('/includes/definitions/discovery/' . $this->getName() . '.yaml');
+            if (file_exists($file)) {
+                $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+            }
+        }
+
+        if ($module) {
+            return $this->device['dynamic_discovery']['modules'][$module] ?? [];
+        }
+
+        return $this->device['dynamic_discovery'] ?? [];
+    }
+
+    public function hasYamlDiscovery(string $module = null)
+    {
+        return $module ? isset($this->getDiscovery()['modules'][$module]) : ! empty($this->getDiscovery());
     }
 }

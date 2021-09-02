@@ -6,8 +6,7 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: stormshield
-mib_dir:
-    - stormshield
+mib_dir: stormshield
 discovery:
     -
         sysObjectID:

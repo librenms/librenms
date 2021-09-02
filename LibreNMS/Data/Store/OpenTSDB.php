@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @copyright  2017 Yacine Benamsili <https://github.com/yac01/librenms.git>
  * @author     Tony Murray <murraytony@gmail.com>
@@ -33,7 +32,7 @@ use Log;
 
 class OpenTSDB extends BaseDatastore
 {
-    /** @var \Socket\Raw\Socket $connection */
+    /** @var \Socket\Raw\Socket */
     protected $connection;
 
     public function __construct(\Socket\Raw\Factory $socketFactory)
@@ -76,19 +75,20 @@ class OpenTSDB extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             Log::error("OpenTSDB Error: not connected\n");
+
             return;
         }
 
         $flag = Config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
-        $tmp_tags = "hostname=".$device['hostname'];
+        $tmp_tags = 'hostname=' . $device['hostname'];
 
         foreach ($tags as $k => $v) {
-            $v = str_replace(array(' ',',','='), '_', $v);
-            if (!empty($v)) {
-                $tmp_tags = $tmp_tags ." ". $k ."=".$v;
+            $v = str_replace([' ', ',', '='], '_', $v);
+            if (! empty($v)) {
+                $tmp_tags = $tmp_tags . ' ' . $k . '=' . $v;
             }
         }
 
@@ -96,10 +96,10 @@ class OpenTSDB extends BaseDatastore
             foreach ($fields as $k => $v) {
                 $measurement = $k;
                 if ($flag == true) {
-                    $measurement = $measurement.".".$device['co'];
+                    $measurement = $measurement . '.' . $device['co'];
                 }
 
-                $this->putData('port.'.$measurement, $timestamp, $v, $tmp_tags);
+                $this->putData('port.' . $measurement, $timestamp, $v, $tmp_tags);
             }
         } else {
             if ($flag == true) {
@@ -107,7 +107,7 @@ class OpenTSDB extends BaseDatastore
             }
 
             foreach ($fields as $k => $v) {
-                $tmp_tags_key = $tmp_tags . " " . "key" . "=" . $k;
+                $tmp_tags_key = $tmp_tags . ' ' . 'key' . '=' . $k;
                 $this->putData($measurement, $timestamp, $v, $tmp_tags_key);
             }
         }
@@ -136,7 +136,7 @@ class OpenTSDB extends BaseDatastore
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {

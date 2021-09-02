@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'bigip_apm_sessions');
+$rrd_filename = Rrd::name($device['hostname'], 'bigip_apm_sessions');
 
 require 'includes/html/graphs/common.inc.php';
 

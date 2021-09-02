@@ -69,7 +69,7 @@ class PollerClusterSettings extends Migration
                 'update_frequency',
                 'loglevel',
                 'watchdog_enabled',
-                'watchdog_log'
+                'watchdog_log',
             ]);
         });
     }

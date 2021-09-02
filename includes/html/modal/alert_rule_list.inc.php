@@ -15,18 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -62,7 +61,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                             echo "
                                 <tr>
                                     <td>{$rule['name']}</td>
-                                    <td><i>".htmlentities($rule_display)."</i></td>
+                                    <td><i>" . htmlentities($rule_display) . "</i></td>
                                     <td>{$rule['severity']}</td>
                                     <td>{$rule['id']}</td>
                                 </tr>
@@ -93,8 +92,8 @@ if (!Auth::user()->hasGlobalAdmin()) {
                                     success: function (data) {
                                         if (data.status == 'ok') {
                                             $("#search_alert_rule_modal").one('hidden.bs.modal', function(event) {
-                                                loadRule(data);
                                                 $('#create-alert').modal('show');
+                                                loadRule(data);
                                             });
                                             $("#search_alert_rule_modal").modal('hide');
                                         } else {

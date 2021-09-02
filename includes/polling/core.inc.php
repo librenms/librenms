@@ -11,21 +11,19 @@
  * See COPYING for more details.
  */
 
-use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Time;
 
-$snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysContact.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
+$snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
 
-$poll_device['sysUptime']   = $snmpdata['.1.3.6.1.2.1.1.3.0'];
-$poll_device['sysContact']  = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.4.0']);
-$poll_device['sysName']     = str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']));
+$poll_device['sysUptime'] = $snmpdata['.1.3.6.1.2.1.1.3.0'];
+$poll_device['sysName'] = str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']));
 $poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
-$poll_device['sysDescr']    = str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']);
+$poll_device['sysDescr'] = str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']);
 
-if (!empty($agent_data['uptime'])) {
-    list($uptime) = explode(' ', $agent_data['uptime']);
+if (! empty($agent_data['uptime'])) {
+    [$uptime] = explode(' ', $agent_data['uptime']);
     $uptime = round($uptime);
     echo "Using UNIX Agent Uptime ($uptime)\n";
 } else {
@@ -44,9 +42,9 @@ if ($uptime != 0 && Config::get("os.{$device['os']}.bad_uptime") !== true) {
         log_event('Device rebooted after ' . Time::formatInterval($device['uptime']) . " -> {$uptime}s", $device, 'reboot', 4, $device['uptime']);
     }
 
-    $tags = array(
+    $tags = [
         'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
-    );
+    ];
     data_update($device, 'uptime', $tags, $uptime);
 
     $os->enableGraph('uptime');
@@ -54,20 +52,14 @@ if ($uptime != 0 && Config::get("os.{$device['os']}.bad_uptime") !== true) {
     echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
 
     $update_array['uptime'] = $uptime;
-    $device['uptime']       = $uptime;
+    $device['uptime'] = $uptime;
 }//end if
 
-$poll_device['sysContact'] = str_replace('"', '', $poll_device['sysContact']);
-
-if ($poll_device['sysContact'] == 'not set') {
-    $poll_device['sysContact'] = '';
-}
-
 // Save results of various polled values to the database
-foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
+foreach (['sysObjectID', 'sysName', 'sysDescr'] as $elem) {
     if ($poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
-        $device[$elem]       = $poll_device[$elem];
+        $device[$elem] = $poll_device[$elem];
         log_event("$elem -> " . $poll_device[$elem], $device, 'system', 3);
     }
 }

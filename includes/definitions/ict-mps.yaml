@@ -2,9 +2,8 @@ os: ict-mps
 text: 'ICT Modular Power System'
 type: power
 icon: ict
-nobulk: true
-mib_dir:
-    - ict
+snmp_bulk: false
+mib_dir: ict
 over:
     - { graph: device_voltage, text: 'Input Voltage' }
     - { graph: device_voltage, text: 'Output Voltage' }

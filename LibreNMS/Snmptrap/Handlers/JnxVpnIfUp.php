@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Neil Kahle <nkahle@kanren.net>
  */
@@ -45,7 +44,7 @@ class JnxVpnIfUp implements SnmptrapHandler
         $vpnType = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnIfVpnType'));
         $vpnName = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnIfVpnName'));
 
-        if (substr($vpnName, 0, 6) === "vt/lsi") {
+        if (substr($vpnName, 0, 6) === 'vt/lsi') {
             $vpnDevice = substr($vpnName, 7, 15);
             Log::event("$vpnType to device $vpnDevice is now connected", $device->device_id, 'trap', 1);
         } else {

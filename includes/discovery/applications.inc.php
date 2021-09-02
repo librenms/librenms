@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,10 +27,10 @@ use LibreNMS\Config;
 echo "\nApplications: ";
 
 // fetch applications from the client
-$results = snmpwalk_cache_oid($device, 'nsExtendStatus', array(), 'NET-SNMP-EXTEND-MIB');
+$results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MIB');
 
 // Load our list of available applications
-$applications = array();
+$applications = [];
 if ($results) {
     foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
         $name = basename($file, '.inc.php');
@@ -52,20 +51,20 @@ d_echo(PHP_EOL . 'Available: ' . implode(', ', array_keys($applications)) . PHP_
 d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
 
 // Generate a list of enabled apps and a list of all discovered apps from the db
-list($enabled_apps, $discovered_apps) = array_reduce(dbFetchRows(
+[$enabled_apps, $discovered_apps] = array_reduce(dbFetchRows(
     'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? ORDER BY `app_type`',
-    array($device['device_id'])
+    [$device['device_id']]
 ), function ($result, $app) {
     $result[0][] = $app['app_type'];
     if ($app['discovered']) {
         $result[1][] = $app['app_type'];
     }
-    return $result;
-}, array(array(), array()));
 
+    return $result;
+}, [[], []]);
 
 // Enable applications
-$current_apps = array();
+$current_apps = [];
 foreach ($results as $extend => $result) {
     if (isset($applications[$extend])) {
         $app = $applications[$extend];
@@ -74,13 +73,13 @@ foreach ($results as $extend => $result) {
         if (in_array($app, $enabled_apps)) {
             echo '.';
         } else {
-            dbInsert(array(
+            dbInsert([
                 'device_id' => $device['device_id'],
                 'app_type' => $app,
                 'discovered' => 1,
                 'app_status' => '',
-                'app_instance' => ''
-            ), 'applications');
+                'app_instance' => '',
+            ], 'applications');
 
             echo '+';
             log_event("Application enabled by discovery: $app", $device, 'application', 1);
@@ -106,7 +105,7 @@ if ($num > 0) {
 }
 
 // clean application_metrics
-dbDeleteOrphans('application_metrics', array('applications.app_id'));
+dbDeleteOrphans('application_metrics', ['applications.app_id']);
 
 echo PHP_EOL;
 

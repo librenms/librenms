@@ -14,14 +14,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 //We can use RFC1213 or IP-FORWARD-MIB or MPLS-L3VPN-STD-MIB
 
 use App\Models\Device;
-use LibreNMS\Util\IPv4;
 use LibreNMS\Config;
+use LibreNMS\Util\IPv4;
 
 $ipForwardMibRoutesNumber = snmp_get($device, 'IP-FORWARD-MIB::inetCidrRouteNumber.0', '-Osqn');
 
@@ -42,7 +42,7 @@ $delete_row = [];
 $update_timestamp = dbFetchRows('select now() as now')[0]['now'];
 
 //Load current DB entries:
-$dbRoute = dbFetchRows('select * from `route` where `device_id` = ?', array($device['device_id']));
+$dbRoute = dbFetchRows('select * from `route` where `device_id` = ?', [$device['device_id']]);
 foreach ($dbRoute as $dbRow) {
     $current = $mixed[$dbRow['context_name']][$dbRow['inetCidrRouteDestType']][$dbRow['inetCidrRouteDest']][$dbRow['inetCidrRoutePfxLen']][$dbRow['inetCidrRoutePolicy']][$dbRow['inetCidrRouteNextHopType']][$dbRow['inetCidrRouteNextHop']];
     if (isset($current) && isset($current['db']) && count($current['db']) > 0) {
@@ -62,14 +62,14 @@ foreach ($dbRoute as $dbRow) {
 
 if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
     //RFC1213-MIB
-    $mib = "RFC1213-MIB";
-    $tableRoute = array();
+    $mib = 'RFC1213-MIB';
+    $tableRoute = [];
 
     $oid = '.1.3.6.1.2.1.4.21';
     $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
     d_echo('Routing table:');
     d_echo($tableRoute);
-        echo "RFC1213 ";
+    echo 'RFC1213 ';
     foreach ($tableRoute as $ipRoute) {
         if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
             continue;
@@ -93,12 +93,12 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
         $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
         $entryClean['updated_at'] = $update_timestamp;
         $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
-        if (isset($current) && isset($current['db']) && count($current['db']) > 0 &&  $delete_row[$current['db']['route_id']] != 1) {
+        if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
             //we already have a row in DB
             $entryClean['route_id'] = $current['db']['route_id'];
             $update_row[] = $entryClean;
         } else {
-            $entry['created_at'] = array('NOW()');
+            $entry['created_at'] = ['NOW()'];
             $create_row[] = $entryClean;
         }
     }
@@ -109,7 +109,6 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
 
 // IP-FORWARD-MIB with inetCidrRouteTable
 
-
 if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCidrRouteNumber'] < $max_routes) {
     // We have ip forward mib available
     d_echo('IP FORWARD MIB (with inetCidr support)');
@@ -117,7 +116,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
     $oid = '.1.3.6.1.2.1.4.24.7.1';
     $res = snmpwalk_group($device, $oid, $mib, 6, []);
     $ipForwardNb['0']['inetCidrRouteNumber'] = count($res); // Some cisco devices report ipv4+ipv6 but only include ipv6 in this table
-        echo "inetCidrRoute ";
+    echo 'inetCidrRoute ';
     foreach ($res as $inetCidrRouteDestType => $next1) {
         //ipv4 or ipv6
         foreach ($next1 as $inetCidrRouteDest => $next2) {
@@ -146,7 +145,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     unset($entry['inetCidrRouteStatus']);
                     $entryPerType[$inetCidrRouteDestType]++;
                     $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop];
-                    if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
+                    if (! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {
                         //we already have a row in DB
                         $entry['route_id'] = $current['db']['route_id'];
                         $update_row[] = $entry;
@@ -154,9 +153,8 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                         d_echo(isset($current));
                         d_echo(isset($current['db']));
                         d_echo($current['db']);
-                        d_echo(count($current['db']));
                         d_echo($delete_row[$current['db']['route_id']]);
-                        $entry['created_at'] = array('NOW()');
+                        $entry['created_at'] = ['NOW()'];
                         $create_row[] = $entry;
                     }
                 }
@@ -178,7 +176,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
     $mib = 'IP-FORWARD-MIB';
     $oid = '.1.3.6.1.2.1.4.24.4.1';
     $ipCidrTable = snmpwalk_group($device, $oid, $mib, 6, []);
-    echo "ipCidrRouteTable ";
+    echo 'ipCidrRouteTable ';
     // we need to translate the values to inetCidr structure;
     //d_echo($ipCidrTable);
     foreach ($ipCidrTable as $inetCidrRouteDest => $next1) {
@@ -203,12 +201,12 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
                     $entryClean['updated_at'] = $update_timestamp;
                     $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
-                    if (isset($current) && isset($current['db']) && count($current['db']) > 0 &&  $delete_row[$current['db']['route_id']] != 1) {
+                    if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
                         //we already have a row in DB
                         $entryClean['route_id'] = $current['db']['route_id'];
                         $update_row[] = $entryClean;
                     } else {
-                        $entryClean['created_at'] = array('NOW()');
+                        $entryClean['created_at'] = ['NOW()'];
                         $create_row[] = $entryClean;
                     }
                 }
@@ -221,20 +219,19 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
 // MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRteTable
 // Route numbers : MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes
 
-
 $mib = 'MPLS-L3VPN-STD-MIB';
 $oid = 'mplsL3VpnVrfPerfCurrNumRoutes';
 $mpls_vpn_route_nb = snmpwalk_group($device, $oid, $mib, 6, []);
 
 foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
     if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
-        echo("Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.");
+        echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
         $mpls_skip = 1;
     }
 }
 
 if ($mpls_skip != 1) {
-        echo "mplsL3VpnVrfRteTable ";
+    echo 'mplsL3VpnVrfRteTable ';
     // We can discover the routes;
     $oid = 'mplsL3VpnVrfRteTable';
     $mpls_route_table = snmpwalk_group($device, $oid, $mib, 7, []);
@@ -287,7 +284,7 @@ if ($mpls_skip != 1) {
                             d_echo($current['db']);
                             d_echo(count($current['db']));
                             d_echo($delete_row[$current['db']['route_id']]);
-                            $entry['created_at'] = array('NOW()');
+                            $entry['created_at'] = ['NOW()'];
                             $create_row[] = $entry;
                         }
                     }
@@ -304,7 +301,7 @@ foreach ($delete_row as $k => $v) {
         dbDelete(
             'route',
             '`route_id` = ?',
-            array($k)
+            [$k]
         );
         echo '-';
         d_echo($delete_row_data[$k]);
@@ -316,7 +313,7 @@ foreach ($update_row as $upd_entry) {
         $upd_entry,
         'route',
         '`route_id` = ?',
-        array($upd_entry['route_id'])
+        [$upd_entry['route_id']]
     );
     echo '.';
 }

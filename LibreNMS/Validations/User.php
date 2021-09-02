@@ -15,16 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Validations;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
@@ -47,14 +47,20 @@ class User extends BaseValidation
         $lnms_username = \config('librenms.user');
         $lnms_groupname = \config('librenms.group');
 
-        if (!($username === 'root' || $username === $lnms_username)) {
-            if (isCli()) {
-                $validator->fail("You need to run this script as $lnms_username or root");
+        if (! ($username === 'root' || $username === $lnms_username)) {
+            if (App::runningInConsole()) {
+                $validator->fail("You need to run this script as '$lnms_username' or root");
             } elseif (function_exists('posix_getgrnam')) {
                 $lnms_group = posix_getgrnam($lnms_groupname);
-                if (!in_array($username, $lnms_group['members'])) {
+
+                if ($lnms_group === false) {
                     $validator->fail(
-                        "Your web server or php-fpm is not running as user '$lnms_username' or in the group '$lnms_groupname''",
+                        "The group '$lnms_groupname' does not exist",
+                        "groupadd $lnms_groupname"
+                    );
+                } elseif (! in_array($username, $lnms_group['members'])) {
+                    $validator->fail(
+                        "Your web server or php-fpm is not running as user '$lnms_username' or in the group '$lnms_groupname'",
                         "usermod -a -G $lnms_groupname $username"
                     );
                 }
@@ -66,8 +72,8 @@ class User extends BaseValidation
             return;
         }
 
-        # if no git, then we probably have different permissions by design
-        if (!Git::repoPresent()) {
+        // if no git, then we probably have different permissions by design
+        if (! Git::repoPresent()) {
             return;
         }
 
@@ -84,42 +90,45 @@ class User extends BaseValidation
                 "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/",
             ];
 
-            $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
-            if (!empty($find_result)) {
-                // Ignore files created by the webserver
-                $ignore_files = array(
-                    "$log_dir/error_log",
-                    "$log_dir/access_log",
-                    "$dir/bootstrap/cache/",
-                    "$dir/storage/framework/cache/",
-                    "$dir/storage/framework/sessions/",
-                    "$dir/storage/framework/views/",
-                    "$dir/storage/debugbar/",
-                    "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
-                );
+            if (! Config::get('installed_from_package')) {
+                $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
+                if (! empty($find_result)) {
+                    // Ignore files created by the webserver
+                    $ignore_files = [
+                        "$log_dir/error_log",
+                        "$log_dir/access_log",
+                        "$dir/bootstrap/cache/",
+                        "$dir/storage/framework/cache/",
+                        "$dir/storage/framework/sessions/",
+                        "$dir/storage/framework/views/",
+                        "$dir/storage/debugbar/",
+                        "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
+                    ];
 
-                $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
-                    if (Str::startsWith($file, $ignore_files)) {
-                        return false;
+                    $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
+                        if (Str::startsWith($file, $ignore_files)) {
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                    if (! empty($files)) {
+                        $result = ValidationResult::fail(
+                            "We have found some files that are owned by a different user than '$lnms_username', this " .
+                            'will stop you updating automatically and / or rrd files being updated causing graphs to fail.'
+                        )
+                            ->setFix($fix)
+                            ->setList('Files', $files);
+
+                        $validator->result($result);
+
+                        return;
                     }
-
-                    return true;
-                });
-
-                if (!empty($files)) {
-                    $result = ValidationResult::fail(
-                        "We have found some files that are owned by a different user than $lnms_username, this " .
-                        'will stop you updating automatically and / or rrd files being updated causing graphs to fail.'
-                    )
-                        ->setFix($fix)
-                        ->setList('Files', $files);
-
-                    $validator->result($result);
-                    return;
                 }
             }
         } else {
-            $validator->warn("You don't have LIBRENMS_USER set, this most likely needs to be set to librenms");
+            $validator->warn("You don't have LIBRENMS_USER set, this most likely needs to be set to 'librenms'");
         }
     }
 }

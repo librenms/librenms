@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateVrfLiteCiscoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,7 +18,7 @@ class CreateVrfLiteCiscoTable extends Migration
             $table->string('context_name', 128)->index();
             $table->string('intance_name', 128)->nullable()->default('');
             $table->string('vrf_name', 128)->nullable()->default('Default')->index();
-            $table->index(['device_id','context_name','vrf_name']);
+            $table->index(['device_id', 'context_name', 'vrf_name']);
         });
     }
 

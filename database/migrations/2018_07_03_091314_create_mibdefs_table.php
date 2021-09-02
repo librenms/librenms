@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateMibdefsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -28,7 +27,7 @@ class CreateMibdefsTable extends Migration
             } else {
                 $table->timestamp('last_modified')->useCurrent();
             }
-            $table->primary(['module','mib','object_type']);
+            $table->primary(['module', 'mib', 'object_type']);
         });
     }
 

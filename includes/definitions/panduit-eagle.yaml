@@ -2,8 +2,7 @@ os: panduit-eagle
 text: 'Eagle-I'
 type: power
 icon: panduit
-mib_dir:
-    - sinetica
+mib_dir: sinetica
 over:
     - { graph: "", text: "" }
 discovery:

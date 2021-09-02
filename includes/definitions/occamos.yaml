@@ -2,8 +2,8 @@ os: occamos
 text: Calix B6 System
 type: network
 icon: calix
-mib_dir:
-    - calix
+mib_dir: calix
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

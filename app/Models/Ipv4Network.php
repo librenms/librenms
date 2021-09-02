@@ -15,26 +15,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ipv4Network extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'ipv4_network_id';
 
     // ---- Define Relationships ----
 
-    public function ipv4()
+    public function ipv4(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv4Address::class, 'ipv4_network_id');
     }

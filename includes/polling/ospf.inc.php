@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
@@ -8,21 +7,15 @@ use App\Models\OspfNbr;
 use App\Models\OspfPort;
 use LibreNMS\RRD\RrdDefinition;
 
-$device_model = Device::find($device['device_id']);
+$device_model = DeviceCache::getPrimary();
 
-if (key_exists('vrf_lite_cisco', $device) && ($device['vrf_lite_cisco'] != '')) {
-    $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} else {
-    $vrfs_lite_cisco = array(array('context_name' => null));
-}
-
-foreach ($vrfs_lite_cisco as $vrf_lite) {
-    $device['context_name'] = $vrf_lite['context_name'];
+foreach ($device_model->getVrfContexts() as $context_name) {
+    $device['context_name'] = $context_name;
 
     echo ' Processes: ';
 
     // Pull data from device
-    $ospf_instances_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfGeneralGroup', array(), 'OSPF-MIB');
+    $ospf_instances_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfGeneralGroup', [], 'OSPF-MIB');
     d_echo($ospf_instances_poll);
 
     $ospf_instances = collect();
@@ -52,7 +45,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     echo ' Areas: ';
 
     // Pull data from device
-    $ospf_areas_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfAreaEntry', array(), 'OSPF-MIB');
+    $ospf_areas_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfAreaEntry', [], 'OSPF-MIB');
     d_echo($ospf_areas_poll);
 
     $ospf_areas = collect();
@@ -76,17 +69,17 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     echo ' Ports: ';
 
     // Pull data from device
-    $ospf_ports_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfEntry', array(), 'OSPF-MIB');
+    $ospf_ports_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfEntry', [], 'OSPF-MIB');
     d_echo($ospf_ports_poll);
 
     $ospf_ports = collect();
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // find port_id
         if ($ospf_port['ospfAddressLessIf']) {
-            $ospf_port['port_id'] = (int)$device_model->ports()->where('ifIndex', $ospf_port['ospfAddressLessIf'])->value('port_id');
+            $ospf_port['port_id'] = (int) $device_model->ports()->where('ifIndex', $ospf_port['ospfAddressLessIf'])->value('port_id');
         } else {
             // FIXME force same device ?
-            $ospf_port['port_id'] = (int)Ipv4Address::query()
+            $ospf_port['port_id'] = (int) Ipv4Address::query()
                 ->where('ipv4_address', $ospf_port['ospfIfIpAddress'])
                 ->where('context_name', $device['context_name'])
                 ->value('port_id');
@@ -111,7 +104,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     echo ' Neighbours: ';
 
     // Pull data from device
-    $ospf_nbrs_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfNbrEntry', array(), 'OSPF-MIB');
+    $ospf_nbrs_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfNbrEntry', [], 'OSPF-MIB');
     d_echo($ospf_nbrs_poll);
 
     $ospf_neighbours = collect();
@@ -138,9 +131,33 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
         ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
 
     echo $ospf_neighbours->count();
+
+    echo ' TOS Metrics: ';
+
+    // Pull data from device
+    $ospf_tos_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfMetricEntry', [], 'OSPF-MIB');
+    d_echo($ospf_tos_poll);
+
+    $ospf_tos_metrics = collect();
+    foreach ($ospf_tos_poll as $ospf_tos_id => $ospf_tos) {
+        // get ospf_port_id
+        $ospf_tos['ospf_port_id'] = OspfPort::query()
+            ->where('ospfIfIpAddress', $ospf_tos['ospfIfMetricIpAddress'])
+            ->where('context_name', $device['context_name'])
+            ->value('ospf_port_id');
+        $tos = OspfPort::updateOrCreate([
+            'device_id' => $device['device_id'],
+            'ospf_port_id' => $ospf_tos['ospf_port_id'],
+            'context_name' => $device['context_name'],
+        ], $ospf_tos);
+
+        $ospf_tos_metrics->push($tos);
+    }
+
+    echo $ospf_tos_metrics->count();
 }
 
-unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
+unset($device['context_name'], $context_name);
 
 if ($instance_count) {
     // Create device-wide statistics RRD
@@ -185,6 +202,9 @@ unset(
     $ospf_nbr,
     $neighbour,
     $ospf_nbr_id,
+    $ospf_tos,
+    $tos,
+    $ospf_tos_id,
     $rrd_def,
     $fields,
     $tags

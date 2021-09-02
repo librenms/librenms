@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class UserWidget extends Model
 {
@@ -15,17 +16,17 @@ class UserWidget extends Model
 
     // ---- Define Relationships ----
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-    public function widget()
+    public function widget(): HasOne
     {
         return $this->hasOne(\App\Models\Widget::class, 'widget_id');
     }
 
-    public function dashboard()
+    public function dashboard(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Dashboard::class, 'dashboard_id');
     }

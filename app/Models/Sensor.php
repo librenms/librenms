@@ -2,8 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
 class Sensor extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
     protected static $icons = [
@@ -32,8 +38,10 @@ class Sensor extends DeviceRelatedModel
         'snr'                  => 'signal',
         'state'                => 'bullseye',
         'temperature'          => 'thermometer-three-quarters',
+        'tv_signal'            => 'signal',
         'voltage'              => 'bolt',
         'waterflow'            => 'tint',
+        'percent'              => 'percent',
     ];
 
     // ---- Helper Functions ----
@@ -46,6 +54,7 @@ class Sensor extends DeviceRelatedModel
             'eer' => 'EER',
             'snr' => 'SNR',
         ]);
+
         return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
     }
 
@@ -66,8 +75,13 @@ class Sensor extends DeviceRelatedModel
     }
 
     // ---- Define Relationships ----
-    public function events()
+    public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
+    }
+
+    public function translations(): BelongsToMany
+    {
+        return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id');
     }
 }

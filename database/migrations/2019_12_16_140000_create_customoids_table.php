@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateCustomoidsTable extends Migration
 {
@@ -39,7 +39,6 @@ class CreateCustomoidsTable extends Migration
             $table->string('user_func', 100)->nullable();
         });
     }
-
 
     /**
      * Reverse the migrations.

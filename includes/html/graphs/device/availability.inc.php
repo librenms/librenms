@@ -4,7 +4,7 @@ $scale_min = '0';
 $scale_max = '100';
 $float_precision = '3';
 
-$rrd_filename = rrd_name($device['hostname'], array('availability', $vars['duration']));
+$rrd_filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
 
 $ds = 'availability';
 
@@ -15,7 +15,7 @@ $colour_area_max = 'cc9999';
 
 $line_text = \LibreNMS\Util\Time::humanTime($vars['duration']);
 
-$graph_title .= '::'.$line_text;
+$graph_title .= '::' . $line_text;
 
 $graph_max = 1;
 $graph_min = 0;

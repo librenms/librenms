@@ -59,8 +59,54 @@ return [
             'username' => env('DB_USERNAME', 'librenms'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'mysql_cluster' => [
+            'read' => [
+                'host' => [
+                    env('DB_HOST', 'localhost'),
+                    env('DB_HOST_R2', ''),
+                    env('DB_HOST_R3', ''),
+                    env('DB_HOST_R4', ''),
+                    env('DB_HOST_R5', ''),
+                    env('DB_HOST_R6', ''),
+                    env('DB_HOST_R7', ''),
+                    env('DB_HOST_R8', ''),
+                    env('DB_HOST_R9', ''),
+                ],
+            ],
+            'write' => [
+                'host' => [
+                    env('DB_HOST', 'localhost'),
+                    env('DB_HOST_W2', ''),
+                    env('DB_HOST_W3', ''),
+                    env('DB_HOST_W4', ''),
+                    env('DB_HOST_W5', ''),
+                    env('DB_HOST_W6', ''),
+                    env('DB_HOST_W7', ''),
+                    env('DB_HOST_W8', ''),
+                    env('DB_HOST_W9', ''),
+                ],
+            ],
+            'sticky' => env('DB_STICKY', null),
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'librenms'),
+            'username' => env('DB_USERNAME', 'librenms'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
@@ -78,8 +124,8 @@ return [
             'username' => env('DB_TEST_USERNAME', 'root'),
             'password' => env('DB_TEST_PASSWORD', ''),
             'unix_socket' => env('DB_TEST_SOCKET', ''),
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'strict' => true,
             'engine' => null,
@@ -125,7 +171,7 @@ return [
             'database' => storage_path('testing.sqlite'),
             'prefix' => '',
             'foreign_key_constraints' => true,
-        ]
+        ],
 
     ],
 
@@ -155,14 +201,15 @@ return [
 
     'redis' => [
 
-        'client' => env('REDIS_CLIENT', 'phpredis'),
+        'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),

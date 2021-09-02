@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,6 +30,9 @@ use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\InstallerStep;
+use LibreNMS\ValidationResult;
+use LibreNMS\Validations\Database;
+use LibreNMS\Validator;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DatabaseController extends InstallationController implements InstallerStep
@@ -40,7 +42,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function index(Request $request)
     {
-        if (!$this->initInstallStep()) {
+        if (! $this->initInstallStep()) {
             return $this->redirectToIncomplete();
         }
 
@@ -67,23 +69,35 @@ class DatabaseController extends InstallationController implements InstallerStep
         session()->forget('install.database'); // reset db complete status
 
         $ok = false;
-        $message = '';
+        $messages = [];
         try {
             $conn = Eloquent::DB('setup');
-            $ok = $conn && !is_null($conn->getPdo());
+            $ok = $conn && ! is_null($conn->getPdo());
+
+            // validate Database
+            $validator = new Validator();
+            (new Database())->validateSystem($validator);
+            $results = $validator->getResults('database');
+
+            foreach ($results as $result) {
+                if ($result->getStatus() == ValidationResult::FAILURE) {
+                    $ok = false;
+                    $messages[] = $result->getMessage() . '  ' . $result->getFix();
+                }
+            }
         } catch (\Exception $e) {
-            $message = $e->getMessage();
+            $messages[] = $e->getMessage();
         }
 
         return response()->json([
             'result' => $ok ? 'ok' : 'fail',
-            'message' => $message,
+            'message' => implode('<br />', $messages),
         ]);
     }
 
     public function migrate(Request $request)
     {
-        $response = new StreamedResponse(function () use ($request) {
+        $response = new StreamedResponse(function () {
             try {
                 $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
@@ -114,6 +128,7 @@ class DatabaseController extends InstallationController implements InstallerStep
         $this->configureDatabase();
         if (Eloquent::isConnected() && Schema::isCurrent()) {
             $this->markStepComplete();
+
             return true;
         }
 

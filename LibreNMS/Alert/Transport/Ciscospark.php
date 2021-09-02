@@ -9,9 +9,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Ciscospark extends Transport
@@ -25,15 +25,16 @@ class Ciscospark extends Transport
             $room_id = $this->config['room-id'];
             $token = $this->config['api-token'];
         }
+
         return $this->contactCiscospark($obj, $room_id, $token);
     }
 
     public function contactCiscospark($obj, $room_id, $token)
     {
         $text = null;
-        $data = array (
-            'roomId' => $room_id
-        );
+        $data = [
+            'roomId' => $room_id,
+        ];
 
         $akey = 'text';
         if ($this->config['use-markdown'] === 'on') {
@@ -55,23 +56,25 @@ class Ciscospark extends Transport
         }
         $data[$akey] = $text;
 
-        $curl   = curl_init();
+        $curl = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-type' => 'application/json',
             'Expect:',
-            'Authorization: Bearer ' . $token
-        ));
+            'Authorization: Bearer ' . $token,
+        ]);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if ($code != 200) {
-            echo("Cisco Spark returned Error, retry later\r\n");
+            echo "Cisco Spark returned Error, retry later\r\n";
+
             return false;
         }
+
         return true;
     }
 
@@ -97,12 +100,12 @@ class Ciscospark extends Transport
                     'descr' => 'Use Markdown when sending the alert',
                     'type' => 'checkbox',
                     'default' => false,
-                ]
+                ],
             ],
             'validation' => [
                 'api-token' => 'required|string',
-                'room-id' => 'required|string'
-            ]
+                'room-id' => 'required|string',
+            ],
         ];
     }
 }

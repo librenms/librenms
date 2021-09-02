@@ -14,5 +14,5 @@ if ($device['sysObjectID'] == '.1.3.6.1.4.1.23128.1000.1.1') {
 
 // McAfee ACE 9.5.0
 if (preg_match('/^McAfee [A-Z]{3} ([^,]+)$/', $device['sysDescr'], $regexp_result)) {
-    $version  = $regexp_result[1];
+    $version = $regexp_result[1];
 }

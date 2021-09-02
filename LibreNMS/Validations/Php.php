@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,9 +29,9 @@ use LibreNMS\Validator;
 
 class Php extends BaseValidation
 {
-    const PHP_MIN_VERSION = '7.2.5';
-    const PHP_MIN_VERSION_DATE = 'May, 2020';
-    const PHP_RECOMMENDED_VERSION = '7.3';
+    const PHP_MIN_VERSION = '7.3';
+    const PHP_MIN_VERSION_DATE = 'November, 2020';
+    const PHP_RECOMMENDED_VERSION = '7.4';
 
     /**
      * Validate this module.
@@ -48,17 +47,17 @@ class Php extends BaseValidation
         $this->checkTimezone($validator);
     }
 
-    private function checkVersion(Validator$validator)
+    private function checkVersion(Validator $validator)
     {
         // if update is not set to false and version is min or newer
         if (Config::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
-            $validator->warn("PHP version " . self::PHP_MIN_VERSION . " is the minimum supported version as of " . self::PHP_MIN_VERSION_DATE . ". We recommend you update PHP to a supported version (" . self::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.");
+            $validator->warn('PHP version ' . self::PHP_MIN_VERSION . ' is the minimum supported version as of ' . self::PHP_MIN_VERSION_DATE . '. We recommend you update PHP to a supported version (' . self::PHP_RECOMMENDED_VERSION . ' suggested) to continue to receive updates. If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
         }
 
         $web_version = PHP_VERSION;
         $cli_version = rtrim(shell_exec('php -r "echo PHP_VERSION;"'));
         if (version_compare($web_version, $cli_version, '!=')) {
-            $validator->fail("PHP version of your webserver ($web_version) does not match the cli version ($cli_version)", "If you updated PHP recently, restart php-fpm or apache to switch to the new version");
+            $validator->fail("PHP version of your webserver ($web_version) does not match the cli version ($cli_version)", 'If you updated PHP recently, restart php-fpm or apache to switch to the new version');
         }
     }
 
@@ -71,16 +70,16 @@ class Php extends BaseValidation
         }
 
         foreach ($required_modules as $extension) {
-            if (!extension_loaded($extension)) {
+            if (! extension_loaded($extension)) {
                 $validator->fail("Missing PHP extension: $extension", "Please install $extension");
             } elseif (shell_exec("php -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
                 $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
             }
         }
 
-        $suggested_extensions = array('posix' => 'php-process');
+        $suggested_extensions = ['posix' => 'php-process'];
         foreach ($suggested_extensions as $extension => $packages) {
-            if (!extension_loaded($extension)) {
+            if (! extension_loaded($extension)) {
                 $validator->warn("Missing optional PHP extension: $extension", "It is suggested you install $packages or the one that matches your php version");
             }
         }
@@ -89,7 +88,7 @@ class Php extends BaseValidation
     private function checkFunctions(Validator $validator)
     {
         $disabled_functions = explode(',', ini_get('disable_functions'));
-        $required_functions = array(
+        $required_functions = [
             'exec',
             'passthru',
             'shell_exec',
@@ -97,8 +96,8 @@ class Php extends BaseValidation
             'escapeshellcmd',
             'proc_close',
             'proc_open',
-            'popen'
-        );
+            'popen',
+        ];
 
         foreach ($required_functions as $function) {
             if (in_array($function, $disabled_functions)) {
@@ -106,9 +105,9 @@ class Php extends BaseValidation
             }
         }
 
-        if (!function_exists('openssl_random_pseudo_bytes')) {
-            $validator->warn("openssl_random_pseudo_bytes is not being used for user password hashing. This is a recommended function (https://secure.php.net/openssl_random_pseudo_bytes)");
-            if (!is_readable('/dev/urandom')) {
+        if (! function_exists('openssl_random_pseudo_bytes')) {
+            $validator->warn('openssl_random_pseudo_bytes is not being used for user password hashing. This is a recommended function (https://secure.php.net/openssl_random_pseudo_bytes)');
+            if (! is_readable('/dev/urandom')) {
                 $validator->warn("It also looks like we can't use /dev/urandom for user password hashing. We will fall back to generating our own hash - be warned");
             }
         }
@@ -126,7 +125,7 @@ class Php extends BaseValidation
             // make sure timezone is set
             $validator->fail(
                 'You have no timezone set for php.',
-                'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
+                'https://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
             );
         } elseif ($sh_tz !== $php_tz) {
             // check if system timezone matches the timezone of the current running php

@@ -11,28 +11,27 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Pushbullet API Transport
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Pushbullet extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (!empty($this->config)) {
+        if (! empty($this->config)) {
             $opts = $this->config['pushbullet-token'];
         }
+
         return $this->contactPushbullet($obj, $opts);
     }
 
@@ -40,28 +39,28 @@ class Pushbullet extends Transport
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
 
-        $data = array("type" => "note", "title" => $obj['title'], "body" => $obj['msg']);
+        $data = ['type' => 'note', 'title' => $obj['title'], 'body' => $obj['msg']];
         $data = json_encode($data);
 
         $curl = curl_init('https://api.pushbullet.com/v2/pushes');
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Content-Length: ' . strlen($data),
             'Authorization: Bearer ' . $opts,
-        ));
+        ]);
 
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 201) {
-            if ($debug) {
-                var_dump($ret);
-            }
+            var_dump($ret);
+
             return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -73,12 +72,12 @@ class Pushbullet extends Transport
                     'title' => 'Access Token',
                     'name' => 'pushbullet-token',
                     'descr' => 'Pushbullet Access Token',
-                    'type' => 'text'
-                ]
+                    'type' => 'text',
+                ],
             ],
             'validation' => [
-                'pushbullet-token' => 'required|string'
-            ]
+                'pushbullet-token' => 'required|string',
+            ],
         ];
     }
 }

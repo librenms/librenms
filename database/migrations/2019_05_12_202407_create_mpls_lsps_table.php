@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMplsLspsTable extends Migration
 {
@@ -18,15 +18,15 @@ class CreateMplsLspsTable extends Migration
             $table->unsignedInteger('vrf_oid');
             $table->unsignedInteger('lsp_oid');
             $table->unsignedInteger('device_id')->index();
-            $table->enum('mplsLspRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'));
+            $table->enum('mplsLspRowStatus', ['active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy']);
             $table->bigInteger('mplsLspLastChange')->nullable();
             $table->string('mplsLspName', 64);
-            $table->enum('mplsLspAdminState', array('noop','inService','outOfService'));
-            $table->enum('mplsLspOperState', array('unknown','inService','outOfService','transition'));
+            $table->enum('mplsLspAdminState', ['noop', 'inService', 'outOfService']);
+            $table->enum('mplsLspOperState', ['unknown', 'inService', 'outOfService', 'transition']);
             $table->string('mplsLspFromAddr', 32);
             $table->string('mplsLspToAddr', 32);
-            $table->enum('mplsLspType', array('unknown','dynamic','static','bypassOnly','p2mpLsp','p2mpAuto','mplsTp','meshP2p','oneHopP2p','srTe','meshP2pSrTe','oneHopP2pSrTe'));
-            $table->enum('mplsLspFastReroute', array('true','false'));
+            $table->enum('mplsLspType', ['unknown', 'dynamic', 'static', 'bypassOnly', 'p2mpLsp', 'p2mpAuto', 'mplsTp', 'meshP2p', 'oneHopP2p', 'srTe', 'meshP2pSrTe', 'oneHopP2pSrTe']);
+            $table->enum('mplsLspFastReroute', ['true', 'false']);
             $table->bigInteger('mplsLspAge')->nullable();
             $table->bigInteger('mplsLspTimeUp')->nullable();
             $table->bigInteger('mplsLspTimeDown')->nullable();

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateCefSwitchingTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -28,7 +27,7 @@ class CreateCefSwitchingTable extends Migration
             $table->integer('punt2host_prev');
             $table->unsignedInteger('updated');
             $table->unsignedInteger('updated_prev');
-            $table->unique(['device_id','entPhysicalIndex','afi','cef_index']);
+            $table->unique(['device_id', 'entPhysicalIndex', 'afi', 'cef_index']);
         });
     }
 

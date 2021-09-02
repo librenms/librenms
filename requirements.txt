@@ -2,3 +2,4 @@ PyMySQL
 python-dotenv
 redis>=3.0
 setuptools
+psutil

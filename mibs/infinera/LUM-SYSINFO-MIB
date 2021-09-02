@@ -1,0 +1,583 @@
+LUM-SYSINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    lumModules, lumSysinfoMIB
+        FROM LUM-REG
+    MgmtNameString, Integer32WithNA, Unsigned32WithNA
+        FROM LUM-TC;
+
+lumSysinfoMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201806290000Z" -- June 29 2018
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.se"
+    DESCRIPTION
+        "Contains information about CPU utilization, RAM memory etc.
+
+"
+    REVISION
+        "201806290000Z" -- June 29 2018
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 71 }
+
+-- ----------------------------------------------------
+-- Conformance area, containing groups and complicance
+-- specifications.
+-- ----------------------------------------------------
+
+lumSysinfoConfs OBJECT IDENTIFIER ::= { lumSysinfoMIB 1 }
+lumSysinfoGroups OBJECT IDENTIFIER ::= { lumSysinfoConfs 1 }
+lumSysinfoCompl OBJECT IDENTIFIER ::= { lumSysinfoConfs 2 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the SYSINFO MIB
+-- ----------------------------------------------------
+
+lumSysinfoMIBObjects OBJECT IDENTIFIER ::= { lumSysinfoMIB 2 }
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+sysinfoBoardStartupList OBJECT IDENTIFIER ::= { lumSysinfoMIBObjects 1 }
+sysinfoBoardLoadList OBJECT IDENTIFIER ::= { lumSysinfoMIBObjects 2 }
+sysinfoBoardMemoryList OBJECT IDENTIFIER ::= { lumSysinfoMIBObjects 3 }
+sysinfoBoardProcessList OBJECT IDENTIFIER ::= { lumSysinfoMIBObjects 4 }
+
+-- ----------------------------------------------------
+-- Startup information
+-- ----------------------------------------------------
+
+sysinfoBoardStartupTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysinfoBoardStartupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The board startup list."
+    ::= { sysinfoBoardStartupList 1 }
+
+sysinfoBoardStartupEntry OBJECT-TYPE
+    SYNTAX      SysinfoBoardStartupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the board startup list.
+
+"
+    INDEX { sysinfoBoardStartupIndex }
+    ::= { sysinfoBoardStartupTable 1 }
+
+SysinfoBoardStartupEntry ::=
+    SEQUENCE {
+        sysinfoBoardStartupIndex                         Unsigned32,
+        sysinfoBoardStartupName                          MgmtNameString,
+        sysinfoBoardStartupUptime                        DisplayString,
+        sysinfoBoardStartupUptimeSeconds                 Unsigned32,
+        sysinfoBoardStartupRebootReason					 DisplayString}
+
+sysinfoBoardStartupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each board entry.
+
+"
+    ::= { sysinfoBoardStartupEntry 1 }
+
+sysinfoBoardStartupName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Object name, [boardName]:[subrack]:[slot]
+
+"
+    ::= { sysinfoBoardStartupEntry 2 }
+
+sysinfoBoardStartupUptime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Uptime since boot. Syntax (same as 'uptime' and 'top' linux commands):
+        - 'mm min', example: '23 minutes', or
+        - 'hh:mm', example: '14:08', meaning 14 hours and 8 minutes, or
+        - 'days, mm min', example: '36 days and 48 min' or
+        - 'days, hh:mm' example: '36 days, 11:32' meaning 36 days, 11 hours and 32 minutes
+
+"
+    ::= { sysinfoBoardStartupEntry 3 }
+
+sysinfoBoardStartupUptimeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Uptime since boot expressed in seconds.
+
+"
+    ::= { sysinfoBoardStartupEntry 4 }
+
+sysinfoBoardStartupRebootReason OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason for the last reboot.
+
+        Possible reasons are:
+        - Software upgrade (SWU) function
+        - Watchdog reboot due to a nonrecoverable failure condition
+        - FW activation
+        - Nonrecoverable configuration mismatch between controller and traffic unit
+        - Nonrecoverable failure during bootup of board
+        - Unknown. Could be:
+        			- Upgrade from a release prior to XTM_30.1
+        			- Reboot from bash
+        			- Power cycle
+
+"
+        DEFVAL { " " }
+    ::= { sysinfoBoardStartupEntry 5 }
+
+-- ----------------------------------------------------
+-- Load averages per board
+-- ----------------------------------------------------
+
+sysinfoBoardLoadTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysinfoBoardLoadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The board load average list."
+    ::= { sysinfoBoardLoadList 1 }
+
+sysinfoBoardLoadEntry OBJECT-TYPE
+    SYNTAX      SysinfoBoardLoadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the board list. One entry for each board.
+
+"
+    INDEX { sysinfoBoardLoadIndex }
+    ::= { sysinfoBoardLoadTable 1 }
+
+SysinfoBoardLoadEntry ::=
+    SEQUENCE {
+        sysinfoBoardLoadIndex            		Unsigned32,
+        sysinfoBoardLoadName             		MgmtNameString,
+        sysinfoBoardLoadLoad1Min				Unsigned32,
+        sysinfoBoardLoadLoad5Min				Unsigned32,
+        sysinfoBoardLoadLoad15Min				Unsigned32}
+
+sysinfoBoardLoadIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each board entry.
+
+"
+    ::= { sysinfoBoardLoadEntry 1 }
+
+sysinfoBoardLoadName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Object name, [boardName]:[subrack]:[slot]
+
+"
+    ::= { sysinfoBoardLoadEntry 2 }
+
+sysinfoBoardLoadLoad1Min OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System load averages is the average number of processes that are
+       either in a runnable or uninterruptable state.  A process in a
+       runnable state is either using the CPU or waiting to use the CPU. A
+       process in uninterruptable state is waiting for some I/O access, eg
+       waiting for disk.  Load averages are not normalized for the number of CPUs
+       in a system, so a load average of 1 means a single CPU system is
+       loaded all the time while on a 4 CPU system it means it was idle 75%
+       of the time.
+
+"
+    ::= { sysinfoBoardLoadEntry 3 }
+
+sysinfoBoardLoadLoad5Min OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System load averages is the average number of processes that are
+       either in a runnable or uninterruptable state.  A process in a
+       runnable state is either using the CPU or waiting to use the CPU. A
+       process in uninterruptable state is waiting for some I/O access, eg
+       waiting for disk.  Load averages are not normalized for the number of CPUs
+       in a system, so a load average of 1 means a single CPU system is
+       loaded all the time while on a 4 CPU system it means it was idle 75%
+       of the time.
+
+"
+    ::= { sysinfoBoardLoadEntry 4 }
+
+sysinfoBoardLoadLoad15Min OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System load averages is the average number of processes that are
+       either in a runnable or uninterruptable state.  A process in a
+       runnable state is either using the CPU or waiting to use the CPU. A
+       process in uninterruptable state is waiting for some I/O access, eg
+       waiting for disk.  Load averages are not normalized for the number of CPUs
+       in a system, so a load average of 1 means a single CPU system is
+       loaded all the time while on a 4 CPU system it means it was idle 75%
+       of the time.
+
+"
+    ::= { sysinfoBoardLoadEntry 5 }
+
+-- ----------------------------------------------------
+-- Memory per board
+-- ----------------------------------------------------
+
+sysinfoBoardMemoryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysinfoBoardMemoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The board memory list."
+    ::= { sysinfoBoardMemoryList 1 }
+
+sysinfoBoardMemoryEntry OBJECT-TYPE
+    SYNTAX      SysinfoBoardMemoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the board list. One entry for each board.
+
+"
+    INDEX { sysinfoBoardMemoryIndex }
+    ::= { sysinfoBoardMemoryTable 1 }
+
+SysinfoBoardMemoryEntry ::=
+    SEQUENCE {
+        sysinfoBoardMemoryIndex            		Unsigned32,
+        sysinfoBoardMemoryName             		MgmtNameString,
+        sysinfoBoardMemoryTotalMem				Unsigned32,
+        sysinfoBoardMemoryFreeMem				Unsigned32,
+        sysinfoBoardMemoryAvailableMem			Unsigned32,
+        sysinfoBoardMemoryUsageMemPercent		Unsigned32}
+
+sysinfoBoardMemoryIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each board entry.
+
+"
+    ::= { sysinfoBoardMemoryEntry 1 }
+
+sysinfoBoardMemoryName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Object name, [boardName]:[subrack]:[slot]
+"
+    ::= { sysinfoBoardMemoryEntry 2 }
+
+sysinfoBoardMemoryTotalMem OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total usable memory.
+
+"
+    ::= { sysinfoBoardMemoryEntry 3 }
+
+sysinfoBoardMemoryFreeMem OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of physical memory not used by the system.
+
+"
+    ::= { sysinfoBoardMemoryEntry 4 }
+
+sysinfoBoardMemoryAvailableMem OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An estimate of how much memory is available for starting new applications, without swapping.
+
+"
+    ::= { sysinfoBoardMemoryEntry 5 }
+
+sysinfoBoardMemoryUsageMemPercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory utilization expressed as a percentage. Based on available memory.
+
+"
+    ::= { sysinfoBoardMemoryEntry 6 }
+
+-- ----------------------------------------------------
+-- Processes per board
+-- ----------------------------------------------------
+
+sysinfoBoardProcessTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysinfoBoardProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The board process list."
+    ::= { sysinfoBoardProcessList 1 }
+
+sysinfoBoardProcessEntry OBJECT-TYPE
+    SYNTAX      SysinfoBoardProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for each process per board.
+
+"
+    INDEX { sysinfoBoardProcessIndex }
+    ::= { sysinfoBoardProcessTable 1 }
+
+SysinfoBoardProcessEntry ::=
+    SEQUENCE {
+        sysinfoBoardProcessIndex            	Unsigned32,
+        sysinfoBoardProcessName             	MgmtNameString,
+        sysinfoBoardProcessProcessName         	MgmtNameString,
+        sysinfoBoardProcessPid         			Integer32,
+        sysinfoBoardProcessVmSize         		Unsigned32,
+        sysinfoBoardProcessVmRSS         		Unsigned32,
+        sysinfoBoardProcessSetReference			INTEGER,
+        sysinfoBoardProcessVmSizeReference		Unsigned32WithNA,
+        sysinfoBoardProcessVmRSSReference		Unsigned32WithNA,
+        sysinfoBoardProcessVmSizeDiff			Integer32WithNA,
+        sysinfoBoardProcessVmRSSDiff			Integer32WithNA,
+        sysinfoBoardProcessReferenceTime		DisplayString}
+
+sysinfoBoardProcessIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each board entry.
+
+"
+    ::= { sysinfoBoardProcessEntry 1 }
+
+sysinfoBoardProcessName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Object name, [boardName]:[subrack]:[slot]:[localIndex]
+"
+    ::= { sysinfoBoardProcessEntry 2 }
+
+sysinfoBoardProcessProcessName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Process name. Child processes are displayed within brackets ().
+
+"
+    ::= { sysinfoBoardProcessEntry 3 }
+
+sysinfoBoardProcessPid OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Process ID.
+"
+    ::= { sysinfoBoardProcessEntry 4 }
+
+sysinfoBoardProcessVmSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Virtual memory size.
+"
+    ::= { sysinfoBoardProcessEntry 5 }
+
+sysinfoBoardProcessVmRSS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Resident set size.
+"
+    ::= { sysinfoBoardProcessEntry 6 }
+
+sysinfoBoardProcessSetReference OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noAction (1),
+                    setReference (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the reference values for virtual memory size
+        and resident set size
+
+"
+    DEFVAL { noAction }
+    ::= { sysinfoBoardProcessEntry 7 }
+
+sysinfoBoardProcessVmSizeReference OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Virtual memory size reference value.
+"
+    ::= { sysinfoBoardProcessEntry 8 }
+
+sysinfoBoardProcessVmRSSReference OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Resident set size reference value.
+"
+    ::= { sysinfoBoardProcessEntry 9 }
+
+sysinfoBoardProcessVmSizeDiff OBJECT-TYPE
+    SYNTAX      Integer32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Difference between the current virtual memory size
+        and its reference value.
+"
+    ::= { sysinfoBoardProcessEntry 10 }
+
+sysinfoBoardProcessVmRSSDiff OBJECT-TYPE
+    SYNTAX      Integer32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Difference between the current resident set size
+        and its reference value.
+"
+    ::= { sysinfoBoardProcessEntry 11 }
+
+sysinfoBoardProcessReferenceTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time where reference values were saved.
+
+"
+    DEFVAL { "Not set" }
+    ::= { sysinfoBoardProcessEntry 12 }
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+sysinfoBoardStartupGroup OBJECT-GROUP
+    OBJECTS {
+        sysinfoBoardStartupIndex,
+        sysinfoBoardStartupName,
+        sysinfoBoardStartupUptime,
+        sysinfoBoardStartupUptimeSeconds,
+        sysinfoBoardStartupRebootReason}
+    STATUS      current
+    DESCRIPTION
+        "The board startup objects."
+    ::= { lumSysinfoGroups 1 }
+
+sysinfoBoardLoadGroup OBJECT-GROUP
+    OBJECTS {
+        sysinfoBoardLoadIndex,
+        sysinfoBoardLoadName,
+        sysinfoBoardLoadLoad1Min,
+        sysinfoBoardLoadLoad5Min,
+        sysinfoBoardLoadLoad15Min}
+    STATUS      current
+    DESCRIPTION
+        "The board load objects."
+    ::= { lumSysinfoGroups 2 }
+
+sysinfoBoardMemoryGroup OBJECT-GROUP
+    OBJECTS {
+        sysinfoBoardMemoryIndex,
+        sysinfoBoardMemoryName,
+        sysinfoBoardMemoryTotalMem,
+        sysinfoBoardMemoryFreeMem,
+        sysinfoBoardMemoryAvailableMem,
+        sysinfoBoardMemoryUsageMemPercent}
+    STATUS      current
+    DESCRIPTION
+        "The board memory objects."
+    ::= { lumSysinfoGroups 3 }
+
+sysinfoBoardProcessGroup OBJECT-GROUP
+    OBJECTS {
+        sysinfoBoardProcessIndex,
+        sysinfoBoardProcessName,
+        sysinfoBoardProcessProcessName,
+        sysinfoBoardProcessPid,
+        sysinfoBoardProcessVmSize,
+        sysinfoBoardProcessVmRSS,
+        sysinfoBoardProcessSetReference,
+        sysinfoBoardProcessVmSizeReference,
+        sysinfoBoardProcessVmRSSReference,
+        sysinfoBoardProcessVmSizeDiff,
+        sysinfoBoardProcessVmRSSDiff,
+        sysinfoBoardProcessReferenceTime}
+    STATUS      current
+    DESCRIPTION
+        "The per board process objects."
+    ::= { lumSysinfoGroups 4 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumSysinfoBasicComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the SYSINFO MIB (XTM 31.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysinfoBoardStartupGroup,
+            sysinfoBoardLoadGroup,
+            sysinfoBoardMemoryGroup,
+            sysinfoBoardProcessGroup}
+    ::= { lumSysinfoCompl 1 }
+
+END
+
+
+

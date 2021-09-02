@@ -2,8 +2,7 @@ os: ibm-amm
 text: 'IBM AMM'
 type: appliance
 icon: ibmos
-mib_dir:
-    - ibm
+mib_dir: ibm
 discovery:
     -
         sysDescr:

@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -37,7 +36,7 @@ class Graph
 
     /**
      * Get an array of all graph subtypes for the given type
-     * @param $type
+     * @param string $type
      * @param Device $device
      * @return array
      */
@@ -67,14 +66,15 @@ class Graph
         }
 
         sort($types);
+
         return $types;
     }
 
     /**
      * Check if the given graph is a mib graph
      *
-     * @param $type
-     * @param $subtype
+     * @param string $type
+     * @param string $subtype
      * @return bool
      */
     public static function isMibGraph($type, $subtype)
@@ -93,6 +93,7 @@ class Graph
         }
 
         $os_group = Config::getOsSetting($device->os, 'group');
+
         return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
     }
 }

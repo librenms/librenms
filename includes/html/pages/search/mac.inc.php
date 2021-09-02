@@ -7,8 +7,12 @@
             <tr>
                 <th data-column-id="hostname" data-order="asc">Device</th>
                 <th data-column-id="interface">Interface</th>
-                <th data-column-id="address" data-sortable="false">MAC Address</th>
-                <th data-column-id="description" data-sortable="false">Description</th></tr>
+                <th data-column-id="address" data-sortable="false" data-formatter="tooltip">MAC Address</th>
+<?php
+if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+    echo '                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
+}
+?>                <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th></tr>
             </tr>
         </thead>
     </table>
@@ -32,20 +36,20 @@ var grid = $("#mac-search").bootgrid({
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 $param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " WHERE `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ' WHERE `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $sql .= " $where ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $_POST['device_id']) {
         echo '" selected "+';
     }
 
-    echo '">'.format_hostname($data).'</option>"+';
+    echo '">' . format_hostname($data) . '</option>"+';
 }
 ?>
                "</select>"+
@@ -73,7 +77,7 @@ if ($_POST['interface'] == 'Vlan%') {
                "<div class=\"form-group\">"+
                "<input type=\"text\" name=\"address\" id=\"address\" value=\""+
 <?php
-echo '"'.$_POST['address'].'"+';
+echo '"' . $_POST['address'] . '"+';
 ?>
 
                "\" class=\"form-control input-sm\" placeholder=\"Mac Address\"/>"+
@@ -88,11 +92,21 @@ echo '"'.$_POST['address'].'"+';
             id: "address-search",
             search_type: "mac",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            interface: '<?php echo mres($_POST['interface']); ?>',
-            address: '<?php echo mres($_POST['address']); ?>'
+            interface: '<?php echo $_POST['interface']; ?>',
+            address: '<?php echo $_POST['address']; ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax_table.php",
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
 });
 
 </script>

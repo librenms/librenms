@@ -2,7 +2,7 @@
 --
 -- October 1995, Software LAB
 --
--- Copyright (c) 1993-2001 by Super Micro Computer Inc.
+-- Copyright (c) 1993-2019 Super Micro Computer, Inc.
 -- All rights reserved.
 -- 
 -- *****************************************************************
@@ -51,5 +51,11 @@ smHealth OBJECT-IDENTITY
 	DESCRIPTION
 		"smHealth is the main subtree for new mib development."
 	::= { supermicro 2 }
+
+smSSMInfo OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"smSSMInfo is the main subtree for ssm mib development."
+	::= { supermicro 100 }
 
 END

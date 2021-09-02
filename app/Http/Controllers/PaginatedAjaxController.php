@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -127,7 +126,6 @@ abstract class PaginatedAjaxController extends Controller
     {
         if ($search) {
             $query->where(function ($query) use ($fields, $search) {
-                /** @var Builder $query */
                 foreach ($fields as $field) {
                     $query->orWhere($field, 'like', '%' . $search . '%');
                 }
@@ -187,13 +185,13 @@ abstract class PaginatedAjaxController extends Controller
      * @param  array $rules
      * @param  array $messages
      * @param  array $customAttributes
-     * @return void
+     * @return array
      */
     public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
     {
         $full_rules = array_replace($this->baseRules(), $rules);
 
-        parent::validate($request, $full_rules, $messages, $customAttributes);
+        return parent::validate($request, $full_rules, $messages, $customAttributes);
     }
 
     /**

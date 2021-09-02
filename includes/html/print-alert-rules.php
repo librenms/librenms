@@ -15,20 +15,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 The LibreNMS Community
  * @author     Original Author <unknown>
  * @author     Joseph Tingiris <joseph.tingiris@gmail.com>
  */
-
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Enum\AlertState;
 
 $no_refresh = true;
 
@@ -44,13 +43,13 @@ if (isset($_POST['create-default'])) {
         return isset($rule['default']) && $rule['default'];
     });
 
-    $default_extra = array(
+    $default_extra = [
         'mute' => false,
         'count' => -1,
         'delay' => 300,
         'invert' => false,
         'interval' => 300,
-    );
+    ];
 
     foreach ($default_rules as $add_rule) {
         $extra = $default_extra;
@@ -59,15 +58,15 @@ if (isset($_POST['create-default'])) {
         }
 
         $qb = QueryBuilderParser::fromOld($add_rule['rule']);
-        $insert = array(
+        $insert = [
             'rule' => '',
             'builder' => json_encode($qb),
             'query' => $qb->toSql(),
             'severity' => 'critical',
             'extra' => json_encode($extra),
             'disabled' => 0,
-            'name' => $add_rule['name']
-        );
+            'name' => $add_rule['name'],
+        ];
 
         dbInsert($insert, 'alert_rules');
     }
@@ -92,14 +91,14 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device['device_id'] . '">Create new alert rule</button>';
 echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device['device_id'] . '">Create rule from collection</button>';
 echo '</div>';
 
 echo '<div class="col pull-right">';
 echo '<select data-toggle="popover" data-placement="left" data-content="results per page" name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
-$result_options = array(
+$result_options = [
     '10',
     '50',
     '100',
@@ -107,7 +106,7 @@ $result_options = array(
     '500',
     '1000',
     '5000',
-);
+];
 foreach ($result_options as $option) {
     echo "<option value='$option'";
     if ($results == $option) {
@@ -126,18 +125,18 @@ $param = [];
 if (isset($device['device_id']) && $device['device_id'] > 0) {
     //device selected
 
-    $global_rules = "SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)";
+    $global_rules = 'SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)';
 
-    $device_rules = "SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)";
+    $device_rules = 'SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)';
     $param[] = $device['device_id'];
 
-    $device_group_rules = "SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)";
+    $device_group_rules = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
     $param[] = $device['device_id'];
 
-    $device_location_rules = "SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)";
+    $device_location_rules = 'SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)';
     $param[] = $device['device_id'];
 
-    $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .') UNION DISTINCT ('. $device_location_rules .')';
+    $full_query = '(' . $global_rules . ') UNION DISTINCT (' . $device_rules . ') UNION DISTINCT (' . $device_group_rules . ') UNION DISTINCT (' . $device_location_rules . ')';
 } else {
     // no device selected
     $full_query = 'SELECT alert_rules.* FROM alert_rules';
@@ -187,37 +186,37 @@ foreach ($rule_list as $rule) {
         break;
     }
 
-    $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
-    $severity = dbFetchCell('SELECT severity FROM alert_rules where id = ?', array($rule['id']));
-    $ico   = 'check';
-    $col   = 'success';
+    $sub = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', [$rule['id']]);
+    $severity = dbFetchCell('SELECT severity FROM alert_rules where id = ?', [$rule['id']]);
+    $ico = 'check';
+    $col = 'success';
     $extra = '';
     $status_msg = '';
     if (sizeof($sub) == 1) {
         $sub = $sub[0];
-        if ((int) $sub['state'] === 0) {
+        if ((int) $sub['state'] === AlertState::CLEAR) {
             $ico = 'check';
             $col = 'success';
-            $status_msg = "All devices matching " . $rule['name'] . "  are OK";
+            $status_msg = 'All devices matching ' . $rule['name'] . '  are OK';
         }
-        if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
+        if ((int) $sub['state'] === AlertState::ACTIVE || (int) $sub['state'] === AlertState::ACKNOWLEDGED) {
             $alert_style = alert_layout($severity);
-            $ico   = $alert_style['icon'];
-            $col   = $alert_style['icon_color'];
+            $ico = $alert_style['icon'];
+            $col = $alert_style['icon_color'];
             $extra = $alert_style['background_color'];
-            $status_msg = "Some devices matching " . $rule['name'] . " are currently alerting";
+            $status_msg = 'Some devices matching ' . $rule['name'] . ' are currently alerting';
         }
     }
 
     $alert_checked = '';
-    $orig_ico      = $ico;
-    $orig_col      = $col;
-    $orig_class    = $extra;
+    $orig_ico = $ico;
+    $orig_col = $col;
+    $orig_class = $extra;
     if ($rule['disabled']) {
-        $ico   = 'pause';
-        $col   = '';
+        $ico = 'pause';
+        $col = '';
         $extra = 'active';
-        $status_msg = $rule['name'] . " is OFF";
+        $status_msg = $rule['name'] . ' is OFF';
     } else {
         $alert_checked = 'checked';
     }
@@ -252,7 +251,7 @@ foreach ($rule_list as $rule) {
     }
     $popover_msg .= ' alert Rule #' . $rule['id'];
 
-    echo "<tr class='".$extra."' id='rule_id_".$rule['id']."'>";
+    echo "<tr class='" . $extra . "' id='rule_id_" . $rule['id'] . "'>";
 
     // Type
 
@@ -260,7 +259,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td>'.$rule['name'].'</td>';
+    echo '<td>' . $rule['name'] . '</td>';
 
     // Devices (and Groups)
 
@@ -283,7 +282,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= "$except_device_or_group<a href=\"/devices\/location=".$location_map['id']."\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">".$location_map['location']."</a><br>";
+            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View Devices for Location" target="_blank">' . $location_map['location'] . '</a><br>';
         }
     }
 
@@ -292,7 +291,7 @@ foreach ($rule_list as $rule) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . "</a><br>";
+            $groups .= $except_device_or_group . '<a href="' . url('device-groups/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . ' data-content="' . $group_map['name'] . '" title="' . $groups_msg . '" target="_blank">' . $group_map['name'] . '</a><br>';
         }
     }
 
@@ -301,7 +300,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . "</a><br>";
+            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . $device_map['hostname'] . '" title="' . $devices_msg . '" target="_blank">' . $device_map['hostname'] . '</a><br>';
         }
     }
 
@@ -315,52 +314,52 @@ foreach ($rule_list as $rule) {
     if ($devices) {
         echo $devices;
     }
-    if (!$devices && !$groups && !$locations) {
+    if (! $devices && ! $groups && ! $locations) {
         // All Devices
-        echo "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
+        echo '<a href="' . url('devices') . '" data-container="body" data-toggle="popover" data-placement=" . $popover_position . " data-content="View All Devices" target="_blank">All Devices</a><br>';
     }
 
-    echo "</td>";
+    echo '</td>';
 
     // Transports
-    $transport_count=dbFetchCell('SELECT COUNT(*) FROM alert_transport_map WHERE rule_id=?', [$rule['id']]);
+    $transport_count = dbFetchCell('SELECT COUNT(*) FROM alert_transport_map WHERE rule_id=?', [$rule['id']]);
 
-    $transports_popover='right';
+    $transports_popover = 'right';
 
-    $transports=null;
+    $transports = null;
     if ($transport_count) {
         $transport_maps = dbFetchRows('SELECT transport_or_group_id,target_type FROM alert_transport_map WHERE alert_transport_map.rule_id=? ORDER BY target_type', [$rule['id']]);
         foreach ($transport_maps as $transport_map) {
-            $transport_name=null;
-            if ($transport_map['target_type'] == "group") {
+            $transport_name = null;
+            if ($transport_map['target_type'] == 'group') {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name . "</a>";
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name . '</a>';
             }
-            if ($transport_map['target_type'] == "single") {
+            if ($transport_map['target_type'] == 'single') {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name . "</a>";
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name . '</a>';
             }
-            $transports .= $transport_edit . "<br>";
+            $transports .= $transport_edit . '<br>';
         }
     }
 
-    if (!$transport_count || !$transports) {
+    if (! $transport_count || ! $transports) {
         $default_transports = dbFetchRows('SELECT transport_id, transport_name FROM alert_transports WHERE is_default=1 ORDER BY transport_name', []);
         foreach ($default_transports as $default_transport) {
-            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . $default_transport['transport_name'] . "'>" . $default_transport['transport_name'] . "</a>";
-            $transports .= $transport_edit . "<br>";
+            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . $default_transport['transport_name'] . "'>" . $default_transport['transport_name'] . '</a>';
+            $transports .= $transport_edit . '<br>';
         }
     }
 
-    if (!$transports) {
-        $transports = "none";
+    if (! $transports) {
+        $transports = 'none';
     }
 
     echo "<td colspan='2'>$transports</td>";
 
     // Extra
 
-    echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
+    echo '<td><small>Max: ' . $rule_extra['count'] . '<br />Delay: ' . $rule_extra['delay'] . '<br />Interval: ' . $rule_extra['interval'] . '</small></td>';
 
     // Rule
 
@@ -376,45 +375,48 @@ foreach ($rule_list as $rule) {
     } else {
         $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
     }
-    echo '<i>'.htmlentities($rule_display).'</i></td>';
+    echo '<i>' . htmlentities($rule_display) . '</i></td>';
 
     // Severity
-    echo '<td>'.($rule['severity'] == "ok" ? strtoupper($rule['severity']) : ucwords($rule['severity'])).'</td>';
+    echo '<td>' . ($rule['severity'] == 'ok' ? strtoupper($rule['severity']) : ucwords($rule['severity'])) . '</td>';
 
     // Status
 
-    $status_popover='top';
+    $status_popover = 'top';
 
-    echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
+    echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div></td>";
+        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
     }
-
+    if ($sub['state'] == AlertState::ACKNOWLEDGED) {
+        echo "<div data-toggle='popover' data-content='Some Alerts for " . $rule['name'] . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
+    }
+    echo '</td>';
     // Enabled
 
-    $enabled_popover='top';
+    $enabled_popover = 'top';
 
     echo '<td>';
     if ($rule['disabled']) {
-        $enabled_msg = $rule['name'] . " is OFF";
+        $enabled_msg = $rule['name'] . ' is OFF';
     }
-    if (!$rule['disabled']) {
-        $enabled_msg = $rule['name'] . " is ON";
+    if (! $rule['disabled']) {
+        $enabled_msg = $rule['name'] . ' is ON';
     }
 
-    echo "<div id='on-off-checkbox-" .$rule['id']. "' data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_msg . "' class='btn-group btn-group-sm' role='group'>";
-    echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' data-alert_name='".$rule['name']."' data-alert_status='". $status_msg. "' ".$alert_checked." data-size='small' data-toggle='modal'>";
-    echo "</div>";
+    echo "<div id='on-off-checkbox-" . $rule['id'] . "' data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_msg . "' class='btn-group btn-group-sm' role='group'>";
+    echo "<input id='" . $rule['id'] . "' type='checkbox' name='alert-rule' data-orig_class='" . $orig_class . "' data-orig_colour='" . $orig_col . "' data-orig_state='" . $orig_ico . "' data-alert_id='" . $rule['id'] . "' data-alert_name='" . $rule['name'] . "' data-alert_status='" . $status_msg . "' " . $alert_checked . " data-size='small' data-toggle='modal'>";
+    echo '</div>';
     echo '</td>';
 
     // Action
 
-    $action_popover='left';
+    $action_popover = 'left';
 
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
-    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='$action_popover' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' data-alert_name='".$rule['name']."' name='delete-alert-rule' data-content='Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='$action_popover' data-target='#create-alert' data-rule_id='" . $rule['id'] . "' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . $rule['name'] . "' name='delete-alert-rule' data-content='Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     echo '</td>';
 
     echo "</tr>\r\n";
@@ -433,8 +435,8 @@ if (($count % $results) > 0) {
     echo generate_pagination($count, $results, $page_number);
     echo '</div>';
     echo '<div class="col pull-right">';
-    $showing_start = ($page_number*$results)-$results+1;
-    $showing_end = $page_number*$results;
+    $showing_start = ($page_number * $results) - $results + 1;
+    $showing_end = $page_number * $results;
     if ($showing_end > $count) {
         $showing_end = $count;
     }
@@ -443,8 +445,8 @@ if (($count % $results) > 0) {
     echo '</div>';
 }
 
-echo '<input type="hidden" name="page_number" id="page_number" value="'.$page_number.'">
-    <input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">
+echo '<input type="hidden" name="page_number" id="page_number" value="' . $page_number . '">
+    <input type="hidden" name="results_amount" id="results_amount" value="' . $results . '">
     </form>';
 
 if ($count < 1) {
@@ -464,7 +466,7 @@ if ($count < 1) {
 $("[data-toggle='modal'], [data-toggle='popover']").popover({
     trigger: 'hover'
 });
-$('#ack-alert').click('', function(e) {
+$('#ack-alert').on("click", function(e) {
     event.preventDefault();
     var alert_id = $(this).data("alert_id");
     $.ajax({
@@ -536,12 +538,12 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
 function updateResults(results) {
     $('#results_amount').val(results.value);
     $('#page_number').val(1);
-    $('#result_form').submit();
+    $('#result_form').trigger( "submit" );
 }
 
 function changePage(page,e) {
     e.preventDefault();
     $('#page_number').val(page);
-    $('#result_form').submit();
+    $('#result_form').trigger( "submit" );
 }
 </script>

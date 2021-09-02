@@ -166,7 +166,7 @@
                 locationMap.setView(location, zoom);
             });
 
-            $('#save-location').click(function () {
+            $('#save-location').on("click", function () {
                 update_location(locationId, locationMarker.getLatLng(), function (success) {
                     if (success) {
                         modal.modal('hide');
@@ -222,10 +222,10 @@
             $.ajax({
                 method: 'DELETE',
                 url: "ajax/location/" + locationId
-            }).success(function () {
+            }).done(function () {
                 locations_grid.bootgrid('reload');
                 toastr.success('@lang('Location deleted')');
-            }).error(function (e) {
+            }).fail(function (e) {
                 var data = e.responseJSON;
                 if (data && data.hasOwnProperty('id')) {
                     toastr.error(data.id.join(' '));

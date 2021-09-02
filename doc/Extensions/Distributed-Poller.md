@@ -4,14 +4,15 @@ path: blob/master/doc/
 # Distributed Poller
 
 A normal install contains all parts of LibreNMS:
- - Poller/Discovery/etc workers
- - RRD (Time series data store) *
- - Database *
- - Webserver (Web UI/API) *
- 
+
+- Poller/Discovery/etc workers
+- RRD (Time series data store) *
+- Database *
+- Webserver (Web UI/API) *
+
 \* may only be installed on one server (however, some can be clustered)
 
-Distributed Polling allows the workers to be spread across additional 
+Distributed Polling allows the workers to be spread across additional
 servers for horizontal scaling. Distributed polling is not intended for
 remote polling.
 
@@ -21,16 +22,23 @@ devices to a single or a group of designated pollers.
 All pollers need to write to the same set of RRD files, preferably via
 RRDcached.
 
-It is a requirement that all pollers can access the central memcached
-to communicate with each other.
+It is also a requirement that at least one locking service is in place
+to which all pollers can connect. There are currently three locking
+mechanisms available
 
-# Requirements
+- memcached
+- redis (preferred)
+- sql locks (default)
+
+All of the above locking mechanisms are natively supported in LibreNMS.
+If none are specified, it will default to using SQL.
+
+## Requirements for distributed polling
 
 These requirements are above the normal requirements for a full LibreNMS install.
 
 - rrdtool version 1.4 or above
-- Python 3 python-memcached package
-- a memcached install
+- At least one locking mechanism configured
 - a rrdcached install
 
 By default, all hosts are shared and have the `poller_group = 0`. To
@@ -43,7 +51,7 @@ devices from any of the groups listed.  If new devices get added from
 the poller they will be assigned to the first poller group in the list
 unless the group is specified when adding the device.
 
-A standard configuration for a distributed poller would look like:
+The following is a standard config, combined with a locking mechanism below:
 
 ```php
 // Distributed Poller-Settings
@@ -51,9 +59,33 @@ $config['distributed_poller']                            = true;
 // optional: defaults to hostname
 #$config['distributed_poller_name']                      = 'custom';
 $config['distributed_poller_group']                      = 0;
-$config['distributed_poller_memcached_host']             = 'example.net';
-$config['distributed_poller_memcached_port']             = '11211';
+
 ```
+## Locking mechanisms
+Pick one of the following setups, do not use all of them at the same
+time.
+
+### Using REDIS
+
+In your `.env` file you will need to specify a redis server, port and
+the driver.
+
+```
+REDIS_HOST=HOSTNAME or IP
+REDIS_PORT=6379
+CACHE_DRIVER=redis
+```
+### Using Memcached
+
+Preferably you should set the memcached server settings via the web UI.
+Under Settings > Global Settings > Distributed poller, you fill out the
+memcached host and port, and then in your `.env` file you will need to add:
+
+```
+CACHE_DRIVER=memcached
+```
+If you want to use memcached, you will also need to install an additional
+Python 3 python-memcached package.
 
 ## Example Setup
 
@@ -63,18 +95,18 @@ running within an OpenStack environment with some commodity hardware
 for remote pollers. Here's a diagram of how you can scale LibreNMS
 out:
 
-![Example Setup](http://docs.librenms.org/img/librenms-distributed-diagram.png)
+![Example Setup](@= config.site_url =@/img/librenms-distributed-diagram.png)
 
 ## Architecture
 
-How you setup the distribution is entirely up to you, you can choose
+How you set the distribution up is entirely up to you. You can choose
 to host the majority of the required services on a single virtual
 machine or server and then a poller to actually query the devices
-being monitored all the way through to having a dedicated server for
+being monitored, all the way through to having a dedicated server for
 each of the individual roles. Below are notes on what you need to
-consider both from the software layer but also connectivity.
+consider both from the software layer, but also connectivity.
 
-### Web / API Layer
+## Web / API Layer
 
 This is typically Apache but we have setup guides for both Nginx and
 Lighttpd which should work perfectly fine. There is nothing unique
@@ -88,7 +120,7 @@ web service can then generate rrd graphs via RRDCached. If RRDCached
 isn't an option then you can mount the rrd directory to read the RRD
 files directly.
 
-### Database Server
+## Database Server
 
 MySQL / MariaDB - At the moment these are the only database servers
 that are supported.
@@ -96,7 +128,7 @@ that are supported.
 The pollers, web and API layers should all be able to access the
 database server directly.
 
-### RRD Storage
+## RRD Storage
 
 Central storage should be provided so all RRD files can be read from
 and written to in one location. As suggested above, it's recommended
@@ -106,14 +138,7 @@ For this example, we are running RRDCached to allow all pollers and
 web/api servers to read/write to the rrd files with the rrd directory
 also exported by NFS for simple access and maintenance.
 
-### Memcache
-
-Memcache is required for the distributed pollers to be able to
-register to a central location and record what devices are
-polled. Memcache can run from any of the servers so long as it is
-accessible by all pollers.
-
-### Pollers
+## Pollers
 
 Pollers can be installed and run from anywhere, the only requirements are:
 
@@ -149,19 +174,26 @@ cause issues with a large number of devices.
 A last note to make sure of, is that all pollers writing to the same DB
 need to have the same `APP_KEY` value set in the `.env` file.
 
-### Discovery
+## Discovery
 
-It's not necessary to run discovery services on all pollers. In fact,
-you should only run one discovery process per poller group. Designate
-a single poller to run discovery (or a separate server if required).
+Depending on your setup will depend on how you configure your discovery processes.
 
-### Configuration
+**Cron based polling**
+
+It's not necessary to run discovery services on all pollers. In fact, you should
+only run one discovery process per poller group.
+Designate a single poller to run discovery (or a separate server if required).
+
+**Dispatcher service**
+When using the dispatcher service, discovery can run on all nodes.
+
+## Configuration
 
 Settings in config.php should be copied to all servers as they only apply locally.
 
 One way around this is to set settings in the database via the web ui or `./lnms config:set`
 
-### Config sample
+## Config sample
 
 The following config is taken from a live setup which consists of a
 Web server, DB server, RRDCached server and 3 pollers.
@@ -209,10 +241,10 @@ OPTS="$OPTS -w 1800 -z 900"
 Ubuntu (/etc/default/rrdcached) - RRDCached 1.5.5 and above.
 
 ```
-OPTS="-l 0:42217"
-OPTS="$OPTS -R -j /var/lib/rrdcached/journal/ -F"
-OPTS="$OPTS -b /opt/librenms/rrd -B"
-OPTS="$OPTS -w 1800 -z 900"
+BASE_OPTIONS="-l 0:42217"
+BASE_OPTIONS="$BASE_OPTIONS -R -j /var/lib/rrdcached/journal/ -F"
+BASE_OPTIONS="$BASE_OPTIONS -b /opt/librenms/rrd -B"
+BASE_OPTIONS="$BASE_OPTIONS -w 1800 -z 900"
 ```
 
 Poller 1:

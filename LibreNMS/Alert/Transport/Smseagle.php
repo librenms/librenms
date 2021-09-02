@@ -11,19 +11,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * SMSEagle API Transport
  * @author Barry O'Donovan <barry@lightnet.ie>
  * @copyright 2017 Barry O'Donovan, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\Transport;
 
@@ -31,10 +29,11 @@ class Smseagle extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $smseagle_opts['url']   = $this->config['smseagle-url'];
-        $smseagle_opts['user']  = $this->config['smseagle-user'];
+        $smseagle_opts['url'] = $this->config['smseagle-url'];
+        $smseagle_opts['user'] = $this->config['smseagle-user'];
         $smseagle_opts['token'] = $this->config['smseagle-pass'];
-        $smseagle_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['smseagle-mobiles']);
+        $smseagle_opts['to'] = preg_split('/([,\r\n]+)/', $this->config['smseagle-mobiles']);
+
         return $this->contactSmseagle($obj, $smseagle_opts);
     }
 
@@ -48,14 +47,14 @@ class Smseagle extends Transport
         ];
         $url = Str::startsWith($opts['url'], 'http') ? '' : 'http://';
         $url .= $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
-        $curl   = curl_init($url);
+        $curl = curl_init($url);
 
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $ret = curl_exec($curl);
-        if (substr($ret, 0, 2) == "OK") {
+        if (substr($ret, 0, 2) == 'OK') {
             return true;
         } else {
             return false;
@@ -96,7 +95,7 @@ class Smseagle extends Transport
                 'smseagle-user'    => 'required|string',
                 'smseagle-pass'    => 'required|string',
                 'smseagle-mobiles' => 'required',
-            ]
+            ],
         ];
     }
 }

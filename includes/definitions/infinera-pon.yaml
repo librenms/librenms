@@ -2,11 +2,10 @@ os: infinera-pon
 text: 'Infinera PON'
 type: network
 icon: infinera
-mib_dir:
-    - infinera
+mib_dir: infinera
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     -
-        sysObjectID:
-            - .1.3.6.1.4.1.42229
+        sysObjectID_regex:
+            - '/^.1.3.6.1.4.1.42229$/'

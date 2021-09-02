@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.311.1.1.3.1.1",
+                    "sysDescr": "Hardware: x86 Family 16 Model 4 Stepping 2 AT/AT COMPATIBLE - Software: Windows 2000 Version 5.1 (Build 2600 Multiprocessor Free)",
+                    "sysContact": null,
+                    "version": "XP (NT 5.1)",
+                    "hardware": "Generic x86",
+                    "features": "Multiprocessor",
+                    "os": "windows",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "windows.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,5 +1,27 @@
 mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NETSWITCH-MIB::hpLocalMemTotalBytes
+                free: NETSWITCH-MIB::hpLocalMemFreeBytes
+                used: NETSWITCH-MIB::hpLocalMemAllocBytes
+                descr: 'Local Memory {{ $index }}'
+                type: hpLocal
+            -
+                total: NETSWITCH-MIB::hpGlobalMemTotalBytes
+                free: NETSWITCH-MIB::hpGlobalMemFreeBytes
+                used: NETSWITCH-MIB::hpGlobalMemAllocBytes
+                descr: 'Global Memory {{ $index }}'
+                type: hpGlobal
+    os:
+        sysDescr_regex:
+            - '/( (?<hardware>\d{4,}\S*)[^,]*)?, revision (?<version>[^ ,]+)/'
+            - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
+        version:
+            - NETSWITCH-MIB::hpSwitchOsVersion.0
+            - HP-SN-AGENT-MIB::snAgImgVer.0
+        serial: SEMI-MIB::hpHttpMgSerialNumber.0
     processors:
         data:
             -

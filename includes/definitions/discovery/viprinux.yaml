@@ -1,5 +1,9 @@
 mib: VIPRINET-MIB
 modules:
+    os:
+        version: VIPRINET-MIB::vpnRouterFirmware.0
+        hardware: VIPRINET-MIB::vpnRouterModel.0
+        serial: VIPRINET-MIB::vpnRouterSerial.0
     processors:
         data:
             -

@@ -15,14 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 
 // table name => regex (first group is index, second group is id)
 $virtual_tables = [
@@ -35,7 +33,7 @@ $virtual_tables = [
 
 $data = snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn');
 foreach (explode(PHP_EOL, $data) as $line) {
-    list($oid, $value) = explode(' = ', $line);
+    [$oid, $value] = explode(' = ', $line);
 
     $processed = false;
     foreach ($virtual_tables as $vt_name => $vt_regex) {
@@ -50,7 +48,7 @@ foreach (explode(PHP_EOL, $data) as $line) {
         }
     }
 
-    if (!$processed) {
+    if (! $processed) {
         $pre_cache[$oid] = [[$oid => $value]];
     }
 }

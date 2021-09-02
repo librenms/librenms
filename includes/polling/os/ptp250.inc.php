@@ -9,8 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
 */
-use LibreNMS\RRD\RrdDefinition;
 
 $version = $device['sysDescr'];
-$masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CAMBIUM-PTP250-MIB"));
-$hardware = 'PTP 250 '. $masterSlaveMode;
+$masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', 'CAMBIUM-PTP250-MIB'));
+$hardware = 'PTP 250 ' . $masterSlaveMode;

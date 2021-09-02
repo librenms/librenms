@@ -32,7 +32,7 @@
                 Public License for more details.
 
                 You should have received a copy of the GNU General Public License along
-                with this program. If not, see http://www.gnu.org/licenses/.
+                with this program. If not, see https://www.gnu.org/licenses/.
 
                 LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
 """
@@ -51,9 +51,9 @@ try:
     from optparse import OptionParser
 
 except ImportError as exc:
-    print('ERROR: missing one or more of the following python modules:')
-    print('threading, queue, sys, subprocess, time, os, json')
-    print('ERROR: %s' % exc)
+    print("ERROR: missing one or more of the following python modules:")
+    print("threading, queue, sys, subprocess, time, os, json")
+    print("ERROR: %s" % exc)
     sys.exit(2)
 
 
@@ -72,9 +72,9 @@ def memc_alive():
     try:
         global memc
         key = str(uuid.uuid4())
-        memc.set('poller.ping.' + key, key, 60)
-        if memc.get('poller.ping.' + key) == key:
-            memc.delete('poller.ping.' + key)
+        memc.set("poller.ping." + key, key, 60)
+        if memc.get("poller.ping." + key) == key:
+            memc.delete("poller.ping." + key)
             return True
         else:
             return False
@@ -94,7 +94,9 @@ def memc_touch(key, time):
 def get_time_tag(step):
     ts = int(time.time())
     return ts - ts % step
-#EOC0
+
+
+# EOC0
 
 
 """
@@ -114,17 +116,19 @@ def printworker():
         global servicedisco
         if servicedisco:
             if not IsNode:
-                memc_touch('service.master', 10)
-                nodes = memc.get('service.nodes')
+                memc_touch("service.master", 10)
+                nodes = memc.get("service.nodes")
                 if nodes is None and not memc_alive():
-                    print("WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly.")
+                    print(
+                        "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
+                    )
                     servicedisco = False
                     nodes = nodeso
                 if nodes is not nodeso:
                     print("INFO: %s Node(s) Total" % (nodes))
                     nodeso = nodes
             else:
-                memc_touch('service.nodes', 10)
+                memc_touch("service.nodes", 10)
             try:
                 worker_id, device_id, elapsed_time = print_queue.get(False)
             except:
@@ -144,10 +148,17 @@ def printworker():
         per_device_duration[device_id] = elapsed_time
         service_devices += 1
         if elapsed_time < 300:
-            print("INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
+            print(
+                "INFO: worker %s finished device %s in %s seconds"
+                % (worker_id, device_id, elapsed_time)
+            )
         else:
-            print("WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
+            print(
+                "WARNING: worker %s finished device %s in %s seconds"
+                % (worker_id, device_id, elapsed_time)
+            )
         print_queue.task_done()
+
 
 """
     This class will fork off single instances of the check-services.php process, record
@@ -159,28 +170,48 @@ def poll_worker():
     while True:
         device_id = poll_queue.get()
         # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
-        if not servicedisco or memc.get('service.device.' + str(device_id)) is None:
+        if not servicedisco or memc.get("service.device." + str(device_id)) is None:
             if servicedisco:
-                result = memc.add('service.device.' + str(device_id), config['distributed_poller_name'], 300)
+                result = memc.add(
+                    "service.device." + str(device_id),
+                    config["distributed_poller_name"],
+                    300,
+                )
                 if not result:
-                    print("This device (%s) appears to be being service checked by another service node" % (device_id))
+                    print(
+                        "This device (%s) appears to be being service checked by another service node"
+                        % (device_id)
+                    )
                     poll_queue.task_done()
                     continue
                 if not memc_alive() and IsNode:
-                    print("Lost Memcached, Not service checking Device %s as Node. Master will check it." % device_id)
+                    print(
+                        "Lost Memcached, Not service checking Device %s as Node. Master will check it."
+                        % device_id
+                    )
                     poll_queue.task_done()
                     continue
             # EOC5
             try:
                 start_time = time.time()
 
-                output = "-d >> %s/services_device_%s.log" % (log_dir, device_id) if debug else ">> /dev/null"
+                output = (
+                    "-d >> %s/services_device_%s.log" % (log_dir, device_id)
+                    if debug
+                    else ">> /dev/null"
+                )
                 # TODO replace with command_runner
-                command = "/usr/bin/env php %s -h %s %s 2>&1" % (service_path, device_id, output)
+                command = "/usr/bin/env php %s -h %s %s 2>&1" % (
+                    service_path,
+                    device_id,
+                    output,
+                )
                 subprocess.check_call(command, shell=True)
 
                 elapsed_time = int(time.time() - start_time)
-                print_queue.put([threading.current_thread().name, device_id, elapsed_time])
+                print_queue.put(
+                    [threading.current_thread().name, device_id, elapsed_time]
+                )
             except (KeyboardInterrupt, SystemExit):
                 raise
             except:
@@ -188,48 +219,60 @@ def poll_worker():
         poll_queue.task_done()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
 
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    LNMS.check_for_file(install_dir + '/.env')
+    LNMS.check_for_file(install_dir + "/.env")
     config = json.loads(LNMS.get_config_data(install_dir))
 
-    service_path = config['install_dir'] + '/check-services.php'
-    log_dir = config['log_dir']
+    service_path = config["install_dir"] + "/check-services.php"
+    log_dir = config["log_dir"]
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
-    if 'distributed_poller_group' in config:
-        service_group = str(config['distributed_poller_group'])
+    if "distributed_poller_group" in config:
+        service_group = str(config["distributed_poller_group"])
     else:
         service_group = False
 
-
-    if ('distributed_poller' in config and
-        'distributed_poller_memcached_host' in config and
-        'distributed_poller_memcached_port' in config and
-        config['distributed_poller']):
+    if (
+        "distributed_poller" in config
+        and "distributed_poller_memcached_host" in config
+        and "distributed_poller_memcached_port" in config
+        and config["distributed_poller"]
+    ):
         try:
             import memcache
             import uuid
-            memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
-                                    str(config['distributed_poller_memcached_port'])])
-            if str(memc.get("service.master")) == config['distributed_poller_name']:
+
+            memc = memcache.Client(
+                [
+                    config["distributed_poller_memcached_host"]
+                    + ":"
+                    + str(config["distributed_poller_memcached_port"])
+                ]
+            )
+            if str(memc.get("service.master")) == config["distributed_poller_name"]:
                 print("This system is already joined as the service master.")
                 sys.exit(2)
             if memc_alive():
                 if memc.get("service.master") is None:
                     print("Registered as Master")
-                    memc.set("service.master", config['distributed_poller_name'], 10)
+                    memc.set("service.master", config["distributed_poller_name"], 10)
                     memc.set("service.nodes", 0, 300)
                     IsNode = False
                 else:
-                    print("Registered as Node joining Master %s" % memc.get("service.master"))
+                    print(
+                        "Registered as Node joining Master %s"
+                        % memc.get("service.master")
+                    )
                     IsNode = True
                     memc.incr("service.nodes")
                 servicedisco = True
             else:
-                print("Could not connect to memcached, disabling distributed service checks.")
+                print(
+                    "Could not connect to memcached, disabling distributed service checks."
+                )
                 servicedisco = False
                 IsNode = False
         except SystemExit:
@@ -256,8 +299,13 @@ if __name__ == '__main__':
     usage = "usage: %prog [options] <workers> (Default: 1 (Do not set too high)"
     description = "Spawn multiple check-services.php processes in parallel."
     parser = OptionParser(usage=usage, description=description)
-    parser.add_option('-d', '--debug', action='store_true', default=False,
-                      help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+    parser.add_option(
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
+    )
     (options, args) = parser.parse_args()
 
     debug = options.debug
@@ -270,12 +318,23 @@ if __name__ == '__main__':
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
     if service_group is not False:
-        query = "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON `services`.`device_id` = `devices`.`device_id` WHERE `devices`.`poller_group` IN(" + service_group + ") AND `devices`.`disabled` = 0"
+        query = (
+            "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON `services`.`device_id` = `devices`.`device_id` WHERE `devices`.`poller_group` IN("
+            + service_group
+            + ") AND `devices`.`disabled` = 0"
+        )
     else:
         query = "SELECT DISTINCT(`services`.`device_id`) FROM `services` LEFT JOIN `devices` ON `services`.`device_id` = `devices`.`device_id` WHERE `devices`.`disabled` = 0"
     # EOC2
 
-    db = LNMS.db_open(config['db_socket'], config['db_host'], config['db_port'], config['db_user'], config['db_pass'], config['db_name'])
+    db = LNMS.db_open(
+        config["db_socket"],
+        config["db_host"],
+        config["db_port"],
+        config["db_user"],
+        config["db_pass"],
+        config["db_name"],
+    )
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()
@@ -294,8 +353,10 @@ if __name__ == '__main__':
     poll_queue = queue.Queue()
     print_queue = queue.Queue()
 
-    print("INFO: starting the service check at %s with %s threads" % (time.strftime("%Y-%m-%d %H:%M:%S"),
-                                                                      amount_of_workers))
+    print(
+        "INFO: starting the service check at %s with %s threads"
+        % (time.strftime("%Y-%m-%d %H:%M:%S"), amount_of_workers)
+    )
 
     for device_id in devices_list:
         poll_queue.put(device_id)
@@ -317,12 +378,15 @@ if __name__ == '__main__':
 
     total_time = int(time.time() - s_time)
 
-    print("INFO: services-wrapper checked %s devices in %s seconds with %s workers" % (service_devices, total_time, amount_of_workers))
+    print(
+        "INFO: services-wrapper checked %s devices in %s seconds with %s workers"
+        % (service_devices, total_time, amount_of_workers)
+    )
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
     if servicedisco or memc_alive():
         master = memc.get("service.master")
-        if master == config['distributed_poller_name'] and not IsNode:
+        if master == config["distributed_poller_name"] and not IsNode:
             print("Wait for all service-nodes to finish")
             nodes = memc.get("service.nodes")
             while nodes is not None and nodes > 0:
@@ -334,7 +398,7 @@ if __name__ == '__main__':
             print("Clearing Locks")
             x = minlocks
             while x <= maxlocks:
-                memc.delete('service.device.' + str(x))
+                memc.delete("service.device." + str(x))
                 x = x + 1
             print("%s Locks Cleared" % x)
             print("Clearing Nodes")
@@ -348,17 +412,29 @@ if __name__ == '__main__':
     show_stopper = False
 
     if total_time > 300:
-        print("WARNING: the process took more than 5 minutes to finish, you need faster hardware or more threads")
-        print("INFO: in sequential style service checks the elapsed time would have been: %s seconds" % real_duration)
+        print(
+            "WARNING: the process took more than 5 minutes to finish, you need faster hardware or more threads"
+        )
+        print(
+            "INFO: in sequential style service checks the elapsed time would have been: %s seconds"
+            % real_duration
+        )
         for device in per_device_duration:
             if per_device_duration[device] > 300:
-                print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
+                print(
+                    "WARNING: device %s is taking too long: %s seconds"
+                    % (device, per_device_duration[device])
+                )
                 show_stopper = True
         if show_stopper:
-            print("ERROR: Some devices are taking more than 300 seconds, the script cannot recommend you what to do.")
+            print(
+                "ERROR: Some devices are taking more than 300 seconds, the script cannot recommend you what to do."
+            )
         else:
             recommend = int(total_time / 300.0 * amount_of_workers + 1)
             print(
-                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
+                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)"
+                % recommend
+            )
 
         sys.exit(2)

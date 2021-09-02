@@ -15,10 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -62,17 +61,17 @@ class Proc
      */
     public function __construct(
         $cmd,
-        $descriptorspec = array(
-            0 => array("pipe", "r"),
-            1 => array("pipe", "w"),
-            2 => array("pipe", "w")
-        ),
+        $descriptorspec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ],
         $cwd = null,
         $env = null,
         $blocking = false
     ) {
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
-        if (!is_resource($this->_process)) {
+        if (! is_resource($this->_process)) {
             throw new Exception("Command failed: $cmd");
         }
         stream_set_blocking($this->_pipes[1], $blocking);
@@ -105,14 +104,13 @@ class Proc
         return $this->_pipes[$nr];
     }
 
-
     /**
      * Send a command to this process and return the output
      * the output may not correspond to this command if this
      * process is not synchronous
      * If the command isn't terminated with a newline, add one
      *
-     * @param $command
+     * @param string $command
      * @return array
      */
     public function sendCommand($command)
@@ -142,13 +140,14 @@ class Proc
     public function getOutput($timeout = 15)
     {
         if ($this->_synchronous) {
-            $pipes = array($this->_pipes[1], $this->_pipes[2]);
+            $pipes = [$this->_pipes[1], $this->_pipes[2]];
             $w = null;
             $x = null;
 
             stream_select($pipes, $w, $x, $timeout);
         }
-        return array(stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2]));
+
+        return [stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2])];
     }
 
     /**
@@ -177,7 +176,13 @@ class Proc
     public function close($command = null)
     {
         if (isset($command)) {
-            $this->sendInput($this->checkAddEOL($command));
+            try {
+                if (is_resource($this->_pipes[0])) {
+                    $this->sendInput($this->checkAddEOL($command));
+                }
+            } catch (\ErrorException $e) {
+                // might have closed already
+            }
         }
 
         $this->closePipes();
@@ -204,7 +209,7 @@ class Proc
 
         $time = 0;
         while ($time < $timeout) {
-            $closed = !$this->isRunning();
+            $closed = ! $this->isRunning();
             if ($closed) {
                 break;
             }
@@ -213,7 +218,7 @@ class Proc
             $time += 100;
         }
 
-        if (!$closed) {
+        if (! $closed) {
             // try harder
             if (function_exists('posix_kill')) {
                 $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
@@ -222,8 +227,8 @@ class Proc
             }
             proc_close($this->_process);
 
-            if (!$killed && $this->isRunning()) {
-                throw new Exception("Terminate failed!");
+            if (! $killed && $this->isRunning()) {
+                throw new Exception('Terminate failed!');
             }
         }
     }
@@ -252,10 +257,11 @@ class Proc
      */
     public function isRunning()
     {
-        if (!is_resource($this->_process)) {
+        if (! is_resource($this->_process)) {
             return false;
         }
         $st = $this->getStatus();
+
         return isset($st['running']) && $st['running'];
     }
 
@@ -272,7 +278,8 @@ class Proc
 
     /**
      * If this process waits for output
-     * @return boolean
+     *
+     * @return bool
      */
     public function isSynchronous()
     {
@@ -284,7 +291,7 @@ class Proc
      * It is advisable not to change this mid way as output could get mixed up
      * or you could end up blocking until the getOutput timeout expires
      *
-     * @param boolean $synchronous
+     * @param bool $synchronous
      */
     public function setSynchronous($synchronous)
     {
@@ -295,14 +302,15 @@ class Proc
      * Add and end of line character to a string if
      * it doesn't already end with one
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     private function checkAddEOL($string)
     {
-        if (!Str::endsWith($string, PHP_EOL)) {
+        if (! Str::endsWith($string, PHP_EOL)) {
             $string .= PHP_EOL;
         }
+
         return $string;
     }
 }

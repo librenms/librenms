@@ -2,8 +2,7 @@ os: e3meter
 text: 'E3 Meter'
 type: power
 icon: riedo
-mib_dir:
-    - riedo
+mib_dir: riedo
 over:
     - { graph: device_power, text: Power }
     - { graph: device_voltage, text: Voltage }
