@@ -15,6 +15,10 @@ class DeviceLink extends Component
     public $device;
     public $tab;
     public $section;
+    /**
+     * @var string
+     */
+    public $status;
 
     /**
      * Create a new component instance.
@@ -26,6 +30,7 @@ class DeviceLink extends Component
         $this->device = $device instanceof Device ? $device : DeviceCache::get($device);
         $this->tab = $tab;
         $this->section = $section;
+        $this->status = $this->status();
     }
 
     /**
@@ -44,16 +49,12 @@ class DeviceLink extends Component
         ]);
     }
 
-    public function linkClass()
+    public function status()
     {
         if ($this->device->disabled) {
-            return 'list-device-disabled';
+            return 'disabled';
         }
 
-        if ($this->device->ignore) {
-            return $this->device->status ? 'list-device-ignored-up' : 'list-device-ignored';
-        }
-
-        return $this->device->status ? 'list-device' : 'list-device-down';
+        return $this->device->status ? 'up' : ($this->device->ignore ? 'disabled' : 'down');
     }
 }

@@ -1,9 +1,9 @@
 @isset($title)
-    <div class="border-b font-semibold">
+    <div class="tw-border-b tw-font-semibold">
         {{ $title }}
     </div>
 @endisset
-<div class="flex flex-row flex-wrap">
+<div class="tw-flex flex-row tw-flex-wrap">
     @foreach($graphs as $graph)
         <x-graph :type="$type" :loading="$loading" :port="$port" :device="$device" :vars="$graph"></x-graph>
     @endforeach

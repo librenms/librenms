@@ -15,6 +15,7 @@ class PortLink extends Component
     public $label;
     public $description;
     public $graphs;
+    public $status;
 
     /**
      * Create a new component instance.
@@ -27,6 +28,7 @@ class PortLink extends Component
         $this->link = Url::portUrl($port);
         $this->label = Rewrite::normalizeIfName($port->getLabel());
         $this->description = $port->getDescription();
+        $this->status = $this->status();
 
         $this->graphs = $graphs === null ? [
             ['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]],
@@ -47,17 +49,15 @@ class PortLink extends Component
         return view('components.port-link');
     }
 
-    public function linkClass()
+    private function status()
     {
         if ($this->port->ifAdminStatus == 'down') {
-            return 'interface-admindown';
+            return 'disabled';
         }
 
-        if ($this->port->ifAdminStatus == 'up' && $this->port->ifOperStatus != 'up') {
-            return 'interface-updown';
-        }
-
-        return 'interface-upup';
+        return $this->port->ifAdminStatus == 'up' && $this->port->ifOperStatus != 'up'
+            ? 'down'
+            : 'up';
     }
 
     public function fillDefaultVars(array $vars): array

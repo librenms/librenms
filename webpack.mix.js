@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+const tailwindcss = require('tailwindcss'); /* Add this line at the top */
 
 /*
  |--------------------------------------------------------------------------
@@ -14,6 +15,9 @@ const mix = require('laravel-mix');
 mix.setPublicPath('html/')
     .js('resources/js/app.js', 'js')
     .vue()
-    .sass('resources/sass/app.scss', 'css')
+    .sass('resources/sass/app.scss', 'css/vendor.css')
+    .postCss('resources/css/app.css', 'css', [
+        require('tailwindcss'),
+    ])
     .extract()
     .version('html/js/lang/*.js');
