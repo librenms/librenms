@@ -4,7 +4,7 @@ text: 'Alcatel-Lucent Enterprise Stellar Wireless OS (AWOS)'
 type: network
 ifXmcbc: true
 ifname: true
-nobulk: true
+snmp_bulk: false
 ignore_mount_string:
     - firmware
     - overlay

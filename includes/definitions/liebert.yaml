@@ -2,7 +2,7 @@ os: liebert
 text: Liebert
 type: power
 icon: vertiv
-nobulk: true
+snmp_bulk: false
 mib_dir: liebert
 rfc1628_compat: true
 discovery:
