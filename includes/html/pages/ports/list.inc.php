@@ -34,7 +34,7 @@ if ($vars['errors']) {
             <thead>
             <tr>
                 <th data-column-id="hostname" data-formatter="device">Device</th>
-                <th data-column-id="ifDescr"<?php echo $sort ?> data-formatter="device">Port</th>
+                <th data-column-id="ifDescr"<?php echo $sort ?> data-formatter="port">Port</th>
                 <th data-column-id="secondsIfLastChange" data-converter="duration">Status Changed</th>
                 <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
                 <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
