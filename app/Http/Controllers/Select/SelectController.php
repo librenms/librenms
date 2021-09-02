@@ -91,4 +91,15 @@ abstract class SelectController extends PaginatedAjaxController
             'text' => $attributes->forget($model->getKeyName())->first(),
         ];
     }
+
+    protected function includeGeneral(): bool
+    {
+        if (request()->has('id') && request('id') !== 0) {
+            return false;
+        } elseif (request()->has('term') && ! Str::contains('general', strtolower(request('term')))) {
+            return false;
+        }
+
+        return true;
+    }
 }
