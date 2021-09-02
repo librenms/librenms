@@ -63,7 +63,6 @@ class PortsController extends TableController
             'port_descr_type',
             'ports.disabled' => 'disabled',
             'ports.ignore' => 'ignore',
-            'deleted',
         ];
     }
 
@@ -93,6 +92,7 @@ class PortsController extends TableController
         $query = Port::hasAccess($request->user())
             ->with('device')
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
+            ->where('deleted', $request->get('deleted', 0)) // always filter deleted
             ->when($request->get('hostname'), function (Builder $query, $hostname) {
                 $query->where(function (Builder $query) use ($hostname) {
                     $query->where('hostname', 'like', "%$hostname%")
