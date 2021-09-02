@@ -26,10 +26,10 @@
           x-on:mouseenter="clearTimeout(hideTimeout)"
           x-on:mouseleave="hide(delay)"
           x-bind:class="{'hidden': !popupShow, 'block': popupShow}"
-          class="hidden bg-white border-2 ml-3 z-50 font-normal leading-normal text-sm text-left no-underline rounded-lg"
+          class="hidden bg-green-500 border-2 ml-3 z-50 font-normal leading-normal text-sm text-left no-underline rounded-lg"
     >
         @isset($title)
-            <div class="opacity-90 p-3 mb-0 border-b border-solid rounded-t-lg">
+            <div class="opacity-90 p-3 mb-0 border-b-2 border-solid rounded-t-lg">
                 {{ $title }}
             </div>
         @endisset

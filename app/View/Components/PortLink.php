@@ -28,12 +28,9 @@ class PortLink extends Component
         $this->label = Rewrite::normalizeIfName($port->getLabel());
         $this->description = $port->getDescription();
 
-        $this->graphs = collect($graphs === null ? [
-            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-1d']],
-            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-7d']],
-            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-30d']],
-            ['type' => 'port_bits', 'text' => trans('Traffic'), 'vars' => ['from' => '-1y']],
-        ] : Arr::wrap($graphs))->groupBy('text');
+        $this->graphs = $graphs === null ? [
+            ['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]],
+        ] : Arr::wrap($graphs);
 
         if ($this->description == $this->label) {
             $this->description = '';
@@ -63,13 +60,15 @@ class PortLink extends Component
         return 'interface-upup';
     }
 
-    public function fillDefaultVars($vars): array
+    public function fillDefaultVars(array $vars): array
     {
-        return [
+        return array_map(function ($graph_vars) {
+            return array_merge([
                 'from' => '-1d',
                 'type' => 'port_bits',
                 'legend' => 'yes',
                 'text' => '',
-            ] + Arr::wrap($vars);
+            ], Arr::wrap($graph_vars));
+        }, $vars);
     }
 }

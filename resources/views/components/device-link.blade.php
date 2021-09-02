@@ -19,11 +19,7 @@
     <x-slot name="body">
         @foreach($graphs as $graph)
             @isset($graph['text'], $graph['graph'])
-                <div class="font-semibold">{{ $graph['text'] }}</div>
-                <div class="flex flex-row flex-wrap">
-                    <x-graph :device="$device" start="-1d" :type="$graph['graph']" loading="lazy" trim="1" />
-                    <x-graph :device="$device" start="-1w" :type="$graph['graph']" loading="lazy" trim="1" />
-                </div>
+                <x-graph-row loading="lazy" :device="$device" :type="$graph['graph']" :title="$graph['text']" :graphs="[['from' => '-1d'], ['from' => '-1w']]"></x-graph-row>
             @endisset
         @endforeach
     </x-slot>
