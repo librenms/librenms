@@ -2,7 +2,7 @@ os: ict-pdu
 text: 'ICT Distribution Series'
 type: power
 icon: ict
-nobulk: true
+snmp_bulk: false
 mib_dir: ict
 over:
     - { graph: device_current, text: Current }

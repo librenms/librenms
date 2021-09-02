@@ -4,7 +4,7 @@ text: 'Huawei SmartAX MDU'
 type: network
 icon: huawei
 ifname: true
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

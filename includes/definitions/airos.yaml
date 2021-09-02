@@ -2,7 +2,7 @@ os: airos
 text: 'Ubiquiti AirOS'
 type: wireless
 icon: ubiquiti
-nobulk: true
+snmp_bulk: false
 mib_dir: ubnt
 over:
     - { graph: device_bits, text: 'Device Traffic' }

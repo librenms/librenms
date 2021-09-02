@@ -3,7 +3,7 @@ text: 'Imco Power'
 type: power
 icon: imco
 group: IMCO POWER
-nobulk: true
+snmp_bulk: false
 discovery:
     -
         sysObjectID:
