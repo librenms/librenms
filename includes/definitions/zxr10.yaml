@@ -3,6 +3,11 @@ group: zxr10
 text: 'ZTE ZXR10'
 type: network
 icon: zte
+mib_dir: zte
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
         sysDescr:
