@@ -864,7 +864,16 @@
         },
         "default_port_group": {
             "default": 0,
-            "type": "integer"
+            "type": "select-dynamic",
+            "group": "discovery",
+            "section": "networks",
+            "order": 0,
+            "options": {
+                "target": "port-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:port_groups,id"
+            }
         },
         "device_location_map_open": {
             "order": 2,
