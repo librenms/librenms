@@ -3,8 +3,8 @@ modules:
     mempools:
         data:
             -
-                total: ZXR10-MIB::zxr10SystemMemSize
-                used: ZXR10-MIB::zxr10SystemMemUsed
+                total: ZXR10-MIB::zxr10SystemMemSize.1
+                used: ZXR10-MIB::zxr10SystemMemUsed.1
                 precision: 1024
     processors:
         data:
