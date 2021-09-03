@@ -47,13 +47,12 @@ foreach ($pre_cache['timos_oids'] as $index => $entry) {
         discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, 'timos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_func);
     }
 }
-#new code follows for multi-lane optics
+//new code follows for multi-lane optics
 
 $numlanes = snmpwalk_cache_multi_oid($device, 'tmnxPortEntry', [], 'TIMETRA-PORT-MIB', 'timos');
 $lanes = snmpwalk_cache_multi_oid($device, 'tmnxDDMLaneEntry', [], 'TIMETRA-PORT-MIB', 'timos');
 
 foreach ($numlanes as $index => $entry) {
-    echo("Number of lanes " . $entry['tmnxPortSFPNumLanes']);
     if (is_numeric($entry['tmnxPortSFPNumLanes']) && $entry['tmnxPortSFPNumLanes'] > 1) {
         for ($x = 1; $x <= $entry['tmnxPortSFPNumLanes']; $x++) {
             $lane = $lanes[$index . '.' . $x];
