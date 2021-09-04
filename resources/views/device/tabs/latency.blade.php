@@ -20,17 +20,9 @@
             <div class="tab-content">
                 @foreach($data['smokeping_tabs'] as $direction)
                     <div class="tab-pane fade in @if($loop->first) active @endif" id="{{ $direction }}">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>Average</h3>
-                            </div>
-                        </div>
-                        <div class="row">
-                            @foreach(\LibreNMS\Util\Html::graphRow(['type' => "device_smokeping_{$direction}_all_avg", 'device' => $device->device_id]) as $graph)
-                                <div class='col-md-3'>{!! $graph !!}</div>
-                            @endforeach
-                        </div>
-                        <div class="row">
+                        <x-graph-row :type="'device_smokeping_' . $direction . '_all_avg'" title="Average" :device="$device" columns="responsive"></x-graph-row>
+                    </div>
+                    <div class="row">
                             <div class="col-md-12">
                                 <h3>Aggregate</h3>
                             </div>
@@ -221,7 +213,7 @@
         .panel.with-nav-tabs .nav-justified {
             margin-bottom: -1px;
         }
-        
+
         .bootstrap-datetimepicker-widget.dropdown-menu {
             inset: auto!important;
         }

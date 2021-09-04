@@ -34,21 +34,31 @@ class GraphRow extends Component
      * @var float|int
      */
     public $rowWidth;
+    /**
+     * @var bool
+     */
+    public $responsive;
+    /**
+     * @var string
+     */
+    public $aspect;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(string $type = '', string $title = null, string $loading = 'eager', $device = null, $port = null, int $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']])
+    public function __construct(string $type = '', string $title = null, string $loading = 'eager', $device = null, $port = null, $aspect = 'normal', $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']])
     {
         $this->type = $type;
+        $this->aspect = $aspect;
         $this->loading = $loading;
         $this->device = $device;
         $this->port = $port;
         $this->graphs = $graphs;
         $this->title = $title;
-        $this->rowWidth = (max(array_column($graphs, 'width') + [0]) ?: Graph::DEFAULT_WIDTH) * min($columns, count($graphs));
+        $this->responsive = $columns == 'responsive';
+        $this->rowWidth = $this->calculateRowWidth($columns);
     }
 
     /**
@@ -59,5 +69,21 @@ class GraphRow extends Component
     public function render()
     {
         return view('components.graph-row');
+    }
+
+    private function calculateRowWidth($columns): ?int
+    {
+        if (! $this->responsive) {
+            return null;
+        }
+
+        $max = max(array_column($this->graphs, 'width') + [0]);
+
+        if (! $max) {
+            $max = $this->aspect == 'wide' ? Graph::DEFAULT_WIDE_WIDTH : Graph::DEFAULT_NORMAL_WIDTH;
+        }
+
+        // width * columns, unless there is less graphs than columns
+        return $max * min($columns, count($this->graphs));
     }
 }

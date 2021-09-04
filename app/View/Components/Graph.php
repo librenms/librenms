@@ -8,8 +8,10 @@ use Illuminate\View\Component;
 
 class Graph extends Component
 {
-    const DEFAULT_WIDTH = 340;
-    const DEFAULT_HEIGHT = 100;
+    const DEFAULT_WIDE_WIDTH = 340;
+    const DEFAULT_WIDE_HEIGHT = 100;
+    const DEFAULT_NORMAL_WIDTH = 300;
+    const DEFAULT_NORMAL_HEIGHT = 150;
 
     public $vars;
     public $width;
@@ -25,16 +27,16 @@ class Graph extends Component
      *
      * @return void
      */
-    public function __construct($type = '', $vars = [], $from = '-1d', $to = null, $legend = 'no', $width = self::DEFAULT_WIDTH, $height = self::DEFAULT_HEIGHT, $absolute_size = 0, $device = null, $port = null)
+    public function __construct($type = '', $vars = [], $from = '-1d', $to = null, $legend = 'no', $aspect = 'normal', $width = null, $height = null, $absolute_size = 0, $device = null, $port = null)
     {
         $this->type = $type;
         $this->vars = $vars;
         $this->from = $from;
         $this->to = $to;
         $this->legend = $legend;
-        $this->width = $width;
-        $this->height = $height;
         $this->absolute_size = $absolute_size;
+        $this->width = $width ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_WIDTH : self::DEFAULT_NORMAL_WIDTH);
+        $this->height = $height ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_HEIGHT : self::DEFAULT_NORMAL_HEIGHT);
 
         // handle device and port ids/models for convenience could be set in $vars
         if ($device instanceof Device) {
