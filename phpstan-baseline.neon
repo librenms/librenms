@@ -31,16 +31,6 @@ parameters:
 			path: LibreNMS/Authentication/MysqlAuthorizer.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/MysqlAuthorizer.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/MysqlAuthorizer.php
-
-		-
 			message: "#^Parameter \\#2 \\$password of method LibreNMS\\\\Authentication\\\\MysqlAuthorizer\\:\\:addUser\\(\\) expects string, null given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/SSOAuthorizer.php
@@ -266,16 +256,6 @@ parameters:
 			path: tests/AddHostTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$username of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/AuthHTTPTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$newpassword of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/AuthHTTPTest.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php
@@ -283,16 +263,6 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, null given\\.$#"
 			count: 2
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$username of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$newpassword of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
 			path: tests/AuthSSOTest.php
 
 		-
