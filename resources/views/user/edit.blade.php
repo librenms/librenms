@@ -39,23 +39,6 @@
                 </div>
             </div>
         </form>
-
-        <form action="{{ route('users.update', $user->user_id)}}" method="POST" role="form"
-              class="form-horizontal col-md-8 col-md-offset-2">
-            {{ method_field('PUT') }}
-            @csrf
-            <input type="hidden" id="revoke_user" name="revoke_user" value="1">
-            <div class="form-group">
-                <div class="col-sm-9 col-sm-offset-3">
-                    <button type="submit" class="btn btn-warning"
-                    @if(Auth::id() == $user->user_id) disabled
-                    @elseif(! $user->sessions()->count()) disabled
-                    @endif>
-                    @lang('Revoke User Session')
-                    </button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
 @endsection

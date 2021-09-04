@@ -44,6 +44,12 @@ class User extends Authenticatable
     {
         parent::boot();
 
+        static::saving(function (User $user) {
+            if (! $user->enabled) {
+                $user->sessions()->delete();
+            }
+        });
+
         static::deleting(function (User $user) {
             $user->sessions()->delete();
         });
@@ -239,10 +245,5 @@ class User extends Authenticatable
     public function widgets(): HasMany
     {
         return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
-    }
-
-    public function sessions(): HasMany
-    {
-        return $this->hasMany(\App\Models\Sessions::class, 'user_id', 'user_id');
     }
 }

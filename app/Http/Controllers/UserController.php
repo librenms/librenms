@@ -165,10 +165,6 @@ class UserController extends Controller
             $user->setPassword($request->new_password);
         }
 
-        if ($request->get('revoke_user')) {
-            $this->revoke($user);
-        }
-
         $user->fill($request->all());
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
@@ -186,20 +182,6 @@ class UserController extends Controller
         }
 
         return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
-    }
-
-    /**
-     * Revoke User Sessions.
-     *
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function revoke(User $user)
-    {
-        $user->sessions()->delete();
-
-        return response()->json(__('User :username revoked.', ['username' => $user->username]));
     }
 
     /**
