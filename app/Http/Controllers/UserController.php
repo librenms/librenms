@@ -170,9 +170,12 @@ class UserController extends Controller
         if ($request->get('new_password') && $user->canSetPassword($request->user())) {
             $user->setPassword($request->new_password);
             $current_user = Auth::user();
-            Auth::setUser($user);
+            Auth::setUser($user); // make sure new password is loaded
             Auth::logoutOtherDevices($request->new_password);
-            Auth::setUser($current_user);
+
+            if ($current_user->user_id !== $user->user_id) {
+                Auth::setUser($current_user);
+            }
         }
 
         $user->fill($request->all());
