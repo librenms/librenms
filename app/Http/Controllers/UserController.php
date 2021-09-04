@@ -31,6 +31,7 @@ use App\Models\AuthLog;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
+use Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
@@ -168,6 +169,7 @@ class UserController extends Controller
     {
         if ($request->get('new_password') && $user->canSetPassword($request->user())) {
             $user->setPassword($request->new_password);
+            Auth::setUser($user)->logoutOtherDevices($request->new_password);
         }
 
         $user->fill($request->all());
@@ -176,17 +178,15 @@ class UserController extends Controller
             Toastr::success(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
-        if ($user->isDirty()) {
-            if ($user->save()) {
-                Toastr::success(__('User :username updated', ['username' => $user->username]));
-            } else {
-                Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
+        if ($user->save()) {
+            Toastr::success(__('User :username updated', ['username' => $user->username]));
 
-                return redirect()->back();
-            }
+            return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
         }
 
-        return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
+        Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
+
+        return redirect()->back();
     }
 
     /**
