@@ -27,8 +27,6 @@ namespace App\Http\Controllers\Widgets;
 use App\Models\Alert;
 use Illuminate\Http\Request;
 
-// use LibreNMS\Enum\AlertState;
-
 class AlertsController extends WidgetController
 {
     protected $title = 'Alerts';
@@ -48,14 +46,6 @@ class AlertsController extends WidgetController
 
     public function getView(Request $request)
     {
-        /* This is done in the frontend now.
-
-        $alert_count = Alert::where('state', '!=', AlertState::RECOVERED)->count();
-
-        if ($alert_count) {
-            $this->title .= ' (' . $alert_count . ')';
-        } */
-
         return view('widgets.alerts', $this->getSettings());
     }
 
