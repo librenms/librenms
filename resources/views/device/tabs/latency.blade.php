@@ -22,27 +22,11 @@
                     <div class="tab-pane fade in @if($loop->first) active @endif" id="{{ $direction }}">
                         <x-graph-row :type="'device_smokeping_' . $direction . '_all_avg'" title="Average" :device="$device" columns="responsive"></x-graph-row>
                     </div>
-                    <div class="row">
-                            <div class="col-md-12">
-                                <h3>Aggregate</h3>
-                            </div>
-                        </div>
-                        <div class="row">
-                            @foreach(\LibreNMS\Util\Html::graphRow(['type' => "device_smokeping_{$direction}_all", 'device' => $device->device_id, 'legend' => 'no']) as $graph)
-                                <div class='col-md-3'>{!! $graph !!}</div>
-                            @endforeach
-                        </div>
+                    <div class="row"><x-graph-row :type="'device_smokeping_' . $direction . '_all'" title="Aggregate" :device="$device" columns="responsive"></x-graph-row>
                         @foreach($data['smokeping']->otherGraphs($direction) as $info)
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h3>@deviceLink($info['device'])</h3>
-                                </div>
-                            </div>
-                            <div class="row">
-                                @foreach(\LibreNMS\Util\Html::graphRow($info['graph']) as $graph)
-                                    <div class='col-md-3'>{!! $graph !!}</div>
-                                @endforeach
-                            </div>
+                            <x-graph-row :type="$info['graph']" :device="$info['device']" columns="responsive">
+                                <x-slot name="title"><x-device-link device="$info['device']" /></x-slot>
+                            </x-graph-row>
                         @endforeach
                     </div>
                 @endforeach

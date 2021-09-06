@@ -24,7 +24,6 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Alert;
 use Illuminate\Http\Request;
 
 class AlertsController extends WidgetController

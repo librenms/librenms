@@ -19,7 +19,7 @@
                 @foreach($vlans as $port)
                     @if(!$vars)
 @if($port->port)
-@portLink($port->port, $port->port->getShortLabel())
+    <x-port-link :port="$port->port">{{ $port->port }}</x-port-link>
 @if($port->untagged)
 (U)@endif
 @if(!$loop->last),
