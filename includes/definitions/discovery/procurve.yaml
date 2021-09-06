@@ -18,7 +18,7 @@ modules:
         sysDescr_regex:
             - '/( (?<hardware>\d{4,}\S*)[^,]*)?, revision (?<version>[^ ,]+)/'
             - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
-            - '/(HPE OfficeConnect Switch|HP) (?<hardware>[\d]+[\ \-]\S+).*(?<version>PT[0-9\.]+)/'
+            - '/(HPE OfficeConnect Switch|HP) (?<hardware>[\d]+[\ \-]\S+).*(?<version>P\S[0-9\.]+)/'
             - '/(HP ProCurve) (?<hardware>\d+\S?).*(?<version>P[1-9\.]+)/'
         version:
             - NETSWITCH-MIB::hpSwitchOsVersion.0
@@ -58,7 +58,7 @@ modules:
                     index: 'hpicfFanState.{{ $index }}'
                     state_name: hpicfFanState
                     states:
-                        - { descr: removed, graph: 1, value: 1, generic: 3 }
+                        - { descr: removed, graph: 0, value: 1, generic: 3 }
                         - { descr: off, graph: 1, value: 2, generic: 3 }
                         - { descr: underspeed, graph: 1, value: 3, generic: 1 }
                         - { descr: overspeed, graph: 1, value: 4, generic: 1 }
