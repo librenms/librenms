@@ -73,7 +73,7 @@ class GraphRow extends Component
 
     private function calculateRowWidth($columns): ?int
     {
-        if (! $this->responsive) {
+        if ($this->responsive) {
             return null;
         }
 
