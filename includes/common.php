@@ -315,7 +315,6 @@ function device_by_id_cache($device_id, $refresh = false)
     $device['lat'] = $model->location->lat ?? null;
     $device['lng'] = $model->location->lng ?? null;
     $device['attribs'] = $model->getAttribs();
-    $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
 
     return $device;
 }
@@ -656,7 +655,7 @@ function version_info($remote = false)
     $output['db_schema'] = vsprintf('%s (%s)', $version->database());
     $output['php_ver'] = phpversion();
     $output['python_ver'] = \LibreNMS\Util\Version::python();
-    $output['mysql_ver'] = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
+    $output['mysql_ver'] = \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
         Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
     )), 1, 1)));

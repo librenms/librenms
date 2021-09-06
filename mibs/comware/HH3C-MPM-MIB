@@ -1,0 +1,381 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: LAN Switch Multicast Port Management MIB
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2005-03-22 Created by Wang Xiaodong
+-- V1.1 2005-08-11 updated by Wang Xiaodong
+--      Add hh3cMPortGroupLimitReplace
+-- V1.2 2006-02-06 updated by Lv Jianning
+--      Add hh3cHostStaticJoinTable
+-- ==================================================================
+-- ==================================================================
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+HH3C-MPM-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+
+    Integer32,MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,mib-2
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,RowStatus
+        FROM SNMPv2-TC
+
+    hh3cCommon
+        FROM HH3C-OID-MIB
+
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+
+    ifIndex
+        FROM IF-MIB;
+
+    hh3cMpm MODULE-IDENTITY
+        LAST-UPDATED "200503220000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "The MPM (Multicast Port Management) MIB."
+        REVISION "200503220000Z"
+        DESCRIPTION
+            "The initial version of this MIB file."
+        ::= { hh3cCommon 51 }
+
+    EnabledStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "A simple status value for the object."
+        SYNTAX     INTEGER { enabled(1), disabled(2) }
+
+
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cMPMObject OBJECT IDENTIFIER ::= {  hh3cMpm 1  }
+
+    hh3cMPortGroupLimitMinNumber OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The lower limit of group-limit number."
+        ::= { hh3cMPMObject 1 }
+
+    hh3cMPortGroupLimitMaxNumber OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The upper limit of group-limit number."
+        ::= { hh3cMPMObject 2 }
+
+
+    hh3cMPMTable OBJECT IDENTIFIER ::= {  hh3cMpm 2  }
+
+    hh3cMPortGroupJoinTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Hh3cMPortGroupJoinEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table which is used for configuring a port in a specified VLAN to join
+            a multicast group."
+        ::= { hh3cMPMTable 1 }
+
+    hh3cMPortGroupJoinEntry OBJECT-TYPE
+        SYNTAX     Hh3cMPortGroupJoinEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry which is used for configuring a port in a specified VLAN to join
+            a multicast group."
+        INDEX      {
+                      ifIndex,
+                      hh3cMPortGroupJoinVlanID,
+                      hh3cMPortGroupJoinAddressType,
+                      hh3cMPortGroupJoinAddress
+                      }
+        ::= { hh3cMPortGroupJoinTable 1 }
+
+    Hh3cMPortGroupJoinEntry ::= SEQUENCE {
+        hh3cMPortGroupJoinVlanID          Integer32,
+        hh3cMPortGroupJoinAddressType     InetAddressType,
+        hh3cMPortGroupJoinAddress         InetAddress,
+        hh3cMPortGroupJoinStatus          RowStatus
+        }
+
+    hh3cMPortGroupJoinVlanID OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An index uniquely identifying a port in a specified
+            VLAN which joined the multicast group."
+        ::= { hh3cMPortGroupJoinEntry 1 }
+
+    hh3cMPortGroupJoinAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Type of the multicast IP address."
+        ::= { hh3cMPortGroupJoinEntry 2 }
+
+    hh3cMPortGroupJoinAddress OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "IP address of the group which the port belongs to,
+            and it must be a valid multicast IP address."
+        ::= { hh3cMPortGroupJoinEntry 3 }
+
+    hh3cMPortGroupJoinStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "This object is responsible for managing the creation and
+             deletion of rows, which supports 'active', 'notReady',
+             'createAndGo', 'destroy'.
+
+             Until instances of all corresponding columns are
+             appropriately configured, the value of the
+             corresponding instance of the hh3cMPortGroupJoinStatus
+             column is 'notReady'.
+
+             In particular, a newly created row cannot be actived
+             until the port belongs to the corresponding VLAN and
+             IGMP or IGMP snooping is enabled on that VLAN."
+        ::= { hh3cMPortGroupJoinEntry 4 }
+
+    hh3cMPortGroupTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Hh3cMPortGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table containing information about the status of a port
+             which joined a multicast group in the VLAN."
+         ::= { hh3cMPMTable 2 }
+
+    hh3cMPortGroupEntry OBJECT-TYPE
+        SYNTAX     Hh3cMPortGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry containing information about the status of a port
+             which joined a multicast group in the VLAN."
+        INDEX      {  ifIndex,
+                      hh3cMPortGroupVlanID,
+                      hh3cMPortGroupAddressType,
+                      hh3cMPortGroupAddress
+                   }
+        ::= { hh3cMPortGroupTable 1 }
+
+    Hh3cMPortGroupEntry ::= SEQUENCE {
+        hh3cMPortGroupVlanID          Integer32,
+        hh3cMPortGroupAddressType     InetAddressType,
+        hh3cMPortGroupAddress         InetAddress
+        }
+
+    hh3cMPortGroupVlanID OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An index uniquely identifies that a port belongs to a specified
+            VLAN."
+        ::= { hh3cMPortGroupEntry 1 }
+
+    hh3cMPortGroupAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Type of multicast IP address."
+        ::= { hh3cMPortGroupEntry 2 }
+
+    hh3cMPortGroupAddress OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "IP address of the group which the port joined, and it must be a
+             valid multicast IP address."
+        ::= { hh3cMPortGroupEntry 3 }
+
+    hh3cMPortConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cMPortConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table configuring the fast leave status, group limit number and
+             group policy parameter on a port in the specified VLAN."
+        ::= { hh3cMPMTable 3 }
+
+    hh3cMPortConfigEntry OBJECT-TYPE
+        SYNTAX  Hh3cMPortConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry containing information about the fast leave status, group
+             limit number and group policy parameter of a port in the specified
+             VLAN."
+        INDEX  { ifIndex,
+                 hh3cMPortConfigVlanID }
+        ::= { hh3cMPortConfigTable 1 }
+
+    Hh3cMPortConfigEntry ::= SEQUENCE {
+        hh3cMPortConfigVlanID          Integer32,
+        hh3cMPortGroupLimitNumber      Unsigned32,
+        hh3cMPortFastLeaveStatus       EnabledStatus,
+        hh3cMPortGroupPolicyParameter  Integer32,
+        hh3cMPortConfigRowStatus       RowStatus,
+        hh3cMPortGroupLimitReplace     EnabledStatus
+        }
+
+    hh3cMPortConfigVlanID OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The VLAN index."
+        ::= { hh3cMPortConfigEntry 1 }
+
+    hh3cMPortGroupLimitNumber OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The group limit number of the port."
+        ::= { hh3cMPortConfigEntry 2 }
+
+    hh3cMPortFastLeaveStatus OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The fast leave status of the port."
+        DEFVAL  { 2 }
+        ::= { hh3cMPortConfigEntry 3 }
+
+    hh3cMPortGroupPolicyParameter OBJECT-TYPE
+        SYNTAX  Integer32(0|2000..2999)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The ACL number which is used as the group policy parameter
+             of the port."
+        DEFVAL  { 0 }
+        ::= { hh3cMPortConfigEntry 4 }
+
+    hh3cMPortConfigRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object is responsible for managing the creation and
+             deletion of rows, which supports 'active', 'notReady',
+             'createAndGo' and 'destroy'."
+        ::= { hh3cMPortConfigEntry 5 }
+
+    hh3cMPortGroupLimitReplace OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is related to the object hh3cMPortGroupLimitNumber.
+             If the current IGMP group number is less than the value of
+             hh3cMPortGroupLimitNumber, any new IGMP group is permitted.
+             If the current IGMP group number equals to the value of
+             hh3cMPortGroupLimitNumber and the value of this object is enabled,
+             the group with the minimum multicast address will be replaced by
+             the new group.
+             If the current IGMP group number equals to the value of
+             hh3cMPortGroupLimitNumber and the value of this object is disabled,
+             none of new group will be permitted."
+        DEFVAL  { disabled }
+        ::= { hh3cMPortConfigEntry 6 }
+
+    hh3cHostStaticJoinTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Hh3cHostStaticJoinEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table used to configure a host on a port in a specified VLAN
+            statically to join a multicast group."
+        ::= { hh3cMPMTable 4 }
+
+    hh3cHostStaticJoinEntry OBJECT-TYPE
+        SYNTAX     Hh3cHostStaticJoinEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry used to configure a host on a port in a specified VLAN
+            statically to join a multicast group."
+        INDEX      {
+                      ifIndex,
+                      hh3cHostStaticJoinVlanID,
+                      hh3cHostStaticJoinAddressType,
+                      hh3cHostStaticJoinAddress
+                      }
+        ::= { hh3cHostStaticJoinTable 1 }
+
+    Hh3cHostStaticJoinEntry ::= SEQUENCE {
+        hh3cHostStaticJoinVlanID          Integer32,
+        hh3cHostStaticJoinAddressType     InetAddressType,
+        hh3cHostStaticJoinAddress         InetAddress,
+        hh3cHostStaticJoinStatus          RowStatus
+        }
+
+    hh3cHostStaticJoinVlanID OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An index uniquely identify the specified VLAN in which a host
+            on a port statically joined the multicast group."
+        ::= { hh3cHostStaticJoinEntry 1 }
+
+    hh3cHostStaticJoinAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Type of the multicast IP address."
+        ::= { hh3cHostStaticJoinEntry 2 }
+
+    hh3cHostStaticJoinAddress OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "IP address of the group which the host belongs to, and it must be
+            a valid multicast IP address."
+        ::= { hh3cHostStaticJoinEntry 3 }
+
+    hh3cHostStaticJoinStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "This object is responsible for managing rows, which supports
+            'active', 'createAndGo' and 'destroy'."
+        ::= { hh3cHostStaticJoinEntry 4 }
+END

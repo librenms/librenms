@@ -1,0 +1,2661 @@
+-- ============================================================================
+-- Copyright (C) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Capability of Quality of Service with system and interface
+--              Management Information Base.
+-- Reference: RFC 3291
+-- Version: 1.4
+-- History:
+-- V1.0 created by tangshun.
+-- V1.1 modified by ChenWei
+--   Modify the syntax and description of hh3cQoSModuleIndex.
+--   Modify the description of hh3cQoSCharacteristicsValue.
+-- V1.2 modified by MouXuanli
+--   Add hh3cQoSSysCapabilityTable and hh3cQoSIfCapabilityTable.
+-- V1.3 modified by LuZefeng
+--   Modify the description of hh3cQoSSysCapCharacteristicsValue
+-- V1.4 modified by gaomengfei
+--   Modify the description of hh3cQoSSysCapCharacteristicsValue
+-- ============================================================================
+HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cSNMPAgCpb
+                FROM HH3C-OID-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+        hh3cQosCapability MODULE-IDENTITY
+            LAST-UPDATED "201610250000Z"            -- Oct. 25, 2016 at 00:00 GMT
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "QoS management information base."
+            REVISION "201610250000Z"        -- Oct 25, 2016 at 00:00 GMT
+            DESCRIPTION
+                "Modify the description of hh3cQoSSysCapCharacteristicsValue."
+            REVISION "201410280000Z"        -- Oct 28, 2014 at 00:00 GMT
+            DESCRIPTION
+                "Modify the description of hh3cQoSSysCapCharacteristicsValue."
+            ::= { hh3cSNMPAgCpb 1 }
+
+        hh3cQoSCapabilityMibObjects OBJECT IDENTIFIER ::= { hh3cQosCapability 1 }
+
+--
+-- Module Type
+--
+        CapabilityPhysicalType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "An enumerated value which provides an indication of the
+                 general hardware type of a particular capability entity.
+
+                 The enumeration 'stack' is applicable if the physical entity
+                 class is some sort of super-container (possibly virtual),
+                 intended to group together multiple chassis entities.  A
+                 stack may be realized by a 'virtual' cable, a real
+                 interconnect cable, attached to multiple chassis, or may in
+                 fact be comprised of multiple interconnect cables.  A stack
+                 should not be modeled within any other physical entities,
+                 but a stack may be contained within another stack.  Only
+                 chassis entities should be contained within a stack.
+
+                 The enumeration 'chassis' is applicable if the physical
+                 entity class is an overall container for networking
+                 equipment.  Any class of physical entity except a stack may
+                 be contained within a chassis, and a chassis may only be
+                 contained within a stack.
+
+                 The enumeration 'module' is applicable if the physical
+                 entity class is some sort of self-contained sub-system.
+                 If it is removable, then it should be modeled within a
+                 container entity, otherwise it should be modeled directly
+                 within another physical entity (e.g., a chassis or another
+                 module).
+
+                 The enumeration 'port' is applicable if the physical entity
+                 class is some sort of networking port, capable of receiving
+                 and/or transmitting networking traffic.
+                "
+            REFERENCE
+                "rfc2737
+                 ENTITY-MIB
+                "
+            SYNTAX INTEGER
+            {
+                stack(1),
+                chassis(2),
+                module(3),
+                port(4)
+            }
+
+        hh3cQoSCapabilityGroup OBJECT IDENTIFIER ::= { hh3cQoSCapabilityMibObjects 1 }
+
+        hh3cQoSCapabilityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSCapabilityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of capability of QoS of system information."
+            ::= { hh3cQoSCapabilityGroup 1 }
+
+        hh3cQoSCapabilityEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSCapabilityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Capability of QoS information entry."
+            INDEX { hh3cQoSCapabilityPhysicalType,
+                    hh3cQoSCapabilityPhysicalIndex,
+                    hh3cQoSModuleIndex,
+                    hh3cQoSCharacteristicsIndex }
+            ::= { hh3cQoSCapabilityTable 1 }
+
+        Hh3cQoSCapabilityEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSCapabilityPhysicalType
+                    CapabilityPhysicalType,
+                hh3cQoSCapabilityPhysicalIndex
+                    Integer32,
+                hh3cQoSModuleIndex
+                    Integer32,
+                hh3cQoSCharacteristicsIndex
+                    Integer32,
+                hh3cQoSCharacteristicsValue
+                    Unsigned32
+            }
+
+        hh3cQoSCapabilityPhysicalType OBJECT-TYPE
+            SYNTAX CapabilityPhysicalType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The concentric device supports 'chassis' and 'port'.
+
+                 The distributed device supports 'chassis',
+                 'module' and 'port'.
+
+                 The Intelligent Resilient Framework System supports
+                 'stack', 'chassis', 'module' and 'port'.
+                "
+            ::= { hh3cQoSCapabilityEntry 1 }
+
+        hh3cQoSCapabilityPhysicalIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of each physical entity.
+                 If hh3cQoSCapabilityPhysicalType is 'stack',
+                 the value of this object is 0.
+
+                 If hh3cQoSCapabilityPhysicalType is 'chassis' and 'module',
+                 the value of this object is equal to 'entPhysicalIndex',
+                 which is defined by 'ENTITY-MIB'.
+
+                 If hh3cQoSCapabilityPhysicalType is 'port',
+                 the value of this object is equal to 'ifIndex',
+                 which is defined by 'RFC1213-MIB'.
+                "
+            REFERENCE
+                "RFC2737.
+                 RFC1213.
+                 ENTITY-MIB.
+                "
+            ::= { hh3cQoSCapabilityEntry 2 }
+
+        hh3cQoSModuleIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The module index of QoS.
+                 QoS module:
+                     Index    Characteristic
+                     1        car module
+                     2        gts module
+                     3        lr module
+                     4        hardware queue management module
+                     5        wred module
+                     6        priority mapping table module
+                     7        colored priority mapping table module
+                     8        port priority module
+                     9        qos policy module
+                     10       qos interface generic module
+                     11       flow template module
+                     12       vqos and vacl module
+                     13       statistic module
+                     21       carl module
+                     22       fifo module
+                     23       pq module
+                     24       cq module
+                     25       wfq module
+                     26       rtpq module
+                "
+            ::= { hh3cQoSCapabilityEntry 3 }
+
+        hh3cQoSCharacteristicsIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The characteristics index of modules of QoS."
+            ::= { hh3cQoSCapabilityEntry 4 }
+
+        hh3cQoSCharacteristicsValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The characteristics value of modules of QoS.
+                 The type of value of characteristics.
+
+                 car module:
+                     Index  Characteristic  Value
+                     1      car function    1, if supported.
+                     2      match any       1, if supported.
+                     3      match acl       If last 8 bits of this object are set to 1,
+                                            it indicates that the match acl type is supported,
+                                            bit 0 stands for IPv6 basic acl,
+                                            bit 1 stands for IPv6 advanced acl,
+                                            bit 2 stands for mac acl,
+                                            bit 3 stands for user acl,
+                                            bit 4 stands for IPv6 user acl,
+                                            bit 5 stands for IPv6 simple acl,
+                                            bit 6 stands for IPv4 basic acl,
+                                            bit 7 stands for IPv4 advanced acl.
+                     4      match carl      1, if supported.
+                     5      green action    If last 10 bits of this object are set to 1,
+                                            it indicates that the green action type is supported,
+                                            bit 0 stands for continue,
+                                            bit 1 stands for drop,
+                                            bit 2 stands for transmit,
+                                            bit 3 stands for setting prec,
+                                            bit 4 stands for setting dscp,
+                                            bit 5 stands for setting exp,
+                                            bit 6 stands for setting atm clp,
+                                            bit 7 stands for setting fr de,
+                                            bit 8 stands for setting 802.1p,
+                                            bit 9 stands for setting local precedence.
+                     6      yellow action   If last 10 bits of this object are set to 1,
+                                            it indicates that the yellow action type is supported,
+                                            and the mask is same to green action.
+                     7      red action      If last 10 bits of this object are set to 1,
+                                            it indicates that the red action type is supported,
+                                            and the mask is same to green action.
+                     8      input           1, if supported.
+                     9      output          1, if supported.
+                     10     cir             1, if supported.
+                     11     burst size      1, if supported.
+                     12     excess burst size
+                                            1, if supported.
+                     13     pir             1, if supported.
+                     14     default cir     The default value of cir(integer).
+                     15     lower limit of cir
+                                            The lower limit value of cir(integer).
+                     16     upper limit of cir
+                                            The upper limit value of cir(integer).
+                     17     cir granularity
+                                            The value of cir granularity(integer).
+                     18     default pir     The default value of pir(integer).
+                     19     lower limit of pir
+                                            The lower limit value of cir(integer).
+                     20     upper limit of pir
+                                            The upper limit value of pir(integer).
+                     21     pir granularity
+                                            The value of pir granularity(integer).
+                     22     default burst size
+                                            The default value of burst size(integer).
+                     23     lower limit of burst size
+                                            The lower limit value of burst size(integer).
+                     24     upper limit of burst size
+                                            The upper limit value of burst size(integer).
+                     25     car burst granularity size
+                                            The value of burst granularity size(integer).
+                     26     default excess burst size
+                                            The default value of excess burst size(integer).
+                     27     lower limit of excess burst size
+                                            The lower limit value of excess burst size(integer).
+                     28     upper limit of excess burst size
+                                            The upper limit value of excess burst size(integer).
+                     29     excess burst granularity size
+                                            The value of excess burst granularity size(integer).
+                     30     car aggregation function
+                                            1, if supported.
+                     31     max aggregation
+                                            The max value of aggregation(integer).
+                     32     flow number     The value of flow number(integer).
+
+                 gts module
+                     Index  Characteristic  Value
+                     1      gts function    1, if supported.
+                     2      match any       1, if supported.
+                     3      match acl       If last 8 bits of this object are set to 1,
+                                            it indicates that the match acl type is supported,
+                                            bit 0 stands for IPv6 basic acl,
+                                            bit 1 stands for IPv6 advanced acl,
+                                            bit 2 stands for mac acl,
+                                            bit 3 stands for user acl,
+                                            bit 4 stands for IPv6 user acl,
+                                            bit 5 stands for IPv6 simple acl,
+                                            bit 6 stands for IPv4 basic acl,
+                                            bit 7 stands for IPv4 advanced acl.
+                     4      match queue     1, if supported.
+                     5      cir             1, if supported.
+                     6      burst size      1, if supported.
+                     7      excess burst size
+                                            1, if supported.
+                     8      queue length    1, if supported.
+                     9      default cir     The default value of cir(integer).
+                     10     lower limit of cir
+                                            The lower limit value of cir(integer).
+                     11     upper limit of cir
+                                            The upper limit value of cir(integer).
+                     12     cir granularity
+                                            The value of cir granularity(integer).
+                     13     default burst size
+                                            The default value of burst size(integer).
+                     14     lower limit of burst size
+                                            The lower limit value of burst size(integer).
+                     15     upper limit of burst size
+                                            The upper limit value of burst size(integer).
+                     16     burst size granularity
+                                            The value of burst size granularity(integer).
+                     17     default excess burst size
+                                            The default value of excess burst size(integer).
+                     18     lower limit of excess burst size
+                                            The lower limit value of excess burst size(integer).
+                     19     upper limit of excess burst size
+                                            The upper limit value of excess burst size(integer).
+                     20     excess burst size granularity
+                                            The value of excess burst size granularity(integer).
+                     21     default queue length
+                                            The default length of queue(integer).
+                     22     lower limit of queue length
+                                            The lower limit length of queue(integer).
+                     23     upper limit of queue length
+                                            The upper limit length of queue(integer).
+                     24     queue number    The number of queue(integer).
+                     25     flow number     The value of flow number(integer).
+                     26     pir             1, if supported.
+                     27     lower limit of pir
+                                            The lower limit value of pir(integer).
+                     28     upper limit of pir
+                                            The upper limit value of pir(integer).
+                     29     pir granularity
+                                            The value of pir granularity(integer).
+
+                 lr module
+                     Index  Characteristic  Value
+                     1      lr function     1, if supported.
+                     2      input           1, if supported.
+                     3      output          1, if supported.
+                     4      cir             1, if supported.
+                     5      burst size      1, if supported.
+                     6      excess burst size
+                                            1, if supported.
+                     7      default cir     The default value of cir(integer).
+                     8      lower limit of cir
+                                            The lower limit value of cir(integer).
+                     9      upper limit of cir
+                                            The upper limit value of cir(integer).
+                     10     cir granularity
+                                            The value of cir granularity(integer).
+                     11     default burst size
+                                            The default value of burst size(integer).
+                     12     lower limit of burst size
+                                            The lower limit value of burst size(integer).
+                     13     upper limit of burst size
+                                            The upper limit value of burst size(integer).
+                     14     burst size granularity
+                                            The value of burst size granularity(integer).
+                     15     default excess burst size
+                                            The default value of excess burst size(integer).
+                     16     lower limit of excess burst size
+                                            The lower limit value of excess burst size(integer).
+                     17     upper limit of excess burst size
+                                            The upper limit value of excess burst size(integer).
+                     18     excess burst size granularity
+                                            The value of excess burst size granularity(integer).
+
+                 hardware queue management module
+                     Index  Characteristic  Value
+                     1      hardware queue management function
+                                            1, if supported.
+                     2      mode            If last 7 bits of this object are set to 1,
+                                            it indicates that the MODE type is supported,
+                                            bit 0 stands for sp mode,
+                                            bit 1 stands for wrr mode,
+                                            bit 2 stands for hard wfq mode,
+                                            bit 3 stands for sp pattern,
+                                            bit 4 stands for max delay of wrr,
+                                            bit 5 stands for wrr group,
+                                            bit 6 stands for bandwidth mode.
+                     3      default mode    The default mode(integer).
+                     4      max queue number
+                                            The max number of queue(integer).
+                     5      wrr group number
+                                            The number of wrr group(integer).
+                     6      wrr unit        If last 2 bits of this object are set to 1,
+                                            it indicates that the wrr unit type is supported,
+                                            bit 0 stands for weight,
+                                            bit 1 stands for byte count.
+                     7      wfq unit        If last 3 bits of this object are set to 1,
+                                            it indicates that the wfq unit type is supported,
+                                            bit 0 stands for bandwidth,
+                                            bit 1 stands for percent,
+                                            bit 2 stands for weight.
+                     8      default wrr schedule value
+                                            The default value of wrr schedule(integer).
+                     9      lower limit of wrr schedule value
+                                            The lower limit value of wrr schedule(integer).
+                     10     upper limit of wrr schedule value
+                                            The upper limit value of wrr schedule.
+                     11     default value of wfq schedule
+                                            The default value of wfq schedule(integer).
+                     12     lower limit of wfq schedule value
+                                            The lower limit value of wfq schedule(integer).
+                     13     upper limit of wfq schedule value
+                                            The upper limit value of wfq schedule.
+                     14     default max delay
+                                            The default value of max delay(integer).
+                     15     lower limit of max delay
+                                            The lower limit value of max delay(integer).
+                     16     upper limit of max delay
+                                            The upper limit value of max delay(integer).
+                     17     wrr sp group    1, if supported.
+                     18     wrr sp weight   1, if supported.
+                     19     default wrr sp weight
+                                            The default value of wrr sp weight(integer).
+                     20     default wrr group
+                                            The default group of wrr(integer).
+
+                     21     default bandwidth value
+                                            The default value of bandwidth(integer).
+                     22     lower limit of bandwidth value
+                                            The lower limit value of bandwidth(integer).
+                     23     upper limit of bandwidth value
+                                            The upper limit value of bandwidth(integer).
+
+                 wred module
+                     Index  Characteristic  Value
+                     1      wred function   1, if supported.
+                     2      port based      1, if supported.
+                     3      table based     The value of table based(integer).
+                     4      IP precedence   1, if supported.
+                     5      dscp            1, if supported.
+                     6      exp             1, if supported.
+                     7      atm clp         1, if supported.
+                     8      802.1p          1, if supported.
+                     9      fr de           1, if supported.
+                     10     queue           1, if supported.
+                     11     drop precedence
+                                            1, if supported.
+                     12     color level     If last 3 bits of this object are set to 1,
+                                            it indicates that the color type is supported,
+                                            bit 0 stands for green,
+                                            bit 1 stands for yellow,
+                                            bit 2 stands for red.
+                     13     min threshold   1, if supported.
+                     14     max threshold   1, if supported.
+                     15     exponent        1, if supported.
+                     16     discard probability denominator
+                                            1, if supported.
+                     17     lower limit of min threshold
+                                            The lower limit value of min threshold(integer).
+                     18     upper limit of min threshold
+                                            The upper limit value of min threshold(integer).
+                     19     default min threshold
+                                            The default value of min threshold(integer).
+                     20     lower limit of max threshold
+                                            The lower limit value of max threshold(integer).
+                     21     lower limit of max threshold
+                                            The upper limit value of max threshold(integer).
+                     22     default max threshold
+                                            The default value of max threshold (integer).
+                     23     lower limit of exponent
+                                            The lower limit value of exponent(integer).
+                     24     upper limit of exponent
+                                            The upper limit value of exponent(integer).
+                     25     default exponent
+                                            The default value of exponent(integer).
+                     26     lower limit of discard probability denominator
+                                            The lower limit value of mark prob(integer).
+                     27     upper limit of discard probability denominator
+                                            The upper limit value of mark prob(integer).
+                     28     default discard probability denominator
+                                            The value of default mark prob(integer).
+                     29     port based parameter
+                                            If last 2 bits of this object are set to 1,
+                                            it indicates that the color type is supported,
+                                            bit 0 stands for port based IP,
+                                            bit 1 stands for port based dscp.
+
+                 priority mapping table module
+                     Index  Characteristic  Value
+                     1      priority map table function
+                                            1, if supported.
+                     2      802.1p map to lp
+                                            If last 3 bits of this object are set to 1,
+                                            it indicates that the direction type is supported,
+                                            bit 0 stands for no direction,
+                                            bit 1 stands for inbound,
+                                            bit 2 stands for outbound.
+                     3      802.1p map to dp
+                                            Same to 802.1p map to lp.
+                     4      802.1p map to dscp
+                                            Same to 802.1p map to lp.
+                     5      dscp map to lp
+                                            Same to 802.1p map to lp.
+                     6      dscp map to dp
+                                            Same to 802.1p map to lp.
+                     7      dscp map to 802.1p
+                                            Same to 802.1p map to lp.
+                     8      dscp map to dscp
+                                            Same to 802.1p map to lp.
+                     9      exp map to lp
+                                            Same to 802.1p map to lp.
+                     10     exp map to dp
+                                            Same to 802.1p map to lp.
+                     11     lp map to 802.1p
+                                            Same to 802.1p map to lp.
+                     12     802.1p map to rpr
+                                            Same to 802.1p map to lp.
+                     13     dscp map to rpr
+                                            Same to 802.1p map to lp.
+                     14     exp map to rpr
+                                            Same to 802.1p map to lp.
+                     15     IP precedence map to rpr
+                                            Same to 802.1p map to lp.
+                     16     lp map to dscp
+                                            Same to 802.1p map to lp.
+                     17     802.11e map to lp
+                                            Same to 802.1p map to lp.
+                     18     lp map to 802.11e
+                                            Same to 802.1p map to lp.
+                     19     up map to 802.1p
+                                            Same to 802.1p map to lp.
+                     20     up map to dscp  Same to 802.1p map to lp.
+                     21     up map to exp   Same to 802.1p map to lp.
+                     22     up map to dp    Same to 802.1p map to lp.
+                     23     up map to lp    Same to 802.1p map to lp.
+                     24     up map to rpr   Same to 802.1p map to lp.
+                     25     up map to fc    Same to 802.1p map to lp.
+                     26     lp map to lp    Same to 802.1p map to lp.
+                     27     802.1p map to exp
+                                            Same to 802.1p map to lp.
+                     28     dscp map to exp
+                                            Same to 802.1p map to lp.
+                     29     exp map to 802.1p
+                                            Same to 802.1p map to lp.
+                     30     exp map to dscp
+                                            Same to 802.1p map to lp.
+                     31     exp map to exp  Same to 802.1p map to lp.
+                     32     lp map to exp   Same to 802.1p map to lp.
+                     33     lp map to dp    Same to 802.1p map to lp.
+                     34     up map to up    Same to 802.1p map to lp.
+
+                 colored priority mapping table module
+                     Index  Characteristic  Value
+                     1      colored priority mapping table function
+                                            If bit 0 - bit 2 of this object are set to 1,
+                                            it indicates that the direction type is supported,
+                                            bit 0 stands for no direction,
+                                            bit 1 stands for inbound,
+                                            bit 2 stands for outbound.
+                                            If bit 3 - bit 5 of this object are set to 1,
+                                            it indicates that the color type is supported,
+                                            bit 3 stands for green,
+                                            bit 4 stands for yellow,
+                                            bit 5 stands for red.
+                     2      802.1p map to lp
+                                            Same to colored priority mapping table function.
+                     3      802.1p map to dp
+                                            Same to colored priority mapping table function.
+                     4      802.1p map to dscp
+                                            Same to colored priority mapping table function.
+                     5      dscp map to lp  Same to colored priority mapping table function.
+                     6      dscp map to dp  Same to colored priority mapping table function.
+                     7      dscp map to 802.1p
+                                            Same to colored priority mapping table function.
+                     8      dscp map to dscp
+                                            Same to colored priority mapping table function.
+                     9      exp map to lp   Same to colored priority mapping table function.
+                     10     exp map to dp   Same to colored priority mapping table function.
+                     11     lp map to 802.1p
+                                            Same to colored priority mapping table function.
+                     12     802.1p map to rpr
+                                            Same to colored priority mapping table function.
+                     13     dscp map to rpr
+                                            Same to colored priority mapping table function.
+                     14     exp map to rpr  Same to colored priority mapping table function.
+                     15     IP precedence map to rpr
+                                            Same to colored priority mapping table function.
+                     16     lp map to dscp  Same to colored priority mapping table function.
+                     17     802.11e map to lp
+                                            Same to colored priority mapping table function.
+                     18     lp map to 802.11e
+                                            Same to colored priority mapping table function.
+                     19     up map to 802.1p
+                                            Same to colored priority mapping table function.
+                     20     up map to dscp  Same to colored priority mapping table function.
+                     21     up map to exp   Same to colored priority mapping table function.
+                     22     up map to dp    Same to colored priority mapping table function.
+                     23     up map to lp    Same to colored priority mapping table function.
+                     24     up map to rpr   Same to colored priority mapping table function.
+                     25     up map to fc    Same to colored priority mapping table function.
+                     26     lp map to lp    Same to colored priority mapping table function.
+                     27     802.1p map to exp
+                                            Same to colored priority mapping table function.
+                     28     dscp map to exp
+                                            Same to colored priority mapping table function.
+                     29     exp map to 802.1p
+                                            Same to colored priority mapping table function.
+                     30     exp map to dscp
+                                            Same to colored priority mapping table function.
+                     31     exp map to exp  Same to colored priority mapping table function.
+                     32     lp map to exp   Same to colored priority mapping table function.
+                     33     lp map to dp    Same to colored priority mapping table function.
+                     34     up map to up    Same to colored priority mapping table function.
+
+                 port priority Module
+                     Index  Characteristic  Value
+                     1      port priority function
+                                            1, if supported.
+                     2      priority trust
+                                            If last 2 bits of this object are set to 1,
+                                            it indicates that the priority trust type is supported,
+                                            bit 0 stands for global,
+                                            bit 1 stands for interface.
+                     3      802.1p          1, if supported.
+                     4      dscp            1, if supported.
+                     5      exp             1, if supported.
+                     6      IP precedence
+                                            1, if supported.
+                     7      802.11e         1, if supported.
+                     8      override        1, if supported.
+                     9      auto            1, if supported.
+
+                 qos policy module
+                     Index  Characteristic  Value
+                     1      qos policy function
+                                            If last 4 bits of this object are set to 1,
+                                            it indicates that the policy type is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound,
+                                            bit 2 stands for global inbound,
+                                            bit 3 stands for global outbound.
+                     2      match not       1, if supported.
+                     3      and             If last 19 bits of this object are set to 1,
+                                            it indicates that the if match and type is supported,
+                                            bit 0 stands for acl,
+                                            bit 1 stands for class,
+                                            bit 2 stands for dscp,
+                                            bit 3 stands for inbound interface,
+                                            bit 4 stands for IP precedence,
+                                            bit 5 stands for rtp port,
+                                            bit 6 stands for mpls exp,
+                                            bit 7 stands for 802.1p,
+                                            bit 8 stands for mac,
+                                            bit 9 stands for protocol,
+                                            bit 10 stands for service vlan ID,
+                                            bit 11 stands for pr de,
+                                            bit 12 stands for atm clp,
+                                            bit 13 stands for source IP,
+                                            bit 14 stands for any,
+                                            bit 15 stands for local ID,
+                                            bit 16 stands for topmost vlan,
+                                            bit 17 stands for local precedence,
+                                            bit 18 stands for drop priority.
+                     4      or              If last 19 bits of this object are set to 1,
+                                            it indicates that the if match or type is supported,
+                                            bit 0 stands for acl,
+                                            bit 1 stands for class,
+                                            bit 2 stands for dscp,
+                                            bit 3 stands for inbound interface,
+                                            bit 4 stands for IP precedence,
+                                            bit 5 stands for rtp port,
+                                            bit 6 stands for mpls exp,
+                                            bit 7 stands for 802.1p,
+                                            bit 8 stands for mac,
+                                            bit 9 stands for protocol,
+                                            bit 10 stands for service vlan ID,
+                                            bit 11 stands for pr de,
+                                            bit 12 stands for atm clp,
+                                            bit 13 stands for source IP,
+                                            bit 14 stands for any,
+                                            bit 15 stands for local ID,
+                                            bit 16 stands for topmost vlan,
+                                            bit 17 stands for local precedence,
+                                            bit 18 stands for drop priority.
+                     5      match acl       If last 8 bits of this object are set to 1,
+                                            it indicates that the acl type is supported,
+                                            bit 0 stands for IPv6 basic acl,
+                                            bit 1 stands for IPv6 advanced acl,
+                                            bit 2 stands for mac acl,
+                                            bit 3 stands for user acl,
+                                            bit 4 stands for IPv6 user acl,
+                                            bit 5 stands for IPv6 simple acl,
+                                            bit 6 stands for IPv4 basic acl,
+                                            bit 7 stands for IPv4 advanced acl.
+                     6      match sub class
+                                            1, if supported.
+                     7      match dscp
+                                            1, if supported.
+                     8      match inbound interface
+                                            1, if supported.
+                     9      match ip precedence
+                                            1, if supported.
+                     10     match rtp port
+                                            1, if supported.
+                     11     match mpls exp
+                                            1, if supported.
+                     12     match 802.1p
+                                            1, if supported.
+                     13     match mac
+                                            1, if supported.
+                     14     match protocol  If last 3 bits of this object are set to 1,
+                                            it indicates that the protocol type is supported,
+                                            bit 0 stands for IPv4 protocol,
+                                            bit 1 stands for IPv6 protocol,
+                                            bit 2 stands for bittorrent protocol.
+                     15     match customer vlan ID
+                                            If last 2 bits of this object are set to 1,
+                                            it indicates that the match type is supported,
+                                            bit 0 stands for service vlan ID list,
+                                            bit 1 stands for service vlan ID range.
+                     16     match fr de
+                                            1, if supported.
+                     17     match atm clp
+                                            1, if supported.
+                     18     match source ip-address
+                                            1, if supported.
+                     19     match any
+                                            1, if supported.
+                     20     match qos local ID
+                                            1, if supported.
+                     21     traffic police action
+                                            1, if supported.
+                     22     traffic shape action
+                                            1, if supported.
+                     23     set ip dscp action
+                                            1, if supported.
+                     24     set ip precedence action
+                                            1, if supported.
+                     25     set mpls exp action
+                                            1, if supported.
+                     26     class based wfq action
+                                            1, if supported.
+                     27     nest sub traffic policy
+                                            1, if supported.
+                     28     set fr de action
+                                            1, if supported.
+                     29     set 802.1p action
+                                            1, if supported.
+                     30     set atm clp action
+                                            1, if supported.
+                     31     account action
+                                            1, if supported.
+                     32     filter action
+                                            1, if supported.
+                     33     set drop priority action
+                                            1, if supported.
+                     34     set vlan ID action
+                                            1, if supported.
+                     35     traffic redirect to IP next hop
+                                            1, if supported.
+                     36     traffic redirect to interface
+                                            If last 11 bits of this object are set to 1,
+                                            it indicates that the redirecting interface type
+                                            is supported,
+                                            bit 0 stands for l2ethernet,
+                                            bit 1 stands for l2ge,
+                                            bit 2 stands for l2xge,
+                                            bit 3 stands for l3ethernet,
+                                            bit 4 stands for l3ge,
+                                            bit 5 stands for l3xge,
+                                            bit 6 stands for serial,
+                                            bit 7 stands for eacl,
+                                            bit 8 stands for tunnel,
+                                            bit 9 stands for olt,
+                                            bit 10 stands for nat.
+                     37     traffic redirect to cpu
+                                            1, if supported.
+                     38     set local precedence action
+                                            1, if supported.
+                     39     wred action
+                                            1, if supported.
+                     40     set qos local ID action
+                                            1, if supported.
+                     41     match service vlan ID
+                                            If last 2 bits of this object are set to 1,
+                                            it indicates that the match type is supported,
+                                            bit 0 stands for service vlan list,
+                                            bit 1 stands for service vlan range.
+                     42     set service vlan ID
+                                            1, if supported.
+                     43     nest topmost vlan tag
+                                            If last 2 bits of this object are set to 1,
+                                            it indicates that the nest type is supported,
+                                            bit 0 stands for nest vlan ID,
+                                            bit 1 stands for nest cos.
+                     44     priority map action
+                                            If last 21 bits of this object are set to 1,
+                                            it indicates that the priority map type is supported,
+                                            bit 0 stands for user def(Reserved right now),
+                                            bit 1 stands for 802.1p map to lp,
+                                            bit 2 stands for 802.1p map to dp,
+                                            bit 3 stands for 802.1p map to dscp,
+                                            bit 4 stands for dscp map to lp,
+                                            bit 5 stands for dscp map to dp,
+                                            bit 6 stands for dscp map to 802.1p,
+                                            bit 7 stands for dscp map to dscp,
+                                            bit 8 stands for exp map to lp,
+                                            bit 9 stands for exp map to dp,
+                                            bit 10 stands for lp map to 802.1p,
+                                            bit 11 stands for lp map to lp,
+                                            bit 12 stands for lp map to dscp,
+                                            bit 13 stands for up map to 802.1p,
+                                            bit 14 stands for up map to dscp,
+                                            bit 15 stands for dscp map to exp,
+                                            bit 16 stands for exp map to 802.1p,
+                                            bit 17 stands for exp map to dscp,
+                                            bit 18 stands for exp map to exp,
+                                            bit 19 stands for lp map to exp,
+                                            bit 20 stands for lp map to dp.
+                     45     traffic redirect to aggregation group
+                                            1, if supported.
+                     46     match local precedence
+                                            1, if supported.
+                     47     match drop priority
+                                            1, if supported.
+                     48     bind interface type
+                                            not supported.
+                     49     flow based mirror to interface
+                                            If the bits of this object are set to 1,
+                                            it indicates that the flow based mirror to
+                                            interface type is supported.
+                     50     flow based mirror to vlan
+                                            1, if supported.
+                     51     flow based mirror to cpu
+                                            1, if supported.
+                     52     qos policy support dynamic modified
+                                            not supported.
+                     53     set forwarding class ID action
+                                            1, if supported.
+                     54     colored priority map action
+                                            If last 22 bits of this object are set to 1,
+                                            it indicates that the priority map type is supported,
+                                            bit 0 stands for user def(Reserved right now),
+                                            bit 1 stands for 802.1p map to lp,
+                                            bit 2 stands for 802.1p map to dp,
+                                            bit 3 stands for 802.1p map to dscp,
+                                            bit 4 stands for dscp map to lp,
+                                            bit 5 stands for dscp map to dp,
+                                            bit 6 stands for dscp map to 802.1p,
+                                            bit 7 stands for dscp map to dscp,
+                                            bit 8 stands for exp map to lp,
+                                            bit 9 stands for exp map to dp,
+                                            bit 10 stands for lp map to 802.1p,
+                                            bit 11 stands for lp map to lp,
+                                            bit 12 stands for lp map to dscp,
+                                            bit 13 stands for up map to 802.1p,
+                                            bit 14 stands for up map to dscp,
+                                            bit 15 stands for dscp map to exp,
+                                            bit 16 stands for exp map to 802.1p,
+                                            bit 17 stands for exp map to dscp,
+                                            bit 18 stands for exp map to exp,
+                                            bit 19 stands for lp map to exp,
+                                            bit 20 stands for lp map to dp,
+                                            bit 21 stands for color map dp.
+                     55     802.1q manipulation mode
+                                            If last 10 bits of this object are set to 1,
+                                            it indicates that the 802.1q manipulation mode
+                                            type is supported,
+                                            bit 0 stands for behavior check method,
+                                            bit 1 stands for behavior nest,
+                                            bit 2 stands for behavior remark,
+                                            bit 3 stands for classifier and,
+                                            bit 4 stands for classifier or,
+                                            bit 5 stands for classifier acl,
+                                            bit 6 stands for classifier customer vlan,
+                                            bit 7 stands for classifier service vlan,
+                                            bit 8 stands for classifier customer 802.1p,
+                                            bit 9 stands for classifier service 802,1p.
+                     56     match service 802.1p
+                                            1, if supported.
+
+                 qos interface generic module
+                     Index  Characteristic  Value
+                     1      hard            If last 2 bits of this object are set to 1,
+                                            it indicates that the qos port type is supported,
+                                            bit 0 stands for soft, bit 1 stands for hard.
+                     2      max bandwidth   1, if supported.
+                     3      reserved bandwidth
+                                            1, if supported.
+                     4      qm token        1, if supported.
+
+                 flow template module
+                     Index  Characteristic  Value
+                     1      flow template function
+                                            1, if supported.
+                     2      max number      The max number of flow template(integer).
+                     3      source IP address
+                                            1, if supported.
+                     4      source IPv6 address
+                                            1, if supported.
+                     5      destination IP address
+                                            1, if supported.
+                     6      destination IPv6 address
+                                            1, if supported.
+                     7      IP l3 protocol
+                                            1, if supported.
+                     8      IPv6 l3 protocol
+                                            1, if supported.
+                     9      dscp            1, if supported.
+                     10     IPv6 dscp       1, if supported.
+                     11     fragments       1, if supported.
+                     12     IPv6 fragments
+                                            1, if supported.
+                     13     source port
+                                            1, if supported.
+                     14     destination port
+                                            1, if supported.
+                     15     icmp type       1, if supported.
+                     16     icmp code       1, if supported.
+                     17     TCP flag        1, if supported.
+                     18     source mac address
+                                            1, if supported.
+                     19     source mac wildcast
+                                            1, if supported.
+                     20     destination mac address
+                                            1, if supported.
+                     21     destination mac wildcast
+                                            1, if supported.
+                     22     eth protocol    1, if supported.
+                     23     vlan ID         1, if supported.
+                     24     cos             1, if supported.
+                     25     cos service     1, if supported.
+                     26     topmost vlan ID
+                                            1, if supported.
+                     27     tos             1, if supported.
+                     28     IPv6 tos        1, if supported.
+                     29     IP precedence   1, if supported.
+                     30     IPv6 precedence
+                                            1, if supported.
+                     31     IPv6 icmp type
+                                            1, if supported.
+                     32     IPv6 icmp code
+                                            1, if supported.
+                     33     mpls exp        1, if supported.
+                     46     offset type     If last 7 bits of this object are set to 1,
+                                            it indicates that the flow template
+                                            extend offset type is supported,
+                                            bit 0 stands for start,
+                                            bit 1 stands for l2,
+                                            bit 2 stands for mpls,
+                                            bit 3 stands for IPv4,
+                                            bit 4 stands for IPv6,
+                                            bit 5 stands for l4,
+                                            bit 6 stands for l5.
+                     47     start offset    The max value of start offset(integer).
+                     48     start length    The max value of start length(integer).
+                     49     l2 offset       The max value of l2 offset(integer).
+                     50     l2 length       The max value of l2 length(integer).
+                     51     mpls offset     The max value of mpls offset(integer).
+                     52     mpls length     The max value of mpls length(integer).
+                     53     IPv4 offset     The max value of IPv4 offset(integer).
+                     54     IPv4 length     The max value of IPv4 length(integer).
+                     55     IPv6 offset     The max value of IPv6 offset(integer).
+                     56     IPv6 length     The max value of IPv6 length(integer).
+                     57     l4 offset       The max value of l4 offset(integer).
+                     58     l4 length       The max value of l4 length(integer).
+                     59     l5 offset       The max value of l5 offset(integer).
+                     60     l5 length       The max value of l5 length(integer).
+
+                 vqos and vacl module
+                     Index  Characteristic  Value
+                     1      vqos            If last 2 bits of this object are set to 1,
+                                            it indicates that the vqos and vacl type is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound.
+                     2      vacl            If last 2 bits of this object are set to 1,
+                                            it indicates that the vacl type is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound.
+                     3      vqos priority   1, if supported.
+
+                 Statistic Module
+                     Index  Characteristic  Value
+                     1      current queue length statistic
+                                            1, if supported.
+                     2      total queue length statistic
+                                            1, if supported.
+                     3      queue drop pkt statistic
+                                            1, if supported.
+                     4      current active wfq queue number statistic
+                                            1, if supported.
+                     5      max number of active queue statistic
+                                            1, if supported.
+                     6      total number of wfq queue statistic
+                                            1, if supported.
+                     7      acl pkt number statistic
+                                            1, if supported.
+                     8      acl byte number statistic
+                                            1, if supported.
+                     9      car red pkt number statistic
+                                            1, if supported.
+                     10     car red byte number statistic
+                                            1, if supported.
+                     11     car green pkt number statistic
+                                            1, if supported.
+                     12     car green byte number statistic
+                                            1, if supported.
+                     13     car yellow pkt number statistic
+                                            1, if supported.
+                     14     car yellow byte number statistic
+                                            1, if supported.
+                     15     gts transmit pkt number statistic
+                                            1, if supported.
+                     16     gts transmit byte number statistic
+                                            1, if supported.
+                     17     gts delay pkt number statistic
+                                            1, if supported.
+                     18     gts delay byte number statistic
+                                            1, if supported.
+                     19     gts drop pkt number statistic
+                                            1, if supported.
+                     20     gts drop byte number statistic
+                                            1, if supported.
+                     21     lr transmit pkt number statistic
+                                            1, if supported.
+                     22     lr transmit byte number statistic
+                                            1, if supported.
+                     23     lr delay pkt number statistic
+                                            1, if supported.
+                     24     lr delay pkt number statistic
+                                            1, if supported.
+                     25     qos policy class match pkt statistic
+                                            1, if supported.
+                     26     qos policy class match byte statistic
+                                            1, if supported.
+                     27     account pkt number statistic
+                                            1, if supported.
+                     28     account byte number statistic
+                                            1, if supported.
+                     29     wred queue statistic
+                                            1, if supported.
+                     30     wred precedence statistic
+                                            1, if supported.
+                     31     wred green traffic statistic
+                                            1, if supported.
+                     32     wred yellow traffic statistic
+                                            1, if supported.
+                     33     wred red traffic statistic
+                                            1, if supported.
+                     34     wred port based statistic
+                                            1, if supported.
+                     35     hard interface queue statistic
+                                            1, if supported.
+
+                 carl module
+                     Index  Characteristic  Value
+                     1      carl function
+                                            1, if supported.
+                     2      match precedence
+                                            1, if supported.
+                     3      match mac       1, if supported.
+                     4      match dscp      1, if supported.
+
+                 fifo module
+                     Index  Characteristic  Value
+                     1      fifo function   1, if supported.
+                     2      set queue length
+                                            1, if supported.
+                     3      default fifo queue length
+                                            The value of default fifo queue length(integer).
+                     4      lower limit of fifo queue length
+                                            The lower limit value of fifo queue length(integer).
+                     5      upper limit of fifo queue length
+                                            The upper limit value of fifo queue length(integer).
+
+                 pq module
+                     Index  Characteristic  Value
+                     1      pq function     1, if supported.
+                     2      match pql       1, if supported.
+                     3      pql function    1, if supported.
+                     4      pql match inbound interface
+                                            1, if supported.
+                     5      pql match protocol
+                                            1, if supported.
+                     6      set pql default queue
+                                            1, if supported.
+                     7      pql default queue
+                                            The value of pql default queue(integer).
+                     8      set pql queue length
+                                            1, if supported.
+                     9      lower limit of pql queue length
+                                            The lower limit value of pql queue length(integer).
+                     10     upper limit of pql queue length
+                                            The upper limit value of pql queue length(integer).
+                     11     pql match local precedence
+                                            1, if supported.
+
+                 cq module
+                     Index  Characteristic  Value
+                     1      cq function     1, if supported.
+                     2      match cql       1, if supported.
+                     3      cql function    1, if supported.
+                     4      cql match inbound interface
+                                            1, if supported.
+                     5      cql match protocol
+                                            1, if supported.
+                     6      set cql default queue
+                                            1, if supported.
+                     7      cql default queue
+                                            The default queue of cql(integer).
+                     8      set cql queue length
+                                            1, if supported.
+                     9      cql queue serving
+                                            1, if supported.
+                     10     default cql queue length
+                                            The default length of cql queue(integer).
+                     11     lower limit of cql queue length
+                                            The lower limit value of cql queue length(integer).
+                     12     upper limit of cql queue length
+                                            The upper limit value of cql queue length(integer).
+                     13     default cql queue serving
+                                            The value of default cql queue serving(integer).
+                     14     lower limit of cql queue serving
+                                            The lower limit value of cql queue serving(integer).
+                     15     upper limit of cql queue serving
+                                            The upper limit value of cql queue serving(integer).
+                     16     cql match local precedence
+                                            1, if supported.
+                 wfq module
+                     Index  Characteristic  Value
+                     1      wfq function    1, if supported.
+                     2      match dscp      1, if supported.
+                     3      match precedence
+                                            1, if supported.
+                     4      set wfq queue length
+                                            1, if supported.
+                     5      set wfq queue number
+                                            1, if supported.
+                     6      default wfq queue length
+                                            The default length of wfq queue(integer).
+                     7      lower limit of wfq queue length
+                                            The lower limit value of
+                                            wfq queue length(integer).
+                     8      lower limit of wfq queue length
+                                            The upper limit value of
+                                            wfq queue length(integer).
+                     9      default wfq queue number
+                                            The default number of wfq queue(integer).
+                     10     lower limit of wfq queue number
+                                            The lower limit number of wfq queue(integer).
+                     11     upper limit of wfq queue number
+                                            The upper limit number of wfq queue(integer).
+                     12     lower limit number of wfq queue based on dscp
+                                            The lower limit number of wfq queue
+                                            based on dscp(integer).
+                     13     upper limit number of wfq queue based on dscp
+                                            The upper limit number of wfq queue
+                                            based on dscp(integer).
+
+                 rtpq module
+                     Index  Characteristic  Value
+                     1      rtpq function   1, if supported.
+                     2      match start port
+                                            The value of match start port(integer).
+                     3      match end port
+                                            The value of match end port(integer).
+                     4      bandwidth       1, if supported.
+                     5      cbs             1, if supported.
+                     6      default start port
+                                            The value of default start port(integer).
+                     7      lower limit of start port
+                                            The lower limit value of start port(integer).
+                     8      upper limit of start port
+                                            The upper limit value of start port(integer).
+                     9      default end port
+                                            The value of default end port(integer).
+                     10     lower limit of end port
+                                            The lower limit value of end port(integer).
+                     11     upper limit of end port
+                                            The upper limit value of end port(integer).
+                     12     default bandwidth
+                                            The default value of bandwidth(integer).
+                     13     lower limit of bandwidth
+                                            The lower limit value of bandwidth(integer).
+                     14     upper limit of bandwidth
+                                            The upper limit value of bandwidth(integer).
+                     15     default cbs     The default value of cbs(integer).
+                     16     lower limit of cbs
+                                            The lower limit value of cbs(integer).
+                     17     upper limit of cbs
+                                            The upper limit value of cbs(integer).
+                     18     queue length of low latency
+                                            The queue length of low latency(integer).
+                  "
+            ::= { hh3cQoSCapabilityEntry 5 }
+
+-- hh3cQoSSysCapabilityTable
+
+        hh3cQoSSysCapabilityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSSysCapabilityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of system capability of QoS."
+            ::= { hh3cQoSCapabilityGroup 2 }
+
+        hh3cQoSSysCapabilityEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSSysCapabilityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Capability of system QoS information entry."
+            INDEX { hh3cQoSSysCapModuleIndex,
+                    hh3cQoSSysCapCharacteristicsIndex }
+            ::= { hh3cQoSSysCapabilityTable 1 }
+
+        Hh3cQoSSysCapabilityEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSSysCapModuleIndex
+                    Integer32,
+                hh3cQoSSysCapCharacteristicsIndex
+                    Integer32,
+                hh3cQoSSysCapCharacteristicsValue
+                    Unsigned32
+            }
+
+        hh3cQoSSysCapModuleIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The module index of QoS.
+                 QoS module:
+                     Index    Characteristic
+                     1        car module
+                     2        gts module
+                     3        lr module
+                     4        hardware queue module
+                     5        software queue module
+                     6        wred module
+                     7        priority mapping table module
+                     8        port priority module
+                     9        redirect&mirror module
+                     10       mqc module
+                     11       queue statistic module
+                "
+            ::= { hh3cQoSSysCapabilityEntry 1 }
+
+        hh3cQoSSysCapCharacteristicsIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The system capability characteristics index of modules of QoS."
+            ::= { hh3cQoSSysCapabilityEntry 2 }
+
+        hh3cQoSSysCapCharacteristicsValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system capability characteristics value of modules of QoS.
+
+                 car module:
+                     Index  Characteristic  Value
+                     1      car function    1, if supported.
+                     2      global car      If one of the last 3 bits of this object
+                                            is set to 1, it indicates that global
+                                            CAR is supported.
+                                            bit 0 stands for aggregative CAR,
+                                            bit 1 stands for hierarchy CAR,
+                                            bit 2 stands for common global CAR.
+                     3      mqc car         1, if supported.
+                     4      mqc global car  bit 0 stands for application of aggregative
+                                            CAR by MQC,
+                                            bit 1 stands for application of hierarchy
+                                            CAR by MQC.
+                     5      if car          If one of the last 2 bits of this object
+                                            is set to 1, it indicates that interface CAR
+                                            is supported.
+                                            bit 0 stands for normal CAR on interface,
+                                            bit 1 stands for application of aggregative
+                                            CAR on interface.
+                     6      mqc car token   If one of the last 3 bits of this object
+                                            is set to 1, it indicates that 3 token
+                                            parameters are all supported.
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     7      aggregative car token
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that 3 token
+                                            parameters are all supported.
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     8      hierarchy car token
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that 3 token
+                                            parameters are all supported.
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     9      if car token    If one of the last 3 bits of this object
+                                            is set to 1, it indicates that 3 token
+                                            parameters are all supported.
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     10     mqc car green action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that green action
+                                            is supported.
+                                            bit 0 stands for continuing,
+                                            bit 1 stands for dropping,
+                                            bit 2 stands for transmitting,
+                                            bit 3 stands for remarking IP precedence,
+                                            bit 4 stands for remarking DSCP,
+                                            bit 5 stands for remarking MPLS-EXP,
+                                            bit 6 stands for remarking CLP bit of
+                                            ATM,
+                                            bit 7 stands for remarking DE bit of
+                                            FR,
+                                            bit 8 stands for remarking 802.1p priority
+                                            value,
+                                            bit 9 stands for remarking local precedence.
+                     11     mqc car yellow action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that yellow action
+                                            is supported and the mask is the same
+                                            as that for green action.
+                     12     mqc car red action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that red action is
+                                            supported and the mask is the same as
+                                            that for green action.
+                     13     aggregative car green action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that green action
+                                            is supported.
+                                            bit 0 stands for continuing,
+                                            bit 1 stands for dropping,
+                                            bit 2 stands for transmitting,
+                                            bit 3 stands for remarking IP precedence,
+                                            bit 4 stands for remarking DSCP,
+                                            bit 5 stands for remarking MPLS-EXP,
+                                            bit 6 stands for remarking CLP bit of
+                                            ATM,
+                                            bit 7 stands for remarking DE bit of
+                                            FR,
+                                            bit 8 stands for remarking 802.1p priority
+                                            value,
+                                            bit 9 stands for remarking local precedence.
+                     14     aggregative car yellow action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that yellow action
+                                            is supported and the mask is the same as
+                                            that for green action.
+                     15     aggregative car red action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that red action is
+                                            supported and the mask is the same as
+                                            that for green action.
+                     16     hierarchy car green action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that green action
+                                            is supported.
+                                            bit 0 stands for continuing,
+                                            bit 1 stands for dropping,
+                                            bit 2 stands for transmitting,
+                                            bit 3 stands for remarking IP precedence,
+                                            bit 4 stands for remarking DSCP,
+                                            bit 5 stands for remarking MPLS-EXP,
+                                            bit 6 stands for remarking CLP bit of
+                                            ATM,
+                                            bit 7 stands for remarking DE bit of
+                                            FR,
+                                            bit 8 stands for remarking 802.1p priority
+                                            value,
+                                            bit 9 stands for remarking local precedence.
+                     17     hierarchy car yellow action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that yellow action
+                                            is supported and the mask is the same as
+                                            that for green action.
+                     18     hierarchy car red action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that red action is
+                                            supported and the mask is the same as
+                                            that for green action.
+                     19     lower limit of cir
+                                            The lower limit value of committed information
+                                            rate(integer).
+                     20     upper limit of cir
+                                            The upper limit value of committed information
+                                            rate(integer).
+                     21     cir granularity
+                                            The value of committed information rate
+                                            granularity(integer).
+                     22     lower limit of pir
+                                            The lower limit value of peak information
+                                            rate(integer).
+                     23     upper limit of pir
+                                            The upper limit value of peak information
+                                            rate(integer).
+                     24     pir granularity
+                                            The value of peak information rate
+                                            granularity(integer).
+                     25     lower limit of burst size
+                                            The lower limit value of burst size(integer).
+                     26     upper limit of burst size
+                                            The upper limit value of burst size(integer).
+                     27     burst size granularity
+                                            The value of burst size granularity(integer).
+                     28     default burst size
+                                            The default value of burst size(integer).
+                     29     lower limit of excess burst size
+                                            The lower limit value of excess burst
+                                            size(integer).
+                     30     upper limit of excess burst size
+                                            The upper limit value of excess burst
+                                            size(integer).
+                     31     excess burst size granularity
+                                            The value of excess burst size
+                                            granularity(integer).
+                     32     default excess burst size
+                                            The default value of excess burst size(integer).
+                     33     green packet statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that counting of
+                                            green packets is supported.
+                                            bit 0 stands for counting by packet.
+                                            bit 1 stands for counting by byte.
+                     34     red packet statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that counting of
+                                            red packets is supported.
+                                            bit 0 stands for counting by packet.
+                                            bit 1 stands for counting by byte.
+                     35     yellow packet statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that counting of
+                                            yellow packets is supported.
+                                            bit 0 stands for counting by packet.
+                                            bit 1 stands for counting by byte.
+                     36     if car direction
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the direction
+                                            type is supported.
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound.
+                     37     if car match type
+                                            If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the match type
+                                            is supported.
+                                            bit 0 stands for matching any packets,
+                                            bit 1 stands for matching IPv4 ACL,
+                                            bit 2 stands for matching IPv6 ACL,
+                                            bit 3 stands for matching CAR list.
+                     38     if car match ACL type
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that ACL types are
+                                            supported.
+                                            bit 0 stands for matching IPv4 basic ACL,
+                                            bit 1 stands for matching IPv4 advance ACL,
+                                            bit 2 stands for matching MAC ACL,
+                                            bit 3 stands for matching user ACL,
+                                            bit 4 stands for matching IPv6 basic ACL,
+                                            bit 5 stands for matching IPv6 advance ACL.
+                     39     if car green action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that green action
+                                            is supported.
+                                            bit 0 stands for continuing,
+                                            bit 1 stands for dropping,
+                                            bit 2 stands for transmitting,
+                                            bit 3 stands for remarking IP precedence,
+                                            bit 4 stands for remarking DSCP,
+                                            bit 5 stands for remarking MPLS-EXP,
+                                            bit 6 stands for remarking CLP bit of
+                                            ATM,
+                                            bit 7 stands for remarking DE bit of
+                                            FR,
+                                            bit 8 stands for remarking 802.1p priority
+                                            value,
+                                            bit 9 stands for remarking local precedence.
+                     40     if car yellow action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that yellow action
+                                            is supported and the mask is the same as
+                                            that for green action.
+                     41     if car red action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that red action is
+                                            supported and the mask is the same as that
+                                            for green action.
+                     42     car list        1, if supported.
+                     43     car list MPLS-EXP
+                                            1, if supported.
+                     44     car list min IP mask length
+                                            The minimum length of IP mask (integer).
+                     45     car logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
+
+                 gts module:
+                     Index  Characteristic  Value
+                     1      gts function    1, if supported.
+                     2      if gts          If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the GTS on
+                                            interface is supported,
+                                            bit 0 stands for matching any,
+                                            bit 1 stands for matching IPv4 ACL,
+                                            bit 2 stands for matching IPv6 ACL,
+                                            bit 3 stands for matching queue.
+                     3      if gts token    If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the interface
+                                            GTS token is supported,
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     4      if gts queue length
+                                            1, if supported.
+                     5      if gts match acl type
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that ACL types
+                                            are supported,
+                                            bit 0 stands for IPv4 basic ACL,
+                                            bit 1 stands for IPv4 advanced ACL,
+                                            bit 2 stands for MAC ACL,
+                                            bit 3 stands for user ACL,
+                                            bit 4 stands for IPv6 basic ACL,
+                                            bit 5 stands for IPv6 advanced ACL.
+                     6      if gts queue number
+                                            The queue number of GTS(integer).
+                     7      mqc gts         If one of the last 2 bits of this object
+                                            is set to 1, it indicates that GTS
+                                            configuration for behavior is supported.
+                                            bit 0 stands for absolute GTS,
+                                            bit 1 stands for percent GTS.
+                     8      mqc gts token   If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the behavior
+                                            GTS token is supported,
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     9      mqc gts queue length
+                                            1, if supported.
+                     10     lower limit of cir
+                                            The lower limit value of committed information
+                                            rate(integer).
+                     11     upper limit of cir
+                                            The upper limit value of committed information
+                                            rate(integer).
+                     12     cir granularity
+                                            The value of committed information rate
+                                            granularity(integer).
+                     13     lower limit of pir
+                                            The lower limit value of peak information
+                                            rate(integer).
+                     14     upper limit of pir
+                                            The upper limit value of peak information
+                                            rate(integer).
+                     15     pir granularity
+                                            The value of peak information rate
+                                            granularity(integer).
+                     16     lower limit of burst size
+                                            The lower limit value of burst size(integer).
+                     17     upper limit of burst size
+                                            The upper limit value of burst size(integer).
+                     18     burst size granularity
+                                            The value of burst size granularity(integer).
+                     19     lower limit of excess burst size
+                                            The lower limit value of excess burst
+                                            size(integer).
+                     20     upper limit of excess burst size
+                                            The upper limit value of excess burst
+                                            size(integer).
+                     21     excess burst size granularity
+                                            The value of excess burst size
+                                            granularity(integer).
+                     22     lower limit of queue length
+                                            The lower limit value of queue length(integer).
+                     23     upper limit of queue length
+                                            The upper limit value of queue length(integer).
+                     24     default queue length
+                                            The default length of queue(integer).
+                     25     transmission statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the counting
+                                            of transmission traffic is supported,
+                                            bit 0 stands for counting by packet,
+                                            bit 1 stands for counting by byte.
+                     26     delay statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the counting
+                                            of delay traffic is supported,
+                                            bit 0 stands for counting by packet,
+                                            bit 1 stands for counting by byte.
+                     27     drop statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the counting
+                                            of drop traffic is supported,
+                                            bit 0 stands for counting by packet,
+                                            bit 1 stands for counting by byte.
+                     28     logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
+
+                 lr module:
+                     Index  Characteristic  Value
+                     1      lr function     1, if supported.
+                     2      lr token        If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the rate
+                                            limit token is supported,
+                                            bit 0 stands for burst size,
+                                            bit 1 stands for excess burst size,
+                                            bit 2 stands for peak information rate.
+                     3      lr direction    If one of the last 5 bits of this object
+                                            is set to 1, it indicates that the direction
+                                            type is supported,
+                                            bit 0 stands for inbound direction,
+                                            bit 1 stands for outbound direction.
+                                            bit 2 stands for pw inbound direction,
+                                            bit 3 stands for pw outbound direction.
+                                            bit 4 stands for blade.
+                     4      transmission statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the counting
+                                            of transmission traffic is supported,
+                                            bit 0 stands for counting by packet,
+                                            bit 1 stands for counting by byte.
+                     5     delay statistics
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the counting
+                                            of delay traffic is supported,
+                                            bit 0 stands for counting by packet,
+                                            bit 1 stands for counting by byte.
+                     6     drop statistics  If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the counting
+                                            of drop traffic is supported,
+                                            bit 0 stands for counting by packet,
+                                            bit 1 stands for counting by byte.
+                     7     lr logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
+
+                 hardware queue module:
+                     Index  Characteristic  Value
+                     1      hardware queue management function
+                                            1, if supported.
+                     2      sp port type    If one of the last 8 bits of this object
+                                            is set to 1, it indicates that the SP on
+                                            port is supported,
+                                            bit 0 stands for Layer 2 Ethernet port,
+                                            bit 1 stands for Layer 3 Ethernet port,
+                                            bit 2 stands for POS port,
+                                            bit 3 stands for ATM port,
+                                            bit 4 stands for serial port,
+                                            bit 5 stands for mesh port,
+                                            bit 6 stands for MFR port,
+                                            bit 7 stands for RPR port.
+                     3      wrr port type   If one of the last 8 bits of this object
+                                            is set to 1, it indicates that the WRR on
+                                            port is supported,
+                                            bit 0 stands for Layer 2 Ethernet port,
+                                            bit 1 stands for Layer 3 Ethernet port,
+                                            bit 2 stands for POS port,
+                                            bit 3 stands for ATM port,
+                                            bit 4 stands for serial port,
+                                            bit 5 stands for mesh port,
+                                            bit 6 stands for MFR port,
+                                            bit 7 stands for RPR port.
+                     4      wfq port type   If one of the last 8 bits of this object
+                                            is set to 1, it indicates that the WFQ on
+                                            port is supported,
+                                            bit 0 stands for Layer 2 Ethernet port,
+                                            bit 1 stands for Layer 3 Ethernet port,
+                                            bit 2 stands for POS port,
+                                            bit 3 stands for ATM port,
+                                            bit 4 stands for serial port,
+                                            bit 5 stands for mesh port,
+                                            bit 6 stands for MFR port,
+                                            bit 7 stands for RPR port.
+                     5      wrr max group id
+                                            The max group ID of WRR.  If it is not
+                                            set to 0, it indicates that WRR group
+                                            is supported(integer).
+                     6      wrr unit        If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the WRR
+                                            unit type is supported,
+                                            bit 0 stands for weight,
+                                            bit 1 stands for byte count,
+                                            bit 2 stands for bandwidth,
+                                            bit 3 stands for percent.
+                     7      lower limit of wrr weight
+                                            The lower limit value of WRR weight (integer).
+                     8      upper limit of wrr weight
+                                            The upper limit value of WRR weight (integer).
+                     9      lower limit of wrr byte
+                                            The lower limit value of WRR byte (integer).
+                     10     upper limit of wrr byte
+                                            The upper limit value of WRR byte (integer).
+                     11     wfq max group id
+                                            The max group ID of WFQ.  If it is not
+                                            set to 0, it indicates that WFQ group
+                                            is supported(integer).
+                     12     wfq unit        If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the WFQ
+                                            unit type is supported,
+                                            bit 0 stands for weight,
+                                            bit 1 stands for byte count,
+                                            bit 2 stands for bandwidth,
+                                            bit 3 stands for percent.
+                     13     lower limit of wfq weight
+                                            The lower limit value of WFQ weight (integer).
+                     14     upper limit of wfq weight
+                                            The upper limit value of WFQ weight (integer).
+                     15     lower limit of wfq byte
+                                            The lower limit value of WFQ byte (integer).
+                     16     upper limit of wfq byte
+                                            The upper limit value of WFQ byte (integer).
+                     17     lower limit of bandwidth
+                                            The lower limit value of bandwidth(integer).
+                     18     profile port type
+                                            If one of the last 8 bits of this object
+                                            is set to 1, it indicates that the HQ profile
+                                            on port is supported,
+                                            bit 0 stands for Layer 2 Ethernet port,
+                                            bit 1 stands for Layer 3 Ethernet port,
+                                            bit 2 stands for POS port,
+                                            bit 3 stands for ATM port,
+                                            bit 4 stands for serial port,
+                                            bit 5 stands for mesh port,
+                                            bit 6 stands for MFR port,
+                                            bit 7 stands for RPR port.
+                     19     profile queue mode
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the HQ profile
+                                            mode is supported,
+                                            bit 0 stands for SP,
+                                            bit 1 stands for WRR,
+                                            bit 2 stands for WFQ.
+                     20     profile default queue mode
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the HQ profile
+                                            default mode is supported,
+                                            bit 0 stands for SP,
+                                            bit 1 stands for WRR,
+                                            bit 2 stands for WFQ.
+                     21     profile max queue number
+                                            The max number of profile queue(integer).
+                     22     profile max wrr group id
+                                            The max value of profile WRR group ID.
+                                            If it is not set to 0, it indicates
+                                            that profile WRR group is supported(integer).
+                     23     lower limit of profile wrr weight
+                                            The lower limit value of profile WRR
+                                            weight(integer).
+                     24     upper limit of profile wrr weight
+                                            The upper limit value of profile WRR
+                                            weight(integer).
+                     25     lower limit of profile wfq weight
+                                            The lower limit value of profile WFQ
+                                            weight(integer).
+                     26     upper limit of profile wfq weight
+                                            The upper limit value of profile WFQ
+                                            weight(integer).
+                     27     low latency     1, if supported.
+                     28     sub interface   1, if supported.
+
+                 software queue module:
+                     Index  Characteristic  Value
+                     1      software queue function
+                                            1, if supported.
+                     2      software queue type
+                                            If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the software
+                                            queue is supported,
+                                            bit 0 stands for FIFO,
+                                            bit 1 stands for WFQ,
+                                            bit 2 stands for CBQ,
+                                            bit 3 stands for RTPQ.
+                     3      wfq default queue number
+                                            The default number of WFQ queues(integer).
+                     4      wfq max queue number
+                                            The max number of WFQ queues(integer).
+                     5      classifier-behavior wfq
+                                            If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the cbwfq
+                                            is supported,
+                                            bit 0 stands for WFQ,
+                                            bit 1 stands for QUEUE-NUMBER,
+                                            bit 2 stands for QUEUE-LENGTH,
+                                            bit 3 stands for SP.
+                     6      classifier-behavior queue PCT
+                                            1, if supported.
+                     7      min CBS ratio   The min ratio of burst size(integer).
+                     8      max CBS ratio   The max ratio of burst size(integer).
+                     9      classifier-behavior queue PIR
+                                            1, if supported.
+                     10     queue max length
+                                            The max length of queue(integer).
+                     11     queue min bandwidth
+                                            The min bandwidth of queue(integer).
+                     12     queue max bandwidth
+                                            The max bandwidth of queue(integer).
+                     13     queue min CBS   The min burst size of queue(integer).
+                     14     queue max CBS   The max burst size of queue(integer).
+                     15     queue min PIR   The min peak information rate of queue(integer).
+                     16     queue max PIR   The max peak information rate of queue(integer).
+                     17     queue resequencing
+                                            1, if supported.
+                     18     QM token        1, if supported.
+                     19     preclassify     1, if supported.
+                     20     predrop         1, if supported.
+                     21     layer 2 ethernet interface
+                                            1, if supported.
+                     22     remain assured forwarding
+                                            1, if supported.
+                     23     software queue logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
+
+                 wred module:
+                     Index  Characteristic  Value
+                     1      wred function   1, if supported.
+                     2      wred if type    If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the WRED
+                                            on interface is supported,
+                                            bit 0 stands for Layer 2 interface,
+                                            bit 1 stands for Layer 3 interface.
+                     3      table if type   If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the table
+                                            on interface is supported,
+                                            bit 0 stands for Layer 2 interface,
+                                            bit 1 stands for Layer 3 interface.
+                     4      table type      If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the WRED
+                                            table is supported,
+                                            bit 0 stands for queue based table,
+                                            bit 1 stands for IP precedence based table,
+                                            bit 2 stands for DSCP based table.
+                     5      drop level      If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the WRED
+                                            drop level is supported,
+                                            bit 0 stands for green,
+                                            bit 1 stands for yellow,
+                                            bit 2 stands for red.
+                     6      queue number    The queue number of WRED table(integer).
+                     7      lower limit of min threshold
+                                            The lower limit value of min threshold(integer).
+                     8      upper limit of min threshold
+                                            The upper limit value of min threshold(integer)
+                     9      lower limit of max threshold
+                                            The lower limit value of max threshold(integer).
+                     10     upper limit of max threshold
+                                            The upper limit value of max threshold(integer)
+                     11     min exponent    The min value of exponent(integer).
+                     12     max exponent    The max value of exponent(integer).
+                     13     lower limit of discard prob
+                                            The lower limit value of mark probability
+                                            denominator(integer).
+                     14     upper limit of discard prob
+                                            The upper limit value of mark probability
+                                            denominator(integer).
+                     15     ECN(explicit congestion notification)
+                                            1, if supported.
+                     16     default table   1, if supported.
+                     17     mqc wred        1, if supported.
+
+                 priority mapping table module:
+                     Index  Characteristic  Value
+                     1      priority map table function
+                                            1, if supported.
+                     2      802.1p map to lp
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that this map
+                                            type is supported,
+                                            bit 0 stands for no direction,
+                                            bit 1 stands for inbound,
+                                            bit 2 stands for outbound.
+                     3      802.1p map to dp
+                                            Same as 802.1p map to lp.
+                     4      exp map to lp   Same as 802.1p map to lp.
+                     5      dscp map to lp  Same as 802.1p map to lp.
+                     6      exp map to dp   Same as 802.1p map to lp.
+                     7      dscp map to dp  Same as 802.1p map to lp.
+                     8      dscp map to 802.1p
+                                            Same as 802.1p map to lp.
+                     9      802.1p map to dscp
+                                            Same as 802.1p map to lp.
+                     10     dscp map to dscp
+                                            Same as 802.1p map to lp.
+                     11     dscp map to exp
+                                            Same as 802.1p map to lp.
+                     12     exp map to dscp
+                                            Same as 802.1p map to lp.
+                     13     exp map to 802.1p
+                                            Same as 802.1p map to lp.
+                     14     exp map to exp  Same as 802.1p map to lp.
+                     15     lp map to 802.1p
+                                            Same as 802.1p map to lp.
+                     16     802.1p map to rpr
+                                            Same as 802.1p map to lp.
+                     17     dscp map to rpr
+                                            Same as 802.1p map to lp.
+                     18     exp map to rpr  Same as 802.1p map to lp.
+                     19     IP precedence map to rpr
+                                            Same as 802.1p map to lp.
+                     20     up map to dot1p
+                                            Same as 802.1p map to lp.
+                     21     up map to dscp  Same as 802.1p map to lp.
+                     22     up map to exp   Same as 802.1p map to lp.
+                     23     up map to dp    Same as 802.1p map to lp.
+                     24     up map to lp    Same as 802.1p map to lp.
+                     25     up map to rpr   Same as 802.1p map to lp.
+                     26     up map to fc    Same as 802.1p map to lp.
+                     27     lp map to dscp  Same as 802.1p map to lp.
+                     28     dot11e map to lp
+                                            Same as 802.1p map to lp.
+                     29     lp map to dot11e
+                                            Same as 802.1p map to lp.
+                     30     lp map to lp    Same as 802.1p map to lp.
+                     31     dot1p map to exp
+                                            Same as 802.1p map to lp.
+                     32     lp map to exp   Same as 802.1p map to lp.
+                     33     lp map to dp    Same as 802.1p map to lp.
+                     34     up map to up    Same as 802.1p map to lp.
+                     35     dot1p map to dot1p
+                                            Same as 802.1p map to lp.
+                     36     802.1p color map to lp
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that this map
+                                            type is supported,
+                                            bit 0 stands for no direction,
+                                            bit 1 stands for inbound,
+                                            bit 2 stands for outbound,
+                                            bit 3 stands for color green,
+                                            bit 4 stands for color yellow,
+                                            bit 5 stands for color red.
+                     37     802.1p color map to dp
+                                            Same as 802.1p color map to lp.
+                     38     exp color map to lp
+                                            Same as 802.1p color map to lp.
+                     39     dscp color map to lp
+                                            Same as 802.1p color map to lp.
+                     40     exp color map to dp
+                                            Same as 802.1p color map to lp.
+                     41     dscp color map to dp
+                                            Same as 802.1p color map to lp.
+                     42     dscp color map to 802.1p
+                                            Same as 802.1p color map to lp.
+                     43     802.1p color map to dscp
+                                            Same as 802.1p color map to lp.
+                     44     dscp color map to dscp
+                                            Same as 802.1p color map to lp.
+                     45     dscp color map to exp
+                                            Same as 802.1p color map to lp.
+                     46     exp color map to dscp
+                                            Same as 802.1p color map to lp.
+                     47     exp color map to 802.1p
+                                            Same as 802.1p color map to lp.
+                     48     exp color map to exp
+                                            Same as 802.1p color map to lp.
+                     49     lp color map to 802.1p
+                                            Same as 802.1p color map to lp.
+                     50     802.1p color map to rpr
+                                            Same as 802.1p color map to lp.
+                     51     dscp color map to rpr
+                                            Same as 802.1p color map to lp.
+                     52     exp color map to rpr
+                                            Same as 802.1p color map to lp.
+                     53     IP precedence color map to rpr
+                                            Same as 802.1p color map to lp.
+                     54     up color map to dot1p
+                                            Same as 802.1p color map to lp.
+                     55     up color map to dscp
+                                            Same as 802.1p color map to lp.
+                     56     up color map to exp
+                                            Same as 802.1p color map to lp.
+                     57     up color map to dp
+                                            Same as 802.1p color map to lp.
+                     58     up color map to lp
+                                            Same as 802.1p color map to lp.
+                     59     up color map to rpr
+                                            Same as 802.1p color map to lp.
+                     60     up color map to fc
+                                            Same as 802.1p color map to lp.
+                     61     lp color map to dscp
+                                            Same as 802.1p color map to lp.
+                     62     dot11e color map to lp
+                                            Same as 802.1p color map to lp.
+                     63     lp color map to dot11e
+                                            Same as 802.1p color map to lp.
+                     64     lp color map to lp
+                                            Same as 802.1p color map to lp.
+                     65     dot1p color map to exp
+                                            Same as 802.1p color map to lp.
+                     66     lp color map to exp
+                                            Same as 802.1p color map to lp.
+                     67     lp color map to dp
+                                            Same as 802.1p color map to lp.
+                     68     up color map to up
+                                            Same as 802.1p color map to lp.
+                     69     dot1p color map to dot1p
+                                            Same as 802.1p color map to lp.
+                     70     up to fc export number
+                                            The export fc number of up map to fc table.
+                     71     behavior map type
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the pre-primap
+                                            table for behavior is supported,
+                                            bit 0 stands for pre-map,
+                                            bit 1 stands for colored pre-map,
+                                            bit 2 stands for color-dp.
+                     72     behavior table type
+                                            0, if no map table or colored map table
+                                            is supported,
+                                            1, if all map table and colored map table
+                                            are supported,
+                                            2, if only specified colored map table
+                                            are supported, and the specified colored
+                                            map table are {dot1p-dot1p, dot1p-dp,
+                                            dot1p-dscp, dot1p-exp, dot1p-lp, dscp-dot1p,
+                                            dscp-dp, dscp-dscp, dscp-exp, dscp-lp,
+                                            exp-dot1p, exp-dp, exp-dscp, exp-exp, exp-lp}.
+
+                 port priority module:
+                     Index  Characteristic  Value
+                     1      port priority function
+                                            1, if supported.
+                     2      port priority type
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the port
+                                            priority type is supported,
+                                            bit 0 stands for default,
+                                            bit 1 stands for dot1p,
+                                            bit 2 stands for DP,
+                                            bit 3 stands for DSCP,
+                                            bit 4 stands for EXP,
+                                            bit 5 stands for LP.
+                     3      priority trust mode
+                                            If one of the last 7 bits of this object
+                                            is set to 1, it indicates that the trust
+                                            mode is supported,
+                                            bit 0 stands for untrust,
+                                            bit 1 stands for dot1p,
+                                            bit 2 stands for DSCP,
+                                            bit 3 stands for EXP,
+                                            bit 4 stands for IP precedence,
+                                            bit 5 stands for dot11e,
+                                            bit 6 stands for auto.
+                     4      override        1, if supported.
+                     5      port priority iftype
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that the trust
+                                            mode is supported,
+                                            bit 0 stands for l2eth,
+                                            bit 1 stands for l3eth,
+                                            bit 2 stands for pos,
+                                            bit 3 stands for atm,
+                                            bit 4 stands for serial,
+                                            bit 5 stands for mp,
+                                            bit 6 stands for mrf,
+                                            bit 7 stands for rpr,
+                                            bit 8 stands for ids,
+                                            bit 9 stands for fc.
+
+                 redirect&mirror module:
+                     Index  Characteristic  Value
+                     1      redirect and mirror function
+                                            1, if supported.
+                     2      redirect to CPU
+                                            1, if supported.
+                     3      redirect and set vlan
+                                            1, if supported.
+                     4      redirect interface type
+                                            If one of the last 15 bits of this object
+                                            is set to 1, it indicates that the redirect
+                                            interface type is supported,
+                                            bit 0 stands for L2Eth,
+                                            bit 1 stands for L2GE,
+                                            bit 2 stands for L2XGE,
+                                            bit 3 stands for L2FGE,
+                                            bit 4 stands for L2HGE,
+                                            bit 5 stands for L3Eth,
+                                            bit 6 stands for L3GE,
+                                            bit 7 stands for L3XGE,
+                                            bit 8 stands for L3FGE,
+                                            bit 9 stands for L3HGE,
+                                            bit 10 stands for tunnel,
+                                            bit 11 stands for RAGG,
+                                            bit 12 stands for BAGG,
+                                            bit 13 stands for L2TGE,
+                                            bit 14 stands for L3TGE.
+                     5      mirror to CPU   1, if supported.
+                     6      mirror to vlan  1, if supported.
+                     7      mirror to slave interface
+                                            1, if supported.
+                     8      mirror interface type
+                                            If one of the last 15 bits of this object
+                                            is set to 1, it indicates that the mirror
+                                            interface type is supported,
+                                            bit 0 stands for L2Eth,
+                                            bit 1 stands for L2GE,
+                                            bit 2 stands for L2XGE,
+                                            bit 3 stands for L2FGE,
+                                            bit 4 stands for L2HGE,
+                                            bit 5 stands for L3Eth,
+                                            bit 6 stands for L3GE,
+                                            bit 7 stands for L3XGE,
+                                            bit 8 stands for L3FGE,
+                                            bit 9 stands for L3HGE,
+                                            bit 10 stands for tunnel,
+                                            bit 11 stands for RAGG,
+                                            bit 12 stands for BAGG,
+                                            bit 13 stands for L2TGE,
+                                            bit 14 stands for L3TGE.
+                     9      track OAP       1, if supported.
+
+                 mqc module:
+                     Index  Characteristic  Value
+                     1      qos policy function
+                                            1, if supported.
+                     2      interface policy
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the interface
+                                            policy is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound.
+                     3      global policy   If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the global
+                                            policy is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound.
+                     4      vlan policy     If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the VLAN
+                                            policy is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound.
+                     5      copp policy     If one of the last 3 bits of this object
+                                            is set to 1, it indicates that the COPP
+                                            policy is supported,
+                                            bit 0 stands for inbound,
+                                            bit 1 stands for outbound,
+                                            bit 2 stands for coppmp inbound.
+                     6      interface type  If one of the last 8 bits of this object
+                                            is set to 1, it indicates that the interface
+                                            type is supported,
+                                            bit 0 stands for VT(Virtual-Template),
+                                            bit 1 stands for tunnel,
+                                            bit 2 stands for VLAN,
+                                            bit 3 stands for RAGG,
+                                            bit 4 stands for BAGG,
+                                            bit 5 stands for dialer,
+                                            bit 6 stands for VPPP,
+                                            bit 7 stands for VSI.
+
+                     7      system predefined
+                                            1, if supported.
+                     8      rate statistics 1, if supported.
+                     9      min interval    The min interval of rate statistics (integer).
+                     10     max interval    The max interval of rate statistics (integer).
+                     11     match not       1, if supported.
+                     12     match any       1, if supported.
+                     13     match acl       If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the ACL
+                                            type is supported,
+                                            bit 0 stands for IPv4 basic ACL,
+                                            bit 1 stands for IPv4 advanced ACL,
+                                            bit 2 stands for MAC ACL,
+                                            bit 3 stands for user ACL,
+                                            bit 4 stands for IPv6 basic ACL,
+                                            bit 5 stands for IPv6 advanced ACL.
+                     14     match mac       1, if supported.
+                     15     match customer vlan ID
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the match
+                                            type is supported,
+                                            bit 0 stands for customer VLAN ID list,
+                                            bit 1 stands for customer VLAN ID range.
+                     16     match service vlan ID
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the match
+                                            type is supported,
+                                            bit 0 stands for service VLAN ID list,
+                                            bit 1 stands for service VLAN ID range.
+                     17     match customer dot1p
+                                            1, if supported.
+                     18     match service dot1p
+                                            1, if supported.
+                     19     match dscp      1, if supported.
+                     20     match ip precedence
+                                            1, if supported.
+                     21     match protocol  If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the protocol
+                                            type is supported,
+                                            bit 0 stands for IPv4 protocol,
+                                            bit 1 stands for IPv6 protocol,
+                                            bit 2 stands for bittorrent protocol,
+                                            bit 3 stands for ARP protocol.
+                     22     match qos local ID
+                                            1, if supported.
+                     23     match copp protocol
+                                            1, if supported.
+                     24     match copp group
+                                            If one of the last 7 bits of this object
+                                            is set to 1, it indicates that the COPP
+                                            group type is supported,
+                                            bit 0 stands for critical group,
+                                            bit 1 stands for important group,
+                                            bit 2 stands for management group,
+                                            bit 3 stands for normal group,
+                                            bit 4 stands for redirect group,
+                                            bit 5 stands for monitor group,
+                                            bit 6 stands for exception group.
+                     25     match mpls label
+                                            1, if supported.
+                     26     match second mpls label
+                                            1, if supported.
+                     27     match mpls exp  1, if supported.
+                     28     match second mpls exp
+                                            1, if supported.
+                     29     match forwarding layer
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the forwarding
+                                            layer is supported,
+                                            bit 0 stands for bridge,
+                                            bit 1 stands for route.
+                     30     match input interface
+                                            1, if supported.
+                     31     match classifier
+                                            1, if supported.
+                     32     match RTP protocol
+                                            1, if supported.
+                     33     match packet length
+                                            1, if supported.
+                     34     match drop priority
+                                            1, if supported.
+                     35     match local precedence
+                                            1, if supported.
+                     36     match app-group
+                                            1, if supported.
+                     37     account action  If it is not set to 0, it indicates that
+                                            accounting action is supported.
+                                            1, if accounting by default method is
+                                            supported,
+                                            2, if accounting by one method of packet
+                                            and byte is supported,
+                                            3, if accounting by neither method or one
+                                            of packet and byte is supported,
+                                            4, if accounting by neither method or one
+                                            or two of packet and byte is supported.
+                     38     filter action   1, if supported.
+                     39     nest topmost vlan tag
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the nest
+                                            action is supported,
+                                            bit 0 stands for nest VLAN ID,
+                                            bit 1 stands for nest VLAN ID and COS.
+                     40     remark action   If one of the last 15 bits of this object
+                                            is set to 1, it indicates that the remark
+                                            action is supported,
+                                            bit 0 stands for DSCP,
+                                            bit 1 stands for IP precedence,
+                                            bit 2 stands for MPLS-EXP,
+                                            bit 3 stands for dot1p,
+                                            bit 4 stands for QoS local ID,
+                                            bit 5 stands for local precedence,
+                                            bit 6 stands for drop precedence,
+                                            bit 7 stands for customer VLAN ID,
+                                            bit 8 stands for service VLAN ID,
+                                            bit 9 stands for customer dot1p trust,
+                                            bit 10 stands for imposition MPLS-EXP,
+                                            bit 11 stands for fc,
+                                            bit 12 stands for atm clp,
+                                            bit 13 stands for fr de,
+                                            bit 14 stands for account level.
+                     41     green packets remark action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that the green
+                                            packets remark action is supported and
+                                            the mask is the same as that for remark
+                                            action.
+                     42     yellow remark action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that the yellow
+                                            packets remark action is supported and
+                                            the mask is the same as that for remark
+                                            action.
+                     43     red remark action
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that the red
+                                            packets remark action is supported and
+                                            the mask is the same as that for remark
+                                            action.
+                     44     nest policy action
+                                            1, if supported.
+                     45     classifier-behavior mode type
+                                            If one of the last 5 bits of this object
+                                            is set to 1, it indicates that the
+                                            classifier-behavior mode type is supported,
+                                            bit 0 stands for dot1q-tag-manipulation
+                                            mode,
+                                            bit 1 stands for QPPB mode,
+                                            bit 2 stands for IP-source-guard mode,
+                                            bit 3 stands for voice-VLAN mode,
+                                            bit 4 stands for DCBX mode.
+                     46     classifier-behavior statistics unit
+                                            If one of the last 2 bits of this object
+                                            is set to 1, it indicates that the
+                                            classifier-behavior statistics unit is
+                                            supported,
+                                            bit 0 stands for packet,
+                                            bit 1 stands for byte.
+
+                 queue statistic module:
+                     Index  Characteristic  Value
+                     1      queue statistic function
+                                            1, if supported.
+                     2      TC counter      1, if supported.
+                     3      port queue statistic
+                                            1, if supported.
+                     4      queue global function
+                                            1, if supported.
+                     5      TC parameter    If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the TC parameter
+                                            is supported,
+                                            bit 0 stands for interface,
+                                            bit 1 stands for VLAN,
+                                            bit 2 stands for local precedence,
+                                            bit 3 stands for drop precedence.
+
+             "
+            ::= { hh3cQoSSysCapabilityEntry 3 }
+
+-- hh3cQoSIfCapabilityTable
+
+        hh3cQoSIfCapabilityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSIfCapabilityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of interface capability of QoS."
+            ::= { hh3cQoSCapabilityGroup 3 }
+
+        hh3cQoSIfCapabilityEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSIfCapabilityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Capability of interface QoS information entry."
+            INDEX { hh3cQoSIfCapIfIndex,
+                    hh3cQoSIfCapModuleIndex,
+                    hh3cQoSIfCapCharacteristicsIndex }
+            ::= { hh3cQoSIfCapabilityTable 1 }
+
+        Hh3cQoSIfCapabilityEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSIfCapIfIndex
+                    Integer32,
+                hh3cQoSIfCapModuleIndex
+                    Integer32,
+                hh3cQoSIfCapCharacteristicsIndex
+                    Integer32,
+                hh3cQoSIfCapCharacteristicsValue
+                    Unsigned32
+            }
+
+        hh3cQoSIfCapIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interface index of interface capability of QoS."
+            ::= { hh3cQoSIfCapabilityEntry 1 }
+
+        hh3cQoSIfCapModuleIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The module index of interface capability of QoS.
+                 QoS module:
+                     Index    Characteristic
+                     1        car module
+                     2        gts module
+                     3        lr module
+                     4        hardware queue module
+                     5        software queue module
+                     6        wred module
+                     7        priority mapping table module
+                     8        port priority module
+                     9        redirect&mirror module
+                     10       mqc module
+                     11       queue statistic module
+                "
+            ::= { hh3cQoSIfCapabilityEntry 2 }
+
+        hh3cQoSIfCapCharacteristicsIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interface capability characteristics index of modules of QoS."
+            ::= { hh3cQoSIfCapabilityEntry 3 }
+
+        hh3cQoSIfCapCharacteristicsValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface capability characteristics value of modules of QoS.
+
+                 car module:
+                     Index  Characteristic  Value
+                     1      car function    1, if supported.
+                     2      interface min cir
+                                            The min value of interface committed
+                                            information rate(integer).
+                     3      interface max cir
+                                            The max value of interface committed
+                                            information rate(integer).
+                     4      interface cir granularity
+                                            The value of interface committed information
+                                            rate granularity(integer).
+                     5      interface min cbs
+                                            The min value of interface burst size(integer).
+                     6      interface max cbs
+                                            The max value of interface burst size(integer).
+                     7      interface cbs granularity
+                                            The value of interface burst size granularity(integer).
+                     8      interface min ebs
+                                            The min value of interface excess burst
+                                            size(integer).
+                     9      interface max ebs
+                                            The max value of interface excess burst
+                                            size(integer).
+                     10     interface ebs granularity
+                                            The value of interface excess burst size
+                                            granularity(integer).
+                     11     interface min pir
+                                            The min value of interface peak information
+                                            rate(integer).
+                     12     interface max pir
+                                            The max value of interface peak information
+                                            rate(integer).
+                     13     interface pir granularity
+                                            The value of interface peak information rate
+                                            granularity(integer).
+
+                 gts module:
+                     Index  Characteristic  Value
+                     1      gts function    1, if supported.
+                     2      interface min cir
+                                            The min value of interface committed information
+                                            rate(integer).
+                     3      interface max cir
+                                            The max value of interface committed information
+                                            rate(integer).
+                     4      interface cir granularity
+                                            The value of interface committed information
+                                            rate granularity(integer).
+                     5      interface min cbs
+                                            The min value of interface burst size(integer).
+                     6      interface max cbs
+                                            The max value of interface burst size(integer).
+                     7      interface cbs granularity
+                                            The value of interface burst size granularity(integer).
+                     8      interface min ebs
+                                            The min value of interface excess burst
+                                            size(integer).
+                     9      interface max ebs
+                                            The max value of interface excess burst
+                                            size(integer).
+                     10     interface ebs granularity
+                                            The value of interface excess burst size
+                                            granularity(integer).
+                     11     interface min pir
+                                            The min value of interface peak information
+                                            rate(integer).
+                     12     interface max pir
+                                            The max value of interface peak information
+                                            rate(integer).
+                     13     interface pir granularity
+                                            The value of interface peak information
+                                            rate granularity(integer).
+
+                 lr module:
+                     Index  Characteristic  Value
+                     1      lr function     1, if supported.
+                     2      interface min cir
+                                            The min value of interface committed information
+                                            rate(integer).
+                     3      interface max cir
+                                            The max value of interface committed information
+                                            rate(integer).
+                     4      interface cir granularity
+                                            The value of interface committed information
+                                            rate granularity(integer).
+                     5      interface min cbs
+                                            The min value of interface burst size(integer).
+                     6      interface max cbs
+                                            The max value of interface burst size(integer).
+                     7      interface cbs granularity
+                                            The value of interface burst size granularity(integer).
+                     8      interface min ebs
+                                            The min value of interface excess burst
+                                            size(integer).
+                     9      interface max ebs
+                                            The max value of interface excess burst
+                                            size(integer).
+                     10     interface ebs granularity
+                                            The value of interface excess burst size
+                                            granularity(integer).
+                     11     interface min pir
+                                            The min value of interface peak information
+                                            rate(integer).
+                     12     interface max pir
+                                            The max value of interface peak information
+                                            rate(integer).
+                     13     interface pir granularity
+                                            The value of interface peak information
+                                            rate granularity(integer).
+
+                 hardware queue module:
+                     Index  Characteristic  Value
+                     1      hardware queue management function
+                                            1, if supported.
+                     2      hardware queue default mode
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that default
+                                            mode type is supported,
+                                            bit 0 stands for SP mode,
+                                            bit 1 stands for WRR mode,
+                                            bit 2 stands for WFQ mode.
+                     3      hardware queue mode
+                                            If one of the last 3 bits of this object
+                                            is set to 1, it indicates that mode type
+                                            is supported,
+                                            bit 0 stands for SP mode,
+                                            bit 1 stands for WRR mode,
+                                            bit 2 stands for WFQ mode.
+                     4      wrr default unit
+                                            If one of the last 4 bits of this object
+                                            is set to 1, it indicates that WRR default
+                                            unit type is supported,
+                                            bit 0 stands for weight,
+                                            bit 1 stands for byte count,
+                                            bit 2 stands for bandwidth,
+                                            bit 3 stands for percent.
+                     5      wfq default unit
+                                            If one of the last 4 bits of this object
+                                            is set to 1, it indicates that WFQ default
+                                            unit type is supported,
+                                            bit 0 stands for weight,
+                                            bit 1 stands for byte count,
+                                            bit 2 stands for bandwidth,
+                                            bit 3 stands for percent.
+                     6      queue max number
+                                            The max queue number(integer).
+
+                 software queue module:
+                     Index  Characteristic  Value
+                     1      software queue function
+                                            1, if supported.
+                     2      FIFO function   1, if supported.
+                     3      FIFO default queue length
+                                            The default length of FIFO queue(integer).
+                     4      FIFO max queue length
+                                            The max length of FIFO queue(integer).
+
+                 port priority module:
+                     Index  Characteristic  Value
+                     1      port priority function
+                                            1, if supported.
+                     2      port priority type
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the priority
+                                            on interface is supported.
+                                            bit 0 stands for default,
+                                            bit 1 stands for dot1p,
+                                            bit 2 stands for DP,
+                                            bit 3 stands for DSCP,
+                                            bit 4 stands for EXP,
+                                            bit 5 stands for LP.
+                     3      priority trust mode
+                                            If one of the last 7 bits of this object
+                                            is set to 1, it indicates that the priority
+                                            trust on interface is supported.
+                                            bit 0 stands for untrust,
+                                            bit 1 stands for dot1p,
+                                            bit 2 stands for DSCP,
+                                            bit 3 stands for EXP,
+                                            bit 4 stands for IP precedence,
+                                            bit 5 stands for dot11e,
+                                            bit 6 stands for auto.
+                     4      default priority trust mode
+                                            The default value of port priority trust
+                                            type.  If one of the last 7 bits of this
+                                            object is set to 1, it indicates that
+                                            the default priority trust type on interface
+                                            is supported.
+                                            bit 0 stands for untrust,
+                                            bit 1 stands for dot1p,
+                                            bit 2 stands for DSCP,
+                                            bit 3 stands for EXP,
+                                            bit 4 stands for IP precedence,
+                                            bit 5 stands for dot11e,
+                                            bit 6 stands for auto.
+                     5      override        1, if supported.
+             "
+            ::= { hh3cQoSIfCapabilityEntry 4 }
+
+END

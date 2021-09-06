@@ -3,7 +3,7 @@
 Introduction
 ------------
 
-LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
+LibreNMS is an auto-discovering PHP/MySQL/SNMP based network monitoring
 which includes support for a wide range of network hardware and operating
 systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
 many more.
@@ -14,10 +14,7 @@ We intend LibreNMS to be a viable project and community that:
 - offers a welcoming, friendly environment for everyone.
 
 The [Debian Social Contract][10] will be the basis of our priority system,
-and mutual respect is the basis of our behaviour towards others.  For more
-about the culture we're trying to build, please read the [Freenode
-philosophy][13], including [guidelines for running an IRC channel][6] and
-[being a community catalyst][7].
+and mutual respect is the basis of our behavior towards others.
 
 
 Documentation
@@ -34,8 +31,8 @@ You can participate in the project by:
 - Talking to us on [Discord][4] or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
-- Cloning the [repo][2] and filing [pull requests][19] on github.
-- [Bug Reports](https://community.librenms.org) on our Community Fourms
+- Cloning the [repository][2] and filing [pull requests][19] on GitHub.
+- [Bug Reports](https://community.librenms.org) on our Community Forums
 - See [CONTRIBUTING][15] for more details.
 
 
@@ -85,12 +82,9 @@ exception):
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
 [4]: https://discord.gg/librenms "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
-[6]: http://freenode.net/changuide "Freenode channel guidelines"
-[7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
 [11]: https://www.librenms.org/#downloads
-[13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: https://docs.librenms.org/General/Contributing/
 [16]: https://docs.librenms.org/

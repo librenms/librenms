@@ -1,0 +1,352 @@
+-- =====================================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Timerange MIB Definition
+-- Reference:
+-- Version: V1.3
+-- History:
+--   V1.0 Yang Hongjie,2003-04-11,Initial Version
+--   v1.1 modify follow node define:
+--        hh3cTrngPeriodicDayOfWeek,hh3cTrngCreateRowStatus
+--        hh3cTimerangeAbsolueRowStatus,hh3cTimerangePeriodicRowStatus
+--   V1.2 2004-10-12 updated by gaolong
+--        Change DESCRIPTION syntax format of hh3cTRNG and hh3cTrngCreateTimerangeTable.
+--        Change hh3cTrngPeriodicDayofWeek to hh3cTrngPeriodicDayOfWeek. This is
+--        a word error.
+--   V1.3 2005-2-5 updated by zhangjie
+--        Correct word error for 'wednesday'.
+--      Adjust the file format
+-- =====================================================================
+HH3C-TRNG-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cRhw
+                FROM HH3C-OID-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            TruthValue, DateAndTime, RowStatus
+                FROM SNMPv2-TC;
+
+
+        hh3cTRNG MODULE-IDENTITY
+            LAST-UPDATED "200304110000Z"        -- April 11, 2003 at 00:00 GMT
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "The HH3C-TRNG-MIB contains objects to
+                Configure the system absolute and periodic time-range."
+            REVISION "200304110000Z"        -- April 11, 2003 at 00:00 GMT
+            DESCRIPTION
+                "200304110000Z, --The initial revision of this MIB module."
+            ::= { hh3cRhw 13 }
+
+
+--
+-- Node definitions
+--
+
+        hh3cTRNGMibObjects OBJECT IDENTIFIER ::= { hh3cTRNG 1 }
+
+
+        hh3cTrngCreateTimerangeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cTrngCreateTimerangeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                              "Creat TimeRange."
+            ::= { hh3cTRNGMibObjects 1 }
+
+
+        hh3cTrngCreateTimerangeEntry OBJECT-TYPE
+            SYNTAX Hh3cTrngCreateTimerangeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define the entry of hh3cTrngCreateTimerangeTable"
+            INDEX { hh3cTrngIndex }
+            ::= { hh3cTrngCreateTimerangeTable 1 }
+
+
+        Hh3cTrngCreateTimerangeEntry ::=
+            SEQUENCE {
+                hh3cTrngIndex
+                    Integer32,
+                hh3cTrngName
+                    OCTET STRING,
+                hh3cTrngValidFlag
+                    TruthValue,
+                hh3cTrngCreateRowStatus
+                    RowStatus
+             }
+
+        hh3cTrngIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..256)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "TimeRange's index"
+            ::= { hh3cTrngCreateTimerangeEntry 1 }
+
+
+        hh3cTrngName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "TimeRange's name"
+            ::= { hh3cTrngCreateTimerangeEntry 2 }
+
+
+        hh3cTrngValidFlag OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Valid or Invalid flag"
+            ::= { hh3cTrngCreateTimerangeEntry 3 }
+
+
+        hh3cTrngCreateRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this conceptual row.Now only realize CreateAndGo and Destroy and Active."
+            ::= { hh3cTrngCreateTimerangeEntry 4 }
+
+
+        hh3cTrngAbsoluteTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cTrngAbsoluteEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Creat absoluteness time item of the TimeRange"
+            ::= { hh3cTRNGMibObjects 2 }
+
+
+        hh3cTrngAbsoluteEntry OBJECT-TYPE
+            SYNTAX Hh3cTrngAbsoluteEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define the entry of hh3cTrngAbsoluteTable"
+            INDEX { hh3cTrngAbsoluteNameIndex, hh3cTrngAbsoluteSubIndex }
+            ::= { hh3cTrngAbsoluteTable 1 }
+
+
+        Hh3cTrngAbsoluteEntry ::=
+            SEQUENCE {
+                hh3cTrngAbsoluteNameIndex
+                    Integer32,
+                hh3cTrngAbsoluteSubIndex
+                    Integer32,
+                hh3cTimerangeAbsoluteStartTime
+                    DateAndTime,
+                hh3cTimerangeAbsoluteEndTime
+                    DateAndTime,
+                hh3cTimerangeAbsolueRowStatus
+                    RowStatus
+             }
+
+        hh3cTrngAbsoluteNameIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..256)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "TimeRange's index"
+            ::= { hh3cTrngAbsoluteEntry 1 }
+
+
+        hh3cTrngAbsoluteSubIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..12)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "SubItem's index"
+            ::= { hh3cTrngAbsoluteEntry 2 }
+
+
+        hh3cTimerangeAbsoluteStartTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Start point of the timerange.The format defined like 'YYYY-MM-DD,hh:mm:0.0'."
+            ::= { hh3cTrngAbsoluteEntry 3 }
+
+
+        hh3cTimerangeAbsoluteEndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End point of the timerange.The format defined like 'YYYY-MM-DD,hh:mm:0.0'."
+            ::= { hh3cTrngAbsoluteEntry 4 }
+
+
+        hh3cTimerangeAbsolueRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this conceptual row. Now only realize CreateAndGo and Destroy and Active."
+            ::= { hh3cTrngAbsoluteEntry 5 }
+
+
+        hh3cTrngPeriodicTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cTrngPeriodicEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Creat periodic time item of the TimeRange"
+            ::= { hh3cTRNGMibObjects 3 }
+
+
+        hh3cTrngPeriodicEntry OBJECT-TYPE
+            SYNTAX Hh3cTrngPeriodicEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define the index of hh3cTrngPeriodicTable"
+            INDEX { hh3cTrngPeriodicNameIndex, hh3cTrngPeriodicSubIndex }
+            ::= { hh3cTrngPeriodicTable 1 }
+
+
+        Hh3cTrngPeriodicEntry ::=
+            SEQUENCE {
+                hh3cTrngPeriodicNameIndex
+                    Integer32,
+                hh3cTrngPeriodicSubIndex
+                    Integer32,
+                hh3cTrngPeriodicDayOfWeek
+                    BITS,
+                hh3cTimerangePeriodicStartTime
+                    DateAndTime,
+                hh3cTimerangePeriodicEndTime
+                    DateAndTime,
+                hh3cTimerangePeriodicRowStatus
+                    RowStatus
+             }
+
+        hh3cTrngPeriodicNameIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..256)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "TimeRange's index"
+            ::= { hh3cTrngPeriodicEntry 1 }
+
+
+        hh3cTrngPeriodicSubIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..32)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "SubItem's index"
+            ::= { hh3cTrngPeriodicEntry 2 }
+
+
+        hh3cTrngPeriodicDayOfWeek OBJECT-TYPE
+            SYNTAX BITS {
+                                      sunday(0),
+                                      monday(1),
+                                      tuesday(2),
+                                      wednesday(3),
+                                      thursday(4),
+                                      friday(5),
+                                      saturday(6)
+                                      }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The day of week. This is a bit-map of possible conditions.
+                The various bit positions are:
+                |0        |sunday                    |
+                |1        |monday                 |
+                |2        |tuesday                |
+                |3        |wednesday              |
+                |4        |thursday               |
+                |5        |friday                 |
+                |6        |saturday               |
+                "
+            ::= { hh3cTrngPeriodicEntry 3 }
+
+
+        hh3cTimerangePeriodicStartTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Start point of this timerange,The format defined like 'hh:mm:0,0'."
+            ::= { hh3cTrngPeriodicEntry 4 }
+
+
+        hh3cTimerangePeriodicEndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End point of this timerange. The format definedlike 'hh:mm:0,0'."
+            ::= { hh3cTrngPeriodicEntry 5 }
+
+
+        hh3cTimerangePeriodicRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this conceptual row, Now only realize CreateAndGo and Destroy and Active."
+            ::= { hh3cTrngPeriodicEntry 6 }
+
+        hh3cTRNGMibConformance OBJECT IDENTIFIER ::= { hh3cTRNG 3 }
+
+
+        hh3cTRNGMibCompliances OBJECT IDENTIFIER ::= { hh3cTRNGMibConformance 1 }
+
+
+        hh3cTRNGMibCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The compliance statement for entities which
+                implement the Time-range MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hh3cTRNGGroup }
+                OBJECT hh3cTrngCreateRowStatus
+                    SYNTAX INTEGER
+                    DESCRIPTION
+                        "Now only realize CreateAndGo and Destroy and Active."
+                OBJECT hh3cTimerangeAbsolueRowStatus
+                    SYNTAX INTEGER
+                    DESCRIPTION
+                        "Now only realize CreateAndGo and Destroy and Active."
+                OBJECT hh3cTimerangePeriodicRowStatus
+                    SYNTAX INTEGER
+                    DESCRIPTION
+                        "Now only realize CreateAndGo and Destroy and Active."
+            ::= { hh3cTRNGMibCompliances 1 }
+
+
+        hh3cTRNGMibGroups OBJECT IDENTIFIER ::= { hh3cTRNGMibConformance 2 }
+
+
+        hh3cTRNGGroup OBJECT-GROUP
+            OBJECTS { hh3cTrngName, hh3cTrngValidFlag, hh3cTrngCreateRowStatus, hh3cTimerangeAbsoluteStartTime, hh3cTimerangeAbsoluteEndTime,
+                hh3cTimerangeAbsolueRowStatus, hh3cTrngPeriodicDayOfWeek, hh3cTimerangePeriodicStartTime, hh3cTimerangePeriodicEndTime, hh3cTimerangePeriodicRowStatus
+                 }
+            STATUS current
+            DESCRIPTION
+                "A collection of objects providing mandatory time-range information."
+            ::= { hh3cTRNGMibGroups 1 }
+
+
+
+    END
+

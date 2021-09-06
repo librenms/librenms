@@ -141,7 +141,7 @@ marker.bindPopup(title);
               rl.id AS right_id,
               rl.lat AS right_lat,
               rl.lng AS right_lng,
-              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifSpeed) AS link_capacity,
               sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
               sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
             FROM
@@ -187,7 +187,7 @@ marker.bindPopup(title);
               rl.id AS right_id,
               rl.lat AS right_lat,
               rl.lng AS right_lng,
-              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifSpeed) AS link_capacity,
               sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
               sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
             FROM
@@ -231,7 +231,7 @@ marker.bindPopup(title);
             $icon = 'greenMarker';
             $z_offset = 0;
 
-            $speed = $link['link_capacity'] / 1000;
+            $speed = $link['link_capacity'] / 1000000000;
             if ($speed > 500000) {
                 $width = 20;
             } else {

@@ -1,0 +1,2656 @@
+-- =================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: interface extension mib
+-- Reference: IF-MIB
+-- Version: V2.6
+-- History:
+--   V1.0 Created by gaolong
+--     Initial version 2004-11-13
+--   V1.1 2007-01-13 Modified by wanglirong
+--     Added hh3cIfStatGlobalFlowInterval and hh3cIfSpeedStatTable
+--   V1.2 Modified by chenxi
+--     Added hh3cRTParentIfTable, hh3cRTSubIfTable, and
+--     hh3cIfLinkModeTable 2007-10-15
+--   V1.3 2009-05-05 Added hh3cIfPhysicalNumber and hh3cIfTable
+--   V1.4 2009-08-08 Added hh3cIfMtu, hh3cIfBandwidth, hh3cIfDiscardPktRate,
+--     and hh3cIfExtTrapCfgTable
+--   V1.5 2010-09-04 Added hh3cIfInNUcastPkts, hh3cIfOutNUcastPkts, and hh3cIfStatusKeepTime by shuaixj
+--   V1.6 2011-09-16 Added hh3cIfHCFlowStatTable by xiedong
+--        2011-11-04 Added hh3cIfIsPoe by duyanbing
+--   V1.7 2013-09-13 Added hh3cIfOperStatus and hh3cIfDownTimes by duyanbing
+--   V1.8 2014-07-23 Added hh3cIfShutDownInterval and hh3cIfUsingTable by xiedong
+--        2014-09-19 Added hh3cIfDampeningSuppressed and hh3cIfDampeningNotSuppressed by yinzhonghong
+--   V1.9 2014-11-20 Added hh3cIfPortTypeTable, hh3cIfPfcStatus, and hh3cIfPfcDot1pNoDrop by songhao
+--   V2.0 2015-02-12 Added hh3cIfPortUp, hh3cIfPortDown by chenzhouhui
+--        2015-12-10 Added hh3cIfDescription by chenzhouhui
+--   V2.1 2016-07-01 Added the values 25GE and 50GE to hh3cIfUsingType and hh3cIfUsingSupportType by yuhaiyan
+--        2016-12-05 Added hh3cIfHCSpeedStatTable by songhao.
+--        2017-07-13 Added hh3cIfFwdErrDiscards by songhao.
+--        2017-12-13 Added hh3cIfThroughputInKbps and hh3cIfThroughputOutKbps by chenzhouhui.
+--        2018-01-09 Added hh3cIfMonScalarGroup, hh3cIfMonGroup, hh3cIfMonGroup and hh3cIfMonTrapPrex by guhangchao.
+--        2018-02-07 Added hh3cIfPortDot1pTable, hh3cIfPfcOutRising and hh3cIfPfcInRising by guhangchao.
+--   V2.2 2018-04-26 Modified hh3cIfMonScalarGroup, hh3cIfMonGroup, hh3cIfMonGroup and hh3cIfMonTrapPrex by guhangchao.
+--   V2.3 2018-06-05 Added hh3cIfQueBufferTable by zhuhaifeng.
+--        2019-08-06 Added hh3cIfSpeedStatInBits, hh3cIfSpeedStatOutBits, hh3cIfSpeedStatHCInBits
+--        and hh3cIfSpeedStatHCOutBits by matianming.
+--   V2.4 2020-06-09 modify hh3cIfMonGroup by guhangchao
+--   V2.5 2020-08-04 modify hh3cIfMonGroup and hh3cIfMonTrapPrex by guhangchao
+--        2020-08-05 Added hh3cIfFiberOrCopper by shuaixiaojuan.
+--   V2.6 2021-04-27 Added the values 200GE and 400GE to hh3cIfUsingType and hh3cIfUsingSupportType by zhaoqingtao.
+--        2021-05-14 Added hh3cIfTransferMode by lijinshuo.
+-- =================================================================
+HH3C-IF-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        ifIndex, ifDescr, InterfaceIndex
+    FROM IF-MIB
+        Integer32, Counter64, Unsigned32, TimeTicks,
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        CounterBasedGauge64
+    FROM HCNUM-TC
+        DisplayString, RowStatus, TruthValue
+    FROM SNMPv2-TC;
+
+hh3cIfExt MODULE-IDENTITY
+    LAST-UPDATED "202105140000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB is an extension of interface MIBs such as IF-MIB.
+
+        This MIB is applicable to routers, switches, and other products.
+
+        Some objects in this MIB may be used only for some specific products,
+        so users should refer to the related documents to acquire more
+        detailed information.
+        "
+    REVISION "202105140000Z"
+    DESCRIPTION
+        "Added hh3cIfTransferMode to hh3cIfTable."
+    REVISION "202104270000Z"
+    DESCRIPTION
+        "Added the values 200GE and 400GE to hh3cIfUsingType and hh3cIfUsingSupportType."
+    REVISION "202008050000Z"
+    DESCRIPTION
+        "Added hh3cIfFiberOrCopper to hh3cIfTable."
+    REVISION "202008040000Z"
+    DESCRIPTION
+        "modify hh3cIfMonGroup and hh3cIfMonTrapPrex."
+    REVISION "202006090000Z"
+    DESCRIPTION
+        "modify hh3cIfMonGroup."
+    REVISION "201908060000Z"
+    DESCRIPTION
+        "Added hh3cIfSpeedStatInBits, hh3cIfSpeedStatOutBits, hh3cIfSpeedStatHCInBits
+        and hh3cIfSpeedStatHCOutBits."
+    REVISION "201806050000Z"
+    DESCRIPTION
+        "Added hh3cIfQueBufferTable."
+    REVISION "201804260000Z"
+    DESCRIPTION
+        "Modified hh3cIfMonScalarGroup, hh3cIfMonGroup, hh3cIfMonGroup and hh3cIfMonTrapPrex."
+    REVISION "201802070000Z"
+    DESCRIPTION
+        "Added hh3cIfPortDot1pTable, hh3cIfPfcOutRising and hh3cIfPfcInRising."
+    REVISION "201801090000Z"
+    DESCRIPTION
+        "Added hh3cIfMonScalarGroup, hh3cIfMonGroup, hh3cIfMonGroup and hh3cIfMonTrapPrex."
+    REVISION "201712131820Z"
+    DESCRIPTION
+        "Added Added hh3cIfThroughputInKbps and hh3cIfThroughputOutKbps."
+    REVISION "201707131040Z"
+    DESCRIPTION
+        "Added hh3cIfFwdErrDiscards."
+    REVISION "201612051800Z"
+    DESCRIPTION
+        "Added hh3cIfHCSpeedStatTable."
+    REVISION "201607011700Z"
+    DESCRIPTION
+        "Added the values 25GE and 50GE to hh3cIfUsingType and hh3cIfUsingSupportType."
+    REVISION "201512101000Z"
+    DESCRIPTION
+        "Added hh3cIfDescription."
+    REVISION "201504020458Z"
+    DESCRIPTION
+        "Added hh3cIfPortUp and hh3cIfPortDown"
+    REVISION "201411200800Z"
+    DESCRIPTION
+        "Added hh3cIfPortTypeTable, hh3cIfPfcStatus, and hh3cIfPfcDot1pNoDrop."
+    REVISION "200905061936Z"
+    DESCRIPTION
+        "Update this MIB module."
+    REVISION "200411131936Z"        -- December 13, 2004 at 19:36 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 40 }
+
+
+--
+-- Node definitions
+--
+
+-- Scalar MIB objects, which are considered as global variables
+-- to all interfaces on a device, are defined in this section.
+hh3cIfExtScalarGroup OBJECT IDENTIFIER ::= { hh3cIfExt 1 }
+
+hh3cIfStatGlobalFlowInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sampling interval for in/out flow of all interfaces.
+        Setting zero indicates closing the statistic function."
+    ::= { hh3cIfExtScalarGroup 1 }
+
+hh3cIfShutDownInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set the port status detection timer.  The device starts a port status
+        detection timer when a port is shut down by a protocol.  Once the timer
+        expires, the device brings up the port so the port status reflects
+        the port's physical status."
+    ::= { hh3cIfExtScalarGroup 2 }
+
+hh3cIfThroughputInKbps OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual incoming throughput of the device in kbps."
+    ::= { hh3cIfExtScalarGroup 3 }
+
+hh3cIfThroughputOutKbps OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual outgoing throughput of the device in kbps."
+    ::= { hh3cIfExtScalarGroup 4 }
+
+-- =================================================================
+-- All other groups are defined below.  Of course, scalar objects can
+-- also be defined in a subsection, but they must be one part of
+-- that subsection.
+
+-- Note that a scalar group should be defined firstly and all
+-- scalar objects are placed under that group when doing so.
+hh3cIfExtGroup OBJECT IDENTIFIER ::= { hh3cIfExt 2 }
+
+
+-- =================================================================
+-- The section below describes statistics of interfaces on a device.
+-- These statistics may not be included in standard MIBs.
+hh3cIfStat OBJECT IDENTIFIER ::= { hh3cIfExtGroup 1 }
+
+-- Define a scalar group that contains all scalar objects used for
+-- interface statistics.
+hh3cIfStatScalarGroup OBJECT IDENTIFIER ::= { hh3cIfStat 1 }
+
+hh3cIfStatTable OBJECT IDENTIFIER ::= { hh3cIfStat 2 }
+
+hh3cIfFlowStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfFlowStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get statistic information
+        of interfaces on a device."
+    ::= { hh3cIfStatTable 1 }
+
+hh3cIfFlowStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfFlowStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items"
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfFlowStatTable 1 }
+
+Hh3cIfFlowStatEntry ::= SEQUENCE
+    {
+        hh3cIfStatFlowInterval    Integer32,
+        hh3cIfStatFlowInBits      Unsigned32,
+        hh3cIfStatFlowOutBits     Unsigned32,
+        hh3cIfStatFlowInPkts      Unsigned32,
+        hh3cIfStatFlowOutPkts     Unsigned32,
+        hh3cIfStatFlowInBytes     Unsigned32,
+        hh3cIfStatFlowOutBytes    Unsigned32
+    }
+
+hh3cIfStatFlowInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sampling interval for in/out flow of interface.
+        Setting zero indicates closing this statistic function
+        and objects in this table should return 0."
+    ::= { hh3cIfFlowStatEntry 1 }
+
+hh3cIfStatFlowInBits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In bits in the specified interval."
+    ::= { hh3cIfFlowStatEntry 2 }
+
+hh3cIfStatFlowOutBits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Out bits in the specified interval."
+    ::= { hh3cIfFlowStatEntry 3 }
+
+hh3cIfStatFlowInPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In packets in the specified interval."
+    ::= { hh3cIfFlowStatEntry 4 }
+
+hh3cIfStatFlowOutPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Out packets in the specified interval."
+    ::= { hh3cIfFlowStatEntry 5 }
+
+hh3cIfStatFlowInBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In bytes in the specified interval."
+    ::= { hh3cIfFlowStatEntry 6 }
+
+hh3cIfStatFlowOutBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Out bytes in the specified interval."
+    ::= { hh3cIfFlowStatEntry 7 }
+
+
+-- =================================================================
+hh3cIfSpeedStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfSpeedStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get average speed information
+        in the specified interval for interfaces on a device."
+    ::= { hh3cIfStatTable 2 }
+
+hh3cIfSpeedStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfSpeedStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items"
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfSpeedStatTable 1 }
+
+Hh3cIfSpeedStatEntry ::= SEQUENCE
+    {
+        hh3cIfSpeedStatInterval    Integer32,
+        hh3cIfSpeedStatInPkts      Unsigned32,
+        hh3cIfSpeedStatOutPkts     Unsigned32,
+        hh3cIfSpeedStatInBytes     Unsigned32,
+        hh3cIfSpeedStatOutBytes    Unsigned32,
+        hh3cIfSpeedStatInBits      Unsigned32,
+        hh3cIfSpeedStatOutBits     Unsigned32
+    }
+
+hh3cIfSpeedStatInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sampling interval for in/out flow of interface.
+        Setting zero indicates closing this statistic function
+        and objects in this table should return 0."
+    ::= { hh3cIfSpeedStatEntry 1 }
+
+hh3cIfSpeedStatInPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of input packets per second in the interval specified by
+        hh3cIfSpeedStatInterval."
+    ::= { hh3cIfSpeedStatEntry 2 }
+
+hh3cIfSpeedStatOutPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of output packets per second in the interval specified by
+        hh3cIfSpeedStatInterval."
+    ::= { hh3cIfSpeedStatEntry 3 }
+
+hh3cIfSpeedStatInBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of input bytes per second in the interval specified by
+        hh3cIfSpeedStatInterval."
+    ::= { hh3cIfSpeedStatEntry 4 }
+
+hh3cIfSpeedStatOutBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of output bytes per second in the interval specified by
+        hh3cIfSpeedStatInterval."
+    ::= { hh3cIfSpeedStatEntry 5 }
+
+hh3cIfSpeedStatInBits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of input bits per second in the interval specified by
+        hh3cIfSpeedStatInterval."
+    ::= { hh3cIfSpeedStatEntry 6 }
+
+hh3cIfSpeedStatOutBits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of output bits per second in the interval specified by
+        hh3cIfSpeedStatInterval."
+    ::= { hh3cIfSpeedStatEntry 7 }
+
+-- =================================================================
+hh3cIfHCFlowStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfHCFlowStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get statistic information
+         of interfaces on a device."
+    ::= { hh3cIfStatTable 3 }
+
+hh3cIfHCFlowStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfHCFlowStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items"
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfHCFlowStatTable 1 }
+
+Hh3cIfHCFlowStatEntry ::= SEQUENCE
+    {
+        hh3cIfStatFlowHCInBits      CounterBasedGauge64,
+        hh3cIfStatFlowHCOutBits     CounterBasedGauge64,
+        hh3cIfStatFlowHCInPkts      CounterBasedGauge64,
+        hh3cIfStatFlowHCOutPkts     CounterBasedGauge64,
+        hh3cIfStatFlowHCInBytes     CounterBasedGauge64,
+        hh3cIfStatFlowHCOutBytes    CounterBasedGauge64
+    }
+
+hh3cIfStatFlowHCInBits OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In bits in the specified interval.  This object is a 64-bit
+         version of hh3cIfStatFlowInBits."
+    ::= { hh3cIfHCFlowStatEntry 1 }
+
+hh3cIfStatFlowHCOutBits OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Out bits in the specified interval.  This object is a 64-bit
+         version of hh3cIfStatFlowOutBits."
+    ::= { hh3cIfHCFlowStatEntry 2 }
+
+hh3cIfStatFlowHCInPkts OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In packets in the specified interval.  This object is a 64-bit
+         version of hh3cIfStatFlowInPkts."
+    ::= { hh3cIfHCFlowStatEntry 3 }
+
+hh3cIfStatFlowHCOutPkts OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Out packets in the specified interval.  This object is a 64-bit
+         version of hh3cIfStatFlowOutPkts."
+    ::= { hh3cIfHCFlowStatEntry 4 }
+
+hh3cIfStatFlowHCInBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In bytes in the specified interval.  This object is a 64-bit
+         version of hh3cIfStatFlowInBytes."
+    ::= { hh3cIfHCFlowStatEntry 5 }
+
+hh3cIfStatFlowHCOutBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Out bytes in the specified interval.  This object is a 64-bit
+         version of hh3cIfStatFlowOutBytes."
+    ::= { hh3cIfHCFlowStatEntry 6 }
+
+-- =================================================================
+hh3cIfHCSpeedStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfHCSpeedStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get average speed information
+        in the specified interval for interfaces on a device.
+
+        This table is a 64-bit version of hh3cIfSpeedStatTable."
+    ::= { hh3cIfStatTable 4 }
+
+hh3cIfHCSpeedStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfHCSpeedStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items"
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfHCSpeedStatTable 1 }
+
+Hh3cIfHCSpeedStatEntry ::= SEQUENCE
+    {
+        hh3cIfSpeedStatHCInPkts      CounterBasedGauge64,
+        hh3cIfSpeedStatHCOutPkts     CounterBasedGauge64,
+        hh3cIfSpeedStatHCInBytes     CounterBasedGauge64,
+        hh3cIfSpeedStatHCOutBytes    CounterBasedGauge64,
+        hh3cIfSpeedStatHCInBits      CounterBasedGauge64,
+        hh3cIfSpeedStatHCOutBits     CounterBasedGauge64
+    }
+
+hh3cIfSpeedStatHCInPkts OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of input packets per second in the interval specified by
+        hh3cIfSpeedStatInterval.
+
+        This object is a 64-bit version of hh3cIfSpeedStatInPkts."
+    ::= { hh3cIfHCSpeedStatEntry 1 }
+
+hh3cIfSpeedStatHCOutPkts OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of output packets per second in the interval specified by
+        hh3cIfSpeedStatInterval.
+
+        This object is a 64-bit version of hh3cIfSpeedStatOutPkts."
+    ::= { hh3cIfHCSpeedStatEntry 2 }
+
+hh3cIfSpeedStatHCInBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of input bytes per second in the interval specified by
+        hh3cIfSpeedStatInterval.
+
+        This object is a 64-bit version of hh3cIfSpeedStatInBytes."
+    ::= { hh3cIfHCSpeedStatEntry 3 }
+
+hh3cIfSpeedStatHCOutBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of output bytes per second in the interval specified by
+        hh3cIfSpeedStatInterval.
+
+        This object is a 64-bit version of hh3cIfSpeedStatOutBytes."
+    ::= { hh3cIfHCSpeedStatEntry 4 }
+
+hh3cIfSpeedStatHCInBits OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of input bits per second in the interval specified by
+        hh3cIfSpeedStatInterval.
+
+        This object is a 64-bit version of hh3cIfSpeedStatInBits."
+    ::= { hh3cIfHCSpeedStatEntry 5 }
+
+hh3cIfSpeedStatHCOutBits OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of output bits per second in the interval specified by
+        hh3cIfSpeedStatInterval.
+
+        This object is a 64-bit version of hh3cIfSpeedStatOutBits."
+    ::= { hh3cIfHCSpeedStatEntry 6 }
+
+-- =================================================================
+
+hh3cIfControl OBJECT IDENTIFIER ::= { hh3cIfExtGroup 2 }
+
+hh3cRTParentIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRTParentIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all interfaces that can create subinterfaces."
+    ::= { hh3cIfControl  1 }
+
+hh3cRTParentIfEntry OBJECT-TYPE
+    SYNTAX      Hh3cRTParentIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes an interface that can create subinterfaces."
+    INDEX
+        {
+            hh3cRTParentIfIndex
+        }
+    ::= { hh3cRTParentIfTable 1}
+
+Hh3cRTParentIfEntry    ::= SEQUENCE
+    {
+        hh3cRTParentIfIndex      Integer32,
+        hh3cRTMinSubIfOrdinal    Integer32,
+        hh3cRTMaxSubIfOrdinal    Integer32
+    }
+
+hh3cRTParentIfIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the interface that can create subinterfaces.  The value
+        is the same as the ifIndex value for this interface."
+    ::= { hh3cRTParentIfEntry 1 }
+
+hh3cRTMinSubIfOrdinal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The min ordinal of the subinterface."
+    ::= { hh3cRTParentIfEntry 2 }
+
+hh3cRTMaxSubIfOrdinal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The max ordinal of the subinterface."
+    ::= { hh3cRTParentIfEntry 3 }
+
+-- =================================================================
+
+hh3cRTSubIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRTSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to create or delete subinterfaces.
+        To create a subinterface, a valid parent interface must be
+        specified by hh3cRTSubIfParentIfIndex, and hh3cRTSubIfOrdinal
+        must be in the range between hh3cRTMinSubIfOrdinal and
+        hh3cRTMaxSubIfOrdinal of the parent interface from
+        hh3cRTParentIfTable.
+
+        Subinterfaces are logical virtual interfaces configured on a
+        main interface.  The main interface can be either a physical
+        interface (such as a Layer 3 Ethernet interface) or a logical
+        interface (such as an MFR interface).  The subinterfaces on a
+        main interface share the physical layer parameters of the main
+        interface but can have link layer and network layer parameters
+        of their own.  Disabling or enabling a subinterface doesn't
+        affect the main interface, but the main interface status change
+        affects the subinterfaces.  The subinterfaces can't operate
+        correctly unless the main interface is connected.
+        Creating multiple subinterfaces on a single interface
+        enables you to plan network in a more flexible way.
+
+        You can create subinterfaces for the following physical
+        interfaces:
+        Ethernet interface.  An Ethernet subinterface associated with no
+        VLAN supports only IPX, while an Ethernet subinterface associated
+        with a VLAN supports both IP and IPX.
+        WAN interfaces with their data link layer protocols being frame
+        relay, whose subinterfaces support IP and IPX.
+        WAN interfaces with their data link layer protocols being X.25,
+        whose subinterfaces support IP and IPX.
+        ATM interface, whose subinterfaces support only IP."
+    ::= { hh3cIfControl  2 }
+
+hh3cRTSubIfEntry OBJECT-TYPE
+    SYNTAX      Hh3cRTSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The hh3cRTSubIfTable entry items"
+    INDEX
+        {
+            hh3cRTSubIfParentIfIndex,
+            hh3cRTSubIfOrdinal
+        }
+    ::= { hh3cRTSubIfTable 1}
+
+Hh3cRTSubIfEntry    ::= SEQUENCE
+    {
+        hh3cRTSubIfParentIfIndex    Integer32,
+        hh3cRTSubIfOrdinal          Integer32,
+        hh3cRTSubIfSubIfIndex       Integer32,
+        hh3cRTSubIfSubIfDesc        DisplayString,
+        hh3cRTSubIfRowStatus        RowStatus
+    }
+
+hh3cRTSubIfParentIfIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parent interface index.  The value should be the same as
+        hh3cRTParentIfIndex."
+    ::= { hh3cRTSubIfEntry 1 }
+
+hh3cRTSubIfOrdinal OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ordinal of the subinterface.  It should between
+        hh3cRTMinSubIfOrdinal and hh3cRTMaxSubIfOrdinal of the parent
+        interface."
+    ::= { hh3cRTSubIfEntry 2 }
+
+hh3cRTSubIfSubIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the subinterface"
+    ::= { hh3cRTSubIfEntry 3 }
+
+hh3cRTSubIfSubIfDesc OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface"
+    ::= { hh3cRTSubIfEntry 4 }
+
+hh3cRTSubIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status."
+    ::= { hh3cRTSubIfEntry 5 }
+
+-- =================================================================
+hh3cIfLinkModeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfLinkModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get or set the link mode of an
+        interface.
+        According to the layer at which the device processes received
+        data packets, Ethernet interfaces can operate in bridge or route
+        mode."
+    ::= { hh3cIfControl  3 }
+
+hh3cIfLinkModeEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfLinkModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The interface link mode table entry"
+    INDEX
+        {
+            hh3cIfLinkModeIndex
+        }
+    ::= { hh3cIfLinkModeTable 1}
+
+Hh3cIfLinkModeEntry    ::= SEQUENCE
+    {
+        hh3cIfLinkModeIndex            Integer32,
+        hh3cIfLinkMode                 INTEGER,
+        hh3cIfLinkModeSwitchSupport    TruthValue
+    }
+
+hh3cIfLinkModeIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value is the same as ifIndex."
+    ::= { hh3cIfLinkModeEntry 1 }
+
+
+hh3cIfLinkMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            bridgeMode(1),
+            routeMode(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current link mode of the interface.
+        If hh3cIfLinkModeSwitchSupport is true, writing to the object can
+        change the link mode of the interface."
+    ::= { hh3cIfLinkModeEntry 2 }
+
+hh3cIfLinkModeSwitchSupport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the interface supports link mode switching.
+        If this object is true, the interface can operate in either
+        bridge mode or route mode.  Otherwise the interfaces can operate
+        only in bridge or route mode."
+    ::= { hh3cIfLinkModeEntry 3 }
+
+-- =================================================================
+hh3cIfPortTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get or set the port type
+        of an interface."
+    ::= { hh3cIfControl  4 }
+
+hh3cIfPortTypeEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The interface port type table entry."
+    INDEX
+        {
+            hh3cIfPortTypeIndex
+        }
+    ::= { hh3cIfPortTypeTable 1}
+
+Hh3cIfPortTypeEntry    ::= SEQUENCE
+    {
+        hh3cIfPortTypeIndex            InterfaceIndex,
+        hh3cIfPortType                 INTEGER
+    }
+
+hh3cIfPortTypeIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value is the same as ifIndex."
+    ::= { hh3cIfPortTypeEntry 1 }
+
+hh3cIfPortType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            other(1),
+            ethernet(2),
+            fc(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current port type of the interface.
+        Don't set the port type to other for an interface."
+    ::= { hh3cIfPortTypeEntry 2 }
+
+-- =================================================================
+hh3cIfPfcDot1pTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfPfcDot1pEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table can set the inbound and outbound rate thresholds for the specified dot1p values."
+    ::= { hh3cIfControl 5 }
+
+hh3cIfPfcDot1pEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfPfcDot1pEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry items"
+    INDEX
+        {
+            ifIndex,
+            hh3cIfPfcDot1pValue
+        }
+    ::= { hh3cIfPfcDot1pTable 1}
+
+Hh3cIfPfcDot1pEntry ::= SEQUENCE
+    {
+       hh3cIfPfcDot1pValue                 INTEGER,
+       hh3cIfPfcDot1pInPps                 Unsigned32,
+       hh3cIfPfcDot1pOutPps                Unsigned32,
+       hh3cIfPfcDot1pInPpsThreshold        Unsigned32,
+       hh3cIfPfcDot1pOutPpsThreshold       Unsigned32
+    }
+
+hh3cIfPfcDot1pValue OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        pri0(1),
+        pri1(2),
+        pri2(3),
+        pri3(4),
+        pri4(5),
+        pri5(6),
+        pri6(7),
+        pri7(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The PFC dot1p value list."
+    ::= { hh3cIfPfcDot1pEntry 1 }
+
+hh3cIfPfcDot1pInPps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current inbound rate for the PFC dot1p."
+    ::= { hh3cIfPfcDot1pEntry 2 }
+
+hh3cIfPfcDot1pOutPps  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current outbound rate for the PFC dot1p. "
+    ::= { hh3cIfPfcDot1pEntry 3 }
+
+hh3cIfPfcDot1pInPpsThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the inbound rate.
+         If the hh3cIfPfcDot1pInPpsThreshold is set to 0, no hh3cIfPfcInRising will be generated."
+    ::= { hh3cIfPfcDot1pEntry 4 }
+
+hh3cIfPfcDot1pOutPpsThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the outbound rate.
+         If the hh3cIfPfcDot1pOutPpsThreshold is set to 0, no hh3cIfPfcOutRising will be generated."
+    ::= { hh3cIfPfcDot1pEntry 5 }
+
+-- =================================================================
+hh3cIfQueBufferTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfQueBufferEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get the usage info, thresholds, and
+        statistics of queue buffers and to set the thresholds of queue buffers."
+    ::= { hh3cIfControl 6 }
+
+hh3cIfQueBufferEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfQueBufferEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry items"
+    INDEX
+        {
+            ifIndex,
+            hh3cIfQueId
+        }
+    ::= { hh3cIfQueBufferTable 1}
+
+Hh3cIfQueBufferEntry ::= SEQUENCE
+    {
+       hh3cIfQueId                         INTEGER,
+       hh3cIfQueOutUcastTotal              Unsigned32,
+       hh3cIfQueOutUcastFree               Unsigned32,
+       hh3cIfQueOutUcastUsedRatio          Unsigned32,
+       hh3cIfQueOutUcastUsedPeak           Unsigned32,
+       hh3cIfQueOutUcastThreshold          Unsigned32,
+       hh3cIfQueOutUcastOverThres          Unsigned32,
+       hh3cIfQueInTotal                    Unsigned32,
+       hh3cIfQueInFree                     Unsigned32,
+       hh3cIfQueInUsedRatio                Unsigned32,
+       hh3cIfQueInUsedPeak                 Unsigned32,
+       hh3cIfQueInThreshold                Unsigned32,
+       hh3cIfQueInOverThres                Unsigned32,
+       hh3cIfQueInHeadRoomTotal            Unsigned32,
+       hh3cIfQueInHeadRoomFree             Unsigned32,
+       hh3cIfQueInHeadRoomUsedRatio        Unsigned32,
+       hh3cIfQueInHeadRoomUsedPeak         Unsigned32
+    }
+
+hh3cIfQueId OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        que0(1),
+        que1(2),
+        que2(3),
+        que3(4),
+        que4(5),
+        que5(6),
+        que6(7),
+        que7(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The buffer's queue ID."
+    ::= { hh3cIfQueBufferEntry 1 }
+
+hh3cIfQueOutUcastTotal  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total amount of outbound unicast queue buffer."
+    ::= { hh3cIfQueBufferEntry 2 }
+
+hh3cIfQueOutUcastFree  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of free outbound unicast queue buffer."
+    ::= { hh3cIfQueBufferEntry 3 }
+
+hh3cIfQueOutUcastUsedRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of outbound unicast queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 4 }
+
+hh3cIfQueOutUcastUsedPeak  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peak of outbound unicast queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 5 }
+
+hh3cIfQueOutUcastThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The alarm threshold of outbound unicast queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 6 }
+
+hh3cIfQueOutUcastOverThres  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times of exceeding the alarm threshold of outbound unicast queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 7 }
+
+hh3cIfQueInTotal  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total amount of inbound queue buffer."
+    ::= { hh3cIfQueBufferEntry 8 }
+
+hh3cIfQueInFree  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of free inbound queue buffer."
+    ::= { hh3cIfQueBufferEntry 9 }
+
+hh3cIfQueInUsedRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of inbound queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 10 }
+
+hh3cIfQueInUsedPeak  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peak of inbound queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 11 }
+
+hh3cIfQueInThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The alarm threshold of inbound queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 12 }
+
+hh3cIfQueInOverThres  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times over the alarm threshold of inbound queue buffer which is used."
+    ::= { hh3cIfQueBufferEntry 13 }
+
+hh3cIfQueInHeadRoomTotal  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total amount of inbound queue headroom buffer."
+    ::= { hh3cIfQueBufferEntry 14 }
+
+hh3cIfQueInHeadRoomFree  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of free inbound queue headroom buffer."
+    ::= { hh3cIfQueBufferEntry 15 }
+
+hh3cIfQueInHeadRoomUsedRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of inbound queue headroom buffer which is used."
+    ::= { hh3cIfQueBufferEntry 16 }
+
+hh3cIfQueInHeadRoomUsedPeak  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peak of inbound queue headroom buffer which is used."
+    ::= { hh3cIfQueBufferEntry 17 }
+
+-- =================================================================
+hh3cIfInterfaces OBJECT IDENTIFIER ::= { hh3cIfExtGroup 3 }
+
+hh3cIfPhysicalNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of physical interfaces on the device."
+    ::= { hh3cIfInterfaces 1 }
+
+hh3cIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of interface entries.  The number of entries is given by
+         the value of IfNumber."
+    ::= { hh3cIfInterfaces 2 }
+
+hh3cIfEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         particular interface."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfTable 1 }
+
+Hh3cIfEntry ::= SEQUENCE
+    {
+        hh3cIfUpDownTimes      Integer32,
+        hh3cIfMtu              Integer32,
+        hh3cIfBandwidthRate    Integer32,
+        hh3cIfDiscardPktRate   Integer32,
+        hh3cIfStatusKeepTime   TimeTicks,
+        hh3cIfInNUcastPkts     Counter64,
+        hh3cIfOutNUcastPkts    Counter64,
+        hh3cIfIsPoe            TruthValue,
+        hh3cIfOperStatus       INTEGER,
+        hh3cIfDownTimes        Integer32,
+        hh3cIfPfcStatus        INTEGER,
+        hh3cIfPfcDot1pNoDrop   BITS,
+        hh3cIfDescription      DisplayString,
+        hh3cIfFwdErrDiscards   Unsigned32,
+        hh3cIfFiberOrCopper    INTEGER,
+        hh3cIfTransferMode     INTEGER
+    }
+
+hh3cIfUpDownTimes OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface's up/down times, since the device was initialized."
+    ::= { hh3cIfEntry 1 }
+
+hh3cIfMtu OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The size of the largest datagram that can be sent or received on the
+        interface, specified in octets.  For interfaces that are used for
+        transmitting network datagram, this is the size of the largest network
+        datagram that can be sent on the interfaces."
+    ::= { hh3cIfEntry 2 }
+
+hh3cIfBandwidthRate OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate of the bandwidth for an interface."
+    ::= { hh3cIfEntry 3 }
+
+hh3cIfDiscardPktRate OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate of the discarded packets for an interface."
+    ::= { hh3cIfEntry 4 }
+
+hh3cIfStatusKeepTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time since the interface
+        entered its current operational state."
+    ::= { hh3cIfEntry 5 }
+
+hh3cIfInNUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of non-unicast (i.e., subnetwork-
+        broadcast or subnetwork-multicast) packets
+        delivered to a higher-layer protocol."
+    ::= { hh3cIfEntry 6 }
+
+hh3cIfOutNUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets that higher-level
+        protocols requested be transmitted to a non-
+        unicast (i.e., a subnetwork-broadcast or
+        subnetwork-multicast) address."
+    ::= { hh3cIfEntry 7 }
+
+hh3cIfIsPoe OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the interface supports PoE."
+    ::= { hh3cIfEntry 8 }
+
+hh3cIfOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                up(1),        -- ready to forward packets
+                down(2),
+                testing(3),   -- in a test mode
+                admindown(4)  -- shut down by administrator
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current status of the interface.  In testing state,
+            no operational packets can be forwarded.  If ifAdminStatus
+            is down, hh3cIfOperStatus should be admindown.  If
+            ifAdminStatus is changed to up, hh3cIfOperStatus should
+            change to up if the interface is ready to send and receive
+            network traffic; otherwise, it should stay in down state."
+    ::= { hh3cIfEntry 9 }
+
+hh3cIfDownTimes OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times the interface went down, since the device was initialized."
+    ::= { hh3cIfEntry 10 }
+
+hh3cIfPfcStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2),
+            auto(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Pfc (Priority-based Flow Control) status.
+         Forcibly enable Pfc by enable(1).
+         Disable Pfc by disable(2).
+         Set Pfc to auto mode by auto(3).
+               In auto mode, the local end automatically negotiates
+               the Pfc status with its peer.
+         When congestion occurs in the network, the local device notifies
+         the peer to stop sending packets carrying the specified 802.1p
+         priority if all of the following conditions exist:
+         1. Both the local end and the remote end have Pfc enabled.
+         2. Both the local end and the remote end have the dot1p list specified
+         by hh3cIfPfcDot1pNoDrop.
+         3. The specified 802.1p priority is in the dot1p list of hh3cIfPfcDot1pNoDrop.
+         4. The local end receives a packet carrying the specified 802.1p priority."
+    DEFVAL { disable }
+    ::= { hh3cIfEntry 11 }
+
+hh3cIfPfcDot1pNoDrop OBJECT-TYPE
+    SYNTAX      BITS { pri0(0), pri1(1), pri2(2), pri3(3), pri4(4), pri5(5), pri6(6), pri7(7) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Pfc (Priority-based Flow Control) dot1q list,
+        bit 0 through bit 7 corresponding to priority 0 through priority 7.
+        See hh3cIfPfcStatus."
+    DEFVAL{ { } }
+    ::= { hh3cIfEntry 12 }
+
+hh3cIfDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is also an 'alias' name for the interface specified by a
+        network manager, like the object of ifAlias.  However, the size of
+        this object is larger than ifAlias.  When this object is set to a
+        string of more than 64 characters, only the first 64 characters of the
+        object are read for the IfAlias object."
+    ::= { hh3cIfEntry 13 }
+
+hh3cIfFwdErrDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that were discarded when being forwarded."
+    ::= { hh3cIfEntry 14 }
+
+hh3cIfFiberOrCopper  OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        unknown  (0),
+        fiber  (1),
+        copper   (2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of the port,which can be copper or fiber."
+    ::= { hh3cIfEntry 15 }
+
+hh3cIfTransferMode   OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        lan  (1),
+        wan  (2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transfer mode of the port, which can be lan or wan."
+    ::= { hh3cIfEntry 16 }
+
+hh3cIfUsingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfUsingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing management information applicable to splitting
+       interfaces.  To improve port density, reduce costs, and improve network
+       flexibility, a high-bandwidth interface can be split into multiple
+       low-bandwidth breakout interfaces, and the breakout interfaces can be
+       combined into a higher-bandwidth interface.
+       For example, a 40-GE interface can be split into four 10-GE breakout
+       interfaces.  After the operation takes effect on a 40-GE interface, the
+       system deletes the 40-GE interface and creates four 10-GE breakout
+       interfaces."
+    ::= { hh3cIfInterfaces 3 }
+
+hh3cIfUsingEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfUsingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of hh3cIfUsingTable."
+    INDEX { hh3cIfUsingIndex }
+    ::= { hh3cIfUsingTable 1 }
+
+Hh3cIfUsingEntry ::= SEQUENCE
+    {
+        hh3cIfUsingIndex              Integer32,
+        hh3cIfUsingSupportType        Integer32,
+        hh3cIfUsingType               INTEGER,
+        hh3cIfUsingStatus             INTEGER
+    }
+
+hh3cIfUsingIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of an interface that can be split into multiple low-bandwidth
+        breakout interfaces or be restored to a high-bandwidth interface."
+    ::= { hh3cIfUsingEntry 1 }
+
+hh3cIfUsingSupportType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the port type which can be split into or restored to.
+        From lowest bit, each bit corresponds to a port type ('10GE', '20GE',
+        '40GE', '100GE', '25GE', '50GE', '200GE', '400GE').
+        For example, value 3 means this object can be split into 10GE or 20GE,
+        value 4 means this object can be split into 40GE, or can be restored to
+        40GE."
+    ::= { hh3cIfUsingEntry 2 }
+
+hh3cIfUsingType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                noUsing(0),
+                using10GE(1),
+                using20GE(2),
+                using40GE(3),
+                using100GE(4),
+                using25GE(5),
+                using50GE(6),
+                using200GE(7),
+                using400GE(8)
+             }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the port type that can be split into or restored to.
+
+        After this object is set to a non-zero value, the operation returns
+        success in the following cases:
+        1.  The original instance still exists and is read as a non-zero value.
+            In this case, object hh3cIfUsingStatus change to needReboot(1),
+            which means that you need to reboot the line card (for distributed
+            devices) or device (for centralized devices) where the port is
+            located to make the operation take effect.
+            Set this object to noUsing(0) for cancelling the operation.
+        2.  The operation takes effect immediately.
+        Original instance is deleted and new instance is created while the
+        operation takes effect."
+    ::= { hh3cIfUsingEntry 3 }
+
+hh3cIfUsingStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                noUsing(0),
+                needReboot(1)
+             }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " After object hh3cIfUsingType is set to a non-zero value, the value
+         for this object is needReboot(1) until you reboot the line card (for
+         distributed devices) or device (for centralized devices) where the
+         port is located."
+    ::= { hh3cIfUsingEntry 4 }
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+
+hh3cIfExtTrap OBJECT IDENTIFIER ::= { hh3cIfExt 3 }
+hh3cIfExtTrapPrex OBJECT IDENTIFIER ::= { hh3cIfExtTrap 0 }
+-- All trap definitions should be placed under this object.
+
+hh3cIfBandwidthUsageHigh NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifDescr,
+            hh3cIfBandwidthRate,
+            hh3cIfBandwidthUpperLimit
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the rate of the bandwidth for the
+         interface exceeds the upper limit."
+    ::= { hh3cIfExtTrapPrex 1 }
+
+hh3cIfDiscardPktRateHigh NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifDescr,
+            hh3cIfDiscardPktRate,
+            hh3cIfDiscardPktRateUpperLimit
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the rate of the discarded packets
+         for the interface exceeds the upper limit."
+    ::= { hh3cIfExtTrapPrex 2 }
+
+hh3cIfDampeningSuppressed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface is suppressed
+         via dampening."
+    ::= { hh3cIfExtTrapPrex 3 }
+
+hh3cIfDampeningNotSuppressed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface is resumed to
+         not suppressed via dampening."
+    ::= { hh3cIfExtTrapPrex 4 }
+
+hh3cIfPortUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when physical state of the interface changes to up."
+    ::= { hh3cIfExtTrapPrex 5 }
+
+hh3cIfPortDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when physical state of the interface changes to down."
+    ::= { hh3cIfExtTrapPrex 6 }
+
+hh3cIfPfcOutRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfPfcDot1pValue,
+            hh3cIfPfcDot1pOutPps,
+            hh3cIfPfcDot1pOutPpsThreshold
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the outbound rate exceeds the threshold for the dot1p value.
+     If the hh3cIfPfcDot1pOutPpsThreshold is set to 0, no hh3cIfPfcOutRising will be generated."
+    ::= { hh3cIfExtTrapPrex 7 }
+
+hh3cIfPfcInRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfPfcDot1pValue,
+            hh3cIfPfcDot1pInPps,
+            hh3cIfPfcDot1pInPpsThreshold
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the inbound rate exceeds the threshold for the dot1p value.
+     If the hh3cIfPfcDot1pInPpsThreshold is set to 0, no hh3cIfPfcInRising will be generated."
+    ::= { hh3cIfExtTrapPrex 8 }
+
+hh3cIfExtTrapObject OBJECT IDENTIFIER ::= { hh3cIfExtTrap 1 }
+
+hh3cIfExtTrapCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfExtTrapCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The trap configuration table."
+    ::= { hh3cIfExtTrapObject 1 }
+
+hh3cIfExtTrapCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfExtTrapCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for this table."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfExtTrapCfgTable 1 }
+
+Hh3cIfExtTrapCfgEntry ::= SEQUENCE
+    {
+        hh3cIfBandwidthUpperLimit      Integer32,
+        hh3cIfDiscardPktRateUpperLimit Integer32
+    }
+
+hh3cIfBandwidthUpperLimit OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate of the bandwidth upper limit for an interface."
+    ::= { hh3cIfExtTrapCfgEntry 1 }
+
+hh3cIfDiscardPktRateUpperLimit OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate of the discarded packets upper limit for an interface."
+    ::= { hh3cIfExtTrapCfgEntry 2 }
+
+-- =================================================================
+hh3cIfMonScalarGroup OBJECT IDENTIFIER ::= { hh3cIfExt 4 }
+
+-- =================================================================
+-- All other groups are defined below.  Of course, scalar objects can
+-- also be defined in a subsection, but they must be one part of
+-- that subsection.
+
+-- Note that a scalar group should be defined firstly and all
+-- scalar objects are placed under that group when doing so.
+
+hh3cIfMonGroup OBJECT IDENTIFIER ::= { hh3cIfExt 5 }
+
+-- =================================================================
+hh3cIfMonStat OBJECT IDENTIFIER ::= { hh3cIfMonGroup 1 }
+
+hh3cIfMonStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfMonStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is about some types of statistics."
+    ::= { hh3cIfMonStat 1}
+
+hh3cIfMonStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfMonStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry items."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfMonStatTable 1}
+
+Hh3cIfMonStatEntry ::= SEQUENCE
+    {
+        hh3cIfMonInputUsageStatistics         Unsigned32,
+        hh3cIfMonOutputUsageStatistics        Unsigned32,
+        hh3cIfMonInputErrorAlarmStatistics    Counter64,
+        hh3cIfMonOutputErrorAlarmStatistics   Counter64,
+        hh3cIfMonSdhErrorStatistics           Counter64,
+        hh3cIfMonSdhB1ErrorStatistics         Counter64,
+        hh3cIfMonSdhB2ErrorStatistics         Counter64,
+        hh3cIfMonCRCErrorStatistics           Counter64,
+        hh3cIfMonRxPauseFrameStatistics       Counter64,
+        hh3cIfMonTxPauseFrameStatistics       Counter64,
+        hh3cIfMonRuntStatistics               Counter64,
+        hh3cIfMonGiantStatistics              Counter64
+    }
+
+hh3cIfMonInputUsageStatistics OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the inbound bandwidth usage."
+    ::= { hh3cIfMonStatEntry 1 }
+
+hh3cIfMonOutputUsageStatistics OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the outbound bandwidth usage."
+    ::= { hh3cIfMonStatEntry 2 }
+
+hh3cIfMonInputErrorAlarmStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of inbound error packets."
+    ::= { hh3cIfMonStatEntry 3 }
+
+hh3cIfMonOutputErrorAlarmStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics  about the number of outbound error packets."
+    ::= { hh3cIfMonStatEntry 4 }
+
+hh3cIfMonSdhErrorStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of SDH error packets."
+    ::= { hh3cIfMonStatEntry 5 }
+
+hh3cIfMonSdhB1ErrorStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of SDH B1 error packets."
+    ::= { hh3cIfMonStatEntry 6 }
+
+hh3cIfMonSdhB2ErrorStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of SDH B2 error packets."
+    ::= { hh3cIfMonStatEntry 7 }
+
+hh3cIfMonCRCErrorStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of CRC error packets. "
+    ::= { hh3cIfMonStatEntry 8}
+
+hh3cIfMonRxPauseFrameStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of received pause frames."
+    ::= { hh3cIfMonStatEntry 9}
+
+hh3cIfMonTxPauseFrameStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the number of transmitted pause frames."
+    ::= { hh3cIfMonStatEntry 10}
+
+hh3cIfMonRuntStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the Runt packets."
+    ::= { hh3cIfMonStatEntry 11 }
+
+hh3cIfMonGiantStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the Giant packets."
+    ::= { hh3cIfMonStatEntry 12 }
+
+-- =================================================================
+hh3cIfMonControl  OBJECT IDENTIFIER ::= { hh3cIfMonGroup 2 }
+
+hh3cIfMonThresholdTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfMonThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is about the upper threshold, lower threshold, CRC type, and inspection interval.
+         The upper threshold and lower threshold must be bound together.  If the CRC type is configured,
+         node hh3cIfMonCRCErrType must be carried.  If there is no current configuration for a type, all
+         attributes of this type must be carried.  After modification, the table hh3cIfMonAlarmDownEnableTable
+         will be changed.If there is configuration for the current type, setting all attributes of this type to
+         invalid values indicates that the configuration of this type is deleted, and the table hh3cIfMonAlarmDownEnableTable
+         will be changed.  Take CRC as an example.  If there is no CRC configuration, nodes hh3cIfMonCRCErrorLowThres,
+         hh3cIfMonCRCErrorLowThres, hh3cIfMonCRCErrorLowThres, and hh3cIfMonCRCErrorLowThres must be carried.
+         After modification, the node hh3cIfMonCRCErrorEnableDown becomes false.  If there is CRC configuration,
+         settings the nodes hh3cIfMonCRCErrorLowThres, hh3cIfMonCRCErrorHighThres, hh3cIfMonCRCErrorInterval,
+         and hh3cIfMonCRCErrorInterval to invalid values indicates the CRC configuration is deleted, and the
+         node hh3cIfMonCRCErrorEnableDown becomes invalid."
+
+    ::= { hh3cIfMonControl 1 }
+
+hh3cIfMonThresholdEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfMonThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry items."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfMonThresholdTable 1}
+
+Hh3cIfMonThresholdEntry ::= SEQUENCE
+    {
+        hh3cIfMonInputUsageLowThres               Unsigned32,
+        hh3cIfMonInputUsageHighThres              Unsigned32,
+        hh3cIfMonOutputUsageLowThres              Unsigned32,
+        hh3cIfMonOutputUsageHighThres             Unsigned32,
+        hh3cIfMonInputErrorAlarmLowThres          Unsigned32,
+        hh3cIfMonInputErrorAlarmHighThres         Unsigned32,
+        hh3cIfMonInputErrorAlarmInterval          Unsigned32,
+        hh3cIfMonOutputErrorAlarmLowThres         Unsigned32,
+        hh3cIfMonOutputErrorAlarmHighThres        Unsigned32,
+        hh3cIfMonOutputErrorAlarmInterval         Unsigned32,
+        hh3cIfMonSdhErrorLowThres                 Unsigned32,
+        hh3cIfMonSdhErrorHighThres                Unsigned32,
+        hh3cIfMonSdhErrorInterval                 Unsigned32,
+        hh3cIfMonSdhB1ErrorLowThres               Unsigned32,
+        hh3cIfMonSdhB1ErrorHighThres              Unsigned32,
+        hh3cIfMonSdhB1ErrorInterval               Unsigned32,
+        hh3cIfMonSdhB2ErrorLowThres               Unsigned32,
+        hh3cIfMonSdhB2ErrorHighThres              Unsigned32,
+        hh3cIfMonSdhB2ErrorInterval               Unsigned32,
+        hh3cIfMonCRCErrorLowThres                 Unsigned32,
+        hh3cIfMonCRCErrorHighThres                Unsigned32,
+        hh3cIfMonCRCErrorInterval                 Unsigned32,
+        hh3cIfMonCRCErrType                       INTEGER,
+        hh3cIfMonRxPauseFrameLowThres             Unsigned32,
+        hh3cIfMonRxPauseFrameHighThres            Unsigned32,
+        hh3cIfMonRxPauseFrameInterval             Unsigned32,
+        hh3cIfMonTxPauseFrameLowThres             Unsigned32,
+        hh3cIfMonTxPauseFrameHighThres            Unsigned32,
+        hh3cIfMonTxPauseFrameInterval             Unsigned32,
+        hh3cIfMonGiantLowThres                    Unsigned32,
+        hh3cIfMonGiantHighThres                   Unsigned32,
+        hh3cIfMonGiantInterval                    Unsigned32,
+        hh3cIfMonRuntLowThres                     Unsigned32,
+        hh3cIfMonRuntHighThres                    Unsigned32,
+        hh3cIfMonRuntInterval                     Unsigned32
+    }
+
+hh3cIfMonInputUsageLowThres        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the inbound bandwidth usage."
+    DEFVAL { 80 }
+    ::= { hh3cIfMonThresholdEntry 1 }
+
+hh3cIfMonInputUsageHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the inbound bandwidth usage."
+    DEFVAL { 90 }
+    ::= { hh3cIfMonThresholdEntry 2 }
+
+hh3cIfMonOutputUsageLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the outbound bandwidth usage."
+    DEFVAL { 80 }
+    ::= { hh3cIfMonThresholdEntry 3 }
+
+hh3cIfMonOutputUsageHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the outbound bandwidth usage."
+    DEFVAL { 90 }
+    ::= { hh3cIfMonThresholdEntry 4 }
+
+hh3cIfMonInputErrorAlarmLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of inbound error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 5 }
+
+hh3cIfMonInputErrorAlarmHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of inbound error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 6 }
+
+hh3cIfMonInputErrorAlarmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of inbound error packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 7 }
+
+hh3cIfMonOutputErrorAlarmLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of outbound error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 8 }
+
+hh3cIfMonOutputErrorAlarmHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of outbound error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 9 }
+
+hh3cIfMonOutputErrorAlarmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of outbound error packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 10 }
+
+hh3cIfMonSdhErrorLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of SDH error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 11 }
+
+hh3cIfMonSdhErrorHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of SDH error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 12 }
+
+hh3cIfMonSdhErrorInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of SDH error packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 13 }
+
+hh3cIfMonSdhB1ErrorLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of SDH B1 error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 14 }
+
+hh3cIfMonSdhB1ErrorHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of SDH B1 error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 15 }
+
+hh3cIfMonSdhB1ErrorInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of SDH B1 error packets. "
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 16 }
+
+hh3cIfMonSdhB2ErrorLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of SDH B2 error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 17 }
+
+hh3cIfMonSdhB2ErrorHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of SDH B2 error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 18 }
+
+hh3cIfMonSdhB2ErrorInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of SDH B2 error packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 19 }
+
+hh3cIfMonCRCErrorLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of CRC error packets."
+    ::= { hh3cIfMonThresholdEntry 20 }
+
+hh3cIfMonCRCErrorHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of CRC error packets."
+    ::= { hh3cIfMonThresholdEntry 21 }
+
+hh3cIfMonCRCErrorInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of CRC error packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 22 }
+
+hh3cIfMonCRCErrType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        absolute(1),
+        ratio(2),
+        invalid(65535)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " Inspection type for the CRC error packets."
+    ::= { hh3cIfMonThresholdEntry 23 }
+
+hh3cIfMonRxPauseFrameLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of received pause frames."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 24 }
+
+hh3cIfMonRxPauseFrameHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of received pause frames."
+    DEFVAL { 500 }
+    ::= { hh3cIfMonThresholdEntry 25 }
+
+hh3cIfMonRxPauseFrameInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of received pause frames."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 26 }
+
+hh3cIfMonTxPauseFrameLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of transmitted pause frames."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 27 }
+
+hh3cIfMonTxPauseFrameHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of transmitted pause frames."
+    DEFVAL { 500 }
+    ::= { hh3cIfMonThresholdEntry 28 }
+
+hh3cIfMonTxPauseFrameInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of transmitted pause frames."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 29 }
+
+hh3cIfMonGiantLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of Giant error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 30 }
+
+hh3cIfMonGiantHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of Giant error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 31 }
+
+hh3cIfMonGiantInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of Giant error packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 32 }
+
+hh3cIfMonRuntLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of Runt error packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 33 }
+
+hh3cIfMonRuntHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of Runt error packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 34 }
+
+hh3cIfMonRuntInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of Runt packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 35 }
+
+-- =================================================================
+hh3cIfMonAlarmDownEnableTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cIfMonAlarmDownEnableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table can set or get whether to enable the interface down function."
+    ::= { hh3cIfMonControl 2 }
+
+hh3cIfMonAlarmDownEnableEntry OBJECT-TYPE
+    SYNTAX      Hh3cIfMonAlarmDownEnableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry items"
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cIfMonAlarmDownEnableTable 1}
+
+Hh3cIfMonAlarmDownEnableEntry ::= SEQUENCE
+    {
+        hh3cIfMonInputErrorAlarmEnableDown        TruthValue,
+        hh3cIfMonOutputErrorAlarmEnableDown       TruthValue,
+        hh3cIfMonSdhErrorEnableDown               TruthValue,
+        hh3cIfMonSdhB1ErrorEnableDown             TruthValue,
+        hh3cIfMonSdhB2ErrorEnableDown             TruthValue,
+        hh3cIfMonCRCErrorEnableDown               TruthValue,
+        hh3cIfMonGiantEnableDown                  TruthValue,
+        hh3cIfMonRuntEnableDown                   TruthValue
+    }
+
+hh3cIfMonInputErrorAlarmEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of inbound error packets exceeds the upper threshold,
+         the physical interface goes down. "
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 1 }
+
+hh3cIfMonOutputErrorAlarmEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of outbound error packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 2 }
+
+hh3cIfMonSdhErrorEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of SDH error packets exceeds the upper threshold,
+         the physical interface goes down. "
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 3 }
+
+hh3cIfMonSdhB1ErrorEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of SDH B1 error packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 4 }
+
+hh3cIfMonSdhB2ErrorEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of SDH B2 error packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 5 }
+
+hh3cIfMonCRCErrorEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of CRC error packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 6 }
+
+hh3cIfMonGiantEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of Giant error packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 7 }
+
+hh3cIfMonRuntEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of Runt error packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 8 }
+
+
+-- =================================================================
+-- Traps are defined below.
+
+hh3cIfMonTrap OBJECT IDENTIFIER ::= { hh3cIfExt 6 }
+hh3cIfMonTrapPrex OBJECT IDENTIFIER ::= { hh3cIfMonTrap 0 }
+-- All trap definitions should be placed under this object.
+
+hh3cIfMonInputUsageRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonInputUsageLowThres,
+            hh3cIfMonInputUsageHighThres,
+            hh3cIfMonInputUsageStatistics
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the inbound bandwidth usage exceeds the
+         upper threshold."
+    ::= { hh3cIfMonTrapPrex 1 }
+
+hh3cIfMonInputUsageResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonInputUsageLowThres,
+            hh3cIfMonInputUsageHighThres,
+            hh3cIfMonInputUsageStatistics
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the inbound bandwidth usage drops from
+         above the upper threshold to below the lower threshold."
+    ::= { hh3cIfMonTrapPrex 2 }
+
+hh3cIfMonOutputUsageRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonOutputUsageLowThres,
+            hh3cIfMonOutputUsageHighThres,
+            hh3cIfMonOutputUsageStatistics
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the outbound bandwidth usage exceeds the
+         upper threshold."
+    ::= { hh3cIfMonTrapPrex 3 }
+
+hh3cIfMonOutputUsageResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonOutputUsageLowThres,
+            hh3cIfMonOutputUsageHighThres,
+            hh3cIfMonOutputUsageStatistics
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the outbound bandwidth usage drops from
+         above the upper threshold to below the lower threshold."
+    ::= { hh3cIfMonTrapPrex 4 }
+
+hh3cIfMonInputErrorAlarmRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonInputErrorAlarmHighThres,
+            hh3cIfMonInputErrorAlarmLowThres,
+            hh3cIfMonInputErrorAlarmStatistics,
+            hh3cIfMonInputErrorAlarmInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of inbound error packets exceeds the
+         upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 5 }
+
+hh3cIfMonInputErrorAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonInputErrorAlarmHighThres,
+            hh3cIfMonInputErrorAlarmLowThres,
+            hh3cIfMonInputErrorAlarmStatistics,
+            hh3cIfMonInputErrorAlarmInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of inbound error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 6 }
+
+hh3cIfMonOutputErrorAlarmRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonOutputErrorAlarmHighThres,
+            hh3cIfMonOutputErrorAlarmLowThres,
+            hh3cIfMonOutputErrorAlarmStatistics,
+            hh3cIfMonOutputErrorAlarmInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of outbound error packets exceeds the
+         upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 7 }
+
+hh3cIfMonOutputErrorAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonOutputErrorAlarmHighThres,
+            hh3cIfMonOutputErrorAlarmLowThres,
+            hh3cIfMonOutputErrorAlarmStatistics,
+            hh3cIfMonOutputErrorAlarmInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of outbound error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 8 }
+
+hh3cIfMonSdhErrorRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonSdhErrorLowThres,
+            hh3cIfMonSdhErrorHighThres,
+            hh3cIfMonSdhErrorStatistics,
+            hh3cIfMonSdhErrorInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of SDH error packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 9 }
+
+hh3cIfMonSdhErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonSdhErrorLowThres,
+            hh3cIfMonSdhErrorHighThres,
+            hh3cIfMonSdhErrorStatistics,
+            hh3cIfMonSdhErrorInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of SDH error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 10 }
+
+hh3cIfMonSdhB1ErrorRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonSdhB1ErrorLowThres,
+            hh3cIfMonSdhB1ErrorHighThres,
+            hh3cIfMonSdhB1ErrorStatistics,
+            hh3cIfMonSdhB1ErrorInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of SDH B1 error packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 11 }
+
+hh3cIfMonSdhB1ErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonSdhB1ErrorLowThres,
+            hh3cIfMonSdhB1ErrorHighThres,
+            hh3cIfMonSdhB1ErrorStatistics,
+            hh3cIfMonSdhB1ErrorInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of SDH B1 error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 12 }
+
+hh3cIfMonSdhB2ErrorRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonSdhB2ErrorLowThres,
+            hh3cIfMonSdhB2ErrorHighThres,
+            hh3cIfMonSdhB2ErrorStatistics,
+            hh3cIfMonSdhB2ErrorInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of SDH B2 error packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 13 }
+
+hh3cIfMonSdhB2ErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonSdhB2ErrorLowThres,
+            hh3cIfMonSdhB2ErrorHighThres,
+            hh3cIfMonSdhB2ErrorStatistics,
+            hh3cIfMonSdhB2ErrorInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of SDH B2 error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 14 }
+
+hh3cIfMonCRCErrorRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonCRCErrorHighThres,
+            hh3cIfMonCRCErrorLowThres,
+            hh3cIfMonCRCErrorStatistics,
+            hh3cIfMonCRCErrorInterval,
+            hh3cIfMonCRCErrType
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of CRC error packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 15 }
+
+hh3cIfMonCRCErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonCRCErrorHighThres,
+            hh3cIfMonCRCErrorLowThres,
+            hh3cIfMonCRCErrorStatistics,
+            hh3cIfMonCRCErrorInterval,
+            hh3cIfMonCRCErrType
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of CRC error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 16 }
+
+hh3cIfMonRxPauseFrameRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonRxPauseFrameHighThres,
+            hh3cIfMonRxPauseFrameLowThres,
+            hh3cIfMonRxPauseFrameStatistics,
+            hh3cIfMonRxPauseFrameInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of received pause frames exceeds the
+         upper threshold."
+    ::= { hh3cIfMonTrapPrex 17 }
+
+hh3cIfMonRxPauseFrameResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonRxPauseFrameHighThres,
+            hh3cIfMonRxPauseFrameLowThres,
+            hh3cIfMonRxPauseFrameStatistics,
+            hh3cIfMonRxPauseFrameInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of received pause frames drops from
+         above the upper threshold to below the lower-threshold."
+    ::= { hh3cIfMonTrapPrex 18 }
+
+hh3cIfMonTxPauseFrameRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonTxPauseFrameHighThres,
+            hh3cIfMonTxPauseFrameLowThres,
+            hh3cIfMonTxPauseFrameStatistics,
+            hh3cIfMonTxPauseFrameInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of transmitted pause frames exceeds
+         the upper threshold."
+    ::= { hh3cIfMonTrapPrex 19 }
+
+hh3cIfMonTxPauseFrameResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonTxPauseFrameHighThres,
+            hh3cIfMonTxPauseFrameLowThres,
+            hh3cIfMonTxPauseFrameStatistics,
+            hh3cIfMonTxPauseFrameInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of transmitted pause frames  drops from
+         above the upper threshold to below the lower threshold."
+    ::= { hh3cIfMonTrapPrex 20 }
+
+hh3cIfMonGiantRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonGiantLowThres,
+            hh3cIfMonGiantHighThres,
+            hh3cIfMonGiantStatistics,
+            hh3cIfMonGiantInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of Giant error packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 21 }
+
+hh3cIfMonGiantResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonGiantLowThres,
+            hh3cIfMonGiantHighThres,
+            hh3cIfMonGiantStatistics,
+            hh3cIfMonGiantInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of Giant error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 22 }
+
+ hh3cIfMonRuntRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonRuntLowThres,
+            hh3cIfMonRuntHighThres,
+            hh3cIfMonRuntStatistics,
+            hh3cIfMonRuntInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of Runt error packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 23 }
+
+hh3cIfMonRuntResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonRuntLowThres,
+            hh3cIfMonRuntHighThres,
+            hh3cIfMonRuntStatistics,
+            hh3cIfMonRuntInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of Runt error packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 24 }
+
+
+hh3cIfMonTrapObject OBJECT IDENTIFIER ::= { hh3cIfMonTrap 1 }
+
+END

@@ -1,3 +1,158 @@
+## 21.8.0
+*(2021-08-22)*
+
+A big thank you to the following 40 contributors this last month:
+
+  - [PipoCanaja](https://github.com/PipoCanaja) (12)
+  - [murrant](https://github.com/murrant) (10)
+  - [Jellyfrog](https://github.com/Jellyfrog) (8)
+  - [paulierco](https://github.com/paulierco) (5)
+  - [mpikzink](https://github.com/mpikzink) (5)
+  - [ottorei](https://github.com/ottorei) (3)
+  - [fbourqui](https://github.com/fbourqui) (2)
+  - [facuxt](https://github.com/facuxt) (2)
+  - [geg347](https://github.com/geg347) (2)
+  - [dennypage](https://github.com/dennypage) (2)
+  - [opalivan](https://github.com/opalivan) (2)
+  - [keryazmi](https://github.com/keryazmi) (2)
+  - [wkamlun](https://github.com/wkamlun) (2)
+  - [si458](https://github.com/si458) (2)
+  - [martinberg](https://github.com/martinberg) (2)
+  - [vakartel](https://github.com/vakartel) (1)
+  - [SanderBlom](https://github.com/SanderBlom) (1)
+  - [SourceDoctor](https://github.com/SourceDoctor) (1)
+  - [VirTechSystems](https://github.com/VirTechSystems) (1)
+  - [Talkabout](https://github.com/Talkabout) (1)
+  - [hannut](https://github.com/hannut) (1)
+  - [kevinwallace](https://github.com/kevinwallace) (1)
+  - [jasoncheng7115](https://github.com/jasoncheng7115) (1)
+  - [arjitc](https://github.com/arjitc) (1)
+  - [igorek24](https://github.com/igorek24) (1)
+  - [mtoupsUNO](https://github.com/mtoupsUNO) (1)
+  - [Laplacence](https://github.com/Laplacence) (1)
+  - [tcwarn](https://github.com/tcwarn) (1)
+  - [deajan](https://github.com/deajan) (1)
+  - [Npeca75](https://github.com/Npeca75) (1)
+  - [Negatifff](https://github.com/Negatifff) (1)
+  - [adamus1red](https://github.com/adamus1red) (1)
+  - [rhinoau](https://github.com/rhinoau) (1)
+  - [arrmo](https://github.com/arrmo) (1)
+  - [e-caille](https://github.com/e-caille) (1)
+  - [Sea-n](https://github.com/Sea-n) (1)
+  - [saschareichert](https://github.com/saschareichert) (1)
+  - [bennetgallein](https://github.com/bennetgallein) (1)
+  - [loopodoopo](https://github.com/loopodoopo) (1)
+  - [tikitaru](https://github.com/tikitaru) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (37)
+  - [murrant](https://github.com/murrant) (28)
+  - [PipoCanaja](https://github.com/PipoCanaja) (20)
+  - [SourceDoctor](https://github.com/SourceDoctor) (2)
+
+#### Feature
+* Lnms config:set ability to set os settings ([#13151](https://github.com/librenms/librenms/pull/13151)) - [murrant](https://github.com/murrant)
+* Detect sending non-html emails as html ([#13114](https://github.com/librenms/librenms/pull/13114)) - [murrant](https://github.com/murrant)
+* Add peak in and out ([#13006](https://github.com/librenms/librenms/pull/13006)) - [bennetgallein](https://github.com/bennetgallein)
+
+#### Device
+* Add OSAG new OS ([#13156](https://github.com/librenms/librenms/pull/13156)) - [paulierco](https://github.com/paulierco)
+* More specific grandstream-ht detection ([#13152](https://github.com/librenms/librenms/pull/13152)) - [murrant](https://github.com/murrant)
+* Added voltage, cell states and wireless data for cell interface (GEMDS OS). ([#13142](https://github.com/librenms/librenms/pull/13142)) - [SanderBlom](https://github.com/SanderBlom)
+* Opnsense detection ([#13097](https://github.com/librenms/librenms/pull/13097)) - [mpikzink](https://github.com/mpikzink)
+* Added OID for Extreme switch X350-48t ([#13096](https://github.com/librenms/librenms/pull/13096)) - [tcwarn](https://github.com/tcwarn)
+* Add Janitza power consumed ([#13095](https://github.com/librenms/librenms/pull/13095)) - [mpikzink](https://github.com/mpikzink)
+* Added/fixed LLDP discovery ([#13082](https://github.com/librenms/librenms/pull/13082)) - [Npeca75](https://github.com/Npeca75)
+* Allow stack index other than '1.' for CiscoSB ([#13078](https://github.com/librenms/librenms/pull/13078)) - [dennypage](https://github.com/dennypage)
+* Add logo for Scientific Linux ([#13075](https://github.com/librenms/librenms/pull/13075)) - [mpikzink](https://github.com/mpikzink)
+* Fix Cisco SLAs garbage entries ([#13068](https://github.com/librenms/librenms/pull/13068)) - [murrant](https://github.com/murrant)
+* Cisco ISE version, HW, SW and test-data ([#13062](https://github.com/librenms/librenms/pull/13062)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Packetlight EDFA sensors and add test-data ([#13060](https://github.com/librenms/librenms/pull/13060)) - [opalivan](https://github.com/opalivan)
+* Alcatel-Lucent AOS7 bgp fix2 ([#13059](https://github.com/librenms/librenms/pull/13059)) - [paulierco](https://github.com/paulierco)
+* Add logo for Linux Mint ([#13055](https://github.com/librenms/librenms/pull/13055)) - [arrmo](https://github.com/arrmo)
+* Alcatel-Lucent Aos6 ignore second power supply ([#13054](https://github.com/librenms/librenms/pull/13054)) - [paulierco](https://github.com/paulierco)
+* Alcatel-Lucent Aos7 increase fan threshold ([#13053](https://github.com/librenms/librenms/pull/13053)) - [paulierco](https://github.com/paulierco)
+* Use non numeric snmpwalk for nxos fan trays ([#13048](https://github.com/librenms/librenms/pull/13048)) - [e-caille](https://github.com/e-caille)
+* Alcatel-Lucent Aos7 bgp fix ([#13047](https://github.com/librenms/librenms/pull/13047)) - [paulierco](https://github.com/paulierco)
+* Add number of connected wireless client and number of connected FortiAP ([#13037](https://github.com/librenms/librenms/pull/13037)) - [wkamlun](https://github.com/wkamlun)
+* Update Sensors for ADVA FSP150CC + discovery fix ([#13020](https://github.com/librenms/librenms/pull/13020)) - [keryazmi](https://github.com/keryazmi)
+* Improve dell-compellent detection for newer firmwares ([#13019](https://github.com/librenms/librenms/pull/13019)) - [saschareichert](https://github.com/saschareichert)
+* Poll current connections for F5 ltm ([#12968](https://github.com/librenms/librenms/pull/12968)) - [martinberg](https://github.com/martinberg)
+* Ericsson 6600 series ([#12931](https://github.com/librenms/librenms/pull/12931)) - [loopodoopo](https://github.com/loopodoopo)
+* Fix WUT ThermoHygro with new hardware revisions ([#12913](https://github.com/librenms/librenms/pull/12913)) - [mpikzink](https://github.com/mpikzink)
+* Fix polling current on ICT2000DB-12IRC ([#12529](https://github.com/librenms/librenms/pull/12529)) - [tikitaru](https://github.com/tikitaru)
+
+#### Webui
+* Cleanup Port hover minigraph description when using "Interface Description Parsing" ([#13143](https://github.com/librenms/librenms/pull/13143)) - [fbourqui](https://github.com/fbourqui)
+* Dark mode improvements ([#13141](https://github.com/librenms/librenms/pull/13141)) - [facuxt](https://github.com/facuxt)
+* Improvements to dark theme. ([#13139](https://github.com/librenms/librenms/pull/13139)) - [facuxt](https://github.com/facuxt)
+* Adjust App String Pi-hole to project name ([#13136](https://github.com/librenms/librenms/pull/13136)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Sort port selector dropdown ([#13135](https://github.com/librenms/librenms/pull/13135)) - [VirTechSystems](https://github.com/VirTechSystems)
+* Priority filtering for syslog widget ([#13134](https://github.com/librenms/librenms/pull/13134)) - [Talkabout](https://github.com/Talkabout)
+* Center new service window ([#13115](https://github.com/librenms/librenms/pull/13115)) - [arjitc](https://github.com/arjitc)
+* Add urlencode for location link in device view ([#13076](https://github.com/librenms/librenms/pull/13076)) - [Negatifff](https://github.com/Negatifff)
+* Add device_group to availability widget hyperlink ([#13061](https://github.com/librenms/librenms/pull/13061)) - [rhinoau](https://github.com/rhinoau)
+* More sensor data on inventory page ([#13057](https://github.com/librenms/librenms/pull/13057)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Api
+* Adding API route to set bgpPeerDescr field ([#13056](https://github.com/librenms/librenms/pull/13056)) - [geg347](https://github.com/geg347)
+* API mac search ([#12964](https://github.com/librenms/librenms/pull/12964)) - [mpikzink](https://github.com/mpikzink)
+
+#### Alerting
+* Add EU Service Region to PagerDuty transport ([#13154](https://github.com/librenms/librenms/pull/13154)) - [ottorei](https://github.com/ottorei)
+* Fix HTML encoded characters in Slack ([#13120](https://github.com/librenms/librenms/pull/13120)) - [geg347](https://github.com/geg347)
+* Add SignalWire (Twilio alternative) alert transport support ([#13107](https://github.com/librenms/librenms/pull/13107)) - [igorek24](https://github.com/igorek24)
+
+#### Discovery
+* Full Python code fusion / refactor and hardening ([#13094](https://github.com/librenms/librenms/pull/13094)) - [deajan](https://github.com/deajan)
+* Extend REGEX filtering option by sensor_class ([#13066](https://github.com/librenms/librenms/pull/13066)) - [opalivan](https://github.com/opalivan)
+
+#### Oxidized
+* Follow redirects when reloading Oxidized nodes list ([#13051](https://github.com/librenms/librenms/pull/13051)) - [martinberg](https://github.com/martinberg)
+
+#### Bug
+* Fix issue syslog_xlate containing dots ([#13148](https://github.com/librenms/librenms/pull/13148)) - [vakartel](https://github.com/vakartel)
+* Enclose IPv6 literal in [brackets] for snmpget and unix-agent ([#13130](https://github.com/librenms/librenms/pull/13130)) - [kevinwallace](https://github.com/kevinwallace)
+* Fix lnms scan, nets not detected ([#13129](https://github.com/librenms/librenms/pull/13129)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Update docs for controlling modules ([#13147](https://github.com/librenms/librenms/pull/13147)) - [murrant](https://github.com/murrant)
+* Update docs: Example for optional data on templates ([#13128](https://github.com/librenms/librenms/pull/13128)) - [ottorei](https://github.com/ottorei)
+* Update FAQs for large groups ([#13110](https://github.com/librenms/librenms/pull/13110)) - [ottorei](https://github.com/ottorei)
+* Document new optional ups-nut arg1 ([#13072](https://github.com/librenms/librenms/pull/13072)) - [adamus1red](https://github.com/adamus1red)
+* Formatted applications docs for copy/paste ([#13049](https://github.com/librenms/librenms/pull/13049)) - [si458](https://github.com/si458)
+* Update cleanup config document ([#13026](https://github.com/librenms/librenms/pull/13026)) - [Sea-n](https://github.com/Sea-n)
+
+#### Translation
+* Updated Traditional Chinese Translation ([#13116](https://github.com/librenms/librenms/pull/13116)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+
+#### Tests
+* Run PHPStan with higher level for new files ([#13108](https://github.com/librenms/librenms/pull/13108)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Misc
+* Added two indexes to 'syslog' table for performance ([#13105](https://github.com/librenms/librenms/pull/13105)) - [mtoupsUNO](https://github.com/mtoupsUNO)
+* Remove timeouts for passthrough lnms commands ([#13080](https://github.com/librenms/librenms/pull/13080)) - [murrant](https://github.com/murrant)
+* Add Laravel task scheduling ([#13074](https://github.com/librenms/librenms/pull/13074)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Mibs
+* MIB cleaning (misc again) ([#13103](https://github.com/librenms/librenms/pull/13103)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added H3C / Comware MIB files ([#13102](https://github.com/librenms/librenms/pull/13102)) - [Laplacence](https://github.com/Laplacence)
+* Update Cisco Small Business (mostly) MIBs ([#13099](https://github.com/librenms/librenms/pull/13099)) - [dennypage](https://github.com/dennypage)
+* Update NET-SNMP mibs ([#13093](https://github.com/librenms/librenms/pull/13093)) - [Jellyfrog](https://github.com/Jellyfrog)
+* MIB cleaning for Dell + Gandi ([#13089](https://github.com/librenms/librenms/pull/13089)) - [PipoCanaja](https://github.com/PipoCanaja)
+* MIB cleaning for Panasonic (1 file) and Avtech (11 files) ([#13088](https://github.com/librenms/librenms/pull/13088)) - [PipoCanaja](https://github.com/PipoCanaja)
+* MIB cleaning for OS "Junose" ([#13087](https://github.com/librenms/librenms/pull/13087)) - [PipoCanaja](https://github.com/PipoCanaja)
+* MIB cleaning (Misc) ([#13086](https://github.com/librenms/librenms/pull/13086)) - [PipoCanaja](https://github.com/PipoCanaja)
+* MIB cleaning for Junos ([#13085](https://github.com/librenms/librenms/pull/13085)) - [PipoCanaja](https://github.com/PipoCanaja)
+* MIB cleaning for HP ([#13084](https://github.com/librenms/librenms/pull/13084)) - [PipoCanaja](https://github.com/PipoCanaja)
+* MIB cleaning for equallogic ([#13083](https://github.com/librenms/librenms/pull/13083)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Dependencies
+* Bump super-linter ([#13073](https://github.com/librenms/librenms/pull/13073)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Bump larastan ([#13071](https://github.com/librenms/librenms/pull/13071)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+
 ## 21.7.0
 *(2021-07-16)*
 

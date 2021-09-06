@@ -129,13 +129,19 @@ class Url
      */
     public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
     {
+        if ($port === null) {
+            return $text;
+        }
+
         $label = Rewrite::normalizeIfName($port->getLabel());
         if (! $text) {
             $text = $label;
         }
 
         $content = '<div class=list-large>' . addslashes(htmlentities($port->device->displayName() . ' - ' . $label)) . '</div>';
-        if ($port->ifAlias) {
+        if ($port['port_descr_descr']) {
+            $content .= addslashes(\LibreNMS\Util\Clean::html($port['port_descr_descr'], [])) . '<br />';
+        } elseif ($port['ifAlias']) {
             $content .= addslashes(htmlentities($port->ifAlias)) . '<br />';
         }
 

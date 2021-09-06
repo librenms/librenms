@@ -63,6 +63,7 @@ class GitHub
         'translation' => [],
         'tests' => [],
         'misc' => [],
+        'mibs' => [],
         'dependencies' => [],
     ];
     protected $changelog_users = [];

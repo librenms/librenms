@@ -1,0 +1,515 @@
+-- =============================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The VXLAN(Virtual eXtensible Local Area Network) MIB
+-- Reference:
+-- Version: V1.2
+-- History:
+--   V1.0 2013-11-21 Initial version created by Neng Yan
+--   V1.1 2015-02-11 Modified by Neng Yan.  Values 'unknown(0)', 'openflow(4)',
+--                   and 'ovsdb(5)' were added for data type 'hh3cVxlanMacType'
+--   V1.2 2019-03-04 Modified by lipeng, added hh3cVxlanTunnelInputOctets,
+--                   hh3cVxlanTunnelOutputOctets, hh3cVxlanTunnelInputPackets,
+--                   hh3cVxlanTunnelOutputPackets, hh3cVxlanTunnelInputDiscards,
+--                   hh3cVxlanTunnelOutputDiscards
+-- =============================================================================
+HH3C-VXLAN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        RowStatus, TruthValue, MacAddress
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32, Counter64
+    FROM SNMPv2-SMI
+        InetAddressType,
+        InetAddress
+    FROM INET-ADDRESS-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cVxlan MODULE-IDENTITY
+    LAST-UPDATED
+        "201903041650Z"        -- Mar 4, 2019 at 16:50 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The overlay MIB."
+    REVISION
+        "201903041650Z"   -- Mar 4, 2019 at 16:50 GMT
+    DESCRIPTION
+        "Added hh3cVxlanTunnelInputOctets,
+         hh3cVxlanTunnelOutputOctets, hh3cVxlanTunnelInputPackets,
+         hh3cVxlanTunnelOutputPackets, hh3cVxlanTunnelInputDiscards,
+         hh3cVxlanTunnelOutputDiscards."
+    REVISION
+        "201502110900Z"   -- Feb 11, 2015 at 09:00 GMT
+    DESCRIPTION
+        "Values 'unknown(0)', 'openflow(4)', and 'ovsdb(5)' were added
+         for data type 'hh3cVxlanMacType'."
+    REVISION
+        "201311210900Z"   -- Nov 21, 2013 at 09:00 GMT
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 150 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+
+hh3cVxlanObjects      OBJECT IDENTIFIER ::= { hh3cVxlan 1 }
+
+hh3cVxlanScalarGroup OBJECT IDENTIFIER ::= { hh3cVxlanObjects 1 }
+
+hh3cVxlanLocalMacNotify    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Local MAC(Media Access Control) address report capability."
+    DEFVAL { false }
+    ::= { hh3cVxlanScalarGroup 1 }
+
+hh3cVxlanRemoteMacLearn    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Remote MAC address self-learning capability."
+    DEFVAL { true }
+    ::= { hh3cVxlanScalarGroup 2 }
+
+hh3cVxlanNextVxlanID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next available VXLAN ID(identifier), in the range of 0x0 to 0xFFFFFF.
+        The invalid value 0xFFFFFFFF indicates that no ID can be set."
+    ::= { hh3cVxlanScalarGroup 3 }
+
+hh3cVxlanConfigured    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of currently configured VXLANs."
+    ::= { hh3cVxlanScalarGroup 4 }
+
+-- =============================================================================
+-- hh3cVxlanTable Definition
+-- =============================================================================
+hh3cVxlanTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVxlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for VXLAN parameters."
+    ::= { hh3cVxlanObjects 2 }
+
+hh3cVxlanEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVxlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the parameters of a VXLAN."
+    INDEX
+    {
+        hh3cVxlanID
+    }
+    ::= { hh3cVxlanTable 1 }
+
+Hh3cVxlanEntry ::=
+    SEQUENCE
+    {
+        hh3cVxlanID                 Unsigned32,
+        hh3cVxlanAddrType           InetAddressType,
+        hh3cVxlanGroupAddr          InetAddress,
+        hh3cVxlanSourceAddr         InetAddress,
+        hh3cVxlanVsiIndex           Unsigned32,
+        hh3cVxlanRemoteMacCount     Unsigned32,
+        hh3cVxlanRowStatus          RowStatus
+    }
+
+hh3cVxlanID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VXLAN ID."
+    ::= { hh3cVxlanEntry 1 }
+
+hh3cVxlanAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of multicast group address."
+    ::= { hh3cVxlanEntry 2 }
+
+hh3cVxlanGroupAddr    OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Group destination address."
+    ::= { hh3cVxlanEntry 3 }
+
+hh3cVxlanSourceAddr    OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Group source address."
+    ::= { hh3cVxlanEntry 4 }
+
+hh3cVxlanVsiIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VSI index.  A unique index for the conceptual row identifying
+         a VSI in the hh3cVsiTable."
+    ::= { hh3cVxlanEntry 5 }
+
+hh3cVxlanRemoteMacCount    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote MAC address count of this VXLAN."
+    ::= { hh3cVxlanEntry 6 }
+
+hh3cVxlanRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  When a row in this
+         table is in active state, no objects in that row
+         can be modified by the agent except
+         hh3cVxlanGroupAddr, hh3cVxlanSourceAddr."
+    ::= { hh3cVxlanEntry 7 }
+
+-- =============================================================================
+-- End of hh3cVxlanTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVxlanTunnelTable Definition
+-- =============================================================================
+hh3cVxlanTunnelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVxlanTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for VXLAN tunnel parameters."
+    ::= { hh3cVxlanObjects 3 }
+
+hh3cVxlanTunnelEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVxlanTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the parameters of a VXLAN tunnel."
+    INDEX
+    {
+        hh3cVxlanID,
+        hh3cVxlanTunnelID
+    }
+    ::= { hh3cVxlanTunnelTable 1 }
+
+Hh3cVxlanTunnelEntry ::=
+    SEQUENCE
+    {
+        hh3cVxlanTunnelID             Unsigned32,
+        hh3cVxlanTunnelRowStatus      RowStatus,
+        hh3cVxlanTunnelOctets         Counter64,
+        hh3cVxlanTunnelPackets        Counter64,
+        hh3cVxlanTunnelInputOctets    Counter64,
+        hh3cVxlanTunnelOutputOctets   Counter64,
+        hh3cVxlanTunnelInputPackets   Counter64,
+        hh3cVxlanTunnelOutputPackets  Counter64,
+        hh3cVxlanTunnelInputDiscards  Counter64,
+        hh3cVxlanTunnelOutputDiscards Counter64
+    }
+
+hh3cVxlanTunnelID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index for tunnel."
+    ::= { hh3cVxlanTunnelEntry 1 }
+
+hh3cVxlanTunnelRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVxlanTunnelEntry 2 }
+
+hh3cVxlanTunnelOctets   OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of octets that have been forwarded over the tunnel.
+
+        Discontinuities in the value of this counter can
+        occur at re-initialization of the management system,
+        and at other times."
+    ::= { hh3cVxlanTunnelEntry 3 }
+
+hh3cVxlanTunnelPackets  OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of packets that have been forwarded over the tunnel.
+
+        Discontinuities in the value of this counter can
+        occur at re-initialization of the management system
+        and at other times."
+    ::= { hh3cVxlanTunnelEntry 4 }
+
+hh3cVxlanTunnelInputOctets   OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of incoming bytes that have been forwarded over the tunnel."
+    ::= { hh3cVxlanTunnelEntry 5 }
+
+hh3cVxlanTunnelOutputOctets   OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of outgoing bytes that have been forwarded over the tunnel."
+    ::= { hh3cVxlanTunnelEntry 6 }
+
+hh3cVxlanTunnelInputPackets  OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of incoming packets that have been forwarded over the tunnel."
+    ::= { hh3cVxlanTunnelEntry 7 }
+
+hh3cVxlanTunnelOutputPackets  OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of outgoing packets that have been forwarded over the tunnel."
+    ::= { hh3cVxlanTunnelEntry 8 }
+
+hh3cVxlanTunnelInputDiscards  OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of incoming discarded packets that have been forwarded over
+         the tunnel."
+    ::= { hh3cVxlanTunnelEntry 9 }
+
+hh3cVxlanTunnelOutputDiscards  OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of outgoing discarded packets that have been forwarded over
+         the tunnel."
+    ::= { hh3cVxlanTunnelEntry 10 }
+
+-- =============================================================================
+-- End of hh3cVxlanTunnelTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVxlanTunnelBoundTable Definition
+-- =============================================================================
+hh3cVxlanTunnelBoundTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVxlanTunnelBoundEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for the number of VXLANs to which the tunnel is bound."
+    ::= { hh3cVxlanObjects 4 }
+
+hh3cVxlanTunnelBoundEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVxlanTunnelBoundEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry represents the number of VXLANs to which a tunnel is bound."
+    INDEX
+    {
+        hh3cVxlanTunnelID
+    }
+    ::= { hh3cVxlanTunnelBoundTable 1 }
+
+Hh3cVxlanTunnelBoundEntry ::=
+    SEQUENCE
+    {
+        hh3cVxlanTunnelBoundVxlanNum  Unsigned32
+    }
+
+hh3cVxlanTunnelBoundVxlanNum    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of VXLANs to which this tunnel is bound."
+    ::= { hh3cVxlanTunnelBoundEntry 1 }
+
+-- =============================================================================
+-- End of hh3cVxlanTunnelBoundTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVxlanMacTable Definition
+-- =============================================================================
+hh3cVxlanMacTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVxlanMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for VXLAN remote MAC addresses."
+    ::= { hh3cVxlanObjects 5 }
+
+hh3cVxlanMacEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVxlanMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A VXLAN remote MAC address."
+    INDEX
+    {
+        hh3cVxlanVsiIndex,
+        hh3cVxlanMacAddr
+    }
+    ::= { hh3cVxlanMacTable 1 }
+
+Hh3cVxlanMacEntry ::=
+    SEQUENCE
+    {
+        hh3cVxlanMacAddr            MacAddress,
+        hh3cVxlanMacTunnelID        Unsigned32,
+        hh3cVxlanMacType            INTEGER
+    }
+
+hh3cVxlanMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC address."
+    ::= { hh3cVxlanMacEntry 1 }
+
+hh3cVxlanMacTunnelID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for tunnel."
+    ::= { hh3cVxlanMacEntry 2 }
+
+hh3cVxlanMacType    OBJECT-TYPE
+    SYNTAX      INTEGER{
+                 unknown (0),
+                 selfLearned (1),
+                 staticConfigured (2),
+                 protocolLearned (3),
+                 openflow (4),
+                 ovsdb (5)
+                 }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of an MAC address.
+
+        selfLearned: Unicast address dynamically learned in the data plane.
+        staticConfigured: Unicast address manually added.
+        protocolLearned: Unicast address advertised through VXLAN IS-IS or BGP.
+               Support for VXLAN IS-IS and BGP depends on the software version.
+        openflow: Unicast address issued by a controller through OpenFlow.
+        ovsdb: Unicast address issued by a controller through OVSDB."
+    ::= { hh3cVxlanMacEntry 3 }
+
+-- =============================================================================
+-- End of hh3cVxlanMacTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVxlanStaticMacTable Definition
+-- =============================================================================
+hh3cVxlanStaticMacTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVxlanStaticMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for VXLAN static remote MAC addresses."
+    ::= { hh3cVxlanObjects 6 }
+
+hh3cVxlanStaticMacEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVxlanStaticMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A VXLAN static MAC address."
+    INDEX
+    {
+        hh3cVxlanVsiIndex,
+        hh3cVxlanStaticMacAddr
+    }
+    ::= { hh3cVxlanStaticMacTable 1 }
+
+Hh3cVxlanStaticMacEntry ::=
+    SEQUENCE
+    {
+        hh3cVxlanStaticMacAddr         MacAddress,
+        hh3cVxlanStaticMacTunnelID     Unsigned32,
+        hh3cVxlanStaticMacRowStatus    RowStatus
+    }
+
+hh3cVxlanStaticMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static MAC address."
+    ::= { hh3cVxlanStaticMacEntry 1 }
+
+hh3cVxlanStaticMacTunnelID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A unique index for tunnel."
+    ::= { hh3cVxlanStaticMacEntry 2 }
+
+hh3cVxlanStaticMacRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  When a row in this
+         table is in active state, no objects in that row
+         can be modified by the agent."
+    ::= { hh3cVxlanStaticMacEntry 3 }
+
+-- =============================================================================
+-- End of hh3cVxlanStaticMacTable Definition
+-- =============================================================================
+
+END

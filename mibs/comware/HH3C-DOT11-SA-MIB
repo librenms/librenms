@@ -1,0 +1,663 @@
+-- =============================================================================
+-- Copyright (c) 2004-2012 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide spectrum analysis information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Created by Wang Lu
+--     Initial version 2011-08-05
+-- =============================================================================
+HH3C-DOT11-SA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        DateAndTime
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        hh3cDot11,
+        Hh3cDot11ChannelScopeType,
+        Hh3cDot11ObjectIDType,
+        Hh3cDot11RadioScopeType,
+        Hh3cDot11SaIntfDevType
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11Sa MODULE-IDENTITY
+    LAST-UPDATED "201108262000Z"        -- Aug 26, 2011 at 20:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB module provides spectrum analysis information.
+        The initial revision of this MIB module.
+
+        The spectrum analysis module on APs is able to examine the radio
+        frequency (RF) environment in which the Wi-Fi network is operating,
+        identify interference and classify its sources. An analysis of the
+        results can then be used to quickly isolate issues with packet
+        transmission, channel quality, and traffic congestion caused by
+        contention with other devices operating in the same band or channel."
+    REVISION "201108262000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 13 }
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+
+hh3cDot11SaCfgGroup OBJECT IDENTIFIER  ::= { hh3cDot11Sa 1 }
+hh3cDot11SaStatusGroup OBJECT IDENTIFIER  ::= { hh3cDot11Sa 2 }
+hh3cDot11SaNotifyGroup OBJECT IDENTIFIER  ::= { hh3cDot11Sa 3 }
+
+-- cfg table
+hh3cDot11SaCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11SaCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to configure spectrum analysis."
+    ::= { hh3cDot11SaCfgGroup 1 }
+
+hh3cDot11SaCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11SaCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entry contains the spectrum analysis configuration."
+    INDEX { hh3cDot11SaCfgRadioType }
+    ::= { hh3cDot11SaCfgTable 1 }
+
+Hh3cDot11SaCfgEntry ::= SEQUENCE
+    {
+        hh3cDot11SaCfgRadioType       INTEGER,
+        hh3cDot11SaEnable             TruthValue,
+        hh3cDot11SaRptDevType         BITS,
+        hh3cDot11SaTrapDevEnable      TruthValue,
+        hh3cDot11SaTrapDevType        BITS,
+        hh3cDot11SaTrapAQEnable       TruthValue,
+        hh3cDot11SaTrapAQThreshold    Integer32,
+        hh3cDot11SaDrivenRRMEnable    TruthValue,
+        hh3cDot11SaDrivenRRMSnt       INTEGER
+    }
+
+hh3cDot11SaCfgRadioType OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        dot11bg(1),
+        dot11a(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the radio type of the configuration."
+    ::= { hh3cDot11SaCfgEntry 1 }
+
+hh3cDot11SaEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether spectrum analysis is enabled globally."
+    ::= { hh3cDot11SaCfgEntry 2 }
+
+hh3cDot11SaRptDevType OBJECT-TYPE
+    SYNTAX BITS
+        {
+            microwave(0),
+            microwaveInverter(1),
+            bluetooth(2),
+            fixedFreqOthers(3),
+            fixedFreqCordlessPhone(4),
+            fixedFreqVideo(5),
+            fixedFreqAudio(6),
+            freqHopperOthers(7),
+            freqHopperCordlessBase(8),
+            freqHopperCordlessNetwork(9),
+            freqHopperXbox(10),
+            genericInterferer(11)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents which types of interference devices should be reported."
+    ::= { hh3cDot11SaCfgEntry 3 }
+
+hh3cDot11SaTrapDevEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the interference device trap is enabled."
+    ::= { hh3cDot11SaCfgEntry 4 }
+
+hh3cDot11SaTrapDevType OBJECT-TYPE
+    SYNTAX BITS
+        {
+            microwave(0),
+            microwaveInverter(1),
+            bluetooth(2),
+            fixedFreqOthers(3),
+            fixedFreqCordlessPhone(4),
+            fixedFreqVideo(5),
+            fixedFreqAudio(6),
+            freqHopperOthers(7),
+            freqHopperCordlessBase(8),
+            freqHopperCordlessNetwork(9),
+            freqHopperXbox(10),
+            genericInterferer(11)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents which types of interference device will send traps
+         when the interference device trap is enabled."
+    ::= { hh3cDot11SaCfgEntry 5 }
+
+hh3cDot11SaTrapAQEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the air quality trap is enabled."
+    ::= { hh3cDot11SaCfgEntry 6 }
+
+hh3cDot11SaTrapAQThreshold OBJECT-TYPE
+    SYNTAX Integer32(1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the air quality trap threshold.  When the air quality
+        is below this value, the air quality trap will be sent."
+    ::= { hh3cDot11SaCfgEntry 7 }
+
+hh3cDot11SaDrivenRRMEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configure whether to trigger RRM to run when an access point detects
+         a certain level of interference."
+    ::= { hh3cDot11SaCfgEntry 8 }
+
+hh3cDot11SaDrivenRRMSnt OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        low(1),
+        medium(2),
+        high(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configure the threshold at which RRM will be triggered.  When the
+         interference level for the access point rises above the threshold
+         level, RRM initiates a local dynamic channel assignment (DCA) run
+         and changes the channel of the affected access point radio if
+         possible to improve network performance.  Low represents a decreased
+         sensitivity to changes in the environment while high represents an
+         increased sensitivity."
+    ::= { hh3cDot11SaCfgEntry 9 }
+
+-- fft table
+hh3cDot11SaRtFFTDataTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11SaRtFFTDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains the real-time FFT data for spectrum analysis."
+    ::= { hh3cDot11SaStatusGroup 1 }
+
+hh3cDot11SaRtFFTDataEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11SaRtFFTDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entry contains the real-time FFT data for spectrum analysis."
+    INDEX
+        {
+            hh3cDot11SaAPID,
+            hh3cDot11SaRadioID,
+            hh3cDot11SaRtDataGroupID,
+            hh3cDot11SaFrequency
+        }
+    ::= { hh3cDot11SaRtFFTDataTable 1 }
+
+Hh3cDot11SaRtFFTDataEntry ::= SEQUENCE
+    {
+        hh3cDot11SaAPID               Hh3cDot11ObjectIDType,
+        hh3cDot11SaRadioID            Hh3cDot11RadioScopeType,
+        hh3cDot11SaRtDataGroupID      Integer32,
+        hh3cDot11SaFrequency          Integer32,
+        hh3cDot11SaRtFreqPower        Integer32,
+        hh3cDot11SaRtFreqMaxPower     Integer32,
+        hh3cDot11SaRtFreqDutyCycle    Integer32,
+        hh3cDot11SaRtFreqDataSeqNo    Unsigned32
+    }
+
+hh3cDot11SaAPID OBJECT-TYPE
+    SYNTAX Hh3cDot11ObjectIDType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the serial ID of the AP."
+    ::= { hh3cDot11SaRtFFTDataEntry 1 }
+
+hh3cDot11SaRadioID OBJECT-TYPE
+    SYNTAX Hh3cDot11RadioScopeType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the ID of the radio."
+    ::= { hh3cDot11SaRtFFTDataEntry 2 }
+
+hh3cDot11SaRtDataGroupID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents group ID of the collected data.  Maybe the device collects
+         multiple groups of data at the collected interval."
+    ::= { hh3cDot11SaRtFFTDataEntry 3 }
+
+hh3cDot11SaFrequency OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the frequency number in 100 Hz."
+    ::= { hh3cDot11SaRtFFTDataEntry 4 }
+
+hh3cDot11SaRtFreqPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the power of the frequency point."
+    ::= { hh3cDot11SaRtFFTDataEntry 5 }
+
+hh3cDot11SaRtFreqMaxPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the max power of the frequency point."
+    ::= { hh3cDot11SaRtFFTDataEntry 6 }
+
+hh3cDot11SaRtFreqDutyCycle OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the duty cycle of the frequency point."
+    ::= { hh3cDot11SaRtFFTDataEntry 7 }
+
+hh3cDot11SaRtFreqDataSeqNo OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the sequence number of the data."
+    ::= { hh3cDot11SaRtFFTDataEntry 8 }
+
+-- interfering device table
+hh3cDot11SaIntfDevTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11SaIntfDevEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains the information of the interfering devices."
+    ::= { hh3cDot11SaStatusGroup 2 }
+
+hh3cDot11SaIntfDevEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11SaIntfDevEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entry contains the information of the interfering devices."
+    INDEX
+        {
+            hh3cDot11SaAPID,
+            hh3cDot11SaRadioID,
+            hh3cDot11SaDevID
+        }
+    ::= { hh3cDot11SaIntfDevTable 1 }
+
+Hh3cDot11SaIntfDevEntry ::= SEQUENCE
+    {
+        hh3cDot11SaDevID              Integer32,
+        hh3cDot11SaDevType            Hh3cDot11SaIntfDevType,
+        hh3cDot11SaDevSI              Integer32,
+        hh3cDot11SaDevRSSI            Integer32,
+        hh3cDot11SaDevDutyCycle       Integer32,
+        hh3cDot11SaDevAffectedChls    OCTET STRING,
+        hh3cDot11SaDevDetectedTime    DateAndTime
+    }
+
+hh3cDot11SaDevID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the device identification number that uniquely
+         identified the interfering device."
+    ::= { hh3cDot11SaIntfDevEntry 1 }
+
+hh3cDot11SaDevType OBJECT-TYPE
+    SYNTAX Hh3cDot11SaIntfDevType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents type of the interferer."
+    ::= { hh3cDot11SaIntfDevEntry 2 }
+
+hh3cDot11SaDevSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents severity index of the interfering device.  Severity index
+         is calculated, a positive integer between 0 and 100(with 100 being the
+         most severe)."
+    ::= { hh3cDot11SaIntfDevEntry 3 }
+
+hh3cDot11SaDevRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents receive signal strength indicator (RSSI) of interfering
+         device."
+    ::= { hh3cDot11SaIntfDevEntry 4 }
+
+hh3cDot11SaDevDutyCycle OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents proportion of time in percentage during which the
+         interfering device was active."
+    ::= { hh3cDot11SaIntfDevEntry 5 }
+
+hh3cDot11SaDevAffectedChls OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents channels that the interfering device affects."
+    ::= { hh3cDot11SaIntfDevEntry 6 }
+
+hh3cDot11SaDevDetectedTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents time at which the interference was detected."
+    ::= { hh3cDot11SaIntfDevEntry 7 }
+
+-- air quality table
+hh3cDot11SaAirQualityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11SaAirQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains the air quality of the channels."
+    ::= { hh3cDot11SaStatusGroup 3 }
+
+hh3cDot11SaAirQualityEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11SaAirQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entry contains the air quality of the channels."
+    INDEX
+        {
+            hh3cDot11SaAPID,
+            hh3cDot11SaRadioID,
+            hh3cDot11SaChlNum
+        }
+    ::= { hh3cDot11SaAirQualityTable 1 }
+
+Hh3cDot11SaAirQualityEntry ::= SEQUENCE
+    {
+        hh3cDot11SaChlNum             Hh3cDot11ChannelScopeType,
+        hh3cDot11SaAvgQuality         Integer32,
+        hh3cDot11SaMinQuality         Integer32,
+        hh3cDot11SaIntfDevNum         Integer32,
+        hh3cDot11SaWiFiUtil           Integer32,
+        hh3cDot11SaNonWiFiUtil        Integer32,
+        hh3cDot11SaNoiseFloor         Integer32
+    }
+
+hh3cDot11SaChlNum OBJECT-TYPE
+    SYNTAX Hh3cDot11ChannelScopeType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the radio channel where the air quality is monitored."
+    ::= { hh3cDot11SaAirQualityEntry 1 }
+
+hh3cDot11SaAvgQuality OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the average air quality for this radio channel."
+    ::= { hh3cDot11SaAirQualityEntry 2 }
+
+hh3cDot11SaMinQuality OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the minimum air quality for this radio channel."
+    ::= { hh3cDot11SaAirQualityEntry 3 }
+
+hh3cDot11SaIntfDevNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of interferers detected by the radios
+         on the 802.11a/n or 802.11b/g/n radio band."
+    ::= { hh3cDot11SaAirQualityEntry 4 }
+
+hh3cDot11SaWiFiUtil OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the percentage of the channel currently being
+         used by Wi-Fi devices."
+    ::= { hh3cDot11SaAirQualityEntry 5 }
+
+hh3cDot11SaNonWiFiUtil OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the percentage of the channel currently being
+         used by non-Wi-Fi interference."
+    ::= { hh3cDot11SaAirQualityEntry 6 }
+
+hh3cDot11SaNoiseFloor OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents current noise floor recorded on the channel."
+    ::= { hh3cDot11SaAirQualityEntry 7 }
+
+--Notify Group
+hh3cDot11SaTraps OBJECT IDENTIFIER  ::= { hh3cDot11SaNotifyGroup 0 }
+hh3cDot11SaIntfDevDetected NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11SaTrapAPID,
+            hh3cDot11SaTrapRadioID,
+            hh3cDot11SaTrapDevID,
+            hh3cDot11SaTrapIntfDevType,
+            hh3cDot11APTrapDevSI,
+            hh3cDot11SaTrapDevRSSI,
+            hh3cDot11APTrapDevDC,
+            hh3cDot11APTrapDevChls,
+            hh3cDot11APTrapDevDctTime
+        }
+    STATUS current
+    DESCRIPTION
+        "Interfering device is detected."
+    ::= { hh3cDot11SaTraps 1 }
+
+hh3cDot11SaIntfDevDisappear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11SaTrapAPID,
+            hh3cDot11SaTrapRadioID,
+            hh3cDot11SaTrapDevID,
+            hh3cDot11SaTrapIntfDevType
+        }
+    STATUS current
+    DESCRIPTION
+        "Interfering device disappeared."
+    ::= { hh3cDot11SaTraps 2 }
+
+hh3cDot11SaChlQltLow NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11SaTrapAPID,
+            hh3cDot11SaTrapRadioID,
+            hh3cDot11SaTrapChlNum,
+            hh3cDot11SaTrapChlQlt,
+            hh3cDot11SaTrapChlIntfNum
+        }
+    STATUS current
+    DESCRIPTION
+        "The quality of the channel is below the specified threshold."
+    ::= { hh3cDot11SaTraps 3 }
+
+hh3cDot11SaChlQltRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11SaTrapAPID,
+            hh3cDot11SaTrapRadioID,
+            hh3cDot11SaTrapChlNum,
+            hh3cDot11SaTrapChlQlt,
+            hh3cDot11SaTrapChlIntfNum
+        }
+    STATUS current
+    DESCRIPTION
+        "The quality of the channel recovered from low status."
+    ::= { hh3cDot11SaTraps 4 }
+
+hh3cDot11SaTrapVars OBJECT IDENTIFIER  ::= { hh3cDot11SaNotifyGroup 1 }
+
+hh3cDot11SaTrapAPID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the identifier of the AP."
+    ::= { hh3cDot11SaTrapVars 1 }
+
+hh3cDot11SaTrapRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the identifier of the radio."
+    ::= { hh3cDot11SaTrapVars 2 }
+
+hh3cDot11SaTrapDevID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the device identification number that uniquely
+         identified the interfering device."
+    ::= { hh3cDot11SaTrapVars 3 }
+
+hh3cDot11SaTrapIntfDevType OBJECT-TYPE
+    SYNTAX Hh3cDot11SaIntfDevType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents type of the interferer."
+    ::= { hh3cDot11SaTrapVars 4 }
+
+hh3cDot11APTrapDevSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents severity index of the interfering device.  Severity index
+         is calculated, a positive integer between 0 and 100(with 100 being the
+         most severe)."
+    ::= { hh3cDot11SaTrapVars 5 }
+
+hh3cDot11SaTrapDevRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents receive signal strength indicator (RSSI) of interfering
+         device."
+    ::= { hh3cDot11SaTrapVars 6 }
+
+hh3cDot11APTrapDevDC OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents proportion of time in percentage during which the
+         interfering device was active."
+    ::= { hh3cDot11SaTrapVars 7 }
+
+hh3cDot11APTrapDevChls OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents channels that the interfering device affects."
+    ::= { hh3cDot11SaTrapVars 8 }
+
+hh3cDot11APTrapDevDctTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents time at which the interference was detected."
+    ::= { hh3cDot11SaTrapVars 9 }
+
+hh3cDot11SaTrapChlNum OBJECT-TYPE
+    SYNTAX Hh3cDot11ChannelScopeType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the radio channel where the air quality is monitored."
+    ::= { hh3cDot11SaTrapVars 10 }
+
+hh3cDot11SaTrapChlQlt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the quality for this radio channel."
+    ::= { hh3cDot11SaTrapVars 11 }
+
+hh3cDot11SaTrapChlIntfNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the number of interferers detected by the radios
+         on the 802.11a/n or 802.11b/g/n radio band."
+    ::= { hh3cDot11SaTrapVars 12 }
+END

@@ -28,6 +28,7 @@ use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use LibreNMS\Util\Laravel;
 
 class Eloquent
@@ -143,5 +144,10 @@ class Eloquent
             'engine' => null,
         ]);
         \Config::set('database.default', $name);
+    }
+
+    public static function version($name = null)
+    {
+        return Arr::first(self::DB($name)->selectOne('select version()'));
     }
 }

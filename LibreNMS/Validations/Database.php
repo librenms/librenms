@@ -99,7 +99,7 @@ class Database extends BaseValidation
 
     private function checkVersion(Validator $validator)
     {
-        $version = Eloquent::DB()->selectOne('SELECT VERSION() as version')->version;
+        $version = Eloquent::version();
         $version = explode('-', $version);
 
         if (isset($version[1]) && $version[1] == 'MariaDB') {
@@ -317,6 +317,11 @@ class Database extends BaseValidation
         foreach ($current_schema as $table => $data) {
             $validator->fail("Database: extra table ($table)");
             $schema_update[] = $this->dropTableSql($table);
+        }
+
+        // set utc timezone if timestamp issues
+        if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $schema_update)) {
+            array_unshift($schema_update, "SET TIME_ZONE='+00:00';");
         }
 
         if (empty($schema_update)) {

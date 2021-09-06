@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table id="syslog" class="table table-hover table-condensed table-striped">
+    <table id="syslog" class="table table-hover table-condensed table-striped" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="label"></th>
@@ -22,7 +22,8 @@
         {
             return {
                 device: '{{ $device ?: '' }}',
-                device_group: '{{ $device_group }}'
+                device_group: '{{ $device_group }}',
+                level: '{{ $level }}'
             };
         },
         url: "{{ url('/ajax/table/syslog') }}"

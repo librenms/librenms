@@ -28,6 +28,7 @@ use App\Http\Controllers\PaginatedAjaxController;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 abstract class SelectController extends PaginatedAjaxController
 {
@@ -51,7 +52,10 @@ abstract class SelectController extends PaginatedAjaxController
         $this->validate($request, $this->rules());
         $limit = $request->get('limit', 50);
 
-        $query = $this->search($request->get('term'), $this->baseQuery($request), $this->searchFields($request));
+        $query = $this->baseQuery($request)->when($request->has('id'), function ($query) {
+            return $query->whereKey(request('id'));
+        });
+        $query = $this->search($request->get('term'), $query, $this->searchFields($request));
         $this->sort($request, $query);
         $paginator = $query->simplePaginate($limit);
 
@@ -87,5 +91,16 @@ abstract class SelectController extends PaginatedAjaxController
             'id' => $attributes->count() == 1 ? $attributes->first() : $model->getKey(),
             'text' => $attributes->forget($model->getKeyName())->first(),
         ];
+    }
+
+    protected function includeGeneral(): bool
+    {
+        if (request()->has('id') && request('id') !== 0) {
+            return false;
+        } elseif (request()->has('term') && ! Str::contains('general', strtolower(request('term')))) {
+            return false;
+        }
+
+        return true;
     }
 }

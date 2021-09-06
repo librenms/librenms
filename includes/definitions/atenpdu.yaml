@@ -3,7 +3,7 @@ text: Aten PDU
 type: power
 icon: aten
 mib_dir: aten
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

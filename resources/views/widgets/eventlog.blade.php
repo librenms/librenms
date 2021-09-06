@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table id="eventlog" class="table table-hover table-condensed table-striped">
+    <table id="eventlog" class="table table-hover table-condensed table-striped" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="datetime" data-order="desc">Timestamp</th>

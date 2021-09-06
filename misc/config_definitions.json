@@ -672,6 +672,13 @@
                 "/-K9W8-/"
             ]
         },
+        "bad_entity_sensor_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
+        },
         "bad_disk_regexp": {
             "default": [],
             "type": "array"
@@ -768,6 +775,14 @@
             "default": "https://stats.librenms.org/log.php",
             "type": "text"
         },
+        "callback_proxy": {
+            "default": null,
+            "type": "text"
+        },
+        "collectd_dir": {
+            "default": null,
+            "type": "directory"
+        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
@@ -842,6 +857,23 @@
             "default": "librenms",
             "hidden": true,
             "type": "boolean"
+        },
+        "debug.run_trace": {
+            "default": false,
+            "type": "boolean"
+        },
+        "default_port_group": {
+            "default": 0,
+            "type": "select-dynamic",
+            "group": "discovery",
+            "section": "networks",
+            "order": 0,
+            "options": {
+                "target": "port-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:port_groups,id"
+            }
         },
         "device_location_map_open": {
             "order": 2,
@@ -955,6 +987,17 @@
                 }
             ],
             "type": "array"
+        },
+        "disabled_sensors": {
+            "default": null,
+            "type": "array"
+        },
+        "disabled_sensors_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "discover_services": {
             "default": false,
@@ -1275,10 +1318,16 @@
         },
         "default_poller_group": {
             "default": 0,
-            "type": "integer",
+            "type": "select-dynamic",
             "group": "poller",
             "section": "distributed",
-            "order": 3
+            "order": 3,
+            "options": {
+                "target": "poller-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:poller_groups,id"
+            }
         },
         "distributed_poller_memcached_host": {
             "default": "example.net",
@@ -1688,6 +1737,10 @@
         "github_api": {
             "default": "https://api.github.com/repos/librenms/librenms/",
             "type": "text"
+        },
+        "good_if": {
+            "default": null,
+            "type": "array"
         },
         "graph_colours.blues": {
             "default": [
@@ -3283,6 +3336,13 @@
             },
             "type": "array"
         },
+        "graphs.port_speed_zoom": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "graph",
+            "order": 4
+        },
         "graphs.row.normal": {
             "default": {
                 "sixhour": "6 Hours",
@@ -3388,6 +3448,19 @@
             "options": {
                 "old": "Old",
                 "new": "New"
+            }
+        },
+        "html.device.links": {
+            "default": [],
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "object",
+                "value.*.action": "boolean",
+                "value.*.icon": "string",
+                "value.*.external": "boolean",
+                "value.*.title": "required|string",
+                "value.*.url": "required|string"
             }
         },
         "html.device.primary_link": {
@@ -3702,6 +3775,10 @@
             ],
             "type": "array"
         },
+        "libvirt_username": {
+            "default": null,
+            "type": "text"
+        },
         "list_colour.even": {
             "default": "#ffffff",
             "type": "color"
@@ -3729,6 +3806,27 @@
         "list_colour.odd_alt2": {
             "default": "#e3e3e3",
             "type": "color"
+        },
+        "location_map": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
+        "location_map_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
+        "location_map_regex_sub": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
         },
         "log_dir": {
             "type": "directory"
@@ -4255,6 +4353,10 @@
             "section": "device-group",
             "type": "boolean"
         },
+        "php_memory_limit": {
+            "default": null,
+            "type": "integer"
+        },
         "ping": {
             "default": "/bin/ping",
             "group": "external",
@@ -4676,6 +4778,10 @@
             "order": 7,
             "type": "boolean"
         },
+        "rancid_configs": {
+            "default": [],
+            "type": "array"
+        },
         "rancid_ignorecomments": {
             "default": false,
             "type": "boolean"
@@ -5017,6 +5123,11 @@
                 "public"
             ]
         },
+        "snmp.exec_timeout": {
+            "default": 1200,
+            "type": "integer",
+            "units": "seconds"
+        },
         "snmp.max_repeaters": {
             "group": "poller",
             "section": "snmp",
@@ -5150,8 +5261,8 @@
             "type": "text"
         },
         "summary_errors": {
-            "default": 0,
-            "type": "integer"
+            "default": false,
+            "type": "boolean"
         },
         "syslog_filter": {
             "default": [
@@ -5334,14 +5445,21 @@
             "order": 2,
             "type": "boolean"
         },
+        "webui.custom_css": {
+            "default": [],
+            "type": "array"
+        },
         "webui.default_dashboard_id": {
             "default": 0,
             "group": "webui",
             "section": "dashboard",
             "order": 0,
-            "type": "dashboard-select",
+            "type": "select-dynamic",
+            "options": {
+                "target": "dashboard"
+            },
             "validate": {
-                "value": "zero_or_exists:dashboards,dashboard_id"
+                "value": "integer|zero_or_exists:dashboards,dashboard_id"
             }
         },
         "webui.dynamic_graphs": {

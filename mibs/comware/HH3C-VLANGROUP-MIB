@@ -1,0 +1,70 @@
+-- =============================================================
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: vlan-group mib
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2018-10-26
+--        Initial Version by mazhixing
+-- =============================================================
+HH3C-VLANGROUP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+            FROM HH3C-OID-MIB
+    MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI;
+
+hh3cVlanGroup  MODULE-IDENTITY
+    LAST-UPDATED    "201810241436Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+         "This MIB provides VLAN group information."
+    REVISION        "201810241436Z"
+    DESCRIPTION
+            "Initial version of this MIB module.
+             Added hh3cVlanGroupTable"
+    ::= { hh3cCommon 178 }
+
+-- hh3cVlanGroupTable:
+
+hh3cVlanGroupTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVlanGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+     "A list of VLAN groups."
+    ::= { hh3cVlanGroup 1 }
+
+hh3cVlanGroupEntry     OBJECT-TYPE
+    SYNTAX         Hh3cVlanGroupEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+     "This entry contains VLAN group information."
+    INDEX {
+            hh3cVlanGroupName
+    }
+    ::= { hh3cVlanGroupTable 1 }
+
+Hh3cVlanGroupEntry ::= SEQUENCE  {
+    hh3cVlanGroupName          OCTET STRING
+    }
+
+hh3cVlanGroupName      OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..31))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+     "Name of the VLAN group."
+    ::= { hh3cVlanGroupEntry 1 }
+
+END
