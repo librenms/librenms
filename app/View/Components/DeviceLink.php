@@ -55,7 +55,7 @@ class DeviceLink extends Component
         ]);
     }
 
-    public function status()
+    public function status(): string
     {
         if ($this->device->disabled) {
             return 'disabled';

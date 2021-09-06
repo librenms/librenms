@@ -10,11 +10,29 @@ use LibreNMS\Util\Url;
 
 class PortLink extends Component
 {
+    /**
+     * @var \App\Models\Port
+     */
     public $port;
+    /**
+     * @var string
+     */
     public $link;
+    /**
+     * @var array|string|string[]
+     */
     public $label;
+    /**
+     * @var string
+     */
     public $description;
+    /**
+     * @var array|array[]
+     */
     public $graphs;
+    /**
+     * @var string
+     */
     public $status;
 
     /**
@@ -22,7 +40,7 @@ class PortLink extends Component
      *
      * @return void
      */
-    public function __construct(Port $port, $graphs = null)
+    public function __construct(Port $port, ?array $graphs = null)
     {
         $this->port = $port;
         $this->link = Url::portUrl($port);
@@ -49,7 +67,7 @@ class PortLink extends Component
         return view('components.port-link');
     }
 
-    private function status()
+    private function status(): string
     {
         if ($this->port->ifAdminStatus == 'down') {
             return 'disabled';

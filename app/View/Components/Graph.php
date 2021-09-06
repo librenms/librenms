@@ -13,21 +13,55 @@ class Graph extends Component
     const DEFAULT_NORMAL_WIDTH = 300;
     const DEFAULT_NORMAL_HEIGHT = 150;
 
+    /**
+     * @var array
+     */
     public $vars;
+    /**
+     * @var int|null
+     */
     public $width;
+    /**
+     * @var int|null
+     */
     public $height;
+    /**
+     * @var string
+     */
     public $type;
+    /**
+     * @var int|string|null
+     */
     public $from;
+    /**
+     * @var int|string|null
+     */
     public $to;
+    /**
+     * @var string
+     */
     public $legend;
+    /**
+     * @var int
+     */
     public $absolute_size;
 
     /**
      * Create a new component instance.
      *
-     * @return void
+     * @param  string  $type
+     * @param  array  $vars
+     * @param  int|string  $from
+     * @param  int|string  $to
+     * @param  string  $legend
+     * @param  string  $aspect
+     * @param  int|null  $width
+     * @param  int|null  $height
+     * @param  int  $absolute_size
+     * @param  \App\Models\Device|null  $device
+     * @param  \App\Models\Port|null  $port
      */
-    public function __construct($type = '', $vars = [], $from = '-1d', $to = null, $legend = 'no', $aspect = 'normal', $width = null, $height = null, $absolute_size = 0, $device = null, $port = null)
+    public function __construct(string $type = '', array $vars = [], $from = '-1d', $to = null, string $legend = 'no', string $aspect = 'normal', ?int $width = null, ?int $height = null, int $absolute_size = 0, ?Device $device = null, ?Port $port = null)
     {
         $this->type = $type;
         $this->vars = $vars;
