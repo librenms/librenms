@@ -59,14 +59,14 @@ class Graph extends Component
     {
         return view('components.graph', [
             'link' => url('graph.php') . '?' . http_build_query($this->vars + [
-                        'type' => $this->type,
-                        'legend' => $this->legend,
-                        'absolute_size' => $this->absolute_size,
-                        'width' => $this->width,
-                        'height' => $this->height,
-                        'from' => $this->from,
-                        'to' => $this->to,
-                    ])
+                'type' => $this->type,
+                'legend' => $this->legend,
+                'absolute_size' => $this->absolute_size,
+                'width' => $this->width,
+                'height' => $this->height,
+                'from' => $this->from,
+                'to' => $this->to,
+            ]),
         ]);
     }
 }

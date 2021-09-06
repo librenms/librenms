@@ -20,6 +20,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         $port = \App\Models\Port::inRandomOrder()->first();
         $device = \App\Models\Device::inRandomOrder()->first();
         $vars = ['device' => $device->device_id];
+
         return view(['template' => '@extends("layouts.librenmsv1")
 
 @section("title", "Test")
@@ -41,9 +42,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 <div style="height: 1200px" class="bg-red-200">
 </div>
 @endsection
-'], ['port' => $port, 'device' => $device, 'vars' => $vars]);
+', ], ['port' => $port, 'device' => $device, 'vars' => $vars]);
     });
-
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
