@@ -13,7 +13,13 @@ class DeviceLink extends Component
      * @var \App\Models\Device
      */
     public $device;
+    /**
+     * @var string|null
+     */
     public $tab;
+    /**
+     * @var string|null
+     */
     public $section;
     /**
      * @var string
