@@ -23,7 +23,7 @@ class GraphRow extends Component
      */
     public $port;
     /**
-     * @var array|\string[][]
+     * @var array|string[][]
      */
     public $graphs;
     /**
