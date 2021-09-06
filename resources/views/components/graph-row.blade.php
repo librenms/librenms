@@ -5,6 +5,6 @@
 @endisset
 <div class="tw-flex tw-flex-wrap" @if(! $responsive) style="width: {{ $rowWidth }}px;" @endif {{ $attributes }}>
     @foreach($graphs as $graph)
-        <x-graph :type="$type" :loading="$loading" :aspect="$aspect" :port="$port" :device="$device" :vars="$graph" class="@if($responsive) tw-xl:w-1/4 tw-lg:w-1/2 tw-sm:w-full tw-flex-auto @endif"></x-graph>
+        <x-graph :type="$type" :loading="$loading" :aspect="$aspect" :port="$port" :device="$device" :vars="$graph" class="@if($responsive) xl:tw-w-1/4 lg:tw-w-1/2 sm:tw-w-full @endif"></x-graph>
     @endforeach
 </div>
