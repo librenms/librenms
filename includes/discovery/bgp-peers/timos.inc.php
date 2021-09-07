@@ -88,8 +88,7 @@ if (Config::get('enable_bgp')) {
                 // if no peer exists with vrf and address matching for this device, then delete
                 if (is_null($vrfId)) {
                     $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id is NULL', [$device['device_id'], $address]);
-                }
-                else {
+                } else {
                     $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
                 }
                 echo str_repeat('-', $deleted);
@@ -98,7 +97,7 @@ if (Config::get('enable_bgp')) {
             
             // deletes any duplicates with same device id, same peer address and same vrfid
             $duplicatecount = dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-            if ( $duplicatecount > '1') {
+            if ($duplicatecount > '1') {
                 $n = $duplicatecount - 1;
                 $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ? LIMIT ?', [$device['device_id'], $address, $vrfId, $n]);
             }
