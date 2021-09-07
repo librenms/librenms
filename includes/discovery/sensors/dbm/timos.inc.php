@@ -6,7 +6,7 @@ $user_func = 'mw_to_dbm';
 foreach ($pre_cache['timos_oids'] as $index => $entry) {
     if (is_numeric($entry['tmnxDDMRxOpticalPower']) && $entry['tmnxDDMRxOpticalPower'] != 0 && $entry['tmnxDDMTxOutputPower'] != 0) {
         $oid = '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.' . $index;
-        $value = round(10 * log10($entry['tmnxDDMRxOpticalPower'] / $divisor), 2);
+        $value = round(mw_to_dbm($entry['tmnxDDMRxOpticalPower'] / $divisor), 2);
 
         $int_ext = $entry['tmnxDDMExternallyCalibrated'];
         if ($int_ext == 'true') {
@@ -20,10 +20,10 @@ foreach ($pre_cache['timos_oids'] as $index => $entry) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
 
-        $limit_low = round(10 * log10($entry['tmnxDDMRxOpticalPowerLowAlarm'] / $divisor), 2);
-        $warn_limit_low = round(10 * log10($entry['tmnxDDMRxOpticalPowerLowWarning'] / $divisor), 2);
-        $limit = round(10 * log10($entry['tmnxDDMRxOpticalPowerHiAlarm'] / $divisor), 2);
-        $warn_limit = round(10 * log10($entry['tmnxDDMRxOpticalPowerHiWarning'] / $divisor), 2);
+        $limit_low = round(mw_to_dbm($entry['tmnxDDMRxOpticalPowerLowAlarm'] / $divisor), 2);
+        $warn_limit_low = round(mw_to_dbm($entry['tmnxDDMRxOpticalPowerLowWarning'] / $divisor), 2);
+        $limit = round(mw_to_dbm($entry['tmnxDDMRxOpticalPowerHiAlarm'] / $divisor), 2);
+        $warn_limit = round(mw_to_dbm($entry['tmnxDDMRxOpticalPowerHiWarning'] / $divisor), 2);
 
         $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
         $descr = $port_descr['ifName'] . ' RX Power ' . $int_ext;
@@ -47,9 +47,9 @@ foreach ($pre_cache['timos_oids'] as $index => $entry) {
         discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, 'timos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_func);
     }
 }
-//new code follows for multi-lane optics
+#new code follows for multi-lane optics
 
-$numlanes = snmpwalk_cache_multi_oid($device, 'tmnxPortEntry', [], 'TIMETRA-PORT-MIB', 'timos');
+$numlanes = snmpwalk_cache_multi_oid($device, 'tmnxPortSFPNumLanes', [], 'TIMETRA-PORT-MIB', 'timos');
 $lanes = snmpwalk_cache_multi_oid($device, 'tmnxDDMLaneEntry', [], 'TIMETRA-PORT-MIB', 'timos');
 
 foreach ($numlanes as $index => $entry) {
@@ -58,12 +58,12 @@ foreach ($numlanes as $index => $entry) {
             $lane = $lanes[$index . '.' . $x];
             if (is_numeric($lane['tmnxDDMLaneRxOpticalPower']) && $lane['tmnxDDMLaneRxOpticalPower'] != 0 && $lane['tmnxDDMLaneTxOutputPower'] != 0) {
                 $oid = '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.17.' . $index . '.' . $x;
-                $value = round(10 * log10($lane['tmnxDDMLaneRxOpticalPower'] / $divisor), 2);
+                $value = round(mw_to_dbm($lane['tmnxDDMLaneRxOpticalPower'] / $divisor), 2);
                 $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
                 $descr = $port_descr['ifName'] . ' RX Power Lane ' . $x;
 
-                $limit_low = round(10 * log10($lane['tmnxDDMLaneRxOpticalPwrLowAlarm'] / $divisor), 2);
-                $limit = round(10 * log10($lane['tmnxDDMLaneRxOpticalPwrHiAlarm'] / $divisor), 2);
+                $limit_low = round(mw_to_dbm($lane['tmnxDDMLaneRxOpticalPwrLowAlarm'] / $divisor), 2);
+                $limit = round(mw_to_dbm($lane['tmnxDDMLaneRxOpticalPwrHiAlarm'] / $divisor), 2);
 
                 $warn_limit_low = $lane['tmnxDDMLaneRxOpticalPwrLowWarn'] / $divisor;
                 $warn_limit = $lane['tmnxDDMLaneRxOpticalPwrHiWarn'] / $divisor;
@@ -75,12 +75,12 @@ foreach ($numlanes as $index => $entry) {
             }
             if (is_numeric($lane['tmnxDDMLaneTxOutputPower']) && $lane['tmnxDDMLaneTxOutputPower'] != 0 && $lane['tmnxDDMLaneRxOpticalPower'] != 0) {
                 $oid = '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.12.' . $index . '.' . $x;
-                $value = round(10 * log10($lane['tmnxDDMLaneTxOutputPower'] / $divisor), 2);
+                $value = round(mw_to_dbm($lane['tmnxDDMLaneTxOutputPower'] / $divisor), 2);
                 $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
                 $descr = $port_descr['ifName'] . ' TX Power Lane ' . $x;
 
-                $limit_low = round(10 * log10($lane[' tmnxDDMLaneTxOutputPowerLowAlarm'] / $divisor), 2);
-                $limit = round(10 * log10($lane[' tmnxDDMLaneTxOutputPowerHiAlarm'] / $divisor), 2);
+                $limit_low = round(mw_to_dbm($lane[' tmnxDDMLaneTxOutputPowerLowAlarm'] / $divisor), 2);
+                $limit = round(mw_to_dbm($lane[' tmnxDDMLaneTxOutputPowerHiAlarm'] / $divisor), 2);
 
                 $warn_limit_low = $lane[' tmnxDDMLaneTxOutputPowerLowWarn'] / $divisor;
                 $warn_limit = $lane['tmnxDDMLaneTxOutputPowerHiWarn'] / $divisor;
