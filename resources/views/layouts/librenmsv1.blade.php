@@ -74,18 +74,18 @@
             }
         });
         var ajax_url = "{{ url('/ajax') }}";
-    </script>
-    <script src="{{ asset('js/librenms.js?ver=05072021') }}"></script>
-    <script type="text/javascript">
-        <!-- Begin
-        function popUp(URL)
-        {
-            day = new Date();
-            id = day.getTime();
-            eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
         }
-        // End -->
     </script>
+    <script src="{{ asset('js/librenms.js?ver=09072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
