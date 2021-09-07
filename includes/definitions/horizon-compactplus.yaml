@@ -5,8 +5,8 @@ icon: dragonwave
 mib_dir: 'dragonwave'
 over:
     - { graph: device_temperature, text: 'Temperature' }
-    - { graph: device_snr, text: 'SNR' }
-    - { graph: device_signal, text: 'RSL' }
+    - { graph: device_wireless_snr, text: 'SNR' }
+    - { graph: device_wireless_rssi, text: 'RSL' }
 discovery:
     -
         sysObjectID:
