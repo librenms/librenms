@@ -116,10 +116,10 @@ discovery_modules:
 
 Some devices have buggy snmp implementations and don't respond well to
 the more efficient snmpbulkwalk. To disable snmpbulkwalk and only use
-snmpwalk for an os set the following.
+snmpwalk for an OS set the following.
 
 ```yaml
-nobulk: true
+snmp_bulk: false
 ```
 
 #### Limit the oids per snmpget

@@ -2,7 +2,7 @@ os: ict-psu
 text: 'ICT Digital Series Power Supply'
 type: power
 icon: ict
-nobulk: true
+snmp_bulk: false
 mib_dir: ict
 over:
     - { graph: device_voltage, text: Voltage }

@@ -363,7 +363,7 @@
                 "type": "string"
             }
         },
-        "nobulk": {
+        "snmp_bulk": {
             "type": "boolean"
         },
         "snmp_max_oid": {

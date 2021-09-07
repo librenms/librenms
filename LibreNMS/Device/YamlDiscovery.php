@@ -289,7 +289,7 @@ class YamlDiscovery
                         continue;
                     }
 
-                    $saved_nobulk = Config::getOsSetting($os->getName(), 'nobulk', false);
+                    $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
                         foreach ((array) $data['oid'] as $oid) {
@@ -304,14 +304,14 @@ class YamlDiscovery
                                 $snmp_flag[] = '-Ih';
 
                                 // disable bulk request for specific data
-                                if (! empty($data['nobulk'])) {
-                                    Config::set('os.' . $os->getName() . '.nobulk', true);
+                                if (isset($data['snmp_bulk'])) {
+                                    Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
                                 $mib = $device['dynamic_discovery']['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
-                                Config::set('os.' . $os->getName() . '.nobulk', $saved_nobulk);
+                                Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
                         }
                     }
