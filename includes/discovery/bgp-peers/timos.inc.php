@@ -94,7 +94,7 @@ if (Config::get('enable_bgp')) {
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;
             }
-            
+
             // deletes any duplicates with same device id, same peer address and same vrfid
             $duplicatecount = dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
             if ($duplicatecount > '1') {
