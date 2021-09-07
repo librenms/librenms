@@ -100,7 +100,7 @@ class IPv6 extends IP
         foreach ($net_bytes as $index => $byte) {
             $shift = min($cidr - 16 * ($index - 1), 16);
             if ($shift > 0) {
-                $mask = ~(0xffff >> $shift) & 0xffff;
+                $mask = ~(0xFFFF >> $shift) & 0xFFFF;
                 $net_bytes[$index] = $byte & $mask;
             } else {
                 $net_bytes[$index] = 0;
@@ -134,7 +134,7 @@ class IPv6 extends IP
         for ($index = 1; $index <= 8; $index++) {
             $shift = $cidr - 16 * ($index - 1);
             if ($shift > 0) {
-                $mask = ~(0xffff >> $shift) & 0xffff;
+                $mask = ~(0xFFFF >> $shift) & 0xFFFF;
                 if (($net_bytes[$index] & $mask) != ($ip_bytes[$index] & $mask)) {
                     return false;
                 }
