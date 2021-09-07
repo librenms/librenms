@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AccessPoint;
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
@@ -135,7 +136,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
             $foundid = 0;
 
             for ($z = 0; $z < sizeof($ap_db); $z++) {
-                if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
+                if ($ap_db[$z]['mac_addr'] == $mac && $ap_db[$z]['radio_number'] == $radionum) {
                     $foundid = $ap_db[$z]['accesspoint_id'];
                     $ap_db[$z]['seen'] = 1;
                     continue;
@@ -187,10 +188,18 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         }//end foreach
     }//end foreach
 
+    $local_ap_macs = [];
+
     // mark APs which are not on this controller anymore as deleted
     for ($z = 0; $z < sizeof($ap_db); $z++) {
+        $local_ap_macs[] = $ap_db[$z]['mac_addr'];
         if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
             dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
         }
     }
-}//end if
+
+    // Cleanup, delete access points which are online on this controller but marked as offline on any other one
+    AccessPoint::where(['mac_addr' => $local_ap_macs, 'deleted' => '1'])
+        ->whereNotIn('device_id', [$device['device_id']])
+        ->delete();
+}
