@@ -58,10 +58,10 @@ class Graph extends Component
      * @param  int|null  $width
      * @param  int|null  $height
      * @param  int  $absolute_size
-     * @param  \App\Models\Device|null  $device
-     * @param  \App\Models\Port|null  $port
+     * @param  \App\Models\Device|int|null  $device
+     * @param  \App\Models\Port|int|null  $port
      */
-    public function __construct(string $type = '', array $vars = [], $from = '-1d', $to = null, string $legend = 'no', string $aspect = 'normal', ?int $width = null, ?int $height = null, int $absolute_size = 0, ?Device $device = null, ?Port $port = null)
+    public function __construct(string $type = '', array $vars = [], $from = '-1d', $to = null, string $legend = 'no', string $aspect = 'normal', ?int $width = null, ?int $height = null, int $absolute_size = 0, $device = null, $port = null)
     {
         $this->type = $type;
         $this->vars = $vars;

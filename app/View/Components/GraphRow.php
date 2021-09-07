@@ -2,8 +2,6 @@
 
 namespace App\View\Components;
 
-use App\Models\Device;
-use App\Models\Port;
 use Illuminate\View\Component;
 
 class GraphRow extends Component
@@ -48,9 +46,16 @@ class GraphRow extends Component
     /**
      * Create a new component instance.
      *
-     * @return void
+     * @param  string  $type
+     * @param  string|null  $title
+     * @param  string  $loading
+     * @param  string  $aspect
+     * @param  int  $columns
+     * @param  array  $graphs
+     * @param  \App\Models\Device|int|null  $device
+     * @param  \App\Models\Port|int|null  $port
      */
-    public function __construct(string $type = '', string $title = null, string $loading = 'eager', ?Device $device = null, ?Port $port = null, string $aspect = 'normal', $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']])
+    public function __construct(string $type = '', string $title = null, string $loading = 'eager', string $aspect = 'normal', int $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], $device = null, $port = null)
     {
         $this->type = $type;
         $this->aspect = $aspect;
@@ -73,7 +78,7 @@ class GraphRow extends Component
         return view('components.graph-row');
     }
 
-    private function calculateRowWidth(array $columns): ?int
+    private function calculateRowWidth(int $columns): ?int
     {
         if ($this->responsive) {
             return null;
